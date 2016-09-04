@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Advanced-R-Solutions</title>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+  <meta name="description" content="Solutions to the exercises in Hadley Wickhams book Advanced R.">
+  <meta name="generator" content="bookdown 0.1.7 and GitBook 2.6.7">
+
+  <meta property="og:title" content="Advanced-R-Solutions" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Solutions to the exercises in Hadley Wickhams book Advanced R." />
+  <meta name="github-repo" content="Tazinho/Advanced-R-Solutions" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Advanced-R-Solutions" />
+  
+  <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickhams book Advanced R." />
+  
+
+<meta name="author" content="Malte Grosser">
+
+<meta name="date" content="2016-09-04">
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="index.html">
+<link rel="next" href="subsetting.html">
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Prerequisites</a></li>
+<li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Data Structures</a><ul>
+<li class="chapter" data-level="2.1" data-path="intro.html"><a href="intro.html#vectors"><i class="fa fa-check"></i><b>2.1</b> Vectors</a></li>
+<li class="chapter" data-level="2.2" data-path="intro.html"><a href="intro.html#attributes"><i class="fa fa-check"></i><b>2.2</b> Attributes</a></li>
+<li class="chapter" data-level="2.3" data-path="intro.html"><a href="intro.html#matrices-and-arrays"><i class="fa fa-check"></i><b>2.3</b> Matrices and arrays</a></li>
+<li class="chapter" data-level="2.4" data-path="intro.html"><a href="intro.html#data-frames"><i class="fa fa-check"></i><b>2.4</b> Data frames</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>3</b> Subsetting</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Advanced-R-Solutions</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="intro" class="section level1">
+<h1><span class="header-section-number">2</span> Data Structures</h1>
+<div id="vectors" class="section level2">
+<h2><span class="header-section-number">2.1</span> Vectors</h2>
+<ol style="list-style-type: decimal">
+<li><p>What are the six types of atomic vector? How does a list differ from an atomic vector?</p></li>
+<li><p>What makes is.vector() and is.numeric() fundamentally different to is.list() and is.character()?</p></li>
+<li><p>Test your knowledge of vector coercion rules by predicting the output of the following uses of c():</p>
+<p>c(1, FALSE) c(“a”, 1) c(list(1), “a”) c(TRUE, 1L)</p></li>
+<li><p>Why do you need to use unlist() to convert a list to an atomic vector? Why doesn’t as.vector() work?</p></li>
+<li><p>Why is 1 == “1” true? Why is -1 &lt; FALSE true? Why is “one” &lt; 2 false?</p></li>
+<li><p>Why is the default missing value, NA, a logical vector? What’s special about logical vectors? (Hint: think about c(FALSE, NA_character_).)</p></li>
+</ol>
+</div>
+<div id="attributes" class="section level2">
+<h2><span class="header-section-number">2.2</span> Attributes</h2>
+<ol style="list-style-type: decimal">
+<li><p>An early draft used this code to illustrate structure():</p>
+<p>structure(1:5, comment = “my attribute”) #&gt; [1] 1 2 3 4 5</p>
+<p>But when you print that object you don’t see the comment attribute. Why? Is the attribute missing, or is there something else special about it? (Hint: try using help.)</p></li>
+<li><p>What happens to a factor when you modify its levels?</p>
+<p>f1 &lt;- factor(letters) levels(f1) &lt;- rev(levels(f1))</p></li>
+<li><p>What does this code do? How do f2 and f3 differ from f1?</p>
+<p>f2 &lt;- rev(factor(letters))</p>
+<p>f3 &lt;- factor(letters, levels = rev(letters))</p></li>
+</ol>
+</div>
+<div id="matrices-and-arrays" class="section level2">
+<h2><span class="header-section-number">2.3</span> Matrices and arrays</h2>
+<ol style="list-style-type: decimal">
+<li><p>What does dim() return when applied to a vector?</p></li>
+<li><p>If is.matrix(x) is TRUE, what will is.array(x) return?</p></li>
+<li><p>How would you describe the following three objects? What makes them different to 1:5?</p>
+<p>x1 &lt;- array(1:5, c(1, 1, 5)) x2 &lt;- array(1:5, c(1, 5, 1)) x3 &lt;- array(1:5, c(5, 1, 1))</p></li>
+</ol>
+</div>
+<div id="data-frames" class="section level2">
+<h2><span class="header-section-number">2.4</span> Data frames</h2>
+<ol style="list-style-type: decimal">
+<li><p>What attributes does a data frame possess?</p></li>
+<li><p>What does as.matrix() do when applied to a data frame with columns of different types?</p></li>
+<li><p>Can you have a data frame with 0 rows? What about 0 columns?</p></li>
+</ol>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="subsetting.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
+
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"facebook": true,
+"twitter": true,
+"google": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
