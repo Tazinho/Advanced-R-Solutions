@@ -33,8 +33,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="intro.html">
-<link rel="next" href="functions.html">
+<link rel="prev" href="environments.html">
+<link rel="next" href="functional-programming.html">
 
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -65,15 +65,13 @@
 <ul class="summary">
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Prerequisites</a></li>
 <li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Data structures</a></li>
-<li class="chapter" data-level="3" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>3</b> Subsetting</a><ul>
-<li class="chapter" data-level="3.1" data-path="subsetting.html"><a href="subsetting.html#data-types"><i class="fa fa-check"></i><b>3.1</b> Data types</a></li>
-<li class="chapter" data-level="3.2" data-path="subsetting.html"><a href="subsetting.html#subsetting-operators"><i class="fa fa-check"></i><b>3.2</b> Subsetting operators</a></li>
-<li class="chapter" data-level="3.3" data-path="subsetting.html"><a href="subsetting.html#applications"><i class="fa fa-check"></i><b>3.3</b> Applications</a></li>
-</ul></li>
+<li class="chapter" data-level="3" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>3</b> Subsetting</a></li>
 <li class="chapter" data-level="4" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>4</b> Functions</a></li>
 <li class="chapter" data-level="5" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>5</b> OO field guide</a></li>
 <li class="chapter" data-level="6" data-path="environments.html"><a href="environments.html"><i class="fa fa-check"></i><b>6</b> Environments</a></li>
-<li class="chapter" data-level="7" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html"><i class="fa fa-check"></i><b>7</b> Exceptions and debugging</a></li>
+<li class="chapter" data-level="7" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html"><i class="fa fa-check"></i><b>7</b> Exceptions and debugging</a><ul>
+<li class="chapter" data-level="7.1" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html#condition-handling"><i class="fa fa-check"></i><b>7.1</b> Condition handling</a></li>
+</ul></li>
 <li class="chapter" data-level="8" data-path="functional-programming.html"><a href="functional-programming.html"><i class="fa fa-check"></i><b>8</b> Functional programming</a></li>
 <li class="chapter" data-level="9" data-path="functionals.html"><a href="functionals.html"><i class="fa fa-check"></i><b>9</b> Functionals</a></li>
 <li class="chapter" data-level="10" data-path="function-operators.html"><a href="function-operators.html"><i class="fa fa-check"></i><b>10</b> Function operators</a></li>
@@ -102,33 +100,22 @@
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="subsetting" class="section level1">
-<h1><span class="header-section-number">3</span> Subsetting</h1>
-<div id="data-types" class="section level2">
-<h2><span class="header-section-number">3.1</span> Data types</h2>
+<div id="exceptions-and-debugging" class="section level1">
+<h1><span class="header-section-number">7</span> Exceptions and debugging</h1>
+<div id="condition-handling" class="section level2">
+<h2><span class="header-section-number">7.1</span> Condition handling</h2>
 <ol style="list-style-type: decimal">
-<li><p>Fix each of the following common data frame subsetting errors:</p>
-<p>mtcars[mtcars$cyl = 4, ] mtcars[-1:4, ] mtcars[mtcars$cyl &lt;= 5] mtcars[mtcars$cyl == 4 | 6, ]</p></li>
-<li><p>Why does x &lt;- 1:5; x[NA] yield five missing values? (Hint: why is it different from x[NA_real_]?)</p></li>
-<li><p>What does upper.tri() return? How does subsetting a matrix with it work? Do we need any additional subsetting rules to describe its behaviour?</p>
-<p>x &lt;- outer(1:5, 1:5, FUN = “*“) x[upper.tri(x)]</p></li>
-<li><p>Why does mtcars[1:20] return an error? How does it differ from the similar mtcars[1:20, ]?</p></li>
-<li><p>Implement your own function that extracts the diagonal entries from a matrix (it should behave like diag(x) where x is a matrix).</p></li>
-<li><p>What does df[is.na(df)] &lt;- 0 do? How does it work?</p></li>
-</ol>
-</div>
-<div id="subsetting-operators" class="section level2">
-<h2><span class="header-section-number">3.2</span> Subsetting operators</h2>
-<ol style="list-style-type: decimal">
-<li>Given a linear model, e.g., mod &lt;- lm(mpg ~ wt, data = mtcars), extract the residual degrees of freedom. Extract the R squared from the model summary (summary(mod))</li>
-</ol>
-</div>
-<div id="applications" class="section level2">
-<h2><span class="header-section-number">3.3</span> Applications</h2>
-<ol style="list-style-type: decimal">
-<li><p>How would you randomly permute the columns of a data frame? (This is an important technique in random forests.) Can you simultaneously permute the rows and columns in one step?</p></li>
-<li><p>How would you select a random sample of m rows from a data frame? What if the sample had to be contiguous (i.e., with an initial row, a final row, and every row in between)?</p></li>
-<li><p>How could you put the columns in a data frame in alphabetical order?</p></li>
+<li><p>Compare the following two implementations of message2error(). What is the main advantage of withCallingHandlers() in this scenario? (Hint: look carefully at the traceback.)</p>
+<p>message2error &lt;- function(code) { withCallingHandlers(code, message = function(e) stop(e)) } message2error &lt;- function(code) { tryCatch(code, message = function(e) stop(e)) }</p></li>
+<li><p>Defensive programming</p></li>
+<li><p>The goal of the col_means() function defined below is to compute the means of all numeric columns in a data frame.</p>
+<p>col_means &lt;- function(df) { numeric &lt;- sapply(df, is.numeric) numeric_cols &lt;- df[, numeric]</p>
+<p>data.frame(lapply(numeric_cols, mean)) }</p></li>
+<li><p>However, the function is not robust to unusual inputs. Look at the following results, decide which ones are incorrect, and modify col_means() to be more robust. (Hint: there are two function calls in col_means() that are particularly prone to problems.)</p>
+<p>col_means(mtcars) col_means(mtcars[, 0]) col_means(mtcars[0, ]) col_means(mtcars[, “mpg”, drop = F]) col_means(1:10) col_means(as.matrix(mtcars)) col_means(as.list(mtcars))</p>
+<p>mtcars2 &lt;- mtcars mtcars2[-1] &lt;- lapply(mtcars2[-1], as.character) col_means(mtcars2)</p></li>
+<li><p>The following function “lags” a vector, returning a version of x that is n values behind the original. Improve the function so that it (1) returns a useful error message if n is not a vector, and (2) has reasonable behaviour when n is 0 or longer than x.</p>
+<p>lag &lt;- function(x, n = 1L) { xlen &lt;- length(x) c(rep(NA, n), x[seq_len(xlen - n)]) }</p></li>
 </ol>
 
 </div>
@@ -138,8 +125,8 @@
           </div>
         </div>
       </div>
-<a href="intro.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="functions.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
+<a href="environments.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="functional-programming.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
 
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>

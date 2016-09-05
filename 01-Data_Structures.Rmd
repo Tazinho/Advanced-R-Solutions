@@ -1,23 +1,32 @@
-# Data Structures {#intro}
+# Data structures {#intro}
 
 ## Vectors
 
 1. What are the six types of atomic vector? How does a list differ from an atomic vector?
+The six types are logical, integer, double, character, complex and raw. The elements of a list
+don't need to be of the same type.
 
 2. What makes is.vector() and is.numeric() fundamentally different to is.list() and is.character()?
+The first two tests don't check for a specific type.
 
 3. Test your knowledge of vector coercion rules by predicting the output of the following uses of c():
-
+```{r}
     c(1, FALSE)
     c("a", 1)
     c(list(1), "a")
     c(TRUE, 1L)
-
+```
+    
 4. Why do you need to use unlist() to convert a list to an atomic vector? Why doesn’t as.vector() work?
+To get rid of the nested structure.
 
 5. Why is 1 == "1" true? Why is -1 < FALSE true? Why is "one" < 2 false?
+These operators are all functions which coerce their arguments in these cases to
+character, double and character. Regarding the latter case, "one" is behind "2" in ASCI.
 
 6. Why is the default missing value, NA, a logical vector? What’s special about logical vectors? (Hint: think about c(FALSE, NA_character_).)
+It is a practical concern. When you combine NAs in c() with other atomic types it will be coerced
+like TRUE and FALSE to integer, real, complex and character.
 
 ## Attributes
 

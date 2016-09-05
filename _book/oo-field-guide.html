@@ -33,8 +33,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="intro.html">
-<link rel="next" href="functions.html">
+<link rel="prev" href="functions.html">
+<link rel="next" href="environments.html">
 
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -65,13 +65,13 @@
 <ul class="summary">
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Prerequisites</a></li>
 <li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Data structures</a></li>
-<li class="chapter" data-level="3" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>3</b> Subsetting</a><ul>
-<li class="chapter" data-level="3.1" data-path="subsetting.html"><a href="subsetting.html#data-types"><i class="fa fa-check"></i><b>3.1</b> Data types</a></li>
-<li class="chapter" data-level="3.2" data-path="subsetting.html"><a href="subsetting.html#subsetting-operators"><i class="fa fa-check"></i><b>3.2</b> Subsetting operators</a></li>
-<li class="chapter" data-level="3.3" data-path="subsetting.html"><a href="subsetting.html#applications"><i class="fa fa-check"></i><b>3.3</b> Applications</a></li>
-</ul></li>
+<li class="chapter" data-level="3" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>3</b> Subsetting</a></li>
 <li class="chapter" data-level="4" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>4</b> Functions</a></li>
-<li class="chapter" data-level="5" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>5</b> OO field guide</a></li>
+<li class="chapter" data-level="5" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>5</b> OO field guide</a><ul>
+<li class="chapter" data-level="5.1" data-path="oo-field-guide.html"><a href="oo-field-guide.html#s3"><i class="fa fa-check"></i><b>5.1</b> S3</a></li>
+<li class="chapter" data-level="5.2" data-path="oo-field-guide.html"><a href="oo-field-guide.html#s4"><i class="fa fa-check"></i><b>5.2</b> S4</a></li>
+<li class="chapter" data-level="5.3" data-path="oo-field-guide.html"><a href="oo-field-guide.html#rc"><i class="fa fa-check"></i><b>5.3</b> RC</a></li>
+</ul></li>
 <li class="chapter" data-level="6" data-path="environments.html"><a href="environments.html"><i class="fa fa-check"></i><b>6</b> Environments</a></li>
 <li class="chapter" data-level="7" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html"><i class="fa fa-check"></i><b>7</b> Exceptions and debugging</a></li>
 <li class="chapter" data-level="8" data-path="functional-programming.html"><a href="functional-programming.html"><i class="fa fa-check"></i><b>8</b> Functional programming</a></li>
@@ -102,33 +102,40 @@
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="subsetting" class="section level1">
-<h1><span class="header-section-number">3</span> Subsetting</h1>
-<div id="data-types" class="section level2">
-<h2><span class="header-section-number">3.1</span> Data types</h2>
+<div id="oo-field-guide" class="section level1">
+<h1><span class="header-section-number">5</span> OO field guide</h1>
+<div id="s3" class="section level2">
+<h2><span class="header-section-number">5.1</span> S3</h2>
 <ol style="list-style-type: decimal">
-<li><p>Fix each of the following common data frame subsetting errors:</p>
-<p>mtcars[mtcars$cyl = 4, ] mtcars[-1:4, ] mtcars[mtcars$cyl &lt;= 5] mtcars[mtcars$cyl == 4 | 6, ]</p></li>
-<li><p>Why does x &lt;- 1:5; x[NA] yield five missing values? (Hint: why is it different from x[NA_real_]?)</p></li>
-<li><p>What does upper.tri() return? How does subsetting a matrix with it work? Do we need any additional subsetting rules to describe its behaviour?</p>
-<p>x &lt;- outer(1:5, 1:5, FUN = “*“) x[upper.tri(x)]</p></li>
-<li><p>Why does mtcars[1:20] return an error? How does it differ from the similar mtcars[1:20, ]?</p></li>
-<li><p>Implement your own function that extracts the diagonal entries from a matrix (it should behave like diag(x) where x is a matrix).</p></li>
-<li><p>What does df[is.na(df)] &lt;- 0 do? How does it work?</p></li>
+<li><p>Read the source code for t() and t.test() and confirm that t.test() is an S3 generic and not an S3 method. What happens if you create an object with class test and call t() with it?</p></li>
+<li><p>What classes have a method for the Math group generic in base R? Read the source code. How do the methods work?</p></li>
+<li><p>R has two classes for representing date time data, POSIXct and POSIXlt, which both inherit from POSIXt. Which generics have different behaviours for the two classes? Which generics share the same behaviour?</p></li>
+<li><p>Which base generic has the greatest number of defined methods?</p></li>
+<li><p>UseMethod() calls methods in a special way. Predict what the following code will return, then run it and read the help for UseMethod() to figure out what’s going on. Write down the rules in the simplest form possible.</p></li>
+</ol>
+<p>y &lt;- 1 g &lt;- function(x) { y &lt;- 2 UseMethod(“g”) } g.numeric &lt;- function(x) y g(10)</p>
+<p>h &lt;- function(x) { x &lt;- 10 UseMethod(“h”) } h.character &lt;- function(x) paste(“char”, x) h.numeric &lt;- function(x) paste(“num”, x)</p>
+<p>h(“a”)</p>
+<ol start="6" style="list-style-type: decimal">
+<li>Internal generics don’t dispatch on the implicit class of base types. Carefully read ?“internal generic” to determine why the length of f and g is different in the example below. What function helps distinguish between the behaviour of f and g?</li>
+</ol>
+<p>f &lt;- function() 1 g &lt;- function() 2 class(g) &lt;- “function”</p>
+<p>class(f) class(g)</p>
+<p>length.function &lt;- function(x) “function” length(f) length(g)</p>
+</div>
+<div id="s4" class="section level2">
+<h2><span class="header-section-number">5.2</span> S4</h2>
+<ol style="list-style-type: decimal">
+<li><p>Which S4 generic has the most methods defined for it? Which S4 class has the most methods associated with it?</p></li>
+<li><p>What happens if you define a new S4 class that doesn’t “contain” an existing class? (Hint: read about virtual classes in ?Classes.)</p></li>
+<li><p>What happens if you pass an S4 object to an S3 generic? What happens if you pass an S3 object to an S4 generic? (Hint: read ?setOldClass for the second case.)</p></li>
 </ol>
 </div>
-<div id="subsetting-operators" class="section level2">
-<h2><span class="header-section-number">3.2</span> Subsetting operators</h2>
+<div id="rc" class="section level2">
+<h2><span class="header-section-number">5.3</span> RC</h2>
 <ol style="list-style-type: decimal">
-<li>Given a linear model, e.g., mod &lt;- lm(mpg ~ wt, data = mtcars), extract the residual degrees of freedom. Extract the R squared from the model summary (summary(mod))</li>
-</ol>
-</div>
-<div id="applications" class="section level2">
-<h2><span class="header-section-number">3.3</span> Applications</h2>
-<ol style="list-style-type: decimal">
-<li><p>How would you randomly permute the columns of a data frame? (This is an important technique in random forests.) Can you simultaneously permute the rows and columns in one step?</p></li>
-<li><p>How would you select a random sample of m rows from a data frame? What if the sample had to be contiguous (i.e., with an initial row, a final row, and every row in between)?</p></li>
-<li><p>How could you put the columns in a data frame in alphabetical order?</p></li>
+<li><p>Use a field function to prevent the account balance from being directly manipulated. (Hint: create a “hidden” .balance field, and read the help for the fields argument in setRefClass().)</p></li>
+<li><p>I claimed that there aren’t any RC classes in base R, but that was a bit of a simplification. Use getClasses() and find which classes extend() from envRefClass. What are the classes used for? (Hint: recall how to look up the documentation for a class.)</p></li>
 </ol>
 
 </div>
@@ -138,8 +145,8 @@
           </div>
         </div>
       </div>
-<a href="intro.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="functions.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
+<a href="functions.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="environments.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
 
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>

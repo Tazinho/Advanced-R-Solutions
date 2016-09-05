@@ -33,8 +33,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="intro.html">
-<link rel="next" href="functions.html">
+<link rel="prev" href="subsetting.html">
+<link rel="next" href="oo-field-guide.html">
 
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -65,12 +65,14 @@
 <ul class="summary">
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Prerequisites</a></li>
 <li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Data structures</a></li>
-<li class="chapter" data-level="3" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>3</b> Subsetting</a><ul>
-<li class="chapter" data-level="3.1" data-path="subsetting.html"><a href="subsetting.html#data-types"><i class="fa fa-check"></i><b>3.1</b> Data types</a></li>
-<li class="chapter" data-level="3.2" data-path="subsetting.html"><a href="subsetting.html#subsetting-operators"><i class="fa fa-check"></i><b>3.2</b> Subsetting operators</a></li>
-<li class="chapter" data-level="3.3" data-path="subsetting.html"><a href="subsetting.html#applications"><i class="fa fa-check"></i><b>3.3</b> Applications</a></li>
+<li class="chapter" data-level="3" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>3</b> Subsetting</a></li>
+<li class="chapter" data-level="4" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>4</b> Functions</a><ul>
+<li class="chapter" data-level="4.1" data-path="functions.html"><a href="functions.html#function-components"><i class="fa fa-check"></i><b>4.1</b> Function components</a></li>
+<li class="chapter" data-level="4.2" data-path="functions.html"><a href="functions.html#lexical-scoping"><i class="fa fa-check"></i><b>4.2</b> Lexical Scoping</a></li>
+<li class="chapter" data-level="4.3" data-path="functions.html"><a href="functions.html#function-arguments"><i class="fa fa-check"></i><b>4.3</b> Function arguments</a></li>
+<li class="chapter" data-level="4.4" data-path="functions.html"><a href="functions.html#special-calls"><i class="fa fa-check"></i><b>4.4</b> Special calls</a></li>
+<li class="chapter" data-level="4.5" data-path="functions.html"><a href="functions.html#return-values"><i class="fa fa-check"></i><b>4.5</b> Return Values</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>4</b> Functions</a></li>
 <li class="chapter" data-level="5" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>5</b> OO field guide</a></li>
 <li class="chapter" data-level="6" data-path="environments.html"><a href="environments.html"><i class="fa fa-check"></i><b>6</b> Environments</a></li>
 <li class="chapter" data-level="7" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html"><i class="fa fa-check"></i><b>7</b> Exceptions and debugging</a></li>
@@ -102,34 +104,69 @@
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="subsetting" class="section level1">
-<h1><span class="header-section-number">3</span> Subsetting</h1>
-<div id="data-types" class="section level2">
-<h2><span class="header-section-number">3.1</span> Data types</h2>
+<div id="functions" class="section level1">
+<h1><span class="header-section-number">4</span> Functions</h1>
+<div id="function-components" class="section level2">
+<h2><span class="header-section-number">4.1</span> Function components</h2>
 <ol style="list-style-type: decimal">
-<li><p>Fix each of the following common data frame subsetting errors:</p>
-<p>mtcars[mtcars$cyl = 4, ] mtcars[-1:4, ] mtcars[mtcars$cyl &lt;= 5] mtcars[mtcars$cyl == 4 | 6, ]</p></li>
-<li><p>Why does x &lt;- 1:5; x[NA] yield five missing values? (Hint: why is it different from x[NA_real_]?)</p></li>
-<li><p>What does upper.tri() return? How does subsetting a matrix with it work? Do we need any additional subsetting rules to describe its behaviour?</p>
-<p>x &lt;- outer(1:5, 1:5, FUN = “*“) x[upper.tri(x)]</p></li>
-<li><p>Why does mtcars[1:20] return an error? How does it differ from the similar mtcars[1:20, ]?</p></li>
-<li><p>Implement your own function that extracts the diagonal entries from a matrix (it should behave like diag(x) where x is a matrix).</p></li>
-<li><p>What does df[is.na(df)] &lt;- 0 do? How does it work?</p></li>
+<li><p>What function allows you to tell if an object is a function? What function allows you to tell if a function is a primitive function?</p></li>
+<li><p>This code makes a list of all functions in the base package.</p>
+<p>objs &lt;- mget(ls(“package:base”), inherits = TRUE) funs &lt;- Filter(is.function, objs)</p>
+<p>Use it to answer the following questions:</p></li>
+</ol>
+<ol style="list-style-type: lower-alpha">
+<li><p>Which base function has the most arguments?</p></li>
+<li><p>How many base functions have no arguments? What’s special about those functions?</p></li>
+<li><p>How could you adapt the code to find all primitive functions?</p></li>
+</ol>
+<ol start="3" style="list-style-type: decimal">
+<li><p>What are the three important components of a function?</p></li>
+<li><p>When does printing a function not show what environment it was created in?</p></li>
 </ol>
 </div>
-<div id="subsetting-operators" class="section level2">
-<h2><span class="header-section-number">3.2</span> Subsetting operators</h2>
+<div id="lexical-scoping" class="section level2">
+<h2><span class="header-section-number">4.2</span> Lexical Scoping</h2>
 <ol style="list-style-type: decimal">
-<li>Given a linear model, e.g., mod &lt;- lm(mpg ~ wt, data = mtcars), extract the residual degrees of freedom. Extract the R squared from the model summary (summary(mod))</li>
+<li><p>What does the following code return? Why? What does each of the three c’s mean?</p>
+<p>c &lt;- 10 c(c = c)</p></li>
+<li><p>What are the four principles that govern how R looks for values?</p>
+<p>What does the following function return? Make a prediction before running the code yourself.</p>
+<p>f &lt;- function(x) { f &lt;- function(x) { f &lt;- function(x) { x ^ 2 } f(x) + 1 } f(x) * 2 } f(10)</p></li>
 </ol>
 </div>
-<div id="applications" class="section level2">
-<h2><span class="header-section-number">3.3</span> Applications</h2>
+<div id="function-arguments" class="section level2">
+<h2><span class="header-section-number">4.3</span> Function arguments</h2>
 <ol style="list-style-type: decimal">
-<li><p>How would you randomly permute the columns of a data frame? (This is an important technique in random forests.) Can you simultaneously permute the rows and columns in one step?</p></li>
-<li><p>How would you select a random sample of m rows from a data frame? What if the sample had to be contiguous (i.e., with an initial row, a final row, and every row in between)?</p></li>
-<li><p>How could you put the columns in a data frame in alphabetical order?</p></li>
+<li><p>Clarify the following list of odd function calls:</p>
+<p>x &lt;- sample(replace = TRUE, 20, x = c(1:10, NA)) y &lt;- runif(min = 0, max = 1, 20) cor(m = “k”, y = y, u = “p”, x = x)</p></li>
+<li><p>What does this function return? Why? Which principle does it illustrate?</p>
+<p>f1 &lt;- function(x = {y &lt;- 1; 2}, y = 0) { x + y } f1()</p></li>
+<li><p>What does this function return? Why? Which principle does it illustrate?</p>
+<p>f2 &lt;- function(x = z) { z &lt;- 100 x } f2()</p></li>
 </ol>
+</div>
+<div id="special-calls" class="section level2">
+<h2><span class="header-section-number">4.4</span> Special calls</h2>
+<ol style="list-style-type: decimal">
+<li><p>Create a list of all the replacement functions found in the base package. Which ones are primitive functions?</p></li>
+<li><p>What are valid names for user-created infix functions?</p></li>
+<li><p>Create an infix xor() operator.</p></li>
+<li><p>Create infix versions of the set functions intersect(), union(), and setdiff().</p></li>
+<li><p>Create a replacement function that modifies a random location in a vector.</p></li>
+</ol>
+</div>
+<div id="return-values" class="section level2">
+<h2><span class="header-section-number">4.5</span> Return Values</h2>
+<ol style="list-style-type: decimal">
+<li><p>How does the chdir parameter of source() compare to in_dir()? Why might you prefer one approach to the other?</p></li>
+<li><p>What function undoes the action of library()? How do you save and restore the values of options() and par()?</p></li>
+<li><p>Write a function that opens a graphics device, runs the supplied code, and closes the graphics device (always, regardless of whether or not the plotting code worked).</p></li>
+<li><p>We can use on.exit() to implement a simple version of capture.output().</p>
+<p>capture.output2 &lt;- function(code) { temp &lt;- tempfile() on.exit(file.remove(temp), add = TRUE)</p>
+<p>sink(temp) on.exit(sink(), add = TRUE)</p>
+<p>force(code) readLines(temp) } capture.output2(cat(“a”, “b”, “c”, sep = “”)) #&gt; [1] “a” “b” “c”</p></li>
+</ol>
+<p>Compare capture.output() to capture.output2(). How do the functions differ? What features have I removed to make the key ideas easier to see? How have I rewritten the key ideas to be easier to understand?</p>
 
 </div>
 </div>
@@ -138,8 +175,8 @@
           </div>
         </div>
       </div>
-<a href="intro.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="functions.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
+<a href="subsetting.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="oo-field-guide.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
 
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>

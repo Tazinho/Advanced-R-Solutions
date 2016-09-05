@@ -1,0 +1,46 @@
+# Memory
+
+## Object size
+
+1. Repeat the analysis above for numeric, logical, and complex vectors.
+
+2. If a data frame has one million rows, and three variables (two numeric, and one integer), how much space will it take up? Work it out from theory, then verify your work by creating a data frame and measuring its size.
+
+3. Compare the sizes of the elements in the following two lists. Each contains basically the same data, but one contains vectors of small strings while the other contains a single long string.
+
+    vec <- lapply(0:50, function(i) c("ba", rep("na", i)))
+    str <- lapply(vec, paste0, collapse = "")
+
+4. Which takes up more memory: a factor (x) or the equivalent character vector (as.character(x))? Why?
+
+5. Explain the difference in size between 1:5 and list(1:5).
+
+## Memory profiling with lineprof
+
+1. When the input is a list, we can make a more efficient as.data.frame() by using special knowledge. A data frame is a list with class data.frame and row.names attribute. row.names is either a character vector or vector of sequential integers, stored in a special format created by .set_row_names(). This leads to an alternative as.data.frame():
+
+    to_df <- function(x) {
+      class(x) <- "data.frame"
+      attr(x, "row.names") <- .set_row_names(length(x[[1]]))
+      x
+    }
+
+    What impact does this function have on read_delim()? What are the downsides of this function?
+
+2. Line profile the following function with torture = TRUE. What is surprising? Read the source code of rm() to figure out what’s going on.
+
+    f <- function(n = 1e5) {
+      x <- rep(1, n)
+      rm(x)
+    }
+
+## Modification in place
+
+1. The code below makes one duplication. Where does it occur and why? (Hint: look at refs(y).)
+
+    y <- as.list(x)
+    for(i in seq_along(medians)) {
+      y[[i]] <- y[[i]] - medians[i]
+    }
+
+2. The implementation of as.data.frame() in the previous section has one big downside. What is it and how could you avoid it?

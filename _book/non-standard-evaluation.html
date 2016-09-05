@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Advanced-R-Solutions</title>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+  <meta name="description" content="Solutions to the exercises in Hadley Wickhams book Advanced R.">
+  <meta name="generator" content="bookdown 0.1.7 and GitBook 2.6.7">
+
+  <meta property="og:title" content="Advanced-R-Solutions" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Solutions to the exercises in Hadley Wickhams book Advanced R." />
+  <meta name="github-repo" content="Tazinho/Advanced-R-Solutions" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Advanced-R-Solutions" />
+  
+  <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickhams book Advanced R." />
+  
+
+<meta name="author" content="Malte Grosser">
+
+<meta name="date" content="2016-09-04">
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="function-operators.html">
+<link rel="next" href="expressions.html">
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Prerequisites</a></li>
+<li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Data structures</a></li>
+<li class="chapter" data-level="3" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>3</b> Subsetting</a></li>
+<li class="chapter" data-level="4" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>4</b> Functions</a></li>
+<li class="chapter" data-level="5" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>5</b> OO field guide</a></li>
+<li class="chapter" data-level="6" data-path="environments.html"><a href="environments.html"><i class="fa fa-check"></i><b>6</b> Environments</a></li>
+<li class="chapter" data-level="7" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html"><i class="fa fa-check"></i><b>7</b> Exceptions and debugging</a></li>
+<li class="chapter" data-level="8" data-path="functional-programming.html"><a href="functional-programming.html"><i class="fa fa-check"></i><b>8</b> Functional programming</a></li>
+<li class="chapter" data-level="9" data-path="functionals.html"><a href="functionals.html"><i class="fa fa-check"></i><b>9</b> Functionals</a></li>
+<li class="chapter" data-level="10" data-path="function-operators.html"><a href="function-operators.html"><i class="fa fa-check"></i><b>10</b> Function operators</a></li>
+<li class="chapter" data-level="11" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html"><i class="fa fa-check"></i><b>11</b> Non standard evaluation</a><ul>
+<li class="chapter" data-level="11.1" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#capturing-expressions"><i class="fa fa-check"></i><b>11.1</b> Capturing expressions</a></li>
+<li class="chapter" data-level="11.2" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#non-standard-evaluation-in-subset"><i class="fa fa-check"></i><b>11.2</b> Non standard evaluation in subset</a></li>
+<li class="chapter" data-level="11.3" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#scoping-issues"><i class="fa fa-check"></i><b>11.3</b> Scoping issues</a></li>
+<li class="chapter" data-level="11.4" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#calling-from-another-function"><i class="fa fa-check"></i><b>11.4</b> Calling from another function</a></li>
+<li class="chapter" data-level="11.5" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#substitute"><i class="fa fa-check"></i><b>11.5</b> Substitute</a></li>
+<li class="chapter" data-level="11.6" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#the-downsides-of-non-standard-evaluation"><i class="fa fa-check"></i><b>11.6</b> The downsides of non-standard evaluation</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="expressions.html"><a href="expressions.html"><i class="fa fa-check"></i><b>12</b> Expressions</a></li>
+<li class="chapter" data-level="13" data-path="domain-specific-languages.html"><a href="domain-specific-languages.html"><i class="fa fa-check"></i><b>13</b> Domain specific languages</a></li>
+<li class="chapter" data-level="14" data-path="performance.html"><a href="performance.html"><i class="fa fa-check"></i><b>14</b> Performance</a></li>
+<li class="chapter" data-level="15" data-path="profiling.html"><a href="profiling.html"><i class="fa fa-check"></i><b>15</b> Profiling</a></li>
+<li class="chapter" data-level="16" data-path="memory.html"><a href="memory.html"><i class="fa fa-check"></i><b>16</b> Memory</a></li>
+<li class="chapter" data-level="17" data-path="rcpp.html"><a href="rcpp.html"><i class="fa fa-check"></i><b>17</b> Rcpp</a></li>
+<li class="chapter" data-level="18" data-path="rs-c-interface.html"><a href="rs-c-interface.html"><i class="fa fa-check"></i><b>18</b> R’s C interface</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Advanced-R-Solutions</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="non-standard-evaluation" class="section level1">
+<h1><span class="header-section-number">11</span> Non standard evaluation</h1>
+<div id="capturing-expressions" class="section level2">
+<h2><span class="header-section-number">11.1</span> Capturing expressions</h2>
+<ol style="list-style-type: decimal">
+<li><p>One important feature of deparse() to be aware of when programming is that it can return multiple strings if the input is too long. For example, the following call produces a vector of length two:</p>
+<p>g(a + b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q + r + s + t + u + v + w + x + y + z)</p>
+<p>Why does this happen? Carefully read the documentation for ?deparse. Can you write a wrapper around deparse() so that it always returns a single string?</p></li>
+<li><p>Why does as.Date.default() use substitute() and deparse()? Why does pairwise.t.test() use them? Read the source code.</p></li>
+<li><p>pairwise.t.test() assumes that deparse() always returns a length one character vector. Can you construct an input that violates this expectation? What happens?</p></li>
+<li><p>f(), defined above, just calls substitute(). Why can’t we use it to define g()? In other words, what will the following code return? First make a prediction. Then run the code and think about the results.</p>
+<p>f &lt;- function(x) substitute(x) g &lt;- function(x) deparse(f(x)) g(1:10) g(x) g(x + y ^ 2 / z + exp(a * sin(b)))</p></li>
+</ol>
+</div>
+<div id="non-standard-evaluation-in-subset" class="section level2">
+<h2><span class="header-section-number">11.2</span> Non standard evaluation in subset</h2>
+<ol style="list-style-type: decimal">
+<li><p>Predict the results of the following lines of code:</p>
+<p>eval(quote(eval(quote(eval(quote(2 + 2)))))) eval(eval(quote(eval(quote(eval(quote(2 + 2))))))) quote(eval(quote(eval(quote(eval(quote(2 + 2)))))))</p></li>
+<li><p>subset2() has a bug if you use it with a single column data frame. What should the following code return? How can you modify subset2() so it returns the correct type of object?</p>
+<p>sample_df2 &lt;- data.frame(x = 1:10) subset2(sample_df2, x &gt; 8) #&gt; [1] 9 10</p></li>
+<li><p>The real subset function (subset.data.frame()) removes missing values in the condition. Modify subset2() to do the same: drop the offending rows.</p></li>
+<li><p>What happens if you use quote() instead of substitute() inside of subset2()?</p></li>
+<li><p>The second argument in subset() allows you to select variables. It treats variable names as if they were positions. This allows you to do things like subset(mtcars, , -cyl) to drop the cylinder variable, or subset(mtcars, , disp:drat) to select all the variables between disp and drat. How does this work? I’ve made this easier to understand by extracting it out into its own function.</p>
+<p>select &lt;- function(df, vars) { vars &lt;- substitute(vars) var_pos &lt;- setNames(as.list(seq_along(df)), names(df)) pos &lt;- eval(vars, var_pos) df[, pos, drop = FALSE] } select(mtcars, -cyl)</p></li>
+<li><p>What does evalq() do? Use it to reduce the amount of typing for the examples above that use both eval() and quote().</p></li>
+</ol>
+</div>
+<div id="scoping-issues" class="section level2">
+<h2><span class="header-section-number">11.3</span> Scoping issues</h2>
+<ol style="list-style-type: decimal">
+<li><p>plyr::arrange() works similarly to subset(), but instead of selecting rows, it reorders them. How does it work? What does substitute(order(…)) do? Create a function that does only that and experiment with it.</p></li>
+<li><p>What does transform() do? Read the documentation. How does it work? Read the source code for transform.data.frame(). What does substitute(list(…)) do?</p></li>
+<li><p>plyr::mutate() is similar to transform() but it applies the transformations sequentially so that transformation can refer to columns that were just created:</p>
+<p>df &lt;- data.frame(x = 1:5) transform(df, x2 = x * x, x3 = x2 * x) plyr::mutate(df, x2 = x * x, x3 = x2 * x)</p>
+<p>How does mutate work? What’s the key difference between mutate() and transform()?</p></li>
+<li><p>What does with() do? How does it work? Read the source code for with.default(). What does within() do? How does it work? Read the source code for within.data.frame(). Why is the code so much more complex than with()?</p></li>
+</ol>
+</div>
+<div id="calling-from-another-function" class="section level2">
+<h2><span class="header-section-number">11.4</span> Calling from another function</h2>
+<ol style="list-style-type: decimal">
+<li><p>The following R functions all use NSE. For each, describe how it uses NSE, and read the documentation to determine its escape hatch. rm() library() and require() substitute() data() data.frame()</p></li>
+<li><p>Base functions match.fun(), page(), and ls() all try to automatically determine whether you want standard or non-standard evaluation. Each uses a different approach. Figure out the essence of each approach then compare and contrast.</p></li>
+<li><p>Add an escape hatch to plyr::mutate() by splitting it into two functions. One function should capture the unevaluated inputs. The other should take a data frame and list of expressions and perform the computation.</p></li>
+<li><p>What’s the escape hatch for ggplot2::aes()? What about plyr::()? What do they have in common? What are the advantages and disadvantages of their differences?</p></li>
+<li><p>The version of subset2_q() I presented is a simplification of real code. Why is the following version better?</p>
+<p>subset2_q &lt;- function(x, cond, env = parent.frame()) { r &lt;- eval(cond, x, env) x[r, ] }</p>
+<p>Rewrite subset2() and subscramble() to use this improved version.</p></li>
+</ol>
+</div>
+<div id="substitute" class="section level2">
+<h2><span class="header-section-number">11.5</span> Substitute</h2>
+<ol style="list-style-type: decimal">
+<li><p>Use subs() to convert the LHS to the RHS for each of the following pairs: a + b + c -&gt; a * b * c f(g(a, b), c) -&gt; (a + b) * c f(a &lt; b, c, d) -&gt; if (a &lt; b) c else d</p></li>
+<li><p>For each of the following pairs of expressions, describe why you can’t use subs() to convert one to the other. a + b + c -&gt; a + b * c f(a, b) -&gt; f(a, b, c) f(a, b, c) -&gt; f(a, b) How does pryr::named_dots() work? Read the source.</p></li>
+</ol>
+</div>
+<div id="the-downsides-of-non-standard-evaluation" class="section level2">
+<h2><span class="header-section-number">11.6</span> The downsides of non-standard evaluation</h2>
+<ol style="list-style-type: decimal">
+<li><p>What does the following function do? What’s the escape hatch? Do you think that this is an appropriate use of NSE?</p>
+<p>nl &lt;- function(…) { dots &lt;- named_dots(…) lapply(dots, eval, parent.frame()) }</p></li>
+<li><p>Instead of relying on promises, you can use formulas created with ~ to explicitly capture an expression and its environment. What are the advantages and disadvantages of making quoting explicit? How does it impact referential transparency?</p></li>
+<li><p>Read the standard non-standard evaluation rules found at <a href="http://developer.r-project.org/nonstandard-eval.pdf" class="uri">http://developer.r-project.org/nonstandard-eval.pdf</a>.</p></li>
+</ol>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="function-operators.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="expressions.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
+
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"facebook": true,
+"twitter": true,
+"google": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

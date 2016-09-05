@@ -33,8 +33,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="intro.html">
-<link rel="next" href="functions.html">
+<link rel="prev" href="domain-specific-languages.html">
+<link rel="next" href="profiling.html">
 
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -65,11 +65,7 @@
 <ul class="summary">
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Prerequisites</a></li>
 <li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Data structures</a></li>
-<li class="chapter" data-level="3" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>3</b> Subsetting</a><ul>
-<li class="chapter" data-level="3.1" data-path="subsetting.html"><a href="subsetting.html#data-types"><i class="fa fa-check"></i><b>3.1</b> Data types</a></li>
-<li class="chapter" data-level="3.2" data-path="subsetting.html"><a href="subsetting.html#subsetting-operators"><i class="fa fa-check"></i><b>3.2</b> Subsetting operators</a></li>
-<li class="chapter" data-level="3.3" data-path="subsetting.html"><a href="subsetting.html#applications"><i class="fa fa-check"></i><b>3.3</b> Applications</a></li>
-</ul></li>
+<li class="chapter" data-level="3" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>3</b> Subsetting</a></li>
 <li class="chapter" data-level="4" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>4</b> Functions</a></li>
 <li class="chapter" data-level="5" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>5</b> OO field guide</a></li>
 <li class="chapter" data-level="6" data-path="environments.html"><a href="environments.html"><i class="fa fa-check"></i><b>6</b> Environments</a></li>
@@ -80,7 +76,11 @@
 <li class="chapter" data-level="11" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html"><i class="fa fa-check"></i><b>11</b> Non standard evaluation</a></li>
 <li class="chapter" data-level="12" data-path="expressions.html"><a href="expressions.html"><i class="fa fa-check"></i><b>12</b> Expressions</a></li>
 <li class="chapter" data-level="13" data-path="domain-specific-languages.html"><a href="domain-specific-languages.html"><i class="fa fa-check"></i><b>13</b> Domain specific languages</a></li>
-<li class="chapter" data-level="14" data-path="performance.html"><a href="performance.html"><i class="fa fa-check"></i><b>14</b> Performance</a></li>
+<li class="chapter" data-level="14" data-path="performance.html"><a href="performance.html"><i class="fa fa-check"></i><b>14</b> Performance</a><ul>
+<li class="chapter" data-level="14.1" data-path="performance.html"><a href="performance.html#microbenchmarking"><i class="fa fa-check"></i><b>14.1</b> Microbenchmarking</a></li>
+<li class="chapter" data-level="14.2" data-path="performance.html"><a href="performance.html#language-performance"><i class="fa fa-check"></i><b>14.2</b> Language performance</a></li>
+<li class="chapter" data-level="14.3" data-path="performance.html"><a href="performance.html#implementations-performance"><i class="fa fa-check"></i><b>14.3</b> Implementations performance</a></li>
+</ul></li>
 <li class="chapter" data-level="15" data-path="profiling.html"><a href="profiling.html"><i class="fa fa-check"></i><b>15</b> Profiling</a></li>
 <li class="chapter" data-level="16" data-path="memory.html"><a href="memory.html"><i class="fa fa-check"></i><b>16</b> Memory</a></li>
 <li class="chapter" data-level="17" data-path="rcpp.html"><a href="rcpp.html"><i class="fa fa-check"></i><b>17</b> Rcpp</a></li>
@@ -102,33 +102,35 @@
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="subsetting" class="section level1">
-<h1><span class="header-section-number">3</span> Subsetting</h1>
-<div id="data-types" class="section level2">
-<h2><span class="header-section-number">3.1</span> Data types</h2>
+<div id="performance" class="section level1">
+<h1><span class="header-section-number">14</span> Performance</h1>
+<div id="microbenchmarking" class="section level2">
+<h2><span class="header-section-number">14.1</span> Microbenchmarking</h2>
 <ol style="list-style-type: decimal">
-<li><p>Fix each of the following common data frame subsetting errors:</p>
-<p>mtcars[mtcars$cyl = 4, ] mtcars[-1:4, ] mtcars[mtcars$cyl &lt;= 5] mtcars[mtcars$cyl == 4 | 6, ]</p></li>
-<li><p>Why does x &lt;- 1:5; x[NA] yield five missing values? (Hint: why is it different from x[NA_real_]?)</p></li>
-<li><p>What does upper.tri() return? How does subsetting a matrix with it work? Do we need any additional subsetting rules to describe its behaviour?</p>
-<p>x &lt;- outer(1:5, 1:5, FUN = “*“) x[upper.tri(x)]</p></li>
-<li><p>Why does mtcars[1:20] return an error? How does it differ from the similar mtcars[1:20, ]?</p></li>
-<li><p>Implement your own function that extracts the diagonal entries from a matrix (it should behave like diag(x) where x is a matrix).</p></li>
-<li><p>What does df[is.na(df)] &lt;- 0 do? How does it work?</p></li>
+<li><p>Instead of using microbenchmark(), you could use the built-in function system.time(). But system.time() is much less precise, so you’ll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.</p>
+<p>n &lt;- 1:1e6 system.time(for (i in n) sqrt(x)) / length(n) system.time(for (i in n) x ^ 0.5) / length(n)</p></li>
+<li><p>How do the estimates from system.time() compare to those from microbenchmark()? Why are they different?</p></li>
+<li><p>Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.</p>
+<p>x ^ (1 / 2) exp(log(x) / 2)</p></li>
+<li><p>Use microbenchmarking to rank the basic arithmetic operators (+, -, *, /, and ^) in terms of their speed. Visualise the results. Compare the speed of arithmetic on integers vs. doubles.</p></li>
+<li><p>You can change the units in which the microbenchmark results are expressed with the unit parameter. Use unit = “eps” to show the number of evaluations needed to take 1 second. Repeat the benchmarks above with the eps unit. How does this change your intuition for performance?</p></li>
 </ol>
 </div>
-<div id="subsetting-operators" class="section level2">
-<h2><span class="header-section-number">3.2</span> Subsetting operators</h2>
+<div id="language-performance" class="section level2">
+<h2><span class="header-section-number">14.2</span> Language performance</h2>
 <ol style="list-style-type: decimal">
-<li>Given a linear model, e.g., mod &lt;- lm(mpg ~ wt, data = mtcars), extract the residual degrees of freedom. Extract the R squared from the model summary (summary(mod))</li>
+<li><p>scan() has the most arguments (21) of any base function. About how much time does it take to make 21 promises each time scan is called? Given a simple input (e.g., scan(text = “1 2 3”, quiet = T)) what proportion of the total run time is due to creating those promises?</p></li>
+<li><p>Read “Evaluating the Design of the R Language”. What other aspects of the R-language slow it down? Construct microbenchmarks to illustrate.</p></li>
+<li><p>How does the performance of S3 method dispatch change with the length of the class vector? How does performance of S4 method dispatch change with number of superclasses? How about RC?</p></li>
+<li><p>What is the cost of multiple inheritance and multiple dispatch on S4 method dispatch?</p></li>
+<li><p>Why is the cost of name lookup less for functions in the base package?</p></li>
 </ol>
 </div>
-<div id="applications" class="section level2">
-<h2><span class="header-section-number">3.3</span> Applications</h2>
+<div id="implementations-performance" class="section level2">
+<h2><span class="header-section-number">14.3</span> Implementations performance</h2>
 <ol style="list-style-type: decimal">
-<li><p>How would you randomly permute the columns of a data frame? (This is an important technique in random forests.) Can you simultaneously permute the rows and columns in one step?</p></li>
-<li><p>How would you select a random sample of m rows from a data frame? What if the sample had to be contiguous (i.e., with an initial row, a final row, and every row in between)?</p></li>
-<li><p>How could you put the columns in a data frame in alphabetical order?</p></li>
+<li><p>The performance characteristics of squish_ife(), squish_p(), and squish_in_place() vary considerably with the size of x. Explore the differences. Which sizes lead to the biggest and smallest differences?</p></li>
+<li><p>Compare the performance costs of extracting an element from a list, a column from a matrix, and a column from a data frame. Do the same for rows.</p></li>
 </ol>
 
 </div>
@@ -138,8 +140,8 @@
           </div>
         </div>
       </div>
-<a href="intro.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="functions.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
+<a href="domain-specific-languages.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="profiling.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
 
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
