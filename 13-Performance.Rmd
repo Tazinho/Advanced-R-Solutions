@@ -1,0 +1,38 @@
+# Performance
+
+## Microbenchmarking
+
+1. Instead of using microbenchmark(), you could use the built-in function system.time(). But system.time() is much less precise, so you’ll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.
+
+    n <- 1:1e6
+    system.time(for (i in n) sqrt(x)) / length(n)
+    system.time(for (i in n) x ^ 0.5) / length(n)
+
+2. How do the estimates from system.time() compare to those from microbenchmark()? Why are they different?
+
+3. Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.
+
+    x ^ (1 / 2)
+    exp(log(x) / 2)
+
+4. Use microbenchmarking to rank the basic arithmetic operators (+, -, *, /, and ^) in terms of their speed. Visualise the results. Compare the speed of arithmetic on integers vs. doubles.
+
+5. You can change the units in which the microbenchmark results are expressed with the unit parameter. Use unit = "eps" to show the number of evaluations needed to take 1 second. Repeat the benchmarks above with the eps unit. How does this change your intuition for performance?
+
+## Language performance
+
+1. scan() has the most arguments (21) of any base function. About how much time does it take to make 21 promises each time scan is called? Given a simple input (e.g., scan(text = "1 2 3", quiet = T)) what proportion of the total run time is due to creating those promises?
+
+2. Read “Evaluating the Design of the R Language”. What other aspects of the R-language slow it down? Construct microbenchmarks to illustrate.
+
+3. How does the performance of S3 method dispatch change with the length of the class vector? How does performance of S4 method dispatch change with number of superclasses? How about RC?
+
+4. What is the cost of multiple inheritance and multiple dispatch on S4 method dispatch?
+
+5. Why is the cost of name lookup less for functions in the base package?
+
+## Implementations performance
+
+1. The performance characteristics of squish_ife(), squish_p(), and squish_in_place() vary considerably with the size of x. Explore the differences. Which sizes lead to the biggest and smallest differences?
+
+2. Compare the performance costs of extracting an element from a list, a column from a matrix, and a column from a data frame. Do the same for rows.

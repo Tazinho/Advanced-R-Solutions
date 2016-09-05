@@ -1,0 +1,104 @@
+# Functions
+
+## Function components
+
+1. What function allows you to tell if an object is a function? What function allows you to tell if a function is a primitive function?
+
+2. This code makes a list of all functions in the base package.
+
+    objs <- mget(ls("package:base"), inherits = TRUE)
+    funs <- Filter(is.function, objs)
+
+    Use it to answer the following questions:
+
+   a. Which base function has the most arguments?
+
+   b. How many base functions have no arguments? What’s special about those functions?
+
+  c. How could you adapt the code to find all primitive functions?
+
+3. What are the three important components of a function?
+
+4. When does printing a function not show what environment it was created in?
+
+## Lexical Scoping
+
+1. What does the following code return? Why? What does each of the three c’s mean?
+
+    c <- 10
+    c(c = c)
+
+2. What are the four principles that govern how R looks for values?
+
+    What does the following function return? Make a prediction before running the code yourself.
+
+    f <- function(x) {
+      f <- function(x) {
+        f <- function(x) {
+          x ^ 2
+        }
+        f(x) + 1
+      }
+      f(x) * 2
+    }
+    f(10)
+    
+## Function arguments
+
+1. Clarify the following list of odd function calls:
+
+    x <- sample(replace = TRUE, 20, x = c(1:10, NA))
+    y <- runif(min = 0, max = 1, 20)
+    cor(m = "k", y = y, u = "p", x = x)
+
+2. What does this function return? Why? Which principle does it illustrate?
+
+    f1 <- function(x = {y <- 1; 2}, y = 0) {
+      x + y
+    }
+    f1()
+
+3. What does this function return? Why? Which principle does it illustrate?
+
+    f2 <- function(x = z) {
+      z <- 100
+      x
+    }
+    f2()
+    
+## Special calls
+
+1.  Create a list of all the replacement functions found in the base package. Which ones are primitive functions?
+
+2. What are valid names for user-created infix functions?
+
+3. Create an infix xor() operator.
+
+4. Create infix versions of the set functions intersect(), union(), and setdiff().
+
+5. Create a replacement function that modifies a random location in a vector.
+
+## Return Values
+
+1.  How does the chdir parameter of source() compare to in_dir()? Why might you prefer one approach to the other?
+
+2.  What function undoes the action of library()? How do you save and restore the values of options() and par()?
+
+3. Write a function that opens a graphics device, runs the supplied code, and closes the graphics device (always, regardless of whether or not the plotting code worked).
+
+4.  We can use on.exit() to implement a simple version of capture.output().
+
+    capture.output2 <- function(code) {
+      temp <- tempfile()
+      on.exit(file.remove(temp), add = TRUE)
+
+      sink(temp)
+      on.exit(sink(), add = TRUE)
+
+      force(code)
+      readLines(temp)
+    }
+    capture.output2(cat("a", "b", "c", sep = "\n"))
+    #> [1] "a" "b" "c"
+
+ Compare capture.output() to capture.output2(). How do the functions differ? What features have I removed to make the key ideas easier to see? How have I rewritten the key ideas to be easier to understand?
