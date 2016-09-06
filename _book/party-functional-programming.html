@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Advanced R Solutions</title>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+  <meta name="description" content="Solutions to the exercises in Hadley Wickhams book Advanced R.">
+  <meta name="generator" content="bookdown 0.1.7 and GitBook 2.6.7">
+
+  <meta property="og:title" content="Advanced R Solutions" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Solutions to the exercises in Hadley Wickhams book Advanced R." />
+  <meta name="github-repo" content="Tazinho/Advanced-R-Solutions" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Advanced R Solutions" />
+  
+  <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickhams book Advanced R." />
+  
+
+<meta name="author" content="Malte Grosser &amp; Henning Bumann">
+
+<meta name="date" content="2016-09-06">
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: { equationNumbers: { autoNumber: "AMS" } }
+});
+</script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="exceptions-and-debugging.html">
+<link rel="next" href="functional-programming.html">
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a></li>
+<li class="part"><span><b>Foundations</b></span></li>
+<li class="chapter" data-level="1" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>1</b> Subsetting</a></li>
+<li class="chapter" data-level="2" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>2</b> Functions</a></li>
+<li class="chapter" data-level="3" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>3</b> OO field guide</a></li>
+<li class="chapter" data-level="4" data-path="environments.html"><a href="environments.html"><i class="fa fa-check"></i><b>4</b> Environments</a></li>
+<li class="chapter" data-level="5" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html"><i class="fa fa-check"></i><b>5</b> Exceptions and debugging</a></li>
+<li class="chapter" data-level="" data-path="party-functional-programming.html"><a href="party-functional-programming.html"><i class="fa fa-check"></i>(PARTy) Functional Programming</a></li>
+<li class="chapter" data-level="6" data-path="functional-programming.html"><a href="functional-programming.html"><i class="fa fa-check"></i><b>6</b> Functional programming</a><ul>
+<li class="chapter" data-level="6.1" data-path="functional-programming.html"><a href="functional-programming.html#annonymous-functions"><i class="fa fa-check"></i><b>6.1</b> Annonymous functions</a></li>
+<li class="chapter" data-level="6.2" data-path="functional-programming.html"><a href="functional-programming.html#closures"><i class="fa fa-check"></i><b>6.2</b> Closures</a></li>
+<li class="chapter" data-level="6.3" data-path="functional-programming.html"><a href="functional-programming.html#lists-of-functions"><i class="fa fa-check"></i><b>6.3</b> Lists of functions</a></li>
+<li class="chapter" data-level="6.4" data-path="functional-programming.html"><a href="functional-programming.html#case-study-numerical-integration"><i class="fa fa-check"></i><b>6.4</b> Case study: numerical integration</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="functionals.html"><a href="functionals.html"><i class="fa fa-check"></i><b>7</b> Functionals</a></li>
+<li class="chapter" data-level="8" data-path="function-operators.html"><a href="function-operators.html"><i class="fa fa-check"></i><b>8</b> Function operators</a></li>
+<li class="part"><span><b>Metaprogramming</b></span></li>
+<li class="chapter" data-level="9" data-path="expressions.html"><a href="expressions.html"><i class="fa fa-check"></i><b>9</b> Expressions</a></li>
+<li class="chapter" data-level="10" data-path="domain-specific-languages.html"><a href="domain-specific-languages.html"><i class="fa fa-check"></i><b>10</b> Domain specific languages</a></li>
+<li class="part"><span><b>Performant Code</b></span></li>
+<li class="chapter" data-level="11" data-path="profiling.html"><a href="profiling.html"><i class="fa fa-check"></i><b>11</b> Profiling</a></li>
+<li class="chapter" data-level="12" data-path="memory.html"><a href="memory.html"><i class="fa fa-check"></i><b>12</b> Memory</a></li>
+<li class="chapter" data-level="13" data-path="rcpp.html"><a href="rcpp.html"><i class="fa fa-check"></i><b>13</b> Rcpp</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Advanced R Solutions</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="party-functional-programming" class="section level1 unnumbered">
+<h1>(PARTy) Functional Programming</h1>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="exceptions-and-debugging.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="functional-programming.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
+
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"facebook": true,
+"twitter": true,
+"google": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    if (location.protocol !== "file:" && /^https?:/.test(script.src))
+      script.src  = script.src.replace(/^https?:/, '');
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
