@@ -25,7 +25,7 @@
 
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
-<meta name="date" content="2016-09-06">
+<meta name="date" content="2016-09-12">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -56,6 +56,43 @@ MathJax.Hub.Config({
 
 
 
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
 
 </head>
 
@@ -69,7 +106,7 @@ MathJax.Hub.Config({
 
 <ul class="summary">
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a></li>
-<li class="chapter" data-level="1" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
+<li class="chapter" data-level="1" data-path="data-structures.html"><a href="data-structures.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
 <li class="chapter" data-level="2" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>2</b> Subsetting</a></li>
 <li class="chapter" data-level="3" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>3</b> Functions</a></li>
 <li class="chapter" data-level="4" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>4</b> OO field guide</a></li>
@@ -112,39 +149,78 @@ MathJax.Hub.Config({
 <div id="annonymous-functions" class="section level2">
 <h2><span class="header-section-number">7.1</span> Annonymous functions</h2>
 <ol style="list-style-type: decimal">
-<li><p>Given a function, like “mean”, match.fun() lets you find a function. Given a function, can you find its name? Why doesn’t that make sense in R?</p></li>
-<li><p>Use lapply() and an anonymous function to find the coefficient of variation (the standard deviation divided by the mean) for all columns in the mtcars dataset.</p></li>
-<li><p>Use integrate() and an anonymous function to find the area under the curve for the following functions. Use Wolfram Alpha to check your answers. y = x ^ 2 - x, x in [0, 10] y = sin(x) + cos(x), x in [-π, π] y = exp(x) / x, x in [10, 20]</p></li>
-<li><p>A good rule of thumb is that an anonymous function should fit on one line and shouldn’t need to use {}. Review your code. Where could you have used an anonymous function instead of a named function? Where should you have used a named function instead of an anonymous function?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Given a function, like <code>&quot;mean&quot;</code>, <code>match.fun()</code> lets you find a function. Given a function, can you find its name? Why doesn’t that make sense in R?<br />
+<strong><span style="color:green">A</span></strong>:</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Use <code>lapply()</code> and an anonymous function to find the coefficient of variation (the standard deviation divided by the mean) for all columns in the <code>mtcars</code> dataset</p>
+<p><strong><span style="color:green">A</span></strong>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lapply</span>(mtcars, function(x) <span class="kw">sd</span>(x)/<span class="kw">mean</span>(x))</code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Use <code>integrate()</code> and an anonymous function to find the area under the curve for the following functions. Use <a href="http://www.wolframalpha.com/">Wolfram Alpha</a> to check your answers.</p>
+<ol style="list-style-type: decimal">
+<li><code>y = x ^ 2 - x</code>, x in [0, 10]</li>
+<li><code>y = sin(x) + cos(x)</code>, x in [-<span class="math inline">\(\pi\)</span>, <span class="math inline">\(\pi\)</span>]</li>
+<li><code>y = exp(x) / x</code>, x in [10, 20]</li>
+</ol>
+<p><strong><span style="color:green">A</span></strong>:</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: A good rule of thumb is that an anonymous function should fit on one line and shouldn’t need to use <code>{}</code>. Review your code. Where could you have used an anonymous function instead of a named function? Where should you have used a named function instead of an anonymous function?<br />
+<strong><span style="color:green">A</span></strong>:</p></li>
 </ol>
 </div>
 <div id="closures" class="section level2">
 <h2><span class="header-section-number">7.2</span> Closures</h2>
 <ol style="list-style-type: decimal">
-<li><p>Why are functions created by other functions called closures?</p></li>
-<li><p>What does the following statistical function do? What would be a better name for it? (The existing name is a bit of a hint.)</p>
-<p>bc &lt;- function(lambda) { if (lambda == 0) { function(x) log(x) } else { function(x) (x ^ lambda - 1) / lambda } }</p></li>
-<li><p>What does approxfun() do? What does it return?</p></li>
-<li><p>What does ecdf() do? What does it return?</p></li>
-<li><p>Create a function that creates functions that compute the ith central moment of a numeric vector. You can test it by running the following code:</p>
-<p>m1 &lt;- moment(1) m2 &lt;- moment(2)</p>
-<p>x &lt;- runif(100) stopifnot(all.equal(m1(x), 0)) stopifnot(all.equal(m2(x), var(x) * 99 / 100))</p></li>
-<li><p>Create a function pick() that takes an index, i, as an argument and returns a function with an argument x that subsets x with i.</p>
-<p>lapply(mtcars, pick(5)) # should do the same as this lapply(mtcars, function(x) x[[5]])</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Why are functions created by other functions called closures?<br />
+<strong><span style="color:green">A</span></strong>:</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What does the following statistical function do? What would be a better name for it? (The existing name is a bit of a hint.)</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bc &lt;-<span class="st"> </span>function(lambda) {
+  if (lambda ==<span class="st"> </span><span class="dv">0</span>) {
+    function(x) <span class="kw">log</span>(x)
+  } else {
+    function(x) (x ^<span class="st"> </span>lambda -<span class="st"> </span><span class="dv">1</span>) /<span class="st"> </span>lambda
+  }
+}</code></pre></div>
+<p><strong><span style="color:green">A</span></strong>:</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What does <code>approxfun()</code> do? What does it return?<br />
+<strong><span style="color:green">A</span></strong>:</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What does <code>ecdf()</code> do? What does it return?<br />
+<strong><span style="color:green">A</span></strong>:</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Create a function that creates functions that compute the ith <a href="http://en.wikipedia.org/wiki/Central_moment">central moment</a> of a numeric vector. You can test it by running the following code:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m1 &lt;-<span class="st"> </span><span class="kw">moment</span>(<span class="dv">1</span>)
+m2 &lt;-<span class="st"> </span><span class="kw">moment</span>(<span class="dv">2</span>)
+
+x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">100</span>)
+<span class="kw">stopifnot</span>(<span class="kw">all.equal</span>(<span class="kw">m1</span>(x), <span class="dv">0</span>))
+<span class="kw">stopifnot</span>(<span class="kw">all.equal</span>(<span class="kw">m2</span>(x), <span class="kw">var</span>(x) *<span class="st"> </span><span class="dv">99</span> /<span class="st"> </span><span class="dv">100</span>))</code></pre></div>
+<p><strong><span style="color:green">A</span></strong>:</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Create a function <code>pick()</code> that takes an index, <code>i</code>, as an argument and returns a function with an argument <code>x</code> that subsets <code>x</code> with <code>i</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lapply</span>(mtcars, <span class="kw">pick</span>(<span class="dv">5</span>))
+<span class="co"># should do the same as this</span>
+<span class="kw">lapply</span>(mtcars, function(x) x[[<span class="dv">5</span>]])</code></pre></div>
+<p><strong><span style="color:green">A</span></strong>:</p></li>
 </ol>
 </div>
 <div id="lists-of-functions" class="section level2">
 <h2><span class="header-section-number">7.3</span> Lists of functions</h2>
 <ol style="list-style-type: decimal">
-<li><p>Implement a summary function that works like base::summary(), but uses a list of functions. Modify the function so it returns a closure, making it possible to use it as a function factory.</p></li>
-<li><p>Which of the following commands is equivalent to with(x, f(z))? x<span class="math inline">\(f(x\)</span>z). f(x<span class="math inline">\(z).  x\)</span>f(z). f(z). It depends.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Implement a summary function that works like <code>base::summary()</code>, but uses a list of functions. Modify the function so it returns a closure, making it possible to use it as a function factory.<br />
+<strong><span style="color:green">A</span></strong>:</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Which of the following commands is equivalent to <code>with(x, f(z))</code>?</p>
+<ol style="list-style-type: lower-alpha">
+<li><code>x$f(x$z)</code>.</li>
+<li><code>f(x$z)</code>.</li>
+<li><code>x$f(z)</code>.</li>
+<li><code>f(z)</code>.</li>
+<li>It depends.</li>
+</ol>
+<p><strong><span style="color:green">A</span></strong>:</p></li>
 </ol>
 </div>
 <div id="case-study-numerical-integration" class="section level2">
 <h2><span class="header-section-number">7.4</span> Case study: numerical integration</h2>
 <ol style="list-style-type: decimal">
-<li><p>Instead of creating individual functions (e.g., midpoint(), trapezoid(), simpson(), etc.), we could store them in a list. If we did that, how would that change the code? Can you create the list of functions from a list of coefficients for the Newton-Cotes formulae?</p></li>
-<li><p>The trade-off between integration rules is that more complex rules are slower to compute, but need fewer pieces. For sin() in the range [0, π], determine the number of pieces needed so that each rule will be equally accurate. Illustrate your results with a graph. How do they change for different functions? sin(1 / x^2) is particularly challenging.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Instead of creating individual functions (e.g., <code>midpoint()</code>, <code>trapezoid()</code>, <code>simpson()</code>, etc.), we could store them in a list. If we did that, how would that change the code? Can you create the list of functions from a list of coefficients for the Newton-Cotes formulae?<br />
+<strong><span style="color:green">A</span></strong>:</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: The trade-off between integration rules is that more complex rules are slower to compute, but need fewer pieces. For <code>sin()</code> in the range [0, <span class="math inline">\(\pi\)</span>], determine the number of pieces needed so that each rule will be equally accurate. Illustrate your results with a graph. How do they change for different functions? <code>sin(1 / x^2)</code> is particularly challenging.<br />
+<strong><span style="color:green">A</span></strong>:</p></li>
 </ol>
 
 </div>

@@ -145,7 +145,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2><span class="header-section-number">1.1</span> Vectors</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: What are the six types of atomic vector? How does a list differ from an atomic vector?<br />
-<strong><span style="color:green">A</span></strong>:The six types are logical, integer, double, character, complex and raw. The elements of a list don’t have to be of the same type.</p></li>
+<strong><span style="color:green">A</span></strong>: The six types are logical, integer, double, character, complex and raw. The elements of a list don’t have to be of the same type.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What makes <code>is.vector()</code> and <code>is.numeric()</code> fundamentally different to <code>is.list()</code> and <code>is.character()</code>?<br />
 <strong><span style="color:green">A</span></strong>: The first two tests don’t check for a specific type.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Test your knowledge of vector coercion rules by predicting the output of the following uses of <code>c()</code>:</p>
@@ -168,23 +168,32 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">structure</span>(<span class="dv">1</span>:<span class="dv">5</span>, <span class="dt">comment =</span> <span class="st">&quot;my attribute&quot;</span>)</code></pre></div>
 <pre><code>## [1] 1 2 3 4 5</code></pre>
 <p>But when you print that object you don’t see the comment attribute. Why? Is the attribute missing, or is there something else special about it? (Hint: try using help.) </p>
-<p><strong><span style="color:green">A</span></strong>:</p></li>
+<p><strong><span style="color:green">A</span></strong>: From the help of comment <code>(?comment)</code>:</p>
+<blockquote>
+<p>Contrary to other attributes, the comment is not printed (by print or print.default).</p>
+</blockquote>
+<p>Also from the help of attributes <code>(?attributes)</code>:</p>
+<blockquote>
+<p>Note that some attributes (namely class, comment, dim, dimnames, names, row.names and tsp) are treated specially and have restrictions on the values which can be set.</p>
+</blockquote></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What happens to a factor when you modify its levels?</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f1 &lt;-<span class="st"> </span><span class="kw">factor</span>(letters)
 <span class="kw">levels</span>(f1) &lt;-<span class="st"> </span><span class="kw">rev</span>(<span class="kw">levels</span>(f1))</code></pre></div>
-<p><strong><span style="color:green">A</span></strong>:</p></li>
+<p><strong><span style="color:green">A</span></strong>: Both, the entries of the factor and also it’s levels get reversed:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f1</code></pre></div>
+<pre><code>##  [1] z y x w v u t s r q p o n m l k j i h g f e d c b a
+## Levels: z y x w v u t s r q p o n m l k j i h g f e d c b a</code></pre></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What does this code do? How do <code>f2</code> and <code>f3</code> differ from <code>f1</code>?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f2 &lt;-<span class="st"> </span><span class="kw">rev</span>(<span class="kw">factor</span>(letters))
-
-f3 &lt;-<span class="st"> </span><span class="kw">factor</span>(letters, <span class="dt">levels =</span> <span class="kw">rev</span>(letters))</code></pre></div>
-<p><strong><span style="color:green">A</span></strong>:</p></li>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f2 &lt;-<span class="st"> </span><span class="kw">rev</span>(<span class="kw">factor</span>(letters)) <span class="co"># changes only the entries of the factor</span>
+f3 &lt;-<span class="st"> </span><span class="kw">factor</span>(letters, <span class="dt">levels =</span> <span class="kw">rev</span>(letters)) <span class="co"># changes only the levels of the factor</span></code></pre></div>
+<p><strong><span style="color:green">A</span></strong>: Unlike <code>f1</code> <code>f2</code> and <code>f3</code> change only one thing. They change the order of the factor or it’s levels, but not both at the same time.</p></li>
 </ol>
 </div>
 <div id="matrices-and-arrays" class="section level2">
 <h2><span class="header-section-number">1.3</span> Matrices and arrays</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: What does <code>dim()</code> return when applied to a vector?<br />
-<strong><span style="color:green">A</span></strong>:</p></li>
+<strong><span style="color:green">A</span></strong>: <code>NULL</code></p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: If <code>is.matrix(x)</code> is <code>TRUE</code>, what will <code>is.array(x)</code> return?<br />
 <strong><span style="color:green">A</span></strong>:</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: How would you describe the following three objects? What makes them different to <code>1:5</code>?</p>

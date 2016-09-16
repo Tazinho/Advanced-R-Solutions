@@ -25,7 +25,7 @@
 
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
-<meta name="date" content="2016-09-06">
+<meta name="date" content="2016-09-08">
 
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -51,6 +51,43 @@
 
 
 
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
 
 </head>
 
@@ -64,7 +101,7 @@
 
 <ul class="summary">
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a></li>
-<li class="chapter" data-level="1" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
+<li class="chapter" data-level="1" data-path="data-structures.html"><a href="data-structures.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
 <li class="chapter" data-level="2" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>2</b> Subsetting</a></li>
 <li class="chapter" data-level="3" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>3</b> Functions</a></li>
 <li class="chapter" data-level="4" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>4</b> OO field guide</a></li>
@@ -109,27 +146,40 @@
 <li><p>Repeat the analysis above for numeric, logical, and complex vectors.</p></li>
 <li><p>If a data frame has one million rows, and three variables (two numeric, and one integer), how much space will it take up? Work it out from theory, then verify your work by creating a data frame and measuring its size.</p></li>
 <li><p>Compare the sizes of the elements in the following two lists. Each contains basically the same data, but one contains vectors of small strings while the other contains a single long string.</p>
-<p>vec &lt;- lapply(0:50, function(i) c(“ba”, rep(“na”, i))) str &lt;- lapply(vec, paste0, collapse = “”)</p></li>
-<li><p>Which takes up more memory: a factor (x) or the equivalent character vector (as.character(x))? Why?</p></li>
-<li><p>Explain the difference in size between 1:5 and list(1:5).</p></li>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vec &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">0</span>:<span class="dv">50</span>, function(i) <span class="kw">c</span>(<span class="st">&quot;ba&quot;</span>, <span class="kw">rep</span>(<span class="st">&quot;na&quot;</span>, i)))
+str &lt;-<span class="st"> </span><span class="kw">lapply</span>(vec, paste0, <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span>)</code></pre></div></li>
+<li><p>Which takes up more memory: a factor (<code>x</code>) or the equivalent character vector (<code>as.character(x)</code>)? Why?</p></li>
+<li><p>Explain the difference in size between <code>1:5</code> and <code>list(1:5)</code>.</p></li>
 </ol>
 </div>
 <div id="memory-profiling-with-lineprof" class="section level2">
 <h2><span class="header-section-number">15.2</span> Memory profiling with lineprof</h2>
 <ol style="list-style-type: decimal">
-<li><p>When the input is a list, we can make a more efficient as.data.frame() by using special knowledge. A data frame is a list with class data.frame and row.names attribute. row.names is either a character vector or vector of sequential integers, stored in a special format created by .set_row_names(). This leads to an alternative as.data.frame():</p>
-<p>to_df &lt;- function(x) { class(x) &lt;- “data.frame” attr(x, “row.names”) &lt;- .set_row_names(length(x[[1]])) x }</p>
-<p>What impact does this function have on read_delim()? What are the downsides of this function?</p></li>
-<li><p>Line profile the following function with torture = TRUE. What is surprising? Read the source code of rm() to figure out what’s going on.</p>
-<p>f &lt;- function(n = 1e5) { x &lt;- rep(1, n) rm(x) }</p></li>
+<li><p>When the input is a list, we can make a more efficient <code>as.data.frame()</code> by using special knowledge. A data frame is a list with class <code>data.frame</code> and <code>row.names</code> attribute. <code>row.names</code> is either a character vector or vector of sequential integers, stored in a special format created by <code>.set_row_names()</code>. This leads to an alternative <code>as.data.frame()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">to_df &lt;-<span class="st"> </span>function(x) {
+  <span class="kw">class</span>(x) &lt;-<span class="st"> &quot;data.frame&quot;</span>
+  <span class="kw">attr</span>(x, <span class="st">&quot;row.names&quot;</span>) &lt;-<span class="st"> </span><span class="kw">.set_row_names</span>(<span class="kw">length</span>(x[[<span class="dv">1</span>]]))
+  x
+}</code></pre></div>
+<p>What impact does this function have on <code>read_delim()</code>? What are the downsides of this function?</p></li>
+<li><p>Line profile the following function with <code>torture = TRUE</code>. What is surprising? Read the source code of <code>rm()</code> to figure out what’s going on.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span>function(<span class="dt">n =</span> <span class="fl">1e5</span>) {
+  x &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span>, n)
+  <span class="kw">rm</span>(x)
+}</code></pre></div></li>
 </ol>
 </div>
 <div id="modification-in-place" class="section level2">
 <h2><span class="header-section-number">15.3</span> Modification in place</h2>
 <ol style="list-style-type: decimal">
-<li><p>The code below makes one duplication. Where does it occur and why? (Hint: look at refs(y).)</p>
-<p>y &lt;- as.list(x) for(i in seq_along(medians)) { y[[i]] &lt;- y[[i]] - medians[i] }</p></li>
-<li><p>The implementation of as.data.frame() in the previous section has one big downside. What is it and how could you avoid it?</p></li>
+<li><p>The code below makes one duplication. Where does it occur and why? (Hint: look at <code>refs(y)</code>.)</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="kw">runif</span>(<span class="dv">100</span> *<span class="st"> </span><span class="fl">1e4</span>), <span class="dt">ncol =</span> <span class="dv">100</span>))
+medians &lt;-<span class="st"> </span><span class="kw">vapply</span>(x, median, <span class="kw">numeric</span>(<span class="dv">1</span>))
+y &lt;-<span class="st"> </span><span class="kw">as.list</span>(x)
+for(i in <span class="kw">seq_along</span>(medians)) {
+  y[[i]] &lt;-<span class="st"> </span>y[[i]] -<span class="st"> </span>medians[i]
+}</code></pre></div></li>
+<li><p>The implementation of <code>as.data.frame()</code> in the previous section has one big downside. What is it and how could you avoid it?</p></li>
 </ol>
 
 </div>

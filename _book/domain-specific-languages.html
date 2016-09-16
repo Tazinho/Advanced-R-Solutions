@@ -25,7 +25,7 @@
 
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
-<meta name="date" content="2016-09-06">
+<meta name="date" content="2016-09-08">
 
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -51,6 +51,43 @@
 
 
 
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
 
 </head>
 
@@ -64,7 +101,7 @@
 
 <ul class="summary">
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a></li>
-<li class="chapter" data-level="1" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
+<li class="chapter" data-level="1" data-path="data-structures.html"><a href="data-structures.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
 <li class="chapter" data-level="2" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>2</b> Subsetting</a></li>
 <li class="chapter" data-level="3" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>3</b> Functions</a></li>
 <li class="chapter" data-level="4" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>4</b> OO field guide</a></li>
@@ -105,24 +142,24 @@
 <div id="html" class="section level2">
 <h2><span class="header-section-number">12.1</span> HTML</h2>
 <ol style="list-style-type: decimal">
-<li>The escaping rules for
-<script> and <style> tags are different: you don’t want to escape angle brackets or ampersands, but you do want to escape </script>
-or
-</style>
-<p>. Adapt the code above to follow these rules.</p></li>
-<li><p>The use of … for all functions has some big downsides. There’s no input validation and there will be little information in the documentation or autocomplete about how they are used in the function. Create a new function that, when given a named list of tags and their attribute names (like below), creates functions which address this problem.</p>
-<p>list( a = c(“href”), img = c(“src”, “width”, “height”) )</p>
-<p>All tags should get class and id attributes.</p></li>
-<li><p>Currently the HTML doesn’t look terribly pretty, and it’s hard to see the structure. How could you adapt tag() to do indenting and formatting?</p></li>
+<li><p>The escaping rules for <code>&lt;script&gt;</code> and <code>&lt;style&gt;</code> tags are different: you don’t want to escape angle brackets or ampersands, but you do want to escape <code>&lt;/script&gt;</code> or <code>&lt;/style&gt;</code>. Adapt the code above to follow these rules.</p></li>
+<li><p>The use of <code>...</code> for all functions has some big downsides. There’s no input validation and there will be little information in the documentation or autocomplete about how they are used in the function. Create a new function that, when given a named list of tags and their<br />
+attribute names (like below), creates functions which address this problem.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">list</span>(
+  <span class="dt">a =</span> <span class="kw">c</span>(<span class="st">&quot;href&quot;</span>),
+  <span class="dt">img =</span> <span class="kw">c</span>(<span class="st">&quot;src&quot;</span>, <span class="st">&quot;width&quot;</span>, <span class="st">&quot;height&quot;</span>)
+)</code></pre></div>
+<p>All tags should get <code>class</code> and <code>id</code> attributes.</p></li>
+<li><p>Currently the HTML doesn’t look terribly pretty, and it’s hard to see the structure. How could you adapt <code>tag()</code> to do indenting and formatting?</p></li>
 </ol>
 </div>
 <div id="latex" class="section level2">
 <h2><span class="header-section-number">12.2</span> LaTeX</h2>
 <ol style="list-style-type: decimal">
-<li><p>Add escaping. The special symbols that should be escaped by adding a backslash in front of them are , $, and %. Just as with HTML, you’ll need to make sure you don’t end up double-escaping. So you’ll need to create a small S3 class and then use that in function operators. That will also allow you to embed arbitrary LaTeX if needed.</p></li>
-<li><p>Complete the DSL to support all the functions that plotmath supports.</p></li>
-<li><p>There’s a repeating pattern in latex_env(): we take a character vector, do something to each piece, convert it to a list, and then convert the list to an environment. Write a function that automates this task, and then rewrite latex_env().</p></li>
-<li><p>Study the source code for dplyr. An important part of its structure is partial_eval() which helps manage expressions when some of the components refer to variables in the database while others refer to local R objects. Note that you could use very similar ideas if you needed to translate small R expressions into other languages, like JavaScript or Python.</p></li>
+<li><p>Add escaping. The special symbols that should be escaped by adding a backslash in front of them are <code>\</code>, <code>$</code>, and <code>%</code>. Just as with HTML, you’ll need to make sure you don’t end up double-escaping. So you’ll need to create a small S3 class and then use that in function operators. That will also allow you to embed arbitrary LaTeX if needed.</p></li>
+<li><p>Complete the DSL to support all the functions that <code>plotmath</code> supports.</p></li>
+<li><p>There’s a repeating pattern in <code>latex_env()</code>: we take a character vector, do something to each piece, convert it to a list, and then convert the list to an environment. Write a function that automates this task, and then rewrite <code>latex_env()</code>.</p></li>
+<li><p>Study the source code for <code>dplyr</code>. An important part of its structure is <code>partial_eval()</code> which helps manage expressions when some of the components refer to variables in the database while others refer to local R objects. Note that you could use very similar ideas if you needed to translate small R expressions into other languages, like JavaScript or Python.</p></li>
 </ol>
 
 </div>

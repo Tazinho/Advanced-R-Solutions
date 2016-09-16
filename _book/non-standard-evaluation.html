@@ -25,7 +25,7 @@
 
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
-<meta name="date" content="2016-09-06">
+<meta name="date" content="2016-09-12">
 
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -51,6 +51,43 @@
 
 
 
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
 
 </head>
 
@@ -64,7 +101,7 @@
 
 <ul class="summary">
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a></li>
-<li class="chapter" data-level="1" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
+<li class="chapter" data-level="1" data-path="data-structures.html"><a href="data-structures.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
 <li class="chapter" data-level="2" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>2</b> Subsetting</a></li>
 <li class="chapter" data-level="3" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>3</b> Functions</a></li>
 <li class="chapter" data-level="4" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>4</b> OO field guide</a></li>
@@ -109,66 +146,109 @@
 <div id="capturing-expressions" class="section level2">
 <h2><span class="header-section-number">10.1</span> Capturing expressions</h2>
 <ol style="list-style-type: decimal">
-<li><p>One important feature of deparse() to be aware of when programming is that it can return multiple strings if the input is too long. For example, the following call produces a vector of length two:</p>
-<p>g(a + b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q + r + s + t + u + v + w + x + y + z)</p>
-<p>Why does this happen? Carefully read the documentation for ?deparse. Can you write a wrapper around deparse() so that it always returns a single string?</p></li>
-<li><p>Why does as.Date.default() use substitute() and deparse()? Why does pairwise.t.test() use them? Read the source code.</p></li>
-<li><p>pairwise.t.test() assumes that deparse() always returns a length one character vector. Can you construct an input that violates this expectation? What happens?</p></li>
-<li><p>f(), defined above, just calls substitute(). Why can’t we use it to define g()? In other words, what will the following code return? First make a prediction. Then run the code and think about the results.</p>
-<p>f &lt;- function(x) substitute(x) g &lt;- function(x) deparse(f(x)) g(1:10) g(x) g(x + y ^ 2 / z + exp(a * sin(b)))</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: One important feature of <code>deparse()</code> to be aware of when programming is that it can return multiple strings if the input is too long. For example, the following call produces a vector of length two:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">g</span>(a +<span class="st"> </span>b +<span class="st"> </span>c +<span class="st"> </span>d +<span class="st"> </span>e +<span class="st"> </span>f +<span class="st"> </span>g +<span class="st"> </span>h +<span class="st"> </span>i +<span class="st"> </span>j +<span class="st"> </span>k +<span class="st"> </span>l +<span class="st"> </span>m +
+<span class="st">  </span>n +<span class="st"> </span>o +<span class="st"> </span>p +<span class="st"> </span>q +<span class="st"> </span>r +<span class="st"> </span>s +<span class="st"> </span>t +<span class="st"> </span>u +<span class="st"> </span>v +<span class="st"> </span>w +<span class="st"> </span>x +<span class="st"> </span>y +<span class="st"> </span>z)</code></pre></div>
+<p>Why does this happen? Carefully read the documentation for <code>?deparse</code>. Can you write a wrapper around <code>deparse()</code> so that it always returns a single string?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Why does <code>as.Date.default()</code> use <code>substitute()</code> and <code>deparse()</code>? Why does <code>pairwise.t.test()</code> use them? Read the source code.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: <code>pairwise.t.test()</code> assumes that <code>deparse()</code> always returns a length one character vector. Can you construct an input that violates this expectation? What happens?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: <code>f()</code>, defined above, just calls <code>substitute()</code>. Why can’t we use it to define <code>g()</code>? In other words, what will the following code return? First make a prediction. Then run the code and think about the results.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span>function(x) <span class="kw">substitute</span>(x)
+g &lt;-<span class="st"> </span>function(x) <span class="kw">deparse</span>(<span class="kw">f</span>(x))
+<span class="kw">g</span>(<span class="dv">1</span>:<span class="dv">10</span>)
+<span class="kw">g</span>(x)
+<span class="kw">g</span>(x +<span class="st"> </span>y ^<span class="st"> </span><span class="dv">2</span> /<span class="st"> </span>z +<span class="st"> </span><span class="kw">exp</span>(a *<span class="st"> </span><span class="kw">sin</span>(b)))</code></pre></div></li>
 </ol>
 </div>
 <div id="non-standard-evaluation-in-subset" class="section level2">
 <h2><span class="header-section-number">10.2</span> Non standard evaluation in subset</h2>
 <ol style="list-style-type: decimal">
-<li><p>Predict the results of the following lines of code:</p>
-<p>eval(quote(eval(quote(eval(quote(2 + 2)))))) eval(eval(quote(eval(quote(eval(quote(2 + 2))))))) quote(eval(quote(eval(quote(eval(quote(2 + 2)))))))</p></li>
-<li><p>subset2() has a bug if you use it with a single column data frame. What should the following code return? How can you modify subset2() so it returns the correct type of object?</p>
-<p>sample_df2 &lt;- data.frame(x = 1:10) subset2(sample_df2, x &gt; 8) #&gt; [1] 9 10</p></li>
-<li><p>The real subset function (subset.data.frame()) removes missing values in the condition. Modify subset2() to do the same: drop the offending rows.</p></li>
-<li><p>What happens if you use quote() instead of substitute() inside of subset2()?</p></li>
-<li><p>The second argument in subset() allows you to select variables. It treats variable names as if they were positions. This allows you to do things like subset(mtcars, , -cyl) to drop the cylinder variable, or subset(mtcars, , disp:drat) to select all the variables between disp and drat. How does this work? I’ve made this easier to understand by extracting it out into its own function.</p>
-<p>select &lt;- function(df, vars) { vars &lt;- substitute(vars) var_pos &lt;- setNames(as.list(seq_along(df)), names(df)) pos &lt;- eval(vars, var_pos) df[, pos, drop = FALSE] } select(mtcars, -cyl)</p></li>
-<li><p>What does evalq() do? Use it to reduce the amount of typing for the examples above that use both eval() and quote().</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Predict the results of the following lines of code:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="dv">2</span> +<span class="st"> </span><span class="dv">2</span>))))))
+<span class="kw">eval</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="dv">2</span> +<span class="st"> </span><span class="dv">2</span>)))))))
+<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="dv">2</span> +<span class="st"> </span><span class="dv">2</span>)))))))</code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: <code>subset2()</code> has a bug if you use it with a single column data frame. What should the following code return? How can you modify <code>subset2()</code> so it returns the correct type of object?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">subset2 &lt;-<span class="st"> </span>function(x, condition) {
+  condition_call &lt;-<span class="st"> </span><span class="kw">substitute</span>(condition)
+  r &lt;-<span class="st"> </span><span class="kw">eval</span>(condition_call, x)
+  x[r, ]
+}
+sample_df2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="dv">1</span>:<span class="dv">10</span>)
+<span class="kw">subset2</span>(sample_df2, x &gt;<span class="st"> </span><span class="dv">8</span>)</code></pre></div>
+<pre><code>## [1]  9 10</code></pre></li>
+<li><p><strong><span style="color:red">Q</span></strong>: The real subset function (<code>subset.data.frame()</code>) removes missing values in the condition. Modify <code>subset2()</code> to do the same: drop the offending rows.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What happens if you use <code>quote()</code> instead of <code>substitute()</code> inside of <code>subset2()</code>?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: The second argument in <code>subset()</code> allows you to select variables. It treats variable names as if they were positions. This allows you to do things like <code>subset(mtcars, , -cyl)</code> to drop the cylinder variable, or <code>subset(mtcars, , disp:drat)</code> to select all the variables between <code>disp</code> and <code>drat</code>. How does this work? I’ve made this easier to understand by extracting it out into its own function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">select &lt;-<span class="st"> </span>function(df, vars) {
+  vars &lt;-<span class="st"> </span><span class="kw">substitute</span>(vars)
+  var_pos &lt;-<span class="st"> </span><span class="kw">setNames</span>(<span class="kw">as.list</span>(<span class="kw">seq_along</span>(df)), <span class="kw">names</span>(df))
+  pos &lt;-<span class="st"> </span><span class="kw">eval</span>(vars, var_pos)
+  df[, pos, drop =<span class="st"> </span><span class="ot">FALSE</span>]
+}
+<span class="kw">select</span>(mtcars, -cyl)</code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What does <code>evalq()</code> do? Use it to reduce the amount of typing for the examples above that use both <code>eval()</code> and <code>quote()</code>.</p></li>
 </ol>
 </div>
 <div id="scoping-issues" class="section level2">
 <h2><span class="header-section-number">10.3</span> Scoping issues</h2>
 <ol style="list-style-type: decimal">
-<li><p>plyr::arrange() works similarly to subset(), but instead of selecting rows, it reorders them. How does it work? What does substitute(order(…)) do? Create a function that does only that and experiment with it.</p></li>
-<li><p>What does transform() do? Read the documentation. How does it work? Read the source code for transform.data.frame(). What does substitute(list(…)) do?</p></li>
-<li><p>plyr::mutate() is similar to transform() but it applies the transformations sequentially so that transformation can refer to columns that were just created:</p>
-<p>df &lt;- data.frame(x = 1:5) transform(df, x2 = x * x, x3 = x2 * x) plyr::mutate(df, x2 = x * x, x3 = x2 * x)</p>
-<p>How does mutate work? What’s the key difference between mutate() and transform()?</p></li>
-<li><p>What does with() do? How does it work? Read the source code for with.default(). What does within() do? How does it work? Read the source code for within.data.frame(). Why is the code so much more complex than with()?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: <code>plyr::arrange()</code> works similarly to <code>subset()</code>, but instead of selecting rows, it reorders them. How does it work? What does <code>substitute(order(...))</code> do? Create a function that does only that and experiment with it.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What does <code>transform()</code> do? Read the documentation. How does it work? Read the source code for <code>transform.data.frame()</code>. What does <code>substitute(list(...))</code> do?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: <code>plyr::mutate()</code> is similar to <code>transform()</code> but it applies the transformations sequentially so that transformation can refer to columns that were just created:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="dv">1</span>:<span class="dv">5</span>)
+<span class="kw">transform</span>(df, <span class="dt">x2 =</span> x *<span class="st"> </span>x, <span class="dt">x3 =</span> x2 *<span class="st"> </span>x)
+plyr::<span class="kw">mutate</span>(df, <span class="dt">x2 =</span> x *<span class="st"> </span>x, <span class="dt">x3 =</span> x2 *<span class="st"> </span>x)</code></pre></div>
+<p>How does mutate work? What’s the key difference between <code>mutate()</code> and <code>transform()</code>?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What does <code>with()</code> do? How does it work? Read the source code for <code>with.default()</code>. What does <code>within()</code> do? How does it work? Read the source code for <code>within.data.frame()</code>. Why is the code so much more complex than <code>with()</code>?</p></li>
 </ol>
 </div>
 <div id="calling-from-another-function" class="section level2">
 <h2><span class="header-section-number">10.4</span> Calling from another function</h2>
 <ol style="list-style-type: decimal">
-<li><p>The following R functions all use NSE. For each, describe how it uses NSE, and read the documentation to determine its escape hatch. rm() library() and require() substitute() data() data.frame()</p></li>
-<li><p>Base functions match.fun(), page(), and ls() all try to automatically determine whether you want standard or non-standard evaluation. Each uses a different approach. Figure out the essence of each approach then compare and contrast.</p></li>
-<li><p>Add an escape hatch to plyr::mutate() by splitting it into two functions. One function should capture the unevaluated inputs. The other should take a data frame and list of expressions and perform the computation.</p></li>
-<li><p>What’s the escape hatch for ggplot2::aes()? What about plyr::()? What do they have in common? What are the advantages and disadvantages of their differences?</p></li>
-<li><p>The version of subset2_q() I presented is a simplification of real code. Why is the following version better?</p>
-<p>subset2_q &lt;- function(x, cond, env = parent.frame()) { r &lt;- eval(cond, x, env) x[r, ] }</p>
-<p>Rewrite subset2() and subscramble() to use this improved version.</p></li>
+<li><strong><span style="color:red">Q</span></strong>: The following R functions all use NSE. For each, describe how it uses NSE, and read the documentation to determine its escape hatch.
+<ul>
+<li><code>rm()</code></li>
+<li><code>library()</code> and <code>require()</code></li>
+<li><code>substitute()</code></li>
+<li><code>data()</code></li>
+<li><code>data.frame()</code></li>
+</ul></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Base functions <code>match.fun()</code>, <code>page()</code>, and <code>ls()</code> all try to automatically determine whether you want standard or non-standard evaluation. Each uses a different approach. Figure out the essence of each approach then compare and contrast.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Add an escape hatch to <code>plyr::mutate()</code> by splitting it into two functions. One function should capture the unevaluated inputs. The other should take a data frame and list of expressions and perform the computation.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What’s the escape hatch for <code>ggplot2::aes()</code>? What about <code>plyr::.()</code>? What do they have in common? What are the advantages and disadvantages of their differences?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: The version of <code>subset2_q()</code> I presented is a simplification of real code. Why is the following version better?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">subset2_q &lt;-<span class="st"> </span>function(x, cond, <span class="dt">env =</span> <span class="kw">parent.frame</span>()) {
+  r &lt;-<span class="st"> </span><span class="kw">eval</span>(cond, x, env)
+  x[r, ]
+}</code></pre></div>
+<p>Rewrite <code>subset2()</code> and <code>subscramble()</code> to use this improved version.</p></li>
 </ol>
 </div>
 <div id="substitute" class="section level2">
 <h2><span class="header-section-number">10.5</span> Substitute</h2>
 <ol style="list-style-type: decimal">
-<li><p>Use subs() to convert the LHS to the RHS for each of the following pairs: a + b + c -&gt; a * b * c f(g(a, b), c) -&gt; (a + b) * c f(a &lt; b, c, d) -&gt; if (a &lt; b) c else d</p></li>
-<li><p>For each of the following pairs of expressions, describe why you can’t use subs() to convert one to the other. a + b + c -&gt; a + b * c f(a, b) -&gt; f(a, b, c) f(a, b, c) -&gt; f(a, b) How does pryr::named_dots() work? Read the source.</p></li>
+<li><strong><span style="color:red">Q</span></strong>: Use <code>subs()</code> to convert the LHS to the RHS for each of the following pairs:
+<ul>
+<li><code>a + b + c</code> -&gt; <code>a * b * c</code></li>
+<li><code>f(g(a, b), c)</code> -&gt; <code>(a + b) * c</code></li>
+<li><code>f(a &lt; b, c, d)</code> -&gt; <code>if (a &lt; b) c else d</code></li>
+</ul></li>
+<li><strong><span style="color:red">Q</span></strong>: For each of the following pairs of expressions, describe why you can’t use <code>subs()</code> to convert one to the other.
+<ul>
+<li><code>a + b + c</code> -&gt; <code>a + b * c</code></li>
+<li><code>f(a, b)</code> -&gt; <code>f(a, b, c)</code></li>
+<li><code>f(a, b, c)</code> -&gt; <code>f(a, b)</code></li>
+</ul></li>
+<li><strong><span style="color:red">Q</span></strong>: How does <code>pryr::named_dots()</code> work? Read the source.</li>
 </ol>
 </div>
 <div id="the-downsides-of-non-standard-evaluation" class="section level2">
 <h2><span class="header-section-number">10.6</span> The downsides of non-standard evaluation</h2>
 <ol style="list-style-type: decimal">
-<li><p>What does the following function do? What’s the escape hatch? Do you think that this is an appropriate use of NSE?</p>
+<li><p><strong><span style="color:red">Q</span></strong>: What does the following function do? What’s the escape hatch? Do you think that this is an appropriate use of NSE?</p>
 <p>nl &lt;- function(…) { dots &lt;- named_dots(…) lapply(dots, eval, parent.frame()) }</p></li>
-<li><p>Instead of relying on promises, you can use formulas created with ~ to explicitly capture an expression and its environment. What are the advantages and disadvantages of making quoting explicit? How does it impact referential transparency?</p></li>
-<li><p>Read the standard non-standard evaluation rules found at <a href="http://developer.r-project.org/nonstandard-eval.pdf" class="uri">http://developer.r-project.org/nonstandard-eval.pdf</a>.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Instead of relying on promises, you can use formulas created with ~ to explicitly capture an expression and its environment. What are the advantages and disadvantages of making quoting explicit? How does it impact referential transparency?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Read the standard non-standard evaluation rules found at <a href="http://developer.r-project.org/nonstandard-eval.pdf" class="uri">http://developer.r-project.org/nonstandard-eval.pdf</a>.</p></li>
 </ol>
 
 </div>

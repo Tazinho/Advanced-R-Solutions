@@ -25,7 +25,7 @@
 
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
-<meta name="date" content="2016-09-06">
+<meta name="date" content="2016-09-08">
 
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -51,6 +51,43 @@
 
 
 
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
 
 </head>
 
@@ -64,7 +101,7 @@
 
 <ul class="summary">
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a></li>
-<li class="chapter" data-level="1" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
+<li class="chapter" data-level="1" data-path="data-structures.html"><a href="data-structures.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
 <li class="chapter" data-level="2" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>2</b> Subsetting</a></li>
 <li class="chapter" data-level="3" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>3</b> Functions</a></li>
 <li class="chapter" data-level="4" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>4</b> OO field guide</a></li>
@@ -106,37 +143,58 @@
 <div id="has-somebody-already-solved-the-problem" class="section level2">
 <h2><span class="header-section-number">14.1</span> Has somebody already solved the problem?</h2>
 <ol style="list-style-type: decimal">
-<li><p>What are faster alternatives to lm? Which are specifically designed to work with larger datasets?</p></li>
-<li><p>What package implements a version of match() that’s faster for repeated lookups? How much faster is it?</p></li>
+<li><p>What are faster alternatives to <code>lm</code>? Which are specifically designed to work with larger datasets?</p></li>
+<li><p>What package implements a version of <code>match()</code> that’s faster for repeated lookups? How much faster is it?</p></li>
 <li><p>List four functions (not just those in base R) that convert a string into a date time object. What are their strengths and weaknesses?</p></li>
 <li><p>How many different ways can you compute a 1d density estimate in R?</p></li>
 <li><p>Which packages provide the ability to compute a rolling mean?</p></li>
-<li><p>What are the alternatives to optim()?</p></li>
+<li><p>What are the alternatives to <code>optim()</code>?</p></li>
 </ol>
 </div>
 <div id="do-as-little-as-possible" class="section level2">
 <h2><span class="header-section-number">14.2</span> Do as little as possible</h2>
 <ol style="list-style-type: decimal">
-<li><p>How do the results change if you compare mean() and mean.default() on 10,000 observations, rather than on 100?</p></li>
-<li><p>The following code provides an alternative implementation of rowSums(). Why is it faster for this input?</p>
-<p>rowSums2 &lt;- function(df) { out &lt;- df[[1L]] if (ncol(df) == 1) return(out)</p>
-<p>for (i in 2:ncol(df)) { out &lt;- out + df[[i]] } out }</p>
-<p>df &lt;- as.data.frame( replicate(1e3, sample(100, 1e4, replace = TRUE)) ) system.time(rowSums(df)) #&gt; user system elapsed #&gt; 0.240 0.018 0.258 system.time(rowSums2(df)) #&gt; user system elapsed #&gt; 0.071 0.003 0.073</p></li>
-<li><p>What’s the difference between rowSums() and .rowSums()?</p></li>
-<li><p>Make a faster version of chisq.test() that only computes the chi-square test statistic when the input is two numeric vectors with no missing values. You can try simplifying chisq.test() or by coding from the mathematical definition.</p></li>
-<li><p>Can you make a faster version of table() for the case of an input of two integer vectors with no missing values? Can you use it to speed up your chi-square test?</p></li>
-<li><p>Imagine you want to compute the bootstrap distribution of a sample correlation using cor_df() and the data in the example below. Given that you want to run this many times, how can you make this code faster? (Hint: the function has three components that you can speed up.)</p>
-<p>n &lt;- 1e6 df &lt;- data.frame(a = rnorm(n), b = rnorm(n))</p>
-<p>cor_df &lt;- function(i) { i &lt;- sample(seq(n), n * 0.01) cor(q[i, , drop = FALSE])[2,1] }</p>
+<li><p>How do the results change if you compare <code>mean()</code> and <code>mean.default()</code> on 10,000 observations, rather than on 100?</p></li>
+<li><p>The following code provides an alternative implementation of <code>rowSums()</code>. Why is it faster for this input?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rowSums2 &lt;-<span class="st"> </span>function(df) {
+  out &lt;-<span class="st"> </span>df[[1L]]
+  if (<span class="kw">ncol</span>(df) ==<span class="st"> </span><span class="dv">1</span>) <span class="kw">return</span>(out)
+
+  for (i in <span class="dv">2</span>:<span class="kw">ncol</span>(df)) {
+    out &lt;-<span class="st"> </span>out +<span class="st"> </span>df[[i]]
+  }
+  out
+}
+
+df &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(
+  <span class="kw">replicate</span>(<span class="fl">1e3</span>, <span class="kw">sample</span>(<span class="dv">100</span>, <span class="fl">1e4</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>))
+)
+<span class="kw">system.time</span>(<span class="kw">rowSums</span>(df))</code></pre></div>
+<pre><code>##    user  system elapsed 
+##    0.05    0.00    0.05</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(<span class="kw">rowSums2</span>(df))</code></pre></div>
+<pre><code>##    user  system elapsed 
+##    0.03    0.00    0.03</code></pre></li>
+<li><p>What’s the difference between <code>rowSums()</code> and <code>.rowSums()</code>?</p></li>
+<li><p>Make a faster version of <code>chisq.test()</code> that only computes the chi-square test statistic when the input is two numeric vectors with no missing values. You can try simplifying <code>chisq.test()</code> or by coding from the <a href="http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test">mathematical definition</a>.</p></li>
+<li><p>Can you make a faster version of <code>table()</code> for the case of an input of two integer vectors with no missing values? Can you use it to speed up your chi-square test?</p></li>
+<li><p>Imagine you want to compute the bootstrap distribution of a sample correlation using <code>cor_df()</code> and the data in the example below. Given that you want to run this many times, how can you make this code faster? (Hint: the function has three components that you can speed up.)</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="fl">1e6</span>
+df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">a =</span> <span class="kw">rnorm</span>(n), <span class="dt">b =</span> <span class="kw">rnorm</span>(n))
+
+cor_df &lt;-<span class="st"> </span>function(i) {
+  i &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">seq</span>(n), n *<span class="st"> </span><span class="fl">0.01</span>)
+  <span class="kw">cor</span>(q[i, , <span class="dt">drop =</span> <span class="ot">FALSE</span>])[<span class="dv">2</span>,<span class="dv">1</span>]
+}</code></pre></div>
 <p>Is there a way to vectorise this procedure?</p></li>
 </ol>
 </div>
 <div id="vectorise" class="section level2">
 <h2><span class="header-section-number">14.3</span> Vectorise</h2>
 <ol style="list-style-type: decimal">
-<li><p>The density functions, e.g., dnorm(), have a common interface. Which arguments are vectorised over? What does rnorm(10, mean = 10:1) do?</p></li>
-<li><p>Compare the speed of apply(x, 1, sum) with rowSums(x) for varying sizes of x.</p></li>
-<li><p>How can you use crossprod() to compute a weighted sum? How much faster is it than the naive sum(x * w)?</p></li>
+<li><p>The density functions, e.g., <code>dnorm()</code>, have a common interface. Which arguments are vectorised over? What does <code>rnorm(10, mean = 10:1)</code> do?</p></li>
+<li><p>Compare the speed of <code>apply(x, 1, sum)</code> with <code>rowSums(x)</code> for varying sizes of <code>x</code>.</p></li>
+<li><p>How can you use <code>crossprod()</code> to compute a weighted sum? How much faster is it than the naive <code>sum(x * w)</code>?</p></li>
 </ol>
 
 </div>

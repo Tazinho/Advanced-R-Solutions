@@ -2,26 +2,47 @@
 
 ## HTML
 
-1. The escaping rules for <script> and <style> tags are different: you don’t want to escape angle brackets or ampersands, but you do want to escape </script> or </style>. Adapt the code above to follow these rules.
+1.  The escaping rules for `<script>` and `<style>` tags are different: you
+    don't want to escape angle brackets or ampersands, but you do want to
+    escape `</script>` or `</style>`.  Adapt the code above to follow these
+    rules.
 
-2. The use of ... for all functions has some big downsides. There’s no input validation and there will be little information in the documentation or autocomplete about how they are used in the function. Create a new function that, when given a named list of tags and their
+1.  The use of `...` for all functions has some big downsides. There's no
+    input validation and there will be little information in the
+    documentation or autocomplete about how they are used in the function. 
+    Create a new function that, when given a named list of tags and their   
     attribute names (like below), creates functions which address this problem.
 
+    ```{r, eval = FALSE}
     list(
       a = c("href"),
       img = c("src", "width", "height")
     )
+    ```
 
-    All tags should get class and id attributes.
+    All tags should get `class` and `id` attributes.
 
-3. Currently the HTML doesn’t look terribly pretty, and it’s hard to see the structure. How could you adapt tag() to do indenting and formatting?
+1. Currently the HTML doesn't look terribly pretty, and it's hard to see the
+   structure. How could you adapt `tag()` to do indenting and formatting?
 
 ## LaTeX
 
-1. Add escaping. The special symbols that should be escaped by adding a backslash in front of them are \, $, and %. Just as with HTML, you’ll need to make sure you don’t end up double-escaping. So you’ll need to create a small S3 class and then use that in function operators. That will also allow you to embed arbitrary LaTeX if needed.
+1.  Add escaping. The special symbols that should be escaped by adding a backslash
+    in front of them are `\`, `$`, and `%`. Just as with HTML, you'll need to 
+    make sure you don't end up double-escaping. So you'll need to create a small 
+    S3 class and then use that in function operators. That will also allow you 
+    to embed arbitrary LaTeX if needed.
 
-2. Complete the DSL to support all the functions that plotmath supports.
+1.  Complete the DSL to support all the functions that `plotmath` supports.
 
-3. There’s a repeating pattern in latex_env(): we take a character vector, do something to each piece, convert it to a list, and then convert the list to an environment. Write a function that automates this task, and then rewrite latex_env().
+1.  There's a repeating pattern in `latex_env()`: we take a character vector,
+    do something to each piece, convert it to a list, and then convert the list 
+    to an environment. Write a function that automates this task, and then rewrite
+    `latex_env()`.
 
-4. Study the source code for dplyr. An important part of its structure is partial_eval() which helps manage expressions when some of the components refer to variables in the database while others refer to local R objects. Note that you could use very similar ideas if you needed to translate small R expressions into other languages, like JavaScript or Python.
+1.  Study the source code for `dplyr`. An important part of its structure is
+    `partial_eval()` which helps manage expressions when some of the
+    components refer to variables in the database while others refer to local R
+    objects. Note that you could use very similar ideas if you needed to 
+    translate small R expressions into other languages, like JavaScript or 
+    Python.

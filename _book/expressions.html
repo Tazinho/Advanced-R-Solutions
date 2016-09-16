@@ -25,7 +25,7 @@
 
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
-<meta name="date" content="2016-09-06">
+<meta name="date" content="2016-09-12">
 
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -51,6 +51,43 @@
 
 
 
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
 
 </head>
 
@@ -64,7 +101,7 @@
 
 <ul class="summary">
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a></li>
-<li class="chapter" data-level="1" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
+<li class="chapter" data-level="1" data-path="data-structures.html"><a href="data-structures.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
 <li class="chapter" data-level="2" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>2</b> Subsetting</a></li>
 <li class="chapter" data-level="3" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>3</b> Functions</a></li>
 <li class="chapter" data-level="4" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>4</b> OO field guide</a></li>
@@ -110,82 +147,112 @@
 <div id="structure-of-expressions" class="section level2">
 <h2><span class="header-section-number">11.1</span> Structure of expressions</h2>
 <ol style="list-style-type: decimal">
-<li><p>There’s no existing base function that checks if an element is a valid component of an expression (i.e., it’s a constant, name, call, or pairlist). Implement one by guessing the names of the “is” functions for calls, names, and pairlists.</p>
-<p>pryr::ast() uses non-standard evaluation. What’s its escape hatch to standard evaluation?</p></li>
-<li><p>What does the call tree of an if statement with multiple else conditions look like?</p></li>
-<li><p>Compare ast(x + y %+% z) to ast(x ^ y %+% z). What do they tell you about the precedence of custom infix functions?</p></li>
-<li><p>Why can’t an expression contain an atomic vector of length greater than one? Which one of the six types of atomic vector can’t appear in an expression? Why?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: There’s no existing base function that checks if an element is a valid component of an expression (i.e., it’s a constant, name, call, or pairlist). Implement one by guessing the names of the “is” functions for calls, names, and pairlists.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: <code>pryr::ast()</code> uses non-standard evaluation. What’s its escape hatch to standard evaluation?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What does the call tree of an if statement with multiple else conditions look like?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Compare <code>ast(x + y %+% z)</code> to <code>ast(x ^ y %+% z)</code>. What do they tell you about the precedence of custom infix functions?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Why can’t an expression contain an atomic vector of length greater than one? Which one of the six types of atomic vector can’t appear in an expression? Why?</p></li>
 </ol>
 </div>
 <div id="names" class="section level2">
 <h2><span class="header-section-number">11.2</span> Names</h2>
 <ol style="list-style-type: decimal">
-<li><p>You can use formals() to both get and set the arguments of a function. Use formals() to modify the following function so that the default value of x is missing and y is 10.</p>
-<p>g &lt;- function(x = 20, y) { x + y }</p></li>
-<li><p>Write an equivalent to get() using as.name() and eval(). Write an equivalent to assign() using as.name(), substitute(), and eval(). (Don’t worry about the multiple ways of choosing an environment; assume that the user supplies it explicitly.)</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: You can use <code>formals()</code> to both get and set the arguments of a function. Use <code>formals()</code> to modify the following function so that the default value of <code>x</code> is missing and <code>y</code> is 10.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">g &lt;-<span class="st"> </span>function(<span class="dt">x =</span> <span class="dv">20</span>, y) {
+  x +<span class="st"> </span>y
+}</code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Write an equivalent to <code>get()</code> using <code>as.name()</code> and <code>eval()</code>. Write an equivalent to <code>assign()</code> using <code>as.name()</code>, <code>substitute()</code>, and <code>eval()</code>. (Don’t worry about the multiple ways of choosing an environment; assume that the user supplies it explicitly.)</p></li>
 </ol>
 </div>
 <div id="calls" class="section level2">
 <h2><span class="header-section-number">11.3</span> Calls</h2>
 <ol style="list-style-type: decimal">
-<li><p>The following two calls look the same, but are actually different:</p>
-<p>(a &lt;- call(“mean”, 1:10)) #&gt; mean(1:10) (b &lt;- call(“mean”, quote(1:10))) #&gt; mean(1:10) identical(a, b) #&gt; [1] FALSE</p>
+<li><p><strong><span style="color:red">Q</span></strong>: The following two calls look the same, but are actually different:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(a &lt;-<span class="st"> </span><span class="kw">call</span>(<span class="st">&quot;mean&quot;</span>, <span class="dv">1</span>:<span class="dv">10</span>))</code></pre></div>
+<pre><code>## mean(1:10)</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(b &lt;-<span class="st"> </span><span class="kw">call</span>(<span class="st">&quot;mean&quot;</span>, <span class="kw">quote</span>(<span class="dv">1</span>:<span class="dv">10</span>)))</code></pre></div>
+<pre><code>## mean(1:10)</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">identical</span>(a, b)</code></pre></div>
+<pre><code>## [1] FALSE</code></pre>
 <p>What’s the difference? Which one should you prefer?</p></li>
-<li><p>Implement a pure R version of do.call().</p></li>
-<li><p>Concatenating a call and an expression with c() creates a list. Implement concat() so that the following code works to combine a call and an additional argument.</p>
-<p>concat(quote(f), a = 1, b = quote(mean(a))) #&gt; f(a = 1, b = mean(a))</p></li>
-<li><p>Since list()s don’t belong in expressions, we could create a more convenient call constructor that automatically combines lists into the arguments. Implement make_call() so that the following code works.</p>
-<p>make_call(quote(mean), list(quote(x), na.rm = TRUE)) #&gt; mean(x, na.rm = TRUE) make_call(quote(mean), quote(x), na.rm = TRUE) #&gt; mean(x, na.rm = TRUE)</p></li>
-<li><p>How does mode&lt;- work? How does it use call()?</p></li>
-<li><p>Read the source for pryr::standardise_call(). How does it work? Why is is.primitive() needed?</p></li>
-<li><p>standardise_call() doesn’t work so well for the following calls. Why?</p>
-<p>standardise_call(quote(mean(1:10, na.rm = TRUE))) #&gt; mean(x = 1:10, na.rm = TRUE) standardise_call(quote(mean(n = T, 1:10))) #&gt; mean(x = 1:10, n = T) standardise_call(quote(mean(x = 1:10, , TRUE))) #&gt; mean(x = 1:10, , TRUE)</p></li>
-<li><p>Read the documentation for pryr::modify_call(). How do you think it works? Read the source code.</p></li>
-<li><p>Use ast() and experimentation to figure out the three arguments in an if() call. Which components are required? What are the arguments to the for() and while() calls?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Implement a pure R version of <code>do.call()</code>.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Concatenating a call and an expression with <code>c()</code> creates a list. Implement <code>concat()</code> so that the following code works to combine a call and an additional argument.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">concat</span>(<span class="kw">quote</span>(f), <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">b =</span> <span class="kw">quote</span>(<span class="kw">mean</span>(a)))
+<span class="co">#&gt; f(a = 1, b = mean(a))</span></code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Since <code>list()</code>s don’t belong in expressions, we could create a more convenient call constructor that automatically combines lists into the arguments. Implement <code>make_call()</code> so that the following code works.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">make_call</span>(<span class="kw">quote</span>(mean), <span class="kw">list</span>(<span class="kw">quote</span>(x), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))
+<span class="co">#&gt; mean(x, na.rm = TRUE)</span>
+<span class="kw">make_call</span>(<span class="kw">quote</span>(mean), <span class="kw">quote</span>(x), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+<span class="co">#&gt; mean(x, na.rm = TRUE)</span></code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: How does <code>mode&lt;-</code> work? How does it use <code>call()</code>?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Read the source for <code>pryr::standardise_call()</code>. How does it work? Why is <code>is.primitive()</code> needed?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: <code>standardise_call()</code> doesn’t work so well for the following calls. Why?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(pryr)
+<span class="kw">standardise_call</span>(<span class="kw">quote</span>(<span class="kw">mean</span>(<span class="dv">1</span>:<span class="dv">10</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)))</code></pre></div>
+<pre><code>## mean(x = 1:10, na.rm = TRUE)</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">standardise_call</span>(<span class="kw">quote</span>(<span class="kw">mean</span>(<span class="dt">n =</span> T, <span class="dv">1</span>:<span class="dv">10</span>)))</code></pre></div>
+<pre><code>## mean(x = 1:10, n = T)</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">standardise_call</span>(<span class="kw">quote</span>(<span class="kw">mean</span>(<span class="dt">x =</span> <span class="dv">1</span>:<span class="dv">10</span>, , <span class="ot">TRUE</span>)))</code></pre></div>
+<pre><code>## mean(x = 1:10, , TRUE)</code></pre></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Read the documentation for <code>pryr::modify_call()</code>. How do you think it works? Read the source code.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Use <code>ast()</code> and experimentation to figure out the three arguments in an <code>if()</code> call. Which components are required? What are the arguments to the <code>for()</code> and <code>while()</code> calls?</p></li>
 </ol>
 </div>
 <div id="capturing-the-current-call" class="section level2">
 <h2><span class="header-section-number">11.4</span> Capturing the current call</h2>
 <ol style="list-style-type: decimal">
-<li><p>Compare and contrast update_model() with update.default().</p></li>
-<li><p>Why doesn’t write.csv(mtcars, “mtcars.csv”, row = FALSE) work? What property of argument matching has the original author forgotten?</p></li>
-<li><p>Rewrite update.formula() to use R code instead of C code.</p></li>
-<li><p>Sometimes it’s necessary to uncover the function that called the function that called the current function (i.e., the grandparent, not the parent). How can you use sys.call() or match.call() to find this function?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Compare and contrast <code>update_model()</code> with <code>update.default()</code>.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Why doesn’t <code>write.csv(mtcars, &quot;mtcars.csv&quot;, row = FALSE)</code> work? What property of argument matching has the original author forgotten?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Rewrite <code>update.formula()</code> to use R code instead of C code.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Sometimes it’s necessary to uncover the function that called the function that called the current function (i.e., the grandparent, not the parent). How can you use <code>sys.call()</code> or <code>match.call()</code> to find this function?</p></li>
 </ol>
 </div>
 <div id="pairlists" class="section level2">
 <h2><span class="header-section-number">11.5</span> Pairlists</h2>
 <ol style="list-style-type: decimal">
-<li><p>How are alist(a) and alist(a = ) different? Think about both the input and the output.</p></li>
-<li><p>Read the documentation and source code for pryr::partial(). What does it do? How does it work? Read the documentation and source code for pryr::unenclose(). What does it do and how does it work?</p></li>
-<li><p>The actual implementation of curve() looks more like</p>
-<p>curve3 &lt;- function(expr, xlim = c(0, 1), n = 100, env = parent.frame()) { env2 &lt;- new.env(parent = env) env2$x &lt;- seq(xlim[1], xlim[2], length = n)</p>
-<p>y &lt;- eval(substitute(expr), env2) plot(env2$x, y, type = “l”, ylab = deparse(substitute(expr))) }</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: How are <code>alist(a)</code> and <code>alist(a = )</code> different? Think about both the input and the output.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Read the documentation and source code for <code>pryr::partial()</code>. What does it do? How does it work? Read the documentation and source code for <code>pryr::unenclose()</code>. What does it do and how does it work?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: The actual implementation of <code>curve()</code> looks more like</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">curve3 &lt;-<span class="st"> </span>function(expr, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="dt">n =</span> <span class="dv">100</span>,
+                   <span class="dt">env =</span> <span class="kw">parent.frame</span>()) {
+  env2 &lt;-<span class="st"> </span><span class="kw">new.env</span>(<span class="dt">parent =</span> env)
+  env2$x &lt;-<span class="st"> </span><span class="kw">seq</span>(xlim[<span class="dv">1</span>], xlim[<span class="dv">2</span>], <span class="dt">length =</span> n)
+
+  y &lt;-<span class="st"> </span><span class="kw">eval</span>(<span class="kw">substitute</span>(expr), env2)
+  <span class="kw">plot</span>(env2$x, y, <span class="dt">type =</span> <span class="st">&quot;l&quot;</span>, 
+    <span class="dt">ylab =</span> <span class="kw">deparse</span>(<span class="kw">substitute</span>(expr)))
+}</code></pre></div>
+<p>How does this approach differ from <code>curve2()</code> defined above?</p></li>
 </ol>
-<p>How does this approach differ from curve2() defined above?</p>
 </div>
 <div id="parsing-and-deparsing" class="section level2">
 <h2><span class="header-section-number">11.6</span> Parsing and deparsing</h2>
 <ol style="list-style-type: decimal">
-<li><p>What are the differences between quote() and expression()?</p></li>
-<li><p>Read the help for deparse() and construct a call that deparse() and parse() do not operate symmetrically on.</p></li>
-<li><p>Compare and contrast source() and sys.source().</p></li>
-<li><p>Modify simple_source() so it returns the result of every expression, not just the last one.</p></li>
-<li><p>The code generated by simple_source() lacks source references. Read the source code for sys.source() and the help for srcfilecopy(), then modify simple_source() to preserve source references. You can test your code by sourcing a function that contains a comment. If successful, when you look at the function, you’ll see the comment and not just the source code.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What are the differences between <code>quote()</code> and <code>expression()</code>?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Read the help for <code>deparse()</code> and construct a call that <code>deparse()</code> and <code>parse()</code> do not operate symmetrically on.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Compare and contrast <code>source()</code> and <code>sys.source()</code>.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Modify <code>simple_source()</code> so it returns the result of <em>every</em> expression, not just the last one.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: The code generated by <code>simple_source()</code> lacks source references. Read the source code for <code>sys.source()</code> and the help for <code>srcfilecopy()</code>, then modify <code>simple_source()</code> to preserve source references. You can test your code by sourcing a function that contains a comment. If successful, when you look at the function, you’ll see the comment and not just the source code.</p></li>
 </ol>
 </div>
 <div id="walking-the-ast-with-recursive-functions" class="section level2">
 <h2><span class="header-section-number">11.7</span> Walking the AST with recursive functions</h2>
 <ol style="list-style-type: decimal">
-<li><p>Why does logical_abbr() use a for loop instead of a functional like lapply()?</p></li>
-<li><p>logical_abbr() works when given quoted objects, but doesn’t work when given an existing function, as in the example below. Why not? How could you modify logical_abbr() to work with functions? Think about what components make up a function.</p>
-<p>f &lt;- function(x = TRUE) { g(x + T) } logical_abbr(f)</p></li>
-<li><p>Write a function called ast_type() that returns either “constant”, “name”, “call”, or “pairlist”. Rewrite logical_abbr(), find_assign(), and bquote2() to use this function with switch() instead of nested if statements.</p></li>
-<li><p>Write a function that extracts all calls to a function. Compare your function to pryr::fun_calls().</p></li>
-<li><p>Write a wrapper around bquote2() that does non-standard evaluation so that you don’t need to explicitly quote() the input.</p></li>
-<li><p>Compare bquote2() to bquote(). There is a subtle bug in bquote(): it won’t replace calls to functions with no arguments. Why?</p>
-<p>bquote(.(x)(), list(x = quote(f))) #&gt; .(x)() bquote(.(x)(1), list(x = quote(f))) #&gt; f(1)</p></li>
-<li><p>Improve the base recurse_call() template to also work with lists of functions and expressions (e.g., as from parse(path_to_file)).</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Why does <code>logical_abbr()</code> use a for loop instead of a functional like <code>lapply()</code>?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: <code>logical_abbr()</code> works when given quoted objects, but doesn’t work when given an existing function, as in the example below. Why not? How could you modify <code>logical_abbr()</code> to work with functions? Think about what components make up a function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span>function(<span class="dt">x =</span> <span class="ot">TRUE</span>) {
+  <span class="kw">g</span>(x +<span class="st"> </span>T)
+}
+<span class="kw">logical_abbr</span>(f)</code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Write a function called <code>ast_type()</code> that returns either “constant”, “name”, “call”, or “pairlist”. Rewrite <code>logical_abbr()</code>, <code>find_assign()</code>, and <code>bquote2()</code> to use this function with <code>switch()</code> instead of nested if statements.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Write a function that extracts all calls to a function. Compare your function to <code>pryr::fun_calls()</code>.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Write a wrapper around <code>bquote2()</code> that does non-standard evaluation so that you don’t need to explicitly <code>quote()</code> the input.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Compare <code>bquote2()</code> to <code>bquote()</code>. There is a subtle bug in <code>bquote()</code>: it won’t replace calls to functions with no arguments. Why?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bquote</span>(.(x)(), <span class="kw">list</span>(<span class="dt">x =</span> <span class="kw">quote</span>(f)))</code></pre></div>
+<pre><code>## .(x)()</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bquote</span>(.(x)(<span class="dv">1</span>), <span class="kw">list</span>(<span class="dt">x =</span> <span class="kw">quote</span>(f)))</code></pre></div>
+<pre><code>## f(1)</code></pre></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Improve the base <code>recurse_call()</code> template to also work with lists of functions and expressions (e.g., as from <code>parse(path_to_file))</code>.</p></li>
 </ol>
 
 </div>

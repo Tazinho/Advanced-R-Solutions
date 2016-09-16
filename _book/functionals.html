@@ -25,8 +25,13 @@
 
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
-<meta name="date" content="2016-09-06">
+<meta name="date" content="2016-09-12">
 
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: { equationNumbers: { autoNumber: "AMS" } }
+});
+</script>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -51,6 +56,43 @@
 
 
 
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
 
 </head>
 
@@ -64,7 +106,7 @@
 
 <ul class="summary">
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a></li>
-<li class="chapter" data-level="1" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
+<li class="chapter" data-level="1" data-path="data-structures.html"><a href="data-structures.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
 <li class="chapter" data-level="2" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>2</b> Subsetting</a></li>
 <li class="chapter" data-level="3" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>3</b> Functions</a></li>
 <li class="chapter" data-level="4" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>4</b> OO field guide</a></li>
@@ -72,11 +114,12 @@
 <li class="chapter" data-level="6" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html"><i class="fa fa-check"></i><b>6</b> Exceptions and debugging</a></li>
 <li class="chapter" data-level="7" data-path="functional-programming.html"><a href="functional-programming.html"><i class="fa fa-check"></i><b>7</b> Functional programming</a></li>
 <li class="chapter" data-level="8" data-path="functionals.html"><a href="functionals.html"><i class="fa fa-check"></i><b>8</b> Functionals</a><ul>
-<li class="chapter" data-level="8.1" data-path="functionals.html"><a href="functionals.html#for-loops-functionals-friends-fo-lapply"><i class="fa fa-check"></i><b>8.1</b> For loops functionals: friends fo lapply():</a></li>
-<li class="chapter" data-level="8.2" data-path="functionals.html"><a href="functionals.html#manipulating-matrices-and-data-frames"><i class="fa fa-check"></i><b>8.2</b> Manipulating matrices and data frames</a></li>
-<li class="chapter" data-level="8.3" data-path="functionals.html"><a href="functionals.html#manipulating-lists"><i class="fa fa-check"></i><b>8.3</b> Manipulating lists</a></li>
-<li class="chapter" data-level="8.4" data-path="functionals.html"><a href="functionals.html#mathematical-functionals"><i class="fa fa-check"></i><b>8.4</b> Mathematical functionals</a></li>
-<li class="chapter" data-level="8.5" data-path="functionals.html"><a href="functionals.html#a-family-of-functions"><i class="fa fa-check"></i><b>8.5</b> A family of functions</a></li>
+<li class="chapter" data-level="8.1" data-path="functionals.html"><a href="functionals.html#my-first-functional-lapply"><i class="fa fa-check"></i><b>8.1</b> My first functional: lapply()</a></li>
+<li class="chapter" data-level="8.2" data-path="functionals.html"><a href="functionals.html#for-loops-functionals-friends-fo-lapply"><i class="fa fa-check"></i><b>8.2</b> For loops functionals: friends fo lapply():</a></li>
+<li class="chapter" data-level="8.3" data-path="functionals.html"><a href="functionals.html#manipulating-matrices-and-data-frames"><i class="fa fa-check"></i><b>8.3</b> Manipulating matrices and data frames</a></li>
+<li class="chapter" data-level="8.4" data-path="functionals.html"><a href="functionals.html#manipulating-lists"><i class="fa fa-check"></i><b>8.4</b> Manipulating lists</a></li>
+<li class="chapter" data-level="8.5" data-path="functionals.html"><a href="functionals.html#mathematical-functionals"><i class="fa fa-check"></i><b>8.5</b> Mathematical functionals</a></li>
+<li class="chapter" data-level="8.6" data-path="functionals.html"><a href="functionals.html#a-family-of-functions"><i class="fa fa-check"></i><b>8.6</b> A family of functions</a></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="function-operators.html"><a href="function-operators.html"><i class="fa fa-check"></i><b>9</b> Function operators</a></li>
 <li class="chapter" data-level="10" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html"><i class="fa fa-check"></i><b>10</b> Non standard evaluation</a></li>
@@ -105,60 +148,95 @@
             <section class="normal" id="section-">
 <div id="functionals" class="section level1">
 <h1><span class="header-section-number">8</span> Functionals</h1>
-<div id="for-loops-functionals-friends-fo-lapply" class="section level2">
-<h2><span class="header-section-number">8.1</span> For loops functionals: friends fo lapply():</h2>
+<div id="my-first-functional-lapply" class="section level2">
+<h2><span class="header-section-number">8.1</span> My first functional: lapply()</h2>
 <ol style="list-style-type: decimal">
-<li><p>Use vapply() to:</p>
-<pre><code>Compute the standard deviation of every column in a numeric data frame.
+<li><p><strong><span style="color:red">Q</span></strong>: Why are the following two invocations of <code>lapply()</code> equivalent?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">trims &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.5</span>)
+x &lt;-<span class="st"> </span><span class="kw">rcauchy</span>(<span class="dv">100</span>)
 
-Compute the standard deviation of every numeric column in a mixed data frame. (Hint: you’ll need to use vapply() twice.)</code></pre></li>
-<li><p>Why is using sapply() to get the class() of each element in a data frame dangerous?</p></li>
-<li><p>The following code simulates the performance of a t-test for non-normal data. Use sapply() and an anonymous function to extract the p-value from every trial.</p>
-<p>trials &lt;- replicate( 100, t.test(rpois(10, 10), rpois(7, 10)), simplify = FALSE )</p>
-<p>Extra challenge: get rid of the anonymous function by using [[ directly.</p></li>
-<li><p>What does replicate() do? What sort of for loop does it eliminate? Why do its arguments differ from lapply() and friends?</p></li>
-<li><p>Implement a version of lapply() that supplies FUN with both the name and the value of each component.</p></li>
-<li><p>Implement a combination of Map() and vapply() to create an lapply() variant that iterates in parallel over all of its inputs and stores its outputs in a vector (or a matrix). What arguments should the function take?</p></li>
-<li><p>Implement mcsapply(), a multicore version of sapply(). Can you implement mcvapply(), a parallel version of vapply()? Why or why not?</p></li>
+<span class="kw">lapply</span>(trims, function(trim) <span class="kw">mean</span>(x, <span class="dt">trim =</span> trim))
+<span class="kw">lapply</span>(trims, mean, <span class="dt">x =</span> x)</code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: The function below scales a vector so it falls in the range [0, 1]. How would you apply it to every column of a data frame? How would you apply it to every numeric column in a data frame?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">scale01 &lt;-<span class="st"> </span>function(x) {
+  rng &lt;-<span class="st"> </span><span class="kw">range</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+  (x -<span class="st"> </span>rng[<span class="dv">1</span>]) /<span class="st"> </span>(rng[<span class="dv">2</span>] -<span class="st"> </span>rng[<span class="dv">1</span>])
+}</code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Use both for loops and <code>lapply()</code> to fit linear models to the <code>mtcars</code> using the formulas stored in this list:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">formulas &lt;-<span class="st"> </span><span class="kw">list</span>(
+  mpg ~<span class="st"> </span>disp,
+  mpg ~<span class="st"> </span><span class="kw">I</span>(<span class="dv">1</span> /<span class="st"> </span>disp),
+  mpg ~<span class="st"> </span>disp +<span class="st"> </span>wt,
+  mpg ~<span class="st"> </span><span class="kw">I</span>(<span class="dv">1</span> /<span class="st"> </span>disp) +<span class="st"> </span>wt
+)</code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Fit the model <code>mpg ~ disp</code> to each of the bootstrap replicates of <code>mtcars</code> in the list below by using a for loop and <code>lapply()</code>. Can you do it without an anonymous function?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bootstraps &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">1</span>:<span class="dv">10</span>, function(i) {
+  rows &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">nrow</span>(mtcars), <span class="dt">rep =</span> <span class="ot">TRUE</span>)
+  mtcars[rows, ]
+})</code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: For each model in the previous two exercises, extract <span class="math inline">\(R^2\)</span> using the function below.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rsq &lt;-<span class="st"> </span>function(mod) <span class="kw">summary</span>(mod)$r.squared</code></pre></div></li>
+</ol>
+</div>
+<div id="for-loops-functionals-friends-fo-lapply" class="section level2">
+<h2><span class="header-section-number">8.2</span> For loops functionals: friends fo lapply():</h2>
+<ol style="list-style-type: decimal">
+<li><p><strong><span style="color:red">Q</span></strong>: Use <code>vapply()</code> to:</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Compute the standard deviation of every column in a numeric data frame.</p></li>
+<li><p>Compute the standard deviation of every numeric column in a mixed data frame. (Hint: you’ll need to use <code>vapply()</code> twice.)</p></li>
+</ol></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Why is using <code>sapply()</code> to get the <code>class()</code> of each element in a data frame dangerous?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: The following code simulates the performance of a t-test for non-normal data. Use <code>sapply()</code> and an anonymous function to extract the p-value from every trial.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">trials &lt;-<span class="st"> </span><span class="kw">replicate</span>(
+  <span class="dv">100</span>, 
+  <span class="kw">t.test</span>(<span class="kw">rpois</span>(<span class="dv">10</span>, <span class="dv">10</span>), <span class="kw">rpois</span>(<span class="dv">7</span>, <span class="dv">10</span>)),
+  <span class="dt">simplify =</span> <span class="ot">FALSE</span>
+)</code></pre></div>
+<p>Extra challenge: get rid of the anonymous function by using <code>[[</code> directly.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What does <code>replicate()</code> do? What sort of for loop does it eliminate? Why do its arguments differ from <code>lapply()</code> and friends?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Implement a version of <code>lapply()</code> that supplies <code>FUN</code> with both the name and the value of each component.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Implement a combination of <code>Map()</code> and <code>vapply()</code> to create an <code>lapply()</code> variant that iterates in parallel over all of its inputs and stores its outputs in a vector (or a matrix). What arguments should the function take?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Implement <code>mcsapply()</code>, a multicore version of <code>sapply()</code>. Can you implement <code>mcvapply()</code>, a parallel version of <code>vapply()</code>? Why or why not?</p></li>
 </ol>
 </div>
 <div id="manipulating-matrices-and-data-frames" class="section level2">
-<h2><span class="header-section-number">8.2</span> Manipulating matrices and data frames</h2>
+<h2><span class="header-section-number">8.3</span> Manipulating matrices and data frames</h2>
 <ol style="list-style-type: decimal">
-<li><p>How does apply() arrange the output? Read the documentation and perform some experiments.</p></li>
-<li><p>There’s no equivalent to split() + vapply(). Should there be? When would it be useful? Implement one yourself.</p></li>
-<li><p>Implement a pure R version of split(). (Hint: use unique() and subsetting.) Can you do it without a for loop?</p></li>
-<li><p>What other types of input and output are missing? Brainstorm before you look up some answers in the plyr paper.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: How does <code>apply()</code> arrange the output? Read the documentation and perform some experiments.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: There’s no equivalent to <code>split()</code> + <code>vapply()</code>. Should there be? When would it be useful? Implement one yourself.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Implement a pure R version of <code>split()</code>. (Hint: use <code>unique()</code> and subsetting.) Can you do it without a for loop?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What other types of input and output are missing? Brainstorm before you look up some answers in the <a href="http://www.jstatsoft.org/v40/i01/">plyr paper</a>.</p></li>
 </ol>
 </div>
 <div id="manipulating-lists" class="section level2">
-<h2><span class="header-section-number">8.3</span> Manipulating lists</h2>
+<h2><span class="header-section-number">8.4</span> Manipulating lists</h2>
 <ol style="list-style-type: decimal">
-<li><p>Why isn’t is.na() a predicate function? What base R function is closest to being a predicate version of is.na()?</p></li>
-<li><p>Use Filter() and vapply() to create a function that applies a summary statistic to every numeric column in a data frame.</p></li>
-<li><p>What’s the relationship between which() and Position()? What’s the relationship between where() and Filter()?</p></li>
-<li><p>Implement Any(), a function that takes a list and a predicate function, and returns TRUE if the predicate function returns TRUE for any of the inputs. Implement All() similarly.</p></li>
-<li><p>Implement the span() function from Haskell: given a list x and a predicate function f, span returns the location of the longest sequential run of elements where the predicate is true. (Hint: you might find rle() helpful.)</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Why isn’t <code>is.na()</code> a predicate function? What base R function is closest to being a predicate version of <code>is.na()</code>?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Use <code>Filter()</code> and <code>vapply()</code> to create a function that applies a summary statistic to every numeric column in a data frame.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What’s the relationship between <code>which()</code> and <code>Position()</code>? What’s the relationship between <code>where()</code> and <code>Filter()</code>?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Implement <code>Any()</code>, a function that takes a list and a predicate function, and returns <code>TRUE</code> if the predicate function returns <code>TRUE</code> for any of the inputs. Implement <code>All()</code> similarly.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Implement the <code>span()</code> function from Haskell: given a list <code>x</code> and a predicate function <code>f</code>, <code>span</code> returns the location of the longest sequential run of elements where the predicate is true. (Hint: you might find <code>rle()</code> helpful.)</p></li>
 </ol>
 </div>
 <div id="mathematical-functionals" class="section level2">
-<h2><span class="header-section-number">8.4</span> Mathematical functionals</h2>
+<h2><span class="header-section-number">8.5</span> Mathematical functionals</h2>
 <ol style="list-style-type: decimal">
-<li><p>Implement arg_max(). It should take a function and a vector of inputs, and return the elements of the input where the function returns the highest value. For example, arg_max(-10:5, function(x) x ^ 2) should return -10. arg_max(-5:5, function(x) x ^ 2) should return c(-5, 5). Also implement the matching arg_min() function.</p></li>
-<li><p>Challenge: read about the fixed point algorithm. Complete the exercises using R.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Implement <code>arg_max()</code>. It should take a function and a vector of inputs, and return the elements of the input where the function returns the highest value. For example, <code>arg_max(-10:5, function(x) x ^ 2)</code> should return -10. <code>arg_max(-5:5, function(x) x ^ 2)</code> should return <code>c(-5, 5)</code>. Also implement the matching <code>arg_min()</code> function.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Challenge: read about the <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-12.html#%_sec_1.3">fixed point algorithm</a>. Complete the exercises using R.</p></li>
 </ol>
 </div>
 <div id="a-family-of-functions" class="section level2">
-<h2><span class="header-section-number">8.5</span> A family of functions</h2>
+<h2><span class="header-section-number">8.6</span> A family of functions</h2>
 <ol style="list-style-type: decimal">
-<li><p>Implement smaller and larger functions that, given two inputs, return either the smaller or the larger value. Implement na.rm = TRUE: what should the identity be? (Hint: smaller(x, smaller(NA, NA, na.rm = TRUE), na.rm = TRUE) must be x, so smaller(NA, NA, na.rm = TRUE) must be bigger than any other value of x.) Use smaller and larger to implement equivalents of min(), max(), pmin(), pmax(), and new functions row_min() and row_max().</p></li>
-<li><p>Create a table that has and, or, add, multiply, smaller, and larger in the columns and binary operator, reducing variant, vectorised variant, and array variants in the rows.</p>
-<pre><code>Fill in the cells with the names of base R functions that perform each of the roles.
-
-Compare the names and arguments of the existing R functions. How consistent are they? How could you improve them?
-
-Complete the matrix by implementing any missing functions.</code></pre></li>
-<li><p>How does paste() fit into this structure? What is the scalar binary function that underlies paste()? What are the sep and collapse arguments to paste() equivalent to? Are there any paste variants that don’t have existing R implementations?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Implement <code>smaller</code> and <code>larger</code> functions that, given two inputs, return either the smaller or the larger value. Implement <code>na.rm = TRUE</code>: what should the identity be? (Hint: <code>smaller(x, smaller(NA, NA, na.rm = TRUE), na.rm = TRUE)</code> must be <code>x</code>, so <code>smaller(NA, NA, na.rm = TRUE)</code> must be bigger than any other value of x.) Use <code>smaller</code> and <code>larger</code> to implement equivalents of <code>min()</code>, <code>max()</code>, <code>pmin()</code>, <code>pmax()</code>, and new functions <code>row_min()</code> and <code>row_max()</code>.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Create a table that has <em>and</em>, <em>or</em>, <em>add</em>, <em>multiply</em>, <em>smaller</em>, and <em>larger</em> in the columns and <em>binary operator</em>, <em>reducing variant</em>, <em>vectorised variant</em>, and <em>array variants</em> in the rows.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Fill in the cells with the names of base R functions that perform each of the roles.</p></li>
+<li><p>Compare the names and arguments of the existing R functions. How consistent are they? How could you improve them?</p></li>
+<li><p>Complete the matrix by implementing any missing functions.</p></li>
+</ol></li>
+<li><p><strong><span style="color:red">Q</span></strong>: How does <code>paste()</code> fit into this structure? What is the scalar binary function that underlies <code>paste()</code>? What are the <code>sep</code> and <code>collapse</code> arguments to <code>paste()</code> equivalent to? Are there any <code>paste</code> variants that don’t have existing R implementations?</p></li>
 </ol>
 
 </div>
@@ -207,6 +285,17 @@ gitbook.start({
 });
 </script>
 
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    if (location.protocol !== "file:" && /^https?:/.test(script.src))
+      script.src  = script.src.replace(/^https?:/, '');
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 </body>
 
 </html>
