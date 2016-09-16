@@ -2,56 +2,139 @@
 
 ## S3
 
-1. Read the source code for t() and t.test() and confirm that t.test() is an S3 generic and not an S3 method. What happens if you create an object with class test and call t() with it?
+1.  __<span style="color:red">Q</span>__: Read the source code for `t()` and `t.test()` and confirm that 
+    `t.test()` is an S3 generic and not an S3 method. What happens if 
+    you create an object with class `test` and call `t()` with it?  
+    __<span style="color:green">A</span>__: We can see that `t.test()` is a generic, because it calls `UseMethod()`
+    
+    ```{r}
+    t.test
+    ```  
+    
+    If we create an object with class "test" `t.test()` will cause R to call `t.test.default()` unless you create a method `t.test()` for the generic `t()`.
 
-2. What classes have a method for the Math group generic in base R? Read the source code. How do the methods work?
+2.  __<span style="color:red">Q</span>__: What classes have a method for the `Math` group generic in base R? Read 
+    the source code. How do the methods work?  
+    __<span style="color:green">A</span>__: 
+    
+    ```{r}
+    methods("Math")
+    ```
 
-3. R has two classes for representing date time data, POSIXct and POSIXlt, which both inherit from POSIXt. Which generics have different behaviours for the two classes? Which generics share the same behaviour?
+3.  __<span style="color:red">Q</span>__: R has two classes for representing date time data, `POSIXct` and 
+    `POSIXlt`, which both inherit from `POSIXt`. Which generics have 
+    different behaviours for the two classes? Which generics share the same
+    behaviour?  
+    __<span style="color:green">A</span>__: Since both inherit from "POSIXt", these should be the same for both classes:  
+    
+    ```{r}
+    methods(class = "POSIXt")
+    ```
+    
+    And these should be different (or only existing for one of the classes):
+    
+    ```{r}
+    methods(class = "POSIXct")
+    methods(class = "POSIXlt")
+    ```
 
-4. Which base generic has the greatest number of defined methods?
+4.  __<span style="color:red">Q</span>__: Which base generic has the greatest number of defined methods?  
+__<span style="color:green">A</span>__: 
+    
+    ```{r, warning = FALSE, cache = TRUE}
+    objs <- mget(ls("package:base"), inherits = TRUE)
+    funs <- Filter(is.function, objs)
+    generics <- Filter(function(x) ("generic" %in% pryr::ftype(x)), funs)
+    which.max(lapply(generics, function(x) length(methods(x))))
+    ```
+    
+5.  __<span style="color:red">Q</span>__: `UseMethod()` calls methods in a special way. Predict what the following
+     code will return, then run it and read the help for `UseMethod()` to 
+    figure out what's going on. Write down the rules in the simplest form
+    possible.
 
-5. UseMethod() calls methods in a special way. Predict what the following code will return, then run it and read the help for UseMethod() to figure out what’s going on. Write down the rules in the simplest form possible.
+    ```{r, eval = FALSE}
+    y <- 1
+    g <- function(x) {
+      y <- 2
+      UseMethod("g")
+    }
+    g.numeric <- function(x) y
+    g(10)
 
-y <- 1
-g <- function(x) {
-  y <- 2
-  UseMethod("g")
-}
-g.numeric <- function(x) y
-g(10)
+    h <- function(x) {
+      x <- 10
+      UseMethod("h")
+    }
+    h.character <- function(x) paste("char", x)
+    h.numeric <- function(x) paste("num", x)
 
-h <- function(x) {
-  x <- 10
-  UseMethod("h")
-}
-h.character <- function(x) paste("char", x)
-h.numeric <- function(x) paste("num", x)
+    h("a")
+    ```  
+    
+    __<span style="color:green">A</span>__: `g(10)` will return `2`. Since only `x` is in the execution environment of `g.numeric` R will search for `y` in the enclosing environment, where `y` is defined as `2`. `h("a")` will return `"class a"`, because `x = "a"` is given as input to the called method. From `?UseMethod`:
+    
+    > UseMethod creates a new function call with arguments matched as they came in to the generic. Any local variables defined before the call to UseMethod are retained (unlike S).
+    
+    So generics look at the class of their first argument (default) for method dispatch.
+    Then a call to the particular method is made. Since the methods are created by the generic, R will look in the generics environment (including all objects defined before the `UseMethod` statement) when an object is not found in the environment of the called method.
 
-h("a")
+6.  __<span style="color:red">Q</span>__: Internal generics don't dispatch on the implicit class of base types.
+    Carefully read `?"internal generic"` to determine why the length of `f` 
+    and `g` is different in the example below. What function helps 
+    distinguish between the behaviour of `f` and `g`?
 
-6. Internal generics don’t dispatch on the implicit class of base types. Carefully read ?"internal generic" to determine why the length of f and g is different in the example below. What function helps distinguish between the behaviour of f and g?
+    ```{r, eval = FALSE}
+    f <- function() 1
+    g <- function() 2
+    class(g) <- "function"
+    
+    class(f)
+    class(g)
 
-f <- function() 1
-g <- function() 2
-class(g) <- "function"
+    length.function <- function(x) "function"
+    length(f)
+    length(g)
+    ```  
+    
+    __<span style="color:green">A</span>__: From `?"internal generic"`:  
+    
+    > Many R objects have a class attribute, a character vector giving the names of
+    the classes from which the object inherits. If the object does not have a class attribute,
+    it has an implicit class, "matrix", "array" or the result of mode(x)
+    (except that integer vectors have implicit class "integer").
+    (Functions oldClass and oldClass<- get and set the attribute, which can also be done     directly.)
 
-class(f)
-class(g)
-
-length.function <- function(x) "function"
-length(f)
-length(g)
+    In the first case, the internal generic `length` does not find the `class` of `f` ("function"), so the method `length.function` is not called. This is because `f` doesn't have a class - which is needed for the S3 method dispatch of internal generics (those that are implemented in C, you can check if they are generics with `pryr::ftype`) - only an implicit class. It is very confusing, because `class(f)` returns this (implicit) class.  
+You can check if a class is only implicit by using one of the following approaches:  
+    *   `is.object(f)` returns `FALSE`  
+    *   `oldClass(f)` returns `NULL`  
+    *   `attributes(f)` doesn't contain a `$class` field
 
 ## S4
 
-1. Which S4 generic has the most methods defined for it? Which S4 class has the most methods associated with it?
+1.  __<span style="color:red">Q</span>__: Which S4 generic has the most methods defined for it? Which S4 class 
+    has the most methods associated with it?  
+    __<span style="color:green">A</span>__: 
 
-2. What happens if you define a new S4 class that doesn’t “contain” an existing class? (Hint: read about virtual classes in ?Classes.)
+2.  __<span style="color:red">Q</span>__: What happens if you define a new S4 class that doesn't "contain" an 
+    existing class?  (Hint: read about virtual classes in `?Classes`.)  
+    __<span style="color:green">A</span>__: 
 
-3. What happens if you pass an S4 object to an S3 generic? What happens if you pass an S3 object to an S4 generic? (Hint: read ?setOldClass for the second case.)
+3.  __<span style="color:red">Q</span>__: What happens if you pass an S4 object to an S3 generic? What happens 
+    if you pass an S3 object to an S4 generic? (Hint: read `?setOldClass` 
+    for the second case.)  
+    __<span style="color:green">A</span>__: 
 
 ## RC
 
-1. Use a field function to prevent the account balance from being directly manipulated. (Hint: create a “hidden” .balance field, and read the help for the fields argument in setRefClass().)
+1.  __<span style="color:red">Q</span>__: Use a field function to prevent the account balance from being directly
+    manipulated. (Hint: create a "hidden" `.balance` field, and read the 
+    help for the fields argument in `setRefClass()`.)  
+    __<span style="color:green">A</span>__: 
 
-2. I claimed that there aren’t any RC classes in base R, but that was a bit of a simplification. Use getClasses() and find which classes extend() from envRefClass. What are the classes used for? (Hint: recall how to look up the documentation for a class.)
+2.  __<span style="color:red">Q</span>__: I claimed that there aren't any RC classes in base R, but that was a 
+    bit of a simplification. Use `getClasses()` and find which classes 
+    `extend()` from `envRefClass`. What are the classes used for? (Hint: 
+    recall how to look up the documentation for a class.)  
+    __<span style="color:green">A</span>__: 

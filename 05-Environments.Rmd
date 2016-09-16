@@ -2,28 +2,135 @@
 
 ## Environment basics
 
-1. List three ways in which an environment differs from a list.
+1.  __<span style="color:red">Q</span>__: List three ways in which an environment differs from a list.  
+__<span style="color:green">A</span>__: The most important differences are:
+    * environments have reference semantics
+    * environments have parents
+    * environments are not ordered
+    * elements of environments need to be (uniquely) named
 
-2. If you don’t supply an explicit environment, where do ls() and rm() look? Where does <- make bindings?
+2.  __<span style="color:red">Q</span>__: If you don't supply an explicit environment, where do `ls()` and `rm()`
+    look? Where does `<-` make bindings? The  
+    __<span style="color:green">A</span>__: `ls()` and `rm` look in their calling environments which they find by `as.environment(-1)`.  
+    From the book:
+    
+    > Assignment is the act of binding (or rebinding) a name to a value in an environment.  
+    
+    From `` ?`<-` ``:
+    
+    > The operators `<-` and `=` assign into the environment in which they are evaluated. The operator `<-` can be used anywhere, whereas the operator `=` is only allowed at the top level (e.g., in the complete expression typed at the command prompt) or as one of the subexpressions in a braced list of expressions.
 
-3. Using parent.env() and a loop (or a recursive function), verify that the ancestors of globalenv() include baseenv() and emptyenv(). Use the same basic idea to implement your own version of search().
-
+3.  __<span style="color:red">Q</span>__: Using `parent.env()` and a loop (or a recursive function), verify that the 
+    ancestors of `globalenv()` include `baseenv()` and `emptyenv()`. Use the 
+    same basic idea to implement your own version of `search()`.  
+    __<span style="color:green">A</span>__:  We can print the ancestors for example by using a recursive function:  
+    
+    ```{r, eval = FALSE}
+    ancestors <- function(env = globalenv()){
+      if (identical(env, emptyenv())) {
+        print(env)} 
+      else {
+        print(env)
+        ancestors(parent.env(env))
+      }
+    }
+    
+    ancestors()
+    ```
+    
+    To implement a new version of `search()` we use a while statement:
+    
+    ```{r, eval = FALSE}
+    search2 <- function(env = globalenv()){
+      envs <- character()
+      while (!identical(env, emptyenv())) {
+        ename <- environmentName(env)
+        if (ename == "base") ename <- "package:base"
+        if (ename == "R_GlobalEnv") ename <- ".GlobalEnv"
+        envs <- c(envs, ename)
+        env <- parent.env(env)
+        }
+      return(envs)
+    }
+    ```
+    
 ## Recursing over environments
 
-1. Modify where() to find all environments that contain a binding for name.
+1.  __<span style="color:red">Q</span>__: Modify `where()` to find all environments that contain a binding for
+    `name`.  
+    __<span style="color:green">A</span>__: We look at the source code of the original `pryr::where()`:  
+    
+    ```{r, eval = FALSE}
+    pryr::where
+    function (name, env = parent.frame()) 
+      {
+      stopifnot(is.character(name), length(name) == 1)
+      env <- to_env(env)
+      if (identical(env, emptyenv())) {
+        stop("Can't find ", name, call. = FALSE)
+        }
+      if (exists(name, env, inherits = FALSE)) {
+        env
+        }
+      else {
+        where(name, parent.env(env)) # we will copy this line in the last if block
+      }
+    }
+    ```    
+    
+    Since `where()` stops searching when a match appears, we copy the recursive call in the `else` block to the `block` of the matching case, so that our new function `where2` will look for a binding within the complete search path.
 
-2. Write your own version of get() using a function written in the style of where().
+    ```{r, eval = FALSE}
+    
+    where2 <- function (name, env = parent.frame()) 
+      {
+      stopifnot(is.character(name), length(name) == 1)
+      env <- to_env(env)
+      if (identical(env, emptyenv())) {
+        stop("Can't find ", name, call. = FALSE)
+        }
+      if (exists(name, env, inherits = FALSE)) {
+        env
+        where(name, parent.env(env))
+        }
+      else {
+        where(name, parent.env(env))
+      }
+    }
+    ```   
 
-3. Write a function called fget() that finds only function objects. It should have two arguments, name and env, and should obey the regular scoping rules for functions: if there’s an object with a matching name that’s not a function, look in the parent. For an added challenge, also add an inherits argument which controls whether the function recurses up the parents or only looks in one environment.
+2.  __<span style="color:red">Q</span>__: Write your own version of `get()` using a function written in the style 
+    of `where()`.  
+    __<span style="color:green">A</span>__: 
 
-4. Write your own version of exists(inherits = FALSE) (Hint: use ls().) Write a recursive version that behaves like exists(inherits = TRUE).
+3.  __<span style="color:red">Q</span>__: Write a function called `fget()` that finds only function objects. It 
+    should have two arguments, `name` and `env`, and should obey the regular 
+    scoping rules for functions: if there's an object with a matching name 
+    that's not a function, look in the parent. For an added challenge, also 
+    add an `inherits` argument which controls whether the function recurses up 
+    the parents or only looks in one environment.  
+    __<span style="color:green">A</span>__: 
+
+4.  __<span style="color:red">Q</span>__: Write your own version of `exists(inherits = FALSE)` (Hint: use `ls()`.) 
+    Write a recursive version that behaves like `exists(inherits = TRUE)`.  
+    __<span style="color:green">A</span>__: 
 
 ## Function environments
 
-1. List the four environments associated with a function. What does each one do? Why is the distinction between enclosing and binding environments particularly important?
-
-2. Draw a diagram that shows the enclosing environments of this function:
-
+1.  __<span style="color:red">Q</span>__: List the four environments associated with a function. What does each one
+    do? Why is the distinction between enclosing and binding environments
+    particularly important?  
+    __<span style="color:green">A</span>__:  
+    *   Enclosing: where the function is created
+    *   Binding: where the function was assigned
+    *   Execution: a temporary environment which is created when the function is executed
+    *   Calling: the environment from where the function was called  
+    
+    The difference between binding and enclosing environment is important, because of R's lexical scoping rules. If R can't find an object in the current environment while executing a function, it will look for it in the enclosing environment.
+    
+2.  __<span style="color:red">Q</span>__: Draw a diagram that shows the enclosing environments of this function:
+    
+    ```{r, eval = FALSE}
     f1 <- function(x1) {
       f2 <- function(x2) {
         f3 <- function(x3) {
@@ -34,17 +141,27 @@
       f2(2)
     }
     f1(1)
+    ```  
+    
+    __<span style="color:green">A</span>__: 
+    
+3.  __<span style="color:red">Q</span>__: Expand your previous diagram to show function bindings.  
+__<span style="color:green">A</span>__: 
 
-3. Expand your previous diagram to show function bindings.
+4.  __<span style="color:red">Q</span>__: Expand it again to show the execution and calling environments.  
+__<span style="color:green">A</span>__: 
 
-4. Expand it again to show the execution and calling environments.
-
-5. Write an enhanced version of str() that provides more information about functions. Show where the function was found and what environment it was defined in.
+5.  __<span style="color:red">Q</span>__: Write an enhanced version of `str()` that provides more information 
+    about functions. Show where the function was found and what environment 
+    it was defined in.  
+    __<span style="color:green">A</span>__: 
 
 ## Binding names to values
 
-1. What does this function do? How does it differ from <<- and why might you prefer it?
-
+1.  __<span style="color:red">Q</span>__: What does this function do? How does it differ from `<<-` and why
+    might you prefer it?
+    
+    ```{r, error = TRUE}
     rebind <- function(name, value, env = parent.frame()) {
       if (identical(env, emptyenv())) {
         stop("Can't find ", name, call. = FALSE)
@@ -55,13 +172,19 @@
       }
     }
     rebind("a", 10)
-    #> Error: Can't find a
     a <- 5
     rebind("a", 10)
     a
-    #> [1] 10
+    ```  
+    
+    __<span style="color:green">A</span>__: 
 
-2. Create a version of assign() that will only bind new names, never re-bind old names. Some programming languages only do this, and are known as single assignment languages.
+2.  __<span style="color:red">Q</span>__: Create a version of `assign()` that will only bind new names, never 
+    re-bind old names. Some programming languages only do this, and are known 
+    as [single assignment languages][single assignment].  
+    __<span style="color:green">A</span>__: 
 
-3. Write an assignment function that can do active, delayed, and locked bindings. What might you call it? What arguments should it take? Can you guess which sort of assignment it should do based on the input?
-
+3.  __<span style="color:red">Q</span>__: Write an assignment function that can do active, delayed, and locked 
+    bindings. What might you call it? What arguments should it take? Can you 
+    guess which sort of assignment it should do based on the input?  
+    __<span style="color:green">A</span>__: 

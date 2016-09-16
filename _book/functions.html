@@ -25,7 +25,7 @@
 
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
-<meta name="date" content="2016-09-06">
+<meta name="date" content="2016-09-12">
 
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -51,6 +51,43 @@
 
 
 
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
 
 </head>
 
@@ -64,7 +101,7 @@
 
 <ul class="summary">
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a></li>
-<li class="chapter" data-level="1" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
+<li class="chapter" data-level="1" data-path="data-structures.html"><a href="data-structures.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
 <li class="chapter" data-level="2" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>2</b> Subsetting</a></li>
 <li class="chapter" data-level="3" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>3</b> Functions</a><ul>
 <li class="chapter" data-level="3.1" data-path="functions.html"><a href="functions.html#function-components"><i class="fa fa-check"></i><b>3.1</b> Function components</a></li>
@@ -108,64 +145,189 @@
 <div id="function-components" class="section level2">
 <h2><span class="header-section-number">3.1</span> Function components</h2>
 <ol style="list-style-type: decimal">
-<li><p>What function allows you to tell if an object is a function? What function allows you to tell if a function is a primitive function?</p></li>
-<li><p>This code makes a list of all functions in the base package.</p>
-<p>objs &lt;- mget(ls(“package:base”), inherits = TRUE) funs &lt;- Filter(is.function, objs)</p>
-<p>Use it to answer the following questions:</p></li>
-</ol>
+<li><p><strong><span style="color:red">Q</span></strong>: What function allows you to tell if an object is a function? What function allows you to tell if a function is a primitive function?<br />
+<strong><span style="color:green">A</span></strong>: You can test objects with <code>is.function</code> and <code>is.primitive</code>.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: This code makes a list of all functions in the base package.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">objs &lt;-<span class="st"> </span><span class="kw">mget</span>(<span class="kw">ls</span>(<span class="st">&quot;package:base&quot;</span>), <span class="dt">inherits =</span> <span class="ot">TRUE</span>)
+funs &lt;-<span class="st"> </span><span class="kw">Filter</span>(is.function, objs)</code></pre></div>
+<p>Use it to answer the following questions:</p>
 <ol style="list-style-type: lower-alpha">
 <li><p>Which base function has the most arguments?</p></li>
 <li><p>How many base functions have no arguments? What’s special about those functions?</p></li>
 <li><p>How could you adapt the code to find all primitive functions?</p></li>
 </ol>
-<ol start="3" style="list-style-type: decimal">
-<li><p>What are the three important components of a function?</p></li>
-<li><p>When does printing a function not show what environment it was created in?</p></li>
+<p><strong><span style="color:green">A</span></strong>:</p>
+<ol style="list-style-type: lower-alpha">
+<li>First we create a named vector that returns the number of arguments per function and then we subset it with the index of it’s maximum entry:</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f_arg_length &lt;-<span class="st"> </span><span class="kw">sapply</span>(funs, function(x) <span class="kw">length</span>(<span class="kw">formals</span>(x)))
+f_arg_length[<span class="kw">which.max</span>(f_arg_length)]</code></pre></div>
+<pre><code>## scan 
+##   22</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li>We check the number of functions with <code>formals()</code> returning <code>0</code> or <code>NULL</code>. Then we will see, that all of these functions have <code>formals</code> equal to <code>NULL</code>, which means, that they should be primitive functions.</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(<span class="kw">sapply</span>(funs, function(x) <span class="kw">is.null</span>(<span class="kw">formals</span>(x)) |<span class="st"> </span><span class="kw">length</span>(<span class="kw">formals</span>(x)) ==<span class="st"> </span><span class="dv">0</span>))</code></pre></div>
+<pre><code>## [1] 225</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(<span class="kw">sapply</span>(funs, function(x) !<span class="kw">is.null</span>(<span class="kw">formals</span>(x)) &amp;<span class="st"> </span><span class="kw">length</span>(<span class="kw">formals</span>(x)) ==<span class="st"> </span><span class="dv">0</span>))</code></pre></div>
+<pre><code>## [1] 0</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(<span class="kw">sapply</span>(funs, function(x) <span class="kw">is.null</span>(<span class="kw">formals</span>(x))))</code></pre></div>
+<pre><code>## [1] 225</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(<span class="kw">sapply</span>(funs, function(x) <span class="kw">is.null</span>(<span class="kw">formals</span>(x)) &amp;<span class="st"> </span><span class="kw">is.primitive</span>(x)))</code></pre></div>
+<pre><code>## [1] 183</code></pre>
+Hence not all functions with <code>formals</code> equal to <code>NULL</code> are primitive functions, there must be non primitive functions with this property too.
+<ol start="3" style="list-style-type: lower-alpha">
+<li>Change the predicate in <code>Filter</code> to <code>is.primitive</code>:</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">funs &lt;-<span class="st"> </span><span class="kw">Filter</span>(is.primitive, objs)</code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What are the three important components of a function?<br />
+<strong><span style="color:green">A</span></strong>: <code>body()</code>, <code>formals()</code> and <code>environment()</code>.</p>
+<blockquote>
+<p>There is one exception to the rule that functions have three components. Primitive functions, like <code>sum()</code>, call C code directly with <code>.Primitive()</code> and contain no R code. Therefore their <code>formals()</code>, <code>body()</code>, and <code>environment()</code> are all <code>NULL</code>.</p>
+</blockquote></li>
+<li><p><strong><span style="color:red">Q</span></strong>: When does printing a function not show what environment it was created in?<br />
+<strong><span style="color:green">A</span></strong>: When it was created in the global environment.</p></li>
 </ol>
 </div>
 <div id="lexical-scoping" class="section level2">
 <h2><span class="header-section-number">3.2</span> Lexical Scoping</h2>
 <ol style="list-style-type: decimal">
-<li><p>What does the following code return? Why? What does each of the three c’s mean?</p>
-<p>c &lt;- 10 c(c = c)</p></li>
-<li><p>What are the four principles that govern how R looks for values?</p>
-<p>What does the following function return? Make a prediction before running the code yourself.</p>
-<p>f &lt;- function(x) { f &lt;- function(x) { f &lt;- function(x) { x ^ 2 } f(x) + 1 } f(x) * 2 } f(10)</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What does the following code return? Why? What does each of the three <code>c</code>’s mean?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">c &lt;-<span class="st"> </span><span class="dv">10</span>
+<span class="kw">c</span>(<span class="dt">c =</span> c)</code></pre></div>
+<p><strong><span style="color:green">A</span></strong>: A named vector c, which first field has the name value 10 and the name “c”. The first “c” is the <code>c()</code> function, the second is the name of the first entry and the third is the value of the first entry.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What are the four principles that govern how R looks for values?<br />
+<strong><span style="color:green">A</span></strong>: As stated in the book:</p>
+<blockquote>
+<p>There are four basic principles behind R’s implementation of lexical scoping:</p>
+</blockquote>
+<ul>
+<li>name masking</li>
+<li>functions vs. variables</li>
+<li>a fresh start</li>
+<li>dynamic lookup</li>
+</ul></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What does the following function return? Make a prediction before running the code yourself.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span>function(x) {
+  f &lt;-<span class="st"> </span>function(x) {
+    f &lt;-<span class="st"> </span>function(x) {
+      x ^<span class="st"> </span><span class="dv">2</span>
+    }
+    <span class="kw">f</span>(x) +<span class="st"> </span><span class="dv">1</span>
+  }
+  <span class="kw">f</span>(x) *<span class="st"> </span><span class="dv">2</span>
+}
+<span class="kw">f</span>(<span class="dv">10</span>)</code></pre></div>
+<p><strong><span style="color:green">A</span></strong>: 202</p></li>
 </ol>
 </div>
 <div id="function-arguments" class="section level2">
 <h2><span class="header-section-number">3.3</span> Function arguments</h2>
 <ol style="list-style-type: decimal">
-<li><p>Clarify the following list of odd function calls:</p>
-<p>x &lt;- sample(replace = TRUE, 20, x = c(1:10, NA)) y &lt;- runif(min = 0, max = 1, 20) cor(m = “k”, y = y, u = “p”, x = x)</p></li>
-<li><p>What does this function return? Why? Which principle does it illustrate?</p>
-<p>f1 &lt;- function(x = {y &lt;- 1; 2}, y = 0) { x + y } f1()</p></li>
-<li><p>What does this function return? Why? Which principle does it illustrate?</p>
-<p>f2 &lt;- function(x = z) { z &lt;- 100 x } f2()</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Clarify the following list of odd function calls:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dt">replace =</span> <span class="ot">TRUE</span>, <span class="dv">20</span>, <span class="dt">x =</span> <span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">10</span>, <span class="ot">NA</span>))
+<span class="co"># -&gt; sample(x = c(1:10, NA), size = 20, replace = TRUE)</span>
+y &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dt">min =</span> <span class="dv">0</span>, <span class="dt">max =</span> <span class="dv">1</span>, <span class="dv">20</span>)
+<span class="co"># -&gt; runif(n = 20, min = 0, max = 1)</span>
+<span class="kw">cor</span>(<span class="dt">m =</span> <span class="st">&quot;k&quot;</span>, <span class="dt">y =</span> y, <span class="dt">u =</span> <span class="st">&quot;p&quot;</span>, <span class="dt">x =</span> x)
+<span class="co"># -&gt; cor(x = x, y = y, use = &quot;pairwise.complete.obs&quot;, method = &quot;pearson&quot;)</span></code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What does this function return? Why? Which principle does it illustrate?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f1 &lt;-<span class="st"> </span>function(<span class="dt">x =</span> {y &lt;-<span class="st"> </span><span class="dv">1</span>; <span class="dv">2</span>}, <span class="dt">y =</span> <span class="dv">0</span>) {
+  x +<span class="st"> </span>y
+}
+<span class="kw">f1</span>()</code></pre></div>
+<p><strong><span style="color:green">A</span></strong>: It returns 3 and illustrates lazy evaluation. As you can see, y becomes 1, but only when x is evaluated inside the function (otherwise it is 0):</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f1_ &lt;-<span class="st"> </span>function(<span class="dt">x =</span> {y &lt;-<span class="st"> </span><span class="dv">1</span>; <span class="dv">2</span>}, <span class="dt">y =</span> <span class="dv">0</span>) {
+  y
+}
+<span class="kw">f1_</span>()</code></pre></div>
+<pre><code>## [1] 0</code></pre></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What does this function return? Why? Which principle does it illustrate?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f2 &lt;-<span class="st"> </span>function(<span class="dt">x =</span> z) {
+  z &lt;-<span class="st"> </span><span class="dv">100</span>
+  x
+}
+<span class="kw">f2</span>()</code></pre></div>
+<p><strong><span style="color:green">A</span></strong>: 100, lazy evaluation.</p></li>
 </ol>
 </div>
 <div id="special-calls" class="section level2">
 <h2><span class="header-section-number">3.4</span> Special calls</h2>
 <ol style="list-style-type: decimal">
-<li><p>Create a list of all the replacement functions found in the base package. Which ones are primitive functions?</p></li>
-<li><p>What are valid names for user-created infix functions?</p></li>
-<li><p>Create an infix xor() operator.</p></li>
-<li><p>Create infix versions of the set functions intersect(), union(), and setdiff().</p></li>
-<li><p>Create a replacement function that modifies a random location in a vector.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Create a list of all the replacement functions found in the base package. Which ones are primitive functions?<br />
+<strong><span style="color:green">A</span></strong>: We can find replacementfunctions by searching for functions that end on “&lt;-”:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">repls &lt;-<span class="st"> </span>funs[<span class="kw">grepl</span>(<span class="st">&quot;&lt;-$&quot;</span>, <span class="kw">names</span>(funs))]
+<span class="kw">Filter</span>(is.primitive, repls)</code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What are valid names for user-created infix functions?</p>
+<blockquote>
+<p><strong><span style="color:green">A</span></strong>: All user-created infix functions must start and end with <code>%</code> … they can contain any sequence of characters (except “%”, of course).</p>
+</blockquote></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Create an infix <code>xor()</code> operator.<br />
+<strong><span style="color:green">A</span></strong>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">`</span><span class="dt">%xor_%</span><span class="st">`</span> &lt;-<span class="st"> </span>function(a, b){
+  (a |<span class="st"> </span>b) &amp;<span class="st"> </span>!(a &amp;<span class="st"> </span>b)
+}</code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Create infix versions of the set functions <code>intersect()</code>, <code>union()</code>, and <code>setdiff()</code>.<br />
+<strong><span style="color:green">A</span></strong>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">`</span><span class="dt">%union_%</span><span class="st">`</span> &lt;-<span class="st"> </span>function(a, b){
+  <span class="kw">unique</span>(<span class="kw">c</span>(a, b))
+  }
+
+<span class="st">`</span><span class="dt">%intersect_%</span><span class="st">`</span> &lt;-<span class="st"> </span>function(a, b){
+  <span class="kw">unique</span>(<span class="kw">c</span>(a[a %in%<span class="st"> </span>b], b[b %in%<span class="st"> </span>a]))
+  }
+
+<span class="st">`</span><span class="dt">%setdiff_%</span><span class="st">`</span> &lt;-<span class="st"> </span>function(a, b){
+  a[!<span class="st"> </span>a %in%<span class="st"> </span>b]
+  }</code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Create a replacement function that modifies a random location in a vector.<br />
+<strong><span style="color:green">A</span></strong>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">`</span><span class="dt">random&lt;-</span><span class="st">`</span> &lt;-<span class="st"> </span>function(x, value){
+  x[<span class="kw">sample</span>(<span class="kw">length</span>(x), <span class="dv">1</span>)] &lt;-<span class="st"> </span>value
+  x
+  }</code></pre></div></li>
 </ol>
 </div>
 <div id="return-values" class="section level2">
 <h2><span class="header-section-number">3.5</span> Return Values</h2>
 <ol style="list-style-type: decimal">
-<li><p>How does the chdir parameter of source() compare to in_dir()? Why might you prefer one approach to the other?</p></li>
-<li><p>What function undoes the action of library()? How do you save and restore the values of options() and par()?</p></li>
-<li><p>Write a function that opens a graphics device, runs the supplied code, and closes the graphics device (always, regardless of whether or not the plotting code worked).</p></li>
-<li><p>We can use on.exit() to implement a simple version of capture.output().</p>
-<p>capture.output2 &lt;- function(code) { temp &lt;- tempfile() on.exit(file.remove(temp), add = TRUE)</p>
-<p>sink(temp) on.exit(sink(), add = TRUE)</p>
-<p>force(code) readLines(temp) } capture.output2(cat(“a”, “b”, “c”, sep = “”)) #&gt; [1] “a” “b” “c”</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: How does the <code>chdir</code> parameter of <code>source()</code> compare to <code>in_dir()</code>? Why might you prefer one approach to the other? The <code>in_dir()</code> approach was given in the book as</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">in_dir &lt;-<span class="st"> </span>function(dir, code) {
+  old &lt;-<span class="st"> </span><span class="kw">setwd</span>(dir)
+  <span class="kw">on.exit</span>(<span class="kw">setwd</span>(old))
+
+  <span class="kw">force</span>(code)
+  }</code></pre></div>
+<p><strong><span style="color:green">A</span></strong>: <code>in_dir()</code> takes a path to a working directory as an argument. At the beginning of the function the working directory is changed to this specification and with a call to <code>on.exit</code> it is guranteed, that when the function finishes the working directory also equals to this specification.</p>
+<p>In <code>source()</code> you need the <code>chdir</code> argument to specify, if the working directory should be changed during the evaluation to the <code>file</code> argument, if this is a pathname. The difference in <code>source</code> is, that the actual working directory as output of <code>getwd()</code> is saved to set it in <code>on.exit</code> before changing the directory to the pathname (given to the <code>file</code> argument) for the rest of the execution of the <code>source</code> function.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What function undoes the action of <code>library()</code>? How do you save and restore the values of <code>options()</code> and <code>par()</code>?<br />
+<strong><span style="color:green">A</span></strong>: Use <code>detach()</code> with <code>&quot;package:pacakgename&quot;</code> as first argument.<br />
+Use, getOption() with <code>&quot;optionname&quot;</code> as argument. Type <code>par()</code> in the console and you will get a list with all actual settings.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Write a function that opens a graphics device, runs the supplied code, and closes the graphics device (always, regardless of whether or not the plotting code worked).<br />
+<strong><span style="color:green">A</span></strong>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plot_pdf &lt;-<span class="st"> </span>function(code){
+  <span class="kw">pdf</span>(<span class="st">&quot;test.pdf&quot;</span>)
+  <span class="kw">on.exit</span>(<span class="kw">dev.off</span>())
+  code
+  }</code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: We can use <code>on.exit()</code> to implement a simple version of <code>capture.output()</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">capture.output2 &lt;-<span class="st"> </span>function(code) {
+  temp &lt;-<span class="st"> </span><span class="kw">tempfile</span>()
+  <span class="kw">on.exit</span>(<span class="kw">file.remove</span>(temp), <span class="dt">add =</span> <span class="ot">TRUE</span>)
+
+  <span class="kw">sink</span>(temp)
+  <span class="kw">on.exit</span>(<span class="kw">sink</span>(), <span class="dt">add =</span> <span class="ot">TRUE</span>)
+
+  <span class="kw">force</span>(code)
+  <span class="kw">readLines</span>(temp)
+}
+<span class="kw">capture.output2</span>(<span class="kw">cat</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>))</code></pre></div>
+<pre><code>## Warning in file.remove(temp): kann Datei &#39;C:\Users\mgo\AppData\Local\Temp
+## \Rtmpcv7eWN\file3e0460310fa&#39; nicht löschen. Grund &#39;Permission denied&#39;</code></pre>
+<pre><code>## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot;</code></pre>
+<p>Compare <code>capture.output()</code> to <code>capture.output2()</code>. How do the functions differ? What features have I removed to make the key ideas easier to see? How have I rewritten the key ideas to be easier to understand?<br />
+<strong><span style="color:green">A</span></strong>:</p></li>
 </ol>
-<p>Compare capture.output() to capture.output2(). How do the functions differ? What features have I removed to make the key ideas easier to see? How have I rewritten the key ideas to be easier to understand?</p>
 
 </div>
 </div>

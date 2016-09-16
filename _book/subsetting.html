@@ -25,7 +25,7 @@
 
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
-<meta name="date" content="2016-09-06">
+<meta name="date" content="2016-09-08">
 
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -33,7 +33,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="intro.html">
+<link rel="prev" href="data-structures.html">
 <link rel="next" href="functions.html">
 
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
@@ -51,6 +51,43 @@
 
 
 
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
 
 </head>
 
@@ -64,7 +101,7 @@
 
 <ul class="summary">
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a></li>
-<li class="chapter" data-level="1" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
+<li class="chapter" data-level="1" data-path="data-structures.html"><a href="data-structures.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
 <li class="chapter" data-level="2" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>2</b> Subsetting</a><ul>
 <li class="chapter" data-level="2.1" data-path="subsetting.html"><a href="subsetting.html#data-types"><i class="fa fa-check"></i><b>2.1</b> Data types</a></li>
 <li class="chapter" data-level="2.2" data-path="subsetting.html"><a href="subsetting.html#subsetting-operators"><i class="fa fa-check"></i><b>2.2</b> Subsetting operators</a></li>
@@ -106,28 +143,174 @@
 <div id="data-types" class="section level2">
 <h2><span class="header-section-number">2.1</span> Data types</h2>
 <ol style="list-style-type: decimal">
-<li><p>Fix each of the following common data frame subsetting errors:</p>
-<p>mtcars[mtcars$cyl = 4, ] mtcars[-1:4, ] mtcars[mtcars$cyl &lt;= 5] mtcars[mtcars$cyl == 4 | 6, ]</p></li>
-<li><p>Why does x &lt;- 1:5; x[NA] yield five missing values? (Hint: why is it different from x[NA_real_]?)</p></li>
-<li><p>What does upper.tri() return? How does subsetting a matrix with it work? Do we need any additional subsetting rules to describe its behaviour?</p>
-<p>x &lt;- outer(1:5, 1:5, FUN = “*“) x[upper.tri(x)]</p></li>
-<li><p>Why does mtcars[1:20] return an error? How does it differ from the similar mtcars[1:20, ]?</p></li>
-<li><p>Implement your own function that extracts the diagonal entries from a matrix (it should behave like diag(x) where x is a matrix).</p></li>
-<li><p>What does df[is.na(df)] &lt;- 0 do? How does it work?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Fix each of the following common data frame subsetting errors:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars[mtcars$cyl =<span class="st"> </span><span class="dv">4</span>, ]       <span class="co"># = -&gt; ==</span>
+mtcars[-<span class="dv">1</span>:<span class="dv">4</span>, ]                 <span class="co"># -1:4 -&gt; -(1:4)</span>
+mtcars[mtcars$cyl &lt;=<span class="st"> </span><span class="dv">5</span>]        <span class="co"># &quot;,&quot; is missing</span>
+mtcars[mtcars$cyl ==<span class="st"> </span><span class="dv">4</span> |<span class="st"> </span><span class="dv">6</span>, ]  <span class="co"># 6 -&gt; mtcars$cyl == 6</span></code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Why does <code>x &lt;- 1:5; x[NA]</code> yield five missing values? (Hint: why is it different from <code>x[NA_real_]</code>?)<br />
+<strong><span style="color:green">A</span></strong>: <code>NA</code> is of class logical, so <code>x[NA]</code> becomes recycled to <code>x[NA, NA, NA, NA, NA]</code>. Since subsetting an atomic with <code>NA</code> leads to an <code>NA</code>, you will get 5 of them returned.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What does <code>upper.tri()</code> return? How does subsetting a matrix with it work? Do we need any additional subsetting rules to describe its behaviour?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">outer</span>(<span class="dv">1</span>:<span class="dv">5</span>, <span class="dv">1</span>:<span class="dv">5</span>, <span class="dt">FUN =</span> <span class="st">&quot;*&quot;</span>)
+x[<span class="kw">upper.tri</span>(x)]</code></pre></div>
+<p><strong><span style="color:green">A</span></strong>: <code>upper.tri()</code> has really intuitive source code. It coerces it’s input to a matrix and returns a logical matrix. Hence describing it’s behaviour for the use of subsetting is based on everything that applies to subsetting with logical matrices.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Why does <code>mtcars[1:20]</code> return an error? How does it differ from the similar <code>mtcars[1:20, ]</code>?<br />
+<strong><span style="color:green">A</span></strong>: In the first case <code>mtcar</code> is subsetted with a vector and the statement should return a data.frame of the first 20 columns in <code>mtcars</code>. Since <code>mtcars</code> only has 11 columns, the index is out of bounds, which explains the error. The biggest difference of <code>mtcars[1:20, ]</code> to the former case, is that now <code>mtcars</code> is subsetted with two vectors. In this case you will get returned the first 20 rows and all columns (like subsetting a matrix).</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Implement your own function that extracts the diagonal entries from a matrix (it should behave like <code>diag(x)</code> where <code>x</code> is a matrix).<br />
+<strong><span style="color:green">A</span></strong>: First we copy the relevant part of the source code from the diag() function:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">function (<span class="dt">x =</span> <span class="dv">1</span>, nrow, ncol){
+  if (<span class="kw">is.matrix</span>(x)) {
+    if (<span class="kw">nargs</span>() &gt;<span class="st"> </span>1L) <span class="co"># this and the next line will be dropped</span>
+      <span class="kw">stop</span>(<span class="st">&quot;&#39;nrow&#39; or &#39;ncol&#39; cannot be specified when &#39;x&#39; is a matrix&quot;</span>) 
+    if ((m &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">dim</span>(x))) ==<span class="st"> </span>0L) 
+      <span class="kw">return</span>(<span class="kw">vector</span>(<span class="kw">typeof</span>(x), 0L))
+    y &lt;-<span class="st"> </span>x[<span class="dv">1</span> +<span class="st"> </span>0L:(m -<span class="st"> </span>1L) *<span class="st"> </span>(<span class="kw">dim</span>(x)[1L] +<span class="st"> </span><span class="dv">1</span>)]
+    nms &lt;-<span class="st"> </span><span class="kw">dimnames</span>(x)
+    if (<span class="kw">is.list</span>(nms) &amp;&amp;<span class="st"> </span>!<span class="kw">any</span>(<span class="kw">sapply</span>(nms, is.null)) &amp;&amp;<span class="st"> </span><span class="kw">identical</span>((nm &lt;-<span class="st"> </span>nms[[1L]][<span class="kw">seq_len</span>(m)]),
+                                                                nms[[2L]][<span class="kw">seq_len</span>(m)]))
+      <span class="kw">names</span>(y) &lt;-<span class="st"> </span>nm
+    <span class="kw">return</span>(y)
+  }
+  }</code></pre></div>
+<p>In the next step we drop the unncessary <code>nrow</code> and <code>ncol</code> argument and the related code in the 3rd and 4th line:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diag_v &lt;-<span class="st"> </span>function (<span class="dt">x =</span> <span class="dv">1</span>) {
+  if (<span class="kw">is.matrix</span>(x)) {
+    if ((m &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">dim</span>(x))) ==<span class="st"> </span>0L) 
+      <span class="kw">return</span>(<span class="kw">vector</span>(<span class="kw">typeof</span>(x), 0L))
+    y &lt;-<span class="st"> </span>x[<span class="dv">1</span> +<span class="st"> </span>0L:(m -<span class="st"> </span>1L) *<span class="st"> </span>(<span class="kw">dim</span>(x)[1L] +<span class="st"> </span><span class="dv">1</span>)] <span class="co"># subsetting with a vector</span>
+    nms &lt;-<span class="st"> </span><span class="kw">dimnames</span>(x)
+    if (<span class="kw">is.list</span>(nms) &amp;&amp;<span class="st"> </span>!<span class="kw">any</span>(<span class="kw">sapply</span>(nms, is.null)) &amp;&amp;<span class="st"> </span><span class="kw">identical</span>((nm &lt;-<span class="st"> </span>nms[[1L]][<span class="kw">seq_len</span>(m)]),
+                                                                nms[[2L]][<span class="kw">seq_len</span>(m)]))
+      <span class="kw">names</span>(y) &lt;-<span class="st"> </span>nm
+    <span class="kw">return</span>(y)
+  }
+  }</code></pre></div>
+<p>If we look for the idea to capture the diagonal elements, we can see that the input matrix is subsetted with a vector, so we called this function <code>diag_v</code>. Of course we can implement our own function <code>diag_m</code>, where we subset with a matrix.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diag_m &lt;-<span class="st"> </span>function (<span class="dt">x =</span> <span class="dv">1</span>) {
+  if (<span class="kw">is.matrix</span>(x)) {
+    if ((m &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">dim</span>(x))) ==<span class="st"> </span>0L) 
+      <span class="kw">return</span>(<span class="kw">vector</span>(<span class="kw">typeof</span>(x), 0L))
+    y &lt;-<span class="st"> </span>x[<span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1</span>:m,<span class="dv">1</span>:m), m)] <span class="co"># subsetting with a matrix</span>
+    nms &lt;-<span class="st"> </span><span class="kw">dimnames</span>(x)
+    if (<span class="kw">is.list</span>(nms) &amp;&amp;<span class="st"> </span>!<span class="kw">any</span>(<span class="kw">sapply</span>(nms, is.null)) &amp;&amp;<span class="st"> </span><span class="kw">identical</span>((nm &lt;-<span class="st"> </span>nms[[1L]][<span class="kw">seq_len</span>(m)]), 
+                                                                    nms[[2L]][<span class="kw">seq_len</span>(m)])) 
+      <span class="kw">names</span>(y) &lt;-<span class="st"> </span>nm
+    <span class="kw">return</span>(y)
+  }
+}</code></pre></div>
+<p>Now we can check if we get the same results as the original function and also compare the speed. Therefore we convert the relatively large <code>diamonds</code> dataset from the <code>ggplot2</code> package into a matrix.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diamonds_m &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(ggplot2::diamonds)
+
+<span class="kw">stopifnot</span>(<span class="kw">all.equal</span>(<span class="kw">diag</span>(diamonds_m),
+                    <span class="kw">diag_v</span>(diamonds_m),
+                    <span class="kw">diag_m</span>(diamonds_m))) <span class="co"># our functions succeed the little test</span>
+
+microbenchmark::<span class="kw">microbenchmark</span>(
+  <span class="kw">diag</span>(diamonds_m),
+  <span class="kw">diag_v</span>(diamonds_m),
+  <span class="kw">diag_m</span>(diamonds_m)
+)</code></pre></div>
+<pre><code>## Unit: microseconds
+##                expr    min     lq     mean median      uq    max neval cld
+##    diag(diamonds_m) 12.830 13.930 15.61970 14.297 15.0300 33.724   100  a 
+##  diag_v(diamonds_m) 16.130 17.229 19.78388 17.596 18.5120 45.088   100   b
+##  diag_m(diamonds_m) 16.496 18.329 21.57268 19.062 20.3445 97.506   100   b</code></pre>
+<p>The original function seems to be a little bit faster than the trimmed and our matrix version. Maybe this is tue to compiling issues</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diag_c &lt;-<span class="st"> </span>compiler::<span class="kw">cmpfun</span>(diag)
+diag_v_c &lt;-<span class="st"> </span>compiler::<span class="kw">cmpfun</span>(diag_v)
+diag_m_c &lt;-<span class="st"> </span>compiler::<span class="kw">cmpfun</span>(diag_m)
+
+<span class="co"># Now we can make a fair comparison of the speed:</span>
+
+microbenchmark::<span class="kw">microbenchmark</span>(
+  <span class="kw">diag_c</span>(diamonds_m),
+  <span class="kw">diag_v_c</span>(diamonds_m),
+  <span class="kw">diag_m_c</span>(diamonds_m)
+)</code></pre></div>
+<pre><code>## Unit: microseconds
+##                  expr    min     lq     mean median      uq    max neval
+##    diag_c(diamonds_m) 12.463 13.197 15.30818 13.564 14.4795 31.158   100
+##  diag_v_c(diamonds_m) 12.097 13.197 14.60808 13.564 14.2965 28.226   100
+##  diag_m_c(diamonds_m) 13.930 15.762 19.22296 16.129 17.7790 78.078   100
+##  cld
+##   a 
+##   a 
+##    b</code></pre>
+<p>We can see that our diag_m version is only a little bit slower than the original version. However the source code of the matrix version could be a bit easier to read.</p>
+<p>We could also take an idea from the source code of <code>upper.tri()</code> and subset with a logical vector (but it turns out to be really slow):</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diag_lv &lt;-<span class="st"> </span>function (<span class="dt">x =</span> <span class="dv">1</span>) {
+  if (<span class="kw">is.matrix</span>(x)) {
+    if ((m &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">dim</span>(x))) ==<span class="st"> </span>0L) 
+      <span class="kw">return</span>(<span class="kw">vector</span>(<span class="kw">typeof</span>(x), 0L))
+    y &lt;-<span class="st"> </span>x[<span class="kw">row</span>(x) ==<span class="st"> </span><span class="kw">col</span>(x)]
+    nms &lt;-<span class="st"> </span><span class="kw">dimnames</span>(x)
+    if (<span class="kw">is.list</span>(nms) &amp;&amp;<span class="st"> </span>!<span class="kw">any</span>(<span class="kw">sapply</span>(nms, is.null)) &amp;&amp;<span class="st"> </span><span class="kw">identical</span>((nm &lt;-<span class="st"> </span>nms[[1L]][<span class="kw">seq_len</span>(m)]), 
+                                                            nms[[2L]][<span class="kw">seq_len</span>(m)])) 
+      <span class="kw">names</span>(y) &lt;-<span class="st"> </span>nm
+    <span class="kw">return</span>(y)
+  }
+  }</code></pre></div>
+<p>compile it and compare it with the other versions</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diag_lv_c &lt;-<span class="st"> </span>compiler::<span class="kw">cmpfun</span>(diag_lv)
+<span class="kw">stopifnot</span>(<span class="kw">all.equal</span>(<span class="kw">diag</span>(diamonds_m),
+                    <span class="kw">diag_v_c</span>(diamonds_m),
+                    <span class="kw">diag_m_c</span>(diamonds_m),
+                    <span class="kw">diag_lv_c</span>(diamonds_m))) <span class="co"># our functions succeed the little test</span>
+
+microbenchmark::<span class="kw">microbenchmark</span>(
+  <span class="kw">diag</span>(diamonds_m),
+  <span class="kw">diag_v_c</span>(diamonds_m),
+  <span class="kw">diag_m_c</span>(diamonds_m),
+  <span class="kw">diag_lv_c</span>(diamonds_m)
+)</code></pre></div>
+<pre><code>## Unit: microseconds
+##                   expr      min       lq       mean    median       uq
+##       diag(diamonds_m)   12.464   13.564   17.71288   16.1290   21.078
+##   diag_v_c(diamonds_m)   12.831   13.930   18.83812   18.3290   22.911
+##   diag_m_c(diamonds_m)   14.296   15.763   23.69504   25.4765   28.959
+##  diag_lv_c(diamonds_m) 2650.972 2806.210 4032.19273 3071.2345 5270.052
+##       max neval cld
+##    42.888   100  a 
+##    31.891   100  a 
+##    43.621   100  a 
+##  5523.346   100   b</code></pre></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What does <code>df[is.na(df)] &lt;- 0</code> do? How does it work?<br />
+<strong><span style="color:green">A</span></strong>: It replaces all <code>NAs</code> within <code>df</code> with the value <code>0</code>. <code>is.na(df)</code> returns a logical matrix which is used to subset df. Since you can combine subsetting and assignment, only the matched part of <code>df</code> (the <code>NAs</code>) is replaced with <code>0</code> entries.</p></li>
 </ol>
 </div>
 <div id="subsetting-operators" class="section level2">
 <h2><span class="header-section-number">2.2</span> Subsetting operators</h2>
 <ol style="list-style-type: decimal">
-<li>Given a linear model, e.g., mod &lt;- lm(mpg ~ wt, data = mtcars), extract the residual degrees of freedom. Extract the R squared from the model summary (summary(mod))</li>
+<li><p><strong><span style="color:red">Q</span></strong>: Given a linear model, e.g., <code>mod &lt;- lm(mpg ~ wt, data = mtcars)</code>, extract the residual degrees of freedom. Extract the R squared from the model summary (<code>summary(mod)</code>)<br />
+<strong><span style="color:green">A</span></strong>: Since <code>mod</code> is of type list we can expect several possibilities:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mod$df.residual       <span class="co"># preserving output</span>
+mod$df.r              <span class="co"># preserving output with partial matching</span>
+mod[<span class="st">&quot;df.residual&quot;</span>]    <span class="co"># list output (without partial matching)</span>
+mod[[<span class="st">&quot;df.residual&quot;</span>]]  <span class="co"># preserving output (without partial matching)</span></code></pre></div>
+<p>The same states for <code>summary(mod)</code>, so we can use for example:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(mod)$r.squared</code></pre></div>
+<p>(To get tidy output from r-models in general also the <code>broom</code> package is a good alternative).</p></li>
 </ol>
 </div>
 <div id="applications" class="section level2">
 <h2><span class="header-section-number">2.3</span> Applications</h2>
 <ol style="list-style-type: decimal">
-<li><p>How would you randomly permute the columns of a data frame? (This is an important technique in random forests.) Can you simultaneously permute the rows and columns in one step?</p></li>
-<li><p>How would you select a random sample of m rows from a data frame? What if the sample had to be contiguous (i.e., with an initial row, a final row, and every row in between)?</p></li>
-<li><p>How could you put the columns in a data frame in alphabetical order?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: How would you randomly permute the columns of a data frame? (This is an important technique in random forests.) Can you simultaneously permute the rows and columns in one step?<br />
+<strong><span style="color:green">A</span></strong>: Combine <code>`[`</code> with the <code>sample()</code> function:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">iris[<span class="kw">sample</span>(<span class="kw">ncol</span>(iris))] <span class="co"># permute rows</span>
+iris[<span class="kw">sample</span>(<span class="kw">nrow</span>(iris)), <span class="kw">sample</span>(<span class="kw">ncol</span>(iris)), drop =<span class="st"> </span><span class="ot">FALSE</span>] <span class="co"># permute both at the same time</span></code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: How would you select a random sample of <code>m</code> rows from a data frame? What if the sample had to be contiguous (i.e., with an initial row, a final row, and every row in between)?<br />
+<strong><span style="color:green">A</span></strong>: For example</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m=<span class="dv">10</span>
+iris[<span class="kw">sample</span>(<span class="kw">nrow</span>(iris), m),]
+
+<span class="co"># Blockversion</span>
+start &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">nrow</span>(iris) -<span class="st"> </span>m +<span class="st"> </span><span class="dv">1</span>,<span class="dv">1</span>)
+end &lt;-<span class="st"> </span>start +<span class="st"> </span>m -<span class="st"> </span><span class="dv">1</span>
+iris[start:end, , drop =<span class="st"> </span><span class="ot">FALSE</span>]</code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: How could you put the columns in a data frame in alphabetical order?<br />
+<strong><span style="color:green">A</span></strong>: We can sort the names and subset by name:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">iris[<span class="kw">sort</span>(<span class="kw">names</span>(iris))]</code></pre></div></li>
 </ol>
 
 </div>
@@ -137,7 +320,7 @@
           </div>
         </div>
       </div>
-<a href="intro.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="data-structures.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 <a href="functions.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
 
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

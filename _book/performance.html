@@ -25,7 +25,7 @@
 
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
-<meta name="date" content="2016-09-06">
+<meta name="date" content="2016-09-08">
 
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -51,6 +51,43 @@
 
 
 
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
 
 </head>
 
@@ -64,7 +101,7 @@
 
 <ul class="summary">
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a></li>
-<li class="chapter" data-level="1" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
+<li class="chapter" data-level="1" data-path="data-structures.html"><a href="data-structures.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
 <li class="chapter" data-level="2" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>2</b> Subsetting</a></li>
 <li class="chapter" data-level="3" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>3</b> Functions</a></li>
 <li class="chapter" data-level="4" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>4</b> OO field guide</a></li>
@@ -106,20 +143,23 @@
 <div id="microbenchmarking" class="section level2">
 <h2><span class="header-section-number">13.1</span> Microbenchmarking</h2>
 <ol style="list-style-type: decimal">
-<li><p>Instead of using microbenchmark(), you could use the built-in function system.time(). But system.time() is much less precise, so you’ll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.</p>
-<p>n &lt;- 1:1e6 system.time(for (i in n) sqrt(x)) / length(n) system.time(for (i in n) x ^ 0.5) / length(n)</p></li>
-<li><p>How do the estimates from system.time() compare to those from microbenchmark()? Why are they different?</p></li>
+<li><p>Instead of using <code>microbenchmark()</code>, you could use the built-in function <code>system.time()</code>. But <code>system.time()</code> is much less precise, so you’ll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="dv">1</span>:<span class="fl">1e6</span>
+<span class="kw">system.time</span>(for (i in n) <span class="kw">sqrt</span>(x)) /<span class="st"> </span><span class="kw">length</span>(n)
+<span class="kw">system.time</span>(for (i in n) x ^<span class="st"> </span><span class="fl">0.5</span>) /<span class="st"> </span><span class="kw">length</span>(n)</code></pre></div>
+<p>How do the estimates from <code>system.time()</code> compare to those from <code>microbenchmark()</code>? Why are they different?</p></li>
 <li><p>Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.</p>
-<p>x ^ (1 / 2) exp(log(x) / 2)</p></li>
-<li><p>Use microbenchmarking to rank the basic arithmetic operators (+, -, *, /, and ^) in terms of their speed. Visualise the results. Compare the speed of arithmetic on integers vs. doubles.</p></li>
-<li><p>You can change the units in which the microbenchmark results are expressed with the unit parameter. Use unit = “eps” to show the number of evaluations needed to take 1 second. Repeat the benchmarks above with the eps unit. How does this change your intuition for performance?</p></li>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x ^<span class="st"> </span>(<span class="dv">1</span> /<span class="st"> </span><span class="dv">2</span>)
+<span class="kw">exp</span>(<span class="kw">log</span>(x) /<span class="st"> </span><span class="dv">2</span>)</code></pre></div></li>
+<li><p>Use microbenchmarking to rank the basic arithmetic operators (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, and <code>^</code>) in terms of their speed. Visualise the results. Compare the speed of arithmetic on integers vs. doubles.</p></li>
+<li><p>You can change the units in which the microbenchmark results are expressed with the <code>unit</code> parameter. Use <code>unit = &quot;eps&quot;</code> to show the number of evaluations needed to take 1 second. Repeat the benchmarks above with the eps unit. How does this change your intuition for performance?</p></li>
 </ol>
 </div>
 <div id="language-performance" class="section level2">
 <h2><span class="header-section-number">13.2</span> Language performance</h2>
 <ol style="list-style-type: decimal">
-<li><p>scan() has the most arguments (21) of any base function. About how much time does it take to make 21 promises each time scan is called? Given a simple input (e.g., scan(text = “1 2 3”, quiet = T)) what proportion of the total run time is due to creating those promises?</p></li>
-<li><p>Read “Evaluating the Design of the R Language”. What other aspects of the R-language slow it down? Construct microbenchmarks to illustrate.</p></li>
+<li><p><code>scan()</code> has the most arguments (21) of any base function. About how much time does it take to make 21 promises each time scan is called? Given a simple input (e.g., <code>scan(text = &quot;1 2 3&quot;, quiet = T)</code>) what proportion of the total run time is due to creating those promises?</p></li>
+<li><p>Read <a href="http://r.cs.purdue.edu/pub/ecoop12.pdf">“Evaluating the Design of the R Language”</a>. What other aspects of the R-language slow it down? Construct microbenchmarks to illustrate.</p></li>
 <li><p>How does the performance of S3 method dispatch change with the length of the class vector? How does performance of S4 method dispatch change with number of superclasses? How about RC?</p></li>
 <li><p>What is the cost of multiple inheritance and multiple dispatch on S4 method dispatch?</p></li>
 <li><p>Why is the cost of name lookup less for functions in the base package?</p></li>
@@ -128,7 +168,7 @@
 <div id="implementations-performance" class="section level2">
 <h2><span class="header-section-number">13.3</span> Implementations performance</h2>
 <ol style="list-style-type: decimal">
-<li><p>The performance characteristics of squish_ife(), squish_p(), and squish_in_place() vary considerably with the size of x. Explore the differences. Which sizes lead to the biggest and smallest differences?</p></li>
+<li><p>The performance characteristics of <code>squish_ife()</code>, <code>squish_p()</code>, and <code>squish_in_place()</code> vary considerably with the size of <code>x</code>. Explore the differences. Which sizes lead to the biggest and smallest differences?</p></li>
 <li><p>Compare the performance costs of extracting an element from a list, a column from a matrix, and a column from a data frame. Do the same for rows.</p></li>
 </ol>
 
