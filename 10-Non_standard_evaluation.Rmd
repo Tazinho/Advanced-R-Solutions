@@ -7,30 +7,69 @@
     following call produces a vector of length two:
 
     ```{r, eval = FALSE}
+    g <- function(x) deparse(substitute(x))
     g(a + b + c + d + e + f + g + h + i + j + k + l + m +
       n + o + p + q + r + s + t + u + v + w + x + y + z)
     ```
 
     Why does this happen? Carefully read the documentation for `?deparse`. Can you write a
     wrapper around `deparse()` so that it always returns a single string?
-
+    
+    __<span style="color:green">A</span>__: `deparse()` has a `width.cutoff` argument, which is according to `?deparse` an:
+    
+    > integer in [20, 500] determining the cutoff (in bytes) at which line-breaking is tried.
+    
+    Further:
+    
+    > width.cutoff is a lower bound for the line lengths: deparsing a line proceeds until at least width.cutoff bytes have been output and e.g. arg = value expressions will not be split across lines.
+    
+    You can wrap it with `paste0` for example:
+    
+    ```{r, eval = FALSE}
+    deparse_without_cutoff <- function(x){
+      paste0(deparse(x), collapse = "")
+    }
+    ```
+    
 2.  __<span style="color:red">Q</span>__: Why does `as.Date.default()` use `substitute()` and `deparse()`?
     Why does `pairwise.t.test()` use them? Read the source code.
+    
+    __<span style="color:green">A</span>__: `as.Date.default()` uses them to convert unexpected input expressions (neither dates, nor `NAs`) into a character string and return it within an error message.
+    
+    `pairwise.t.test()` uses them to convert the names of it's datainputs (response vector `x` and grouping factor `g`) into character strings to format these further into a part of the desired output.
 
 3.  __<span style="color:red">Q</span>__: `pairwise.t.test()` assumes that `deparse()` always returns a length one 
     character vector. Can you construct an input that violates this expectation? 
     What happens?
+    
+    __<span style="color:green">A</span>__: We can pass an expression to one of `pairwise.t.test()`'s data input arguments, which exceeds the default cutoff width in `deparse()`. The expression will be splitted into a character vector of length greater 1. Since the deparsed data inputs are directly pasted (read the source code!) with "and" as separator, and the result is just used to be displayed in the output. Just the data.name output will change (it will include more than one "and").
+    
+    ```{r}
+    d=1
+    pairwise.t.test(2, d+d+d+d+d+d+d+d+d+d+d+d+d+d+d+d+d)
+    ```
 
 4.  __<span style="color:red">Q</span>__: `f()`, defined above, just calls `substitute()`. Why can't we use it
     to define `g()`? In other words, what will the following code return?
     First make a prediction. Then run the code and think about the results.
 
     ```{r, eval = FALSE}
-    f <- function(x) substitute(x)
-    g <- function(x) deparse(f(x))
-    g(1:10)
-    g(x)
-    g(x + y ^ 2 / z + exp(a * sin(b)))
+    f <- function(x) substitute(x) 
+    g <- function(x) deparse(f(x)) 
+    g(1:10)                             # -> x
+    g(x)                                # -> x
+    g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x
+    ```
+
+    
+    __<span style="color:green">A</span>__: All return x, because `substitute`'s second argument `env` is the current evaluation environment `environment()`. If you call `substitute` from another function, you may want to set the `env` argument to `parent.frame()`, which refers to the calling environment:
+
+    ```{r, eval = FALSE}
+    f <- function(x) substitute(x, env = parent.frame()) 
+g <- function(x) deparse(f(x)) 
+g(1:10)                             # -> 1:10
+g(x)                                # -> x
+g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
     ```
 
 ## Non standard evaluation in subset
@@ -38,10 +77,14 @@
 1.  __<span style="color:red">Q</span>__: Predict the results of the following lines of code:
 
     ```{r, eval = FALSE}
-    eval(quote(eval(quote(eval(quote(2 + 2))))))
-    eval(eval(quote(eval(quote(eval(quote(2 + 2)))))))
-    quote(eval(quote(eval(quote(eval(quote(2 + 2)))))))
+    eval(quote(eval(quote(eval(quote(2 + 2))))))        # -> 4
+    eval(eval(quote(eval(quote(eval(quote(2 + 2)))))))  # -> 4
+    quote(eval(quote(eval(quote(eval(quote(2 + 2))))))) 
+        # eval(quote(eval(quote(eval(quote(2 + 2))))))
     ```
+
+
+    __<span style="color:green">A</span>__: An outside `quote` always wins...
 
 2.  __<span style="color:red">Q</span>__: `subset2()` has a bug if you use it with a single column data frame.
     What should the following code return? How can you modify `subset2()`
@@ -57,9 +100,14 @@
     subset2(sample_df2, x > 8)
     ```
 
+    
+    __<span style="color:green">A</span>__: The output is an atomic vector. To return always a data.frame change the last row in `subset2` to `x[r, , drop = FALSE]`.
+
 3.  __<span style="color:red">Q</span>__: The real subset function (`subset.data.frame()`) removes missing
     values in the condition. Modify `subset2()` to do the same: drop the 
     offending rows.
+    
+    __<span style="color:green">A</span>__: This time change the last row to `x[!is.na(r) & r, , drop = FALSE]`.
 
 4.  __<span style="color:red">Q</span>__: What happens if you use `quote()` instead of `substitute()` inside of
     `subset2()`?
@@ -80,9 +128,34 @@
     }
     select(mtcars, -cyl)
     ```
+    
+    __<span style="color:green">A</span>__: We can comment what happens
+    
+    ```{r, eval = FALSE}
+    select <- function(df, vars) {
+      vars <- substitute(vars)
+      var_pos <- setNames(as.list(seq_along(df)), names(df)) # We create a list with 
+      # columnnumbers and -names of the original data.frame.
+      pos <- eval(vars, var_pos) # We evaluate the supplied variable names within the
+      # list of all names of the data.frame and return the values of the mathing variable
+      # names and list elements (the positions of supplied variables within the supplied data.frame).
+      df[, pos, drop = FALSE] # now we just subset the data.frame by it's column index.
+    }
+    select(mtcars, -cyl)
+    ```
 
 6.  __<span style="color:red">Q</span>__: What does `evalq()` do? Use it to reduce the amount of typing for the
-    examples above that use both `eval()` and `quote()`.
+    examples above that use both `eval()` and `quote()`. 
+    
+    __<span style="color:green">A</span>__: From the help of `eval()`:
+    
+    > The evalq form is equivalent to eval(quote(expr), ...). eval evaluates its first argument in the current scope before passing it to the evaluator: evalq avoids this.
+    
+    In other "words":
+    
+    ```{r, eval = FALSE}
+    identical(eval(quote(x)), evalq(x)) # -> TRUE
+    ```
 
 ## Scoping issues
 
@@ -90,10 +163,73 @@
     rows, it reorders them. How does it work? What does
     `substitute(order(...))` do? Create a function that does only that
     and experiment with it.
+    
+    __<span style="color:green">A</span>__: `substitute(order(...))` orders the indices of the supplied
+    columns in `...` in the context of the submitted data.frame argument, beginning with the first submitted column.
+  
+    We can just copy the part of the source code and see if it does what we expect:
+  
+    ```{r,  eval = FALSE}
+    arrange_indices <- function (df, ...){
+      stopifnot(is.data.frame(df))
+      ord <- eval(substitute(order(...)), df, parent.frame())
+      ord
+      }
+    
+    identical(arrange_indices(iris, Species, Sepal.Length),
+              order(iris$Species, iris$Sepal.Length))
+    ```
 
 2.  __<span style="color:red">Q</span>__: What does `transform()` do? Read the documentation. How does it work?
     Read the source code for `transform.data.frame()`. What does
     `substitute(list(...))` do?
+    
+    __<span style="color:green">A</span>__: As stated in the next question `transform()` is similar to `plyr::mutate()` but `plyr::mutate()` applies the transformations sequentially so that transformation can refer to columns
+    that were just created. The rest of the question can be answered, by just commenting the source code:
+    
+    ```{r, eval = FALSE}
+    # Setting "..." as function argument allows the user to specify any kind of named 
+    # argument to the function. In this case we can expect arguments of the form 
+    # new_col1 = foo(col_in_data_argument), new_col2 = foo(col_in_data_argument),... 
+    > transform.data.frame
+    function (`_data`, ...) 
+    {
+      # subsitute(list(...)) takes the dots into a list and just returns the expression `list(...)`.
+      # Nothing is evaluated until now (which is important). 
+      # Evaluation of the expression happens with the `eval()` function.
+      # This means: all the names of the arguments in `...` like new_col1, new_col2,...
+      # become names of the list `e`.
+      # All functions/variables like foo(column_in_data_argument) are evaluated within the context
+      # (environment) of the `_data` argument supplied to the `transform()` function (this is 
+      # specified by the second argument of the eval() function).
+      e <- eval(substitute(list(...)), `_data`, parent.frame())
+      
+      # Everything that happens from now on is just about formatting and
+      # returning the correct columns:
+      # We save the names of the list (the names of the added columns)
+      tags <- names(e)
+      # We create a numeric vector and check if the tags (names of the added columns) appear in 
+      # the names of the supplied `_data` argument. If yes, we save the column number, if not we
+      # save an NA.
+      inx <- match(tags, names(`_data`))
+      # We create a logical vector, which is telling us if a column_name is already in the
+      # data.frame (TRUE) or really new (FALSE)
+      matched <- !is.na(inx)
+      # If any new column is corresponding to an old column name,
+      # the correspong old columns will be overwritten
+      if (any(matched)) {
+        `_data`[inx[matched]] <- e[matched]
+        `_data` <- data.frame(`_data`)
+      }
+      # If there is at least one new column name, all of these new columns will be bound
+      # on the old data.frame (which might have changed a bit during the first if). Then the
+      # transformed `data_` is returned
+      if (!all(matched)) 
+        do.call("data.frame", c(list(`_data`), e[!matched]))
+      # Also in case of no new column names the transformed `data_` is returned
+      else `_data`
+    }
+    ```
 
 3.  __<span style="color:red">Q</span>__: `plyr::mutate()` is similar to `transform()` but it applies the
     transformations sequentially so that transformation can refer to columns
@@ -107,6 +243,39 @@
 
     How does mutate work? What's the key difference between `mutate()` and
     `transform()`?
+    
+    __<span style="color:green">A</span>__: The main difference is the possibility of sequential transformations. 
+    Another difference is that unnamed added columns will be thrown away. For the implementation many ideas are 
+    are the same. However the key difference is that for the sequential transformations, a for loop is created
+    which iterates over a list of expressions and simultaneously changes the environment for the evaluation of the
+    next expression (which is the supplied data). This should become clear with some comments on the code:
+    
+    ```{r, eval = FALSE}
+    > mutate
+    function (.data, ...) 
+    {
+      stopifnot(is.data.frame(.data) || is.list(.data) || is.environment(.data))
+      # we catch everything supplied in `...`. But this time we save this in a list of expressions.
+      # However, again the added column names will be the names of this list.
+      cols <- as.list(substitute(list(...))[-1])
+      cols <- cols[names(cols) != ""] # all unnamed arguments in `...` will be thrown away, in 
+      # contrast to `transform()` above, which just creates new columnnames.
+      
+      # Now a for loop evaluates all added columns iteratively in the context (environment)
+      # of the data. 
+      # We start with the first added column:.
+      # If the column name is already in the data, the old column will be overritten. 
+      # If the column name is new, it will be created
+      # Since the underlying data (the environment for the evaluation) gets automatically
+      # "updated" in every iteration of the for loop, it will be possible to use the new columns
+      # directly in the next iteration (which relates to the next added column)
+      for (col in names(cols)) {
+        .data[[col]] <- eval(cols[[col]], .data, parent.frame())
+      }
+      # Afterwards the data gets returned
+      .data
+    }
+    ```
 
 4.  __<span style="color:red">Q</span>__: What does `with()` do? How does it work? Read the source code for
     `with.default()`. What does `within()` do? How does it work? Read the

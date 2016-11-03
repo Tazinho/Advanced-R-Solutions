@@ -10,11 +10,7 @@
    variation (the standard deviation divided by the mean) for all columns in 
    the `mtcars` dataset
     
-    __<span style="color:green">A</span>__:  
-    
-    ```{r, eval = FALSE}
-    lapply(mtcars, function(x) sd(x)/mean(x))
-    ```  
+    __<span style="color:green">A</span>__: `lapply(mtcars, function(x) sd(x)/mean(x))`.  
 
 3. __<span style="color:red">Q</span>__: Use `integrate()` and an anonymous function to find the area under the 
    curve for the following functions. 
@@ -25,6 +21,12 @@
     1. `y = exp(x) / x`, x in [10, 20]
 
     __<span style="color:green">A</span>__: 
+    
+    ```{r, eval = FALSE}
+    integrate(function(x) x^2 - x, 0, 10)
+    integrate(function(x) sin(x) + cos(x), -pi, pi)
+    integrate(function(x) exp(x) / x, 10, 20)
+    ```
 
 4. __<span style="color:red">Q</span>__: A good rule of thumb is that an anonymous function should fit on one line 
    and shouldn't need to use `{}`. Review your code. Where could you have 
@@ -35,7 +37,9 @@
 ## Closures
 
 1.  __<span style="color:red">Q</span>__: Why are functions created by other functions called closures?  
-__<span style="color:green">A</span>__: 
+__<span style="color:green">A</span>__: As stated in the book:
+
+    > because they enclose the environment of the parent function and can access all its variables.
 
 2.  __<span style="color:red">Q</span>__: What does the following statistical function do? What would be a better 
     name for it? (The existing name is a bit of a hint.)
@@ -53,10 +57,10 @@ __<span style="color:green">A</span>__:
     __<span style="color:green">A</span>__: 
 
 3.  __<span style="color:red">Q</span>__: What does `approxfun()` do? What does it return?  
-__<span style="color:green">A</span>__: 
+__<span style="color:green">A</span>__: `approxfun` basically takes a combination of 2-dimensional data points + some extra specifications as arguments and returns a stepwise linear or constant interpolation function (defined on the range of given x-values, by default).
 
 4.  __<span style="color:red">Q</span>__: What does `ecdf()` do? What does it return?  
-__<span style="color:green">A</span>__: 
+__<span style="color:green">A</span>__: "ecdf" means empirical density function. For a numeric vector, `ecdf()` returns the appropriate density function (of class "ecdf", which is inheriting from class "stepfun"). You can describe it's behaviour in 2 steps. In the first part of it's body, the `(x,y)` pairs for the nodes of the density function are calculated. In the second part these pairs are given to `approxfun`.
 
 5.  __<span style="color:red">Q</span>__: Create a function that creates functions that compute the ith 
     [central moment](http://en.wikipedia.org/wiki/Central_moment) of a numeric 
@@ -71,7 +75,13 @@ __<span style="color:green">A</span>__:
     stopifnot(all.equal(m2(x), var(x) * 99 / 100))
     ```  
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: For a discrete formulation look [here](http://www.r-tutor.com/elementary-statistics/numerical-measures/moment)
+    
+    ```{r, eval = FALSE}
+    moment <- function(i){
+      function(x) sum((x - mean(x)) ^ i) / length(x)
+      }
+    ```
 
 6.  __<span style="color:red">Q</span>__: Create a function `pick()` that takes an index, `i`, as an argument and 
     returns a function with an argument `x` that subsets `x` with `i`.
@@ -83,6 +93,16 @@ __<span style="color:green">A</span>__:
     ```  
     
     __<span style="color:green">A</span>__: 
+    
+    ```{r, eval = FALSE}
+    pick <- function(i){
+      function(x) x[[i]]
+      }
+    
+    stopifnot(identical(lapply(mtcars, pick(5)),
+                        lapply(mtcars, function(x) x[[5]]))
+              )
+    ```
     
 ## Lists of functions
 
