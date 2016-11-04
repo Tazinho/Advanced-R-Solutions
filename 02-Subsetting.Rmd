@@ -32,7 +32,7 @@
 
 5.  __<span style="color:red">Q</span>__: Implement your own function that extracts the diagonal entries from a
     matrix (it should behave like `diag(x)` where `x` is a matrix).  
-    __<span style="color:green">A</span>__: First we copy the relevant part of the source code from the diag() function:
+    __<span style="color:green">A</span>__: First we copy the relevant part of the source code from the `diag()` function:
 
     ```{r, eval = FALSE}
     function (x = 1, nrow, ncol){
@@ -69,7 +69,7 @@
     ```
     
     If we look for the idea to capture the diagonal elements, we can see that the     input matrix
-    is subsetted with a vector, so we called this function `diag_v`. Of course we     can implement our own function `diag_m`, where we subset with a matrix.
+    is subsetted with a vector, so we called this function `diag_v()`. Of course we     can implement our own function `diag_m()`, where we subset with a matrix.
     
     ```{r}
     diag_m <- function (x = 1) {
@@ -103,7 +103,7 @@
     )
     ```
     
-    The original function seems to be a little bit faster than the trimmed and our matrix version. Maybe     this is tue to compiling issues
+    The original function seems to be a little bit faster than the trimmed and our matrix version. Maybe     this is due to compiling issues
     
     ```{r}
     diag_c <- compiler::cmpfun(diag)
@@ -158,8 +158,8 @@
     ```
 
 6.  __<span style="color:red">Q</span>__: What does `df[is.na(df)] <- 0` do? How does it work?  
-__<span style="color:green">A</span>__: It replaces all `NAs` within `df` with the value
-`0`. `is.na(df)` returns a logical matrix which is used to subset df. Since you can combine subsetting and assignment, only the matched part of `df` (the `NAs`) is replaced with `0` entries.
+__<span style="color:green">A</span>__: It replaces all `NA`s within `df` with the value
+`0`. `is.na(df)` returns a logical matrix which is used to subset df. Since you can combine subsetting and assignment, only the matched part of `df` (the `NA`s) is replaced with `0` entries.
 
 ## Subsetting operators
 
@@ -205,7 +205,7 @@ __<span style="color:green">A</span>__: It replaces all `NAs` within `df` with t
     iris[sample(nrow(iris), m),]
     
     # Blockversion
-    start <- sample(nrow(iris) - m + 1,1)
+    start <- sample(nrow(iris) - m + 1, 1)
     end <- start + m - 1
     iris[start:end, , drop = FALSE]
     ```
