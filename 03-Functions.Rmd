@@ -66,7 +66,7 @@ __<span style="color:green">A</span>__: When it was created in the global enviro
     c(c = c)
     ```  
     
-    __<span style="color:green">A</span>__: A named vector c, which first field has the name value 10 and the name "c".
+    __<span style="color:green">A</span>__: A named vector c, which first field has the value 10 and the name "c".
     The first "c" is the `c()` function, the second is the name of the first entry and the third is the value of the first entry.
        
 2. __<span style="color:red">Q</span>__: What are the four principles that govern how R looks for values?  
@@ -119,15 +119,37 @@ __<span style="color:green">A</span>__:   As stated in the book:
     ```  
     
     __<span style="color:green">A</span>__: It returns 3 and illustrates lazy evaluation.
-    As you can see, y becomes 1, but only when x is evaluated inside the function (otherwise it is 0):
+    As you can see, y becomes 1, but only when `x` is evaluated (before `y`) inside the function (otherwise it is 0):
     
     ```{r}    
-    f1_ <- function(x = {y <- 1; 2}, y = 0) {
+    f2 <- function(x = {y <- 1; 2}, y = 0) {
       y
     }
-    f1_()
+    f2()
     ```  
     
+    Note that funny things can happen if we switch the evaluation order (even within one line)
+    
+    ```{r}    
+    f3 <- function(x = {y <- 1; 2}, y = 0) {
+      y + x
+    }
+    f3()
+    ```
+
+
+    or we evaluate `y` once before and once after the evaluation of `x`
+    
+    ```{r}    
+    f4 <- function(x = {y <- 1; 2}, y = 0) {
+      y_before_x <- y
+      x
+      y_after_x <- y
+      c(y_before_x, y_after_x)
+    }
+    f4()
+    ```
+
 3.  __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
 
     ```{r, eval = FALSE}
@@ -210,7 +232,7 @@ __<span style="color:green">A</span>__:
     
     __<span style="color:green">A</span>__: `in_dir()` takes a path to a working directory as an argument. At the beginning of the function the working directory is changed to this specification and with a call to `on.exit` it is guranteed, that when the function finishes the working directory also equals to this specification.
     
-    In `source()` you need the `chdir` argument to specify, if the working directory should be changed during the evaluation to the `file` argument, if this is a pathname. The difference in `source` is, that the actual working directory as output of `getwd()` is saved to set it in `on.exit` before changing the directory to the pathname (given to the `file` argument) for the rest of the execution of the `source` function.
+    In `source()` you need the `chdir` argument to specify, if the working directory should be changed during the evaluation to the `file` argument, if this is a pathname. The difference in `source()` is, that the actual working directory as output of `getwd()` is saved to set it in `on.exit` before changing the directory to the pathname (given to the `file` argument) for the rest of the execution of the `source()` function.
 
 2.  __<span style="color:red">Q</span>__: What function undoes the action of `library()`? How do you save and restore
     the values of `options()` and `par()`?  
