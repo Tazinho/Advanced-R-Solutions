@@ -84,7 +84,7 @@ g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
     ```
 
 
-    __<span style="color:green">A</span>__: An outside `quote` always wins...
+    __<span style="color:green">A</span>__: An outside `quote()` always wins...
 
 2.  __<span style="color:red">Q</span>__: `subset2()` has a bug if you use it with a single column data frame.
     What should the following code return? How can you modify `subset2()`
@@ -291,6 +291,37 @@ g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
     * `substitute()`
     * `data()`
     * `data.frame()`
+    
+    __<span style="color:green">A</span>__: 
+    For NSE in `rm()`, we just look at it's first two arguments: `...` and `list = character()`.
+    If we supply expressions to `...` (which can also be character vectors) ,
+    these will be caught by `match.call()` and become an unevaluated call 
+    (in this case a pairlist). However, rm copies and converts the expressions into a character
+    representation and concatenates these with the character vector supplied to the list argument.
+    Then the removing starts...
+    The escape hatch is to supply the objects to be removed as a character vector to           `rm()`'s list argument.
+    
+    You can supply the input to `library()`'s and `require()`'s first argument (`package`) with or         without quotes.
+    In the default case (`character.only = FALSE`) the input to package will be converted via
+    `as.character(substitute(package))`. To ommit this, just supply a character vector and set
+    `character.only = TRUE`.
+    
+    `substitute()` and `eval()`/`quote` are the basic functions for NSE. To see how it's        done  one has to understand parse trees and/or look into the underlying C code. The       problematic behaviour of `substitute()` is pretty obvious. There might be some insights     that make it predictable, but since `substitute()` is written for NSE and only contains
+    the arguments `expr` and `env`, it seems that no escape hatch exists.
+    
+    Like `rm()` `data()` has the first arguments `...` and `list = character()`.
+    Again you can supply unquoted or quoted names to `...`. These will be caught, converted to             character via `as.character(substitute(list(...))[-1L])` and concatenated with the character input     of the `list` argument.
+    The escape hatch is similar to `rm()`: use explicitly the `list` argument.
+    
+    `data.frame()`'s first argument, `...`, gets caught once via
+    `object <- as.list(substitute(list(...)))[-1L]` and once `x <- list(...)`.
+    First one is used among others to create rownames. This can be suppressed via the          setting of the argument `row.names`, which lets you supply a vector or specifing a
+    column of the data.frame for the explicit naming of rows.
+    `x` will be deparsed later and is then used to create the columnnames.
+    Since this process underlies several complex rules in cases of "special namings",
+    `data.frame()` provides the `check.names` argument.
+    One can set `check.names = FALSE`, to ensure that columns will be named however they
+    are supplied to `data.frame()`.
 
 2.  __<span style="color:red">Q</span>__: Base functions `match.fun()`, `page()`, and `ls()` all try to
     automatically determine whether you want standard or non-standard
