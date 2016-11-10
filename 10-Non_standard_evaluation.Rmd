@@ -23,7 +23,7 @@
     
     > width.cutoff is a lower bound for the line lengths: deparsing a line proceeds until at least width.cutoff bytes have been output and e.g. arg = value expressions will not be split across lines.
     
-    You can wrap it with `paste0` for example:
+    You can wrap it with `paste0()` for example:
     
     ```{r, eval = FALSE}
     deparse_without_cutoff <- function(x){
@@ -42,7 +42,7 @@
     character vector. Can you construct an input that violates this expectation? 
     What happens?
     
-    __<span style="color:green">A</span>__: We can pass an expression to one of `pairwise.t.test()`'s data input arguments, which exceeds the default cutoff width in `deparse()`. The expression will be splitted into a character vector of length greater 1. Since the deparsed data inputs are directly pasted (read the source code!) with "and" as separator, and the result is just used to be displayed in the output. Just the data.name output will change (it will include more than one "and").
+    __<span style="color:green">A</span>__: We can pass an expression to one of `pairwise.t.test()`'s data input arguments, which exceeds the default cutoff width in `deparse()`. The expression will be split into a character vector of length greater 1. Since the deparsed data inputs are directly pasted (read the source code!) with "and" as separator, and the result is just used to be displayed in the output. Just the data.name output will change (it will include more than one "and").
     
     ```{r}
     d=1
@@ -62,7 +62,7 @@
     ```
 
     
-    __<span style="color:green">A</span>__: All return x, because `substitute`'s second argument `env` is the current evaluation environment `environment()`. If you call `substitute` from another function, you may want to set the `env` argument to `parent.frame()`, which refers to the calling environment:
+    __<span style="color:green">A</span>__: All return x, because `substitute()`'s second argument `env` is the current evaluation environment `environment()`. If you call `substitute` from another function, you may want to set the `env` argument to `parent.frame()`, which refers to the calling environment:
 
     ```{r, eval = FALSE}
     f <- function(x) substitute(x, env = parent.frame()) 
@@ -136,9 +136,10 @@ g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
       vars <- substitute(vars)
       var_pos <- setNames(as.list(seq_along(df)), names(df)) # We create a list with 
       # columnnumbers and -names of the original data.frame.
-      pos <- eval(vars, var_pos) # We evaluate the supplied variable names within the
-      # list of all names of the data.frame and return the values of the mathing variable
-      # names and list elements (the positions of supplied variables within the supplied data.frame).
+      pos <- eval(vars, var_pos) # We evaluate the supplied variable names within
+      # the list of all names of the data.frame and return the values of the mathing
+      # variable names and list elements (the positions of supplied variables 
+      # within the supplied data.frame).
       df[, pos, drop = FALSE] # now we just subset the data.frame by it's column index.
     }
     select(mtcars, -cyl)
@@ -188,29 +189,29 @@ g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
     that were just created. The rest of the question can be answered, by just commenting the source code:
     
     ```{r, eval = FALSE}
-    # Setting "..." as function argument allows the user to specify any kind of named 
+    # Setting "..." as function argument allows the user to specify any kind of extra 
     # argument to the function. In this case we can expect arguments of the form 
     # new_col1 = foo(col_in_data_argument), new_col2 = foo(col_in_data_argument),... 
     > transform.data.frame
     function (`_data`, ...) 
     {
-      # subsitute(list(...)) takes the dots into a list and just returns the expression `list(...)`.
-      # Nothing is evaluated until now (which is important). 
+      # subsitute(list(...)) takes the dots into a list and just returns the expression
+      # `list(...)`. Nothing is evaluated until now (which is important). 
       # Evaluation of the expression happens with the `eval()` function.
       # This means: all the names of the arguments in `...` like new_col1, new_col2,...
       # become names of the list `e`.
-      # All functions/variables like foo(column_in_data_argument) are evaluated within the context
-      # (environment) of the `_data` argument supplied to the `transform()` function (this is 
-      # specified by the second argument of the eval() function).
+      # All functions/variables like foo(column_in_data_argument) are evaluated within
+      # the context (environment) of the `_data` argument supplied to the `transform()` 
+      # function (this is specified by the second argument of the eval() function).
       e <- eval(substitute(list(...)), `_data`, parent.frame())
       
       # Everything that happens from now on is just about formatting and
       # returning the correct columns:
       # We save the names of the list (the names of the added columns)
       tags <- names(e)
-      # We create a numeric vector and check if the tags (names of the added columns) appear in 
-      # the names of the supplied `_data` argument. If yes, we save the column number, if not we
-      # save an NA.
+      # We create a numeric vector and check if the tags (names of the added columns) 
+      # appear in the names of the supplied `_data` argument. If yes, we save the 
+      # column number, if not we save an NA.
       inx <- match(tags, names(`_data`))
       # We create a logical vector, which is telling us if a column_name is already in the
       # data.frame (TRUE) or really new (FALSE)
@@ -296,13 +297,13 @@ g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
     For NSE in `rm()`, we just look at it's first two arguments: `...` and `list = character()`.
     If we supply expressions to `...` (which can also be character vectors) ,
     these will be caught by `match.call()` and become an unevaluated call 
-    (in this case a pairlist). However, rm copies and converts the expressions into a character
+    (in this case a pairlist). However, `rm()` copies and converts the expressions into a character
     representation and concatenates these with the character vector supplied to the list argument.
     Then the removing starts...
     The escape hatch is to supply the objects to be removed as a character vector to           `rm()`'s list argument.
     
     You can supply the input to `library()`'s and `require()`'s first argument (`package`) with or         without quotes.
-    In the default case (`character.only = FALSE`) the input to package will be converted via
+    In the default case (`character.only = FALSE`) the input to `package` will be converted via
     `as.character(substitute(package))`. To ommit this, just supply a character vector and set
     `character.only = TRUE`.
     
@@ -350,10 +351,21 @@ g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
 
 ## Substitute
 
-1.  __<span style="color:red">Q</span>__: Use `subs()` to convert the LHS to the RHS for each of the following pairs:
+1.  __<span style="color:red">Q</span>__: Use `pryr::subs()` to convert the LHS to the RHS for each of the following pairs:
+    
     * `a + b + c` -> `a * b * c`
     * `f(g(a, b), c)` -> `(a + b) * c`
     * `f(a < b, c, d)` -> `if (a < b) c else d`
+    
+    __<span style="color:green">A</span>__: 
+    
+    ```{r, eval = FALSE}
+    subs(a + b + c, list("+" = quote(`*`)))     # -> `a * b * c`
+    subs(f(g(a, b), c), list(g = quote(`+`),
+                             f = quote(`*`)))   # -> `(a + b) * c`
+    subs(f(a < b, c, d), list(f = quote(`if`))) # -> `if (a < b) c else d`
+    ```
+    
 
 2.  __<span style="color:red">Q</span>__: For each of the following pairs of expressions, describe why you can't
     use `subs()` to convert one to the other.
