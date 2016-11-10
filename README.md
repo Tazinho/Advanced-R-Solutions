@@ -4,6 +4,5 @@
 
 ## Todo
 
-* Add edit page button
 * Add dropdown to answers
 * ...
