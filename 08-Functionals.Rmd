@@ -11,6 +11,10 @@
     lapply(trims, function(trim) mean(x, trim = trim))
     lapply(trims, mean, x = x)
     ```
+    
+    __<span style="color:green">A</span>__: In the first statement each element of `trims` is explicitly supplied to `mean()`'s second argument. In the latter statement this happens via 
+positional matching, since the first argument is supplied via name
+in `lapply()`'s third argument (`...`).
 
 2.  __<span style="color:red">Q</span>__: The function below scales a vector so it falls in the range [0, 1]. How
     would you apply it to every column of a data frame? How would you apply it 
@@ -21,6 +25,12 @@
       rng <- range(x, na.rm = TRUE)
       (x - rng[1]) / (rng[2] - rng[1])
     }
+    ```
+    
+    __<span style="color:green">A</span>__: Since this function needs numeric input, one can check this via an if clause. If one also wants to return non-numeric input columns, these can be supplied to the `else` argument of the `if()` "function":
+    
+    ```{r, eval = FALSE}
+    data.frame(lapply(iris, function(x) if (is.numeric(x)) scale01(x) else x))
     ```
 
 3.  __<span style="color:red">Q</span>__: Use both for loops and `lapply()` to fit linear models to the
@@ -34,7 +44,23 @@
       mpg ~ I(1 / disp) + wt
     )
     ```
+    
+    __<span style="color:green">A</span>__: Like in the first exercise, we can create two `lapply()` versions:
+    
+    ```{r, eval = FALSE}
+    # lapply (2 versions)
+    la1 <- lapply(formulas, lm, data = mtcars)
+    la2 <- lapply(formulas, function(x) lm(formula = x, data = mtcars))
 
+    # for loop
+    lf <- vector("list", length(formulas))
+    for (i in seq_along(formulas)){
+      lf[[i]] <- lm(formulas[[i]], data = mtcars)
+    }
+    ```
+    
+    Note that all versions return the same content, but the objects will differ in the values of the "call" element.
+    
 4.  __<span style="color:red">Q</span>__: Fit the model `mpg ~ disp` to each of the bootstrap replicates of `mtcars` 
     in the list below by using a for loop and `lapply()`. Can you do it 
     without an anonymous function?
@@ -53,7 +79,7 @@
     rsq <- function(mod) summary(mod)$r.squared
     ```
 
-## For loops functionals: friends fo lapply():
+## For loops functionals: friends of lapply():
 
 1.  __<span style="color:red">Q</span>__: Use `vapply()` to:
     
