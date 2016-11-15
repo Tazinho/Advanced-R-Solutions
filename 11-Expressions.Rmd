@@ -12,6 +12,33 @@
 
 3.  __<span style="color:red">Q</span>__: What does the call tree of an if statement with multiple else conditions
     look like?
+    
+    __<span style="color:green">A</span>__: It depends a little bit how it is written.
+    Here the infix version:
+    
+    ```{r}
+    pryr::ast(`if`(FALSE, "first",
+                   `if`(TRUE, "second",
+                        `if`(TRUE, "third", "fourth"))))
+    ```
+    
+    And here the "normal" version:
+    
+    ```{r}
+    pryr::ast(if (FALSE) {
+      "first"
+      } else (
+        if (TRUE) {
+          "second"
+          } else (
+            if (TRUE) {
+              "third"
+              } else (
+                "fourth"
+                )
+            )
+        ))
+    ```
 
 4.  __<span style="color:red">Q</span>__: Compare `ast(x + y %+% z)` to `ast(x ^ y %+% z)`. What do they
     tell you about the precedence of custom infix functions?
