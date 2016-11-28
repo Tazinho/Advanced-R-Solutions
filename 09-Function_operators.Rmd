@@ -4,6 +4,25 @@
 
 1.  __<span style="color:red">Q</span>__: Write a FO that logs a time stamp and message to a file every time a 
     function is run.
+    
+    __<span style="color:green">A</span>__: Note that the example will create a file file in your current working directory:
+    
+    ```{r, eval = FALSE}
+    logger <- function(f, filename){
+      force(f)
+      filename_tmp <- paste(filename, basename(tempfile()), sep = "_")
+      write(paste("created at:", Sys.time()), filename_tmp, append = TRUE)
+      function(..., message = "you can add a message at each call") {
+        write(paste0("used at: ", Sys.time(), ", ", message), filename_tmp, append = TRUE)
+        f(...)
+      }
+    }
+    
+    # the following line creates a file, which name starts with "mean_log"
+    mean <- logger(mean, "mean_log") 
+    mean2(1:4, message = "first time") 
+    mean2(1:4, message = "second_time")
+    ```
 
 2.  __<span style="color:red">Q</span>__: What does the following function do? What would be a good name for it?
 
