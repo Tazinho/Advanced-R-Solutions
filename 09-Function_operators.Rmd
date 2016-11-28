@@ -49,6 +49,26 @@
     was last called. That is, if you called 
     `g <- delay_by(1, f); g(); Sys.sleep(2); g()` there shouldn't be an 
     extra delay.
+    
+    __<span style="color:green">A</span>__: We can do this with three little tricks (and the help
+    of 42):
+    
+    ```{r, eval = FALSE}
+    delay_by_v2 <- function(delay, f) {
+      force(f)
+      # we initialise the timestamp for the last run. We set a specific default value,
+      # to ensure that the first run of the returned function will never be delayed
+      last_runtime <- Sys.time() - (delay + 42)
+      function(...) {
+        # we continually check if enough time passed with an (empty) while statement
+        while (Sys.time() < last_runtime + delay) {}
+        # we override the start for the next waiting interval.
+        # Note that this is done on exit (after the function is evaluated)
+        on.exit(last_runtime <<- Sys.time()) 
+        return(f(...))
+      }
+    }
+    ```
 
 4.  __<span style="color:red">Q</span>__: Write `wait_until()` which delays execution until a specific time.
 
