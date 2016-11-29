@@ -42,7 +42,7 @@
     runif2(10)
     ```
     
-    __<span style="color:green">A</span>__: It returns a new version of the inputfunction. That version will always return the result of it's first run (in case it is not `NULL`), no matter how the input changes. Good names could be `first_run()` or `initial_return()`. 
+    __<span style="color:green">A</span>__: It returns a new version of the inputfunction. That version will always return the result of it's first run (in case this not `NULL`), no matter how the input changes. Good names could be `first_run()` or `initial_return()`. 
 
 3.  __<span style="color:red">Q</span>__: Modify `delay_by()` so that instead of delaying by a fixed amount of time, 
     it ensures that a certain amount of time has elapsed since the function 
@@ -60,7 +60,7 @@
       # to ensure that the first run of the returned function will never be delayed
       last_runtime <- Sys.time() - (delay + 42)
       function(...) {
-        # we continually check if enough time passed with an (empty) while statement
+        # we continually check if enough time passed with an (empty) while statement.
         while (Sys.time() < last_runtime + delay) {}
         # we override the start for the next waiting interval.
         # Note that this is done on exit (after the function is evaluated)
@@ -69,8 +69,26 @@
       }
     }
     ```
+    
+    Alternatively to the empty while statement we could have used `Sys.sleep()`. I would not recommend this solution, since `?Sys.sleep` indicates that `Sys.sleep()` might have some overhead and seems not to be as exact as we need.
 
 4.  __<span style="color:red">Q</span>__: Write `wait_until()` which delays execution until a specific time.
+
+    ```{r, eval = FALSE}
+    wait_until <- function(time, f) {
+      force(f)
+      function(...) {
+        while (Sys.time() < time) {}
+        return(f(...))
+      }
+    }
+    
+    # a little test
+    ptm <- proc.time()
+    m <- wait_until(Sys.time() + 10, mean)
+    m(1:3)
+    proc.time() - ptm
+    ```
 
 5.  __<span style="color:red">Q</span>__: There are three places we could have added a memoise call: why did we 
     choose the one we did?
@@ -80,7 +98,16 @@
     download <- dot_every(10, memoise(delay_by(1, download_file)))
     download <- dot_every(10, delay_by(1, memoise(download_file)))
     ```
-
+    
+    __<span style="color:green">A</span>__: The second was chosen. It's easy to see why, if we eliminate the other two options:
+    
+    * The first version only prints a dot at every tenth `download()` call with a new input.
+    This is because `dot_every()` is inside of `memoise()` and the counter created by
+    `dot_every()` is not "activated" if the input is known.
+    
+    * The third version takes one second for every call. Even if we already know the result and
+    don't download anything again.
+    
 6.  __<span style="color:red">Q</span>__: Why is the `remember()` function inefficient? How could you implement it 
     in more efficient way?
 
