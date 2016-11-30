@@ -74,6 +74,8 @@
 
 4.  __<span style="color:red">Q</span>__: Write `wait_until()` which delays execution until a specific time.
 
+    __<span style="color:green">A</span>__: 
+
     ```{r, eval = FALSE}
     wait_until <- function(time, f) {
       force(f)
@@ -126,7 +128,40 @@
     ```
 
     How can you modify `f` so that it works correctly?
+    
+    __<span style="color:green">A</span>__: You can read in the [stackoverflow](http://stackoverflow.com/questions/8440675) link that the question arose, because the original return of 
+    `fs[[1]](3)` was `4`, which is due to lazy evaluation and could be solved by two users via `force()`:
+    
+    ```{r, eval = FALSE}
+    f <- function(a, b) {force(a); force(b); function(x) a * x + b}
+    ```
+    
+    However you can see in the result within the question that **R**'s behaviour was changed in this case and as Jan Kislinger points out on [twitter](https://twitter.com/JanKislinger/status/794433891486547968):
+    
+    > The real question should be: "How did they modify #rstats so that it works correctly?" otherwise it's a tricky question :D
+    
+    Note that the same issue appears in the [textbook](http://adv-r.had.co.nz/Function-operators.html#behavioural-fos):
+    
+    > In the following example, we take a list of functions and delay each one. But when we try to evaluate the mean, we get the sum instead. 
+    
+    ```{r, eval = FALSE}
+    funs <- list(mean = mean, sum = sum)
+    funs_m <- lapply(funs, delay_by, delay = 0.1)
 
+    funs_m$mean(1:10)
+    #> [1] 5.5
+    ```
+    
+    Which (as one can see) is not true anymore...actually it changed in R version [**3.2**](https://stat.ethz.ch/pipermail/r-announce/2015/000583.html):
+    
+    > Higher order functions such as the apply functions and Reduce()
+     now force arguments to the functions they apply in order to
+     eliminate undesirable interactions between lazy evaluation and
+     variable capture in closures.  This resolves PR#16093.
+     
+     For further interested: [PR#16093](https://bugs.r-project.org/bugzilla3/show_bug.cgi?id=16093#c1) will lead you to the subject "iterated lapply" within the 
+     [R-devel Archives](https://stat.ethz.ch/pipermail/r-devel/2015-March/subject.html#start).
+    
 ## Output FOs
 
 1.  __<span style="color:red">Q</span>__: Create a `negative()` FO that flips the sign of the output of the 
