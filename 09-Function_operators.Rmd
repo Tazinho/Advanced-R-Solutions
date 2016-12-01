@@ -166,6 +166,17 @@
 
 1.  __<span style="color:red">Q</span>__: Create a `negative()` FO that flips the sign of the output of the 
     function to which it is applied.
+    
+    __<span style="color:green">A</span>__: 
+    
+    ```{r, eval = FALSE}
+    negative <- function(f){
+      force(f)
+      function(...){
+        f(...) * (-1)
+      }
+    }
+    ```
 
 2.  __<span style="color:red">Q</span>__: The `evaluate` package makes it easy to capture all the outputs (results, 
     text, messages, warnings, errors, and plots) from an expression. Create a 
@@ -175,6 +186,66 @@
 3.  __<span style="color:red">Q</span>__: Create a FO that tracks files created or deleted in the working directory 
     (Hint: use `dir()` and `setdiff()`.) What other global effects of 
     functions might you want to track?
+    
+    __<span style="color:green">A</span>__: We start with a short version to show the idea:
+    
+    ```{r, eval = FALSE}
+    track_dir <- function(f){
+      force(f)
+      function(...){
+        dir_old <- dir()
+        on.exit(if(!setequal(dir(), dir_old)){
+          message("files in your working directory were deleted or added by this function")})
+        f(...)
+      }
+    }
+    
+    # the following test will create the file "delete_me" in your working directory
+    td <- track_dir(dir.create)
+    td("delete_me")
+    ```
+    
+    Of course we can provide more information on the type of changes:
+    
+    ```{r, eval = FALSE}
+    track_dir <- function(f){
+      force(f)
+      function(...){
+        dir_old <- dir()
+        
+        on.exit(if(!setequal(dir(), dir_old)){
+          message("Files in your working directory were deleted or added by this
+                  function.")},
+          add = TRUE)
+        on.exit(if(length(setdiff(dir_old, dir()) != 0)){
+          message(paste0("The following files were deleted: ",
+                         paste(setdiff(dir_old, dir()), collapse = ", ")
+                         ))
+          },
+          add = TRUE)
+        on.exit(if(length(setdiff(dir(), dir_old) != 0)){
+          message(paste0("The following files were added: ", 
+                         paste(setdiff(dir(), dir_old), collapse = ", ")
+                         ))
+          },
+          add = TRUE)
+        
+        f(...)
+      }
+    }
+
+    # the following test will again create too files in your working directory
+    td <- track_dir(sapply)
+    td(c("delete_me", "me_too"), dir.create)
+    ```
+    
+    Other global effects that might be worth tracking include changes regarding:
+    
+    * the search path and/or introduced `conflicts()`
+    * `options()` and `par()` which modify global settings
+    * the path of the working directory
+    * environment variables
+    * the locale.
 
 ## Input FOs
 
