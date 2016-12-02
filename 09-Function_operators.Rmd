@@ -215,20 +215,15 @@
         
         on.exit(if(!setequal(dir(), dir_old)){
           message("Files in your working directory were deleted or added by this
-                  function.")},
-          add = TRUE)
+                  function.")}, add = TRUE)
         on.exit(if(length(setdiff(dir_old, dir()) != 0)){
           message(paste0("The following files were deleted: ",
                          paste(setdiff(dir_old, dir()), collapse = ", ")
-                         ))
-          },
-          add = TRUE)
+                         ))}, add = TRUE)
         on.exit(if(length(setdiff(dir(), dir_old) != 0)){
           message(paste0("The following files were added: ", 
                          paste(setdiff(dir(), dir_old), collapse = ", ")
-                         ))
-          },
-          add = TRUE)
+                         ))}, add = TRUE)
         
         f(...)
       }
@@ -262,6 +257,24 @@
 3.  __<span style="color:red">Q</span>__: Write FOs that convert a function to return a matrix instead of a data 
     frame, or a data frame instead of a matrix. If you understand S3, 
     call them `as.data.frame.function()` and `as.matrix.function()`.
+    
+    __<span style="color:green">A</span>__: 
+    
+    ```{r, eval = FALSE}
+    as.matrix.function <- function(f){
+      force(f)
+      function(...){
+        as.matrix(f(...))
+      }
+    }
+    
+    as.data.frame.function <- function(f){
+      force(f)
+      function(...){
+        as.data.frame(f(...))
+      }
+    }
+    ```
 
 4.  __<span style="color:red">Q</span>__: You've seen five functions that modify a function to change its output 
     from one form to another. What are they? Draw a table of the various 
