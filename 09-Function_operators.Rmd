@@ -307,3 +307,54 @@
     function. Implement elementary algebra (`plus()`, `minus()`, `multiply()`, 
     `divide()`, `exponentiate()`, `log()`) for functions that return numeric 
     vectors.
+    
+    __<span style="color:green">A</span>__:
+    
+    ```{r, eval = FALSE}
+    plus <- function(f1, f2) {
+      force(f1); force(f2)
+      function(...) {
+        f1(...) + f2(...)
+      }
+    }
+    
+    minus <- function(f1, f2) {
+      force(f1); force(f2)
+      function(...) {
+        f1(...) - f2(...)
+      }
+    }
+    
+    multiply <- function(f1, f2) {
+      force(f1); force(f2)
+      function(...) {
+        f1(...) * f2(...)
+      }
+    }
+    
+    divide <- function(f1, f2) {
+      force(f1); force(f2)
+      function(...) {
+        f1(...) / f2(...)
+      }
+    }
+    
+    exponentiate <- function(f1, f2) {
+      force(f1); force(f2)
+      function(...) {
+        f1(...) ^ f2(...)
+      }
+    }
+    
+    # we rename log to log_ since log() already exists
+    log_ <- function(f1, f2) {
+      force(f1); force(f2)
+      function(...) {
+        log(f1(...), f2(...))
+      }
+    }
+    
+    # Test
+    mns <- minus(mean, function(x) x^2)
+    mns(1:5)
+    ```

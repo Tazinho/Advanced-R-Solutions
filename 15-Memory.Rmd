@@ -3,6 +3,66 @@
 ## Object size
 
 1.  Repeat the analysis above for numeric, logical, and complex vectors.
+    
+    __<span style="color:green">A</span>__: 
+    
+    ### numeric
+    ```{r}
+    library(pryr)
+    sizes <- sapply(0:50, function(n) object_size(vector("numeric", n)))
+    plot(0:50, sizes, xlab = "Length", ylab = "Size (bytes)", 
+         type = "s")
+    
+    plot(0:50, sizes - 40, xlab = "Length", 
+         ylab = "Bytes excluding overhead", type = "n")
+    abline(h = 0, col = "grey80")
+    abline(h = c(8, 16, 32, 48, 64, 128), col = "grey80")
+    abline(a = 0, b = 4, col = "grey90", lwd = 4)
+    lines(sizes - 40, type = "s")
+    
+    x <- numeric(1e6)
+    object_size(x)
+    y <- list(x, x, x)
+    object_size(y)
+    ```
+    
+    ### logical
+    ```{r}
+    sizes <- sapply(0:50, function(n) object_size(vector("logical", n)))
+    plot(0:50, sizes, xlab = "Length", ylab = "Size (bytes)", 
+         type = "s")
+    
+    plot(0:50, sizes - 40, xlab = "Length", 
+         ylab = "Bytes excluding overhead", type = "n")
+    abline(h = 0, col = "grey80")
+    abline(h = c(8, 16, 32, 48, 64, 128), col = "grey80")
+    abline(a = 0, b = 4, col = "grey90", lwd = 4)
+    lines(sizes - 40, type = "s")
+    
+    x <- logical(1e6)
+    object_size(x)
+    y <- list(x, x, x)
+    object_size(y)
+    ```
+    
+    ### complex
+    ```{r}
+    sizes <- sapply(0:50, function(n) object_size(vector("complex", n)))
+    plot(0:50, sizes, xlab = "Length", ylab = "Size (bytes)", 
+         type = "s")
+    
+    plot(0:50, sizes - 40, xlab = "Length", 
+         ylab = "Bytes excluding overhead", type = "n")
+    abline(h = 0, col = "grey80")
+    abline(h = c(8, 16, 32, 48, 64, 128), col = "grey80")
+    abline(a = 0, b = 4, col = "grey90", lwd = 4)
+    lines(sizes - 40, type = "s")
+    
+    x <- complex(1e6)
+    object_size(x)
+    y <- list(x, x, x)
+    object_size(y)
+    ```
 
 1.  If a data frame has one million rows, and three variables (two numeric, and 
     one integer), how much space will it take up? Work it out from theory, 
