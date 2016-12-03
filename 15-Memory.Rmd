@@ -2,11 +2,12 @@
 
 ## Object size
 
-1.  Repeat the analysis above for numeric, logical, and complex vectors.
+1.  __<span style="color:red">Q</span>__: Repeat the analysis above for numeric, logical, and complex vectors.
     
     __<span style="color:green">A</span>__: 
     
-    ### numeric
+    **numeric:**
+    
     ```{r}
     library(pryr)
     sizes <- sapply(0:50, function(n) object_size(vector("numeric", n)))
@@ -26,7 +27,8 @@
     object_size(y)
     ```
     
-    ### logical
+    **logical:**
+    
     ```{r}
     sizes <- sapply(0:50, function(n) object_size(vector("logical", n)))
     plot(0:50, sizes, xlab = "Length", ylab = "Size (bytes)", 
@@ -45,7 +47,8 @@
     object_size(y)
     ```
     
-    ### complex
+    **complex:**
+    
     ```{r}
     sizes <- sapply(0:50, function(n) object_size(vector("complex", n)))
     plot(0:50, sizes, xlab = "Length", ylab = "Size (bytes)", 
@@ -64,11 +67,30 @@
     object_size(y)
     ```
 
-1.  If a data frame has one million rows, and three variables (two numeric, and 
+1.  __<span style="color:red">Q</span>__: If a data frame has one million rows, and three variables (two numeric, and 
     one integer), how much space will it take up? Work it out from theory, 
     then verify your work by creating a data frame and measuring its size.
-
-1.  Compare the sizes of the elements in the following two lists. Each 
+    
+    __<span style="color:green">A</span>__: From the textbook we now that 
+    
+    * an integer`s size is 40 byte plus 4 byte per allocated entry,
+    * a numerics`s size is 40 byte plus 8 byte per allocated entry.
+    
+    So we can calculate the size via:
+    
+    `object_size(df) = 1 * (40 + 4 * 1.000.000) + 2 * (40 + 8 * 1.000.000)
+                           = 20.000.120` bytes.
+    
+    And test this via:
+    
+    ```{r}
+    df <- data.frame(int1 = integer(1000000),
+                     num1 = numeric(1000000),
+                     num2 = numeric(1000000))
+    object_size(df)
+    ```
+    
+1.  __<span style="color:red">Q</span>__: Compare the sizes of the elements in the following two lists. Each 
     contains basically the same data, but one contains vectors of small 
     strings while the other contains a single long string.
 
@@ -76,15 +98,48 @@
     vec <- lapply(0:50, function(i) c("ba", rep("na", i)))
     str <- lapply(vec, paste0, collapse = "")
     ```
+    
+    __<span style="color:green">A</span>__: 
+    
+    ```{r}
+    vec <- lapply(0:50, function(i) c("ba", rep("na", i)))
+    str <- lapply(vec, paste0, collapse = "")
+    object_size(vec)
+    object_size(str)
+    object_size(vec, str)
+    ```
 
-1.  Which takes up more memory: a factor (`x`) or the equivalent character 
+1.  __<span style="color:red">Q</span>__: Which takes up more memory: a factor (`x`) or the equivalent character 
     vector (`as.character(x)`)? Why?
+    
+    __<span style="color:green">A</span>__: To be exact: it depends on the length of unique elements in relation to the overall length of the vector.
+    
+    * In case of a long vector with only a few levels, the character takes approximately twice the memory of a factor:
+    
+    ```{r}
+    object_size(rep(letters[1:20], 1000))
+    object_size(factor(rep(letters[1:20], 1000)))
+    ```
+    
+    That is, because a character allocates 8 bytes per entry (if the entry has less than 8 signs, otherwise roughly one byte per sign) and a factor equals an integer (allocates only 4 byte per entry) with a character vector attribute that contains the levels (unique elements) of the vector:
+    
+    ```{r}
+    object_size(1:20000)
+    object_size(letters[1:20])
+    ```
+    
+    * Of course the factor will allocate more memory, if all entries are unique:
+    
+    ```{r}
+    object_size(letters[1:20])
+    object_size(factor(letters[1:20]))
+    ```
 
-1.  Explain the difference in size between `1:5` and `list(1:5)`.
+1.  __<span style="color:red">Q</span>__: Explain the difference in size between `1:5` and `list(1:5)`.
 
 ## Memory profiling with lineprof
 
-1. When the input is a list, we can make a more efficient `as.data.frame()` 
+1. __<span style="color:red">Q</span>__: When the input is a list, we can make a more efficient `as.data.frame()` 
    by using special knowledge. A data frame is a list with class `data.frame` 
    and `row.names` attribute. `row.names` is either a character vector or 
    vector of sequential integers, stored in a special format created by 
@@ -101,7 +156,7 @@
     What impact does this function have on `read_delim()`?  What are the 
     downsides of this function?
 
-1.  Line profile the following function with `torture = TRUE`. What is 
+1.  __<span style="color:red">Q</span>__: Line profile the following function with `torture = TRUE`. What is 
     surprising? Read the source code of `rm()` to figure out what's going on.
 
     ```{r}
@@ -113,7 +168,7 @@
 
 ## Modification in place
 
-1.  The code below makes one duplication. Where does it occur and why? 
+1.  __<span style="color:red">Q</span>__: The code below makes one duplication. Where does it occur and why? 
     (Hint: look at `refs(y)`.)
 
     ```{r}
@@ -125,7 +180,7 @@
     }
     ```
 
-1.  The implementation of `as.data.frame()` in the previous section has one 
+1.  __<span style="color:red">Q</span>__: The implementation of `as.data.frame()` in the previous section has one 
     big downside. What is it and how could you avoid it?
 
 
