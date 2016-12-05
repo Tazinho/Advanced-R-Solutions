@@ -25,7 +25,7 @@
     exp(log(x) / 2)
     ```
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: The second one looks more complex, but you never know...
     
     ```{r}
     x <- runif(100)
@@ -36,10 +36,70 @@
       exp(log(x) / 2)
     )
     ```
+    
+    ...unless you test it.
 
 1.  __<span style="color:red">Q</span>__: Use microbenchmarking to rank the basic arithmetic operators (`+`, `-`,
     `*`, `/`, and `^`) in terms of their speed. Visualise the results. Compare
     the speed of arithmetic on integers vs. doubles.
+    
+    __<span style="color:green">A</span>__: Since I am on a Windows system, where these short execution times are hard to measure, I just ran the following code on a linux and pasted the results:
+    
+    ```{r, eval = FALSE}
+    mb_integer <- microbenchmark::microbenchmark(
+      1L + 1L, 1L - 1L, 1L * 1L, 1L / 1L, 1L ^ 1L, 
+      times = 100000
+    )
+    
+    mb_double <- microbenchmark::microbenchmark(
+      1 + 1, 1 - 1, 1 * 1, 1 / 1, 1 ^ 1, 
+      times = 100000
+    )
+    
+    mb_integer
+    # and got the following output:
+    # Unit: nanoseconds
+    #     expr min lq     mean median  uq      max neval
+    #  1L + 1L  49 72 102.2314     78  93    19892 1e+05
+    #  1L - 1L  51 73 102.6916     79  93    19898 1e+05
+    #  1L * 1L  50 74 459.0319     81  95 32282526 1e+05
+    #    1L/1L  49 71 101.9581     78  92    17111 1e+05
+    #    1L^1L  68 86 133.0490     97 111  1333248 1e+05
+    
+    mb_double
+    # Unit: nanoseconds
+    #   expr min lq      mean median  uq     max neval
+    #  1 + 1  51 70  99.22536     73  80  473456 1e+05
+    #  1 - 1  49 69 100.97983     72  80  623871 1e+05
+    #  1 * 1  50 70  97.32268     74  83   21533 1e+05
+    #    1/1  50 69 111.22211     74  82 1584062 1e+05
+    #    1^1  82 98 137.42019    108 129   19486 1e+05
+    ```
+    
+    To visualise and compare the results, we make some short spaghetties:
+    
+    ```{r}
+    mb_median <- data.frame(operator = c("+", "-", "*", "/", "^"),
+                            int = c(102.2314, 102.6916, 459.0319, 101.9581, 133.0490),
+                            dbl = c(99.22536, 100.97983, 97.32268, 111.22211, 137.42019),
+                            stringsAsFactors = FALSE)
+
+    mb_median <- tidyr::gather(mb_median, type, time, int, dbl)
+    mb_median <- dplyr::mutate(mb_median, type = factor(type, levels = c("int", "dbl")))
+
+    library(ggplot2)
+    ggplot(mb_median, aes(x = type, y = time, group = operator, color = operator)) +
+      geom_point(show.legend = FALSE) +
+      geom_line(show.legend = FALSE, size = 1.5) +
+      geom_label(aes(label = operator), show.legend = FALSE) +
+      theme_minimal() +
+      ylab("time in nanoseconds") +
+      theme(axis.title.x = element_blank(),
+            axis.title.y = element_text(size = 14),
+            axis.text.x = element_text(size = 14),
+            axis.text.y = element_text(size = 10)) +
+      scale_y_continuous(breaks=seq(0, max(mb_median$time), 10))
+    ```
 
 1.  __<span style="color:red">Q</span>__: You can change the units in which the microbenchmark results are
     expressed with the `unit` parameter. Use `unit = "eps"` to show
