@@ -48,40 +48,42 @@
     ```{r, eval = FALSE}
     mb_integer <- microbenchmark::microbenchmark(
       1L + 1L, 1L - 1L, 1L * 1L, 1L / 1L, 1L ^ 1L, 
-      times = 100000
-    )
+      times = 1000000,
+      control = list(order = "random",
+                     warmup = 20000)
     
     mb_double <- microbenchmark::microbenchmark(
       1 + 1, 1 - 1, 1 * 1, 1 / 1, 1 ^ 1, 
-      times = 100000
-    )
+      times = 1000000,
+      control = list(order = "random",
+                     warmup = 20000)
     
     mb_integer
     # and got the following output:
     # Unit: nanoseconds
-    #     expr min lq     mean median  uq      max neval
-    #  1L + 1L  49 72 102.2314     78  93    19892 1e+05
-    #  1L - 1L  51 73 102.6916     79  93    19898 1e+05
-    #  1L * 1L  50 74 459.0319     81  95 32282526 1e+05
-    #    1L/1L  49 71 101.9581     78  92    17111 1e+05
-    #    1L^1L  68 86 133.0490     97 111  1333248 1e+05
+    #     expr min lq      mean median uq     max neval
+    #  1L + 1L  50 66  96.45262     69 73 7006051 1e+06
+    #  1L - 1L  52 69  88.76438     71 76  587594 1e+06
+    #  1L * 1L  51 68  88.51854     70 75  582521 1e+06
+    #    1L/1L  50 65  94.40669     68 74 7241972 1e+06
+    #    1L^1L  67 77 102.96209     84 92  574519 1e+06
     
     mb_double
     # Unit: nanoseconds
-    #   expr min lq      mean median  uq     max neval
-    #  1 + 1  51 70  99.22536     73  80  473456 1e+05
-    #  1 - 1  49 69 100.97983     72  80  623871 1e+05
-    #  1 * 1  50 70  97.32268     74  83   21533 1e+05
-    #    1/1  50 69 111.22211     74  82 1584062 1e+05
-    #    1^1  82 98 137.42019    108 129   19486 1e+05
+    #   expr min lq      mean median  uq      max neval
+    #  1 + 1  48 66  92.44331     69  75  7217242 1e+06
+    #  1 - 1  50 66  88.13654     68  77   625462 1e+06
+    #  1 * 1  48 66 135.88379     70  77 42974915 1e+06
+    #    1/1  48 65  87.11615     69  77   659032 1e+06
+    #    1^1  79 92 127.07686    103 135   641524 1e+06
     ```
     
     To visualise and compare the results, we make some short spaghetties:
     
     ```{r}
     mb_median <- data.frame(operator = c("+", "-", "*", "/", "^"),
-                            int = c(102.2314, 102.6916, 459.0319, 101.9581, 133.0490),
-                            dbl = c(99.22536, 100.97983, 97.32268, 111.22211, 137.42019),
+                            int = c(69, 71, 70, 68, 84),
+                            dbl = c(69, 68, 70, 69, 103),
                             stringsAsFactors = FALSE)
 
     mb_median <- tidyr::gather(mb_median, type, time, int, dbl)
