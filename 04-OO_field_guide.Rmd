@@ -49,7 +49,7 @@ __<span style="color:green">A</span>__:
     objs <- mget(ls("package:base"), inherits = TRUE)
     funs <- Filter(is.function, objs)
     generics <- Filter(function(x) ("generic" %in% pryr::ftype(x)), funs)
-    which.max(lapply(generics, function(x) length(methods(x))))
+    sort(sapply(generics, function(x) length(methods(x))), decreasing = TRUE)[1]
     ```
     
 5.  __<span style="color:red">Q</span>__: `UseMethod()` calls methods in a special way. Predict what the following
@@ -119,7 +119,46 @@ You can check if a class is only implicit by using one of the following approach
 
 1.  __<span style="color:red">Q</span>__: Which S4 generic has the most methods defined for it? Which S4 class 
     has the most methods associated with it?  
-    __<span style="color:green">A</span>__: 
+    __<span style="color:orange">A</span>__: 
+    
+    **generics:**
+    
+    We restrict our search to those packages that everyone should have installed:
+    
+    ```{r}
+    search()
+    ```
+    
+    Then we start our search for generics and keep those of otype S4:
+    
+    ```{r}
+    generics <- getGenerics(where = search())
+    is_gen_s4 <- vapply(generics@.Data, 
+                        function(x) pryr::otype(get(x)) == "S4", logical(1))
+    generics <- generics[is_gen_s4]
+    ```
+    
+    Finally we calculate the S4-generic with the most methods:
+    
+    ```{r}
+    sort(sapply(generics, function(x) length(methods(x))), decreasing = TRUE)[1]
+    ```
+    
+    **classes:**
+    
+    We collect all S4 classes within a character vector:
+    
+    ```{r}
+    s4classes <- getClasses(where = .GlobalEnv, inherits = TRUE)
+    ```
+    
+    For each of those classes we capture the output of `showMethods()` and count the resulting elements in the characteroutput that contain the string "Function". Note that this is just an approximation and we might revisit this exercise someday:
+    
+    ```{r}
+    Function_count <- sapply(s4classes, function(x) sum(grepl("Function", capture.output(showMethods(class = x)))))
+    sort(Function_count, decreasing = TRUE)[1]
+    ```
+
 
 2.  __<span style="color:red">Q</span>__: What happens if you define a new S4 class that doesn't "contain" an 
     existing class?  (Hint: read about virtual classes in `?Classes`.)  
