@@ -2,27 +2,77 @@
 
 ## Has somebody already solved the problem?
 
-1.  What are faster alternatives to `lm`? Which are specifically designed 
+1.  __<span style="color:red">Q</span>__: What are faster alternatives to `lm`? Which are specifically designed 
     to work with larger datasets?
+        
+    __<span style="color:green">A</span>__: Within the [Cran task view](https://cran.rstudio.com/web/views/) for [HighPerformanceComputing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and it's `speedglm()` function. We might not gain any performanceimprovements on small datasets:
+    
+    ```{r}
+    stopifnot(all.equal(
+      coef(speedglm::speedlm(Sepal.Length ~ Sepal.Width + Species, data = iris)),
+      coef(lm(Sepal.Length ~ Sepal.Width + Species, data = iris))))
 
-1.  What package implements a version of `match()` that's faster for
+    microbenchmark::microbenchmark(
+      speedglm::speedlm(Sepal.Length ~ Sepal.Width + Species, data = iris),
+      lm(Sepal.Length ~ Sepal.Width + Species, data = iris))
+    ```
+    
+    However on bigger datasets it can make a difference:
+    
+    ```{r}
+    eps <- rnorm(100000)
+    x1 <- rnorm(100000, 5, 3)
+    x2 <- rep(c("a", "b"), 50000)
+    y <- 7 * x1 + (x2 == "a") + eps
+    td <- data.frame(y = y, x1 = x1, x2 = x2, eps = eps)
+    
+    stopifnot(all.equal(
+      coef(speedglm::speedlm(y ~ x1 + x2, data = td)),
+      coef(lm(y ~ x1 + x2, data = td))))
+    
+    microbenchmark::microbenchmark(
+      speedglm::speedlm(y ~ x1 + x2, data = td),
+      lm(y ~ x1 + x2, data = td))
+    ```
+    
+    For further speedinprovements, you might consider switching your linear algebra libraries as stated in `?speedglm::speedlm`
+    
+    > The functions of class 'speedlm' may speed up the fitting of LMs to large data sets. High performances can be obtained especially if R is linked against an optimized BLAS, such as ATLAS.
+    
+    Note that there are many other opportunities mentioned in the task view, also some that make it possible to handle data which is not in memory. 
+    
+    When it comes to pure speed a quick google search on [r fastest lm](http://stackoverflow.com/questions/25416413/is-there-a-faster-lm-function) provides a stackoverflow thread where someone already solved this problem for us...
+
+1.  __<span style="color:red">Q</span>__: What package implements a version of `match()` that's faster for
     repeated lookups? How much faster is it?
+    
+    __<span style="color:green">A</span>__: 
 
-1.  List four functions (not just those in base R) that convert a string into a
+1.  __<span style="color:red">Q</span>__: List four functions (not just those in base R) that convert a string into a
     date time object. What are their strengths and weaknesses?
+    
+    __<span style="color:green">A</span>__: 
 
-1.  How many different ways can you compute a 1d density estimate in R?
+1.  __<span style="color:red">Q</span>__: How many different ways can you compute a 1d density estimate in R?
+    
+    __<span style="color:green">A</span>__: 
 
-1.  Which packages provide the ability to compute a rolling mean?
+1.  __<span style="color:red">Q</span>__: Which packages provide the ability to compute a rolling mean?
+    
+    __<span style="color:green">A</span>__: 
 
-1.  What are the alternatives to `optim()`?
+1.  __<span style="color:red">Q</span>__: What are the alternatives to `optim()`?
+    
+    __<span style="color:green">A</span>__: 
 
 ## Do as little as possible
 
-1.  How do the results change if you compare `mean()` and `mean.default()`
+1.  __<span style="color:red">Q</span>__: How do the results change if you compare `mean()` and `mean.default()`
     on 10,000 observations, rather than on 100?
+    
+    __<span style="color:green">A</span>__: 
 
-1.  The following code provides an alternative implementation of `rowSums()`.
+1.  __<span style="color:red">Q</span>__: The following code provides an alternative implementation of `rowSums()`.
     Why is it faster for this input?
 
     ```{r}
@@ -42,19 +92,27 @@
     system.time(rowSums(df))
     system.time(rowSums2(df))
     ```
+    
+    __<span style="color:green">A</span>__: 
 
-1.  What's the difference between `rowSums()` and `.rowSums()`?
+1.  __<span style="color:red">Q</span>__: What's the difference between `rowSums()` and `.rowSums()`?
+    
+    __<span style="color:green">A</span>__: 
 
-1.  Make a faster version of `chisq.test()` that only computes the chi-square
+1.  __<span style="color:red">Q</span>__: Make a faster version of `chisq.test()` that only computes the chi-square
     test statistic when the input is two numeric vectors with no missing
     values. You can try simplifying `chisq.test()` or by coding from the 
     [mathematical definition](http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test).
+    
+    __<span style="color:green">A</span>__: 
 
-1.  Can you make a faster version of `table()` for the case of an input of
+1.  __<span style="color:red">Q</span>__: Can you make a faster version of `table()` for the case of an input of
     two integer vectors with no missing values? Can you use it to
     speed up your chi-square test?
+    
+    __<span style="color:green">A</span>__: 
 
-1.  Imagine you want to compute the bootstrap distribution of a sample
+1.  __<span style="color:red">Q</span>__: Imagine you want to compute the bootstrap distribution of a sample
     correlation using `cor_df()` and the data in the example below. Given that you 
     want to run this many times, how can you make this code faster? (Hint: the 
     function has three components that you can speed up.)
@@ -70,14 +128,22 @@
     ```
 
     Is there a way to vectorise this procedure?
+    
+    __<span style="color:green">A</span>__: 
 
 ## Vectorise
 
-1.  The density functions, e.g., `dnorm()`, have a common interface. Which 
+1.  __<span style="color:red">Q</span>__: The density functions, e.g., `dnorm()`, have a common interface. Which 
     arguments are vectorised over? What does `rnorm(10, mean = 10:1)` do?
+    
+    __<span style="color:green">A</span>__: 
 
-1.  Compare the speed of `apply(x, 1, sum)` with `rowSums(x)` for varying sizes
+1.  __<span style="color:red">Q</span>__: Compare the speed of `apply(x, 1, sum)` with `rowSums(x)` for varying sizes
     of `x`.
+    
+    __<span style="color:green">A</span>__: 
   
-1.  How can you use `crossprod()` to compute a weighted sum? How much faster is
+1.  __<span style="color:red">Q</span>__: How can you use `crossprod()` to compute a weighted sum? How much faster is
     it than the naive `sum(x * w)`?
+    
+    __<span style="color:green">A</span>__: 
