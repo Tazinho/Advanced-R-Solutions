@@ -5,7 +5,7 @@
 1.  __<span style="color:red">Q</span>__: What are faster alternatives to `lm`? Which are specifically designed 
     to work with larger datasets?
         
-    __<span style="color:green">A</span>__: Within the [Cran task view](https://cran.rstudio.com/web/views/) for [HighPerformanceComputing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and it's `speedglm()` function. We might not gain any performanceimprovements on small datasets:
+    __<span style="color:green">A</span>__: Within the [Cran task view](https://cran.rstudio.com/web/views/) for [HighPerformanceComputing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and it's `speedlm()` function. We might not gain any performanceimprovements on small datasets:
     
     ```{r}
     stopifnot(all.equal(
@@ -14,7 +14,8 @@
 
     microbenchmark::microbenchmark(
       speedglm::speedlm(Sepal.Length ~ Sepal.Width + Species, data = iris),
-      lm(Sepal.Length ~ Sepal.Width + Species, data = iris))
+      lm(Sepal.Length ~ Sepal.Width + Species, data = iris)
+    )
     ```
     
     However on bigger datasets it can make a difference:
@@ -32,7 +33,8 @@
     
     microbenchmark::microbenchmark(
       speedglm::speedlm(y ~ x1 + x2, data = td),
-      lm(y ~ x1 + x2, data = td))
+      lm(y ~ x1 + x2, data = td)
+    )
     ```
     
     For further speedinprovements, you might consider switching your linear algebra libraries as stated in `?speedglm::speedlm`
@@ -46,12 +48,27 @@
 1.  __<span style="color:red">Q</span>__: What package implements a version of `match()` that's faster for
     repeated lookups? How much faster is it?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: Again google gives a good recommendation for the searchterm [r faster match](http://stackoverflow.com/questions/32934933/faster-in-operator):
+    
+    ```{r}
+    set.seed(1)
+    table <- 1L:100000L
+    x <- sample(table, 10000, replace=TRUE)
+    
+    stopifnot(all.equal(match(x, table), fastmatch::fmatch(x, table)))
+    
+    microbenchmark::microbenchmark(
+      match(x, table),
+      fastmatch::fmatch(x, table)
+    )
+    ```
+    
+    On my laptop `fastmatch::fmatch()` is around 25 times as fast as `match()`.
 
 1.  __<span style="color:red">Q</span>__: List four functions (not just those in base R) that convert a string into a
     date time object. What are their strengths and weaknesses?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:orange">A</span>__: At least these functions will do the trick: `as.POSIXct()`, `as.POSIXlt()`, `strftime()`, `strptime()`, `lubridate::ymd_hms()`. There might also be some in the timeseries packages `xts` or `zoo`. An update on this will follow...
 
 1.  __<span style="color:red">Q</span>__: How many different ways can you compute a 1d density estimate in R?
     
@@ -70,7 +87,37 @@
 1.  __<span style="color:red">Q</span>__: How do the results change if you compare `mean()` and `mean.default()`
     on 10,000 observations, rather than on 100?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: We start with 100 observations as shown in the textbook:
+    
+    ```{r}
+    x <- runif(1e2)
+    microbenchmark::microbenchmark(
+      mean(x),
+      mean.default(x)
+    )
+    ```
+    
+    In case of 10000 observations we can observe that using `mean.default()` preserves only a small advantage over the use of `mean()`:
+    
+    ```{r}
+    x <- runif(1e4)
+    microbenchmark::microbenchmark(
+      mean(x),
+      mean.default(x),
+      unit = "ns"
+    )
+    ```
+    
+    When using even more observations - like in the next lines - it seems that `mean.default` doesn't preserve anymore any advantage at all:
+    
+    ```{r}
+    x <- runif(1e6)
+    microbenchmark::microbenchmark(
+      mean(x),
+      mean.default(x),
+      unit = "ns"
+    )
+    ```
 
 1.  __<span style="color:red">Q</span>__: The following code provides an alternative implementation of `rowSums()`.
     Why is it faster for this input?
