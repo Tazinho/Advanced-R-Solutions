@@ -6,9 +6,13 @@
     a valid component of an expression (i.e., it's a constant, name,
     call, or pairlist). Implement one by guessing the names of the "is"
     functions for calls, names, and pairlists.
+    
+    __<span style="color:green">A</span>__: 
 
 2.  __<span style="color:red">Q</span>__: `pryr::ast()` uses non-standard evaluation. What's its escape hatch to
     standard evaluation?
+    
+    __<span style="color:green">A</span>__: 
 
 3.  __<span style="color:red">Q</span>__: What does the call tree of an if statement with multiple else conditions
     look like?
@@ -42,10 +46,14 @@
 
 4.  __<span style="color:red">Q</span>__: Compare `ast(x + y %+% z)` to `ast(x ^ y %+% z)`. What do they
     tell you about the precedence of custom infix functions?
+    
+    __<span style="color:green">A</span>__: 
 
 5.  __<span style="color:red">Q</span>__: Why can't an expression contain an atomic vector of length greater than one?
     Which one of the six types of atomic vector can't appear in an expression?
     Why?
+    
+    __<span style="color:green">A</span>__: 
 
 ## Names
 
@@ -58,11 +66,15 @@
       x + y
     }
     ```
+    
+    __<span style="color:green">A</span>__: 
 
 2.  __<span style="color:red">Q</span>__: Write an equivalent to `get()` using `as.name()` and `eval()`. Write an
     equivalent to `assign()` using `as.name()`, `substitute()`, and `eval()`.
     (Don't worry about the multiple ways of choosing an environment; assume
     that the user supplies it explicitly.)
+    
+    __<span style="color:green">A</span>__: 
     
 ## Calls
 
@@ -76,7 +88,11 @@
 
     What's the difference? Which one should you prefer?
 
+    __<span style="color:green">A</span>__: 
+    
 2.  __<span style="color:red">Q</span>__: Implement a pure R version of `do.call()`.
+    
+    __<span style="color:green">A</span>__: 
 
 3.  __<span style="color:red">Q</span>__: Concatenating a call and an expression with `c()` creates a list. Implement
     `concat()` so that the following code works to combine a call and
@@ -86,6 +102,8 @@
     concat(quote(f), a = 1, b = quote(mean(a)))
     #> f(a = 1, b = mean(a))
     ```
+    
+    __<span style="color:green">A</span>__: 
 
 4.  __<span style="color:red">Q</span>__: Since `list()`s don't belong in expressions, we could create a more
     convenient call constructor that automatically combines lists into the
@@ -97,11 +115,17 @@
     make_call(quote(mean), quote(x), na.rm = TRUE)
     #> mean(x, na.rm = TRUE)
     ```
+    
+    __<span style="color:green">A</span>__: 
 
 5.  __<span style="color:red">Q</span>__: How does `mode<-` work? How does it use `call()`?
+    
+    __<span style="color:green">A</span>__: 
 
 6.  __<span style="color:red">Q</span>__: Read the source for `pryr::standardise_call()`. How does it work?
     Why is `is.primitive()` needed?
+    
+    __<span style="color:green">A</span>__: 
 
 7.  __<span style="color:red">Q</span>__: `standardise_call()` doesn't work so well for the following calls.
     Why?
@@ -112,36 +136,54 @@
     standardise_call(quote(mean(n = T, 1:10)))
     standardise_call(quote(mean(x = 1:10, , TRUE)))
     ```
+    
+    __<span style="color:green">A</span>__: 
 
 8.  __<span style="color:red">Q</span>__: Read the documentation for `pryr::modify_call()`. How do you think
     it works? Read the source code.
+    
+    __<span style="color:green">A</span>__: 
 
 9.  __<span style="color:red">Q</span>__: Use `ast()` and experimentation to figure out the three arguments in an
     `if()` call. Which components are required? What are the arguments to
     the `for()` and `while()` calls?
+    
+    __<span style="color:green">A</span>__: 
 
 ## Capturing the current call
 
 1.  __<span style="color:red">Q</span>__: Compare and contrast `update_model()` with `update.default()`.
+    
+    __<span style="color:green">A</span>__: 
 
 2.  __<span style="color:red">Q</span>__: Why doesn't `write.csv(mtcars, "mtcars.csv", row = FALSE)` work?
     What property of argument matching has the original author forgotten?
+    
+    __<span style="color:green">A</span>__: 
 
 3.  __<span style="color:red">Q</span>__: Rewrite `update.formula()` to use R code instead of C code.
+    
+    __<span style="color:green">A</span>__: 
 
 4.  __<span style="color:red">Q</span>__: Sometimes it's necessary to uncover the function that called the
     function that called the current function (i.e., the grandparent, not
     the parent). How can you use `sys.call()` or `match.call()` to find
     this function?
+    
+    __<span style="color:green">A</span>__: 
 
 ## Pairlists
 
 1.  __<span style="color:red">Q</span>__: How are `alist(a)` and `alist(a = )` different? Think about both the
     input and the output.
+    
+    __<span style="color:green">A</span>__: 
 
 2.  __<span style="color:red">Q</span>__: Read the documentation and source code for `pryr::partial()`. What does it
     do? How does it work? Read the documentation and source code for
     `pryr::unenclose()`. What does it do and how does it work?
+    
+    __<span style="color:green">A</span>__: 
 
 3.  __<span style="color:red">Q</span>__: The actual implementation of `curve()` looks more like
 
@@ -158,18 +200,28 @@
     ```
 
     How does this approach differ from `curve2()` defined above?
+    
+    __<span style="color:green">A</span>__: 
 
 ## Parsing and deparsing
 
 1.  __<span style="color:red">Q</span>__: What are the differences between `quote()` and `expression()`?
+    
+    __<span style="color:green">A</span>__: 
 
 2.  __<span style="color:red">Q</span>__: Read the help for `deparse()` and construct a call that `deparse()`
     and `parse()` do not operate symmetrically on.
+    
+    __<span style="color:green">A</span>__: 
 
 3.  __<span style="color:red">Q</span>__: Compare and contrast `source()` and `sys.source()`.
+    
+    __<span style="color:green">A</span>__: 
 
 4.  __<span style="color:red">Q</span>__: Modify `simple_source()` so it returns the result of _every_ expression,
     not just the last one.
+    
+    __<span style="color:green">A</span>__: 
 
 5.  __<span style="color:red">Q</span>__: The code generated by `simple_source()` lacks source references. Read
     the source code for `sys.source()` and the help for `srcfilecopy()`,
@@ -177,11 +229,15 @@
     test your code by sourcing a function that contains a comment. If
     successful, when you look at the function, you'll see the comment and
     not just the source code.
+    
+    __<span style="color:green">A</span>__: 
 
 ## Walking the AST with recursive functions
 
 1.  __<span style="color:red">Q</span>__: Why does `logical_abbr()` use a for loop instead of a functional
     like `lapply()`?
+    
+    __<span style="color:green">A</span>__: 
 
 2.  __<span style="color:red">Q</span>__: `logical_abbr()` works when given quoted objects, but doesn't work when
     given an existing function, as in the example below. Why not? How could
@@ -194,17 +250,25 @@
     }
     logical_abbr(f)
     ```
+    
+    __<span style="color:green">A</span>__: 
 
 3.  __<span style="color:red">Q</span>__: Write a function called `ast_type()` that returns either "constant",
     "name", "call", or "pairlist". Rewrite `logical_abbr()`, `find_assign()`,
     and `bquote2()` to use this function with `switch()` instead of nested if
     statements.
+    
+    __<span style="color:green">A</span>__: 
 
 4.  __<span style="color:red">Q</span>__: Write a function that extracts all calls to a function. Compare your
     function to `pryr::fun_calls()`.
+    
+    __<span style="color:green">A</span>__: 
 
 5.  __<span style="color:red">Q</span>__: Write a wrapper around `bquote2()` that does non-standard evaluation
     so that you don't need to explicitly `quote()` the input.
+    
+    __<span style="color:green">A</span>__: 
 
 6.  __<span style="color:red">Q</span>__: Compare `bquote2()` to `bquote()`. There is a subtle bug in `bquote()`:
     it won't replace calls to functions with no arguments. Why?
@@ -213,6 +277,10 @@
     bquote(.(x)(), list(x = quote(f)))
     bquote(.(x)(1), list(x = quote(f)))
     ```
+    
+    __<span style="color:green">A</span>__: 
 
 7.  __<span style="color:red">Q</span>__: Improve the base `recurse_call()` template to also work with lists of
     functions and expressions (e.g., as from `parse(path_to_file))`.
+    
+    __<span style="color:green">A</span>__: 
