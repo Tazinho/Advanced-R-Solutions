@@ -68,7 +68,7 @@
 1.  __<span style="color:red">Q</span>__: List four functions (not just those in base R) that convert a string into a
     date time object. What are their strengths and weaknesses?
     
-    __<span style="color:orange">A</span>__: At least these functions will do the trick: `as.POSIXct()`, `as.POSIXlt()`, `strftime()`, `strptime()`, `lubridate::ymd_hms()`. There might also be some in the timeseries packages `xts` or `zoo`. An update on this will follow...
+    __<span style="color:orange">A</span>__: At least these functions will do the trick: `as.POSIXct()`, `as.POSIXlt()`, `strftime()`, `strptime()`, `lubridate::ymd_hms()`. There might also be some in the timeseries packages `xts` or `zoo` and in `anytime`. An update on this will follow...
 
 1.  __<span style="color:red">Q</span>__: How many different ways can you compute a 1d density estimate in R?
     
@@ -144,7 +144,25 @@
 
 1.  __<span style="color:red">Q</span>__: What's the difference between `rowSums()` and `.rowSums()`?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: `.rowSums` is defined as
+    
+    ```{r}
+    .rowSums
+    ```
+    
+    this means, that the internal `rowSums` function is called via `.Internal`.
+    
+    > .Internal performs a call to an internal code which is built in to the R
+    interpreter.
+    
+    The internal `rowSums` is a complete different function than the "normal"
+    `rowSums` function.
+    
+    Of course (since they have the same name) in this case these functions are heavily related with each other: If we look into the source code of `rowSums`, we see that it is a wrapper around the internal `rowSums`. Just some input checkings and conversionis are added:
+    
+    ```{r}
+    rowSums
+    ```
 
 1.  __<span style="color:red">Q</span>__: Make a faster version of `chisq.test()` that only computes the chi-square
     test statistic when the input is two numeric vectors with no missing
