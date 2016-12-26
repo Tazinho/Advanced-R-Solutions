@@ -76,7 +76,27 @@
 
 1.  __<span style="color:red">Q</span>__: Which packages provide the ability to compute a rolling mean?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: Again google [r rolling mean](http://stackoverflow.com/questions/743812/calculating-moving-average-in-r)
+provides us with enough information and guides our attention on solutions in the following packages:
+    * `zoo`
+    ```{r}
+    zoo::rollmean(1:10, 2, na.pad = TRUE, align = "left")
+    zoo::rollapply(1:10, 2, mean, fill = NA, align = "left")
+    ```
+    * `TTR`
+    ```{r}
+    TTR::SMA(1:10, 2)
+    ```
+    * `RcppRoll`
+    ```{r}
+    RcppRoll::roll_mean(1:10, n = 2, fill = NA, align = "left")
+    ```
+    * `caTools`
+    ```{r}
+    caTools::runmean(1:10, k = 2, endrule = "NA", align = "left")
+    ```
+
+    Note that an exhaustive example on how to create a rolling mean function is provided in the [textbook](http://adv-r.had.co.nz/Functionals.html).
 
 1.  __<span style="color:red">Q</span>__: What are the alternatives to `optim()`?
     
