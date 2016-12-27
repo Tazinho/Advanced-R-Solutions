@@ -213,7 +213,7 @@ provides us with enough information and guides our attention on solutions in the
       # Output
       x_stat = sum((m - me)^2 / me)
       dof <- (length(margin1) - 1) * (length(margin2) - 1)
-      p <- 1 - pchisq(x_stat, df = dof)
+      p <- pchisq(x_stat, df = dof, lower.tail = FALSE)
       
       return(list(x_stat = x_stat, df = dof, `p-value` = p))
     }
