@@ -195,13 +195,20 @@ provides us with enough information and guides our attention on solutions in the
     chisq.test2 <- function(x, y){
       
       # Input
-      if(!is.numeric(x)){stop("x must be numeric")}
-      if(!is.numeric(y)){stop("y must be numeric")}
-      if(length(x) != length(y)){stop("x and y must have the same length")}
-      if(length(x) <= 1){stop("length of x must be greater one")}
-      if(any(c(x,y) < 0)){stop("all entries of x and y must be greater or equal zero")}
-      if(sum(complete.cases(x, y)) != length(x)){stop("there must be no missing values in x and y")}
-      if(any(is.null(c(x,y)))){stop("entries of x and y must not be NULL")}
+      if(!is.numeric(x)){
+        stop("x must be numeric")}
+      if(!is.numeric(y)){
+        stop("y must be numeric")}
+      if(length(x) != length(y)){
+        stop("x and y must have the same length")}
+      if(length(x) <= 1){
+        stop("length of x must be greater one")}
+      if(any(c(x,y) < 0)){
+        stop("all entries of x and y must be greater or equal zero")}
+      if(sum(complete.cases(x, y)) != length(x)){
+        stop("there must be no missing values in x and y")}
+      if(any(is.null(c(x,y)))){
+        stop("entries of x and y must not be NULL")}
       
       # Help variables
       m <- matrix(c(x, y), nrow = 2, byrow = TRUE)
