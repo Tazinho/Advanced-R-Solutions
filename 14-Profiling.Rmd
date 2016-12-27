@@ -72,7 +72,7 @@
 
 1.  __<span style="color:red">Q</span>__: How many different ways can you compute a 1d density estimate in R?
     
-    __<span style="color:green">A</span>__: According to [Deng and Wickham 2011](https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=3&ved=0ahUKEwim0sTI9JLRAhVScFAKHdLuBOIQFggxMAI&url=http%3A%2F%2Fvita.had.co.nz%2Fpapers%2Fdensity-estimation.pdf&usg=AFQjCNFBdOT4DvSTXtGoawIFkgf6JlXV9Q&sig2=APnTeIL55Zj_0oATw15mBA&cad=rja) density estimation is implemented in over 20 R packages. 
+    __<span style="color:green">A</span>__: According to [Deng and Wickham (2011)](https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=3&ved=0ahUKEwim0sTI9JLRAhVScFAKHdLuBOIQFggxMAI&url=http%3A%2F%2Fvita.had.co.nz%2Fpapers%2Fdensity-estimation.pdf&usg=AFQjCNFBdOT4DvSTXtGoawIFkgf6JlXV9Q&sig2=APnTeIL55Zj_0oATw15mBA&cad=rja) density estimation is implemented in over 20 R packages. 
 
 1.  __<span style="color:red">Q</span>__: Which packages provide the ability to compute a rolling mean?
     
@@ -164,21 +164,21 @@ provides us with enough information and guides our attention on solutions in the
 
 1.  __<span style="color:red">Q</span>__: What's the difference between `rowSums()` and `.rowSums()`?
     
-    __<span style="color:green">A</span>__: `.rowSums` is defined as
+    __<span style="color:green">A</span>__: `.rowSums()` is defined as
     
     ```{r}
     .rowSums
     ```
     
-    this means, that the internal `rowSums` function is called via `.Internal`.
+    this means, that the internal `rowSums()` function is called via `.Internal()`.
     
     > .Internal performs a call to an internal code which is built in to the R
     interpreter.
     
-    The internal `rowSums` is a complete different function than the "normal"
-    `rowSums` function.
+    The internal `rowSums()` is a complete different function than the "normal"
+    `rowSums()` function.
     
-    Of course (since they have the same name) in this case these functions are heavily related with each other: If we look into the source code of `rowSums`, we see that it is a wrapper around the internal `rowSums`. Just some input checkings, conversionis and the special cases (complex numbers) are added:
+    Of course (since they have the same name) in this case these functions are heavily related with each other: If we look into the source code of `rowSums()`, we see that it is a wrapper around the internal `rowSums()`. Just some input checkings, conversions and the special cases (complex numbers) are added:
     
     ```{r}
     rowSums
@@ -189,7 +189,58 @@ provides us with enough information and guides our attention on solutions in the
     values. You can try simplifying `chisq.test()` or by coding from the 
     [mathematical definition](http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test).
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: Since `chisq.test()` has a relatively long source code, we try a new implementation from scratch:
+    
+    ```{r}
+    chisq.test2 <- function(x, y){
+      
+      # Input
+      if(!is.numeric(x)){stop("x must be numeric")}
+      if(!is.numeric(y)){stop("y must be numeric")}
+      if(length(x) != length(y)){stop("x and y must have the same length")}
+      if(length(x) <= 1){stop("length of x must be greater one")}
+      if(any(c(x,y) < 0)){stop("all entries of x and y must be greater or equal zero")}
+      if(sum(complete.cases(x, y)) != length(x)){stop("there must be no missing values in x and y")}
+      if(any(is.null(c(x,y)))){stop("entries of x and y must not be NULL")}
+      
+      # Help variables
+      m <- matrix(c(x, y), nrow = 2, byrow = TRUE)
+      margin1 <- rowSums(m)
+      margin2 <- colSums(m)
+      n <- sum(m)
+      me <- tcrossprod(margin1, margin2) / n
+      
+      # Output
+      x_stat = sum((m - me)^2 / me)
+      dof <- (length(margin1) - 1) * (length(margin2) - 1)
+      p <- 1 - pchisq(x_stat, df = dof)
+      
+      return(list(x_stat = x_stat, df = dof, `p-value` = p))
+    }
+    ```
+    
+    We check if our new implementation returns the same results
+    
+    ```{r}
+    a <- 21:25
+    b <- c(21,23,25,27,29)
+    m_test <- cbind(a, b)
+    
+    chisq.test(m_test)
+    chisq.test2(a, b)
+    ```
+    
+    Finally we benchmark this implementation against a compiled version of itself and the original `stats::chisq.test()`:
+    
+    ```{r}
+    chisq.test2c <- compiler::cmpfun(chisq.test2)
+    
+    microbenchmark::microbenchmark(
+      chisq.test(m_test),
+      chisq.test2(a, b),
+      chisq.test2c(a, b)
+    )
+    ```
 
 1.  __<span style="color:red">Q</span>__: Can you make a faster version of `table()` for the case of an input of
     two integer vectors with no missing values? Can you use it to
