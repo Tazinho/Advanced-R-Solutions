@@ -279,7 +279,7 @@ provides us with enough information and guides our attention on solutions in the
     __<span style="color:orange">A</span>__: The three components (mentioned in the questions hint) are:
 
     1. sampling of indices
-    2. subsetting the data frame / conversion to matrix (or vector input)
+    2. subsetting the data frame/conversion to matrix (or vector input)
     3. the `cor()` function itself.
     
     Since a run of lineprof like shown in the textbook suggests that `as.matrix()` within the `cor()` function is the biggest bottleneck, we start with that:
@@ -344,7 +344,7 @@ provides us with enough information and guides our attention on solutions in the
     )
     ```
     
-    According to the resulting medians, lower and upper quartiles of our benchmark all three new versions seem to provide more or less the same speed benefit (note that the maximum and mean can vary a lot for these approaches). Since the second version is most similar to the code we started, we implement this line into a second version of `cor_df()` and do a benchmark to get the overall speedup:
+    According to the resulting medians, lower and upper quartiles of our benchmark all three new versions seem to provide more or less the same speed benefit (note that the maximum and mean can vary a lot for these approaches). Since the second version is most similar to the code we started, we implement this line into a second version of `cor_df()` (if this sounds too arbitrary, note that in the final solution we will come back to the vector input version anyway) and do a benchmark to get the overall speedup:
     
     ```{r}
     cor_df2 <- function() {
@@ -359,7 +359,7 @@ provides us with enough information and guides our attention on solutions in the
     )
     ```
     
-    Now we can focus on a speedup for the random generation of indices. (Note that a run of linepfrof suggests to optimize `cbind()`. However, after optimising `cor()` to work with vector input, this step will be unncessary anyway). We try differnt approaches for the sequence generation within `sample()` and a direct call of `sample.int()`. When we look into `sample.int()` we see that it calls two different internal sample versions depending on the input. Since in our usecase always the second version will be called, we also provide this version in our benchmark: 
+    Now we can focus on a speedup for the random generation of indices. (Note that a run of linepfrof suggests to optimize `cbind()`. However, after rewriting `cor()` to a version that only works with vector input, this step will be unnecessary anyway). We try differnt approaches for the sequence generation within `sample()` and a direct call of `sample.int()`. When we look into `sample.int()` we see that it calls two different internal sample versions depending on the input. Since in our usecase always the second version will be called, we also provide this version in our benchmark: 
     
     ```{r}
     microbenchmark::microbenchmark(
@@ -388,7 +388,7 @@ provides us with enough information and guides our attention on solutions in the
     )
     ```
     
-    As a last step, we try to speedup the calculation of the pearson correlation coefficient. Since quite a lot of functionality is build into the `stats::cor()` function this seems like a reasonable approach. We try this by working with another `cor()` function from the `WGNA` package and an own implementation which should give a small improvement, because we use `sum(x)/length(x)` instead of `mean(x)` for internal calculations:
+    As a last step, we try to speedup the calculation of the pearson correlation coefficient. Since quite a lot of functionality is build into the `stats::cor()` function this seems like a reasonable approach. We try this by working with another `cor()` function from the `WGNA` package and an own implementation which should give a small improvement, because we use `sum(x) / length(x)` instead of `mean(x)` for internal calculations:
     
     ```{r}
     #WGCNA version (matrix and vector)
@@ -415,6 +415,8 @@ provides us with enough information and guides our attention on solutions in the
       denominator <- sqrt(sum(x_xm^2)) * sqrt(sum(y_ym^2))
       return(numerator / denominator)
     }
+    
+    cor2 <- compiler::cmpfun(cor2)
     
     cor_df5 <- function() {
       i <- sample.int(n, n * 0.01)
