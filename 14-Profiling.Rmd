@@ -211,7 +211,7 @@ provides us with enough information and guides our attention on solutions in the
         stop("entries of x and y must not be NULL")}
       
       # Help variables
-      m <- matrix(c(x, y), nrow = 2, byrow = TRUE)
+      m <- rbind(x, y)
       margin1 <- rowSums(m)
       margin2 <- colSums(m)
       n <- sum(m)
@@ -264,15 +264,200 @@ provides us with enough information and guides our attention on solutions in the
     n <- 1e6
     df <- data.frame(a = rnorm(n), b = rnorm(n))
 
-    cor_df <- function(i) {
+    cor_df <- function() {
+      # note that we omit the inputparameter i, which appears in the textbook, since 
+      # this seems to be unnecessary.
       i <- sample(seq(n), n * 0.01)
-      cor(q[i, , drop = FALSE])[2,1]
+      cor(df[i, , drop = FALSE])[2,1]
+      # note also that in the last line the textbook says q[] instead of df[]. Since
+      # this is probably just a typo, we changed this to df[].
     }
     ```
 
     Is there a way to vectorise this procedure?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:orange">A</span>__: The three components (mentioned in the questions hint) are:
+
+    1. sampling of indices
+    2. subsetting the data frame / conversion to matrix (or vector input)
+    3. the `cor()` function itself.
+    
+    Since a run of lineprof like shown in the textbook suggests that `as.matrix()` within the `cor()` function is the biggest bottleneck, we start with that:
+    
+    ```{r}
+    n <- 1e6
+    df <- data.frame(a = rnorm(n), b = rnorm(n))
+    ```
+
+    Remember the outgoing function:
+    
+    ```{r}
+    cor_df <- function() {
+      i <- sample(seq(n), n * 0.01)
+      cor(df[i, , drop = FALSE])[2,1]
+    }
+    ```
+    
+    First we want to optimise the second line (without attention to the `cor()` function itself). Therefore we exclude the first line from our optimisation approaches and define `i` within the global environment:
+    
+    ```{r}
+    i <- sample(seq(n), n * 0.01)
+    ```
+    
+    Then we define our approaches, check that their behaviour is correct and do the first benchmark:
+    
+    ```{r}
+    # old version
+    cor_v1 <- function() {
+      cor(df[i, , drop = FALSE])[2,1]
+    }
+    
+    # cbind instead of internal as.matrix
+    cor_v2 <- function() {
+      m <- cbind(df$a[i], df$b[i])
+      cor(m)[2, 1]
+    }
+
+    # cbind + vector subsetting of the output matrix
+    cor_v3 <- function() {
+      m <- cbind(df$a[i], df$b[i])
+      cor(m)[2]
+    }
+
+    # Use vector input within the cor function, so that no conversion is needed
+    cor_v4 <- function() {
+      cor(df$a[i], df$b[i])
+    }
+    
+    # check if all return the same result
+    cor_list <- list(cor_v1, cor_v2, cor_v3, cor_v4)
+    ulapply <- function(X, FUN, ...) unlist(lapply(X, FUN, ...))
+    ulapply(cor_list, function(x) identical(x(), cor_v1()))
+    
+    # benchmark
+    set.seed(1)
+    microbenchmark::microbenchmark(
+      cor_v1(),
+      cor_v2(),
+      cor_v3(),
+      cor_v4()
+    )
+    ```
+    
+    According to the resulting medians, lower and upper quartiles of our benchmark all three new versions seem to provide more or less the same speed benefit (note that the maximum and mean can vary a lot for these approaches). Since the second version is most similar to the code we started, we implement this line into a second version of `cor_df()` and do a benchmark to get the overall speedup:
+    
+    ```{r}
+    cor_df2 <- function() {
+      i <- sample(seq(n), n * 0.01)
+      m <- cbind(df$a[i], df$b[i])
+      cor(m)[2, 1]
+    }
+    
+    microbenchmark::microbenchmark(
+      cor_df(),
+      cor_df2()
+    )
+    ```
+    
+    Now we can focus on a speedup for the random generation of indices. (Note that a run of linepfrof suggests to optimize `cbind()`. However, after optimising `cor()` to work with vector input, this step will be unncessary anyway). We try differnt approaches for the sequence generation within `sample()` and a direct call of `sample.int()`. When we look into `sample.int()` we see that it calls two different internal sample versions depending on the input. Since in our usecase always the second version will be called, we also provide this version in our benchmark: 
+    
+    ```{r}
+    microbenchmark::microbenchmark(
+      sample(seq(n), n * 0.01),
+      sample(seq.int(n), n * 0.01),
+      sample(seq_len(n), n * 0.01),
+      sample(1:n, n * 0.01),
+      sample.int(n, n * 0.01),
+      .Internal(sample(n, n * 0.01, replace = FALSE, prob = NULL))
+    )
+    ```
+    
+    The `sample.int()` versions give clearly the biggest improvement. Since the internal version doesn't provide any clear improvement, but restricts the general scope of our function, we choose to implement `sample.int()` in a third version of `cor_df()` and benchmark our actual achievements:
+    
+    ```{r}
+    cor_df3 <- function() {
+      i <- sample.int(n, n * 0.01)
+      m <- cbind(df$a[i], df$b[i])
+      cor(m)[2, 1]
+    }
+
+    microbenchmark::microbenchmark(
+      cor_df(),
+      cor_df2(),
+      cor_df3()
+    )
+    ```
+    
+    As a last step, we try to speedup the calculation of the pearson correlation coefficient. Since quite a lot of functionality is build into the `stats::cor()` function this seems like a reasonable approach. We try this by working with another `cor()` function from the `WGNA` package and an own implementation which should give a small improvement, because we use `sum(x)/length(x)` instead of `mean(x)` for internal calculations:
+    
+    ```{r}
+    #WGCNA version (matrix and vector)
+    cor_df4m <- function() {
+      i <- sample.int(n, n * 0.01)
+      m <- cbind(df$a[i], df$b[i])
+      WGCNA::cor(m)[2]
+    }
+    
+    cor_df4v <- function() {
+      i <- sample.int(n, n * 0.01)
+      WGCNA::cor(df$a[i], df$b[i])[1]
+    }
+    
+    #New implementation of underlying cor function
+    #A definition can be found for example here
+    #http://www.socscistatistics.com/tests/pearson/
+    cor2 <- function(x, y){
+      xm <- sum(x) / length(x)
+      ym <- sum(y) / length(y)
+      x_xm <- x - xm
+      y_ym <- y - ym
+      numerator <- sum((x_xm) * (y_ym))
+      denominator <- sqrt(sum(x_xm^2)) * sqrt(sum(y_ym^2))
+      return(numerator / denominator)
+    }
+    
+    cor_df5 <- function() {
+      i <- sample.int(n, n * 0.01)
+      cor2(df$a[i], df$b[i])
+    }
+    ```
+    
+    In our final benchmark, we also include compiled verions of all our attempts:
+    ```{r}
+    cor_df_c <- compiler::cmpfun(cor_df)
+    cor_df2_c <- compiler::cmpfun(cor_df2)
+    cor_df3_c <- compiler::cmpfun(cor_df3)
+    cor_df4m_c <- compiler::cmpfun(cor_df4m)
+    cor_df4v_c <- compiler::cmpfun(cor_df4v)
+    cor_df5_c <- compiler::cmpfun(cor_df5)
+
+    microbenchmark::microbenchmark(
+      cor_df(),
+      cor_df2(),
+      cor_df3(),
+      cor_df4m(),
+      cor_df4v(),
+      cor_df5(),
+      cor_df_c(),
+      cor_df2_c(),
+      cor_df3_c(),
+      cor_df4m_c(),
+      cor_df4v_c(),
+      cor_df5_c()
+    )
+    ```
+    
+    Our final solution benefits most, from the switch from data frames to vectors. Working with `sample.int` gives only little improvement. Reimplementing and compiling a new correlation function adds only minimal speedup.
+    
+    To trust our final result we include a last check for similar return values:
+    
+    ```{r}
+    set.seed(1)
+    cor_df()
+    set.seed(1)
+    cor_df5_c()
+    ```
+
 
 ## Vectorise
 
