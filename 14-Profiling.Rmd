@@ -276,7 +276,7 @@ provides us with enough information and guides our attention on solutions in the
 
     Is there a way to vectorise this procedure?
     
-    __<span style="color:orange">A</span>__: The three components (mentioned in the questions hint) are:
+    __<span style="color:green">A</span>__: The three components (mentioned in the questions hint) are:
 
     1. sampling of indices
     2. subsetting the data frame/conversion to matrix (or vector input)
@@ -359,14 +359,13 @@ provides us with enough information and guides our attention on solutions in the
     )
     ```
     
-    Now we can focus on a speedup for the random generation of indices. (Note that a run of linepfrof suggests to optimize `cbind()`. However, after rewriting `cor()` to a version that only works with vector input, this step will be unnecessary anyway). We try differnt approaches for the sequence generation within `sample()` and a direct call of `sample.int()`. When we look into `sample.int()` we see that it calls two different internal sample versions depending on the input. Since in our usecase always the second version will be called, we also provide this version in our benchmark: 
+    Now we can focus on a speedup for the random generation of indices. (Note that a run of linepfrof suggests to optimize `cbind()`. However, after rewriting `cor()` to a version that only works with vector input, this step will be unnecessary anyway). We could try differnt approaches for the sequence generation within `sample()` (like `seq(n)`, `seq.int(n)`, `seq_len(n)`, `a:n`) and a direct call of `sample.int()`. In the following, we will see, that `sample.int()` is always faster (since we don't include the generation of the sequence into our benchmark). When we look into `sample.int()` we see that it calls two different internal sample versions depending on the input. Since in our usecase always the second version will be called, we also provide this version in our benchmark: 
     
     ```{r}
+    seq_n <- seq(n)
+    
     microbenchmark::microbenchmark(
-      sample(seq(n), n * 0.01),
-      sample(seq.int(n), n * 0.01),
-      sample(seq_len(n), n * 0.01),
-      sample(1:n, n * 0.01),
+      sample(seq_n, n * 0.01),
       sample.int(n, n * 0.01),
       .Internal(sample(n, n * 0.01, replace = FALSE, prob = NULL))
     )
@@ -450,7 +449,7 @@ provides us with enough information and guides our attention on solutions in the
     )
     ```
     
-    Our final solution benefits most, from the switch from data frames to vectors. Working with `sample.int` gives only little improvement. Reimplementing and compiling a new correlation function adds only minimal speedup.
+    Our final solution benefits most from the switch from data frames to vectors. Working with `sample.int` gives only little improvement. Reimplementing and compiling a new correlation function adds only minimal speedup.
     
     To trust our final result we include a last check for similar return values:
     
@@ -460,8 +459,47 @@ provides us with enough information and guides our attention on solutions in the
     set.seed(1)
     cor_df5_c()
     ```
-
-
+    
+    Vectorization of this problem seems rather difficult, since attempts of using matrix calculus, always depend on building and handling big matrices in the first place.
+    
+    We can for example rewrite our correlation function to work with matrices and build a new (vectorized) version of `cor_df()` on top of that
+    
+    ```{r}
+    cor2m <- function(x, y){
+      n_row <- nrow(x)
+      xm <- colSums(x) / n_row
+      ym <- colSums(y) / n_row
+      x_xm <- t(t(x) - xm)
+      y_ym <- t(t(y) - ym)
+      numerator <- colSums((x_xm) * (y_ym))
+      denominator <- sqrt(colSums(x_xm^2)) * sqrt(colSums(y_ym^2))
+      return(numerator / denominator)
+    }
+    
+    cor_df_v <- function(i){
+      indices <- replicate(i, sample.int(n, n * 0.01), simplify = "array")
+      x <- matrix(df$a[indices], ncol = i)
+      y <- matrix(df$b[indices], ncol = i)
+      cor2m(x, y)
+    }
+    cor_df_v <- compiler::cmpfun(cor_df_v)
+    ```
+    
+    However this still doesn't provide any improvement over the use of `lapply()`:
+    
+    ```{r}
+    ulapply2 <- function(X, FUN, ...) unlist(lapply(X, FUN, ...), use.names = FALSE)
+    
+    microbenchmark::microbenchmark(
+      cor_df5_c(),
+      ulapply2(1:100, function(x) cor_df5_c()),
+      cor_df_v(100)
+    )
+    
+    ```
+    
+    Further improvements can be achieved using parallelisation (for example via `parallel::parLapply()`)
+    
 ## Vectorise
 
 1.  __<span style="color:red">Q</span>__: The density functions, e.g., `dnorm()`, have a common interface. Which 
