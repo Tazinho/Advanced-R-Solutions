@@ -391,7 +391,8 @@ provides us with enough information and guides our attention on solutions in the
     As a last step, we try to speedup the calculation of the pearson correlation coefficient. Since quite a lot of functionality is build into the `stats::cor()` function this seems like a reasonable approach. We try this by working with another `cor()` function from the `WGNA` package and an own implementation which should give a small improvement, because we use `sum(x) / length(x)` instead of `mean(x)` for internal calculations:
     
     ```{r}
-    #WGCNA version (matrix and vector)
+    #WGCNA version (matrix and vector). Note that I don't use a local setup which uses
+    #the full potential of this function. For furter information see ?WGCNA::cor
     cor_df4m <- function() {
       i <- sample.int(n, n * 0.01)
       m <- cbind(df$a[i], df$b[i])
@@ -400,7 +401,7 @@ provides us with enough information and guides our attention on solutions in the
     
     cor_df4v <- function() {
       i <- sample.int(n, n * 0.01)
-      WGCNA::cor(df$a[i], df$b[i])[1]
+      WGCNA::cor(df$a[i], df$b[i], quick = 1)[1]
     }
     
     #New implementation of underlying cor function
