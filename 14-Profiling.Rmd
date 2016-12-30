@@ -505,7 +505,14 @@ provides us with enough information and guides our attention on solutions in the
 1.  __<span style="color:red">Q</span>__: The density functions, e.g., `dnorm()`, have a common interface. Which 
     arguments are vectorised over? What does `rnorm(10, mean = 10:1)` do?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: We can see the interface of these functions via `?dnorm`:
+    
+    > dnorm(x, mean = 0, sd = 1, log = FALSE)
+    pnorm(q, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
+    qnorm(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
+    rnorm(n, mean = 0, sd = 1).
+    
+    They are vectorised over their numeric arguments, which is always the first argument (`x`, `a`, `p`, `n`), 'mean' and 'sd'. Note that it's dangerous to supply a vector to `n` in the `rnorm()` function, since the behaviour will change, when `n` has length 1.
 
 1.  __<span style="color:red">Q</span>__: Compare the speed of `apply(x, 1, sum)` with `rowSums(x)` for varying sizes
     of `x`.
