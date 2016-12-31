@@ -460,9 +460,9 @@ provides us with enough information and guides our attention on solutions in the
     cor_df5_c()
     ```
     
-    Vectorization of this problem seems rather difficult, since attempts of using matrix calculus, always depend on building and handling big matrices in the first place.
+    Vectorisation of this problem seems rather difficult, since attempts of using matrix calculus, always depend on building and handling big matrices in the first place.
     
-    We can for example rewrite our correlation function to work with matrices and build a new (vectorized) version of `cor_df()` on top of that
+    We can for example rewrite our correlation function to work with matrices and build a new (vectorised) version of `cor_df()` on top of that
     
     ```{r}
     cor2m <- function(x, y){
@@ -507,19 +507,98 @@ provides us with enough information and guides our attention on solutions in the
     
     __<span style="color:green">A</span>__: We can see the interface of these functions via `?dnorm`:
     
-    > dnorm(x, mean = 0, sd = 1, log = FALSE)
+    ```
+    dnorm(x, mean = 0, sd = 1, log = FALSE)
     pnorm(q, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
     qnorm(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
     rnorm(n, mean = 0, sd = 1).
+    ```
     
-    They are vectorised over their numeric arguments, which is always the first argument (`x`, `a`, `p`, `n`), 'mean' and 'sd'. Note that it's dangerous to supply a vector to `n` in the `rnorm()` function, since the behaviour will change, when `n` has length 1.
+    They are vectorised over their numeric arguments, which is always the first argument (`x`, `a`, `p`, `n`), `mean` and `sd`. Note that it's dangerous to supply a vector to `n` in the `rnorm()` function, since the behaviour will change, when `n` has length 1 (like in the second part of this question).
+    
+    `rnorm(10, mean = 10:1)` generates ten random numbers from different normal distributions. The normal distributions differ in their means. The first has mean ten, the second has mean nine, the third mean 8 etc.
 
 1.  __<span style="color:red">Q</span>__: Compare the speed of `apply(x, 1, sum)` with `rowSums(x)` for varying sizes
     of `x`.
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: We compare regarding different sizes for square matrices:
+    
+    ```{r}
+    library(microbenchmark)
+    dimensions <- c(1e0, 1e1, 1e2, 1e3, 0.5e4, 1e4)
+    matrices <-  lapply(dimensions,
+                    function(x) tcrossprod(rnorm(x), rnorm(x)))
+    
+    bench_rs <- lapply(matrices,
+                       function(x) fivenum(microbenchmark(rowSums(x),
+                                                          unit = "ns")$time))
+    bench_rs <- data.frame(time = unlist(bench_rs), 
+                           call = "rowSums",
+                           stringsAsFactors = FALSE)
+    
+    bench_apply <- lapply(matrices,
+                          function(x) fivenum(microbenchmark(apply(x, 1, sum),
+                                                             unit = "ns")$time))
+    bench_apply <- data.frame(time = unlist(bench_apply),
+                              call = "apply", stringsAsFactors = FALSE)
+    
+    df <- rbind(bench_rs, bench_apply)
+    
+    df$dimension <- rep(dimensions, each = 5)
+    df$aggr <- rep(c("min", "lq", "median", "uq", "max"),
+                   times = length(dimensions))
+    df$aggr_size <- rep(c(1,2,3,2,1), times = length(dimensions))
+    df$group <- paste(as.character(df$call), as.character(df$aggr), sep = " ")
+    
+    library(ggplot2)
+    
+    ggplot(df, aes(x = dimension, y = time, colour = call, group = group)) +
+      geom_point() + 
+      geom_line(aes(linetype = factor(aggr_size, levels = c("3", "2", "1"))),
+            show.legend = FALSE)
+    ```
   
 1.  __<span style="color:red">Q</span>__: How can you use `crossprod()` to compute a weighted sum? How much faster is
     it than the naive `sum(x * w)`?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: We can just give the vectors to `crossprod()` which converts them to row- and columnvectors and then multiplies these. The result is the dot product which is also a weighted sum.
+    
+    ```{r}
+    a <- rnorm(10)
+    b <- rnorm(10)
+    stopifnot(identical(sum(a * b),
+                        crossprod(a, b)[1]))
+    ```
+    
+    A benchmark of both alternatives for different vector lengths indicates, that the `crossprod()` variant is about 2.5 times faster than `sum()`:
+    
+    ```{r}
+    dimensions <- c(1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 0.5e7, 1e7)
+    xvector <- lapply(dimensions, rnorm)
+    weights <- lapply(dimensions, rnorm)
+    
+    bench_sum <- Map(function(x, y) fivenum(microbenchmark(sum(x * y))$time),
+                     xvector, weights)
+    bench_sum <- data.frame(time = unlist(bench_sum),
+                            call = "sum",
+                            stringsAsFactors = FALSE)
+    bench_cp <- Map(function(x, y) fivenum(microbenchmark(crossprod(x, y)[1])$time),
+                    xvector, weights)
+    bench_cp <- data.frame(time = unlist(bench_cp),
+                           call = "crossproduct",
+                           stringsAsFactors = FALSE)
+    
+    df <- rbind(bench_sum, bench_cp)
+    
+    df$dimension <- rep(dimensions, each = 5)
+    df$aggr <- rep(c("min", "lq", "median", "uq", "max"), times = length(dimensions))
+    df$aggr_size <- rep(c(1,2,3,2,1), times = length(dimensions))
+    df$group <- paste(as.character(df$call), as.character(df$aggr), sep = " ")
+    
+    ggplot(df, aes(x = dimension, y = time, colour = call, group = group)) +
+      geom_point() + 
+      geom_line(aes(linetype = factor(aggr_size, levels = c("3", "2", "1"))),
+                show.legend = FALSE) +
+      scale_y_continuous(expand = c(0,0))
+    ```
+    
