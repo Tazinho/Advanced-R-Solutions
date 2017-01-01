@@ -188,7 +188,35 @@ You can check if a class is only implicit by using one of the following approach
 1.  __<span style="color:red">Q</span>__: Use a field function to prevent the account balance from being directly
     manipulated. (Hint: create a "hidden" `.balance` field, and read the 
     help for the fields argument in `setRefClass()`.)  
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: We are not that experienced in general S4 classes, but it is easy with R6 classes. You can find all the information you need [here](https://github.com/wch/R6). To solve the exercise this [introduction](https://cran.r-project.org/web/packages/R6/vignettes/Introduction.html) should be sufficient:
+    
+    ```{r, eval = FALSE}
+    # definition of the class
+    Account2 <- R6::R6Class("Account",
+                            public = list(
+                              initialize = function(balance = 0){
+                                private$balance = balance
+                                },
+                              withdraw = function(x){
+                                if (private$balance < x) stop("Not enough money")
+                                private$balance <- private$balance - x
+                                },
+                              deposit = function(x) {
+                                private$balance <- private$balance + x
+                                }
+                              ),
+                            private = list(
+                              balance = NULL
+                              )
+                            )
+    # Checking the behaviour
+    # a <- Account2$new(100)
+    # a$withdraw(50); a
+    # a$balance
+    # a$balance <- 5000
+    # a$deposit(100); a
+    # a$withdraw(200); a
+    ```
 
 2.  __<span style="color:red">Q</span>__: I claimed that there aren't any RC classes in base R, but that was a 
     bit of a simplification. Use `getClasses()` and find which classes 
