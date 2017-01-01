@@ -188,7 +188,7 @@ You can check if a class is only implicit by using one of the following approach
 1.  __<span style="color:red">Q</span>__: Use a field function to prevent the account balance from being directly
     manipulated. (Hint: create a "hidden" `.balance` field, and read the 
     help for the fields argument in `setRefClass()`.)  
-    __<span style="color:green">A</span>__: We are not that experienced in general S4 classes, but it is easy with R6 classes. You can find all the information you need [here](https://github.com/wch/R6). To solve the exercise this [introduction](https://cran.r-project.org/web/packages/R6/vignettes/Introduction.html) should be sufficient:
+    __<span style="color:green">A</span>__: We are not that experienced in general RC classes, but it is easy with R6 classes. You can find all the information you need [here](https://github.com/wch/R6). To solve the exercise this [introduction](https://cran.r-project.org/web/packages/R6/vignettes/Introduction.html) should be sufficient:
     
     ```{r, eval = FALSE}
     # definition of the class
@@ -222,4 +222,13 @@ You can check if a class is only implicit by using one of the following approach
     bit of a simplification. Use `getClasses()` and find which classes 
     `extend()` from `envRefClass`. What are the classes used for? (Hint: 
     recall how to look up the documentation for a class.)  
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: We get these classes as described in the exercise:
+    
+    ```{r}
+    classes <- getClasses(where = .GlobalEnv, inherits = TRUE)
+    classes[unlist(lapply(classes, function(x) methods::extends(x, "envRefClass")))]
+    ```
+    
+    Their need is best described in `class?envRefClass` "Purpose of the Class":
+
+    > This class implements basic reference-style semantics for R objects. Objects normally do not come directly from this class, but from subclasses defined by a call to setRefClass. The documentation below is technical background describing the implementation, but applications should use the interface documented under setRefClass, in particular the $ operator and field accessor functions as described there.
