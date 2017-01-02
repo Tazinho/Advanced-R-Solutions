@@ -122,10 +122,31 @@ __<span style="color:green">A</span>__: The most important differences are:
       where2.internal(name, env = parent.frame())
     }
     ```   
+    
+    Note that `where2.internal()` still provides the same structure as `pryr::where` does and you can also divide it in "base case", "success case" and "recursive case".
 
 2.  __<span style="color:red">Q</span>__: Write your own version of `get()` using a function written in the style 
     of `where()`.  
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: Note that `get()` provides a bit more arguments than our following version, but it should be easy to build up on that. However, we can change `pryr::where` to `get2()` with just changing one line:
+    
+    ```{r}
+    get2 <- function(name, env = parent.frame()) 
+      {
+      stopifnot(is.character(name), length(name) == 1)
+      env <- pryr:::to_env(env)
+      if (identical(env, emptyenv())) {
+        stop("Can't find ", name, call. = FALSE)
+        }
+      if (exists(name, env, inherits = FALSE)) {
+        # we cancel env and substitute it with the following line, where we subset
+        # the environment (like a list) by the name of our object and return it
+        return(env[[name]])
+        }
+      else {
+        get2(name, parent.env(env))
+      }
+    }
+    ```
 
 3.  __<span style="color:red">Q</span>__: Write a function called `fget()` that finds only function objects. It 
     should have two arguments, `name` and `env`, and should obey the regular 
