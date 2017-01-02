@@ -25,12 +25,12 @@ __<span style="color:green">A</span>__: The most important differences are:
     same basic idea to implement your own version of `search()`.  
     __<span style="color:green">A</span>__:  We can print the ancestors for example by using a recursive function:  
     
-    ```{r, eval = FALSE}
+    ```{r, eval = TRUE}
     ancestors <- function(env = globalenv()){
       if (identical(env, emptyenv())) {
-        print(env)} 
+        print(environmentName(env))} 
       else {
-        print(env)
+        print(environmentName(env))
         ancestors(parent.env(env))
       }
     }
@@ -40,7 +40,7 @@ __<span style="color:green">A</span>__: The most important differences are:
     
     To implement a new version of `search()` we use a while statement:
     
-    ```{r, eval = FALSE}
+    ```{r, eval = TRUE}
     search2 <- function(env = globalenv()){
       envs <- character()
       while (!identical(env, emptyenv())) {
@@ -52,6 +52,10 @@ __<span style="color:green">A</span>__: The most important differences are:
         }
       return(envs)
     }
+    
+    search2()
+    # visual check that results are identical to the original search() function
+    search()
     ```
     
 ## Recursing over environments
@@ -76,26 +80,45 @@ __<span style="color:green">A</span>__: The most important differences are:
         where(name, parent.env(env)) # we will copy this line in the last if block
       }
     }
-    ```    
+    ```
     
-    Since `where()` stops searching when a match appears, we copy the recursive call in the `else` block to the `block` of the matching case, so that our new function `where2` will look for a binding within the complete search path.
+    Since `where()` stops searching when a match appears, we copy the recursive call in the `else` block to the block of the matching case, so that our new function `where2` will look for a binding within the complete search path. We also need to pay attention to other details. We have to take care to save the bindings in an object, while not overriding it in our recursive calls. So we create a list object for that and define a new function within `where2()` that we call `where2.internal`. `where2.internal()` will do the recursive work and whenever it finds a binding it will write it via `<<-` to the preallocated list in its enclosing environment:
 
     ```{r, eval = FALSE}
-    
-    where2 <- function (name, env = parent.frame()) 
-      {
-      stopifnot(is.character(name), length(name) == 1)
-      env <- to_env(env)
-      if (identical(env, emptyenv())) {
-        stop("Can't find ", name, call. = FALSE)
-        }
-      if (exists(name, env, inherits = FALSE)) {
-        env
-        where(name, parent.env(env))
-        }
-      else {
-        where(name, parent.env(env))
+    where2 <- function(name, env = parent.frame()){
+      # we need to collect all environments where name has a binding
+      env_list <- list()
+      
+      # since our function will be recursive and env_list would be overwritten
+      # when it is inside the recursive function, we put it on the outside of
+      # the recursive function and concatenate every binding environment
+      # that we find via the `<<-` operator on its end.
+      # In the following we start by defining the recursive function:
+      where2.internal <- function(name, env = parent.frame()) {
+        stopifnot(is.character(name), length(name) == 1)
+        env <- pryr:::to_env(env) # note that we need to call to_env via pryr:::
+        
+        # when we reach the empty environment, we return all binding environments
+        # (if we found some) if we found no bindings, we give the same error message
+        # as pryr::where does
+        if (identical(env, emptyenv())) {
+          if (length(env_list) != 0){
+            return(env_list)
+            }
+          stop("Can't find ", name, call. = FALSE)
+          }
+        if (exists(name, env, inherits = FALSE)) {
+          # this is a case where we find a binding. the main difference to
+          # pryr::where is that we don't return immediately. Instead we save
+          # the binding environment to env_list and call where2.internal again
+          env_list <<- c(env_list, env)
+          where2.internal(name, parent.env(env))
+          } else {
+            where2.internal(name, parent.env(env))
+          }
       }
+      
+      where2.internal(name, env = parent.frame())
     }
     ```   
 
