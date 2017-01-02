@@ -70,19 +70,19 @@ __<span style="color:green">A</span>__: The most important differences are:
       {
       stopifnot(is.character(name), length(name) == 1)
       env <- to_env(env)
-      if (identical(env, emptyenv())) {
+      if (identical(env, emptyenv())) { # "base case"
         stop("Can't find ", name, call. = FALSE)
         }
-      if (exists(name, env, inherits = FALSE)) {
+      if (exists(name, env, inherits = FALSE)) { # "success case"
         env
         }
-      else {
-        where(name, parent.env(env)) # we will copy this line in the last if block
+      else { # "recursive case"
+        where(name, parent.env(env)) # we will copy this line in the success case
       }
     }
     ```
     
-    Since `where()` stops searching when a match appears, we copy the recursive call in the `else` block to the block of the matching case, so that our new function `where2` will look for a binding within the complete search path. We also need to pay attention to other details. We have to take care to save the bindings in an object, while not overriding it in our recursive calls. So we create a list object for that and define a new function within `where2()` that we call `where2.internal`. `where2.internal()` will do the recursive work and whenever it finds a binding it will write it via `<<-` to the preallocated list in its enclosing environment:
+    Since `where()` stops searching when a match appears, we copy the recursive call in the `else` block to the block of the matching ("success") case, so that our new function `where2` will look for a binding within the complete search path. We also need to pay attention to other details. We have to take care to save the bindings in an object, while not overriding it in our recursive calls. So we create a list object for that and define a new function within `where2()` that we call `where2.internal`. `where2.internal()` will do the recursive work and whenever it finds a binding it will write it via `<<-` to the especially created list in its enclosing environment:
 
     ```{r, eval = FALSE}
     where2 <- function(name, env = parent.frame()){
