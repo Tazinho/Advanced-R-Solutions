@@ -127,7 +127,7 @@ __<span style="color:green">A</span>__: The most important differences are:
 
 2.  __<span style="color:red">Q</span>__: Write your own version of `get()` using a function written in the style 
     of `where()`.  
-    __<span style="color:green">A</span>__: Note that `get()` provides a bit more arguments than our following version, but it should be easy to build up on that. However, we can change `pryr::where` to `get2()` with just changing one line:
+    __<span style="color:green">A</span>__: Note that `get()` provides a bit more arguments than our following version, but it should be easy to build up on that. However, we can change `pryr::where` to `get2()` with just changing one line of code (and the function name for the recursive call):
     
     ```{r}
     get2 <- function(name, env = parent.frame()) 
@@ -154,7 +154,55 @@ __<span style="color:green">A</span>__: The most important differences are:
     that's not a function, look in the parent. For an added challenge, also 
     add an `inherits` argument which controls whether the function recurses up 
     the parents or only looks in one environment.  
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: We can build up our function on the implementation of `get2()` in the last exercise. We only need to add a check via `is.function()`, change the name (also in the recursive call) and the error message:
+    
+    ```{r}
+    fget2 <- function(name, env = parent.frame()){
+      stopifnot(is.character(name), length(name) == 1)
+      env <- pryr:::to_env(env)
+      if (identical(env, emptyenv())) {
+        stop("Could not find function called ", name, call. = FALSE) # 
+        }
+      # here we add the is.function() check
+      if (exists(name, env, inherits = FALSE) && is.function(env[[name]])) {
+        return(env[[name]])
+        }
+      else {
+        fget2(name, parent.env(env))
+      }
+    }
+    ```
+    
+    Note that this function is almost the same as the implementation of `pryr::fget()`:
+    
+    ```{r}
+    pryr::fget
+    ```
+    
+    We add an `inherits` parameter as described in the exercise:
+    
+    ```{r}
+    fget3 <- function(name, env = parent.frame(), inherits = TRUE){
+      stopifnot(is.character(name), length(name) == 1)
+      env <- pryr:::to_env(env)
+      if (identical(env, emptyenv())) {
+        stop("Could not find function called ", name, call. = FALSE) 
+        }
+      if (exists(name, env, inherits = FALSE) && is.function(env[[name]])) {
+        return(env[[name]])
+        }
+      # after the environment, which is specified in the env parameter, is checked
+      # we stop our function in case the new inherits parameter is set to FALSE
+      if(inherits == FALSE){
+        stop("Could not find function called ", name," within ",
+             environmentName(env),
+             call. = FALSE)
+        }
+      else {
+        fget3(name, parent.env(env))
+      }
+    }
+    ```
 
 4.  __<span style="color:red">Q</span>__: Write your own version of `exists(inherits = FALSE)` (Hint: use `ls()`.) 
     Write a recursive version that behaves like `exists(inherits = TRUE)`.  
