@@ -206,7 +206,29 @@ __<span style="color:green">A</span>__: The most important differences are:
 
 4.  __<span style="color:red">Q</span>__: Write your own version of `exists(inherits = FALSE)` (Hint: use `ls()`.) 
     Write a recursive version that behaves like `exists(inherits = TRUE)`.  
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: We write two versions. `exists2()` will be the case `inherits = FALSE` and `exists3()` `inherits = TRUE`:
+    
+    ```{r}
+    exists2 <- function(name, env = parent.frame()){
+      stopifnot(is.character(name), length(name) == 1)
+      env <- pryr:::to_env(env)
+      name %in% ls(env, sorted = FALSE) # set sorted to FALSE for a small speedup
+    }
+
+    exists3 <- function(name, env = parent.frame()){
+      stopifnot(is.character(name), length(name) == 1)
+      env <- pryr:::to_env(env)
+      if (identical(env, emptyenv())) {
+        return(FALSE)
+      }
+      if (name %in% ls(env, sorted = FALSE)){
+        TRUE
+        }
+      else {
+        exists3(name, parent.env(env))
+      }
+    }
+    ```
 
 ## Function environments
 
