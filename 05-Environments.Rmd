@@ -258,30 +258,48 @@ __<span style="color:green">A</span>__: The most important differences are:
     f1(1)
     ```  
     
-    __<span style="color:green">A</span>__: (style and spelling will be corrected):
+    __<span style="color:green">A</span>__: 
     
     ```{r, echo = FALSE}
-    knitr::include_graphics("diagrams/enclosing_environments_sc.png", dpi = 96)
+    knitr::include_graphics("diagrams/enclosing.png", dpi = 96)
     ```
     
 3.  __<span style="color:red">Q</span>__: Expand your previous diagram to show function bindings.  
-__<span style="color:green">A</span>__: (style and spelling will be corrected):
+__<span style="color:green">A</span>__: 
     
     ```{r, echo = FALSE}
-    knitr::include_graphics("diagrams/enclosing_and_binding_environments_sc.png", dpi = 96)
+    knitr::include_graphics("diagrams/binding.png", dpi = 96)
     ```
 
 4.  __<span style="color:red">Q</span>__: Expand it again to show the execution and calling environments.  
-__<span style="color:green">A</span>__: (style and spelling will be corrected):
+__<span style="color:green">A</span>__: 
     
     ```{r, echo = FALSE}
-    knitr::include_graphics("diagrams/enclosing_binding_calling_execution_environments_sc.png", dpi = 96)
+    knitr::include_graphics("diagrams/calling_execution.png", dpi = 96)
     ```
 
 5.  __<span style="color:red">Q</span>__: Write an enhanced version of `str()` that provides more information 
     about functions. Show where the function was found and what environment 
     it was defined in.  
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: Additionally we provide the function type in the sense of `pryr::ftype`. We use functions from the `pryr` package, since it provides helpers for all requested features:
+    
+    ```{r}
+    fstr <- function(object){
+      if(!is.function(object)){stop("fstr works only for functions")}
+      
+      object_str <- lazyeval::expr_text(object)
+      
+      flist <- list(ftype = pryr::ftype(object),
+                 where = pryr::where(object_str),
+                 enclosing_env = pryr::enclosing_env(object),
+                 args = pryr::fun_args(object)
+                 )
+      
+      return(flist)
+    }
+    ```
+    
+    Note that we wanted to have non standard evaluation like the original `str()` function. Therefore we used `expr_text()` from the [lazyeval](https://github.com/hadley/lazyeval) package. As a result, `fstr(packagename::functionname)` will result in an error in contrast to `str()`.
 
 ## Binding names to values
 
