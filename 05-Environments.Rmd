@@ -329,18 +329,19 @@ __<span style="color:green">A</span>__:
 2.  __<span style="color:red">Q</span>__: Create a version of `assign()` that will only bind new names, never 
     re-bind old names. Some programming languages only do this, and are known 
     as [single assignment languages][single assignment].  
-    __<span style="color:green">A</span>__: We just wrap the body of the `assign` function into an if statement and return a message if `x` already exists:
+    __<span style="color:green">A</span>__: We take the formals from `assign()`'s source code and define our new function. If `x` already exists, we give a message and return `NULL` (since this is the same as `return()`). Otherwise we return the body of the `assign` function:
     
     ```{r}
     assign_non_existant <- function(x, value, pos = -1, envir = as.environment(pos),
                                 inherits = FALSE, immediate = TRUE) {
-      if(!exists(x)){
-        .Internal(assign(x, value, envir, inherits))
-        } else{
-          message("No new assignment: '", x, "' already exists")
-        }
+      if(exists(x)){
+        message("No new assignment: '", x, "' already exists")
+        return(NULL)}
+      .Internal(assign(x, value, envir, inherits))
     }
     ```
+    
+    Note that `.Internal(assign(x, value, envir, inherits))`, is not inside an `else` block or any other function. This is important. Otherwise we would change more of `assign()` then we want (in case of the assignment of a new function, the enclosing environment for that function would differ).
 
 3.  __<span style="color:red">Q</span>__: Write an assignment function that can do active, delayed, and locked 
     bindings. What might you call it? What arguments should it take? Can you 
