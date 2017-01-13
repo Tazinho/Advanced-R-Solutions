@@ -8,6 +8,17 @@
     functions for calls, names, and pairlists.
     
     __<span style="color:green">A</span>__: 
+    
+    ```{r}
+    is.valid <- function(x){
+      out <- FALSE
+      if(is.atomic(x) & length(x) == 1){out <- TRUE}
+      if(is.call(x)){out <- TRUE}
+      if(is.name(x)){out <- TRUE}
+      if(is.pairlist(x)){out <- TRUE}
+      out
+    }
+    ```
 
 2.  __<span style="color:red">Q</span>__: `pryr::ast()` uses non-standard evaluation. What's its escape hatch to
     standard evaluation?
