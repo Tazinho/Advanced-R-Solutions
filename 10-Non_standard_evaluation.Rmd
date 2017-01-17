@@ -36,7 +36,7 @@
     
     __<span style="color:green">A</span>__: `as.Date.default()` uses them to convert unexpected input expressions (neither dates, nor `NAs`) into a character string and return it within an error message.
     
-    `pairwise.t.test()` uses them to convert the names of it's datainputs (response vector `x` and grouping factor `g`) into character strings to format these further into a part of the desired output.
+    `pairwise.t.test()` uses them to convert the names of its datainputs (response vector `x` and grouping factor `g`) into character strings to format these further into a part of the desired output.
 
 3.  __<span style="color:red">Q</span>__: `pairwise.t.test()` assumes that `deparse()` always returns a length one 
     character vector. Can you construct an input that violates this expectation? 
@@ -111,6 +111,8 @@ g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
 
 4.  __<span style="color:red">Q</span>__: What happens if you use `quote()` instead of `substitute()` inside of
     `subset2()`?
+    
+    __<span style="color:orange">A</span>__: We will get ```"Error in eval(expr, envir, enclos) : object 'x' not found"``` in the above example. We are not sure if the problem relates to finding the right expression or the correct environment for evaluation.
 
 5.  __<span style="color:red">Q</span>__: The second argument in `subset()` allows you to select variables. It
     treats variable names as if they were positions. This allows you to do 
@@ -140,7 +142,7 @@ g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
       # the list of all names of the data.frame and return the values of the mathing
       # variable names and list elements (the positions of supplied variables 
       # within the supplied data.frame).
-      df[, pos, drop = FALSE] # now we just subset the data.frame by it's column index.
+      df[, pos, drop = FALSE] # now we just subset the data.frame by its column index.
     }
     select(mtcars, -cyl)
     ```
@@ -156,6 +158,19 @@ g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
     
     ```{r, eval = FALSE}
     identical(eval(quote(x)), evalq(x)) # -> TRUE
+    ```
+    
+    The examples above can be written as:
+    
+    ```{r, eval = FALSE}
+    eval(quote(eval(quote(eval(quote(2 + 2)))))) #->
+    evalq(evalq(evalq(2 + 2)))
+
+    eval(eval(quote(eval(quote(eval(quote(2 + 2))))))) #->
+    eval(evalq(evalq(evalq(2 + 2))))
+
+    quote(eval(quote(eval(quote(eval(quote(2 + 2))))))) #->
+    quote(evalq(evalq(evalq(2 + 2)))) 
     ```
 
 ## Scoping issues
@@ -282,6 +297,21 @@ g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
     `with.default()`. What does `within()` do? How does it work? Read the
     source code for `within.data.frame()`. Why is the code so much more
     complex than `with()`?
+    
+    __<span style="color:orange">A</span>__: `with()` is a generic function
+    that allows writing an expression (second argument) that refers to variablenames of `data` (first argument) as if the corresponding variables were objects themselves.
+    
+    `with()` evaluates the expression via an
+    
+    ```{r, eval = FALSE}
+    eval(substitute(expr), data, enclos = parent.frame())
+    ```
+    
+    construct in a temporary environment, which has the calling frame as a
+    parent. This also means that variables that aren't found in `data`, will be looked up in `with()`'s calling environment. As stated in `?with`, this is useful for modelling functions.
+    
+    In contrast to `with()`, which returns the value of the evaluated expression, `within()` returns the modified object. So `within()` can be used as an alternative to `base::transform()`.
+    There is also a subtile difference regarding the non standard evaluation technique (which I don't understand in detail). `within()` first creates an environment with `data` as parent and `within()`'s calling environment as grandparent. This environment becomes changed, since afterwards the expression is evaluated inside of it. The rest of the code converts this environment into a list and ensures that new variables are not overriden by the former ones.
 
 ## Calling from another function
 
@@ -294,7 +324,7 @@ g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
     * `data.frame()`
     
     __<span style="color:green">A</span>__: 
-    For NSE in `rm()`, we just look at it's first two arguments: `...` and `list = character()`.
+    For NSE in `rm()`, we just look at its first two arguments: `...` and `list = character()`.
     If we supply expressions to `...` (which can also be character vectors) ,
     these will be caught by `match.call()` and become an unevaluated call 
     (in this case a pairlist). However, `rm()` copies and converts the expressions into a character
