@@ -1,2 +1,5 @@
-rm(list= ls(all = TRUE))
-library(methods)
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
