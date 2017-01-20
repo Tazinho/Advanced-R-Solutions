@@ -1,5 +1,9 @@
 # Non standard evaluation
 
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
 ## Capturing expressions
 
 1.  __<span style="color:red">Q</span>__: One important feature of `deparse()` to be aware of when programming is that 
@@ -185,7 +189,7 @@ g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
   
     We can just copy the part of the source code and see if it does what we expect:
   
-    ```{r,  eval = FALSE}
+    ```{r, eval = FALSE}
     arrange_indices <- function (df, ...){
       stopifnot(is.data.frame(df))
       ord <- eval(substitute(order(...)), df, parent.frame())

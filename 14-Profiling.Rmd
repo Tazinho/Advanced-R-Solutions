@@ -1,5 +1,9 @@
 # Profiling
 
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
 ## Has somebody already solved the problem?
 
 1.  __<span style="color:red">Q</span>__: What are faster alternatives to `lm`? Which are specifically designed 
@@ -20,7 +24,7 @@
     
     However on bigger datasets it can make a difference:
     
-    ```{r}
+    ```{r,collapse = TRUE}
     eps <- rnorm(100000)
     x1 <- rnorm(100000, 5, 3)
     x2 <- rep(c("a", "b"), 50000)
@@ -119,7 +123,7 @@ provides us with enough information and guides our attention on solutions in the
     
     In case of 10000 observations we can observe that using `mean.default()` preserves only a small advantage over the use of `mean()`:
     
-    ```{r}
+    ```{r,collapse = TRUE}
     x <- runif(1e4)
     microbenchmark::microbenchmark(
       mean(x),
@@ -523,7 +527,7 @@ provides us with enough information and guides our attention on solutions in the
     
     __<span style="color:green">A</span>__: We compare regarding different sizes for square matrices:
     
-    ```{r}
+    ```{r }
     library(microbenchmark)
     dimensions <- c(1e0, 1e1, 1e2, 1e3, 0.5e4, 1e4)
     matrices <-  lapply(dimensions,
