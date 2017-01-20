@@ -1,5 +1,9 @@
 # Functionals
 
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
 ## My first functional: lapply()
 
 1.  __<span style="color:red">Q</span>__: Why are the following two invocations of `lapply()` equivalent?
@@ -47,7 +51,7 @@ in `lapply()`'s third argument (`...`).
     
     __<span style="color:green">A</span>__: Like in the first exercise, we can create two `lapply()` versions:
     
-    ```{r, eval = FALSE}
+    ```{r, eval = TRUE}
     # lapply (2 versions)
     la1 <- lapply(formulas, lm, data = mtcars)
     la2 <- lapply(formulas, function(x) lm(formula = x, data = mtcars))
@@ -65,7 +69,7 @@ in `lapply()`'s third argument (`...`).
     in the list below by using a for loop and `lapply()`. Can you do it 
     without an anonymous function?
 
-    ```{r, eval = FALSE}
+    ```{r, eval = TRUE}
     bootstraps <- lapply(1:10, function(i) {
       rows <- sample(1:nrow(mtcars), rep = TRUE)
       mtcars[rows, ]
@@ -74,7 +78,7 @@ in `lapply()`'s third argument (`...`).
     
     __<span style="color:green">A</span>__: 
     
-    ```{r, eval = FALSE}
+    ```{r, eval = TRUE}
     # lapply without anonymous function
     la <- lapply(bootstraps, lm, formula = mpg ~ disp)
     
@@ -88,30 +92,23 @@ in `lapply()`'s third argument (`...`).
 5.  __<span style="color:red">Q</span>__: For each model in the previous two exercises, extract $R^2$ using the
     function below.
 
-    ```{r, eval = FALSE}
+    ```{r, eval = TRUE}
     rsq <- function(mod) summary(mod)$r.squared
     ```
     
     __<span style="color:green">A</span>__: For the models in exercise 3:
     
-    ```{r, eval = FALSE}
+    ```{r, eval = TRUE}
     sapply(la1, rsq)
-    [1] 0.7183433 0.8596865 0.7809306 0.8838038
     sapply(la2, rsq)
-    [1] 0.7183433 0.8596865 0.7809306 0.8838038
     sapply(lf1, rsq)
-    [1] 0.7183433 0.8596865 0.7809306 0.8838038
     ```
     
     And the models in exercise 4:
     
-    ```{r, eval = FALSE}
+    ```{r, eval = TRUE}
     sapply(la, rsq)
-    [1] 0.8013568 0.5578498 0.8113716 0.7183457 0.8002792
-    [6] 0.6550259 0.6771618 0.8120105 0.8133837 0.8060203
     sapply(lf, rsq)
-    [1] 0.8013568 0.5578498 0.8113716 0.7183457 0.8002792
-    [6] 0.6550259 0.6771618 0.8120105 0.8133837 0.8060203
     ```
 
 ## For loops functionals: friends of lapply():
