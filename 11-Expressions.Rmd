@@ -59,6 +59,14 @@
     tell you about the precedence of custom infix functions?
     
     __<span style="color:green">A</span>__: 
+    
+    ```{r}
+    # y %+% z will be calculated first and the result will be added to x
+    pryr::ast(x + y %+% z)
+    
+    # x^y will be calculated first, and the result will be used as first argument of `%+%()`
+    pryr::ast(x ^ y %+% z)
+    ```
 
 5.  __<span style="color:red">Q</span>__: Why can't an expression contain an atomic vector of length greater than one?
     Which one of the six types of atomic vector can't appear in an expression?
