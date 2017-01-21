@@ -99,6 +99,17 @@
     
     __<span style="color:green">A</span>__: 
     
+    ```{r}
+    get3 <- function(x, env = globalenv()){
+      eval(as.name(x), env)
+    }
+    
+    assign3 <- function(x, value, env = globalenv()){
+      eval(substitute(x <- as.name(x)), env)
+      eval(substitute(x <- value), env)
+    }
+    ```
+    
 ## Calls
 
 1.  __<span style="color:red">Q</span>__: The following two calls look the same, but are actually different:
