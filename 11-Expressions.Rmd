@@ -100,11 +100,11 @@
     __<span style="color:green">A</span>__: 
     
     ```{r}
-    get3 <- function(x, env = globalenv()){
+    get3 <- function(x, env = parent.frame()){
       eval(as.name(x), env)
     }
     
-    assign3 <- function(x, value, env = globalenv()){
+    assign3 <- function(x, value, env = parent.frame()){
       eval(substitute(x <- as.name(x)), env)
       eval(substitute(x <- value), env)
     }
@@ -114,7 +114,7 @@
 
 1.  __<span style="color:red">Q</span>__: The following two calls look the same, but are actually different:
 
-    ```{r}
+    ```{r, eval = TRUE}
     (a <- call("mean", 1:10))
     (b <- call("mean", quote(1:10)))
     identical(a, b)
@@ -122,7 +122,27 @@
 
     What's the difference? Which one should you prefer?
 
-    __<span style="color:green">A</span>__: 
+    __<span style="color:orange">A</span>__: `call` evalulates its `...` arguments. So in the first call `1:10` will be evaluated and in the second it won't:
+    
+    ```{r, eval = TRUE}
+    as.list(a)
+    as.list(b)
+    ```
+    
+    We can create an example, where we can see the consequences directly:
+    
+    ```{r, eval = TRUE}
+    # h <- call("mean", z)
+    ##> Error: object 'z' not found
+    
+    h <- call("mean", quote(z))
+    # eval(h)
+    ##> Error in mean(z) : object 'z' not found
+    z <- 1:10
+    eval(h)
+    ```
+    
+    From my intuition I would prefer the second version, since it behaves more like lazy evaluation, but I am not sure if this is the correct answer as indended by the exercise.
     
 2.  __<span style="color:red">Q</span>__: Implement a pure R version of `do.call()`.
     
