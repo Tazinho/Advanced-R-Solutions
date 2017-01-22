@@ -1,3 +1,10 @@
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
+```
 # Expressions
 
 ## Structure of expressions
@@ -158,6 +165,13 @@
     ```
     
     __<span style="color:green">A</span>__: 
+    
+    ```{r}
+    concat <- function(f, ...){
+      as.call(c(f, list(...)))
+    }
+    concat(quote(f), a = 1, b = quote(mean(a)))
+    ```
 
 4.  __<span style="color:red">Q</span>__: Since `list()`s don't belong in expressions, we could create a more
     convenient call constructor that automatically combines lists into the
