@@ -154,6 +154,16 @@ knitr::opts_chunk$set(
 2.  __<span style="color:red">Q</span>__: Implement a pure R version of `do.call()`.
     
     __<span style="color:green">A</span>__: 
+    
+    ```{r}
+    do.call2 <- function(what, args, quote = FALSE, env = parent.frame()){
+      if(!is.list(args))
+        stop("second argument must be a list")
+      if (quote) 
+        args <- lapply(args, enquote)
+      eval(as.call(c(what, args)), env)
+    }
+    ```
 
 3.  __<span style="color:red">Q</span>__: Concatenating a call and an expression with `c()` creates a list. Implement
     `concat()` so that the following code works to combine a call and
@@ -185,6 +195,15 @@ knitr::opts_chunk$set(
     ```
     
     __<span style="color:green">A</span>__: 
+    
+    ```{r}
+    make_call <- function(x, ...){
+      as.call(c(x, ...))
+    }
+    
+    make_call(quote(mean), list(quote(x), na.rm = TRUE))
+    make_call(quote(mean), quote(x), na.rm = TRUE)
+    ```
 
 5.  __<span style="color:red">Q</span>__: How does `mode<-` work? How does it use `call()`?
     
