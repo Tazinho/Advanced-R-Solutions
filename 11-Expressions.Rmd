@@ -5,6 +5,13 @@ knitr::opts_chunk$set(
   cache = TRUE
 )
 ```
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
+```
 # Expressions
 
 ## Structure of expressions
@@ -287,6 +294,85 @@ with the help of a separate `switch()`.
     the `for()` and `while()` calls?
     
     __<span style="color:green">A</span>__: 
+    
+    **if:**
+    
+    ```{r, eval = TRUE}
+    ## All these return an error
+    # pryr::ast(if)
+    # pryr::ast(if())
+    # pryr::ast(if{})
+    # pryr::ast(if(){})
+    # pryr::ast(if(TRUE))
+    
+    ## This is the minimum required
+    pryr::ast(if(TRUE){1})
+    
+    ## One can also supply an alternative expression
+    pryr::ast(if(TRUE){}
+              else {3})
+    
+    ## However, one hast to supply the compound expression (the first one),
+    ## otherwise we get an error
+    # pryr::ast(if(TRUE)
+    #           else {3})
+
+    # So this is how if basically works
+    pryr::ast(if(cond)expr)
+    
+    # and here within a call
+    eval(call("if", TRUE, 1))
+    eval(call("if", TRUE, 1, 2))
+    eval(call("if", FALSE, 1, 2))
+    ```
+    
+    **for:**
+    
+    ```{r, eval = TRUE}
+    ## All these return an error
+    # pryr::ast(for)
+    # pryr::ast(for{})
+    # pryr::ast(for())
+    # pryr::ast(for(){})
+    # pryr::ast(for(in){})
+    # pryr::ast(for(var in){})
+    # pryr::ast(for(var in 10))
+    # pryr::ast(for(in 10){})
+    
+    ## This is the minimum required
+    pryr::ast(for(var in 10){})
+
+    ## So this is how for basically works
+    pryr::ast(for(var in seq)expr)
+
+    ## And here within a call (note that we need quote, since var has to be a nanme
+    ## and expr has to be an expression)
+    eval(call("for", var = quote(i), seq = 1:3, expr = quote(print(i))))
+    
+    ## as infix function it looks a little bit easier
+    `for`(i, 1:3, print(i))
+    ```
+    
+    **while:**
+    
+    ```{r, eval = TRUE}
+    ## All these return an error
+    # pryr::ast(while)
+    # pryr::ast(while())
+    # pryr::ast(while(TRUE))
+    # pryr::ast(while(){})
+    # pryr::ast(while()1)
+    # pryr::ast(while(TRUE){})
+
+    ## This is the minimum required
+    pryr::ast(while(TRUE)1)
+
+    ## So this is how while basically works
+    pryr::ast(while(cond)expr)
+    
+    ## And here within a call (infinite loop in this case)
+    # eval(call("while", TRUE , 1))
+    ```
 
 ## Capturing the current call
 
