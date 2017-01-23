@@ -287,8 +287,21 @@ of the input object. What this means should become clear by looking at the three
     
     ```{r, eval = FALSE}
     split2 <- function(x, f, drop = FALSE, ...){
-      levs <- if (drop) {as.character(unique(f))} else {unique(levels(f))}
-      lapply(levs, function(lv) x[f == lv, , drop = FALSE])
+      # there are three relevant cases for f. f is a character, f is a factor and all
+      # levels occur, f is a factor and some levels don't occur.
+      
+      # first we check if f is a factor
+      fact <- is.factor(f)
+      
+      # if drop it set to TRUE, we drop the non occuring levels.
+      # (If f is a character, this has no effect.)
+      if(drop){f <- f[, drop = TRUE]}
+      
+      # now we want all unique elements/levels of f
+      levs <- if (fact) {unique(levels(f))} else {as.character(unique(f))}
+      
+      # we use these levels to subset x and supply names for the resulting output.
+      setNames(lapply(levs, function(lv) x[f == lv, , drop = FALSE]), levs)
     }
     ```
 
