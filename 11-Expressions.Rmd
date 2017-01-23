@@ -257,7 +257,30 @@ with the help of a separate `switch()`.
 8.  __<span style="color:red">Q</span>__: Read the documentation for `pryr::modify_call()`. How do you think
     it works? Read the source code.
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: Again, we explain by commenting the source
+    
+    ```{r, eval = FALSE}
+    function (call, new_args) {
+      # check if call is a call and new_args is a list
+      stopifnot(is.call(call), is.list(new_args))
+      # standardise the call
+      call <- standardise_call(call)
+      # check if the supplied new_args list has any unnamed elements.
+      # if so, an error occurs.
+      nms <- names(new_args) %||% rep("", length(new_args))
+      if (any(nms == "")) {
+        stop("All new arguments must be named", call. = FALSE)
+        }
+      # every name element of the call, for which a new argument was supplied by the user,
+      # becomes overwritten
+      for (nm in nms) {
+        call[[nm]] <- new_args[[nm]]
+        }
+      # finally the modified call is returned
+      call
+    }
+    <environment: namespace:pryr>
+    ```
 
 9.  __<span style="color:red">Q</span>__: Use `ast()` and experimentation to figure out the three arguments in an
     `if()` call. Which components are required? What are the arguments to
