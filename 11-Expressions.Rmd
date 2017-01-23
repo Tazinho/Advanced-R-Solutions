@@ -207,7 +207,35 @@ knitr::opts_chunk$set(
 
 5.  __<span style="color:red">Q</span>__: How does `mode<-` work? How does it use `call()`?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: We can explain it best, when we comment the source code:
+    
+    ```{r, eval = FALSE}
+    function (x) 
+      {
+      # when x is an expression, mode will(x) return "expression"
+      if (is.expression(x)) 
+        return("expression")
+      # when x is a call (or language, which is exactly the same), the first element 
+      # of the call will be coerced to character. 
+      # If the call is an autoprinting (like in quote((1))), mode will return "(".
+      # For any other call, mode will return "call" 
+      if (is.call(x)) 
+        return(switch(deparse(x[[1L]])[1L], `(` = "(", "call"))
+      # if x is a name (or a symbol, which is exactly the same), then mode will return "name"
+      if (is.name(x)) 
+        "name"
+      # otherwise, mode will return dependent on typeof(x). If typeof(x) is double or integer, 
+      # mode will return "numeric". If typeof(x) is closure, builtin or special, mode(x) will
+      # return "function". And in all other cases, mode will just return typeof(x)
+      else switch(tx <- typeof(x), double = , integer = "numeric", 
+                  closure = , builtin = , special = "function", tx)
+      }
+    <bytecode: 0x000000000c4e66e0>
+      <environment: namespace:base>
+    ```
+      
+    As commented above, `mode()` uses `is.call()` to distinguish autoprint- and "normal" calls
+with the help of a separate `switch()`.
 
 6.  __<span style="color:red">Q</span>__: Read the source for `pryr::standardise_call()`. How does it work?
     Why is `is.primitive()` needed?
