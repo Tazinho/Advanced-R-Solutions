@@ -192,6 +192,15 @@ in `lapply()`'s third argument (`...`).
 
 5.  __<span style="color:red">Q</span>__: Implement a version of `lapply()` that supplies `FUN` with both the name 
     and the value of each component.
+    
+    __<span style="color:green">A</span>__:
+    
+    ```{r, eval = TRUE}
+    lapply_nms <- function(X, FUN, ...){
+      Map(FUN, X, names(X))
+    }
+    lapply_nms(iris, function(x, y) c(class(x), y))
+    ```
 
 6.  __<span style="color:red">Q</span>__: Implement a combination of `Map()` and `vapply()` to create an `lapply()`
     variant that iterates in parallel over all of its inputs and stores its 
