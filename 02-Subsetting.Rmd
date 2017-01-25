@@ -10,12 +10,13 @@
     mtcars[mtcars$cyl <= 5]        # "," is missing
     mtcars[mtcars$cyl == 4 | 6, ]  # 6 -> mtcars$cyl == 6
     ```  
-    
+<!-- Finde den Pfeil nicht ganz optimal, da er die alte Lösung betont, vielleicht stattdessen "use '==' instead of '=' verwenden? (auch nicht optimal, da umständlich)"     -->
 
 2.  __<span style="color:red">Q</span>__: Why does `x <- 1:5; x[NA]` yield five missing values? (Hint: why is 
     it different from `x[NA_real_]`?)  
     __<span style="color:green">A</span>__: `NA` is of class logical, so `x[NA]` becomes recycled to `x[NA, NA, NA, NA, NA]`. Since subsetting an atomic with `NA` leads to an `NA`, you will get 5 of them returned.
-    
+<!-- Mir ist gar nicht ovll klar, was hier mit 'NA_real' genau gemeint ist. Ein "echter" NA-Eintrag in 'x'? -->
+
 3.  __<span style="color:red">Q</span>__: What does `upper.tri()` return? How does subsetting a matrix with it 
     work? Do we need any additional subsetting rules to describe its behaviour?
 
@@ -25,6 +26,7 @@
     ```  
     
     __<span style="color:green">A</span>__: `upper.tri()` has really intuitive source code. It coerces it's input to a matrix and returns a logical matrix. Hence describing it's behaviour for the use of subsetting is based on everything that applies to subsetting with logical matrices.
+<!-- Hast du hier an alles gedacht? Ist die Antwort vollständig? -->
 
 4.  __<span style="color:red">Q</span>__: Why does `mtcars[1:20]` return an error? How does it differ from the 
     similar `mtcars[1:20, ]`?  
@@ -68,8 +70,7 @@
       }
     ```
     
-    If we look for the idea to capture the diagonal elements, we can see that the     input matrix
-    is subsetted with a vector, so we called this function `diag_v()`. Of course we     can implement our own function `diag_m()`, where we subset with a matrix.
+    If we look for the idea to capture the diagonal elements, we can see that the input matrix is subsetted with a vector, so we called this function `diag_v()`. Of course we can implement our own function `diag_m()`, where we subset with a matrix.
     
     ```{r}
     diag_m <- function (x = 1) {
@@ -86,8 +87,7 @@
     }
     ```
     
-    Now we can check if we get the same results as the original function and also     compare
-    the speed. Therefore we convert the relatively large `diamonds` dataset from the     `ggplot2` package into a matrix.
+    Now we can check if we get the same results as the original function and also compare the speed. Therefore we convert the relatively large `diamonds` dataset from the `ggplot2` package into a matrix.
     
     ```{r}
     diamonds_m <- as.matrix(ggplot2::diamonds)
@@ -103,7 +103,7 @@
     )
     ```
     
-    The original function seems to be a little bit faster than the trimmed and our matrix version. Maybe     this is due to compiling issues
+    The original function seems to be a little bit faster than the trimmed and our matrix version. Maybe this is due to compiling issues
     
     ```{r}
     diag_c <- compiler::cmpfun(diag)
@@ -119,9 +119,7 @@
     )
     ```
     
-    We can see that our diag_m version is only a little bit slower than the 
-    original version. However the source code of the matrix version could be a bit
-    easier to read.
+    We can see that our diag_m version is only a little bit slower than the original version. However the source code of the matrix version could be a bit easier to read.
     
     We could also take an idea from the source code of `upper.tri()` and subset with a logical vector (but it turns out to be really slow):
     
@@ -157,12 +155,13 @@
     )
     ```
 
+<!-- Ok, den Code zu dem Diagnoalen-Subsetting muss ich mir nochmal ansehen. -->
+
 6.  __<span style="color:red">Q</span>__: What does `df[is.na(df)] <- 0` do? How does it work?  
-__<span style="color:green">A</span>__: It replaces all `NA`s within `df` with the value
-`0`. `is.na(df)` returns a logical matrix which is used to subset df. Since you can combine subsetting and assignment, only the matched part of `df` (the `NA`s) is replaced with `0` entries.
+__<span style="color:green">A</span>__: It replaces all `NA`s within `df` with the value `0`. `is.na(df)` returns a logical matrix which is used to subset df. Since you can combine subsetting and assignment, only the matched part of `df` (the `NA`s) is replaced with `0` entries.
+
 
 ## Subsetting operators
-
 1.  __<span style="color:red">Q</span>__: Given a linear model, e.g., `mod <- lm(mpg ~ wt, data = mtcars)`, extract
     the residual degrees of freedom. Extract the R squared from the model
     summary (`summary(mod)`)  
@@ -174,6 +173,7 @@ __<span style="color:green">A</span>__: It replaces all `NA`s within `df` with t
     mod["df.residual"]    # list output (without partial matching)
     mod[["df.residual"]]  # preserving output (without partial matching)
     ```
+<!-- Was ist partial matching? -->
     
     The same states for `summary(mod)`, so we can use for example:
     
@@ -194,6 +194,9 @@ __<span style="color:green">A</span>__: It replaces all `NA`s within `df` with t
     iris[sample(ncol(iris))] # permute rows
     iris[sample(nrow(iris)), sample(ncol(iris)), drop = FALSE] # permute both at the same time
     ```
+
+<!-- Warum ist 'drop' wichtig? -->
+<!-- Maybe we can do this in a tidyvers-style also! :) [in the Tidyverse-Cookbook]-->
 
 2.  __<span style="color:red">Q</span>__: How would you select a random sample of `m` rows from a data frame? 
     What if the sample had to be contiguous (i.e., with an initial row, a 
