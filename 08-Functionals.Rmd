@@ -1,3 +1,10 @@
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
+```
 # Functionals
 
 ## My first functional: lapply()
@@ -328,6 +335,20 @@ of the input object. What this means should become clear by looking at the three
 
 3.  __<span style="color:red">Q</span>__: What's the relationship between `which()` and `Position()`? What's
     the relationship between `where()` and `Filter()`?
+    
+    __<span style="color:green">A</span>__: `which()` returns all indices of true entries from a logical vector. `Position()` returns just the first (default) or the last integer index of all true entries that occur by applying a predicate function on a vector. So the default relation is `Position(f, x) <=> min(which(f(x)))`.
+    
+    `where()`, defined in the book as:
+    
+    ```{r, eval = FALSE}
+    where <- function(f, x) {
+      vapply(x, f, logical(1))
+    } 
+    ```
+    
+    is useful to return a logical vector from a condition asked on elements of a list or a data frame. `Filter(f, x)` returns all elements of a list or a data frame, where
+the supplied predicate function returns `TRUE`. So the relation is
+`Filter(f, x) <=> x[where(f, x)]`.
 
 4.  __<span style="color:red">Q</span>__: Implement `Any()`, a function that takes a list and a predicate function, 
     and returns `TRUE` if the predicate function returns `TRUE` for any of 

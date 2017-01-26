@@ -68,8 +68,7 @@
       }
     ```
     
-    If we look for the idea to capture the diagonal elements, we can see that the     input matrix
-    is subsetted with a vector, so we called this function `diag_v()`. Of course we     can implement our own function `diag_m()`, where we subset with a matrix.
+    If we look for the idea to capture the diagonal elements, we can see that the input matrix is subsetted with a vector, so we called this function `diag_v()`. Of course we can implement our own function `diag_m()`, where we subset with a matrix.
     
     ```{r}
     diag_m <- function (x = 1) {
@@ -86,8 +85,7 @@
     }
     ```
     
-    Now we can check if we get the same results as the original function and also     compare
-    the speed. Therefore we convert the relatively large `diamonds` dataset from the     `ggplot2` package into a matrix.
+    Now we can check if we get the same results as the original function and also     compare the speed. Therefore we convert the relatively large `diamonds` dataset from the `ggplot2` package into a matrix.
     
     ```{r}
     diamonds_m <- as.matrix(ggplot2::diamonds)
@@ -103,7 +101,7 @@
     )
     ```
     
-    The original function seems to be a little bit faster than the trimmed and our matrix version. Maybe     this is due to compiling issues
+    The original function seems to be a little bit faster than the trimmed and our matrix version. Maybe this is due to compiling issues
     
     ```{r}
     diag_c <- compiler::cmpfun(diag)

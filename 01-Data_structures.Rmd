@@ -26,11 +26,11 @@ __<span style="color:green">A</span>__: The first two tests don't check for a sp
 __<span style="color:green">A</span>__: To get rid of (flatten) the nested structure.
 
 5. __<span style="color:red">Q</span>__: Why is `1 == "1"` true? Why is `-1 < FALSE` true? Why is `"one" < 2` false?  
-__<span style="color:green">A</span>__: These operators are all functions which coerce their arguments (in these cases) to character, double and character. To enlighten the latter case: "one" is behind "2" in ASCI.
+__<span style="color:green">A</span>__: These operators are all functions which coerce their arguments (in these cases) to character, double and character. To enlighten the latter case: "one" comes after "2" in ASCI.
 
 6. __<span style="color:red">Q</span>__: Why is the default missing value, `NA`, a logical vector? What's special
    about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)  
-__<span style="color:green">A</span>__: It is a practical concern. When you combine `NA`'s in `c()` with other atomic types they will be coerced
+__<span style="color:green">A</span>__: It is a practical thought. When you combine `NA`'s in `c()` with other atomic types they will be coerced
 like `TRUE` and `FALSE` to integer `(NA_integer_)`, double `(NA_real_)`, complex `(NA_complex_)` and character `(NA_character_)`.
 
 ## Attributes
@@ -62,7 +62,7 @@ like `TRUE` and `FALSE` to integer `(NA_integer_)`, double `(NA_real_)`, complex
     levels(f1) <- rev(levels(f1))
     ```
     
-    __<span style="color:green">A</span>__: Both, the entries of the factor and also its levels get reversed:
+    __<span style="color:green">A</span>__: Both, the entries of the factor and also its levels are being reversed:
     
     ```{r}
     f1
@@ -108,7 +108,7 @@ __<span style="color:green">A</span>__: names, row.names and class.
     columns of different types?  
     __<span style="color:green">A</span>__: From `?as.matrix`:
     
-    > The method for data frames will return a character matrix if there is only atomic columns and any non-(numeric/logical/complex) column, applying as.vector to factors and format to other non-character columns. Otherwise, the usual coercion hierarchy (logical < integer < double < complex) will be used, e.g., all-logical data frames will be coerced to a logical matrix, mixed logical-integer will give a integer matrix, etc.
+    > The method for data frames will return a character matrix if there is only atomic columns and any non-(numeric/logical/complex) column, applying as.vector to factors and format to other non-character columns. Otherwise the usual coercion hierarchy (logical < integer < double < complex) will be used, e.g., all-logical data frames will be coerced to a logical matrix, mixed logical-integer will give a integer matrix, etc.
 
 3.  __<span style="color:red">Q</span>__: Can you have a data frame with 0 rows? What about 0 columns?  
 __<span style="color:green">A</span>__: Yes, you can create them easily. Also both dimensions can be 0:
