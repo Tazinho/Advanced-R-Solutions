@@ -592,6 +592,59 @@ the supplied predicate function returns `TRUE`. So the relation is
        consistent are they? How could you improve them?
 
     a) Complete the matrix by implementing any missing functions.
+    
+    __<span style="color:green">A</span>__ In the following table we can see the requested base R functions, that we are aware of:
+
+    |            | and      | or       | add      | multiply | smaller  | larger   |
+    |------------|----------|----------|----------|----------|----------|----------|
+    | binary     | `&&`     | `||`     |          |          |          |          |
+    | reducing   | `all`    | `any`    | `sum`    | `prod`   | `min`    | `max`    |
+    | vectorised | `&`      | `|`      | `+`      | `*`      | `pmin`   | `pmax`   |
+    | array      |          |          |          |          |          |          |
+    
+    Notice that we were relatively strict about the _binary_ row. Since the _vectorised_ versions are more general, then the _binary_ versions, we could have used them twice. However, this doesn't seem to be the intention of this exercise. 
+    
+    The last part of this exercise can be solved via copy pasting from the book and the last exercise for the _binary_ row and creating combinations of `apply()` and the _reducing_ versions for the _array_ row. I think the array functions just need a dimension and an `rm.na` argument. I don't know how I would name them, but sth. like `sum_array(1, na.rm = TRUE)` could be ok.
+    
+    The second part of the exercise is hard to solve complete. But in our opinion, there are two important parts. The behaviour for special inputs like `NA`, `NaN`, `NULL` and zero length atomics should be consistent and all versions should have a `rm.na` argument, for which the functions also behave consistent. In the follwing table, we return the output of `` `f`(x, 1) ``, where `f` is the function in the first column  and `x` is the special input in the header (the named functions also have an `rm.na` argument, which is `FALSE` by default). The order of the arguments is important, because of lazy evaluation.
+    
+    |         | `NA`     | `NaN`    | `NULL`       | logical(0)   | integer(0)   |
+    |---------|----------|----------|--------------|--------------|--------------|
+    | `&&`    | `NA`     | `NA`     | error        | `NA`         | `NA`         |
+    | `all`   | `NA`     | `NA`     | `TRUE`       | `TRUE`       | `TRUE`       |
+    | `&`     | `NA`     | `NA`     | error        | `logical(0)` | `logical(0)` |
+    | `||`    | `TRUE`   | `TRUE`   | error        | `TRUE`       | `TRUE`       |
+    | `any`   | `TRUE`   | `TRUE`   | `TRUE`       | `TRUE`       | `TRUE`       |
+    | `|`     | `TRUE`   | `TRUE`   | error        | `logical(0)` | `logical(0)` |
+    | `sum`   | `NA`     | `NaN`    | 1            | 1            | 1            |
+    | `+`     | `NA`     | `NaN`    | `numeric(0)` | `numeric(0)` | `numeric(0)` |
+    | `prod`  | `NA`     | `NaN`    | 1            | 1            | 1            |
+    | `*`     | `NA`     | `NaN`    | `numeric(0)` | `numeric(0)` | `numeric(0)` |
+    | `min`   | `NA`     | `NaN`    | 1            | 1            | 1            |
+    | `pmin`  | `NA`     | `NaN`    | `numeric(0)` | `numeric(0)` | `numeric(0)` |
+    | `max`   | `NA`     | `NaN`    | 1            | 1            | 1            |
+    | `pmax`  | `NA`     | `NaN`    | `numeric(0)` | `numeric(0)` | `numeric(0)` |
+    
+    We can see, that the vectorised and reduced numerical functions are all consistent. However it is not, that the first three logical functions return `NA` for `NA` and `NaN`, while the 4th till 6th function all return `TRUE`. Then `FALSE` would be more consistent for the first three or the return of `NA` for all and an extra `na.rm` argument. In seems relatively hard to find an easy rule for all cases and especially the different behaviour for `NULL` is relatively confusing. Another good opportunity for sorting the functions would be to differentiate between "numerical" and "logical" operators first and then between binary, reduced and vectorised, like below (we left the last colum, which is redundant, because of coercion, as intended):
+    
+    | `` `f(x,1)` `` | `NA`     | `NaN`    | `NULL`       | `logical(0)` |
+    |----------------|----------|----------|--------------|--------------|
+    |    `&&`        | `NA`     | `NA`     | error        | `NA`         |
+    |    `||`        | `TRUE`   | `TRUE`   | error        | `TRUE`       |
+    |    `all`       | `NA`     | `NA`     | `TRUE`       | `TRUE`       |
+    |    `any`       | `TRUE`   | `TRUE`   | `TRUE`       | `TRUE`       |
+    |    `&`         | `NA`     | `NA`     | error        | `logical(0)` |
+    |    `|`         | `TRUE`   | `TRUE`   | error        | `logical(0)` |
+    |    `sum`       | `NA`     | `NaN`    | 1            | 1            |
+    |    `prod`      | `NA`     | `NaN`    | 1            | 1            |
+    |    `min`       | `NA`     | `NaN`    | 1            | 1            |
+    |    `max`       | `NA`     | `NaN`    | 1            | 1            |
+    |    `+`         | `NA`     | `NaN`    | `numeric(0)` | `numeric(0)` |
+    |    `*`         | `NA`     | `NaN`    | `numeric(0)` | `numeric(0)` |
+    |    `pmin`      | `NA`     | `NaN`    | `numeric(0)` | `numeric(0)` |
+    |    `pmax`      | `NA`     | `NaN`    | `numeric(0)` | `numeric(0)` |
+    
+    The other point are the naming conventions. I think they are clear, but it could be useful to provide the missing binary operators and name them for example `++`, `**`, `<>`, `><` to be consistent.
 
 3.  __<span style="color:red">Q</span>__: How does `paste()` fit into this structure? What is the scalar binary 
     function that underlies `paste()`? What are the `sep` and `collapse` 
