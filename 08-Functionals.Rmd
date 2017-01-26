@@ -459,6 +459,127 @@ the supplied predicate function returns `TRUE`. So the relation is
     `smaller(NA, NA, na.rm = TRUE)` must be bigger than any other value of x.) 
     Use `smaller` and `larger` to implement equivalents of `min()`, `max()`,
     `pmin()`, `pmax()`, and new functions `row_min()` and `row_max()`.
+    
+    __<span style="color:green">A</span>__: We can do almost everything as shown in the case study in the textbook. First we define the functions `smaller_()` and `larger_()`. We use the underscore suffix, to built up non suffixed versions on top, which will include the `na.rm` parameter. In contrast to the `add()` example from the book, we change two things at this step. We won't include errorchecking, since this is done later at the top level and we return `NA_integer_` if any of the arguments is `NA` (this is important, if na.rm is set to `FALSE` and wasn't needed by the `add()` example, since `+` already returns `NA` in this case.)
+    
+    ```{r}
+    smaller_ <- function(x, y){
+      if(anyNA(c(x, y))){return(NA_integer_)}
+      out <- x
+      if(y < x) {out <- y}
+      out
+    }
+    
+    larger_ <- function(x, y){
+      if(anyNA(c(x, y))){return(NA_integer_)}
+      out <- x
+      if(y > x) {out <- y}
+      out
+    }
+    ```
+    
+    We can take `na.rm()` from the book:
+    
+    ```{r}
+    rm_na <- function(x, y, identity) {
+      if (is.na(x) && is.na(y)) {
+        identity
+        } else if (is.na(x)) {
+          y
+          } else {
+            x
+          }
+    }
+    ```
+    
+    To find the identity value, we can apply the same argument as in the textbook, hence our functions are also associative and the following equation should hold:
+    
+    ```
+    3 = smaller(smaller(3, NA), NA) = smaller(3, smaller(NA, NA)) = 3
+    ```
+    
+    So the identidy has to be greater than 3. When we generalize from 3 to any real number this means that the identity has to be greater than any number, which leads us to infinity. Hence identity has to be `Inf` for `smaller()` (and `-Inf` for `larger()`), which we implement next:
+    
+    ```{r}
+    smaller <- function(x, y, na.rm = FALSE) {
+      stopifnot(length(x) == 1, length(y) == 1, is.numeric(x) | is.logical(x),
+                is.numeric(y) | is.logical(y))
+      if (na.rm && (is.na(x) || is.na(y))) rm_na(x, y, Inf) else smaller_(x,y)
+    }
+    
+    larger <- function(x, y, na.rm = FALSE) {
+      stopifnot(length(x) == 1, length(y) == 1, is.numeric(x) | is.logical(x),
+                is.numeric(y) | is.logical(y))
+      if (na.rm && (is.na(x) || is.na(y))) rm_na(x, y, -Inf) else larger_(x,y)
+    }
+    ```
+    
+    Like `min()` and `max()` can act on vectors, we can implement this easyly for our new functions. As shown in the book, we also have to set the `init` parameter to the identity value.
+    
+    ```{r}
+    r_smaller <- function(xs, na.rm = TRUE) {
+      Reduce(function(x, y) smaller(x, y, na.rm = na.rm), xs, init = Inf)
+    }
+    # some tests
+    r_smaller(c(1:3, 4:(-1)))
+    r_smaller(NA, na.rm = TRUE)
+    r_smaller(numeric())
+    
+    r_larger <- function(xs, na.rm = TRUE) {
+      Reduce(function(x, y) larger(x, y, na.rm = na.rm), xs, init = -Inf)
+    }
+    # some tests
+    r_larger(c(1:3), c(4:1))
+    r_larger(NA, na.rm = TRUE)
+    r_larger(numeric())
+    ```
+    
+    We can also create vectorised versions as shown in the book. We will just show the `smaller()` case to become not too verbose.
+    
+    ```{r}
+    v_smaller1 <- function(x, y, na.rm = FALSE){
+      stopifnot(length(x) == length(y), is.numeric(x) | is.logical(x), 
+                is.numeric(y)| is.logical(x))
+      if (length(x) == 0) return(numeric())
+      simplify2array(
+        Map(function(x, y) smaller(x, y, na.rm = na.rm), x, y)
+      )
+    }
+    
+    v_smaller2 <- function(x, y, na.rm = FALSE) {
+      stopifnot(length(x) == length(y), is.numeric(x) | is.logical(x), 
+                is.numeric(y)| is.logical(x))
+      vapply(seq_along(x), function(i) smaller(x[i], y[i], na.rm = na.rm),
+             numeric(1))
+    }
+    
+    # Both versions give the same results
+    v_smaller1(1:10, c(2,1,4,3,6,5,8,7,10,9))
+    v_smaller2(1:10, c(2,1,4,3,6,5,8,7,10,9))
+    
+    v_smaller1(numeric(), numeric())
+    v_smaller2(numeric(), numeric())
+    
+    v_smaller1(c(1, NA), c(1, NA), na.rm = FALSE)
+    v_smaller2(c(1, NA), c(1, NA), na.rm = FALSE)
+    
+    v_smaller1(NA,NA)
+    v_smaller2(NA,NA)
+    ```
+    
+    Of course, we are also able to copy paste the rest from the textbook, to solve the last part of the exercise:
+    
+    ```{r}
+    row_min <- function(x, na.rm = FALSE) {
+      apply(x, 1, r_smaller, na.rm = na.rm)
+    }
+    col_min <- function(x, na.rm = FALSE) {
+      apply(x, 2, r_smaller, na.rm = na.rm)
+    }
+    arr_min <- function(x, dim, na.rm = FALSE) {
+      apply(x, dim, r_smaller, na.rm = na.rm)
+    }
+    ```
 
 2.  __<span style="color:red">Q</span>__: Create a table that has _and_, _or_, _add_, _multiply_, _smaller_, and 
     _larger_ in the columns and _binary operator_, _reducing variant_, 
