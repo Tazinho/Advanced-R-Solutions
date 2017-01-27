@@ -312,8 +312,19 @@ of the input object. What this means should become clear by looking at the three
     }
     ```
 
-4.  __<span style="color:red">Q</span>__: What other types of input and output are missing? Brainstorm before you 
-    look up some answers in the [plyr paper](http://www.jstatsoft.org/v40/i01/).
+4.  __<span style="color:red">Q</span>__: What other types of input and output are missing? Brainstorm before you look up some answers in the [plyr paper](http://www.jstatsoft.org/v40/i01/).
+    
+    __<span style="color:green">A</span>__: From the suggested plyr paper, we can extract a lot of possible combinations and list them up on a table. Sean C. Anderson already has done this based on a presentation from Hadley Wickham and provided the following result [here](http://seananderson.ca/2013/12/01/plyr.html). 
+    
+    | object type        | array       | data frame   | list        | nothing   |
+    |--------------------|-------------|--------------|-------------|-----------|
+    | array              | `apply`     | `.`          | `.`         | `.`       |
+    | data frame         | `.`         | `aggregate`  | `by`        | `.`       |
+    | list               | `sapply`    | `.`          | `lapply`    | `.`       |
+    | n replicates       | `replicate` | `.`          | `replicate` | `.`       |
+    | function arguments | `mapply`    | `.`          | `mapply`    | `.`       |
+    
+    Note the column nothing, which is specifically for usecases, where sideeffects like plotting or writing data are intended.
     
 ## Manipulating lists
 
@@ -608,21 +619,21 @@ the supplied predicate function returns `TRUE`. So the relation is
     
     The second part of the exercise is hard to solve complete. But in our opinion, there are two important parts. The behaviour for special inputs like `NA`, `NaN`, `NULL` and zero length atomics should be consistent and all versions should have a `rm.na` argument, for which the functions also behave consistent. In the follwing table, we return the output of `` `f`(x, 1) ``, where `f` is the function in the first column  and `x` is the special input in the header (the named functions also have an `rm.na` argument, which is `FALSE` by default). The order of the arguments is important, because of lazy evaluation.
     
-    |         | `NA`     | `NaN`    | `NULL`       | logical(0)   | integer(0)   |
+    |         | `NA`     | `NaN`    | `NULL`       | `logical(0)` | `integer(0)` |
     |---------|----------|----------|--------------|--------------|--------------|
-    | `&&`    | `NA`     | `NA`     | error        | `NA`         | `NA`         |
+    | `&&`    | `NA`     | `NA`     | `error`      | `NA`         | `NA`         |
     | `all`   | `NA`     | `NA`     | `TRUE`       | `TRUE`       | `TRUE`       |
-    | `&`     | `NA`     | `NA`     | error        | `logical(0)` | `logical(0)` |
-    | `||`    | `TRUE`   | `TRUE`   | error        | `TRUE`       | `TRUE`       |
+    | `&`     | `NA`     | `NA`     | `error`      | `logical(0)` | `logical(0)` |
+    | `||`    | `TRUE`   | `TRUE`   | `error`      | `TRUE`       | `TRUE`       |
     | `any`   | `TRUE`   | `TRUE`   | `TRUE`       | `TRUE`       | `TRUE`       |
-    | `|`     | `TRUE`   | `TRUE`   | error        | `logical(0)` | `logical(0)` |
-    | `sum`   | `NA`     | `NaN`    | 1            | 1            | 1            |
+    | `|`     | `TRUE`   | `TRUE`   | `error`      | `logical(0)` | `logical(0)` |
+    | `sum`   | `NA`     | `NaN`    | `1`          | `1`          | `1`          |
     | `+`     | `NA`     | `NaN`    | `numeric(0)` | `numeric(0)` | `numeric(0)` |
-    | `prod`  | `NA`     | `NaN`    | 1            | 1            | 1            |
+    | `prod`  | `NA`     | `NaN`    | `1`          | `1`          | `1`          |
     | `*`     | `NA`     | `NaN`    | `numeric(0)` | `numeric(0)` | `numeric(0)` |
-    | `min`   | `NA`     | `NaN`    | 1            | 1            | 1            |
+    | `min`   | `NA`     | `NaN`    | `1`          | `1`          | `1`          |
     | `pmin`  | `NA`     | `NaN`    | `numeric(0)` | `numeric(0)` | `numeric(0)` |
-    | `max`   | `NA`     | `NaN`    | 1            | 1            | 1            |
+    | `max`   | `NA`     | `NaN`    | `1`          | `1`          | `1`          |
     | `pmax`  | `NA`     | `NaN`    | `numeric(0)` | `numeric(0)` | `numeric(0)` |
     
     We can see, that the vectorised and reduced numerical functions are all consistent. However it is not, that the first three logical functions return `NA` for `NA` and `NaN`, while the 4th till 6th function all return `TRUE`. Then `FALSE` would be more consistent for the first three or the return of `NA` for all and an extra `na.rm` argument. In seems relatively hard to find an easy rule for all cases and especially the different behaviour for `NULL` is relatively confusing. Another good opportunity for sorting the functions would be to differentiate between "numerical" and "logical" operators first and then between binary, reduced and vectorised, like below (we left the last colum, which is redundant, because of coercion, as intended):
