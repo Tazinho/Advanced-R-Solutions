@@ -320,7 +320,7 @@ of the input object. What this means should become clear by looking at the three
 1.  __<span style="color:red">Q</span>__: Why isn't `is.na()` a predicate function? What base R function is closest
     to being a predicate version of `is.na()`?
     
-    __<span style="color:green">A</span>__: Because a predicate function always returns `TRUE` or `FALSE`. `is.na(NULL)` returns `logical(0)`, which excludes it from being a predicate function. The closest in base that I am aware of is `anyNA()`, if one applies it elementwise.
+    __<span style="color:green">A</span>__: Because a predicate function always returns `TRUE` or `FALSE`. `is.na(NULL)` returns `logical(0)`, which excludes it from being a predicate function. The closest in base that we are aware of is `anyNA()`, if one applies it elementwise.
 
 2.  __<span style="color:red">Q</span>__: Use `Filter()` and `vapply()` to create a function that applies a summary 
     statistic to every numeric column in a data frame.
@@ -602,9 +602,9 @@ the supplied predicate function returns `TRUE`. So the relation is
     | vectorised | `&`      | `|`      | `+`      | `*`      | `pmin`   | `pmax`   |
     | array      |          |          |          |          |          |          |
     
-    Notice that we were relatively strict about the _binary_ row. Since the _vectorised_ versions are more general, then the _binary_ versions, we could have used them twice. However, this doesn't seem to be the intention of this exercise. 
+    Notice that we were relatively strict about the _binary_ row. Since the _vectorised_ and _reducing_ versions are more general, then the _binary_ versions, we could have used them twice. However, this doesn't seem to be the intention of this exercise. 
     
-    The last part of this exercise can be solved via copy pasting from the book and the last exercise for the _binary_ row and creating combinations of `apply()` and the _reducing_ versions for the _array_ row. I think the array functions just need a dimension and an `rm.na` argument. I don't know how I would name them, but sth. like `sum_array(1, na.rm = TRUE)` could be ok.
+    The last part of this exercise can be solved via copy pasting from the book and the last exercise for the _binary_ row and creating combinations of `apply()` and the _reducing_ versions for the _array_ row. We think the array functions just need a dimension and an `rm.na` argument. We don't know how we would name them, but sth. like `sum_array(1, na.rm = TRUE)` could be ok.
     
     The second part of the exercise is hard to solve complete. But in our opinion, there are two important parts. The behaviour for special inputs like `NA`, `NaN`, `NULL` and zero length atomics should be consistent and all versions should have a `rm.na` argument, for which the functions also behave consistent. In the follwing table, we return the output of `` `f`(x, 1) ``, where `f` is the function in the first column  and `x` is the special input in the header (the named functions also have an `rm.na` argument, which is `FALSE` by default). The order of the arguments is important, because of lazy evaluation.
     
@@ -644,9 +644,84 @@ the supplied predicate function returns `TRUE`. So the relation is
     |    `pmin`      | `NA`     | `NaN`    | `numeric(0)` | `numeric(0)` |
     |    `pmax`      | `NA`     | `NaN`    | `numeric(0)` | `numeric(0)` |
     
-    The other point are the naming conventions. I think they are clear, but it could be useful to provide the missing binary operators and name them for example `++`, `**`, `<>`, `><` to be consistent.
+    The other point are the naming conventions. We think they are clear, but it could be useful to provide the missing binary operators and name them for example `++`, `**`, `<>`, `><` to be consistent.
 
 3.  __<span style="color:red">Q</span>__: How does `paste()` fit into this structure? What is the scalar binary 
     function that underlies `paste()`? What are the `sep` and `collapse` 
     arguments to `paste()` equivalent to? Are there any `paste` variants 
     that don't have existing R implementations?
+    
+    __<span style="color:green">A</span>__ `paste()` behaves like a mix. If you supply only length one arguments, it will behave like a reducing function, i.e. :
+    
+    ```{r}
+    paste("a", "b", sep = "")
+    paste("a", "b","", sep = "") 
+    ```
+    
+    If you supply at least one element with length greater then one, it behaves like a vectorised function, i.e. :
+    
+    ```{r}
+    paste(1:3)
+    paste(1:3, 1:2)
+    paste(1:3, 1:2, 1)
+    ```
+    
+    We think it should be possible to implement a new `paste()` starting from
+    
+    ```{r}
+    p_binary <- function(x, y) {
+      stopifnot(length(x) == 1, length(y) == 1)
+      paste0(x,y)
+    }
+    ```
+
+    
+    The `sep` argument is equivalent to bind `sep` on every `...` input supplied to `paste()`, but the last and then bind these results together. In relations:
+    
+    ```
+    paste(n1, n2, ...,nm , sep = sep) <=>
+    paste0(paste0(n1, sep), paste(n2, n3, ..., nm, sep = sep)) <=>
+    paste0(paste0(n1, sep), paste0(n2, sep), ..., paste0(nn, sep), paste0(nm))
+    ```
+    We can check this for scalar and non scalar input
+    
+    ```{r}
+    # scalar:
+    paste("a", "b", "c", sep = "_")
+    paste0(paste0("a", "_"), paste("b", "c", sep = "_"))
+    paste0(paste0("a", "_"), paste0("b", "_"), paste0("c"))
+
+    # non scalar
+    paste(1:2, "b", "c", sep = "_")
+    paste0(paste0(1:2, "_"), paste("b", "c", sep = "_"))
+    paste0(paste0(1:2, "_"), paste0("b", "_"), paste0("c"))
+    ```
+
+    
+    collapse just binds the outputs for non scalar input together with the collapse input.
+    In relations:
+    
+    ```
+    paste(a11, a12, ..., a1n,
+          a21, a22, ..., a2n,
+          ..................,
+          am1, am2, ..., amn, collapse = collapse) <=> 
+    paste0(
+          paste0(paste(  a11,   a12,   ..., a1n), collapse),
+          paste0(paste(  a21,   a22,   ..., a2n), collapse),
+          .................................................,
+          paste0(paste(am-11, am-12, ..., am-1n), collapse),      
+                 paste(am1  ,   am2, ...,   a1m), collapse)
+          )
+    ```
+    
+    One can see this easily by intuition from examples:
+    
+    ```{r}
+    paste(1:5, 1:5, 6, sep = "", collapse = "_x_")
+    paste(1,2,3,4, collapse = "_x_")
+    paste(1:2,1:2,2:3,3:4, collapse = "_x_")
+    ```
+    
+    We think the only paste version that is not implemented in base R is an array version.
+    At least we are not aware of sth. like row_paste or paste_appy etc.
