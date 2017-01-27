@@ -702,16 +702,16 @@ the supplied predicate function returns `TRUE`. So the relation is
     In relations:
     
     ```
-    paste(a11, a12, ..., a1n,
-          a21, a22, ..., a2n,
-          ..................,
-          am1, am2, ..., amn, collapse = collapse) <=> 
+    for input A1, ..., An, where Ai = a1i:ami:
+    
+    paste(A1 , A2 , ...,  An, collapse = collapse) 
+    <=>
     paste0(
-          paste0(paste(  a11,   a12,   ..., a1n), collapse),
-          paste0(paste(  a21,   a22,   ..., a2n), collapse),
-          .................................................,
-          paste0(paste(am-11, am-12, ..., am-1n), collapse),      
-                 paste(am1  ,   am2, ...,  a1mn)
+          paste0(  paste(A1), collapse),
+          paste0(  paste(A2), collapse),
+          ............................
+          paste0(paste(Am-1), collapse),      
+                   paste(Am)
           )
     ```
     
