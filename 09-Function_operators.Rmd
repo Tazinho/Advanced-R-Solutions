@@ -201,6 +201,10 @@
     elements <- list(1:10, c(-1, 10), c(TRUE, FALSE), letters)
     results <- lapply(elements, function(x) log_t(x))
     results
+    
+    # further
+    # results_detailed <- lapply(elements, function(x) lapply(x, function(y))log2(x))
+    # results_detailed
     ```
 
 3.  __<span style="color:red">Q</span>__: Create a FO that tracks files created or deleted in the working directory 
@@ -249,7 +253,7 @@
       }
     }
 
-    # the following test will again create too files in your working directory
+    # the following test will again create two files in your working directory
     td <- track_dir(sapply)
     td(c("delete_me", "me_too"), dir.create)
     ```
@@ -273,6 +277,53 @@
     are `colwise()`'s three main tasks? How could you make `colwise()` simpler 
     by implementing each task as a function operator? (Hint: think about 
     `partial()`.)
+    
+    __<span style="color:orange">A</span>__: We describe how it works by commenting the source code:
+    
+    ```{r, eval = FALSE}
+    function (.fun, .cols = true, ...) 
+      {
+      # We check if .cols is not a function, since it is possible to supply a
+      # predicate function.
+      # if so, the .cols arguments will be "quoted", and filter() will 
+      # be a function that checks and evaluates these .cols within its other argument
+      if (!is.function(.cols)) {
+        .cols <- as.quoted(.cols)
+        filter <- function(df) eval.quoted(.cols, df)
+      }
+      # otherwise, filter will be be Filter(), which applies the function 
+      # in .cols to every element of its other argument
+      else {
+        filter <- function(df) Filter(.cols, df)
+      }
+      # the ... arguments are caught in the list dots
+      dots <- list(...)
+      # a function is created, which will also be the return value.
+      # it checks if its input is a data frame
+      function(df, ...) {
+        stopifnot(is.data.frame(df))
+        # if df is split (in "plyr" speaking), this will be taken into account...
+        df <- strip_splits(df)
+        # now the columns of the data frame are chosen, depending on the input of .cols
+        # this can chosen directly, via a predicate function, or all columns (default)
+        filtered <- filter(df)
+        # if this means, that no columns are selected, an empty data frame will be returned
+        if (length(filtered) == 0) 
+          return(data.frame())
+        # otherwise lapply will be called on all filtered columns, with 
+        # the .fun argument, which has to be provided by the user, and some other
+        # arguments provided by the user, when calling the function (...) and
+        # when defining the function (dots)
+        out <- do.call("lapply", c(list(filtered, .fun, ...), 
+                               dots))
+        # the output will be named and converted from list into a data frame again
+        names(out) <- names(filtered)
+        quickdf(out)
+      }
+    }
+    
+    <environment: namespace:plyr>
+    ```
 
 3.  __<span style="color:red">Q</span>__: Write FOs that convert a function to return a matrix instead of a data 
     frame, or a data frame instead of a matrix. If you understand S3, 
