@@ -423,7 +423,7 @@ provides us with enough information and guides our attention on solutions in the
     ```
     
     In our final benchmark, we also include compiled verions of all our attempts:
-    ```{r}
+    ```{r, eval = FALSE}
     cor_df_c <- compiler::cmpfun(cor_df)
     cor_df2_c <- compiler::cmpfun(cor_df2)
     cor_df3_c <- compiler::cmpfun(cor_df3)
@@ -445,17 +445,47 @@ provides us with enough information and guides our attention on solutions in the
       cor_df4v_c(),
       cor_df5_c()
     )
+    #> 
+    #> Unit: milliseconds
+    #>          expr      min       lq      mean    median        uq        max
+    #>      cor_df() 7.885838 9.146994 12.739322  9.844561 10.447188   83.08044
+    #>     cor_df2() 1.951941 3.178821  6.101036  3.339742  3.485085   36.25404
+    #>     cor_df3() 1.288831 1.943510  4.353773  2.018105  2.145119   66.74022
+    #>    cor_df4m() 1.534061 2.156848  6.344015  2.243540  2.370921  234.17307
+    #>    cor_df4v() 1.639997 2.271949  5.755720  2.349477  2.453214  196.49897
+    #>     cor_df5() 1.281133 1.879911  6.263500  1.932696  2.064292  237.83135
+    #>    cor_df_c() 7.600654 9.337239 13.613901 10.009330 10.965688   41.17146
+    #>   cor_df2_c() 2.009124 2.878242  5.645224  3.298138  3.469871   34.29037
+    #>   cor_df3_c() 1.312291 1.926281  4.426418  1.986948  2.094532   87.97220
+    #>  cor_df4m_c() 1.548357 2.179025  3.306796  2.242991  2.355709   23.87195
+    #>  cor_df4v_c() 1.669689 2.255087 27.148456  2.341962  2.490419 2263.33230
+    #>   cor_df5_c() 1.284065 1.888892  3.884798  1.953774  2.078955   25.81583
+    #>  neval cld
+    #>    100   a
+    #>    100   a
+    #>    100   a
+    #>    100   a
+    #>    100   a
+    #>    100   a
+    #>    100   a
+    #>    100   a
+    #>    100   a
+    #>    100   a
+    #>    100   a
+    #>    100   a
     ```
     
     Our final solution benefits most from the switch from data frames to vectors. Working with `sample.int` gives only little improvement. Reimplementing and compiling a new correlation function adds only minimal speedup.
     
     To trust our final result we include a last check for similar return values:
     
-    ```{r}
+    ```{r, eval = FALSE}
     set.seed(1)
     cor_df()
+    #> [1] -0.001441277
     set.seed(1)
     cor_df5_c()
+    #> [1] -0.001441277
     ```
     
     Vectorisation of this problem seems rather difficult, since attempts of using matrix calculus, always depend on building and handling big matrices in the first place.
@@ -485,7 +515,7 @@ provides us with enough information and guides our attention on solutions in the
     
     However this still doesn't provide any improvement over the use of `lapply()`:
     
-    ```{r}
+    ```{r, eval = FALSE}
     ulapply2 <- function(X, FUN, ...) unlist(lapply(X, FUN, ...), use.names = FALSE)
     
     microbenchmark::microbenchmark(
@@ -493,7 +523,15 @@ provides us with enough information and guides our attention on solutions in the
       ulapply2(1:100, function(x) cor_df5_c()),
       cor_df_v(100)
     )
-    
+    #> Unit: milliseconds
+    #>                                      expr        min         lq      mean
+    #>                               cor_df5_c()   1.098219   1.148988   2.06762
+    #>  ulapply2(1:100, function(x) cor_df5_c()) 228.250897 233.052303 256.56849
+    #>                             cor_df_v(100) 263.158918 272.988449 312.43802
+    #>      median         uq      max neval cld
+    #>    1.864515   2.030201  13.2325   100 a  
+    #>  238.665277 247.184900 410.0768   100  b 
+    #>  278.648158 291.164035 581.2834   100   c
     ```
     
     Further improvements can be achieved using parallelisation (for example via `parallel::parLapply()`)
@@ -521,7 +559,7 @@ provides us with enough information and guides our attention on solutions in the
     
     __<span style="color:green">A</span>__: We compare regarding different sizes for square matrices:
     
-    ```{r }
+    ```{r long calculation}
     library(microbenchmark)
     dimensions <- c(1e0, 1e1, 1e2, 1e3, 0.5e4, 1e4)
     matrices <-  lapply(dimensions,
@@ -566,8 +604,7 @@ provides us with enough information and guides our attention on solutions in the
     ```{r}
     a <- rnorm(10)
     b <- rnorm(10)
-    stopifnot(identical(sum(a * b),
-                        crossprod(a, b)[1]))
+    sum(a * b) - crossprod(a, b)[1]
     ```
     
     A benchmark of both alternatives for different vector lengths indicates, that the `crossprod()` variant is about 2.5 times faster than `sum()`:
