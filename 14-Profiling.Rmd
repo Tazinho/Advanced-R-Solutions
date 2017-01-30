@@ -1,3 +1,10 @@
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
+```
 # Profiling
 
 ## Has somebody already solved the problem?
@@ -5,9 +12,9 @@
 1.  __<span style="color:red">Q</span>__: What are faster alternatives to `lm`? Which are specifically designed 
     to work with larger datasets?
         
-    __<span style="color:green">A</span>__: Within the [Cran task view](https://cran.rstudio.com/web/views/) for [HighPerformanceComputing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and it's `speedlm()` function. We might not gain any performanceimprovements on small datasets:
+    __<span style="color:green">A</span>__: Within the [Cran task view](https://cran.rstudio.com/web/views/) for [HighPerformanceComputing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and it's `speedlm()` function. We might not gain any performance improvements on small datasets:
     
-    ```{r}
+    ```{r, eval=FALSE}
     stopifnot(all.equal(
       coef(speedglm::speedlm(Sepal.Length ~ Sepal.Width + Species, data = iris)),
       coef(lm(Sepal.Length ~ Sepal.Width + Species, data = iris))))
@@ -20,7 +27,7 @@
     
     However on bigger datasets it can make a difference:
     
-    ```{r,collapse = TRUE}
+    ```{r,collapse = TRUE, eval=FALSE}
     eps <- rnorm(100000)
     x1 <- rnorm(100000, 5, 3)
     x2 <- rep(c("a", "b"), 50000)
@@ -44,13 +51,13 @@
     Note that there are many other opportunities mentioned in the task view, also some that make it possible to handle data which is not in memory. 
     
     When it comes to pure speed a quick google search on [r fastest lm](http://stackoverflow.com/questions/25416413/is-there-a-faster-lm-function) provides a stackoverflow thread where someone already solved this problem for us...
+ <!-- We should possibly summarize this answer some time in the future? -->
 
-1.  __<span style="color:red">Q</span>__: What package implements a version of `match()` that's faster for
-    repeated lookups? How much faster is it?
+1.  __<span style="color:red">Q</span>__: What package implements a version of `match()` that's faster for repeated lookups? How much faster is it?
     
     __<span style="color:green">A</span>__: Again google gives a good recommendation for the searchterm [r faster match](http://stackoverflow.com/questions/32934933/faster-in-operator):
     
-    ```{r}
+    ```{r, eval=FALSE}
     set.seed(1)
     table <- 1L:100000L
     x <- sample(table, 10000, replace=TRUE)
@@ -65,8 +72,7 @@
     
     On my laptop `fastmatch::fmatch()` is around 25 times as fast as `match()`.
 
-1.  __<span style="color:red">Q</span>__: List four functions (not just those in base R) that convert a string into a
-    date time object. What are their strengths and weaknesses?
+1.  __<span style="color:red">Q</span>__: List four functions (not just those in base R) that convert a string into a date time object. What are their strengths and weaknesses?
     
     __<span style="color:orange">A</span>__: At least these functions will do the trick: `as.POSIXct()`, `as.POSIXlt()`, `strftime()`, `strptime()`, `lubridate::ymd_hms()`. There might also be some in the timeseries packages `xts` or `zoo` and in `anytime`. An update on this will follow...
 
@@ -84,7 +90,7 @@ provides us with enough information and guides our attention on solutions in the
     zoo::rollapply(1:10, 2, mean, fill = NA, align = "left")
     ```
     * `TTR`
-    ```{r}
+    ```{r, eval=FALSE}
     TTR::SMA(1:10, 2)
     ```
     * `RcppRoll`
@@ -104,12 +110,11 @@ provides us with enough information and guides our attention on solutions in the
 
 ## Do as little as possible
 
-1.  __<span style="color:red">Q</span>__: How do the results change if you compare `mean()` and `mean.default()`
-    on 10,000 observations, rather than on 100?
+1.  __<span style="color:red">Q</span>__: How do the results change if you compare `mean()` and `mean.default()` on 10,000 observations, rather than on 100?
     
     __<span style="color:green">A</span>__: We start with 100 observations as shown in the textbook:
     
-    ```{r}
+    ```{r, eval=FALSE}
     x <- runif(1e2)
     microbenchmark::microbenchmark(
       mean(x),
@@ -119,7 +124,7 @@ provides us with enough information and guides our attention on solutions in the
     
     In case of 10000 observations we can observe that using `mean.default()` preserves only a small advantage over the use of `mean()`:
     
-    ```{r,collapse = TRUE}
+    ```{r,collapse = TRUE, eval=FALSE}
     x <- runif(1e4)
     microbenchmark::microbenchmark(
       mean(x),
@@ -130,7 +135,7 @@ provides us with enough information and guides our attention on solutions in the
     
     When using even more observations - like in the next lines - it seems that `mean.default` doesn't preserve anymore any advantage at all:
     
-    ```{r}
+    ```{r, eval=FALSE}
     x <- runif(1e6)
     microbenchmark::microbenchmark(
       mean(x),
@@ -139,8 +144,7 @@ provides us with enough information and guides our attention on solutions in the
     )
     ```
 
-1.  __<span style="color:red">Q</span>__: The following code provides an alternative implementation of `rowSums()`.
-    Why is it faster for this input?
+1.  __<span style="color:red">Q</span>__: The following code provides an alternative implementation of `rowSums()`. Why is it faster for this input?
 
     ```{r}
     rowSums2 <- function(df) {
@@ -175,8 +179,7 @@ provides us with enough information and guides our attention on solutions in the
     > .Internal performs a call to an internal code which is built in to the R
     interpreter.
     
-    The internal `rowSums()` is a complete different function than the "normal"
-    `rowSums()` function.
+    The internal `rowSums()` is a complete different function than the "normal" `rowSums()` function.
     
     Of course (since they have the same name) in this case these functions are heavily related with each other: If we look into the source code of `rowSums()`, we see that it is a wrapper around the internal `rowSums()`. Just some input checkings, conversions and the special cases (complex numbers) are added:
     
@@ -184,10 +187,7 @@ provides us with enough information and guides our attention on solutions in the
     rowSums
     ```
 
-1.  __<span style="color:red">Q</span>__: Make a faster version of `chisq.test()` that only computes the chi-square
-    test statistic when the input is two numeric vectors with no missing
-    values. You can try simplifying `chisq.test()` or by coding from the 
-    [mathematical definition](http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test).
+1.  __<span style="color:red">Q</span>__: Make a faster version of `chisq.test()` that only computes the chi-square test statistic when the input is two numeric vectors with no missing values. You can try simplifying `chisq.test()` or by coding from the [mathematical definition](http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test).
     
     __<span style="color:green">A</span>__: Since `chisq.test()` has a relatively long source code, we try a new implementation from scratch:
     
@@ -239,7 +239,7 @@ provides us with enough information and guides our attention on solutions in the
     
     Finally we benchmark this implementation against a compiled version of itself and the original `stats::chisq.test()`:
     
-    ```{r}
+    ```{r, eval=FALSE}
     chisq.test2c <- compiler::cmpfun(chisq.test2)
     
     microbenchmark::microbenchmark(
@@ -249,16 +249,11 @@ provides us with enough information and guides our attention on solutions in the
     )
     ```
 
-1.  __<span style="color:red">Q</span>__: Can you make a faster version of `table()` for the case of an input of
-    two integer vectors with no missing values? Can you use it to
-    speed up your chi-square test?
+1.  __<span style="color:red">Q</span>__: Can you make a faster version of `table()` for the case of an input of two integer vectors with no missing values? Can you use it to speed up your chi-square test?
     
     __<span style="color:green">A</span>__: 
 
-1.  __<span style="color:red">Q</span>__: Imagine you want to compute the bootstrap distribution of a sample
-    correlation using `cor_df()` and the data in the example below. Given that you 
-    want to run this many times, how can you make this code faster? (Hint: the 
-    function has three components that you can speed up.)
+1.  __<span style="color:red">Q</span>__: Imagine you want to compute the bootstrap distribution of a sample correlation using `cor_df()` and the data in the example below. Given that you want to run this many times, how can you make this code faster? (Hint: the function has three components that you can speed up.)
 
     ```{r, eval = FALSE}
     n <- 1e6
@@ -304,7 +299,7 @@ provides us with enough information and guides our attention on solutions in the
     
     Then we define our approaches, check that their behaviour is correct and do the first benchmark:
     
-    ```{r}
+    ```{r, eval=FALSE}
     # old version
     cor_v1 <- function() {
       cor(df[i, , drop = FALSE])[2,1]
@@ -344,7 +339,7 @@ provides us with enough information and guides our attention on solutions in the
     
     According to the resulting medians, lower and upper quartiles of our benchmark all three new versions seem to provide more or less the same speed benefit (note that the maximum and mean can vary a lot for these approaches). Since the second version is most similar to the code we started, we implement this line into a second version of `cor_df()` (if this sounds too arbitrary, note that in the final solution we will come back to the vector input version anyway) and do a benchmark to get the overall speedup:
     
-    ```{r}
+    ```{r, eval=FALSE}
     cor_df2 <- function() {
       i <- sample(seq(n), n)
       m <- cbind(df$a[i], df$b[i])
@@ -359,7 +354,7 @@ provides us with enough information and guides our attention on solutions in the
     
     Now we can focus on a speedup for the random generation of indices. (Note that a run of linepfrof suggests to optimize `cbind()`. However, after rewriting `cor()` to a version that only works with vector input, this step will be unnecessary anyway). We could try differnt approaches for the sequence generation within `sample()` (like `seq(n)`, `seq.int(n)`, `seq_len(n)`, `a:n`) and a direct call of `sample.int()`. In the following, we will see, that `sample.int()` is always faster (since we don't include the generation of the sequence into our benchmark). When we look into `sample.int()` we see that it calls two different internal sample versions depending on the input. Since in our usecase always the second version will be called, we also provide this version in our benchmark: 
     
-    ```{r}
+    ```{r, eval=FALSE}
     seq_n <- seq(n)
     
     microbenchmark::microbenchmark(
@@ -371,7 +366,7 @@ provides us with enough information and guides our attention on solutions in the
     
     The `sample.int()` versions give clearly the biggest improvement. Since the internal version doesn't provide any clear improvement, but restricts the general scope of our function, we choose to implement `sample.int()` in a third version of `cor_df()` and benchmark our actual achievements:
     
-    ```{r}
+    ```{r, eval=FALSE}
     cor_df3 <- function() {
       i <- sample.int(n, n)
       m <- cbind(df$a[i], df$b[i])
