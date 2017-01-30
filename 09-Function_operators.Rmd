@@ -357,15 +357,176 @@
     apply a function in this and the previous chapter. Replace the anonymous 
     function with `partial()`. What do you think of the result? Is it easier or 
     harder to read?
+    
+    __<span style="color:green">A</span>__: The results are easy to read. Especially the `Map()` examples profit in readability:
+    
+    ```{r}
+    library(pryr)
+    ## From Functionals
+    # 1
+    trims <- c(0, 0.1, 0.2, 0.5)
+    x <- rcauchy(1000)
+    unlist(lapply(trims, function(trim) mean(x, trim = trim)))
+    unlist(lapply(trims, partial(mean, x)))
+    
+    # 2
+    xs <- replicate(5, runif(10), simplify = FALSE)
+    ws <- replicate(5, rpois(10, 5) + 1, simplify = FALSE)
+    unlist(Map(function(x, w) weighted.mean(x, w, na.rm = TRUE), xs, ws))
+    unlist(Map(partial(weighted.mean, na.rm = TRUE), xs, ws))
+    
+    # 3
+    add <- function(x, y, na.rm = FALSE) {
+      if (na.rm && (is.na(x) || is.na(y))) rm_na(x, y, 0) else x + y
+    }
+  
+    r_add <- function(xs, na.rm = TRUE) {
+      Reduce(function(x, y) add(x, y, na.rm = na.rm), xs)
+    }
+    
+    r_add_compact <- function(xs, na.rm = TRUE) {
+      Reduce(partial(add, na.rm = na.rm), xs)
+    }
+    
+    r_add(1:4)
+    r_add_compact(1:4)
+    
+    # 4
+    v_add1 <- function(x, y, na.rm = FALSE) {
+      stopifnot(length(x) == length(y), is.numeric(x), is.numeric(y))
+      if (length(x) == 0) return(numeric())
+      simplify2array(
+        Map(function(x, y) add(x, y, na.rm = na.rm), x, y)
+      )
+    }
+  
+    v_add1_compact <- function(x, y, na.rm = FALSE) {
+      stopifnot(length(x) == length(y), is.numeric(x), is.numeric(y))
+      if (length(x) == 0) return(numeric())
+      simplify2array(
+        Map(partial(add, na.rm = na.rm), x, y)
+      )
+    }
+    
+    v_add1(1:3, 2:4)
+    v_add1_compact(1:3, 2:4)
+    
+    # 5
+    c_add <- function(xs, na.rm = FALSE) {
+      Reduce(function(x, y) add(x, y, na.rm = na.rm), xs,
+             accumulate = TRUE)
+    }
+    
+    c_add_compact <- function(xs, na.rm = FALSE) {
+      Reduce(partial(add, na.rm = na.rm), xs,
+             accumulate = TRUE)
+    }
+    
+    c_add(1:3)
+    c_add_compact(1:3)
+    
+    ## From Function operators
+    # 6
+    f <- function(x) x ^ 2
+    partial(f)
+    
+    # 7
+    # Map(function(x, y) f(x, y, zs), xs, ys)
+    # Map(partial(f, zs = zs), xs, yz)
+    
+    # 8
+    # f <- function(a) g(a, b = 1)
+    # f <- partial(g, b = 1)
+    
+    # 9
+    compact <- function(x) Filter(Negate(is.null), x)
+    compact <- partial(Filter, Negate(is.null))
+    
+    # 10
+    # Map(function(x, y) f(x, y, zs), xs, ys)
+    # Map(partial(f, zs = zs), xs, ys)
+    
+    # 11
+    funs2 <- list(
+      sum = function(...) sum(..., na.rm = TRUE),
+      mean = function(...) mean(..., na.rm = TRUE),
+      median = function(...) median(..., na.rm = TRUE)
+    )
+    
+    funs2 <- list(
+      sum = partial(sum, na.rm = TRUE),
+      mean = partial(mean, na.rm = TRUE),
+      median = partial(median, na.rm = TRUE)
+    )
+    ```
 
 ## Combining FOs
 
 1.  __<span style="color:red">Q</span>__: Implement your own version of `compose()` using `Reduce` and `%o%`. For 
     bonus points, do it without calling `function`.
+    
+    __<span style="color:green">A</span>__: We use the definition from the textbook:
+    
+    ```{r}
+    compose <- function(f, g) {
+      function(...) f(g(...))
+    }
+    
+    "%o%" <- compose
+    ```
+    
+    And then we build two versions. One via an anonymous function and one via `partial()`:
+    
+    ```{r, eval}
+    compose_red <- function(fs) {
+      Reduce(function(f, g) function(...) f(g(...)), fs)
+    }
+    compose_red(c(mean, length, unique))(1:10)
+    
+    compose_red_bonus <- function(fs) {
+      Reduce(partial(partial(`%o%`)), fs)
+    }
+    compose_red_bonus(c(mean, length, unique))(1:10)
+    ```
 
 2.  __<span style="color:red">Q</span>__: Extend `and()` and `or()` to deal with any number of input functions. Can 
     you do it with `Reduce()`? Can you keep them lazy (e.g., for `and()`, the 
     function returns once it sees the first `FALSE`)?
+    
+    __<span style="color:green">A</span>__: We use `and()` and `or()` as defined in the textbook. They are lazy, since they are build up on `&&` and `||`. Also their reduced versions stay lazy, as we will show at the end of the code
+    
+    ```{r}
+    and <- function(f1, f2) {
+      force(f1); force(f2)
+      function(...) {
+        f1(...) && f2(...)
+      }
+    }
+    
+    and_red <- function(fs){
+      Reduce(function(f, g) and(f, g), fs)
+    }
+    
+    or <- function(f1, f2) {
+      force(f1); force(f2)
+      function(...) {
+        f1(...) || f2(...)
+      }
+    }
+    
+    or_red <- function(fs){
+      Reduce(function(f, g) or(f, g), fs)
+    }
+    
+    # Errors before the first TRUE will be returned
+    tryCatch(
+      or_red(c(is.logical, is.logical, stop, is.character))("a"), 
+      error = function(e) e
+    )
+    
+    # Errors after the first TRUE won't be returned
+    or_red(c(is.logical, is.logical, is.character, stop))("a")
+    ```
 
 3.  __<span style="color:red">Q</span>__: Implement the `xor()` binary operator. Implement it using the existing 
     `xor()` function. Implement it as a combination of `and()` and `or()`. What 
