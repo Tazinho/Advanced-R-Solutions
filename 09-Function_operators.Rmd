@@ -534,6 +534,57 @@
     what you'll call the resulting function to avoid a clash with the existing
     `xor()` function, and how you might change the names of `and()`, `not()`, 
     and `or()` to keep them consistent.
+    
+    __<span style="color:orange">A</span>__: Both versions are implemented straight forward, as also the reduced versions. However, the parallel versions need a little bit more care:
+    
+    ```{r, error = TRUE}
+    xor_fb1 <- function(f1, f2){
+      force(f1); force(f2)
+      function(...){
+        xor(f1(...), f2(...)) 
+      }
+    }
+    
+    xor_fb2 <- function(f1, f2){
+      force(f1); force(f2)
+      function(...){
+        or(f1, f2)(...) && !(and(f1, f2)(...))
+      }
+    }
+    
+    # binary combination
+    xor_fb1(is.logical, is.character)("a")
+    xor_fb2(is.logical, is.character)("a")
+    
+    # parallel combination (results in an error)
+    xor_fb1(c(is.logical, is.character), c(is.logical, is.character))("a")
+    xor_fb2(c(is.logical, is.character), c(is.logical, is.character))("a")
+    
+    # reduced combination (results in an error)
+    xor_fb1(c(is.logical, is.character, is.logical, is.character))("a")
+    xor_fb2(c(is.logical, is.character, is.logical, is.character))("a")
+
+    ### Reduced version
+    xor_fb1_red <- function(fs){
+      Reduce(function(f, g) xor_fb1(f, g), fs)
+    }
+    
+    xor_fb2_red <- function(fs){
+      Reduce(function(f, g) xor_fb2(f, g), fs)
+    }
+
+    # should return TRUE
+    xor_fb1_red(c(is.logical, is.character, is.logical, is.character))("a")
+    xor_fb2_red(c(is.logical, is.character, is.logical, is.character))("a")
+
+    # should return FALSE
+    xor_fb1_red(c(is.logical, is.logical, is.character, is.logical))("a")
+    xor_fb2_red(c(is.logical, is.logical, is.character, is.logical))("a")
+
+    # should return FALSE
+    xor_fb1_red(c(is.logical, is.logical, is.character, is.character))("a")
+    xor_fb2_red(c(is.logical, is.logical, is.character, is.character))("a")
+    ```
 
 4.  __<span style="color:red">Q</span>__: Above, we implemented boolean algebra for functions that return a logical 
     function. Implement elementary algebra (`plus()`, `minus()`, `multiply()`, 
