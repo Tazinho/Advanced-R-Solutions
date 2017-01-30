@@ -108,8 +108,87 @@ __<span style="color:green">A</span>__: "ecdf" means empirical density function.
 
 1.  __<span style="color:red">Q</span>__: Implement a summary function that works like `base::summary()`, but uses a 
     list of functions. Modify the function so it returns a closure, making it 
-    possible to use it as a function factory.  
-    __<span style="color:green">A</span>__: 
+    possible to use it as a function factory.
+    
+    __<span style="color:green">A</span>__: We have two possibilities, we can imitate `base::summary()` completely or create a new summary based on our preferences. Both is not so easy, since it involves a lot of design decisions. We choose the second option, since we just like to create a first draft to apply what we have learned and get some feeling for the challenges that might appear.
+    
+    Some properties, that our new summary function `summary2` should have are nice default actions for specific data types and they should of course be changeable as this is also a part of the exercise. To limit our efforts, we focus on summaries for data frames. Everything else will be explained, via comments on the code:
+    
+    ```{r, error = TRUE}
+    # The arguments of our function factory are the lists of functions that are
+    # applied to data frame columns, depending on their type.
+    # We focus on the most important, so they can be set for characters, integer,
+    # double, logical, factor and date. By default they are set to NULL, but if you 
+    # supply a list with functions, this will override the real default, for the
+    # specific type, which is set inside the function factory.
+    summary2 <- function(character_functions = NULL, integer_functions = NULL,
+                         double_functions = NULL, logical_functions = NULL, 
+                         factor_functions = NULL, date_functions = NULL){
+      
+      # The following functional will later be six times applied on the data frame,
+      # one time for every column type in the scope of our function
+      apply_typefunction <- function(df, pred, functions){
+        lapply(df[vapply(df, pred, logical(1))],
+               function(x) unlist(lapply(functions, function(y) y(x))))
+      }
+      
+      # The following lists of functions are "somehow" similar to those, that are used
+      # by base::summary, so we define them once...
+      default_1 <- list(Table = table)
+      default_2 <- list(Min = min, `1st Qu.` = function(x) quantile(x)[[2]],
+                        Median = median, Mean = mean,
+                        `3rd Qu.` = function(x) quantile(x)[[4]], Max = max)
+      
+      # All those function list, that are not specified, when calling the 
+      # function factory, are now set to their default values
+      if(is.null(character_functions)) {character_functions = default_1}
+      if(is.null(integer_functions))   {integer_functions   = default_2}
+      if(is.null(double_functions))    {double_functions    = default_2}
+      if(is.null(logical_functions))   {logical_functions   = default_1}
+      if(is.null(factor_functions))    {factor_functions    = default_1}
+      if(is.null(date_functions))      {date_functions      = default_2}
+      
+      # Finally the returned function is created
+      function(df){
+        
+        # For every column type, the specific functions will be applied to the
+        # appropriate columns. 
+        characters <- apply_typefunction(df, is.character, character_functions)
+        integers   <- apply_typefunction(df, is.integer  , integer_functions  )
+        doubles    <- apply_typefunction(df, is.double   , double_functions   )
+        logicals   <- apply_typefunction(df, is.logical  , logical_functions  )
+
+        factors    <- apply_typefunction(df, is.factor   , factor_functions   )
+        dates      <- apply_typefunction(df, function(x) inherits(x, 'Date'), 
+                                         date_functions)
+        
+        # The results will be collected in a list and if empty lists appear, because
+        # of non occuring columntypes, these empty lists will be removed from the output.
+        # There are a lot of formatting steps, like ordering, naming and converting
+        # output, that we could do, but we think that the idea is more important for now
+        out <- list(characters, integers, doubles, logicals, 
+                factors, dates)
+        out[lengths(out) != 0]
+      }
+    }
+    
+    # Now we can apply the function factory
+    summary2_default <- summary2()
+    # And the resulting function
+    summary2_default(df = iris)
+    
+    # Unfortunately, we will fail if there are any NAs in integer columns
+    df_nas <- data.frame(integers_na = c(NA, 2:19))
+    summary2_default(df_nas)
+    
+    # But since, we can define new functions for integer columns, we can solve this
+    summary2_naversion <- summary2(integer_functions = list(
+      Mean_na = function(x) mean(x, na.rm = TRUE),
+      Median_na = function(x) median(x, na.rm = TRUE),
+      NAs = function(x) sum(is.na(x)))
+      )
+    summary2_naversion(df_nas)
+    ```
 
 2. __<span style="color:red">Q</span>__: Which of the following commands is equivalent to `with(x, f(z))`?
 

@@ -195,7 +195,7 @@ in `lapply()`'s third argument (`...`).
     replicate
     ```
     
-    Like `sapply()` `replicate()` eliminates a for loop. As explained for `MAP()` in the textbook, also every `replicate()` could have been written via `lapply()`. But using `replicate()` is more concise, and more clearly indicates what you're trying to do.
+    Like `sapply()` `replicate()` eliminates a for loop. As explained for `Map()` in the textbook, also every `replicate()` could have been written via `lapply()`. But using `replicate()` is more concise, and more clearly indicates what you're trying to do.
 
 5.  __<span style="color:red">Q</span>__: Implement a version of `lapply()` that supplies `FUN` with both the name 
     and the value of each component.
@@ -213,6 +213,25 @@ in `lapply()`'s third argument (`...`).
     variant that iterates in parallel over all of its inputs and stores its 
     outputs in a vector (or a matrix). What arguments should the function 
     take?
+    
+    __<span style="color:green">A</span>__ As we understand this exercise, it is about working with a list of lists, like in the following example:
+    
+    ```{r}
+    testlist <- list(iris, mtcars, cars)
+    lapply(testlist, function(x) vapply(x, mean, numeric(1)))
+    ```
+    
+    So we can get the same result with a more specialized function:
+    
+    ````{r}
+    lmapply <- function(X, FUN, FUN.VALUE, simplify = FALSE){
+      out <- Map(function(x) vapply(x, FUN, FUN.VALUE), X)
+      if(simplify == TRUE){return(simplify2array(out))}
+      out
+    }
+
+    lmapply(testlist, mean, numeric(1))
+    ```
 
 7.  __<span style="color:red">Q</span>__: Implement `mcsapply()`, a multicore version of `sapply()`. Can you
     implement `mcvapply()`, a parallel version of `vapply()`? Why or why not?
