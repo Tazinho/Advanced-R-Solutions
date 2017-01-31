@@ -5,7 +5,7 @@
 1.  __<span style="color:red">Q</span>__: What are faster alternatives to `lm`? Which are specifically designed 
     to work with larger datasets?
         
-    __<span style="color:green">A</span>__: Within the [Cran task view](https://cran.rstudio.com/web/views/) for [HighPerformanceComputing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and it's `speedlm()` function. We might not gain any performanceimprovements on small datasets:
+    __<span style="color:green">A</span>__: Within the [Cran task view](https://cran.rstudio.com/web/views/) for [HighPerformanceComputing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and it's `speedlm()` function. We might not gain any performance improvements on small datasets:
     
     ```{r}
     stopifnot(all.equal(
@@ -45,8 +45,7 @@
     
     When it comes to pure speed a quick google search on [r fastest lm](http://stackoverflow.com/questions/25416413/is-there-a-faster-lm-function) provides a stackoverflow thread where someone already solved this problem for us...
 
-1.  __<span style="color:red">Q</span>__: What package implements a version of `match()` that's faster for
-    repeated lookups? How much faster is it?
+1.  __<span style="color:red">Q</span>__: What package implements a version of `match()` that's faster for repeated lookups? How much faster is it?
     
     __<span style="color:green">A</span>__: Again google gives a good recommendation for the searchterm [r faster match](http://stackoverflow.com/questions/32934933/faster-in-operator):
     
@@ -65,8 +64,7 @@
     
     On my laptop `fastmatch::fmatch()` is around 25 times as fast as `match()`.
 
-1.  __<span style="color:red">Q</span>__: List four functions (not just those in base R) that convert a string into a
-    date time object. What are their strengths and weaknesses?
+1.  __<span style="color:red">Q</span>__: List four functions (not just those in base R) that convert a string into a date time object. What are their strengths and weaknesses?
     
     __<span style="color:orange">A</span>__: At least these functions will do the trick: `as.POSIXct()`, `as.POSIXlt()`, `strftime()`, `strptime()`, `lubridate::ymd_hms()`. There might also be some in the timeseries packages `xts` or `zoo` and in `anytime`. An update on this will follow...
 
@@ -104,8 +102,7 @@ provides us with enough information and guides our attention on solutions in the
 
 ## Do as little as possible
 
-1.  __<span style="color:red">Q</span>__: How do the results change if you compare `mean()` and `mean.default()`
-    on 10,000 observations, rather than on 100?
+1.  __<span style="color:red">Q</span>__: How do the results change if you compare `mean()` and `mean.default()` on 10,000 observations, rather than on 100?
     
     __<span style="color:green">A</span>__: We start with 100 observations as shown in the textbook:
     
@@ -139,8 +136,7 @@ provides us with enough information and guides our attention on solutions in the
     )
     ```
 
-1.  __<span style="color:red">Q</span>__: The following code provides an alternative implementation of `rowSums()`.
-    Why is it faster for this input?
+1.  __<span style="color:red">Q</span>__: The following code provides an alternative implementation of `rowSums()`. Why is it faster for this input?
 
     ```{r}
     rowSums2 <- function(df) {
@@ -175,8 +171,7 @@ provides us with enough information and guides our attention on solutions in the
     > .Internal performs a call to an internal code which is built in to the R
     interpreter.
     
-    The internal `rowSums()` is a complete different function than the "normal"
-    `rowSums()` function.
+    The internal `rowSums()` is a complete different function than the "normal" `rowSums()` function.
     
     Of course (since they have the same name) in this case these functions are heavily related with each other: If we look into the source code of `rowSums()`, we see that it is a wrapper around the internal `rowSums()`. Just some input checkings, conversions and the special cases (complex numbers) are added:
     
@@ -184,10 +179,7 @@ provides us with enough information and guides our attention on solutions in the
     rowSums
     ```
 
-1.  __<span style="color:red">Q</span>__: Make a faster version of `chisq.test()` that only computes the chi-square
-    test statistic when the input is two numeric vectors with no missing
-    values. You can try simplifying `chisq.test()` or by coding from the 
-    [mathematical definition](http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test).
+1.  __<span style="color:red">Q</span>__: Make a faster version of `chisq.test()` that only computes the chi-square test statistic when the input is two numeric vectors with no missing values. You can try simplifying `chisq.test()` or by coding from the [mathematical definition](http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test).
     
     __<span style="color:green">A</span>__: Since `chisq.test()` has a relatively long source code, we try a new implementation from scratch:
     
@@ -249,16 +241,12 @@ provides us with enough information and guides our attention on solutions in the
     )
     ```
 
-1.  __<span style="color:red">Q</span>__: Can you make a faster version of `table()` for the case of an input of
-    two integer vectors with no missing values? Can you use it to
+1.  __<span style="color:red">Q</span>__: Can you make a faster version of `table()` for the case of an input of two integer vectors with no missing values? Can you use it to
     speed up your chi-square test?
     
     __<span style="color:green">A</span>__: 
 
-1.  __<span style="color:red">Q</span>__: Imagine you want to compute the bootstrap distribution of a sample
-    correlation using `cor_df()` and the data in the example below. Given that you 
-    want to run this many times, how can you make this code faster? (Hint: the 
-    function has three components that you can speed up.)
+1.  __<span style="color:red">Q</span>__: Imagine you want to compute the bootstrap distribution of a sample correlation using `cor_df()` and the data in the example below. Given that you want to run this many times, how can you make this code faster? (Hint: the  function has three components that you can speed up.)
 
     ```{r, eval = FALSE}
     n <- 1e6
