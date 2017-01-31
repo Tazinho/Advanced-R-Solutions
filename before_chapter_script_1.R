@@ -3,3 +3,5 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   cache = TRUE
 )
+
+Sys.setenv(LANGUAGE = "en")
