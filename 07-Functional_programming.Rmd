@@ -4,7 +4,7 @@
 
 1. __<span style="color:red">Q</span>__: Given a function, like `"mean"`, `match.fun()` lets you find a function. 
    Given a function, can you find its name? Why doesn't that make sense in R?  
-   __<span style="color:green">A</span>__: If you know `body()`, `formals()` and `environment()` it can be possible to find the function. However, this won't be possible for primitive functions, since they return `NULL` for those three properties. Also annonymous functions won't be found, because they are not bound to a name. On the other hand it could be that different names in an environment contain binding to one (or more functions) with the same `body()`, `formals()` and `environment()` which means that the solution wouldn't be unique.
+   __<span style="color:green">A</span>__: If you know `body()`, `formals()` and `environment()` it can be possible to find the function. However, this won't be possible for primitive functions, since they return `NULL` for those three properties. Also annonymous functions won't be found, because they are not bound to a name. On the other hand it could be that different names in an environment contain binding to one (or more functions) with the same `body()`, `formals()` and `environment()` which means that the solution wouldn't be unique. More general: In R a (function) name has an object, but an object (i. e. a function) doesn't (always) have a name.
 
 2. __<span style="color:red">Q</span>__: Use `lapply()` and an anonymous function to find the coefficient of 
    variation (the standard deviation divided by the mean) for all columns in 
