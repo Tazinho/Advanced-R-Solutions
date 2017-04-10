@@ -1,0 +1,284 @@
+
+# Memory
+
+## Object size
+
+1.  __<span style="color:red">Q</span>__: Repeat the analysis above for numeric, logical, and complex vectors.
+    
+    __<span style="color:green">A</span>__: 
+    
+    **numeric:**
+    
+    
+    ```r
+    library(pryr)
+    sizes <- sapply(0:50, function(n) object_size(vector("numeric", n)))
+    plot(0:50, sizes, xlab = "Length", ylab = "Size (bytes)", 
+         type = "s")
+    ```
+    
+    <img src="15-Memory_files/figure-html/unnamed-chunk-2-1.png" width="672" />
+    
+    ```r
+    
+    plot(0:50, sizes - 40, xlab = "Length", 
+         ylab = "Bytes excluding overhead", type = "n")
+    abline(h = 0, col = "grey80")
+    abline(h = c(8, 16, 32, 48, 64, 128), col = "grey80")
+    abline(a = 0, b = 4, col = "grey90", lwd = 4)
+    lines(sizes - 40, type = "s")
+    ```
+    
+    <img src="15-Memory_files/figure-html/unnamed-chunk-2-2.png" width="672" />
+    
+    ```r
+    
+    x <- numeric(1e6)
+    object_size(x)
+    #> 8 MB
+    y <- list(x, x, x)
+    object_size(y)
+    #> 8 MB
+    ```
+    
+    **logical:**
+    
+    
+    ```r
+    sizes <- sapply(0:50, function(n) object_size(vector("logical", n)))
+    plot(0:50, sizes, xlab = "Length", ylab = "Size (bytes)", 
+         type = "s")
+    ```
+    
+    <img src="15-Memory_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+    
+    ```r
+    
+    plot(0:50, sizes - 40, xlab = "Length", 
+         ylab = "Bytes excluding overhead", type = "n")
+    abline(h = 0, col = "grey80")
+    abline(h = c(8, 16, 32, 48, 64, 128), col = "grey80")
+    abline(a = 0, b = 4, col = "grey90", lwd = 4)
+    lines(sizes - 40, type = "s")
+    ```
+    
+    <img src="15-Memory_files/figure-html/unnamed-chunk-3-2.png" width="672" />
+    
+    ```r
+    
+    x <- logical(1e6)
+    object_size(x)
+    #> 4 MB
+    y <- list(x, x, x)
+    object_size(y)
+    #> 4 MB
+    ```
+    
+    **complex:**
+    
+    
+    ```r
+    sizes <- sapply(0:50, function(n) object_size(vector("complex", n)))
+    plot(0:50, sizes, xlab = "Length", ylab = "Size (bytes)", 
+         type = "s")
+    ```
+    
+    <img src="15-Memory_files/figure-html/unnamed-chunk-4-1.png" width="672" />
+    
+    ```r
+    
+    plot(0:50, sizes - 40, xlab = "Length", 
+         ylab = "Bytes excluding overhead", type = "n")
+    abline(h = 0, col = "grey80")
+    abline(h = c(8, 16, 32, 48, 64, 128), col = "grey80")
+    abline(a = 0, b = 4, col = "grey90", lwd = 4)
+    lines(sizes - 40, type = "s")
+    ```
+    
+    <img src="15-Memory_files/figure-html/unnamed-chunk-4-2.png" width="672" />
+    
+    ```r
+    
+    x <- complex(1e6)
+    object_size(x)
+    #> 16 MB
+    y <- list(x, x, x)
+    object_size(y)
+    #> 16 MB
+    ```
+
+1.  __<span style="color:red">Q</span>__: If a data frame has one million rows, and three variables (two numeric, and 
+    one integer), how much space will it take up? Work it out from theory, 
+    then verify your work by creating a data frame and measuring its size.
+    
+    __<span style="color:green">A</span>__: From the textbook we now that 
+    
+    * an integer`s size is 40 byte plus 4 byte per allocated entry,
+    * a numerics`s size is 40 byte plus 8 byte per allocated entry.
+    
+    So we can calculate the size via:
+    
+    `object_size(df) = 1 * (40 + 4 * 1.000.000) + 2 * (40 + 8 * 1.000.000)
+                           = 20.000.120` bytes.
+    
+    And test this via:
+    
+    
+    ```r
+    df <- data.frame(int1 = integer(1000000),
+                     num1 = numeric(1000000),
+                     num2 = numeric(1000000))
+    as.integer(object_size(df))
+    #> [1] 20000896
+    ```
+    
+    Note that we observe a small difference, because we didn't include the costs for creating the `data.frame()` in our previous calculations.
+    
+1.  __<span style="color:red">Q</span>__: Compare the sizes of the elements in the following two lists. Each 
+    contains basically the same data, but one contains vectors of small 
+    strings while the other contains a single long string.
+
+    
+    ```r
+    vec <- lapply(0:50, function(i) c("ba", rep("na", i)))
+    str <- lapply(vec, paste0, collapse = "")
+    ```
+    
+    __<span style="color:green">A</span>__: 
+    
+    
+    ```r
+    vec <- lapply(0:50, function(i) c("ba", rep("na", i)))
+    str <- lapply(vec, paste0, collapse = "")
+    object_size(vec)
+    #> 13.4 kB
+    object_size(str)
+    #> 8.74 kB
+    object_size(vec, str)
+    #> 22.1 kB
+    ```
+
+1.  __<span style="color:red">Q</span>__: Which takes up more memory: a factor (`x`) or the equivalent character 
+    vector (`as.character(x)`)? Why?
+    
+    __<span style="color:green">A</span>__: To be exact: it depends on the length of unique elements in relation to the overall length of the vector.
+    
+    * In case of a long vector with only a few levels, the character takes approximately twice the memory of a factor:
+    
+    
+    ```r
+    object_size(rep(letters[1:20], 1000))
+    #> 161 kB
+    object_size(factor(rep(letters[1:20], 1000)))
+    #> 81.5 kB
+    ```
+    
+    That is, because a character allocates 8 bytes per entry (if the entry has less than 8 signs, otherwise roughly one byte per sign) and a factor equals an integer (allocates only 4 byte per entry) with a character vector attribute that contains the levels (unique elements) of the vector:
+    
+    
+    ```r
+    object_size(1:20000)
+    #> 80 kB
+    object_size(letters[1:20])
+    #> 1.16 kB
+    ```
+    
+    * Of course the factor will allocate more memory, if all entries are unique:
+    
+    
+    ```r
+    object_size(letters[1:20])
+    #> 1.16 kB
+    object_size(factor(letters[1:20]))
+    #> 1.65 kB
+    ```
+
+1.  __<span style="color:red">Q</span>__: Explain the difference in size between `1:5` and `list(1:5)`.
+
+    __<span style="color:green">A</span>__: An empty list needs 40 bytes. For each entry 8 bytes are added (note that for short lists memory is allocated in chunks, similar as explained for integers in the textbook). We can see this via:
+    
+    
+    ```r
+    object_size(vector("list",0))
+    #> 40 B
+    object_size(vector("list",1))
+    #> 48 B
+    ```
+    
+    Since `c(1:5)` needs 48 bytes, `list(1:5)` takes 96. So in general the cost for saving atomics within a list is 40 bytes for the list plus 8 bytes per atomic/listentry.
+
+## Memory profiling with lineprof
+
+1. __<span style="color:red">Q</span>__: When the input is a list, we can make a more efficient `as.data.frame()` 
+   by using special knowledge. A data frame is a list with class `data.frame` 
+   and `row.names` attribute. `row.names` is either a character vector or 
+   vector of sequential integers, stored in a special format created by 
+   `.set_row_names()`. This leads to an alternative `as.data.frame()`:
+
+    
+    ```r
+    to_df <- function(x) {
+      class(x) <- "data.frame"
+      attr(x, "row.names") <- .set_row_names(length(x[[1]]))
+      x
+    }
+    ```
+
+    What impact does this function have on `read_delim()`?  What are the 
+    downsides of this function?
+
+1.  __<span style="color:red">Q</span>__: Line profile the following function with `torture = TRUE`. What is 
+    surprising? Read the source code of `rm()` to figure out what's going on.
+
+    
+    ```r
+    f <- function(n = 1e5) {
+      x <- rep(1, n)
+      rm(x)
+    }
+    ```
+
+## Modification in place
+
+1.  __<span style="color:red">Q</span>__: The code below makes one duplication. Where does it occur and why? 
+    (Hint: look at `refs(y)`.)
+
+    
+    ```r
+    x <- data.frame(matrix(runif(100 * 1e4), ncol = 100))
+    medians <- vapply(x, median, numeric(1))
+    y <- as.list(x)
+    for(i in seq_along(medians)) {
+      y[[i]] <- y[[i]] - medians[i]
+    }
+    ```
+    
+    __<span style="color:green">A</span>__: It occurs in the first iteration of the for loop. `refs(y)` is 2 before the for loop, because `y` is created via `as.list()`, which is not a primitive and so sets the refs counter up to two. Therefore **R** makes a copy, `refs(y)` becomes 1 and the following modifications will occur in place. The following code illustrates this behaviour, when run in the **R**Gui. (Note that `refs()` will always return 2, when run in RStudio, as stated in the textbook. Note also, that you could detect this behaviour with the `tracemem()` function).
+    
+    
+    ```r
+    library(pryr)
+    rm(list = ls(all = TRUE))
+    
+    x <- data.frame(matrix(runif(100 * 1e4), ncol = 4))
+    medians <- vapply(x, median, numeric(1))
+    
+    y <- as.list(x)
+    is.primitive(as.list)
+    # [1] FALSE
+    
+    for(i in seq_along(medians)) {
+      print(c(address(y), refs(y)))
+      y[[i]] <- y[[i]] - medians[i]
+    }
+    # [1] "0x46c4a98" "2"
+    # [1] "0x11de30c8" "1" 
+    # [1] "0x11de30c8" "1" 
+    # [1] "0x11de30c8" "1" 
+    ```
+
+1.  __<span style="color:red">Q</span>__: The implementation of `as.data.frame()` in the previous section has one 
+    big downside. What is it and how could you avoid it?
+
+
+[long-vectors]: http://cran.r-project.org/doc/manuals/R-ints.html#Long-vectors
