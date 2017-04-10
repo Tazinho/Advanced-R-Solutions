@@ -7,26 +7,26 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Advanced R Solutions</title>
   <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
-  <meta name="description" content="Solutions to the exercises in Hadley Wickhams book Advanced R.">
-  <meta name="generator" content="bookdown 0.1.7 and GitBook 2.6.7">
+  <meta name="description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R.">
+  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
 
   <meta property="og:title" content="Advanced R Solutions" />
   <meta property="og:type" content="book" />
   
-  
-  <meta property="og:description" content="Solutions to the exercises in Hadley Wickhams book Advanced R." />
+  <meta property="og:image" content="images/advrs_cover.png" />
+  <meta property="og:description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R." />
   <meta name="github-repo" content="Tazinho/Advanced-R-Solutions" />
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Advanced R Solutions" />
   
-  <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickhams book Advanced R." />
-  
+  <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R." />
+  <meta name="twitter:image" content="images/advrs_cover.png" />
 
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
-<meta name="date" content="2016-09-08">
 
+<meta name="date" content="2017-02-01">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -49,6 +49,43 @@
 
 
 
+<!-- COLLAPSIBLE TEXT WITH OPEN ALL/CLOSE ALL LINK -->
+
+<!-- This goes into the HEAD of the html file -->
+
+<script language="JavaScript" type="text/javascript">
+<!-- Copyright 2007, Sandeep Gangadharan -->
+<!-- For more free scripts go to http://www.sivamdesign.com/scripts/ -->
+<!--
+if (document.getElementById) {
+ document.write('<style type="text/css">.texter {display:none; border-left:white 20px solid; color:#404040; font-family:verdana,arial,helvetica,sans-serif; font-size:9pt} @media print {.texter {display:block;}}</style>') }
+
+ var divNum = new Array("a1","a2","a3");  // at the left you should add a1, a2 etc. for each header you wish to include
+                                          // so if you want 4 headers you should add a1, a2, a3, a4 in the format shown
+                                          // enclosed in double quotes
+function openClose(theID) {
+ for(var i=0; i < divNum.length; i++) {
+  if (divNum[i] == theID) {
+   if (document.getElementById(divNum[i]).style.display == "block") { document.getElementById(divNum[i]).style.display = "none" }
+   else { document.getElementById(divNum[i]).style.display = "block" }
+  }
+  else { document.getElementById(divNum[i]).style.display = "none"; }
+ }
+}
+
+function openAll() {
+ for(var i=0; i < divNum.length; i++) {
+   document.getElementById(divNum[i]).style.display = "block";
+ }
+}
+
+function closeAll() {
+ for(var i=0; i < divNum.length; i++) {
+   document.getElementById(divNum[i]).style.display = "none";
+ }
+}
+// -->
+</script>
 
 
 <style type="text/css">
@@ -101,26 +138,101 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <ul class="summary">
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a></li>
-<li class="chapter" data-level="1" data-path="data-structures.html"><a href="data-structures.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
-<li class="chapter" data-level="2" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>2</b> Subsetting</a></li>
-<li class="chapter" data-level="3" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>3</b> Functions</a></li>
-<li class="chapter" data-level="4" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>4</b> OO field guide</a></li>
-<li class="chapter" data-level="5" data-path="environments.html"><a href="environments.html"><i class="fa fa-check"></i><b>5</b> Environments</a></li>
-<li class="chapter" data-level="6" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html"><i class="fa fa-check"></i><b>6</b> Exceptions and debugging</a></li>
-<li class="chapter" data-level="7" data-path="functional-programming.html"><a href="functional-programming.html"><i class="fa fa-check"></i><b>7</b> Functional programming</a></li>
-<li class="chapter" data-level="8" data-path="functionals.html"><a href="functionals.html"><i class="fa fa-check"></i><b>8</b> Functionals</a></li>
-<li class="chapter" data-level="9" data-path="function-operators.html"><a href="function-operators.html"><i class="fa fa-check"></i><b>9</b> Function operators</a></li>
-<li class="chapter" data-level="10" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html"><i class="fa fa-check"></i><b>10</b> Non standard evaluation</a></li>
-<li class="chapter" data-level="11" data-path="expressions.html"><a href="expressions.html"><i class="fa fa-check"></i><b>11</b> Expressions</a></li>
-<li class="chapter" data-level="12" data-path="domain-specific-languages.html"><a href="domain-specific-languages.html"><i class="fa fa-check"></i><b>12</b> Domain specific languages</a></li>
-<li class="chapter" data-level="13" data-path="performance.html"><a href="performance.html"><i class="fa fa-check"></i><b>13</b> Performance</a></li>
-<li class="chapter" data-level="14" data-path="profiling.html"><a href="profiling.html"><i class="fa fa-check"></i><b>14</b> Profiling</a></li>
+<li class="chapter" data-level="1" data-path="data-structures.html"><a href="data-structures.html"><i class="fa fa-check"></i><b>1</b> Data structures</a><ul>
+<li class="chapter" data-level="1.1" data-path="data-structures.html"><a href="data-structures.html#vectors"><i class="fa fa-check"></i><b>1.1</b> Vectors</a></li>
+<li class="chapter" data-level="1.2" data-path="data-structures.html"><a href="data-structures.html#attributes"><i class="fa fa-check"></i><b>1.2</b> Attributes</a></li>
+<li class="chapter" data-level="1.3" data-path="data-structures.html"><a href="data-structures.html#matrices-and-arrays"><i class="fa fa-check"></i><b>1.3</b> Matrices and arrays</a></li>
+<li class="chapter" data-level="1.4" data-path="data-structures.html"><a href="data-structures.html#data-frames"><i class="fa fa-check"></i><b>1.4</b> Data frames</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>2</b> Subsetting</a><ul>
+<li class="chapter" data-level="2.1" data-path="subsetting.html"><a href="subsetting.html#data-types"><i class="fa fa-check"></i><b>2.1</b> Data types</a></li>
+<li class="chapter" data-level="2.2" data-path="subsetting.html"><a href="subsetting.html#subsetting-operators"><i class="fa fa-check"></i><b>2.2</b> Subsetting operators</a></li>
+<li class="chapter" data-level="2.3" data-path="subsetting.html"><a href="subsetting.html#applications"><i class="fa fa-check"></i><b>2.3</b> Applications</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>3</b> Functions</a><ul>
+<li class="chapter" data-level="3.1" data-path="functions.html"><a href="functions.html#function-components"><i class="fa fa-check"></i><b>3.1</b> Function components</a></li>
+<li class="chapter" data-level="3.2" data-path="functions.html"><a href="functions.html#lexical-scoping"><i class="fa fa-check"></i><b>3.2</b> Lexical Scoping</a></li>
+<li class="chapter" data-level="3.3" data-path="functions.html"><a href="functions.html#function-arguments"><i class="fa fa-check"></i><b>3.3</b> Function arguments</a></li>
+<li class="chapter" data-level="3.4" data-path="functions.html"><a href="functions.html#special-calls"><i class="fa fa-check"></i><b>3.4</b> Special calls</a></li>
+<li class="chapter" data-level="3.5" data-path="functions.html"><a href="functions.html#return-values"><i class="fa fa-check"></i><b>3.5</b> Return Values</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>4</b> OO field guide</a><ul>
+<li class="chapter" data-level="4.1" data-path="oo-field-guide.html"><a href="oo-field-guide.html#s3"><i class="fa fa-check"></i><b>4.1</b> S3</a></li>
+<li class="chapter" data-level="4.2" data-path="oo-field-guide.html"><a href="oo-field-guide.html#s4"><i class="fa fa-check"></i><b>4.2</b> S4</a></li>
+<li class="chapter" data-level="4.3" data-path="oo-field-guide.html"><a href="oo-field-guide.html#rc"><i class="fa fa-check"></i><b>4.3</b> RC</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="environments.html"><a href="environments.html"><i class="fa fa-check"></i><b>5</b> Environments</a><ul>
+<li class="chapter" data-level="5.1" data-path="environments.html"><a href="environments.html#environment-basics"><i class="fa fa-check"></i><b>5.1</b> Environment basics</a></li>
+<li class="chapter" data-level="5.2" data-path="environments.html"><a href="environments.html#recursing-over-environments"><i class="fa fa-check"></i><b>5.2</b> Recursing over environments</a></li>
+<li class="chapter" data-level="5.3" data-path="environments.html"><a href="environments.html#function-environments"><i class="fa fa-check"></i><b>5.3</b> Function environments</a></li>
+<li class="chapter" data-level="5.4" data-path="environments.html"><a href="environments.html#binding-names-to-values"><i class="fa fa-check"></i><b>5.4</b> Binding names to values</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html"><i class="fa fa-check"></i><b>6</b> Exceptions and debugging</a><ul>
+<li class="chapter" data-level="6.1" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html#condition-handling"><i class="fa fa-check"></i><b>6.1</b> Condition handling</a></li>
+<li class="chapter" data-level="6.2" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html#defensive-programming"><i class="fa fa-check"></i><b>6.2</b> Defensive programming</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="functional-programming.html"><a href="functional-programming.html"><i class="fa fa-check"></i><b>7</b> Functional programming</a><ul>
+<li class="chapter" data-level="7.1" data-path="functional-programming.html"><a href="functional-programming.html#annonymous-functions"><i class="fa fa-check"></i><b>7.1</b> Annonymous functions</a></li>
+<li class="chapter" data-level="7.2" data-path="functional-programming.html"><a href="functional-programming.html#closures"><i class="fa fa-check"></i><b>7.2</b> Closures</a></li>
+<li class="chapter" data-level="7.3" data-path="functional-programming.html"><a href="functional-programming.html#lists-of-functions"><i class="fa fa-check"></i><b>7.3</b> Lists of functions</a></li>
+<li class="chapter" data-level="7.4" data-path="functional-programming.html"><a href="functional-programming.html#case-study-numerical-integration"><i class="fa fa-check"></i><b>7.4</b> Case study: numerical integration</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="functionals.html"><a href="functionals.html"><i class="fa fa-check"></i><b>8</b> Functionals</a><ul>
+<li class="chapter" data-level="8.1" data-path="functionals.html"><a href="functionals.html#my-first-functional-lapply"><i class="fa fa-check"></i><b>8.1</b> My first functional: lapply()</a></li>
+<li class="chapter" data-level="8.2" data-path="functionals.html"><a href="functionals.html#for-loops-functionals-friends-of-lapply"><i class="fa fa-check"></i><b>8.2</b> For loops functionals: friends of lapply():</a></li>
+<li class="chapter" data-level="8.3" data-path="functionals.html"><a href="functionals.html#manipulating-matrices-and-data-frames"><i class="fa fa-check"></i><b>8.3</b> Manipulating matrices and data frames</a></li>
+<li class="chapter" data-level="8.4" data-path="functionals.html"><a href="functionals.html#manipulating-lists"><i class="fa fa-check"></i><b>8.4</b> Manipulating lists</a></li>
+<li class="chapter" data-level="8.5" data-path="functionals.html"><a href="functionals.html#mathematical-functionals"><i class="fa fa-check"></i><b>8.5</b> Mathematical functionals</a></li>
+<li class="chapter" data-level="8.6" data-path="functionals.html"><a href="functionals.html#a-family-of-functions"><i class="fa fa-check"></i><b>8.6</b> A family of functions</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="function-operators.html"><a href="function-operators.html"><i class="fa fa-check"></i><b>9</b> Function operators</a><ul>
+<li class="chapter" data-level="9.1" data-path="function-operators.html"><a href="function-operators.html#behavioural-fos"><i class="fa fa-check"></i><b>9.1</b> Behavioural FOs</a></li>
+<li class="chapter" data-level="9.2" data-path="function-operators.html"><a href="function-operators.html#output-fos"><i class="fa fa-check"></i><b>9.2</b> Output FOs</a></li>
+<li class="chapter" data-level="9.3" data-path="function-operators.html"><a href="function-operators.html#input-fos"><i class="fa fa-check"></i><b>9.3</b> Input FOs</a></li>
+<li class="chapter" data-level="9.4" data-path="function-operators.html"><a href="function-operators.html#combining-fos"><i class="fa fa-check"></i><b>9.4</b> Combining FOs</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html"><i class="fa fa-check"></i><b>10</b> Non standard evaluation</a><ul>
+<li class="chapter" data-level="10.1" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#capturing-expressions"><i class="fa fa-check"></i><b>10.1</b> Capturing expressions</a></li>
+<li class="chapter" data-level="10.2" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#non-standard-evaluation-in-subset"><i class="fa fa-check"></i><b>10.2</b> Non standard evaluation in subset</a></li>
+<li class="chapter" data-level="10.3" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#scoping-issues"><i class="fa fa-check"></i><b>10.3</b> Scoping issues</a></li>
+<li class="chapter" data-level="10.4" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#calling-from-another-function"><i class="fa fa-check"></i><b>10.4</b> Calling from another function</a></li>
+<li class="chapter" data-level="10.5" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#substitute"><i class="fa fa-check"></i><b>10.5</b> Substitute</a></li>
+<li class="chapter" data-level="10.6" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#the-downsides-of-non-standard-evaluation"><i class="fa fa-check"></i><b>10.6</b> The downsides of non-standard evaluation</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="expressions.html"><a href="expressions.html"><i class="fa fa-check"></i><b>11</b> Expressions</a><ul>
+<li class="chapter" data-level="11.1" data-path="expressions.html"><a href="expressions.html#structure-of-expressions"><i class="fa fa-check"></i><b>11.1</b> Structure of expressions</a></li>
+<li class="chapter" data-level="11.2" data-path="expressions.html"><a href="expressions.html#names"><i class="fa fa-check"></i><b>11.2</b> Names</a></li>
+<li class="chapter" data-level="11.3" data-path="expressions.html"><a href="expressions.html#calls"><i class="fa fa-check"></i><b>11.3</b> Calls</a></li>
+<li class="chapter" data-level="11.4" data-path="expressions.html"><a href="expressions.html#capturing-the-current-call"><i class="fa fa-check"></i><b>11.4</b> Capturing the current call</a></li>
+<li class="chapter" data-level="11.5" data-path="expressions.html"><a href="expressions.html#pairlists"><i class="fa fa-check"></i><b>11.5</b> Pairlists</a></li>
+<li class="chapter" data-level="11.6" data-path="expressions.html"><a href="expressions.html#parsing-and-deparsing"><i class="fa fa-check"></i><b>11.6</b> Parsing and deparsing</a></li>
+<li class="chapter" data-level="11.7" data-path="expressions.html"><a href="expressions.html#walking-the-ast-with-recursive-functions"><i class="fa fa-check"></i><b>11.7</b> Walking the AST with recursive functions</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="domain-specific-languages.html"><a href="domain-specific-languages.html"><i class="fa fa-check"></i><b>12</b> Domain specific languages</a><ul>
+<li class="chapter" data-level="12.1" data-path="domain-specific-languages.html"><a href="domain-specific-languages.html#html"><i class="fa fa-check"></i><b>12.1</b> HTML</a></li>
+<li class="chapter" data-level="12.2" data-path="domain-specific-languages.html"><a href="domain-specific-languages.html#latex"><i class="fa fa-check"></i><b>12.2</b> LaTeX</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="performance.html"><a href="performance.html"><i class="fa fa-check"></i><b>13</b> Performance</a><ul>
+<li class="chapter" data-level="13.1" data-path="performance.html"><a href="performance.html#microbenchmarking"><i class="fa fa-check"></i><b>13.1</b> Microbenchmarking</a></li>
+<li class="chapter" data-level="13.2" data-path="performance.html"><a href="performance.html#language-performance"><i class="fa fa-check"></i><b>13.2</b> Language performance</a></li>
+<li class="chapter" data-level="13.3" data-path="performance.html"><a href="performance.html#implementations-performance"><i class="fa fa-check"></i><b>13.3</b> Implementations performance</a></li>
+</ul></li>
+<li class="chapter" data-level="14" data-path="profiling.html"><a href="profiling.html"><i class="fa fa-check"></i><b>14</b> Profiling</a><ul>
+<li class="chapter" data-level="14.1" data-path="profiling.html"><a href="profiling.html#has-somebody-already-solved-the-problem"><i class="fa fa-check"></i><b>14.1</b> Has somebody already solved the problem?</a></li>
+<li class="chapter" data-level="14.2" data-path="profiling.html"><a href="profiling.html#do-as-little-as-possible"><i class="fa fa-check"></i><b>14.2</b> Do as little as possible</a></li>
+<li class="chapter" data-level="14.3" data-path="profiling.html"><a href="profiling.html#vectorise"><i class="fa fa-check"></i><b>14.3</b> Vectorise</a></li>
+</ul></li>
 <li class="chapter" data-level="15" data-path="memory.html"><a href="memory.html"><i class="fa fa-check"></i><b>15</b> Memory</a><ul>
 <li class="chapter" data-level="15.1" data-path="memory.html"><a href="memory.html#object-size"><i class="fa fa-check"></i><b>15.1</b> Object size</a></li>
 <li class="chapter" data-level="15.2" data-path="memory.html"><a href="memory.html#memory-profiling-with-lineprof"><i class="fa fa-check"></i><b>15.2</b> Memory profiling with lineprof</a></li>
 <li class="chapter" data-level="15.3" data-path="memory.html"><a href="memory.html#modification-in-place"><i class="fa fa-check"></i><b>15.3</b> Modification in place</a></li>
 </ul></li>
-<li class="chapter" data-level="16" data-path="rcpp.html"><a href="rcpp.html"><i class="fa fa-check"></i><b>16</b> Rcpp</a></li>
+<li class="chapter" data-level="16" data-path="rcpp.html"><a href="rcpp.html"><i class="fa fa-check"></i><b>16</b> Rcpp</a><ul>
+<li class="chapter" data-level="16.1" data-path="rcpp.html"><a href="rcpp.html#getting-started-with-c"><i class="fa fa-check"></i><b>16.1</b> Getting started with C++</a></li>
+<li class="chapter" data-level="16.2" data-path="rcpp.html"><a href="rcpp.html#missing-values"><i class="fa fa-check"></i><b>16.2</b> Missing values</a></li>
+<li class="chapter" data-level="16.3" data-path="rcpp.html"><a href="rcpp.html#the-stl"><i class="fa fa-check"></i><b>16.3</b> The STL</a></li>
+</ul></li>
+<li class="chapter" data-level="17" data-path="testchapter.html"><a href="testchapter.html"><i class="fa fa-check"></i><b>17</b> Testchapter</a></li>
 </ul>
 
       </nav>
@@ -143,26 +255,137 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="object-size" class="section level2">
 <h2><span class="header-section-number">15.1</span> Object size</h2>
 <ol style="list-style-type: decimal">
-<li><p>Repeat the analysis above for numeric, logical, and complex vectors.</p></li>
-<li><p>If a data frame has one million rows, and three variables (two numeric, and one integer), how much space will it take up? Work it out from theory, then verify your work by creating a data frame and measuring its size.</p></li>
-<li><p>Compare the sizes of the elements in the following two lists. Each contains basically the same data, but one contains vectors of small strings while the other contains a single long string.</p>
+<li><p><strong><span style="color:red">Q</span></strong>: Repeat the analysis above for numeric, logical, and complex vectors.</p>
+<p><strong><span style="color:green">A</span></strong>:</p>
+<p><strong>numeric:</strong></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(pryr)
+sizes &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">0</span>:<span class="dv">50</span>, function(n) <span class="kw">object_size</span>(<span class="kw">vector</span>(<span class="st">&quot;numeric&quot;</span>, n)))
+<span class="kw">plot</span>(<span class="dv">0</span>:<span class="dv">50</span>, sizes, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;Size (bytes)&quot;</span>, 
+     <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>)</code></pre></div>
+<p><img src="15-Memory_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="kw">plot</span>(<span class="dv">0</span>:<span class="dv">50</span>, sizes -<span class="st"> </span><span class="dv">40</span>, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, 
+     <span class="dt">ylab =</span> <span class="st">&quot;Bytes excluding overhead&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;n&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">h =</span> <span class="dv">0</span>, <span class="dt">col =</span> <span class="st">&quot;grey80&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">h =</span> <span class="kw">c</span>(<span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">48</span>, <span class="dv">64</span>, <span class="dv">128</span>), <span class="dt">col =</span> <span class="st">&quot;grey80&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">a =</span> <span class="dv">0</span>, <span class="dt">b =</span> <span class="dv">4</span>, <span class="dt">col =</span> <span class="st">&quot;grey90&quot;</span>, <span class="dt">lwd =</span> <span class="dv">4</span>)
+<span class="kw">lines</span>(sizes -<span class="st"> </span><span class="dv">40</span>, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>)</code></pre></div>
+<p><img src="15-Memory_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+x &lt;-<span class="st"> </span><span class="kw">numeric</span>(<span class="fl">1e6</span>)
+<span class="kw">object_size</span>(x)
+<span class="co">#&gt; 8 MB</span>
+y &lt;-<span class="st"> </span><span class="kw">list</span>(x, x, x)
+<span class="kw">object_size</span>(y)
+<span class="co">#&gt; 8 MB</span></code></pre></div>
+<p><strong>logical:</strong></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sizes &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">0</span>:<span class="dv">50</span>, function(n) <span class="kw">object_size</span>(<span class="kw">vector</span>(<span class="st">&quot;logical&quot;</span>, n)))
+<span class="kw">plot</span>(<span class="dv">0</span>:<span class="dv">50</span>, sizes, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;Size (bytes)&quot;</span>, 
+     <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>)</code></pre></div>
+<p><img src="15-Memory_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="kw">plot</span>(<span class="dv">0</span>:<span class="dv">50</span>, sizes -<span class="st"> </span><span class="dv">40</span>, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, 
+     <span class="dt">ylab =</span> <span class="st">&quot;Bytes excluding overhead&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;n&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">h =</span> <span class="dv">0</span>, <span class="dt">col =</span> <span class="st">&quot;grey80&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">h =</span> <span class="kw">c</span>(<span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">48</span>, <span class="dv">64</span>, <span class="dv">128</span>), <span class="dt">col =</span> <span class="st">&quot;grey80&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">a =</span> <span class="dv">0</span>, <span class="dt">b =</span> <span class="dv">4</span>, <span class="dt">col =</span> <span class="st">&quot;grey90&quot;</span>, <span class="dt">lwd =</span> <span class="dv">4</span>)
+<span class="kw">lines</span>(sizes -<span class="st"> </span><span class="dv">40</span>, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>)</code></pre></div>
+<p><img src="15-Memory_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+x &lt;-<span class="st"> </span><span class="kw">logical</span>(<span class="fl">1e6</span>)
+<span class="kw">object_size</span>(x)
+<span class="co">#&gt; 4 MB</span>
+y &lt;-<span class="st"> </span><span class="kw">list</span>(x, x, x)
+<span class="kw">object_size</span>(y)
+<span class="co">#&gt; 4 MB</span></code></pre></div>
+<p><strong>complex:</strong></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sizes &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">0</span>:<span class="dv">50</span>, function(n) <span class="kw">object_size</span>(<span class="kw">vector</span>(<span class="st">&quot;complex&quot;</span>, n)))
+<span class="kw">plot</span>(<span class="dv">0</span>:<span class="dv">50</span>, sizes, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;Size (bytes)&quot;</span>, 
+     <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>)</code></pre></div>
+<p><img src="15-Memory_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="kw">plot</span>(<span class="dv">0</span>:<span class="dv">50</span>, sizes -<span class="st"> </span><span class="dv">40</span>, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, 
+     <span class="dt">ylab =</span> <span class="st">&quot;Bytes excluding overhead&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;n&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">h =</span> <span class="dv">0</span>, <span class="dt">col =</span> <span class="st">&quot;grey80&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">h =</span> <span class="kw">c</span>(<span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">48</span>, <span class="dv">64</span>, <span class="dv">128</span>), <span class="dt">col =</span> <span class="st">&quot;grey80&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">a =</span> <span class="dv">0</span>, <span class="dt">b =</span> <span class="dv">4</span>, <span class="dt">col =</span> <span class="st">&quot;grey90&quot;</span>, <span class="dt">lwd =</span> <span class="dv">4</span>)
+<span class="kw">lines</span>(sizes -<span class="st"> </span><span class="dv">40</span>, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>)</code></pre></div>
+<p><img src="15-Memory_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+x &lt;-<span class="st"> </span><span class="kw">complex</span>(<span class="fl">1e6</span>)
+<span class="kw">object_size</span>(x)
+<span class="co">#&gt; 16 MB</span>
+y &lt;-<span class="st"> </span><span class="kw">list</span>(x, x, x)
+<span class="kw">object_size</span>(y)
+<span class="co">#&gt; 16 MB</span></code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: If a data frame has one million rows, and three variables (two numeric, and one integer), how much space will it take up? Work it out from theory, then verify your work by creating a data frame and measuring its size.</p>
+<p><strong><span style="color:green">A</span></strong>: From the textbook we now that</p>
+<ul>
+<li>an integer`s size is 40 byte plus 4 byte per allocated entry,</li>
+<li>a numerics`s size is 40 byte plus 8 byte per allocated entry.</li>
+</ul>
+<p>So we can calculate the size via:</p>
+<p><code>object_size(df) = 1 * (40 + 4 * 1.000.000) + 2 * (40 + 8 * 1.000.000)                        = 20.000.120</code> bytes.</p>
+<p>And test this via:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">int1 =</span> <span class="kw">integer</span>(<span class="dv">1000000</span>),
+                 <span class="dt">num1 =</span> <span class="kw">numeric</span>(<span class="dv">1000000</span>),
+                 <span class="dt">num2 =</span> <span class="kw">numeric</span>(<span class="dv">1000000</span>))
+<span class="kw">as.integer</span>(<span class="kw">object_size</span>(df))
+<span class="co">#&gt; [1] 20000896</span></code></pre></div>
+<p>Note that we observe a small difference, because we didn’t include the costs for creating the <code>data.frame()</code> in our previous calculations.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Compare the sizes of the elements in the following two lists. Each contains basically the same data, but one contains vectors of small strings while the other contains a single long string.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vec &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">0</span>:<span class="dv">50</span>, function(i) <span class="kw">c</span>(<span class="st">&quot;ba&quot;</span>, <span class="kw">rep</span>(<span class="st">&quot;na&quot;</span>, i)))
-str &lt;-<span class="st"> </span><span class="kw">lapply</span>(vec, paste0, <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span>)</code></pre></div></li>
-<li><p>Which takes up more memory: a factor (<code>x</code>) or the equivalent character vector (<code>as.character(x)</code>)? Why?</p></li>
-<li><p>Explain the difference in size between <code>1:5</code> and <code>list(1:5)</code>.</p></li>
+str &lt;-<span class="st"> </span><span class="kw">lapply</span>(vec, paste0, <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span>)</code></pre></div>
+<p><strong><span style="color:green">A</span></strong>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vec &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">0</span>:<span class="dv">50</span>, function(i) <span class="kw">c</span>(<span class="st">&quot;ba&quot;</span>, <span class="kw">rep</span>(<span class="st">&quot;na&quot;</span>, i)))
+str &lt;-<span class="st"> </span><span class="kw">lapply</span>(vec, paste0, <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span>)
+<span class="kw">object_size</span>(vec)
+<span class="co">#&gt; 13.4 kB</span>
+<span class="kw">object_size</span>(str)
+<span class="co">#&gt; 8.74 kB</span>
+<span class="kw">object_size</span>(vec, str)
+<span class="co">#&gt; 22.1 kB</span></code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Which takes up more memory: a factor (<code>x</code>) or the equivalent character vector (<code>as.character(x)</code>)? Why?</p>
+<p><strong><span style="color:green">A</span></strong>: To be exact: it depends on the length of unique elements in relation to the overall length of the vector.</p>
+<ul>
+<li>In case of a long vector with only a few levels, the character takes approximately twice the memory of a factor:</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">object_size</span>(<span class="kw">rep</span>(letters[<span class="dv">1</span>:<span class="dv">20</span>], <span class="dv">1000</span>))
+<span class="co">#&gt; 161 kB</span>
+<span class="kw">object_size</span>(<span class="kw">factor</span>(<span class="kw">rep</span>(letters[<span class="dv">1</span>:<span class="dv">20</span>], <span class="dv">1000</span>)))
+<span class="co">#&gt; 81.5 kB</span></code></pre></div>
+<p>That is, because a character allocates 8 bytes per entry (if the entry has less than 8 signs, otherwise roughly one byte per sign) and a factor equals an integer (allocates only 4 byte per entry) with a character vector attribute that contains the levels (unique elements) of the vector:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">object_size</span>(<span class="dv">1</span>:<span class="dv">20000</span>)
+<span class="co">#&gt; 80 kB</span>
+<span class="kw">object_size</span>(letters[<span class="dv">1</span>:<span class="dv">20</span>])
+<span class="co">#&gt; 1.16 kB</span></code></pre></div>
+<ul>
+<li>Of course the factor will allocate more memory, if all entries are unique:</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">object_size</span>(letters[<span class="dv">1</span>:<span class="dv">20</span>])
+<span class="co">#&gt; 1.16 kB</span>
+<span class="kw">object_size</span>(<span class="kw">factor</span>(letters[<span class="dv">1</span>:<span class="dv">20</span>]))
+<span class="co">#&gt; 1.65 kB</span></code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Explain the difference in size between <code>1:5</code> and <code>list(1:5)</code>.</p>
+<p><strong><span style="color:green">A</span></strong>: An empty list needs 40 bytes. For each entry 8 bytes are added (note that for short lists memory is allocated in chunks, similar as explained for integers in the textbook). We can see this via:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">object_size</span>(<span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>,<span class="dv">0</span>))
+<span class="co">#&gt; 40 B</span>
+<span class="kw">object_size</span>(<span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>,<span class="dv">1</span>))
+<span class="co">#&gt; 48 B</span></code></pre></div>
+<p>Since <code>c(1:5)</code> needs 48 bytes, <code>list(1:5)</code> takes 96. So in general the cost for saving atomics within a list is 40 bytes for the list plus 8 bytes per atomic/listentry.</p></li>
 </ol>
 </div>
 <div id="memory-profiling-with-lineprof" class="section level2">
 <h2><span class="header-section-number">15.2</span> Memory profiling with lineprof</h2>
 <ol style="list-style-type: decimal">
-<li><p>When the input is a list, we can make a more efficient <code>as.data.frame()</code> by using special knowledge. A data frame is a list with class <code>data.frame</code> and <code>row.names</code> attribute. <code>row.names</code> is either a character vector or vector of sequential integers, stored in a special format created by <code>.set_row_names()</code>. This leads to an alternative <code>as.data.frame()</code>:</p>
+<li><p><strong><span style="color:red">Q</span></strong>: When the input is a list, we can make a more efficient <code>as.data.frame()</code> by using special knowledge. A data frame is a list with class <code>data.frame</code> and <code>row.names</code> attribute. <code>row.names</code> is either a character vector or vector of sequential integers, stored in a special format created by <code>.set_row_names()</code>. This leads to an alternative <code>as.data.frame()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">to_df &lt;-<span class="st"> </span>function(x) {
   <span class="kw">class</span>(x) &lt;-<span class="st"> &quot;data.frame&quot;</span>
   <span class="kw">attr</span>(x, <span class="st">&quot;row.names&quot;</span>) &lt;-<span class="st"> </span><span class="kw">.set_row_names</span>(<span class="kw">length</span>(x[[<span class="dv">1</span>]]))
   x
 }</code></pre></div>
 <p>What impact does this function have on <code>read_delim()</code>? What are the downsides of this function?</p></li>
-<li><p>Line profile the following function with <code>torture = TRUE</code>. What is surprising? Read the source code of <code>rm()</code> to figure out what’s going on.</p>
+<li><p><strong><span style="color:red">Q</span></strong>: Line profile the following function with <code>torture = TRUE</code>. What is surprising? Read the source code of <code>rm()</code> to figure out what’s going on.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span>function(<span class="dt">n =</span> <span class="fl">1e5</span>) {
   x &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span>, n)
   <span class="kw">rm</span>(x)
@@ -172,14 +395,33 @@ str &lt;-<span class="st"> </span><span class="kw">lapply</span>(vec, paste0, <s
 <div id="modification-in-place" class="section level2">
 <h2><span class="header-section-number">15.3</span> Modification in place</h2>
 <ol style="list-style-type: decimal">
-<li><p>The code below makes one duplication. Where does it occur and why? (Hint: look at <code>refs(y)</code>.)</p>
+<li><p><strong><span style="color:red">Q</span></strong>: The code below makes one duplication. Where does it occur and why? (Hint: look at <code>refs(y)</code>.)</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="kw">runif</span>(<span class="dv">100</span> *<span class="st"> </span><span class="fl">1e4</span>), <span class="dt">ncol =</span> <span class="dv">100</span>))
 medians &lt;-<span class="st"> </span><span class="kw">vapply</span>(x, median, <span class="kw">numeric</span>(<span class="dv">1</span>))
 y &lt;-<span class="st"> </span><span class="kw">as.list</span>(x)
 for(i in <span class="kw">seq_along</span>(medians)) {
   y[[i]] &lt;-<span class="st"> </span>y[[i]] -<span class="st"> </span>medians[i]
-}</code></pre></div></li>
-<li><p>The implementation of <code>as.data.frame()</code> in the previous section has one big downside. What is it and how could you avoid it?</p></li>
+}</code></pre></div>
+<p><strong><span style="color:green">A</span></strong>: It occurs in the first iteration of the for loop. <code>refs(y)</code> is 2 before the for loop, because <code>y</code> is created via <code>as.list()</code>, which is not a primitive and so sets the refs counter up to two. Therefore <strong>R</strong> makes a copy, <code>refs(y)</code> becomes 1 and the following modifications will occur in place. The following code illustrates this behaviour, when run in the <strong>R</strong>Gui. (Note that <code>refs()</code> will always return 2, when run in RStudio, as stated in the textbook. Note also, that you could detect this behaviour with the <code>tracemem()</code> function).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(pryr)
+<span class="kw">rm</span>(<span class="dt">list =</span> <span class="kw">ls</span>(<span class="dt">all =</span> <span class="ot">TRUE</span>))
+
+x &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="kw">runif</span>(<span class="dv">100</span> *<span class="st"> </span><span class="fl">1e4</span>), <span class="dt">ncol =</span> <span class="dv">4</span>))
+medians &lt;-<span class="st"> </span><span class="kw">vapply</span>(x, median, <span class="kw">numeric</span>(<span class="dv">1</span>))
+
+y &lt;-<span class="st"> </span><span class="kw">as.list</span>(x)
+<span class="kw">is.primitive</span>(as.list)
+<span class="co"># [1] FALSE</span>
+
+for(i in <span class="kw">seq_along</span>(medians)) {
+  <span class="kw">print</span>(<span class="kw">c</span>(<span class="kw">address</span>(y), <span class="kw">refs</span>(y)))
+  y[[i]] &lt;-<span class="st"> </span>y[[i]] -<span class="st"> </span>medians[i]
+}
+<span class="co"># [1] &quot;0x46c4a98&quot; &quot;2&quot;</span>
+<span class="co"># [1] &quot;0x11de30c8&quot; &quot;1&quot; </span>
+<span class="co"># [1] &quot;0x11de30c8&quot; &quot;1&quot; </span>
+<span class="co"># [1] &quot;0x11de30c8&quot; &quot;1&quot; </span></code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: The implementation of <code>as.data.frame()</code> in the previous section has one big downside. What is it and how could you avoid it?</p></li>
 </ol>
 
 </div>
@@ -203,6 +445,7 @@ for(i in <span class="kw">seq_along</span>(medians)) {
 require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
+"github": false,
 "facebook": true,
 "twitter": true,
 "google": false,
@@ -217,17 +460,29 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": null,
-"text": null
+"link": "https://github.com/Tazinho/Advanced-R-Solutions/edit/master/15-Memory.Rmd",
+"text": "Edit"
 },
 "download": null,
 "toc": {
-"collapse": "subsection"
+"collapse": "section",
+"scroll_highlight": true
 }
 });
 });
 </script>
 
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    if (location.protocol !== "file:" && /^https?:/.test(script.src))
+      script.src  = script.src.replace(/^https?:/, '');
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 </body>
 
 </html>
