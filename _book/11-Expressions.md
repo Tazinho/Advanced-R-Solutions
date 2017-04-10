@@ -1,0 +1,643 @@
+
+
+
+# Expressions
+
+## Structure of expressions
+
+1.  __<span style="color:red">Q</span>__: There's no existing base function that checks if an element is
+    a valid component of an expression (i.e., it's a constant, name,
+    call, or pairlist). Implement one by guessing the names of the "is"
+    functions for calls, names, and pairlists.
+    
+    __<span style="color:green">A</span>__: 
+    
+    
+    ```r
+    is.valid <- function(x){
+      out <- FALSE
+      if(is.atomic(x) & length(x) == 1){out <- TRUE}
+      if(is.call(x)){out <- TRUE}
+      if(is.name(x)){out <- TRUE}
+      if(is.pairlist(x)){out <- TRUE}
+      out
+    }
+    ```
+
+2.  __<span style="color:red">Q</span>__: `pryr::ast()` uses non-standard evaluation. What's its escape hatch to
+    standard evaluation?
+    
+    __<span style="color:green">A</span>__: 
+
+3.  __<span style="color:red">Q</span>__: What does the call tree of an if statement with multiple else conditions
+    look like?
+    
+    __<span style="color:green">A</span>__: It depends a little bit how it is written.
+    Here the infix version:
+    
+    
+    ```r
+    pryr::ast(`if`(FALSE, "first",
+                   `if`(TRUE, "second",
+                        `if`(TRUE, "third", "fourth"))))
+    #> \- ()
+    #>   \- `if
+    #>   \-  FALSE
+    #>   \-  "first"
+    #>   \- ()
+    #>     \- `if
+    #>     \-  TRUE
+    #>     \-  "second"
+    #>     \- ()
+    #>       \- `if
+    #>       \-  TRUE
+    #>       \-  "third"
+    #>       \-  "fourth"
+    ```
+    
+    And here the "normal" version:
+    
+    
+    ```r
+    pryr::ast(if (FALSE) {
+      "first"
+      } else (
+        if (TRUE) {
+          "second"
+          } else (
+            if (TRUE) {
+              "third"
+              } else (
+                "fourth"
+                )
+            )
+        ))
+    #> \- ()
+    #>   \- `if
+    #>   \-  FALSE
+    #>   \- ()
+    #>     \- `{
+    #>     \-  "first"
+    #>   \- ()
+    #>     \- `(
+    #>     \- ()
+    #>       \- `if
+    #>       \-  TRUE
+    #>       \- ()
+    #>         \- `{
+    #>         \-  "second"
+    #>       \- ()
+    #>         \- `(
+    #>         \- ()
+    #>           \- `if
+    #>           \-  TRUE
+    #>           \- ()
+    #>             \- `{
+    #>             \-  "third"
+    #>           \- ()
+    #>             \- `(
+    #>             \-  "fourth"
+    ```
+
+4.  __<span style="color:red">Q</span>__: Compare `ast(x + y %+% z)` to `ast(x ^ y %+% z)`. What do they
+    tell you about the precedence of custom infix functions?
+    
+    __<span style="color:green">A</span>__: 
+    
+    
+    ```r
+    # y %+% z will be calculated first and the result will be added to x
+    pryr::ast(x + y %+% z)
+    #> \- ()
+    #>   \- `+
+    #>   \- `x
+    #>   \- ()
+    #>     \- `%+%
+    #>     \- `y
+    #>     \- `z
+    
+    # x^y will be calculated first, and the result will be used as first argument of `%+%()`
+    pryr::ast(x ^ y %+% z)
+    #> \- ()
+    #>   \- `%+%
+    #>   \- ()
+    #>     \- `^
+    #>     \- `x
+    #>     \- `y
+    #>   \- `z
+    ```
+
+5.  __<span style="color:red">Q</span>__: Why can't an expression contain an atomic vector of length greater than one?
+    Which one of the six types of atomic vector can't appear in an expression?
+    Why?
+    
+    __<span style="color:green">A</span>__: 
+
+## Names
+
+1.  __<span style="color:red">Q</span>__: You can use `formals()` to both get and set the arguments of a function.
+    Use `formals()` to modify the following function so that the default value
+    of `x` is missing and `y` is 10.
+
+    
+    ```r
+    g <- function(x = 20, y) {
+      x + y
+    }
+    ```
+    
+    __<span style="color:green">A</span>__: 
+    
+    
+    ```r
+    formals(g) <- alist(x = , y = 10)
+    ```
+
+2.  __<span style="color:red">Q</span>__: Write an equivalent to `get()` using `as.name()` and `eval()`. Write an
+    equivalent to `assign()` using `as.name()`, `substitute()`, and `eval()`.
+    (Don't worry about the multiple ways of choosing an environment; assume
+    that the user supplies it explicitly.)
+    
+    __<span style="color:green">A</span>__: 
+    
+    
+    ```r
+    get3 <- function(x, env = parent.frame()){
+      eval(as.name(x), env)
+    }
+    
+    assign3 <- function(x, value, env = parent.frame()){
+      eval(substitute(x <- as.name(x)), env)
+      eval(substitute(x <- value), env)
+    }
+    ```
+    
+## Calls
+
+1.  __<span style="color:red">Q</span>__: The following two calls look the same, but are actually different:
+
+    
+    ```r
+    (a <- call("mean", 1:10))
+    #> mean(1:10)
+    (b <- call("mean", quote(1:10)))
+    #> mean(1:10)
+    identical(a, b)
+    #> [1] FALSE
+    ```
+
+    What's the difference? Which one should you prefer?
+
+    __<span style="color:orange">A</span>__: `call` evalulates its `...` arguments. So in the first call `1:10` will be evaluated to an integer (1, 2, 3, ..., 10) and in the second call `quote()` compensates the effect of the evaluation, so that `b`'s second element will be the expression `1:10` (which is again a call):
+    
+    
+    ```r
+    as.list(a)
+    #> [[1]]
+    #> mean
+    #> 
+    #> [[2]]
+    #>  [1]  1  2  3  4  5  6  7  8  9 10
+    as.list(b)
+    #> [[1]]
+    #> mean
+    #> 
+    #> [[2]]
+    #> 1:10
+    ```
+    
+    We can create an example, where we can see the consequences directly:
+    
+    
+    ```r
+    # h <- call("mean", z)
+    ##> Error: object 'z' not found
+    
+    h <- call("mean", quote(z))
+    # eval(h)
+    ##> Error in mean(z) : object 'z' not found
+    z <- 1:10
+    eval(h)
+    #> [1] 5.5
+    ```
+    
+    From my intuition I would prefer the second version, since it behaves more like lazy evaluation, but I am not sure if this is the correct answer as indended by the exercise.
+    
+2.  __<span style="color:red">Q</span>__: Implement a pure R version of `do.call()`.
+    
+    __<span style="color:green">A</span>__: 
+    
+    
+    ```r
+    do.call2 <- function(what, args, quote = FALSE, env = parent.frame()){
+      if(!is.list(args))
+        stop("second argument must be a list")
+      if (quote) 
+        args <- lapply(args, enquote)
+      eval(as.call(c(what, args)), env)
+    }
+    ```
+
+3.  __<span style="color:red">Q</span>__: Concatenating a call and an expression with `c()` creates a list. Implement
+    `concat()` so that the following code works to combine a call and
+    an additional argument.
+
+    
+    ```r
+    concat(quote(f), a = 1, b = quote(mean(a)))
+    #> f(a = 1, b = mean(a))
+    ```
+    
+    __<span style="color:green">A</span>__: 
+    
+    
+    ```r
+    concat <- function(f, ...){
+      as.call(c(f, list(...)))
+    }
+    concat(quote(f), a = 1, b = quote(mean(a)))
+    #> f(a = 1, b = mean(a))
+    ```
+
+4.  __<span style="color:red">Q</span>__: Since `list()`s don't belong in expressions, we could create a more
+    convenient call constructor that automatically combines lists into the
+    arguments. Implement `make_call()` so that the following code works.
+
+    
+    ```r
+    make_call(quote(mean), list(quote(x), na.rm = TRUE))
+    #> mean(x, na.rm = TRUE)
+    make_call(quote(mean), quote(x), na.rm = TRUE)
+    #> mean(x, na.rm = TRUE)
+    ```
+    
+    __<span style="color:green">A</span>__: 
+    
+    
+    ```r
+    make_call <- function(x, ...){
+      as.call(c(x, ...))
+    }
+    
+    make_call(quote(mean), list(quote(x), na.rm = TRUE))
+    #> mean(x, na.rm = TRUE)
+    make_call(quote(mean), quote(x), na.rm = TRUE)
+    #> mean(x, na.rm = TRUE)
+    ```
+
+5.  __<span style="color:red">Q</span>__: How does `mode<-` work? How does it use `call()`?
+    
+    __<span style="color:green">A</span>__: We can explain it best, when we comment the source code:
+    
+    
+    ```r
+    function (x) 
+      {
+      # when x is an expression, mode will(x) return "expression"
+      if (is.expression(x)) 
+        return("expression")
+      # when x is a call (or language, which is exactly the same), the first element 
+      # of the call will be coerced to character. 
+      # If the call is an autoprinting (like in quote((1))), mode will return "(".
+      # For any other call, mode will return "call" 
+      if (is.call(x)) 
+        return(switch(deparse(x[[1L]])[1L], `(` = "(", "call"))
+      # if x is a name (or a symbol, which is exactly the same), then mode will return "name"
+      if (is.name(x)) 
+        "name"
+      # otherwise, mode will return dependent on typeof(x). If typeof(x) is double or integer, 
+      # mode will return "numeric". If typeof(x) is closure, builtin or special, mode(x) will
+      # return "function". And in all other cases, mode will just return typeof(x)
+      else switch(tx <- typeof(x), double = , integer = "numeric", 
+                  closure = , builtin = , special = "function", tx)
+      }
+    <bytecode: 0x000000000c4e66e0>
+      <environment: namespace:base>
+    ```
+      
+    As commented above, `mode()` uses `is.call()` to distinguish autoprint- and "normal" calls
+with the help of a separate `switch()`.
+
+6.  __<span style="color:red">Q</span>__: Read the source for `pryr::standardise_call()`. How does it work?
+    Why is `is.primitive()` needed?
+    
+    __<span style="color:green">A</span>__: 
+
+7.  __<span style="color:red">Q</span>__: `standardise_call()` doesn't work so well for the following calls.
+    Why?
+
+    
+    ```r
+    library(pryr)
+    standardise_call(quote(mean(1:10, na.rm = TRUE)))
+    #> mean(x = 1:10, na.rm = TRUE)
+    standardise_call(quote(mean(n = T, 1:10)))
+    #> mean(x = 1:10, n = T)
+    standardise_call(quote(mean(x = 1:10, , TRUE)))
+    #> mean(x = 1:10, , TRUE)
+    ```
+    
+    __<span style="color:green">A</span>__: 
+
+8.  __<span style="color:red">Q</span>__: Read the documentation for `pryr::modify_call()`. How do you think
+    it works? Read the source code.
+    
+    __<span style="color:green">A</span>__: Again, we explain by commenting the source
+    
+    
+    ```r
+    function (call, new_args) {
+      # check if call is a call and new_args is a list
+      stopifnot(is.call(call), is.list(new_args))
+      # standardise the call
+      call <- standardise_call(call)
+      # check if the supplied new_args list has any unnamed elements.
+      # if so, an error occurs.
+      nms <- names(new_args) %||% rep("", length(new_args))
+      if (any(nms == "")) {
+        stop("All new arguments must be named", call. = FALSE)
+        }
+      # every name element of the call, for which a new argument was supplied by the user,
+      # becomes overwritten
+      for (nm in nms) {
+        call[[nm]] <- new_args[[nm]]
+        }
+      # finally the modified call is returned
+      call
+    }
+    <environment: namespace:pryr>
+    ```
+
+9.  __<span style="color:red">Q</span>__: Use `ast()` and experimentation to figure out the three arguments in an
+    `if()` call. Which components are required? What are the arguments to
+    the `for()` and `while()` calls?
+    
+    __<span style="color:green">A</span>__: 
+    
+    **if:**
+    
+    
+    ```r
+    ## All these return an error
+    # pryr::ast(if)
+    # pryr::ast(if())
+    # pryr::ast(if{})
+    # pryr::ast(if(){})
+    # pryr::ast(if(TRUE))
+    
+    ## This is the minimum required
+    pryr::ast(if(TRUE){1})
+    #> \- ()
+    #>   \- `if
+    #>   \-  TRUE
+    #>   \- ()
+    #>     \- `{
+    #>     \-  1
+    
+    ## One can also supply an alternative expression
+    pryr::ast(if(TRUE){}
+              else {3})
+    #> \- ()
+    #>   \- `if
+    #>   \-  TRUE
+    #>   \- ()
+    #>     \- `{
+    #>   \- ()
+    #>     \- `{
+    #>     \-  3
+    
+    ## However, one has to supply the compound expression (the first one),
+    ## otherwise we get an error
+    # pryr::ast(if(TRUE)
+    #           else {3})
+    
+    # So this is how if basically works
+    pryr::ast(if(cond)expr)
+    #> \- ()
+    #>   \- `if
+    #>   \- `cond
+    #>   \- `expr
+    
+    # and here within a call
+    eval(call("if", TRUE, 1))
+    #> [1] 1
+    eval(call("if", TRUE, 1, 2))
+    #> [1] 1
+    eval(call("if", FALSE, 1, 2))
+    #> [1] 2
+    ```
+    
+    **for:**
+    
+    
+    ```r
+    ## All these return an error
+    # pryr::ast(for)
+    # pryr::ast(for{})
+    # pryr::ast(for())
+    # pryr::ast(for(){})
+    # pryr::ast(for(in){})
+    # pryr::ast(for(var in){})
+    # pryr::ast(for(var in 10))
+    # pryr::ast(for(in 10){})
+    
+    ## This is the minimum required
+    pryr::ast(for(var in 10){})
+    #> \- ()
+    #>   \- `for
+    #>   \- `var
+    #>   \-  10
+    #>   \- ()
+    #>     \- `{
+    
+    ## So this is how for basically works
+    pryr::ast(for(var in seq)expr)
+    #> \- ()
+    #>   \- `for
+    #>   \- `var
+    #>   \- `seq
+    #>   \- `expr
+    
+    ## And here within a call (note that we need quote, since var has to be a nanme
+    ## and expr has to be an expression)
+    eval(call("for", var = quote(i), seq = 1:3, expr = quote(print(i))))
+    #> [1] 1
+    #> [1] 2
+    #> [1] 3
+    
+    ## as infix function it looks a little bit easier
+    `for`(i, 1:3, print(i))
+    #> [1] 1
+    #> [1] 2
+    #> [1] 3
+    ```
+    
+    **while:**
+    
+    
+    ```r
+    ## All these return an error
+    # pryr::ast(while)
+    # pryr::ast(while())
+    # pryr::ast(while(TRUE))
+    # pryr::ast(while(){})
+    # pryr::ast(while()1)
+    # pryr::ast(while(TRUE){})
+    
+    ## This is the minimum required
+    pryr::ast(while(TRUE)1)
+    #> \- ()
+    #>   \- `while
+    #>   \-  TRUE
+    #>   \-  1
+    
+    ## So this is how while basically works
+    pryr::ast(while(cond)expr)
+    #> \- ()
+    #>   \- `while
+    #>   \- `cond
+    #>   \- `expr
+    
+    ## And here within a call (infinite loop in this case)
+    # eval(call("while", TRUE , 1))
+    ```
+
+## Capturing the current call
+
+1.  __<span style="color:red">Q</span>__: Compare and contrast `update_model()` with `update.default()`.
+    
+    __<span style="color:green">A</span>__: 
+
+2.  __<span style="color:red">Q</span>__: Why doesn't `write.csv(mtcars, "mtcars.csv", row = FALSE)` work?
+    What property of argument matching has the original author forgotten?
+    
+    __<span style="color:green">A</span>__: 
+
+3.  __<span style="color:red">Q</span>__: Rewrite `update.formula()` to use R code instead of C code.
+    
+    __<span style="color:green">A</span>__: 
+
+4.  __<span style="color:red">Q</span>__: Sometimes it's necessary to uncover the function that called the
+    function that called the current function (i.e., the grandparent, not
+    the parent). How can you use `sys.call()` or `match.call()` to find
+    this function?
+    
+    __<span style="color:green">A</span>__: 
+
+## Pairlists
+
+1.  __<span style="color:red">Q</span>__: How are `alist(a)` and `alist(a = )` different? Think about both the
+    input and the output.
+    
+    __<span style="color:green">A</span>__: 
+
+2.  __<span style="color:red">Q</span>__: Read the documentation and source code for `pryr::partial()`. What does it
+    do? How does it work? Read the documentation and source code for
+    `pryr::unenclose()`. What does it do and how does it work?
+    
+    __<span style="color:green">A</span>__: 
+
+3.  __<span style="color:red">Q</span>__: The actual implementation of `curve()` looks more like
+
+    
+    ```r
+    curve3 <- function(expr, xlim = c(0, 1), n = 100,
+                       env = parent.frame()) {
+      env2 <- new.env(parent = env)
+      env2$x <- seq(xlim[1], xlim[2], length = n)
+    
+      y <- eval(substitute(expr), env2)
+      plot(env2$x, y, type = "l", 
+        ylab = deparse(substitute(expr)))
+    }
+    ```
+
+    How does this approach differ from `curve2()` defined above?
+    
+    __<span style="color:green">A</span>__: 
+
+## Parsing and deparsing
+
+1.  __<span style="color:red">Q</span>__: What are the differences between `quote()` and `expression()`?
+    
+    __<span style="color:green">A</span>__: 
+
+2.  __<span style="color:red">Q</span>__: Read the help for `deparse()` and construct a call that `deparse()`
+    and `parse()` do not operate symmetrically on.
+    
+    __<span style="color:green">A</span>__: 
+
+3.  __<span style="color:red">Q</span>__: Compare and contrast `source()` and `sys.source()`.
+    
+    __<span style="color:green">A</span>__: 
+
+4.  __<span style="color:red">Q</span>__: Modify `simple_source()` so it returns the result of _every_ expression,
+    not just the last one.
+    
+    __<span style="color:green">A</span>__: 
+
+5.  __<span style="color:red">Q</span>__: The code generated by `simple_source()` lacks source references. Read
+    the source code for `sys.source()` and the help for `srcfilecopy()`,
+    then modify `simple_source()` to preserve source references. You can
+    test your code by sourcing a function that contains a comment. If
+    successful, when you look at the function, you'll see the comment and
+    not just the source code.
+    
+    __<span style="color:green">A</span>__: 
+
+## Walking the AST with recursive functions
+
+1.  __<span style="color:red">Q</span>__: Why does `logical_abbr()` use a for loop instead of a functional
+    like `lapply()`?
+    
+    __<span style="color:green">A</span>__: 
+
+2.  __<span style="color:red">Q</span>__: `logical_abbr()` works when given quoted objects, but doesn't work when
+    given an existing function, as in the example below. Why not? How could
+    you modify `logical_abbr()` to work with functions? Think about what
+    components make up a function.
+
+    
+    ```r
+    f <- function(x = TRUE) {
+      g(x + T)
+    }
+    logical_abbr(f)
+    ```
+    
+    __<span style="color:green">A</span>__: 
+
+3.  __<span style="color:red">Q</span>__: Write a function called `ast_type()` that returns either "constant",
+    "name", "call", or "pairlist". Rewrite `logical_abbr()`, `find_assign()`,
+    and `bquote2()` to use this function with `switch()` instead of nested if
+    statements.
+    
+    __<span style="color:green">A</span>__: 
+
+4.  __<span style="color:red">Q</span>__: Write a function that extracts all calls to a function. Compare your
+    function to `pryr::fun_calls()`.
+    
+    __<span style="color:green">A</span>__: 
+
+5.  __<span style="color:red">Q</span>__: Write a wrapper around `bquote2()` that does non-standard evaluation
+    so that you don't need to explicitly `quote()` the input.
+    
+    __<span style="color:green">A</span>__: 
+
+6.  __<span style="color:red">Q</span>__: Compare `bquote2()` to `bquote()`. There is a subtle bug in `bquote()`:
+    it won't replace calls to functions with no arguments. Why?
+
+    
+    ```r
+    bquote(.(x)(), list(x = quote(f)))
+    #> .(x)()
+    bquote(.(x)(1), list(x = quote(f)))
+    #> f(1)
+    ```
+    
+    __<span style="color:green">A</span>__: 
+
+7.  __<span style="color:red">Q</span>__: Improve the base `recurse_call()` template to also work with lists of
+    functions and expressions (e.g., as from `parse(path_to_file))`.
+    
+    __<span style="color:green">A</span>__: 
