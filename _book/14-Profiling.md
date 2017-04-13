@@ -22,9 +22,9 @@
     #>                                                                  expr
     #>  speedglm::speedlm(Sepal.Length ~ Sepal.Width + Species, data = iris)
     #>                 lm(Sepal.Length ~ Sepal.Width + Species, data = iris)
-    #>       min       lq     mean   median       uq      max neval cld
-    #>  1166.033 1350.414 1538.159 1461.665 1586.112 6451.117   100   b
-    #>   979.453 1080.257 1201.307 1172.447 1274.351 1714.043   100  a
+    #>       min       lq     mean   median       uq      max neval
+    #>  1149.171 1218.817 1314.032 1276.001 1400.082 1741.901   100
+    #>   971.388 1017.208 1161.498 1080.074 1169.698 4822.117   100
     ```
     
     However on bigger datasets it can make a difference:
@@ -46,12 +46,12 @@
       lm(y ~ x1 + x2, data = td)
     )
     #> Unit: milliseconds
-    #>                                       expr      min        lq      mean
-    #>  speedglm::speedlm(y ~ x1 + x2, data = td) 54.48644  63.22691  93.66772
-    #>                 lm(y ~ x1 + x2, data = td) 92.19462 100.85427 131.32081
-    #>     median       uq      max neval cld
-    #>   69.75263 158.1982 184.8288   100  a 
-    #>  106.57007 191.4855 218.1433   100   b
+    #>                                       expr      min       lq      mean
+    #>  speedglm::speedlm(y ~ x1 + x2, data = td) 54.06123 62.77311  85.55337
+    #>                 lm(y ~ x1 + x2, data = td) 92.52416 99.54418 133.29811
+    #>     median        uq      max neval
+    #>   66.20101  72.17358 178.7860   100
+    #>  105.10675 195.80947 241.2627   100
     ```
     
     For further speedinprovements, you might consider switching your linear algebra libraries as stated in `?speedglm::speedlm`
@@ -80,11 +80,11 @@
     )
     #> Unit: microseconds
     #>                         expr       min         lq       mean     median
-    #>              match(x, table) 15809.799 16756.6270 17989.6562 17267.6140
-    #>  fastmatch::fmatch(x, table)   494.125   527.8495   737.0642   698.1165
-    #>          uq       max neval cld
-    #>  18626.6410 26862.362   100   b
-    #>    866.3685  1336.851   100  a
+    #>              match(x, table) 15311.275 15728.0560 16244.7976 15912.0705
+    #>  fastmatch::fmatch(x, table)   432.177   478.3635   619.3539   533.8975
+    #>          uq       max neval
+    #>  16379.8025 20888.143   100
+    #>    771.0625  1350.413   100
     ```
     
     On my laptop `fastmatch::fmatch()` is around 25 times as fast as `match()`.
@@ -148,9 +148,9 @@ provides us with enough information and guides our attention on solutions in the
       mean.default(x)
     )
     #> Unit: nanoseconds
-    #>             expr  min   lq    mean median   uq   max neval cld
-    #>          mean(x) 2566 2933 4861.19 3300.0 3666 65615   100   b
-    #>  mean.default(x)  733  734 1598.75 1099.5 1101 48387   100  a
+    #>             expr  min   lq    mean median   uq   max neval
+    #>          mean(x) 2566 2933 3339.91   2933 3299 31525   100
+    #>  mean.default(x)  367  734 1459.52    734 1100 35190   100
     ```
     
     In case of 10000 observations we can observe that using `mean.default()` preserves only a small advantage over the use of `mean()`:
@@ -164,9 +164,9 @@ provides us with enough information and guides our attention on solutions in the
       unit = "ns"
     )
     #> Unit: nanoseconds
-    #>             expr   min    lq     mean median    uq   max neval cld
-    #>          mean(x) 19428 19795 21268.40  19795 20162 74779   100   b
-    #>  mean.default(x) 17229 17229 17687.23  17595 17596 27859   100  a
+    #>             expr   min    lq     mean median    uq    max neval
+    #>          mean(x) 19428 19428 21319.75  19795 20161 101905   100
+    #>  mean.default(x) 17228 17229 18280.99  17595 17596  70014   100
     ```
     
     When using even more observations - like in the next lines - it seems that `mean.default` doesn't preserve anymore any advantage at all:
@@ -180,9 +180,9 @@ provides us with enough information and guides our attention on solutions in the
       unit = "ns"
     )
     #> Unit: nanoseconds
-    #>             expr     min      lq    mean  median      uq     max neval cld
-    #>          mean(x) 1738969 1822361 1902253 1905571 1963488 2146585   100   a
-    #>  mean.default(x) 1728338 1843072 1901707 1893658 1948641 2306405   100   a
+    #>             expr     min      lq    mean  median      uq     max neval
+    #>          mean(x) 1731271 1785339 1878768 1863600 1945526 2124591   100
+    #>  mean.default(x) 1724306 1752349 1828486 1784606 1863966 2241524   100
     ```
 
 1.  __<span style="color:red">Q</span>__: The following code provides an alternative implementation of `rowSums()`. Why is it faster for this input?
@@ -203,11 +203,11 @@ provides us with enough information and guides our attention on solutions in the
       replicate(1e3, sample(100, 1e4, replace = TRUE))
     )
     system.time(rowSums(df))
-    #>        User      System verstrichen 
-    #>        0.05        0.00        0.04
+    #>    user  system elapsed 
+    #>    0.05    0.00    0.05
     system.time(rowSums2(df))
-    #>        User      System verstrichen 
-    #>        0.03        0.00        0.03
+    #>    user  system elapsed 
+    #>    0.01    0.00    0.02
     ```
     
     __<span style="color:green">A</span>__: 
@@ -221,7 +221,7 @@ provides us with enough information and guides our attention on solutions in the
     .rowSums
     #> function (x, m, n, na.rm = FALSE) 
     #> .Internal(rowSums(x, m, n, na.rm))
-    #> <bytecode: 0x000000001c2f9828>
+    #> <bytecode: 0x000000001c408a50>
     #> <environment: namespace:base>
     ```
     
@@ -258,7 +258,7 @@ provides us with enough information and guides our attention on solutions in the
     #>     else names(z) <- dimnames(x)[[1L]]
     #>     z
     #> }
-    #> <bytecode: 0x0000000019357f00>
+    #> <bytecode: 0x000000001a484c48>
     #> <environment: namespace:base>
     ```
 
@@ -339,14 +339,10 @@ provides us with enough information and guides our attention on solutions in the
       chisq.test2c(a, b)
     )
     #> Unit: microseconds
-    #>                expr    min      lq     mean median     uq     max neval
-    #>  chisq.test(m_test) 70.381 76.2455 89.40129 83.210 96.223 223.970   100
-    #>   chisq.test2(a, b) 21.995 24.7430 30.67440 27.493 32.258  76.245   100
-    #>  chisq.test2c(a, b) 17.962 20.1620 25.45101 23.277 26.393 111.435   100
-    #>  cld
-    #>    c
-    #>   b 
-    #>  a
+    #>                expr    min     lq     mean median     uq     max neval
+    #>  chisq.test(m_test) 71.480 76.612 88.13291 81.194 92.374 236.433   100
+    #>   chisq.test2(a, b) 21.994 24.927 30.84306 26.393 30.425  64.515   100
+    #>  chisq.test2c(a, b) 17.596 20.161 24.84242 22.911 27.126  56.085   100
     ```
 
 1.  __<span style="color:red">Q</span>__: Can you make a faster version of `table()` for the case of an input of two integer vectors with no missing values? Can you use it to
@@ -432,7 +428,7 @@ provides us with enough information and guides our attention on solutions in the
     cor_list <- list(cor_v1, cor_v2, cor_v3, cor_v4)
     ulapply <- function(X, FUN, ...) unlist(lapply(X, FUN, ...))
     ulapply(cor_list, function(x) identical(x(), cor_v1()))
-    #> [1] TRUE TRUE TRUE TRUE
+    #> [1]  TRUE  TRUE  TRUE FALSE
     
     # benchmark
     set.seed(1)
@@ -442,17 +438,17 @@ provides us with enough information and guides our attention on solutions in the
       cor_v3(),
       cor_v4()
     )
-    #> Unit: microseconds
-    #>      expr      min        lq      mean    median        uq       max neval
-    #>  cor_v1() 4254.314 5259.6090 5688.6542 5576.3180 5841.7080 13803.241   100
-    #>  cor_v2()  337.970  449.4050  843.8691  610.3260  682.9050 10260.424   100
-    #>  cor_v3()  350.433  523.6335  600.4283  605.1940  667.1425  1062.663   100
-    #>  cor_v4()  326.974  460.9520  567.2473  578.0685  651.3805   957.826   100
-    #>  cld
-    #>    b
-    #>   a 
-    #>   a 
-    #>   a
+    #> Unit: milliseconds
+    #>      expr       min        lq      mean    median        uq       max
+    #>  cor_v1() 589.88290 660.38203 725.88563 694.35532 811.75270 1003.6055
+    #>  cor_v2()  61.87925  68.31424 129.92406 104.06150 135.80628  318.0035
+    #>  cor_v3()  59.88552  95.32359 143.86044 104.92476 226.86493  377.1782
+    #>  cor_v4()  56.56741  58.71546  95.91036  62.02423  98.13219  414.9290
+    #>  neval
+    #>    100
+    #>    100
+    #>    100
+    #>    100
     ```
     
     According to the resulting medians, lower and upper quartiles of our benchmark all three new versions seem to provide more or less the same speed benefit (note that the maximum and mean can vary a lot for these approaches). Since the second version is most similar to the code we started, we implement this line into a second version of `cor_df()` (if this sounds too arbitrary, note that in the final solution we will come back to the vector input version anyway) and do a benchmark to get the overall speedup:
@@ -471,8 +467,8 @@ provides us with enough information and guides our attention on solutions in the
     )
     #> Unit: milliseconds
     #>       expr       min       lq     mean   median        uq       max neval
-    #>   cor_df() 681.12605 819.0233 976.9459 917.0479 1115.2601 1871.8410   100
-    #>  cor_df2()  78.70953 118.7345 246.9907 222.0433  304.6407  675.3762   100
+    #>   cor_df() 638.25949 804.9105 909.5332 886.4491 1003.7710 1368.1586   100
+    #>  cor_df2()  86.38426 110.9998 237.5796 239.9974  313.8122  689.8761   100
     ```
     
     Now we can focus on a speedup for the random generation of indices. (Note that a run of linepfrof suggests to optimize `cbind()`. However, after rewriting `cor()` to a version that only works with vector input, this step will be unnecessary anyway). We could try differnt approaches for the sequence generation within `sample()` (like `seq(n)`, `seq.int(n)`, `seq_len(n)`, `a:n`) and a direct call of `sample.int()`. In the following, we will see, that `sample.int()` is always faster (since we don't include the generation of the sequence into our benchmark). When we look into `sample.int()` we see that it calls two different internal sample versions depending on the input. Since in our usecase always the second version will be called, we also provide this version in our benchmark: 
@@ -487,14 +483,14 @@ provides us with enough information and guides our attention on solutions in the
       .Internal(sample(n, n, replace = FALSE, prob = NULL))
     )
     #> Unit: milliseconds
-    #>                                                   expr      min       lq
-    #>                                       sample(seq_n, n) 21.53328 22.61647
-    #>                                       sample.int(n, n) 10.23256 10.55660
-    #>  .Internal(sample(n, n, replace = FALSE, prob = NULL)) 10.16878 10.47046
-    #>      mean   median       uq      max neval
-    #>  25.13703 24.28176 26.93438 34.62539   100
-    #>  12.09360 10.82749 12.46859 52.62575   100
-    #>  11.43926 10.73603 11.65775 17.19283   100
+    #>                                                   expr       min       lq
+    #>                                       sample(seq_n, n) 21.861363 25.53944
+    #>                                       sample.int(n, n)  9.964609 12.20357
+    #>  .Internal(sample(n, n, replace = FALSE, prob = NULL)) 10.381023 12.33461
+    #>      mean   median       uq       max neval
+    #>  30.12183 26.79968 32.35107 135.07389   100
+    #>  15.02229 12.74479 17.84642  26.72160   100
+    #>  15.56904 13.10567 18.89222  31.36337   100
     ```
     
     The `sample.int()` versions give clearly the biggest improvement. Since the internal version doesn't provide any clear improvement, but restricts the general scope of our function, we choose to implement `sample.int()` in a third version of `cor_df()` and benchmark our actual achievements:
@@ -514,9 +510,9 @@ provides us with enough information and guides our attention on solutions in the
     )
     #> Unit: milliseconds
     #>       expr       min        lq     mean   median       uq       max neval
-    #>   cor_df() 631.70368 755.94269 852.9936 809.6646 936.6149 1490.2436   100
-    #>  cor_df2()  80.99834 116.23442 209.3948 171.8103 293.0193  594.5985   100
-    #>  cor_df3()  65.40005  84.28988 217.1245 140.5378 288.7853  627.2654   100
+    #>   cor_df() 630.29741 775.17499 843.7971 835.1688 895.0058 1285.0467   100
+    #>  cor_df2()  85.93925  97.74491 192.8243 129.4853 274.8726  705.2006   100
+    #>  cor_df3()  70.69506  85.19641 196.4155 126.5579 239.7615  693.2441   100
     ```
     
     As a last step, we try to speedup the calculation of the pearson correlation coefficient. Since quite a lot of functionality is build into the `stats::cor()` function this seems like a reasonable approach. We try this by working with another `cor()` function from the `WGNA` package and an own implementation which should give a small improvement, because we use `sum(x) / length(x)` instead of `mean(x)` for internal calculations:
@@ -748,7 +744,7 @@ provides us with enough information and guides our attention on solutions in the
     a <- rnorm(10)
     b <- rnorm(10)
     sum(a * b) - crossprod(a, b)[1]
-    #> [1] 0
+    #> [1] -1.776357e-15
     ```
     
     A benchmark of both alternatives for different vector lengths indicates, that the `crossprod()` variant is about 2.5 times faster than `sum()`:
@@ -761,8 +757,6 @@ provides us with enough information and guides our attention on solutions in the
     
     bench_sum <- Map(function(x, y) fivenum(microbenchmark(sum(x * y))$time),
                      xvector, weights)
-    #> Warning in microbenchmark(sum(x * y)): Could not measure a positive
-    #> execution time for one evaluation.
     bench_sum <- data.frame(time = unlist(bench_sum),
                             call = "sum",
                             stringsAsFactors = FALSE)
