@@ -2,7 +2,7 @@
 --- 
 title: "Advanced R Solutions"
 author: "Malte Grosser & Henning Bumann"
-date: "2017-04-10"
+date: "2017-04-13"
 knit: "bookdown::render_book"
 site: bookdown::bookdown_site
 output:
@@ -42,6 +42,16 @@ The date of the exercise versions in Hadley's book is January 25th 2017.
 
 
 
+```
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
+```
 
 <img src="index_files/figure-html/unnamed-chunk-5-1.png" width="672" />
 
