@@ -127,7 +127,7 @@ __<span style="color:green">A</span>__: Yes, you can create them easily. Also bo
     ```r
     head(iris)[-(1:6),]
     #> [1] Sepal.Length Sepal.Width  Petal.Length Petal.Width  Species     
-    #> <0 Zeilen> (oder row.names mit Länge 0)
+    #> <0 rows> (or 0-length row.names)
     
     head(iris)[ , -(1:5)]
     #> data frame with 0 columns and 6 rows

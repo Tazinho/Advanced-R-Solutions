@@ -293,8 +293,8 @@ __<span style="color:green">A</span>__:
       readLines(temp)
     }
     capture.output2(cat("a", "b", "c", sep = "\n"))
-    #> Warning in file.remove(temp): kann Datei 'C:\Users\MGO\AppData\Local\Temp
-    #> \RtmpaqHGHQ\file2f74603b4c5d' nicht löschen. Grund 'Permission denied'
+    #> Warning in file.remove(temp): cannot remove file 'C:\Users\MGO\AppData
+    #> \Local\Temp\RtmpiQu8MY\file19842f913805', reason 'Permission denied'
     #> [1] "a" "b" "c"
     ```
     

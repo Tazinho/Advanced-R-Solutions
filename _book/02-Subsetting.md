@@ -107,10 +107,10 @@
       diag_m(diamonds_m)
     )
     #> Unit: microseconds
-    #>                expr    min     lq     mean  median     uq    max neval cld
-    #>    diag(diamonds_m) 12.463 13.930 17.41222 14.6630 19.245 74.413   100 a  
-    #>  diag_v(diamonds_m) 15.762 17.229 20.16875 17.9620 22.361 35.190   100  b 
-    #>  diag_m(diamonds_m) 17.230 19.062 22.50013 20.1615 25.293 58.284   100   c
+    #>                expr    min     lq     mean median     uq    max neval
+    #>    diag(diamonds_m) 12.464 14.296 16.03761 14.663 15.396 46.187   100
+    #>  diag_v(diamonds_m) 16.130 17.229 20.01479 17.962 18.696 97.506   100
+    #>  diag_m(diamonds_m) 17.962 19.061 21.70105 19.795 20.528 67.081   100
     ```
     
     The original function seems to be a little bit faster than the trimmed and our matrix version. Maybe this is due to compiling issues
@@ -129,14 +129,10 @@
       diag_m_c(diamonds_m)
     )
     #> Unit: microseconds
-    #>                  expr    min      lq     mean median     uq    max neval
-    #>    diag_c(diamonds_m) 12.830 13.7465 18.24799 14.663 19.428 67.814   100
-    #>  diag_v_c(diamonds_m) 12.463 13.9300 17.17394 14.297 18.695 50.952   100
-    #>  diag_m_c(diamonds_m) 14.663 15.9460 20.86527 16.863 21.994 91.641   100
-    #>  cld
-    #>   ab
-    #>   a 
-    #>    b
+    #>                  expr    min     lq     mean median     uq    max neval
+    #>    diag_c(diamonds_m) 12.464 13.197 15.24586 13.564 14.297 63.782   100
+    #>  diag_v_c(diamonds_m) 12.830 13.380 15.05523 13.930 14.846 24.560   100
+    #>  diag_m_c(diamonds_m) 14.297 15.396 17.59923 16.129 16.496 46.921   100
     ```
     
     We can see that our diag_m version is only a little bit slower than the 
@@ -178,16 +174,16 @@
       diag_lv_c(diamonds_m)
     )
     #> Unit: microseconds
-    #>                   expr      min       lq       mean    median        uq
-    #>       diag(diamonds_m)   13.197   15.946   22.50009   19.9785   26.2100
-    #>   diag_v_c(diamonds_m)   13.197   16.495   23.43476   20.3450   28.0420
-    #>   diag_m_c(diamonds_m)   15.763   19.978   28.99928   28.5930   36.6565
-    #>  diag_lv_c(diamonds_m) 2821.058 3104.593 7445.82549 5293.1495 5681.7040
-    #>        max neval cld
-    #>     83.944   100  a 
-    #>     57.918   100  a 
-    #>     59.017   100  a 
-    #>  97868.262   100   b
+    #>                   expr      min        lq       mean   median        uq
+    #>       diag(diamonds_m)   13.196   15.0300   20.40337   17.962   24.7430
+    #>   diag_v_c(diamonds_m)   12.831   15.3965   21.12913   19.062   25.8435
+    #>   diag_m_c(diamonds_m)   15.396   17.9620   25.82856   26.027   30.9750
+    #>  diag_lv_c(diamonds_m) 2637.045 2893.2715 5081.68516 4589.536 5084.9440
+    #>        max neval
+    #>     39.956   100
+    #>     46.187   100
+    #>     61.216   100
+    #>  50670.185   100
     ```
 
 6.  __<span style="color:red">Q</span>__: What does `df[is.na(df)] <- 0` do? How does it work?  

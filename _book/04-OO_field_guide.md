@@ -15,7 +15,7 @@
     t.test
     #> function (x, ...) 
     #> UseMethod("t.test")
-    #> <bytecode: 0x0000000012ebe6c8>
+    #> <bytecode: 0x0000000014fa7ba8>
     #> <environment: namespace:stats>
     ```
     
