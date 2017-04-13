@@ -26,7 +26,7 @@
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
 
-<meta name="date" content="2017-04-10">
+<meta name="date" content="2017-04-13">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -323,10 +323,10 @@ microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">diag_m</span>(diamonds_m)
 )
 <span class="co">#&gt; Unit: microseconds</span>
-<span class="co">#&gt;                expr    min     lq     mean  median     uq    max neval cld</span>
-<span class="co">#&gt;    diag(diamonds_m) 12.463 13.930 17.41222 14.6630 19.245 74.413   100 a  </span>
-<span class="co">#&gt;  diag_v(diamonds_m) 15.762 17.229 20.16875 17.9620 22.361 35.190   100  b </span>
-<span class="co">#&gt;  diag_m(diamonds_m) 17.230 19.062 22.50013 20.1615 25.293 58.284   100   c</span></code></pre></div>
+<span class="co">#&gt;                expr    min     lq     mean median     uq    max neval</span>
+<span class="co">#&gt;    diag(diamonds_m) 12.464 14.296 16.03761 14.663 15.396 46.187   100</span>
+<span class="co">#&gt;  diag_v(diamonds_m) 16.130 17.229 20.01479 17.962 18.696 97.506   100</span>
+<span class="co">#&gt;  diag_m(diamonds_m) 17.962 19.061 21.70105 19.795 20.528 67.081   100</span></code></pre></div>
 <p>The original function seems to be a little bit faster than the trimmed and our matrix version. Maybe this is due to compiling issues</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diag_c &lt;-<span class="st"> </span>compiler::<span class="kw">cmpfun</span>(diag)
 diag_v_c &lt;-<span class="st"> </span>compiler::<span class="kw">cmpfun</span>(diag_v)
@@ -340,14 +340,10 @@ microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">diag_m_c</span>(diamonds_m)
 )
 <span class="co">#&gt; Unit: microseconds</span>
-<span class="co">#&gt;                  expr    min      lq     mean median     uq    max neval</span>
-<span class="co">#&gt;    diag_c(diamonds_m) 12.830 13.7465 18.24799 14.663 19.428 67.814   100</span>
-<span class="co">#&gt;  diag_v_c(diamonds_m) 12.463 13.9300 17.17394 14.297 18.695 50.952   100</span>
-<span class="co">#&gt;  diag_m_c(diamonds_m) 14.663 15.9460 20.86527 16.863 21.994 91.641   100</span>
-<span class="co">#&gt;  cld</span>
-<span class="co">#&gt;   ab</span>
-<span class="co">#&gt;   a </span>
-<span class="co">#&gt;    b</span></code></pre></div>
+<span class="co">#&gt;                  expr    min     lq     mean median     uq    max neval</span>
+<span class="co">#&gt;    diag_c(diamonds_m) 12.464 13.197 15.24586 13.564 14.297 63.782   100</span>
+<span class="co">#&gt;  diag_v_c(diamonds_m) 12.830 13.380 15.05523 13.930 14.846 24.560   100</span>
+<span class="co">#&gt;  diag_m_c(diamonds_m) 14.297 15.396 17.59923 16.129 16.496 46.921   100</span></code></pre></div>
 <p>We can see that our diag_m version is only a little bit slower than the original version. However the source code of the matrix version could be a bit easier to read.</p>
 <p>We could also take an idea from the source code of <code>upper.tri()</code> and subset with a logical vector (but it turns out to be really slow):</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diag_lv &lt;-<span class="st"> </span>function (<span class="dt">x =</span> <span class="dv">1</span>) {
@@ -376,16 +372,16 @@ microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">diag_lv_c</span>(diamonds_m)
 )
 <span class="co">#&gt; Unit: microseconds</span>
-<span class="co">#&gt;                   expr      min       lq       mean    median        uq</span>
-<span class="co">#&gt;       diag(diamonds_m)   13.197   15.946   22.50009   19.9785   26.2100</span>
-<span class="co">#&gt;   diag_v_c(diamonds_m)   13.197   16.495   23.43476   20.3450   28.0420</span>
-<span class="co">#&gt;   diag_m_c(diamonds_m)   15.763   19.978   28.99928   28.5930   36.6565</span>
-<span class="co">#&gt;  diag_lv_c(diamonds_m) 2821.058 3104.593 7445.82549 5293.1495 5681.7040</span>
-<span class="co">#&gt;        max neval cld</span>
-<span class="co">#&gt;     83.944   100  a </span>
-<span class="co">#&gt;     57.918   100  a </span>
-<span class="co">#&gt;     59.017   100  a </span>
-<span class="co">#&gt;  97868.262   100   b</span></code></pre></div></li>
+<span class="co">#&gt;                   expr      min        lq       mean   median        uq</span>
+<span class="co">#&gt;       diag(diamonds_m)   13.196   15.0300   20.40337   17.962   24.7430</span>
+<span class="co">#&gt;   diag_v_c(diamonds_m)   12.831   15.3965   21.12913   19.062   25.8435</span>
+<span class="co">#&gt;   diag_m_c(diamonds_m)   15.396   17.9620   25.82856   26.027   30.9750</span>
+<span class="co">#&gt;  diag_lv_c(diamonds_m) 2637.045 2893.2715 5081.68516 4589.536 5084.9440</span>
+<span class="co">#&gt;        max neval</span>
+<span class="co">#&gt;     39.956   100</span>
+<span class="co">#&gt;     46.187   100</span>
+<span class="co">#&gt;     61.216   100</span>
+<span class="co">#&gt;  50670.185   100</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What does <code>df[is.na(df)] &lt;- 0</code> do? How does it work?<br />
 <strong><span style="color:green">A</span></strong>: It replaces all <code>NA</code>s within <code>df</code> with the value <code>0</code>. <code>is.na(df)</code> returns a logical matrix which is used to subset df. Since you can combine subsetting and assignment, only the matched part of <code>df</code> (the <code>NA</code>s) is replaced with <code>0</code> entries.</p></li>
 </ol>
