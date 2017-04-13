@@ -26,7 +26,7 @@
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
 
-<meta name="date" content="2017-04-10">
+<meta name="date" content="2017-04-13">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -269,9 +269,9 @@ microbenchmark::<span class="kw">microbenchmark</span>(
 <span class="co">#&gt;                                                                  expr</span>
 <span class="co">#&gt;  speedglm::speedlm(Sepal.Length ~ Sepal.Width + Species, data = iris)</span>
 <span class="co">#&gt;                 lm(Sepal.Length ~ Sepal.Width + Species, data = iris)</span>
-<span class="co">#&gt;       min       lq     mean   median       uq      max neval cld</span>
-<span class="co">#&gt;  1166.033 1350.414 1538.159 1461.665 1586.112 6451.117   100   b</span>
-<span class="co">#&gt;   979.453 1080.257 1201.307 1172.447 1274.351 1714.043   100  a</span></code></pre></div>
+<span class="co">#&gt;       min       lq     mean   median       uq      max neval</span>
+<span class="co">#&gt;  1149.171 1218.817 1314.032 1276.001 1400.082 1741.901   100</span>
+<span class="co">#&gt;   971.388 1017.208 1161.498 1080.074 1169.698 4822.117   100</span></code></pre></div>
 <p>However on bigger datasets it can make a difference:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">eps &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100000</span>)
 x1 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100000</span>, <span class="dv">5</span>, <span class="dv">3</span>)
@@ -288,12 +288,12 @@ microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">lm</span>(y ~<span class="st"> </span>x1 +<span class="st"> </span>x2, <span class="dt">data =</span> td)
 )
 <span class="co">#&gt; Unit: milliseconds</span>
-<span class="co">#&gt;                                       expr      min        lq      mean</span>
-<span class="co">#&gt;  speedglm::speedlm(y ~ x1 + x2, data = td) 54.48644  63.22691  93.66772</span>
-<span class="co">#&gt;                 lm(y ~ x1 + x2, data = td) 92.19462 100.85427 131.32081</span>
-<span class="co">#&gt;     median       uq      max neval cld</span>
-<span class="co">#&gt;   69.75263 158.1982 184.8288   100  a </span>
-<span class="co">#&gt;  106.57007 191.4855 218.1433   100   b</span></code></pre></div>
+<span class="co">#&gt;                                       expr      min       lq      mean</span>
+<span class="co">#&gt;  speedglm::speedlm(y ~ x1 + x2, data = td) 54.06123 62.77311  85.55337</span>
+<span class="co">#&gt;                 lm(y ~ x1 + x2, data = td) 92.52416 99.54418 133.29811</span>
+<span class="co">#&gt;     median        uq      max neval</span>
+<span class="co">#&gt;   66.20101  72.17358 178.7860   100</span>
+<span class="co">#&gt;  105.10675 195.80947 241.2627   100</span></code></pre></div>
 <p>For further speedinprovements, you might consider switching your linear algebra libraries as stated in <code>?speedglm::speedlm</code></p>
 <blockquote>
 <p>The functions of class ‘speedlm’ may speed up the fitting of LMs to large data sets. High performances can be obtained especially if R is linked against an optimized BLAS, such as ATLAS.</p>
@@ -314,11 +314,11 @@ microbenchmark::<span class="kw">microbenchmark</span>(
 )
 <span class="co">#&gt; Unit: microseconds</span>
 <span class="co">#&gt;                         expr       min         lq       mean     median</span>
-<span class="co">#&gt;              match(x, table) 15809.799 16756.6270 17989.6562 17267.6140</span>
-<span class="co">#&gt;  fastmatch::fmatch(x, table)   494.125   527.8495   737.0642   698.1165</span>
-<span class="co">#&gt;          uq       max neval cld</span>
-<span class="co">#&gt;  18626.6410 26862.362   100   b</span>
-<span class="co">#&gt;    866.3685  1336.851   100  a</span></code></pre></div>
+<span class="co">#&gt;              match(x, table) 15311.275 15728.0560 16244.7976 15912.0705</span>
+<span class="co">#&gt;  fastmatch::fmatch(x, table)   432.177   478.3635   619.3539   533.8975</span>
+<span class="co">#&gt;          uq       max neval</span>
+<span class="co">#&gt;  16379.8025 20888.143   100</span>
+<span class="co">#&gt;    771.0625  1350.413   100</span></code></pre></div>
 <p>On my laptop <code>fastmatch::fmatch()</code> is around 25 times as fast as <code>match()</code>.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: List four functions (not just those in base R) that convert a string into a date time object. What are their strengths and weaknesses?</p>
 <p><strong><span style="color:orange">A</span></strong>: At least these functions will do the trick: <code>as.POSIXct()</code>, <code>as.POSIXlt()</code>, <code>strftime()</code>, <code>strptime()</code>, <code>lubridate::ymd_hms()</code>. There might also be some in the timeseries packages <code>xts</code> or <code>zoo</code> and in <code>anytime</code>. An update on this will follow…</p></li>
@@ -364,9 +364,9 @@ microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">mean.default</span>(x)
 )
 <span class="co">#&gt; Unit: nanoseconds</span>
-<span class="co">#&gt;             expr  min   lq    mean median   uq   max neval cld</span>
-<span class="co">#&gt;          mean(x) 2566 2933 4861.19 3300.0 3666 65615   100   b</span>
-<span class="co">#&gt;  mean.default(x)  733  734 1598.75 1099.5 1101 48387   100  a</span></code></pre></div>
+<span class="co">#&gt;             expr  min   lq    mean median   uq   max neval</span>
+<span class="co">#&gt;          mean(x) 2566 2933 3339.91   2933 3299 31525   100</span>
+<span class="co">#&gt;  mean.default(x)  367  734 1459.52    734 1100 35190   100</span></code></pre></div>
 <p>In case of 10000 observations we can observe that using <code>mean.default()</code> preserves only a small advantage over the use of <code>mean()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="fl">1e4</span>)
 microbenchmark::<span class="kw">microbenchmark</span>(
@@ -375,9 +375,9 @@ microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="dt">unit =</span> <span class="st">&quot;ns&quot;</span>
 )
 <span class="co">#&gt; Unit: nanoseconds</span>
-<span class="co">#&gt;             expr   min    lq     mean median    uq   max neval cld</span>
-<span class="co">#&gt;          mean(x) 19428 19795 21268.40  19795 20162 74779   100   b</span>
-<span class="co">#&gt;  mean.default(x) 17229 17229 17687.23  17595 17596 27859   100  a</span></code></pre></div>
+<span class="co">#&gt;             expr   min    lq     mean median    uq    max neval</span>
+<span class="co">#&gt;          mean(x) 19428 19428 21319.75  19795 20161 101905   100</span>
+<span class="co">#&gt;  mean.default(x) 17228 17229 18280.99  17595 17596  70014   100</span></code></pre></div>
 <p>When using even more observations - like in the next lines - it seems that <code>mean.default</code> doesn’t preserve anymore any advantage at all:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="fl">1e6</span>)
 microbenchmark::<span class="kw">microbenchmark</span>(
@@ -386,9 +386,9 @@ microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="dt">unit =</span> <span class="st">&quot;ns&quot;</span>
 )
 <span class="co">#&gt; Unit: nanoseconds</span>
-<span class="co">#&gt;             expr     min      lq    mean  median      uq     max neval cld</span>
-<span class="co">#&gt;          mean(x) 1738969 1822361 1902253 1905571 1963488 2146585   100   a</span>
-<span class="co">#&gt;  mean.default(x) 1728338 1843072 1901707 1893658 1948641 2306405   100   a</span></code></pre></div></li>
+<span class="co">#&gt;             expr     min      lq    mean  median      uq     max neval</span>
+<span class="co">#&gt;          mean(x) 1731271 1785339 1878768 1863600 1945526 2124591   100</span>
+<span class="co">#&gt;  mean.default(x) 1724306 1752349 1828486 1784606 1863966 2241524   100</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: The following code provides an alternative implementation of <code>rowSums()</code>. Why is it faster for this input?</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rowSums2 &lt;-<span class="st"> </span>function(df) {
   out &lt;-<span class="st"> </span>df[[1L]]
@@ -404,18 +404,18 @@ df &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(
   <span class="kw">replicate</span>(<span class="fl">1e3</span>, <span class="kw">sample</span>(<span class="dv">100</span>, <span class="fl">1e4</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>))
 )
 <span class="kw">system.time</span>(<span class="kw">rowSums</span>(df))
-<span class="co">#&gt;        User      System verstrichen </span>
-<span class="co">#&gt;        0.05        0.00        0.04</span>
+<span class="co">#&gt;    user  system elapsed </span>
+<span class="co">#&gt;    0.05    0.00    0.05</span>
 <span class="kw">system.time</span>(<span class="kw">rowSums2</span>(df))
-<span class="co">#&gt;        User      System verstrichen </span>
-<span class="co">#&gt;        0.03        0.00        0.03</span></code></pre></div>
+<span class="co">#&gt;    user  system elapsed </span>
+<span class="co">#&gt;    0.01    0.00    0.02</span></code></pre></div>
 <p><strong><span style="color:green">A</span></strong>:</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What’s the difference between <code>rowSums()</code> and <code>.rowSums()</code>?</p>
 <p><strong><span style="color:green">A</span></strong>: <code>.rowSums()</code> is defined as</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">.rowSums
 <span class="co">#&gt; function (x, m, n, na.rm = FALSE) </span>
 <span class="co">#&gt; .Internal(rowSums(x, m, n, na.rm))</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000001c2f9828&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000001c408a50&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:base&gt;</span></code></pre></div>
 <p>this means, that the internal <code>rowSums()</code> function is called via <code>.Internal()</code>.</p>
 <blockquote>
@@ -445,7 +445,7 @@ df &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(
 <span class="co">#&gt;     else names(z) &lt;- dimnames(x)[[1L]]</span>
 <span class="co">#&gt;     z</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x0000000019357f00&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000001a484c48&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:base&gt;</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Make a faster version of <code>chisq.test()</code> that only computes the chi-square test statistic when the input is two numeric vectors with no missing values. You can try simplifying <code>chisq.test()</code> or by coding from the <a href="http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test">mathematical definition</a>.</p>
 <p><strong><span style="color:green">A</span></strong>: Since <code>chisq.test()</code> has a relatively long source code, we try a new implementation from scratch:</p>
@@ -510,14 +510,10 @@ microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">chisq.test2c</span>(a, b)
 )
 <span class="co">#&gt; Unit: microseconds</span>
-<span class="co">#&gt;                expr    min      lq     mean median     uq     max neval</span>
-<span class="co">#&gt;  chisq.test(m_test) 70.381 76.2455 89.40129 83.210 96.223 223.970   100</span>
-<span class="co">#&gt;   chisq.test2(a, b) 21.995 24.7430 30.67440 27.493 32.258  76.245   100</span>
-<span class="co">#&gt;  chisq.test2c(a, b) 17.962 20.1620 25.45101 23.277 26.393 111.435   100</span>
-<span class="co">#&gt;  cld</span>
-<span class="co">#&gt;    c</span>
-<span class="co">#&gt;   b </span>
-<span class="co">#&gt;  a</span></code></pre></div></li>
+<span class="co">#&gt;                expr    min     lq     mean median     uq     max neval</span>
+<span class="co">#&gt;  chisq.test(m_test) 71.480 76.612 88.13291 81.194 92.374 236.433   100</span>
+<span class="co">#&gt;   chisq.test2(a, b) 21.994 24.927 30.84306 26.393 30.425  64.515   100</span>
+<span class="co">#&gt;  chisq.test2c(a, b) 17.596 20.161 24.84242 22.911 27.126  56.085   100</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Can you make a faster version of <code>table()</code> for the case of an input of two integer vectors with no missing values? Can you use it to speed up your chi-square test?</p>
 <p><strong><span style="color:green">A</span></strong>:</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Imagine you want to compute the bootstrap distribution of a sample correlation using <code>cor_df()</code> and the data in the example below. Given that you want to run this many times, how can you make this code faster? (Hint: the function has three components that you can speed up.)</p>
@@ -574,7 +570,7 @@ cor_v4 &lt;-<span class="st"> </span>function() {
 cor_list &lt;-<span class="st"> </span><span class="kw">list</span>(cor_v1, cor_v2, cor_v3, cor_v4)
 ulapply &lt;-<span class="st"> </span>function(X, FUN, ...) <span class="kw">unlist</span>(<span class="kw">lapply</span>(X, FUN, ...))
 <span class="kw">ulapply</span>(cor_list, function(x) <span class="kw">identical</span>(<span class="kw">x</span>(), <span class="kw">cor_v1</span>()))
-<span class="co">#&gt; [1] TRUE TRUE TRUE TRUE</span>
+<span class="co">#&gt; [1]  TRUE  TRUE  TRUE FALSE</span>
 
 <span class="co"># benchmark</span>
 <span class="kw">set.seed</span>(<span class="dv">1</span>)
@@ -584,17 +580,17 @@ microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">cor_v3</span>(),
   <span class="kw">cor_v4</span>()
 )
-<span class="co">#&gt; Unit: microseconds</span>
-<span class="co">#&gt;      expr      min        lq      mean    median        uq       max neval</span>
-<span class="co">#&gt;  cor_v1() 4254.314 5259.6090 5688.6542 5576.3180 5841.7080 13803.241   100</span>
-<span class="co">#&gt;  cor_v2()  337.970  449.4050  843.8691  610.3260  682.9050 10260.424   100</span>
-<span class="co">#&gt;  cor_v3()  350.433  523.6335  600.4283  605.1940  667.1425  1062.663   100</span>
-<span class="co">#&gt;  cor_v4()  326.974  460.9520  567.2473  578.0685  651.3805   957.826   100</span>
-<span class="co">#&gt;  cld</span>
-<span class="co">#&gt;    b</span>
-<span class="co">#&gt;   a </span>
-<span class="co">#&gt;   a </span>
-<span class="co">#&gt;   a</span></code></pre></div>
+<span class="co">#&gt; Unit: milliseconds</span>
+<span class="co">#&gt;      expr       min        lq      mean    median        uq       max</span>
+<span class="co">#&gt;  cor_v1() 589.88290 660.38203 725.88563 694.35532 811.75270 1003.6055</span>
+<span class="co">#&gt;  cor_v2()  61.87925  68.31424 129.92406 104.06150 135.80628  318.0035</span>
+<span class="co">#&gt;  cor_v3()  59.88552  95.32359 143.86044 104.92476 226.86493  377.1782</span>
+<span class="co">#&gt;  cor_v4()  56.56741  58.71546  95.91036  62.02423  98.13219  414.9290</span>
+<span class="co">#&gt;  neval</span>
+<span class="co">#&gt;    100</span>
+<span class="co">#&gt;    100</span>
+<span class="co">#&gt;    100</span>
+<span class="co">#&gt;    100</span></code></pre></div>
 <p>According to the resulting medians, lower and upper quartiles of our benchmark all three new versions seem to provide more or less the same speed benefit (note that the maximum and mean can vary a lot for these approaches). Since the second version is most similar to the code we started, we implement this line into a second version of <code>cor_df()</code> (if this sounds too arbitrary, note that in the final solution we will come back to the vector input version anyway) and do a benchmark to get the overall speedup:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cor_df2 &lt;-<span class="st"> </span>function() {
   i &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">seq</span>(n), n)
@@ -608,8 +604,8 @@ microbenchmark::<span class="kw">microbenchmark</span>(
 )
 <span class="co">#&gt; Unit: milliseconds</span>
 <span class="co">#&gt;       expr       min       lq     mean   median        uq       max neval</span>
-<span class="co">#&gt;   cor_df() 681.12605 819.0233 976.9459 917.0479 1115.2601 1871.8410   100</span>
-<span class="co">#&gt;  cor_df2()  78.70953 118.7345 246.9907 222.0433  304.6407  675.3762   100</span></code></pre></div>
+<span class="co">#&gt;   cor_df() 638.25949 804.9105 909.5332 886.4491 1003.7710 1368.1586   100</span>
+<span class="co">#&gt;  cor_df2()  86.38426 110.9998 237.5796 239.9974  313.8122  689.8761   100</span></code></pre></div>
 <p>Now we can focus on a speedup for the random generation of indices. (Note that a run of linepfrof suggests to optimize <code>cbind()</code>. However, after rewriting <code>cor()</code> to a version that only works with vector input, this step will be unnecessary anyway). We could try differnt approaches for the sequence generation within <code>sample()</code> (like <code>seq(n)</code>, <code>seq.int(n)</code>, <code>seq_len(n)</code>, <code>a:n</code>) and a direct call of <code>sample.int()</code>. In the following, we will see, that <code>sample.int()</code> is always faster (since we don’t include the generation of the sequence into our benchmark). When we look into <code>sample.int()</code> we see that it calls two different internal sample versions depending on the input. Since in our usecase always the second version will be called, we also provide this version in our benchmark:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">seq_n &lt;-<span class="st"> </span><span class="kw">seq</span>(n)
 
@@ -619,14 +615,14 @@ microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">.Internal</span>(<span class="kw">sample</span>(n, n, <span class="dt">replace =</span> <span class="ot">FALSE</span>, <span class="dt">prob =</span> <span class="ot">NULL</span>))
 )
 <span class="co">#&gt; Unit: milliseconds</span>
-<span class="co">#&gt;                                                   expr      min       lq</span>
-<span class="co">#&gt;                                       sample(seq_n, n) 21.53328 22.61647</span>
-<span class="co">#&gt;                                       sample.int(n, n) 10.23256 10.55660</span>
-<span class="co">#&gt;  .Internal(sample(n, n, replace = FALSE, prob = NULL)) 10.16878 10.47046</span>
-<span class="co">#&gt;      mean   median       uq      max neval</span>
-<span class="co">#&gt;  25.13703 24.28176 26.93438 34.62539   100</span>
-<span class="co">#&gt;  12.09360 10.82749 12.46859 52.62575   100</span>
-<span class="co">#&gt;  11.43926 10.73603 11.65775 17.19283   100</span></code></pre></div>
+<span class="co">#&gt;                                                   expr       min       lq</span>
+<span class="co">#&gt;                                       sample(seq_n, n) 21.861363 25.53944</span>
+<span class="co">#&gt;                                       sample.int(n, n)  9.964609 12.20357</span>
+<span class="co">#&gt;  .Internal(sample(n, n, replace = FALSE, prob = NULL)) 10.381023 12.33461</span>
+<span class="co">#&gt;      mean   median       uq       max neval</span>
+<span class="co">#&gt;  30.12183 26.79968 32.35107 135.07389   100</span>
+<span class="co">#&gt;  15.02229 12.74479 17.84642  26.72160   100</span>
+<span class="co">#&gt;  15.56904 13.10567 18.89222  31.36337   100</span></code></pre></div>
 <p>The <code>sample.int()</code> versions give clearly the biggest improvement. Since the internal version doesn’t provide any clear improvement, but restricts the general scope of our function, we choose to implement <code>sample.int()</code> in a third version of <code>cor_df()</code> and benchmark our actual achievements:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cor_df3 &lt;-<span class="st"> </span>function() {
   i &lt;-<span class="st"> </span><span class="kw">sample.int</span>(n, n)
@@ -641,9 +637,9 @@ microbenchmark::<span class="kw">microbenchmark</span>(
 )
 <span class="co">#&gt; Unit: milliseconds</span>
 <span class="co">#&gt;       expr       min        lq     mean   median       uq       max neval</span>
-<span class="co">#&gt;   cor_df() 631.70368 755.94269 852.9936 809.6646 936.6149 1490.2436   100</span>
-<span class="co">#&gt;  cor_df2()  80.99834 116.23442 209.3948 171.8103 293.0193  594.5985   100</span>
-<span class="co">#&gt;  cor_df3()  65.40005  84.28988 217.1245 140.5378 288.7853  627.2654   100</span></code></pre></div>
+<span class="co">#&gt;   cor_df() 630.29741 775.17499 843.7971 835.1688 895.0058 1285.0467   100</span>
+<span class="co">#&gt;  cor_df2()  85.93925  97.74491 192.8243 129.4853 274.8726  705.2006   100</span>
+<span class="co">#&gt;  cor_df3()  70.69506  85.19641 196.4155 126.5579 239.7615  693.2441   100</span></code></pre></div>
 <p>As a last step, we try to speedup the calculation of the pearson correlation coefficient. Since quite a lot of functionality is build into the <code>stats::cor()</code> function this seems like a reasonable approach. We try this by working with another <code>cor()</code> function from the <code>WGNA</code> package and an own implementation which should give a small improvement, because we use <code>sum(x) / length(x)</code> instead of <code>mean(x)</code> for internal calculations:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#WGCNA version (matrix and vector). Note that I don&#39;t use a local setup which uses</span>
 <span class="co">#the full potential of this function. For furter information see ?WGCNA::cor</span>
@@ -827,7 +823,7 @@ df$group &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">10</span>)
 b &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">10</span>)
 <span class="kw">sum</span>(a *<span class="st"> </span>b) -<span class="st"> </span><span class="kw">crossprod</span>(a, b)[<span class="dv">1</span>]
-<span class="co">#&gt; [1] 0</span></code></pre></div>
+<span class="co">#&gt; [1] -1.776357e-15</span></code></pre></div>
 <p>A benchmark of both alternatives for different vector lengths indicates, that the <code>crossprod()</code> variant is about 2.5 times faster than <code>sum()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dimensions &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1e1</span>, <span class="fl">1e2</span>, <span class="fl">1e3</span>, <span class="fl">1e4</span>, <span class="fl">1e5</span>, <span class="fl">1e6</span>, <span class="fl">0.5e7</span>, <span class="fl">1e7</span>)
 xvector &lt;-<span class="st"> </span><span class="kw">lapply</span>(dimensions, rnorm)
@@ -835,8 +831,6 @@ weights &lt;-<span class="st"> </span><span class="kw">lapply</span>(dimensions,
 
 bench_sum &lt;-<span class="st"> </span><span class="kw">Map</span>(function(x, y) <span class="kw">fivenum</span>(<span class="kw">microbenchmark</span>(<span class="kw">sum</span>(x *<span class="st"> </span>y))$time),
                  xvector, weights)
-<span class="co">#&gt; Warning in microbenchmark(sum(x * y)): Could not measure a positive</span>
-<span class="co">#&gt; execution time for one evaluation.</span>
 bench_sum &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">time =</span> <span class="kw">unlist</span>(bench_sum),
                         <span class="dt">call =</span> <span class="st">&quot;sum&quot;</span>,
                         <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)
