@@ -26,7 +26,7 @@
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
 
-<meta name="date" content="2017-04-10">
+<meta name="date" content="2017-04-13">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -312,11 +312,11 @@ for (i in <span class="kw">seq_along</span>(bootstraps)){
 <span class="co">#&gt; [1] 0.7183433 0.8596865 0.7809306 0.8838038</span></code></pre></div>
 <p>And the models in exercise 4:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sapply</span>(la, rsq)
-<span class="co">#&gt;  [1] 0.7651490 0.5738576 0.7096289 0.7362846 0.7700572 0.7265526 0.8140816</span>
-<span class="co">#&gt;  [8] 0.6131600 0.8017107 0.6861357</span>
+<span class="co">#&gt;  [1] 0.7990792 0.7009245 0.7216638 0.6738844 0.7795533 0.7347545 0.6512762</span>
+<span class="co">#&gt;  [8] 0.6943613 0.5996738 0.7131770</span>
 <span class="kw">sapply</span>(lf, rsq)
-<span class="co">#&gt;  [1] 0.7651490 0.5738576 0.7096289 0.7362846 0.7700572 0.7265526 0.8140816</span>
-<span class="co">#&gt;  [8] 0.6131600 0.8017107 0.6861357</span></code></pre></div></li>
+<span class="co">#&gt;  [1] 0.7990792 0.7009245 0.7216638 0.6738844 0.7795533 0.7347545 0.6512762</span>
+<span class="co">#&gt;  [8] 0.6943613 0.5996738 0.7131770</span></code></pre></div></li>
 </ol>
 </div>
 <div id="for-loops-functionals-friends-of-lapply" class="section level2">
@@ -370,7 +370,7 @@ df$b &lt;-<span class="st"> </span>a
 <pre><code>#&gt; function (n, expr, simplify = &quot;array&quot;) 
 #&gt; sapply(integer(n), eval.parent(substitute(function(...) expr)), 
 #&gt;     simplify = simplify)
-#&gt; &lt;bytecode: 0x0000000014244b98&gt;
+#&gt; &lt;bytecode: 0x000000001507c918&gt;
 #&gt; &lt;environment: namespace:base&gt;</code></pre>
 <p>Like <code>sapply()</code> <code>replicate()</code> eliminates a for loop. As explained for <code>Map()</code> in the textbook, also every <code>replicate()</code> could have been written via <code>lapply()</code>. But using <code>replicate()</code> is more concise, and more clearly indicates what you’re trying to do.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Implement a version of <code>lapply()</code> that supplies <code>FUN</code> with both the name and the value of each component.</p>
