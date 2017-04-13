@@ -42,9 +42,9 @@
     }
     runif2 <- f(runif)
     runif2(5)
-    #> [1] 0.1862453 0.7643856 0.8648133 0.7425681 0.6165993
+    #> [1] 0.38117830 0.62566813 0.01181258 0.56624290 0.79400080
     runif2(10)
-    #> [1] 0.1862453 0.7643856 0.8648133 0.7425681 0.6165993
+    #> [1] 0.38117830 0.62566813 0.01181258 0.56624290 0.79400080
     ```
     
     __<span style="color:green">A</span>__: It returns a new version of the inputfunction. That version will always return the result of it's first run (in case this not `NULL`), no matter how the input changes. Good names could be `first_run()` or `initial_return()`. 
@@ -403,17 +403,17 @@
     trims <- c(0, 0.1, 0.2, 0.5)
     x <- rcauchy(1000)
     unlist(lapply(trims, function(trim) mean(x, trim = trim)))
-    #> [1] -1.65539270 -0.04430288 -0.01030057  0.01839772
+    #> [1] -0.086973156 -0.039487297 -0.011210230 -0.008979957
     unlist(lapply(trims, partial(mean, x)))
-    #> [1] -1.65539270 -0.04430288 -0.01030057  0.01839772
+    #> [1] -0.086973156 -0.039487297 -0.011210230 -0.008979957
     
     # 2
     xs <- replicate(5, runif(10), simplify = FALSE)
     ws <- replicate(5, rpois(10, 5) + 1, simplify = FALSE)
     unlist(Map(function(x, w) weighted.mean(x, w, na.rm = TRUE), xs, ws))
-    #> [1] 0.5690851 0.5263820 0.5136807 0.3526922 0.5492151
+    #> [1] 0.5157080 0.3917117 0.3148246 0.6154536 0.4376859
     unlist(Map(partial(weighted.mean, na.rm = TRUE), xs, ws))
-    #> [1] 0.5690851 0.5263820 0.5136807 0.3526922 0.5492151
+    #> [1] 0.5157080 0.3917117 0.3148246 0.6154536 0.4376859
     
     # 3
     add <- function(x, y, na.rm = FALSE) {

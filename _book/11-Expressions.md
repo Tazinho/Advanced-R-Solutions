@@ -329,6 +329,11 @@ with the help of a separate `switch()`.
     
     ```r
     library(pryr)
+    #> 
+    #> Attaching package: 'pryr'
+    #> The following object is masked _by_ '.GlobalEnv':
+    #> 
+    #>     make_call
     standardise_call(quote(mean(1:10, na.rm = TRUE)))
     #> mean(x = 1:10, na.rm = TRUE)
     standardise_call(quote(mean(n = T, 1:10)))
