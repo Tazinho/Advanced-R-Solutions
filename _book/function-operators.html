@@ -26,7 +26,7 @@
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
 
-<meta name="date" content="2017-04-10">
+<meta name="date" content="2017-04-13">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -284,9 +284,9 @@ mean2 &lt;-<span class="st"> </span><span class="kw">logger</span>(mean, <span c
 }
 runif2 &lt;-<span class="st"> </span><span class="kw">f</span>(runif)
 <span class="kw">runif2</span>(<span class="dv">5</span>)
-<span class="co">#&gt; [1] 0.1862453 0.7643856 0.8648133 0.7425681 0.6165993</span>
+<span class="co">#&gt; [1] 0.38117830 0.62566813 0.01181258 0.56624290 0.79400080</span>
 <span class="kw">runif2</span>(<span class="dv">10</span>)
-<span class="co">#&gt; [1] 0.1862453 0.7643856 0.8648133 0.7425681 0.6165993</span></code></pre></div>
+<span class="co">#&gt; [1] 0.38117830 0.62566813 0.01181258 0.56624290 0.79400080</span></code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: It returns a new version of the inputfunction. That version will always return the result of it’s first run (in case this not <code>NULL</code>), no matter how the input changes. Good names could be <code>first_run()</code> or <code>initial_return()</code>.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Modify <code>delay_by()</code> so that instead of delaying by a fixed amount of time, it ensures that a certain amount of time has elapsed since the function was last called. That is, if you called <code>g &lt;- delay_by(1, f); g(); Sys.sleep(2); g()</code> there shouldn’t be an extra delay.</p>
 <p><strong><span style="color:green">A</span></strong>: We can do this with three little tricks (and the help of 42):</p>
@@ -534,17 +534,17 @@ as.data.frame.function &lt;-<span class="st"> </span>function(f){
 trims &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.5</span>)
 x &lt;-<span class="st"> </span><span class="kw">rcauchy</span>(<span class="dv">1000</span>)
 <span class="kw">unlist</span>(<span class="kw">lapply</span>(trims, function(trim) <span class="kw">mean</span>(x, <span class="dt">trim =</span> trim)))
-<span class="co">#&gt; [1] -1.65539270 -0.04430288 -0.01030057  0.01839772</span>
+<span class="co">#&gt; [1] -0.086973156 -0.039487297 -0.011210230 -0.008979957</span>
 <span class="kw">unlist</span>(<span class="kw">lapply</span>(trims, <span class="kw">partial</span>(mean, x)))
-<span class="co">#&gt; [1] -1.65539270 -0.04430288 -0.01030057  0.01839772</span>
+<span class="co">#&gt; [1] -0.086973156 -0.039487297 -0.011210230 -0.008979957</span>
 
 <span class="co"># 2</span>
 xs &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dv">5</span>, <span class="kw">runif</span>(<span class="dv">10</span>), <span class="dt">simplify =</span> <span class="ot">FALSE</span>)
 ws &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dv">5</span>, <span class="kw">rpois</span>(<span class="dv">10</span>, <span class="dv">5</span>) +<span class="st"> </span><span class="dv">1</span>, <span class="dt">simplify =</span> <span class="ot">FALSE</span>)
 <span class="kw">unlist</span>(<span class="kw">Map</span>(function(x, w) <span class="kw">weighted.mean</span>(x, w, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), xs, ws))
-<span class="co">#&gt; [1] 0.5690851 0.5263820 0.5136807 0.3526922 0.5492151</span>
+<span class="co">#&gt; [1] 0.5157080 0.3917117 0.3148246 0.6154536 0.4376859</span>
 <span class="kw">unlist</span>(<span class="kw">Map</span>(<span class="kw">partial</span>(weighted.mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), xs, ws))
-<span class="co">#&gt; [1] 0.5690851 0.5263820 0.5136807 0.3526922 0.5492151</span>
+<span class="co">#&gt; [1] 0.5157080 0.3917117 0.3148246 0.6154536 0.4376859</span>
 
 <span class="co"># 3</span>
 add &lt;-<span class="st"> </span>function(x, y, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
