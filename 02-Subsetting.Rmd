@@ -14,7 +14,7 @@
 
 2.  __<span style="color:red">Q</span>__: Why does `x <- 1:5; x[NA]` yield five missing values? (Hint: why is 
     it different from `x[NA_real_]`?)  
-    __<span style="color:green">A</span>__: `NA` is of class logical, so `x[NA]` becomes recycled to `x[NA, NA, NA, NA, NA]`. Since subsetting an atomic with `NA` leads to an `NA`, you will get 5 of them returned.
+    __<span style="color:green">A</span>__: `NA` is of class logical, so `x[NA]` becomes recycled to `x[NA, NA, NA, NA, NA]`. Since subsetting an atomic with `NA` leads to an `NA`, you will get 5 of them returned. (Note that the recycling won't happen, if you subset with `NA_real_`, `NA_integer`, `NA_character` or `NA_complex`. In fact the letter gives an error).
     
 3.  __<span style="color:red">Q</span>__: What does `upper.tri()` return? How does subsetting a matrix with it 
     work? Do we need any additional subsetting rules to describe its behaviour?
@@ -22,13 +22,13 @@
     ```{r, eval = FALSE}
     x <- outer(1:5, 1:5, FUN = "*")
     x[upper.tri(x)]
-    ```  
+    ```
     
-    __<span style="color:green">A</span>__: `upper.tri()` has really intuitive source code. It coerces it's input to a matrix and returns a logical matrix. Hence describing it's behaviour for the use of subsetting is based on everything that applies to subsetting with logical matrices.
+    __<span style="color:green">A</span>__: `upper.tri()` has really intuitive source code. It coerces its input to a matrix and returns a logical matrix. Hence describing it's behaviour for the use of subsetting is based on everything that applies to subsetting with logical matrices.
 
 4.  __<span style="color:red">Q</span>__: Why does `mtcars[1:20]` return an error? How does it differ from the 
     similar `mtcars[1:20, ]`?  
-    __<span style="color:green">A</span>__: In the first case `mtcar` is subsetted with a vector and the statement should return a data.frame of the first 20 columns in `mtcars`. Since `mtcars` only has 11 columns, the index is out of bounds, which explains the error. The biggest difference of `mtcars[1:20, ]` to the former case, is that now `mtcars` is subsetted with two vectors. In this case you will get returned the first 20 rows and all columns (like subsetting a matrix). 
+    __<span style="color:green">A</span>__: In the first case `mtcars` is subsetted with a vector and the statement should return a data.frame of the first 20 columns in `mtcars` (this is like listsubsetting in the sense, that each element is a column and the result is typestable). Since `mtcars` only has 11 columns, the index is out of bounds, which explains the error. The biggest difference of `mtcars[1:20, ]` to the former case, is that now `mtcars` is subsetted with two vectors. In this case you will get returned the first 20 rows and all columns (like subsetting a matrix). 
 
 5.  __<span style="color:red">Q</span>__: Implement your own function that extracts the diagonal entries from a
     matrix (it should behave like `diag(x)` where `x` is a matrix).  
@@ -117,7 +117,7 @@
     )
     ```
     
-    We can see that our diag_m version is only a little bit slower than the 
+    We can see that our `diag_m()` version is only a little bit slower than the 
     original version. However the source code of the matrix version could be a bit
     easier to read.
     
@@ -157,7 +157,7 @@
 
 6.  __<span style="color:red">Q</span>__: What does `df[is.na(df)] <- 0` do? How does it work?  
 __<span style="color:green">A</span>__: It replaces all `NA`s within `df` with the value
-`0`. `is.na(df)` returns a logical matrix which is used to subset df. Since you can combine subsetting and assignment, only the matched part of `df` (the `NA`s) is replaced with `0` entries.
+`0`. `is.na(df)` returns a logical matrix which is used to subset df. Since you can combine subsetting and assignment (specifically `[<-` is called), only the matched part of `df` (the `NA`s) is replaced with `0` entries.
 
 ## Subsetting operators
 
@@ -167,10 +167,10 @@ __<span style="color:green">A</span>__: It replaces all `NA`s within `df` with t
     __<span style="color:green">A</span>__: Since `mod` is of type list we can expect several possibilities:
     
     ```{r, eval = FALSE}
-    mod$df.residual       # preserving output
-    mod$df.r              # preserving output with partial matching
-    mod["df.residual"]    # list output (without partial matching)
-    mod[["df.residual"]]  # preserving output (without partial matching)
+    mod$df.residual       # simplifying output
+    mod$df.r              # simplifying output with partial matching
+    mod["df.residual"]    # preserving list output (without partial matching)
+    mod[["df.residual"]]  # simplifying output (without partial matching)
     ```
     
     The same states for `summary(mod)`, so we can use for example:
@@ -189,7 +189,7 @@ __<span style="color:green">A</span>__: It replaces all `NA`s within `df` with t
     __<span style="color:green">A</span>__: Combine `` `[` `` with the `sample()` function:
     
     ```{r,eval = FALSE}
-    iris[sample(ncol(iris))] # permute rows
+    iris[sample(ncol(iris))] # permute columns
     iris[sample(nrow(iris)), sample(ncol(iris)), drop = FALSE] # permute both at the same time
     ```
 
@@ -200,7 +200,7 @@ __<span style="color:green">A</span>__: It replaces all `NA`s within `df` with t
     
     ```{r, eval = FALSE}
     m=10
-    iris[sample(nrow(iris), m),]
+    iris[sample(nrow(iris), m), , drop = FALSE]
     
     # Blockversion
     start <- sample(nrow(iris) - m + 1, 1)
