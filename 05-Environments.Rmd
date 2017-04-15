@@ -11,7 +11,8 @@ __<span style="color:green">A</span>__: The most important differences are:
 
 2.  __<span style="color:red">Q</span>__: If you don't supply an explicit environment, where do `ls()` and `rm()`
     look? Where does `<-` make bindings? The  
-    __<span style="color:green">A</span>__: `ls()` and `rm` look in their calling environments which they find by `as.environment(-1)`.  
+    __<span style="color:green">A</span>__: `ls()` and `rm` look in their calling environments which they find by `as.environment(-1)`.
+    <!-- Stil! (Zeile drüber ist "denglisch", weiß es auch gerade nicht besser) -->
     From the book:
     
     > Assignment is the act of binding (or rebinding) a name to a value in an environment.  
@@ -39,6 +40,7 @@ __<span style="color:green">A</span>__: The most important differences are:
     ```
     
     To implement a new version of `search()` we use a while statement:
+    <!-- Sollte `while` vielleicht als Code gemarkupt werden? -->
     
     ```{r, eval = TRUE}
     search2 <- function(env = globalenv()){
@@ -63,6 +65,7 @@ __<span style="color:green">A</span>__: The most important differences are:
 1.  __<span style="color:red">Q</span>__: Modify `where()` to find all environments that contain a binding for
     `name`.  
     __<span style="color:green">A</span>__: We look at the source code of the original `pryr::where()`:  
+    <!-- Vorschlag: Let us look at the source code... -->
     
     ```{r, eval = FALSE}
     pryr::where
@@ -83,6 +86,8 @@ __<span style="color:green">A</span>__: The most important differences are:
     ```
     
     Since `where()` stops searching when a match appears, we copy the recursive call in the `else` block to the block of the matching ("success") case, so that our new function `where2` will look for a binding within the complete search path. We also need to pay attention to other details. We have to take care to save the bindings in an object, while not overriding it in our recursive calls. So we create a list object for that and define a new function within `where2()` that we call `where2.internal`. `where2.internal()` will do the recursive work and whenever it finds a binding it will write it via `<<-` to the especially created list in its enclosing environment:
+    <!-- Vorschlag: We should take care to save the bindings in an object, without overriding it in our recursive calls. -->
+    <!-- Finde den obigen Abschnitt noch etwas "holprig" (und die Erklärungen zum Code da unten eigentlich auch) -->
 
     ```{r, eval = FALSE}
     where2 <- function(name, env = parent.frame()){
@@ -123,11 +128,12 @@ __<span style="color:green">A</span>__: The most important differences are:
     }
     ```   
     
-    Note that `where2.internal()` still provides the same structure as `pryr::where` does and you can also divide it in "base case", "success case" and "recursive case".
+    Note that `where2.internal()` still provides the same structure as `pryr::where` does so that you can also divide it in "base case", "success case" and "recursive case".
+ <!-- kurzen Kommentar eingefügt. -->
 
 2.  __<span style="color:red">Q</span>__: Write your own version of `get()` using a function written in the style 
     of `where()`.  
-    __<span style="color:green">A</span>__: Note that `get()` provides a bit more arguments than our following version, but it should be easy to build up on that. However, we can change `pryr::where` to `get2()` with just changing one line of code (and the function name for the recursive call):
+    __<span style="color:green">A</span>__: Note that `get()` provides a bit more arguments than our following version, but it should be easy to build upon that. However, we can change `pryr::where` to `get2()` by just changing one line of code (and the function name for the recursive call):
     
     ```{r}
     get2 <- function(name, env = parent.frame()) 
@@ -139,7 +145,7 @@ __<span style="color:green">A</span>__: The most important differences are:
         }
       if (exists(name, env, inherits = FALSE)) {
         # we cancel env and substitute it with the following line, where we subset
-        # the environment (like a list) by the name of our object and return it
+        # the environment (like a list) by the name of our object and return it.
         return(env[[name]])
         }
       else {
@@ -239,7 +245,8 @@ __<span style="color:green">A</span>__: The most important differences are:
     *   Enclosing: where the function is created
     *   Binding: where the function was assigned
     *   Execution: a temporary environment which is created when the function is executed
-    *   Calling: the environment from where the function was called  
+    *   Calling: the environment from where the function was called 
+    <!-- Die ersten beiden Antworten klingen "holprig" -->
     
     The difference between binding and enclosing environment is important, because of R's lexical scoping rules. If R can't find an object in the current environment while executing a function, it will look for it in the enclosing environment.
     
@@ -395,3 +402,5 @@ __<span style="color:green">A</span>__:
     ```
     
     At the moment we have no idea for a good default guess routine, so that a specific `atype` of assignment would be done based on the input.
+    
+<!-- Very nice. Irgendwann muss ich nochmal verstehen, was du da geschrieben hast. ;-) -->
