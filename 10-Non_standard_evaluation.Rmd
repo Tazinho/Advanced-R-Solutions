@@ -214,7 +214,7 @@
     __<span style="color:green">A</span>__: `substitute(order(...))` orders the indices of the supplied
     columns in `...` in the context of the submitted data.frame argument, beginning with the first submitted column.
   
-    We can just copy the part of the source code and see if it does what we expect:
+    We can just copy the part of the source code from `plyr::arrange()` and see if it does what we expect:
   
     ```{r, eval = FALSE}
     arrange_indices <- function (df, ...){
@@ -329,7 +329,7 @@
     source code for `within.data.frame()`. Why is the code so much more
     complex than `with()`?
     
-    __<span style="color:orange">A</span>__: `with()` is a generic function
+    __<span style="color:green">A</span>__: `with()` is a generic function
     that allows writing an expression (second argument) that refers to variablenames of `data` (first argument) as if the corresponding variables were objects themselves.
     
     `with()` evaluates the expression via an
@@ -342,7 +342,7 @@
     parent. This also means that variables that aren't found in `data`, will be looked up in `with()`'s calling environment. As stated in `?with`, this is useful for modelling functions.
     
     In contrast to `with()`, which returns the value of the evaluated expression, `within()` returns the modified object. So `within()` can be used as an alternative to `base::transform()`.
-    There is also a subtile difference regarding the non standard evaluation technique (which I don't understand in detail). `within()` first creates an environment with `data` as parent and `within()`'s calling environment as grandparent. This environment becomes changed, since afterwards the expression is evaluated inside of it. The rest of the code converts this environment into a list and ensures that new variables are not overriden by the former ones.
+    `within()` first creates an environment with `data` as parent and `within()`'s calling environment as grandparent. This environment becomes changed, since afterwards the expression is evaluated inside of it. The rest of the code converts this environment into a list and ensures that new variables are not overriden by the former ones.
 
 ## Calling from another function
 
