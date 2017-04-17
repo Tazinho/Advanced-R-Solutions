@@ -1,6 +1,6 @@
 --- 
 title: "Advanced R Solutions"
-author: "Malte Grosser, Henning Bumann, Peter Hurford & Robert Krzyzanowski"
+author: "Malte Grosser & Henning Bumann"
 date: "`r Sys.Date()`"
 knit: "bookdown::render_book"
 site: bookdown::bookdown_site
@@ -37,7 +37,7 @@ knitr::include_graphics('images/advrs_cover.png', dpi = NA)
 ```
 
 This book aims to contribute solutions to Hadley Wickham's book [Advanced R](http://adv-r.had.co.nz/).
-It is planned to finish until July 2017. The code can be found on [github](https://github.com/Tazinho/Advanced-R-Solutions.git).
+It is planned to finish until end of 2016. The code can be found on [github](https://github.com/Tazinho/Advanced-R-Solutions.git).
 
 The date of the exercise versions in Hadley's book is January 25th 2017.
 
@@ -48,51 +48,17 @@ date()
 
 
 ```{r, echo = FALSE, warning=FALSE}
-suppressPackageStartupMessages(library(dplyr))
-suppressPackageStartupMessages(library(tidyr))
-suppressPackageStartupMessages(library(ggplot2))
-suppressPackageStartupMessages(library(forcats))
-suppressPackageStartupMessages(library(methods))
-df <- tibble::tribble(~`1 Data structures`, ~`2 Subsetting`, ~`3 Functions`, ~`4 OO field guide`, ~`5 Environments`, ~`6 Exceptions and debugging`, ~`7 Functional programming`, ~`8 Functionals`, ~`9 Function operators`, ~`10 Non standard evaluation`, ~`11 Expressions`, ~`12 Domain specific languages`, ~`13 Performance`, ~`14 Profiling`, ~`15 Memory`, ~`16 Rcpp`,
-                      "x",             "x",            "x",                 "x",               "x",                           "-",                         "x",              "x",                     "x",                           "x",               "x",                             "-",               "-",             "x",          "x",        "x",
-                      "x",             "x",            "x",                 "x",               "x",                           "x",                         "x",              "x",                     "x",                           "x",               "-",                             "-",               "x",             "x",          "x",        "x",                                                                      
-                      "x",             "x",            "x",                 "x",               "x",                           "x",                         "x",              "x",                     "x",                           "x",               "x",                             "-",               "x",             "-",          "x",        "x",                                   
-                      "x",             "x",            "x",                 "x",               "x",                            NA,                         "-",              "x",                     "x",                           "x",               "x",                             "-",               "-",             "x",          "x",        "x",                                   
-                      "x",             "x",            "x",                 "x",               "x",                            NA,                         "x",              "x",                     "x",                           "x",               "-",                             "-",               "x",             "x",          "-",        "x",                                   
-                      "x",             "x",            "x",                 "x",               "x",                            NA,                         "x",              "x",                     "-",                           "x",               "x",                             "-",               "-",             "x",          "-",        "-",                                   
-                      "x",             "x",            "x",                 "x",               "x",                            NA,                         "x",              "x",                     "x",                           "x",               "x",                             "-",               "-",             "x",          "-",        "x",                                   
-                      "x",             "x",            "x",                 "x",               "x",                            NA,                         "x",              "x",                     "x",                           "-",               "-",                              NA,               "-",             "-",          "-",        "x",                                   
-                      "x",             "x",            "x",                 "-",               "x",                            NA,                         "x",              "x",                     "x",                           "x",               "x",                              NA,               "-",             "x",          "-",        "x",                                   
-                      "x",             "x",            "x",                 "x",               "x",                            NA,                         "x",              "x",                     "x",                           "x",               "x",                              NA,               "-",             "x",           NA,        "-",                                   
-                      "x",              NA,            "x",                 "x",               "x",                            NA,                         "x",              "x",                     "-",                           "x",               "x",                              NA,               "-",             "-",           NA,         NA,                                   
-                      "x",              NA,            "x",                  NA,               "x",                            NA,                         "x",              "-",                     "-",                           "x",               "x",                              NA,                NA,             "x",           NA,         NA,                                   
-                      "x",              NA,            "x",                  NA,               "x",                            NA,                         "-",              "x",                     "x",                           "x",               "-",                              NA,                NA,             "x",           NA,         NA,                                   
-                      "x",              NA,            "x",                  NA,               "x",                            NA,                         "-",              "x",                     "-",                           "-",               "-",                              NA,                NA,             "x",           NA,         NA,                                   
-                      "x",              NA,            "x",                  NA,               "x",                            NA,                          NA,              "x",                     "x",                           "x",               "x",                              NA,                NA,             "x",           NA,         NA,                                   
-                      NA,              NA,            "x",                  NA,                NA,                            NA,                          NA,              "x",                     "x",                           "-",               "x",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,            "x",                  NA,                NA,                            NA,                          NA,              "x",                     "x",                           "-",               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,            "x",                  NA,                NA,                            NA,                          NA,              "x",                     "-",                           "-",               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,            "x",                  NA,                NA,                            NA,                          NA,              "x",                     "x",                           "-",               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,              "x",                      NA,                           "x",               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,              "x",                      NA,                           "-",               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,              "x",                      NA,                           "-",               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,              "-",                      NA,                           "-",               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,              "x",                      NA,                           "-",               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,              "x",                      NA,                           "x",               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,              "x",                      NA,                            NA,               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,               NA,                      NA,                            NA,               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,               NA,                      NA,                            NA,               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,               NA,                      NA,                            NA,               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,               NA,                      NA,                            NA,               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,               NA,                      NA,                            NA,               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,               NA,                      NA,                            NA,               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,               NA,                      NA,                            NA,               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,               NA,                      NA,                            NA,               "-",                              NA,                NA,              NA,           NA,         NA,                                   
-                      NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,               NA,                      NA,                            NA,               "-",                              NA,                NA,              NA,           NA,         NA)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(forcats)
+```
 
+```{r, echo = FALSE, warning=FALSE}
+df <- data.table::fread("D://R//Projects//Advanced R//adv_r_solved_solutions.txt", data.table = FALSE)
 df[df == "x"] <- TRUE
 df[df == "-"] <- FALSE
-#df[df == ""] <- NA 
+df[df == ""] <- NA
 
 df[] <- lapply(df, as.logical)
 
@@ -139,4 +105,4 @@ knitr::write_bib(c(
 ), 'packages.bib')
 ```
 
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work by Malte Grosser, Henning Bumann, Peter Hurford & Robert Krzyzanowski is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work by Malte Grosser and Henning Bumann is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>
