@@ -7,26 +7,26 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Advanced R Solutions</title>
   <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
-  <meta name="description" content="Solutions to the exercises in Hadley Wickhams book Advanced R.">
-  <meta name="generator" content="bookdown 0.1.7 and GitBook 2.6.7">
+  <meta name="description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R.">
+  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
 
   <meta property="og:title" content="Advanced R Solutions" />
   <meta property="og:type" content="book" />
   
-  
-  <meta property="og:description" content="Solutions to the exercises in Hadley Wickhams book Advanced R." />
+  <meta property="og:image" content="images/advrs_cover.png" />
+  <meta property="og:description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R." />
   <meta name="github-repo" content="Tazinho/Advanced-R-Solutions" />
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Advanced R Solutions" />
   
-  <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickhams book Advanced R." />
-  
+  <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R." />
+  <meta name="twitter:image" content="images/advrs_cover.png" />
 
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
-<meta name="date" content="2016-09-11">
 
+<meta name="date" content="2017-04-13">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -49,6 +49,43 @@
 
 
 
+<!-- COLLAPSIBLE TEXT WITH OPEN ALL/CLOSE ALL LINK -->
+
+<!-- This goes into the HEAD of the html file -->
+
+<script language="JavaScript" type="text/javascript">
+<!-- Copyright 2007, Sandeep Gangadharan -->
+<!-- For more free scripts go to http://www.sivamdesign.com/scripts/ -->
+<!--
+if (document.getElementById) {
+ document.write('<style type="text/css">.texter {display:none; border-left:white 20px solid; color:#404040; font-family:verdana,arial,helvetica,sans-serif; font-size:9pt} @media print {.texter {display:block;}}</style>') }
+
+ var divNum = new Array("a1","a2","a3");  // at the left you should add a1, a2 etc. for each header you wish to include
+                                          // so if you want 4 headers you should add a1, a2, a3, a4 in the format shown
+                                          // enclosed in double quotes
+function openClose(theID) {
+ for(var i=0; i < divNum.length; i++) {
+  if (divNum[i] == theID) {
+   if (document.getElementById(divNum[i]).style.display == "block") { document.getElementById(divNum[i]).style.display = "none" }
+   else { document.getElementById(divNum[i]).style.display = "block" }
+  }
+  else { document.getElementById(divNum[i]).style.display = "none"; }
+ }
+}
+
+function openAll() {
+ for(var i=0; i < divNum.length; i++) {
+   document.getElementById(divNum[i]).style.display = "block";
+ }
+}
+
+function closeAll() {
+ for(var i=0; i < divNum.length; i++) {
+   document.getElementById(divNum[i]).style.display = "none";
+ }
+}
+// -->
+</script>
 
 
 <style type="text/css">
@@ -101,25 +138,101 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <ul class="summary">
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a></li>
-<li class="chapter" data-level="1" data-path="data-structures.html"><a href="data-structures.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
-<li class="chapter" data-level="2" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>2</b> Subsetting</a></li>
-<li class="chapter" data-level="3" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>3</b> Functions</a></li>
-<li class="chapter" data-level="4" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>4</b> OO field guide</a></li>
-<li class="chapter" data-level="5" data-path="environments.html"><a href="environments.html"><i class="fa fa-check"></i><b>5</b> Environments</a></li>
+<li class="chapter" data-level="1" data-path="data-structures.html"><a href="data-structures.html"><i class="fa fa-check"></i><b>1</b> Data structures</a><ul>
+<li class="chapter" data-level="1.1" data-path="data-structures.html"><a href="data-structures.html#vectors"><i class="fa fa-check"></i><b>1.1</b> Vectors</a></li>
+<li class="chapter" data-level="1.2" data-path="data-structures.html"><a href="data-structures.html#attributes"><i class="fa fa-check"></i><b>1.2</b> Attributes</a></li>
+<li class="chapter" data-level="1.3" data-path="data-structures.html"><a href="data-structures.html#matrices-and-arrays"><i class="fa fa-check"></i><b>1.3</b> Matrices and arrays</a></li>
+<li class="chapter" data-level="1.4" data-path="data-structures.html"><a href="data-structures.html#data-frames"><i class="fa fa-check"></i><b>1.4</b> Data frames</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>2</b> Subsetting</a><ul>
+<li class="chapter" data-level="2.1" data-path="subsetting.html"><a href="subsetting.html#data-types"><i class="fa fa-check"></i><b>2.1</b> Data types</a></li>
+<li class="chapter" data-level="2.2" data-path="subsetting.html"><a href="subsetting.html#subsetting-operators"><i class="fa fa-check"></i><b>2.2</b> Subsetting operators</a></li>
+<li class="chapter" data-level="2.3" data-path="subsetting.html"><a href="subsetting.html#applications"><i class="fa fa-check"></i><b>2.3</b> Applications</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>3</b> Functions</a><ul>
+<li class="chapter" data-level="3.1" data-path="functions.html"><a href="functions.html#function-components"><i class="fa fa-check"></i><b>3.1</b> Function components</a></li>
+<li class="chapter" data-level="3.2" data-path="functions.html"><a href="functions.html#lexical-scoping"><i class="fa fa-check"></i><b>3.2</b> Lexical Scoping</a></li>
+<li class="chapter" data-level="3.3" data-path="functions.html"><a href="functions.html#function-arguments"><i class="fa fa-check"></i><b>3.3</b> Function arguments</a></li>
+<li class="chapter" data-level="3.4" data-path="functions.html"><a href="functions.html#special-calls"><i class="fa fa-check"></i><b>3.4</b> Special calls</a></li>
+<li class="chapter" data-level="3.5" data-path="functions.html"><a href="functions.html#return-values"><i class="fa fa-check"></i><b>3.5</b> Return Values</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>4</b> OO field guide</a><ul>
+<li class="chapter" data-level="4.1" data-path="oo-field-guide.html"><a href="oo-field-guide.html#s3"><i class="fa fa-check"></i><b>4.1</b> S3</a></li>
+<li class="chapter" data-level="4.2" data-path="oo-field-guide.html"><a href="oo-field-guide.html#s4"><i class="fa fa-check"></i><b>4.2</b> S4</a></li>
+<li class="chapter" data-level="4.3" data-path="oo-field-guide.html"><a href="oo-field-guide.html#rc"><i class="fa fa-check"></i><b>4.3</b> RC</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="environments.html"><a href="environments.html"><i class="fa fa-check"></i><b>5</b> Environments</a><ul>
+<li class="chapter" data-level="5.1" data-path="environments.html"><a href="environments.html#environment-basics"><i class="fa fa-check"></i><b>5.1</b> Environment basics</a></li>
+<li class="chapter" data-level="5.2" data-path="environments.html"><a href="environments.html#recursing-over-environments"><i class="fa fa-check"></i><b>5.2</b> Recursing over environments</a></li>
+<li class="chapter" data-level="5.3" data-path="environments.html"><a href="environments.html#function-environments"><i class="fa fa-check"></i><b>5.3</b> Function environments</a></li>
+<li class="chapter" data-level="5.4" data-path="environments.html"><a href="environments.html#binding-names-to-values"><i class="fa fa-check"></i><b>5.4</b> Binding names to values</a></li>
+</ul></li>
 <li class="chapter" data-level="6" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html"><i class="fa fa-check"></i><b>6</b> Exceptions and debugging</a><ul>
 <li class="chapter" data-level="6.1" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html#condition-handling"><i class="fa fa-check"></i><b>6.1</b> Condition handling</a></li>
 <li class="chapter" data-level="6.2" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html#defensive-programming"><i class="fa fa-check"></i><b>6.2</b> Defensive programming</a></li>
 </ul></li>
-<li class="chapter" data-level="7" data-path="functional-programming.html"><a href="functional-programming.html"><i class="fa fa-check"></i><b>7</b> Functional programming</a></li>
-<li class="chapter" data-level="8" data-path="functionals.html"><a href="functionals.html"><i class="fa fa-check"></i><b>8</b> Functionals</a></li>
-<li class="chapter" data-level="9" data-path="function-operators.html"><a href="function-operators.html"><i class="fa fa-check"></i><b>9</b> Function operators</a></li>
-<li class="chapter" data-level="10" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html"><i class="fa fa-check"></i><b>10</b> Non standard evaluation</a></li>
-<li class="chapter" data-level="11" data-path="expressions.html"><a href="expressions.html"><i class="fa fa-check"></i><b>11</b> Expressions</a></li>
-<li class="chapter" data-level="12" data-path="domain-specific-languages.html"><a href="domain-specific-languages.html"><i class="fa fa-check"></i><b>12</b> Domain specific languages</a></li>
-<li class="chapter" data-level="13" data-path="performance.html"><a href="performance.html"><i class="fa fa-check"></i><b>13</b> Performance</a></li>
-<li class="chapter" data-level="14" data-path="profiling.html"><a href="profiling.html"><i class="fa fa-check"></i><b>14</b> Profiling</a></li>
-<li class="chapter" data-level="15" data-path="memory.html"><a href="memory.html"><i class="fa fa-check"></i><b>15</b> Memory</a></li>
-<li class="chapter" data-level="16" data-path="rcpp.html"><a href="rcpp.html"><i class="fa fa-check"></i><b>16</b> Rcpp</a></li>
+<li class="chapter" data-level="7" data-path="functional-programming.html"><a href="functional-programming.html"><i class="fa fa-check"></i><b>7</b> Functional programming</a><ul>
+<li class="chapter" data-level="7.1" data-path="functional-programming.html"><a href="functional-programming.html#annonymous-functions"><i class="fa fa-check"></i><b>7.1</b> Annonymous functions</a></li>
+<li class="chapter" data-level="7.2" data-path="functional-programming.html"><a href="functional-programming.html#closures"><i class="fa fa-check"></i><b>7.2</b> Closures</a></li>
+<li class="chapter" data-level="7.3" data-path="functional-programming.html"><a href="functional-programming.html#lists-of-functions"><i class="fa fa-check"></i><b>7.3</b> Lists of functions</a></li>
+<li class="chapter" data-level="7.4" data-path="functional-programming.html"><a href="functional-programming.html#case-study-numerical-integration"><i class="fa fa-check"></i><b>7.4</b> Case study: numerical integration</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="functionals.html"><a href="functionals.html"><i class="fa fa-check"></i><b>8</b> Functionals</a><ul>
+<li class="chapter" data-level="8.1" data-path="functionals.html"><a href="functionals.html#my-first-functional-lapply"><i class="fa fa-check"></i><b>8.1</b> My first functional: lapply()</a></li>
+<li class="chapter" data-level="8.2" data-path="functionals.html"><a href="functionals.html#for-loops-functionals-friends-of-lapply"><i class="fa fa-check"></i><b>8.2</b> For loops functionals: friends of lapply():</a></li>
+<li class="chapter" data-level="8.3" data-path="functionals.html"><a href="functionals.html#manipulating-matrices-and-data-frames"><i class="fa fa-check"></i><b>8.3</b> Manipulating matrices and data frames</a></li>
+<li class="chapter" data-level="8.4" data-path="functionals.html"><a href="functionals.html#manipulating-lists"><i class="fa fa-check"></i><b>8.4</b> Manipulating lists</a></li>
+<li class="chapter" data-level="8.5" data-path="functionals.html"><a href="functionals.html#mathematical-functionals"><i class="fa fa-check"></i><b>8.5</b> Mathematical functionals</a></li>
+<li class="chapter" data-level="8.6" data-path="functionals.html"><a href="functionals.html#a-family-of-functions"><i class="fa fa-check"></i><b>8.6</b> A family of functions</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="function-operators.html"><a href="function-operators.html"><i class="fa fa-check"></i><b>9</b> Function operators</a><ul>
+<li class="chapter" data-level="9.1" data-path="function-operators.html"><a href="function-operators.html#behavioural-fos"><i class="fa fa-check"></i><b>9.1</b> Behavioural FOs</a></li>
+<li class="chapter" data-level="9.2" data-path="function-operators.html"><a href="function-operators.html#output-fos"><i class="fa fa-check"></i><b>9.2</b> Output FOs</a></li>
+<li class="chapter" data-level="9.3" data-path="function-operators.html"><a href="function-operators.html#input-fos"><i class="fa fa-check"></i><b>9.3</b> Input FOs</a></li>
+<li class="chapter" data-level="9.4" data-path="function-operators.html"><a href="function-operators.html#combining-fos"><i class="fa fa-check"></i><b>9.4</b> Combining FOs</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html"><i class="fa fa-check"></i><b>10</b> Non standard evaluation</a><ul>
+<li class="chapter" data-level="10.1" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#capturing-expressions"><i class="fa fa-check"></i><b>10.1</b> Capturing expressions</a></li>
+<li class="chapter" data-level="10.2" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#non-standard-evaluation-in-subset"><i class="fa fa-check"></i><b>10.2</b> Non standard evaluation in subset</a></li>
+<li class="chapter" data-level="10.3" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#scoping-issues"><i class="fa fa-check"></i><b>10.3</b> Scoping issues</a></li>
+<li class="chapter" data-level="10.4" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#calling-from-another-function"><i class="fa fa-check"></i><b>10.4</b> Calling from another function</a></li>
+<li class="chapter" data-level="10.5" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#substitute"><i class="fa fa-check"></i><b>10.5</b> Substitute</a></li>
+<li class="chapter" data-level="10.6" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#the-downsides-of-non-standard-evaluation"><i class="fa fa-check"></i><b>10.6</b> The downsides of non-standard evaluation</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="expressions.html"><a href="expressions.html"><i class="fa fa-check"></i><b>11</b> Expressions</a><ul>
+<li class="chapter" data-level="11.1" data-path="expressions.html"><a href="expressions.html#structure-of-expressions"><i class="fa fa-check"></i><b>11.1</b> Structure of expressions</a></li>
+<li class="chapter" data-level="11.2" data-path="expressions.html"><a href="expressions.html#names"><i class="fa fa-check"></i><b>11.2</b> Names</a></li>
+<li class="chapter" data-level="11.3" data-path="expressions.html"><a href="expressions.html#calls"><i class="fa fa-check"></i><b>11.3</b> Calls</a></li>
+<li class="chapter" data-level="11.4" data-path="expressions.html"><a href="expressions.html#capturing-the-current-call"><i class="fa fa-check"></i><b>11.4</b> Capturing the current call</a></li>
+<li class="chapter" data-level="11.5" data-path="expressions.html"><a href="expressions.html#pairlists"><i class="fa fa-check"></i><b>11.5</b> Pairlists</a></li>
+<li class="chapter" data-level="11.6" data-path="expressions.html"><a href="expressions.html#parsing-and-deparsing"><i class="fa fa-check"></i><b>11.6</b> Parsing and deparsing</a></li>
+<li class="chapter" data-level="11.7" data-path="expressions.html"><a href="expressions.html#walking-the-ast-with-recursive-functions"><i class="fa fa-check"></i><b>11.7</b> Walking the AST with recursive functions</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="domain-specific-languages.html"><a href="domain-specific-languages.html"><i class="fa fa-check"></i><b>12</b> Domain specific languages</a><ul>
+<li class="chapter" data-level="12.1" data-path="domain-specific-languages.html"><a href="domain-specific-languages.html#html"><i class="fa fa-check"></i><b>12.1</b> HTML</a></li>
+<li class="chapter" data-level="12.2" data-path="domain-specific-languages.html"><a href="domain-specific-languages.html#latex"><i class="fa fa-check"></i><b>12.2</b> LaTeX</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="performance.html"><a href="performance.html"><i class="fa fa-check"></i><b>13</b> Performance</a><ul>
+<li class="chapter" data-level="13.1" data-path="performance.html"><a href="performance.html#microbenchmarking"><i class="fa fa-check"></i><b>13.1</b> Microbenchmarking</a></li>
+<li class="chapter" data-level="13.2" data-path="performance.html"><a href="performance.html#language-performance"><i class="fa fa-check"></i><b>13.2</b> Language performance</a></li>
+<li class="chapter" data-level="13.3" data-path="performance.html"><a href="performance.html#implementations-performance"><i class="fa fa-check"></i><b>13.3</b> Implementations performance</a></li>
+</ul></li>
+<li class="chapter" data-level="14" data-path="profiling.html"><a href="profiling.html"><i class="fa fa-check"></i><b>14</b> Profiling</a><ul>
+<li class="chapter" data-level="14.1" data-path="profiling.html"><a href="profiling.html#has-somebody-already-solved-the-problem"><i class="fa fa-check"></i><b>14.1</b> Has somebody already solved the problem?</a></li>
+<li class="chapter" data-level="14.2" data-path="profiling.html"><a href="profiling.html#do-as-little-as-possible"><i class="fa fa-check"></i><b>14.2</b> Do as little as possible</a></li>
+<li class="chapter" data-level="14.3" data-path="profiling.html"><a href="profiling.html#vectorise"><i class="fa fa-check"></i><b>14.3</b> Vectorise</a></li>
+</ul></li>
+<li class="chapter" data-level="15" data-path="memory.html"><a href="memory.html"><i class="fa fa-check"></i><b>15</b> Memory</a><ul>
+<li class="chapter" data-level="15.1" data-path="memory.html"><a href="memory.html#object-size"><i class="fa fa-check"></i><b>15.1</b> Object size</a></li>
+<li class="chapter" data-level="15.2" data-path="memory.html"><a href="memory.html#memory-profiling-with-lineprof"><i class="fa fa-check"></i><b>15.2</b> Memory profiling with lineprof</a></li>
+<li class="chapter" data-level="15.3" data-path="memory.html"><a href="memory.html#modification-in-place"><i class="fa fa-check"></i><b>15.3</b> Modification in place</a></li>
+</ul></li>
+<li class="chapter" data-level="16" data-path="rcpp.html"><a href="rcpp.html"><i class="fa fa-check"></i><b>16</b> Rcpp</a><ul>
+<li class="chapter" data-level="16.1" data-path="rcpp.html"><a href="rcpp.html#getting-started-with-c"><i class="fa fa-check"></i><b>16.1</b> Getting started with C++</a></li>
+<li class="chapter" data-level="16.2" data-path="rcpp.html"><a href="rcpp.html#missing-values"><i class="fa fa-check"></i><b>16.2</b> Missing values</a></li>
+<li class="chapter" data-level="16.3" data-path="rcpp.html"><a href="rcpp.html#the-stl"><i class="fa fa-check"></i><b>16.3</b> The STL</a></li>
+</ul></li>
+<li class="chapter" data-level="17" data-path="testchapter.html"><a href="testchapter.html"><i class="fa fa-check"></i><b>17</b> Testchapter</a></li>
 </ul>
 
       </nav>
@@ -174,13 +287,78 @@ message2error &lt;-<span class="st"> </span>function(code) {
 mtcars2 &lt;-<span class="st"> </span>mtcars
 mtcars2[-<span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">lapply</span>(mtcars2[-<span class="dv">1</span>], as.character)
 <span class="kw">col_means</span>(mtcars2)</code></pre></div>
-<p><strong><span style="color:green">A</span></strong>:</p></li>
+<p><strong><span style="color:green">A</span></strong>: We divide the tests according their input types and look at the results:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># data.frame input</span>
+<span class="kw">col_means</span>(mtcars) <span class="co"># correct (return: 1 row numeric data.frame)</span>
+<span class="kw">col_means</span>(mtcars[, <span class="dv">0</span>]) <span class="co"># incorrect (return: error. An empty data.frame would be better)</span>
+<span class="kw">col_means</span>(mtcars[<span class="dv">0</span>, ])[[<span class="dv">1</span>]] <span class="co"># correct (return: 1 row numeric (NaN) data.frame, </span>
+  <span class="co"># which becomes an atomic after subsetting</span>
+<span class="kw">col_means</span>(mtcars[, <span class="st">&quot;mpg&quot;</span>, <span class="dt">drop =</span> F]) <span class="co"># incorrect (returns complete the numeric column as a </span>
+  <span class="co"># data.frame with new names)</span>
+
+<span class="co"># other input</span>
+<span class="kw">col_means</span>(<span class="dv">1</span>:<span class="dv">10</span>) <span class="co"># correct (specific error)</span>
+<span class="kw">col_means</span>(<span class="kw">as.matrix</span>(mtcars)) <span class="co"># correct (specific error)</span>
+<span class="kw">col_means</span>(<span class="kw">as.list</span>(mtcars)) <span class="co"># correct (specific error)</span>
+
+<span class="co"># data.fame (numeric + character columns)</span>
+mtcars2 &lt;-<span class="st"> </span>mtcars
+mtcars2[-<span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">lapply</span>(mtcars2[-<span class="dv">1</span>], as.character)
+<span class="kw">col_means</span>(mtcars2) <span class="co"># incorrect (returns the complete numeric column as a data.frame</span>
+  <span class="co"># with new names)</span></code></pre></div>
+<p>We can make the following changes:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">col_means2 &lt;-<span class="st"> </span>function(df) {
+<span class="co">#  stopifnot(is.data.frame(df))</span>
+numeric &lt;-<span class="st"> </span><span class="kw">vapply</span>(df, is.numeric, <span class="kw">logical</span>(<span class="dv">1</span>)) <span class="co"># sapply() to vapply()</span>
+numeric_cols &lt;-<span class="st"> </span>df[, numeric, drop =<span class="st"> </span><span class="ot">FALSE</span>] <span class="co"># add drop = FALSE</span>
+<span class="kw">data.frame</span>(<span class="kw">lapply</span>(numeric_cols, mean))
+}</code></pre></div>
+<p>And look at the tests again:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># data.frame input</span>
+<span class="kw">col_means2</span>(mtcars) <span class="co"># correct</span>
+<span class="kw">col_means2</span>(mtcars[, <span class="dv">0</span>]) <span class="co"># correct</span>
+<span class="kw">col_means2</span>(mtcars[<span class="dv">0</span>, ])[[<span class="dv">1</span>]] <span class="co"># correct</span>
+<span class="kw">col_means2</span>(mtcars[, <span class="st">&quot;mpg&quot;</span>, <span class="dt">drop =</span> F]) <span class="co">#correct</span>
+
+<span class="co"># other input</span>
+<span class="kw">col_means2</span>(<span class="dv">1</span>:<span class="dv">10</span>) <span class="co"># correct (specific error)</span>
+<span class="kw">col_means2</span>(<span class="kw">as.matrix</span>(mtcars)) <span class="co"># correct (specific error)</span>
+<span class="kw">col_means2</span>(<span class="kw">as.list</span>(mtcars)) <span class="co"># correct (specific error)</span>
+
+<span class="co"># data.frame (numeric + character columns)</span>
+<span class="kw">col_means2</span>(mtcars2) <span class="co"># correct</span></code></pre></div>
+<p>For faster failing in the error cases (where the input is not a data.frame), we can add <code>stopifnot(is.data.frame(df))</code> in the first line of <code>col_means()</code>.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: The following function “lags” a vector, returning a version of <code>x</code> that is <code>n</code> values behind the original. Improve the function so that it (1) returns a useful error message if <code>n</code> is not a vector, and (2) has reasonable behaviour when <code>n</code> is 0 or longer than <code>x</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lag &lt;-<span class="st"> </span>function(x, <span class="dt">n =</span> 1L) {
   xlen &lt;-<span class="st"> </span><span class="kw">length</span>(x)
   <span class="kw">c</span>(<span class="kw">rep</span>(<span class="ot">NA</span>, n), x[<span class="kw">seq_len</span>(xlen -<span class="st"> </span>n)])
 }</code></pre></div>
-<p><strong><span style="color:green">A</span></strong>:</p></li>
+<p><strong><span style="color:green">A</span></strong>: First we test <code>lag()</code>’s actual bahaviour:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">v &lt;-<span class="st"> </span><span class="dv">1</span>:<span class="dv">3</span>
+<span class="kw">lag</span>(v, <span class="dv">1</span>) <span class="co"># -&gt; NA 1 2  ; correct</span>
+<span class="kw">lag</span>(v, <span class="dv">0</span>) <span class="co"># -&gt; 1 2 3   ; correct</span>
+<span class="kw">lag</span>(v, <span class="dv">3</span>) <span class="co"># -&gt; NA NA NA; correct</span>
+<span class="kw">lag</span>(v, <span class="dv">4</span>) <span class="co"># -&gt; Error in seq_len(xlen - n) : </span>
+  <span class="co"># argument must be coercible to non-negative integer</span>
+  <span class="co"># in my opinion the result should be NA NA NA</span>
+<span class="kw">lag</span>(v, iris) <span class="co"># -&gt; Error in lag(v, iris) : (list) object cannot be coerced to type &#39;integer&#39;</span></code></pre></div>
+<p>We can adjust <code>lag()</code>, to get better bahaviour in the latter two error cases:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lag2 &lt;-<span class="st"> </span>function(x, <span class="dt">n =</span> 1L) {
+  <span class="co"># we make sure that a double or integer is supplied</span>
+  if (!<span class="kw">is.numeric</span>(n)) <span class="kw">stop</span>(<span class="st">&quot;n is not a numeric vector&quot;</span>) 
+  xlen &lt;-<span class="st"> </span><span class="kw">length</span>(x)
+  <span class="co"># and we change n so that xlen - n will become 0 in case of n &gt; length(x)</span>
+  <span class="co"># to get the desired behaviour for lag(v, 4)</span>
+  n &lt;-<span class="st"> </span><span class="kw">min</span>(xlen, n)
+  <span class="kw">c</span>(<span class="kw">rep</span>(<span class="ot">NA</span>, n), x[<span class="kw">seq_len</span>(xlen -<span class="st"> </span>n)])
+}</code></pre></div>
+<p>Now we look again at the tests:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lag2</span>(v, <span class="dv">1</span>) <span class="co"># -&gt; correct</span>
+<span class="kw">lag2</span>(v, <span class="dv">0</span>) <span class="co"># -&gt; correct</span>
+<span class="kw">lag2</span>(v, <span class="dv">3</span>) <span class="co"># -&gt; correct</span>
+<span class="kw">lag2</span>(v, <span class="dv">4</span>) <span class="co"># -&gt; NA NA NA; correct</span>
+<span class="kw">lag2</span>(v, iris) <span class="co"># -&gt; Error in lag2(v, iris) : n is not a numeric vector</span></code></pre></div>
+<p>Note that we didn’t test/specify <code>lag()</code>’s behaviour for negative, decimal or <code>length(n) != 1</code> inputs of <code>n</code>.</p></li>
 </ol>
 
 </div>
@@ -204,6 +382,7 @@ mtcars2[-<span class="dv">1</span>] &lt;-<span class="st"> </span><span class="k
 require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
+"github": false,
 "facebook": true,
 "twitter": true,
 "google": false,
@@ -218,17 +397,29 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": null,
-"text": null
+"link": "https://github.com/Tazinho/Advanced-R-Solutions/edit/master/06-Exceptions_and_debugging.Rmd",
+"text": "Edit"
 },
 "download": null,
 "toc": {
-"collapse": "subsection"
+"collapse": "section",
+"scroll_highlight": true
 }
 });
 });
 </script>
 
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    if (location.protocol !== "file:" && /^https?:/.test(script.src))
+      script.src  = script.src.replace(/^https?:/, '');
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 </body>
 
 </html>

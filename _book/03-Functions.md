@@ -1,0 +1,302 @@
+
+# Functions
+
+## Function components
+
+1.  __<span style="color:red">Q</span>__: What function allows you to tell if an object is a function? What function
+    allows you to tell if a function is a primitive function?  
+    __<span style="color:green">A</span>__: You can test objects with `is.function` and `is.primitive`.
+
+2.  __<span style="color:red">Q</span>__: This code makes a list of all functions in the base package. 
+    
+    
+    ```r
+    objs <- mget(ls("package:base"), inherits = TRUE)
+    funs <- Filter(is.function, objs)
+    ```
+    
+    Use it to answer the following questions:
+    
+    a. Which base function has the most arguments?
+    
+    a. How many base functions have no arguments? What's special about those
+       functions?
+       
+    a. How could you adapt the code to find all primitive functions?  
+    
+    __<span style="color:green">A</span>__: 
+    
+    a.  First we create a named vector that returns the number of arguments per function and then we subset it with the index of it's maximum entry:
+        
+    
+    ```r
+    f_arg_length <- sapply(funs, function(x) length(formals(x)))
+    f_arg_length[which.max(f_arg_length)]
+    #> scan 
+    #>   22
+    ```
+    
+    b. We check the number of functions with `formals()` returning `0` or `NULL`.
+    Then we will see, that all of these functions have `formals` equal to `NULL`,
+    which means, that they should be primitive functions.
+    
+    
+    ```r
+    sum(sapply(funs, function(x) is.null(formals(x)) | length(formals(x)) == 0))
+    #> [1] 225
+    sum(sapply(funs, function(x) !is.null(formals(x)) & length(formals(x)) == 0))
+    #> [1] 0
+    sum(sapply(funs, function(x) is.null(formals(x))))
+    #> [1] 225
+    sum(sapply(funs, function(x) is.null(formals(x)) & is.primitive(x)))
+    #> [1] 183
+    ```
+    
+    Hence not all functions with `formals` equal to `NULL` are primitive functions, there must be non primitive functions with this property too.  
+    c. Change the predicate in `Filter` to `is.primitive`:
+    
+    
+    ```r
+    funs <- Filter(is.primitive, objs)
+    ```
+    
+3. __<span style="color:red">Q</span>__: What are the three important components of a function?  
+__<span style="color:green">A</span>__: `body()`, `formals()` and `environment()`.
+    
+    > There is one exception to the rule that functions have three components. Primitive functions, like `sum()`, call C code directly with `.Primitive()` and contain no R code. Therefore their `formals()`, `body()`, and `environment()` are all `NULL`.
+
+4. __<span style="color:red">Q</span>__: When does printing a function not show what environment it was created in?  
+__<span style="color:green">A</span>__: When it was created in the global environment.
+
+## Lexical Scoping
+
+1. __<span style="color:red">Q</span>__: What does the following code return? Why? What does each of the three `c`'s mean?
+
+    
+    ```r
+    c <- 10
+    c(c = c)
+    ```
+    
+    __<span style="color:green">A</span>__: A named vector c, which first field has the value 10 and the name "c". The first "c" is the `c()` function, the second is the name of the first entry and the third is the value of the first entry.
+       
+2. __<span style="color:red">Q</span>__: What are the four principles that govern how R looks for values?  
+__<span style="color:green">A</span>__:   As stated in the book:
+    
+    > There are four basic principles behind R's implementation of lexical scoping:
+    * name masking
+    * functions vs. variables
+    * a fresh start
+    * dynamic lookup
+
+3. __<span style="color:red">Q</span>__: What does the following function return? Make a prediction before 
+   running the code yourself.
+
+    
+    ```r
+    f <- function(x) {
+      f <- function(x) {
+        f <- function(x) {
+          x ^ 2
+        }
+        f(x) + 1
+      }
+      f(x) * 2
+    }
+    f(10)
+    ```
+      
+      __<span style="color:green">A</span>__: 202
+      
+## Function arguments
+
+1.  __<span style="color:red">Q</span>__: Clarify the following list of odd function calls:
+
+    
+    ```r
+    x <- sample(replace = TRUE, 20, x = c(1:10, NA))
+    # -> sample(x = c(1:10, NA), size = 20, replace = TRUE)
+    y <- runif(min = 0, max = 1, 20)
+    # -> runif(n = 20, min = 0, max = 1)
+    cor(m = "k", y = y, u = "p", x = x)
+    # -> cor(x = x, y = y, use = "pairwise.complete.obs", method = "pearson")
+    ```
+
+2.  __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
+  
+    
+    ```r
+    f1 <- function(x = {y <- 1; 2}, y = 0) {
+      x + y
+    }
+    f1()
+    ```
+    
+    __<span style="color:green">A</span>__: It returns 3 and illustrates lazy evaluation. As you can see, y becomes 1, but only when `x` is evaluated (before `y`) inside the function (otherwise it is 0):
+    
+    
+    ```r
+    f2 <- function(x = {y <- 1; 2}, y = 0) {
+      y
+    }
+    f2()
+    #> [1] 0
+    ```
+    
+    Note that funny things can happen if we switch the evaluation order (even within one line)
+    
+    
+    ```r
+    f3 <- function(x = {y <- 1; 2}, y = 0) {
+      y + x
+    }
+    f3()
+    #> [1] 2
+    ```
+
+
+    or we evaluate `y` once before and once after the evaluation of `x`
+    
+    
+    ```r
+    f4 <- function(x = {y <- 1; 2}, y = 0) {
+      y_before_x <- y
+      x
+      y_after_x <- y
+      c(y_before_x, y_after_x)
+    }
+    f4()
+    #> [1] 0 1
+    ```
+
+3.  __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
+
+    
+    ```r
+    f2 <- function(x = z) {
+      z <- 100
+      x
+    }
+    f2()
+    ```
+    
+    __<span style="color:green">A</span>__: 100, lazy evaluation.
+    
+## Special calls
+
+1. __<span style="color:red">Q</span>__: Create a list of all the replacement functions found in the base package. 
+   Which ones are primitive functions?  
+   __<span style="color:green">A</span>__: We can find replacementfunctions by searching for functions that end on "<-":
+    
+    ```r
+    repls <- funs[grepl("<-$", names(funs))]
+    Filter(is.primitive, repls)
+    ```
+
+2. __<span style="color:red">Q</span>__: What are valid names for user-created infix functions?  
+  
+    __<span style="color:green">A</span>__:
+    
+    > All user-created infix functions must start and end with `%` ... they can contain any sequence of characters (except “%”, of course).
+
+3. __<span style="color:red">Q</span>__: Create an infix `xor()` operator.  
+__<span style="color:green">A</span>__: 
+
+    
+    ```r
+    `%xor_%` <- function(a, b){
+      (a | b) & !(a & b)
+    }
+    ```
+
+4. __<span style="color:red">Q</span>__: Create infix versions of the set functions `intersect()`, `union()`, and 
+   `setdiff()`.  
+   __<span style="color:green">A</span>__: 
+   
+    
+    ```r
+    `%union_%` <- function(a, b){
+      unique(c(a, b))
+      }
+    
+    `%intersect_%` <- function(a, b){
+      unique(c(a[a %in% b], b[b %in% a]))
+      }
+    
+    `%setdiff_%` <- function(a, b){
+      a[! a %in% b]
+      }
+    ```
+   
+5. __<span style="color:red">Q</span>__: Create a replacement function that modifies a random location in a vector.  
+__<span style="color:green">A</span>__: 
+
+    
+    ```r
+    `random<-` <- function(x, value){
+      x[sample(length(x), 1)] <- value
+      x
+      }
+    ```
+
+## Return Values
+
+1.  __<span style="color:red">Q</span>__: How does the `chdir` parameter of `source()` compare to `in_dir()`? Why 
+    might you prefer one approach to the other?
+    The `in_dir()` approach was given in the book as
+    
+    
+    ```r
+    in_dir <- function(dir, code) {
+      old <- setwd(dir)
+      on.exit(setwd(old))
+      
+      force(code)
+      }
+    ```
+    
+    __<span style="color:green">A</span>__: `in_dir()` takes a path to a working directory as an argument. At the beginning of the function the working directory is changed to this specification and with a call to `on.exit` it is guranteed, that when the function finishes the working directory also equals to this specification.
+    
+    In `source()` you need the `chdir` argument to specify, if the working directory should be changed during the evaluation to the `file` argument, if this is a pathname. The difference in `source()` is, that the actual working directory as output of `getwd()` is saved to set it in `on.exit` before changing the directory to the pathname (given to the `file` argument) for the rest of the execution of the `source()` function.
+
+2.  __<span style="color:red">Q</span>__: What function undoes the action of `library()`? How do you save and restore
+    the values of `options()` and `par()`?  
+    __<span style="color:green">A</span>__: Use `detach()` with `"package:pacakgename"` as first argument.  
+    Use, getOption() with `"optionname"` as argument.
+    Type `par()` in the console and you will get a list with all actual settings.
+
+3.  __<span style="color:red">Q</span>__: Write a function that opens a graphics device, runs the supplied code, and 
+    closes the graphics device (always, regardless of whether or not the plotting code worked).  
+    __<span style="color:green">A</span>__: 
+    
+    
+    ```r
+    plot_pdf <- function(code){
+      pdf("test.pdf")
+      on.exit(dev.off())
+      code
+      }
+    ```
+
+4.  __<span style="color:red">Q</span>__: We can use `on.exit()` to implement a simple version of `capture.output()`.
+
+    
+    ```r
+    capture.output2 <- function(code) {
+      temp <- tempfile()
+      on.exit(file.remove(temp), add = TRUE)
+    
+      sink(temp)
+      on.exit(sink(), add = TRUE)
+    
+      force(code)
+      readLines(temp)
+    }
+    capture.output2(cat("a", "b", "c", sep = "\n"))
+    #> Warning in file.remove(temp): cannot remove file 'C:\Users\MGO\AppData
+    #> \Local\Temp\RtmpiQu8MY\file19842f913805', reason 'Permission denied'
+    #> [1] "a" "b" "c"
+    ```
+    
+    Compare `capture.output()` to `capture.output2()`. How do the functions differ? What features have I removed to make the key ideas easier to see? How have I rewritten the key ideas to be easier to understand?  
+    __<span style="color:green">A</span>__: 
