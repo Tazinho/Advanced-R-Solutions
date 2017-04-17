@@ -84,10 +84,10 @@
 
     ```{r, eval = FALSE}
     f <- function(x) substitute(x, env = parent.frame()) 
-g <- function(x) deparse(f(x)) 
-g(1:10)                             # -> 1:10
-g(x)                                # -> x
-g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
+    g <- function(x) deparse(f(x)) 
+    g(1:10)                             # -> 1:10
+    g(x)                                # -> x
+    g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
     ```
 
 ## Non standard evaluation in subset
@@ -170,6 +170,13 @@ g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
     }
     select(mtcars, -cyl)
     ```
+    
+    This works also for ranges, i.e.,
+    ```{r, eval = FALSE}
+    select(mtcars, cyl:drat)
+    ```
+    
+    because of the usual precedences `cyl:drat` becomes `2:5`.
 
 6.  __<span style="color:red">Q</span>__: What does `evalq()` do? Use it to reduce the amount of typing for the
     examples above that use both `eval()` and `quote()`. 
