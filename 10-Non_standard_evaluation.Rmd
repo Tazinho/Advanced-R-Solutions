@@ -15,7 +15,7 @@
     Why does this happen? Carefully read the documentation for `?deparse`. Can you write a
     wrapper around `deparse()` so that it always returns a single string?
     
-    __<span style="color:green">A</span>__: `deparse()` has a `width.cutoff` argument, which is according to `?deparse` an:
+    __<span style="color:green">A</span>__: `deparse()` has a `width.cutoff` argument (default 60 byte), which is according to `?deparse` an:
     
     > integer in [20, 500] determining the cutoff (in bytes) at which line-breaking is tried.
     
@@ -23,12 +23,30 @@
     
     > width.cutoff is a lower bound for the line lengths: deparsing a line proceeds until at least width.cutoff bytes have been output and e.g. arg = value expressions will not be split across lines.
     
-    You can wrap it with `paste0()` for example:
+    You can wrap it with for example with `paste0()`:
     
     ```{r, eval = FALSE}
     deparse_without_cutoff <- function(x){
       paste0(deparse(x), collapse = "")
     }
+    ```
+    
+    It can be a little bit enhanced with a `gsub()`:
+    
+    ```{r, eval = FALSE}
+    gsub("\\s+", " ", paste0(deparse(substitute(x))))
+    ```
+    
+    This formats at least the spaces to a unified single space. However note that it is not possible to capture the exact input in every case:
+    
+    ```{r, eval = FALSE}
+    # spaces are unified
+    substitute(1 + 1  + 1   + 1)
+    quote(1 + 1  + 1   + 1)
+    
+    # leading zeros in numeric input are trimmed
+    substitute(01)
+    quote(01)
     ```
     
 2.  __<span style="color:red">Q</span>__: Why does `as.Date.default()` use `substitute()` and `deparse()`?
@@ -42,7 +60,7 @@
     character vector. Can you construct an input that violates this expectation? 
     What happens?
     
-    __<span style="color:green">A</span>__: We can pass an expression to one of `pairwise.t.test()`'s data input arguments, which exceeds the default cutoff width in `deparse()`. The expression will be split into a character vector of length greater 1. Since the deparsed data inputs are directly pasted (read the source code!) with "and" as separator, and the result is just used to be displayed in the output. Just the data.name output will change (it will include more than one "and").
+    __<span style="color:green">A</span>__: We can pass an expression to one of `pairwise.t.test()`'s data input arguments, which exceeds the default cutoff width in `deparse()`. The expression will be split into a character vector of length greater 1. The deparsed data inputs are directly pasted (read the source code!) with "and" as separator and the result is just used to be displayed in the output. Just the data.name output will change (it will include more than one "and").
     
     ```{r}
     d=1
@@ -101,13 +119,19 @@ g(x + y ^ 2 / z + exp(a * sin(b)))  # -> x + y ^ 2 / z + exp(a * sin(b))
     ```
 
     
-    __<span style="color:green">A</span>__: The output is an atomic vector. To return always a data.frame change the last row in `subset2` to `x[r, , drop = FALSE]`.
+    __<span style="color:green">A</span>__: Well what does `base::subset` return?
+    
+    ```{r, eval = TRUE}
+    subset(sample_df2, x > 8)
+    ```
+    
+    So we want that the output is always a data frame and not an atomic vector like above. To return always a data frame change the last row in `subset2()` to `x[r, , drop = FALSE]`.
 
 3.  __<span style="color:red">Q</span>__: The real subset function (`subset.data.frame()`) removes missing
     values in the condition. Modify `subset2()` to do the same: drop the 
     offending rows.
     
-    __<span style="color:green">A</span>__: This time change the last row to `x[!is.na(r) & r, , drop = FALSE]`.
+    __<span style="color:green">A</span>__: This time change the last row to `x[!is.na(r) & r, , drop = FALSE]`. Alternatively you can also exclude `NA`s from the subset via setting them to `FALSE` with `r[is.na(r)] <- FALSE`.
 
 4.  __<span style="color:red">Q</span>__: What happens if you use `quote()` instead of `substitute()` inside of
     `subset2()`?
