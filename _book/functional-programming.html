@@ -7,26 +7,31 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Advanced R Solutions</title>
   <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
-  <meta name="description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R.">
-  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
+  <meta name="description" content="Solutions to the exercises in Hadley Wickhams book Advanced R.">
+  <meta name="generator" content="bookdown 0.1.7 and GitBook 2.6.7">
 
   <meta property="og:title" content="Advanced R Solutions" />
   <meta property="og:type" content="book" />
   
-  <meta property="og:image" content="images/advrs_cover.png" />
-  <meta property="og:description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R." />
+  
+  <meta property="og:description" content="Solutions to the exercises in Hadley Wickhams book Advanced R." />
   <meta name="github-repo" content="Tazinho/Advanced-R-Solutions" />
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Advanced R Solutions" />
   
-  <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R." />
-  <meta name="twitter:image" content="images/advrs_cover.png" />
+  <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickhams book Advanced R." />
+  
 
 <meta name="author" content="Malte Grosser &amp; Henning Bumann">
 
+<meta name="date" content="2016-09-12">
 
-<meta name="date" content="2017-04-13">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: { equationNumbers: { autoNumber: "AMS" } }
+});
+</script>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -49,43 +54,6 @@
 
 
 
-<!-- COLLAPSIBLE TEXT WITH OPEN ALL/CLOSE ALL LINK -->
-
-<!-- This goes into the HEAD of the html file -->
-
-<script language="JavaScript" type="text/javascript">
-<!-- Copyright 2007, Sandeep Gangadharan -->
-<!-- For more free scripts go to http://www.sivamdesign.com/scripts/ -->
-<!--
-if (document.getElementById) {
- document.write('<style type="text/css">.texter {display:none; border-left:white 20px solid; color:#404040; font-family:verdana,arial,helvetica,sans-serif; font-size:9pt} @media print {.texter {display:block;}}</style>') }
-
- var divNum = new Array("a1","a2","a3");  // at the left you should add a1, a2 etc. for each header you wish to include
-                                          // so if you want 4 headers you should add a1, a2, a3, a4 in the format shown
-                                          // enclosed in double quotes
-function openClose(theID) {
- for(var i=0; i < divNum.length; i++) {
-  if (divNum[i] == theID) {
-   if (document.getElementById(divNum[i]).style.display == "block") { document.getElementById(divNum[i]).style.display = "none" }
-   else { document.getElementById(divNum[i]).style.display = "block" }
-  }
-  else { document.getElementById(divNum[i]).style.display = "none"; }
- }
-}
-
-function openAll() {
- for(var i=0; i < divNum.length; i++) {
-   document.getElementById(divNum[i]).style.display = "block";
- }
-}
-
-function closeAll() {
- for(var i=0; i < divNum.length; i++) {
-   document.getElementById(divNum[i]).style.display = "none";
- }
-}
-// -->
-</script>
 
 
 <style type="text/css">
@@ -138,101 +106,27 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <ul class="summary">
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a></li>
-<li class="chapter" data-level="1" data-path="data-structures.html"><a href="data-structures.html"><i class="fa fa-check"></i><b>1</b> Data structures</a><ul>
-<li class="chapter" data-level="1.1" data-path="data-structures.html"><a href="data-structures.html#vectors"><i class="fa fa-check"></i><b>1.1</b> Vectors</a></li>
-<li class="chapter" data-level="1.2" data-path="data-structures.html"><a href="data-structures.html#attributes"><i class="fa fa-check"></i><b>1.2</b> Attributes</a></li>
-<li class="chapter" data-level="1.3" data-path="data-structures.html"><a href="data-structures.html#matrices-and-arrays"><i class="fa fa-check"></i><b>1.3</b> Matrices and arrays</a></li>
-<li class="chapter" data-level="1.4" data-path="data-structures.html"><a href="data-structures.html#data-frames"><i class="fa fa-check"></i><b>1.4</b> Data frames</a></li>
-</ul></li>
-<li class="chapter" data-level="2" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>2</b> Subsetting</a><ul>
-<li class="chapter" data-level="2.1" data-path="subsetting.html"><a href="subsetting.html#data-types"><i class="fa fa-check"></i><b>2.1</b> Data types</a></li>
-<li class="chapter" data-level="2.2" data-path="subsetting.html"><a href="subsetting.html#subsetting-operators"><i class="fa fa-check"></i><b>2.2</b> Subsetting operators</a></li>
-<li class="chapter" data-level="2.3" data-path="subsetting.html"><a href="subsetting.html#applications"><i class="fa fa-check"></i><b>2.3</b> Applications</a></li>
-</ul></li>
-<li class="chapter" data-level="3" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>3</b> Functions</a><ul>
-<li class="chapter" data-level="3.1" data-path="functions.html"><a href="functions.html#function-components"><i class="fa fa-check"></i><b>3.1</b> Function components</a></li>
-<li class="chapter" data-level="3.2" data-path="functions.html"><a href="functions.html#lexical-scoping"><i class="fa fa-check"></i><b>3.2</b> Lexical Scoping</a></li>
-<li class="chapter" data-level="3.3" data-path="functions.html"><a href="functions.html#function-arguments"><i class="fa fa-check"></i><b>3.3</b> Function arguments</a></li>
-<li class="chapter" data-level="3.4" data-path="functions.html"><a href="functions.html#special-calls"><i class="fa fa-check"></i><b>3.4</b> Special calls</a></li>
-<li class="chapter" data-level="3.5" data-path="functions.html"><a href="functions.html#return-values"><i class="fa fa-check"></i><b>3.5</b> Return Values</a></li>
-</ul></li>
-<li class="chapter" data-level="4" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>4</b> OO field guide</a><ul>
-<li class="chapter" data-level="4.1" data-path="oo-field-guide.html"><a href="oo-field-guide.html#s3"><i class="fa fa-check"></i><b>4.1</b> S3</a></li>
-<li class="chapter" data-level="4.2" data-path="oo-field-guide.html"><a href="oo-field-guide.html#s4"><i class="fa fa-check"></i><b>4.2</b> S4</a></li>
-<li class="chapter" data-level="4.3" data-path="oo-field-guide.html"><a href="oo-field-guide.html#rc"><i class="fa fa-check"></i><b>4.3</b> RC</a></li>
-</ul></li>
-<li class="chapter" data-level="5" data-path="environments.html"><a href="environments.html"><i class="fa fa-check"></i><b>5</b> Environments</a><ul>
-<li class="chapter" data-level="5.1" data-path="environments.html"><a href="environments.html#environment-basics"><i class="fa fa-check"></i><b>5.1</b> Environment basics</a></li>
-<li class="chapter" data-level="5.2" data-path="environments.html"><a href="environments.html#recursing-over-environments"><i class="fa fa-check"></i><b>5.2</b> Recursing over environments</a></li>
-<li class="chapter" data-level="5.3" data-path="environments.html"><a href="environments.html#function-environments"><i class="fa fa-check"></i><b>5.3</b> Function environments</a></li>
-<li class="chapter" data-level="5.4" data-path="environments.html"><a href="environments.html#binding-names-to-values"><i class="fa fa-check"></i><b>5.4</b> Binding names to values</a></li>
-</ul></li>
-<li class="chapter" data-level="6" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html"><i class="fa fa-check"></i><b>6</b> Exceptions and debugging</a><ul>
-<li class="chapter" data-level="6.1" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html#condition-handling"><i class="fa fa-check"></i><b>6.1</b> Condition handling</a></li>
-<li class="chapter" data-level="6.2" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html#defensive-programming"><i class="fa fa-check"></i><b>6.2</b> Defensive programming</a></li>
-</ul></li>
+<li class="chapter" data-level="1" data-path="data-structures.html"><a href="data-structures.html"><i class="fa fa-check"></i><b>1</b> Data structures</a></li>
+<li class="chapter" data-level="2" data-path="subsetting.html"><a href="subsetting.html"><i class="fa fa-check"></i><b>2</b> Subsetting</a></li>
+<li class="chapter" data-level="3" data-path="functions.html"><a href="functions.html"><i class="fa fa-check"></i><b>3</b> Functions</a></li>
+<li class="chapter" data-level="4" data-path="oo-field-guide.html"><a href="oo-field-guide.html"><i class="fa fa-check"></i><b>4</b> OO field guide</a></li>
+<li class="chapter" data-level="5" data-path="environments.html"><a href="environments.html"><i class="fa fa-check"></i><b>5</b> Environments</a></li>
+<li class="chapter" data-level="6" data-path="exceptions-and-debugging.html"><a href="exceptions-and-debugging.html"><i class="fa fa-check"></i><b>6</b> Exceptions and debugging</a></li>
 <li class="chapter" data-level="7" data-path="functional-programming.html"><a href="functional-programming.html"><i class="fa fa-check"></i><b>7</b> Functional programming</a><ul>
 <li class="chapter" data-level="7.1" data-path="functional-programming.html"><a href="functional-programming.html#annonymous-functions"><i class="fa fa-check"></i><b>7.1</b> Annonymous functions</a></li>
 <li class="chapter" data-level="7.2" data-path="functional-programming.html"><a href="functional-programming.html#closures"><i class="fa fa-check"></i><b>7.2</b> Closures</a></li>
 <li class="chapter" data-level="7.3" data-path="functional-programming.html"><a href="functional-programming.html#lists-of-functions"><i class="fa fa-check"></i><b>7.3</b> Lists of functions</a></li>
 <li class="chapter" data-level="7.4" data-path="functional-programming.html"><a href="functional-programming.html#case-study-numerical-integration"><i class="fa fa-check"></i><b>7.4</b> Case study: numerical integration</a></li>
 </ul></li>
-<li class="chapter" data-level="8" data-path="functionals.html"><a href="functionals.html"><i class="fa fa-check"></i><b>8</b> Functionals</a><ul>
-<li class="chapter" data-level="8.1" data-path="functionals.html"><a href="functionals.html#my-first-functional-lapply"><i class="fa fa-check"></i><b>8.1</b> My first functional: lapply()</a></li>
-<li class="chapter" data-level="8.2" data-path="functionals.html"><a href="functionals.html#for-loops-functionals-friends-of-lapply"><i class="fa fa-check"></i><b>8.2</b> For loops functionals: friends of lapply():</a></li>
-<li class="chapter" data-level="8.3" data-path="functionals.html"><a href="functionals.html#manipulating-matrices-and-data-frames"><i class="fa fa-check"></i><b>8.3</b> Manipulating matrices and data frames</a></li>
-<li class="chapter" data-level="8.4" data-path="functionals.html"><a href="functionals.html#manipulating-lists"><i class="fa fa-check"></i><b>8.4</b> Manipulating lists</a></li>
-<li class="chapter" data-level="8.5" data-path="functionals.html"><a href="functionals.html#mathematical-functionals"><i class="fa fa-check"></i><b>8.5</b> Mathematical functionals</a></li>
-<li class="chapter" data-level="8.6" data-path="functionals.html"><a href="functionals.html#a-family-of-functions"><i class="fa fa-check"></i><b>8.6</b> A family of functions</a></li>
-</ul></li>
-<li class="chapter" data-level="9" data-path="function-operators.html"><a href="function-operators.html"><i class="fa fa-check"></i><b>9</b> Function operators</a><ul>
-<li class="chapter" data-level="9.1" data-path="function-operators.html"><a href="function-operators.html#behavioural-fos"><i class="fa fa-check"></i><b>9.1</b> Behavioural FOs</a></li>
-<li class="chapter" data-level="9.2" data-path="function-operators.html"><a href="function-operators.html#output-fos"><i class="fa fa-check"></i><b>9.2</b> Output FOs</a></li>
-<li class="chapter" data-level="9.3" data-path="function-operators.html"><a href="function-operators.html#input-fos"><i class="fa fa-check"></i><b>9.3</b> Input FOs</a></li>
-<li class="chapter" data-level="9.4" data-path="function-operators.html"><a href="function-operators.html#combining-fos"><i class="fa fa-check"></i><b>9.4</b> Combining FOs</a></li>
-</ul></li>
-<li class="chapter" data-level="10" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html"><i class="fa fa-check"></i><b>10</b> Non standard evaluation</a><ul>
-<li class="chapter" data-level="10.1" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#capturing-expressions"><i class="fa fa-check"></i><b>10.1</b> Capturing expressions</a></li>
-<li class="chapter" data-level="10.2" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#non-standard-evaluation-in-subset"><i class="fa fa-check"></i><b>10.2</b> Non standard evaluation in subset</a></li>
-<li class="chapter" data-level="10.3" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#scoping-issues"><i class="fa fa-check"></i><b>10.3</b> Scoping issues</a></li>
-<li class="chapter" data-level="10.4" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#calling-from-another-function"><i class="fa fa-check"></i><b>10.4</b> Calling from another function</a></li>
-<li class="chapter" data-level="10.5" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#substitute"><i class="fa fa-check"></i><b>10.5</b> Substitute</a></li>
-<li class="chapter" data-level="10.6" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html#the-downsides-of-non-standard-evaluation"><i class="fa fa-check"></i><b>10.6</b> The downsides of non-standard evaluation</a></li>
-</ul></li>
-<li class="chapter" data-level="11" data-path="expressions.html"><a href="expressions.html"><i class="fa fa-check"></i><b>11</b> Expressions</a><ul>
-<li class="chapter" data-level="11.1" data-path="expressions.html"><a href="expressions.html#structure-of-expressions"><i class="fa fa-check"></i><b>11.1</b> Structure of expressions</a></li>
-<li class="chapter" data-level="11.2" data-path="expressions.html"><a href="expressions.html#names"><i class="fa fa-check"></i><b>11.2</b> Names</a></li>
-<li class="chapter" data-level="11.3" data-path="expressions.html"><a href="expressions.html#calls"><i class="fa fa-check"></i><b>11.3</b> Calls</a></li>
-<li class="chapter" data-level="11.4" data-path="expressions.html"><a href="expressions.html#capturing-the-current-call"><i class="fa fa-check"></i><b>11.4</b> Capturing the current call</a></li>
-<li class="chapter" data-level="11.5" data-path="expressions.html"><a href="expressions.html#pairlists"><i class="fa fa-check"></i><b>11.5</b> Pairlists</a></li>
-<li class="chapter" data-level="11.6" data-path="expressions.html"><a href="expressions.html#parsing-and-deparsing"><i class="fa fa-check"></i><b>11.6</b> Parsing and deparsing</a></li>
-<li class="chapter" data-level="11.7" data-path="expressions.html"><a href="expressions.html#walking-the-ast-with-recursive-functions"><i class="fa fa-check"></i><b>11.7</b> Walking the AST with recursive functions</a></li>
-</ul></li>
-<li class="chapter" data-level="12" data-path="domain-specific-languages.html"><a href="domain-specific-languages.html"><i class="fa fa-check"></i><b>12</b> Domain specific languages</a><ul>
-<li class="chapter" data-level="12.1" data-path="domain-specific-languages.html"><a href="domain-specific-languages.html#html"><i class="fa fa-check"></i><b>12.1</b> HTML</a></li>
-<li class="chapter" data-level="12.2" data-path="domain-specific-languages.html"><a href="domain-specific-languages.html#latex"><i class="fa fa-check"></i><b>12.2</b> LaTeX</a></li>
-</ul></li>
-<li class="chapter" data-level="13" data-path="performance.html"><a href="performance.html"><i class="fa fa-check"></i><b>13</b> Performance</a><ul>
-<li class="chapter" data-level="13.1" data-path="performance.html"><a href="performance.html#microbenchmarking"><i class="fa fa-check"></i><b>13.1</b> Microbenchmarking</a></li>
-<li class="chapter" data-level="13.2" data-path="performance.html"><a href="performance.html#language-performance"><i class="fa fa-check"></i><b>13.2</b> Language performance</a></li>
-<li class="chapter" data-level="13.3" data-path="performance.html"><a href="performance.html#implementations-performance"><i class="fa fa-check"></i><b>13.3</b> Implementations performance</a></li>
-</ul></li>
-<li class="chapter" data-level="14" data-path="profiling.html"><a href="profiling.html"><i class="fa fa-check"></i><b>14</b> Profiling</a><ul>
-<li class="chapter" data-level="14.1" data-path="profiling.html"><a href="profiling.html#has-somebody-already-solved-the-problem"><i class="fa fa-check"></i><b>14.1</b> Has somebody already solved the problem?</a></li>
-<li class="chapter" data-level="14.2" data-path="profiling.html"><a href="profiling.html#do-as-little-as-possible"><i class="fa fa-check"></i><b>14.2</b> Do as little as possible</a></li>
-<li class="chapter" data-level="14.3" data-path="profiling.html"><a href="profiling.html#vectorise"><i class="fa fa-check"></i><b>14.3</b> Vectorise</a></li>
-</ul></li>
-<li class="chapter" data-level="15" data-path="memory.html"><a href="memory.html"><i class="fa fa-check"></i><b>15</b> Memory</a><ul>
-<li class="chapter" data-level="15.1" data-path="memory.html"><a href="memory.html#object-size"><i class="fa fa-check"></i><b>15.1</b> Object size</a></li>
-<li class="chapter" data-level="15.2" data-path="memory.html"><a href="memory.html#memory-profiling-with-lineprof"><i class="fa fa-check"></i><b>15.2</b> Memory profiling with lineprof</a></li>
-<li class="chapter" data-level="15.3" data-path="memory.html"><a href="memory.html#modification-in-place"><i class="fa fa-check"></i><b>15.3</b> Modification in place</a></li>
-</ul></li>
-<li class="chapter" data-level="16" data-path="rcpp.html"><a href="rcpp.html"><i class="fa fa-check"></i><b>16</b> Rcpp</a><ul>
-<li class="chapter" data-level="16.1" data-path="rcpp.html"><a href="rcpp.html#getting-started-with-c"><i class="fa fa-check"></i><b>16.1</b> Getting started with C++</a></li>
-<li class="chapter" data-level="16.2" data-path="rcpp.html"><a href="rcpp.html#missing-values"><i class="fa fa-check"></i><b>16.2</b> Missing values</a></li>
-<li class="chapter" data-level="16.3" data-path="rcpp.html"><a href="rcpp.html#the-stl"><i class="fa fa-check"></i><b>16.3</b> The STL</a></li>
-</ul></li>
-<li class="chapter" data-level="17" data-path="testchapter.html"><a href="testchapter.html"><i class="fa fa-check"></i><b>17</b> Testchapter</a></li>
+<li class="chapter" data-level="8" data-path="functionals.html"><a href="functionals.html"><i class="fa fa-check"></i><b>8</b> Functionals</a></li>
+<li class="chapter" data-level="9" data-path="function-operators.html"><a href="function-operators.html"><i class="fa fa-check"></i><b>9</b> Function operators</a></li>
+<li class="chapter" data-level="10" data-path="non-standard-evaluation.html"><a href="non-standard-evaluation.html"><i class="fa fa-check"></i><b>10</b> Non standard evaluation</a></li>
+<li class="chapter" data-level="11" data-path="expressions.html"><a href="expressions.html"><i class="fa fa-check"></i><b>11</b> Expressions</a></li>
+<li class="chapter" data-level="12" data-path="domain-specific-languages.html"><a href="domain-specific-languages.html"><i class="fa fa-check"></i><b>12</b> Domain specific languages</a></li>
+<li class="chapter" data-level="13" data-path="performance.html"><a href="performance.html"><i class="fa fa-check"></i><b>13</b> Performance</a></li>
+<li class="chapter" data-level="14" data-path="profiling.html"><a href="profiling.html"><i class="fa fa-check"></i><b>14</b> Profiling</a></li>
+<li class="chapter" data-level="15" data-path="memory.html"><a href="memory.html"><i class="fa fa-check"></i><b>15</b> Memory</a></li>
+<li class="chapter" data-level="16" data-path="rcpp.html"><a href="rcpp.html"><i class="fa fa-check"></i><b>16</b> Rcpp</a></li>
 </ul>
 
       </nav>
@@ -256,19 +150,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2><span class="header-section-number">7.1</span> Annonymous functions</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: Given a function, like <code>&quot;mean&quot;</code>, <code>match.fun()</code> lets you find a function. Given a function, can you find its name? Why doesn’t that make sense in R?<br />
-<strong><span style="color:green">A</span></strong>: If you know <code>body()</code>, <code>formals()</code> and <code>environment()</code> it can be possible to find the function. However, this won’t be possible for primitive functions, since they return <code>NULL</code> for those three properties. Also annonymous functions won’t be found, because they are not bound to a name. On the other hand it could be that different names in an environment contain binding to one (or more functions) with the same <code>body()</code>, <code>formals()</code> and <code>environment()</code> which means that the solution wouldn’t be unique. More general: In R a (function) name has an object, but an object (i.e. a function) doesn’t have a name (just a binding sometimes).</p></li>
+<strong><span style="color:green">A</span></strong>:</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Use <code>lapply()</code> and an anonymous function to find the coefficient of variation (the standard deviation divided by the mean) for all columns in the <code>mtcars</code> dataset</p>
-<p><strong><span style="color:green">A</span></strong>: <code>lapply(mtcars, function(x) sd(x)/mean(x))</code>.</p></li>
+<p><strong><span style="color:green">A</span></strong>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lapply</span>(mtcars, function(x) <span class="kw">sd</span>(x)/<span class="kw">mean</span>(x))</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Use <code>integrate()</code> and an anonymous function to find the area under the curve for the following functions. Use <a href="http://www.wolframalpha.com/">Wolfram Alpha</a> to check your answers.</p>
 <ol style="list-style-type: decimal">
 <li><code>y = x ^ 2 - x</code>, x in [0, 10]</li>
 <li><code>y = sin(x) + cos(x)</code>, x in [-<span class="math inline">\(\pi\)</span>, <span class="math inline">\(\pi\)</span>]</li>
 <li><code>y = exp(x) / x</code>, x in [10, 20]</li>
 </ol>
-<p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">integrate</span>(function(x) x^<span class="dv">2</span> -<span class="st"> </span>x, <span class="dv">0</span>, <span class="dv">10</span>)
-<span class="kw">integrate</span>(function(x) <span class="kw">sin</span>(x) +<span class="st"> </span><span class="kw">cos</span>(x), -pi, pi)
-<span class="kw">integrate</span>(function(x) <span class="kw">exp</span>(x) /<span class="st"> </span>x, <span class="dv">10</span>, <span class="dv">20</span>)</code></pre></div></li>
+<p><strong><span style="color:green">A</span></strong>:</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: A good rule of thumb is that an anonymous function should fit on one line and shouldn’t need to use <code>{}</code>. Review your code. Where could you have used an anonymous function instead of a named function? Where should you have used a named function instead of an anonymous function?<br />
 <strong><span style="color:green">A</span></strong>:</p></li>
 </ol>
@@ -277,10 +169,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2><span class="header-section-number">7.2</span> Closures</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: Why are functions created by other functions called closures?<br />
-<strong><span style="color:green">A</span></strong>: As stated in the book:</p>
-<blockquote>
-<p>because they enclose the environment of the parent function and can access all its variables.</p>
-</blockquote></li>
+<strong><span style="color:green">A</span></strong>:</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What does the following statistical function do? What would be a better name for it? (The existing name is a bit of a hint.)</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bc &lt;-<span class="st"> </span>function(lambda) {
   if (lambda ==<span class="st"> </span><span class="dv">0</span>) {
@@ -289,11 +178,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
     function(x) (x ^<span class="st"> </span>lambda -<span class="st"> </span><span class="dv">1</span>) /<span class="st"> </span>lambda
   }
 }</code></pre></div>
-<p><strong><span style="color:green">A</span></strong>: It is the logarithm, when lambda equals zero and <code>x ^ lambda - 1 / lambda</code> otherwise. A better name might be <code>box_cox_transformation</code> (one parametric), you can read about it (here)[<a href="https://en.wikipedia.org/wiki/Power_transform" class="uri">https://en.wikipedia.org/wiki/Power_transform</a>].</p></li>
+<p><strong><span style="color:green">A</span></strong>:</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What does <code>approxfun()</code> do? What does it return?<br />
-<strong><span style="color:green">A</span></strong>: <code>approxfun</code> basically takes a combination of 2-dimensional data points + some extra specifications as arguments and returns a stepwise linear or constant interpolation function (defined on the range of given x-values, by default).</p></li>
+<strong><span style="color:green">A</span></strong>:</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What does <code>ecdf()</code> do? What does it return?<br />
-<strong><span style="color:green">A</span></strong>: “ecdf” means empirical density function. For a numeric vector, <code>ecdf()</code> returns the appropriate density function (of class “ecdf”, which is inheriting from class “stepfun”). You can describe it’s behaviour in 2 steps. In the first part of it’s body, the <code>(x,y)</code> pairs for the nodes of the density function are calculated. In the second part these pairs are given to <code>approxfun</code>.</p></li>
+<strong><span style="color:green">A</span></strong>:</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Create a function that creates functions that compute the ith <a href="http://en.wikipedia.org/wiki/Central_moment">central moment</a> of a numeric vector. You can test it by running the following code:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m1 &lt;-<span class="st"> </span><span class="kw">moment</span>(<span class="dv">1</span>)
 m2 &lt;-<span class="st"> </span><span class="kw">moment</span>(<span class="dv">2</span>)
@@ -301,130 +190,19 @@ m2 &lt;-<span class="st"> </span><span class="kw">moment</span>(<span class="dv"
 x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">100</span>)
 <span class="kw">stopifnot</span>(<span class="kw">all.equal</span>(<span class="kw">m1</span>(x), <span class="dv">0</span>))
 <span class="kw">stopifnot</span>(<span class="kw">all.equal</span>(<span class="kw">m2</span>(x), <span class="kw">var</span>(x) *<span class="st"> </span><span class="dv">99</span> /<span class="st"> </span><span class="dv">100</span>))</code></pre></div>
-<p><strong><span style="color:green">A</span></strong>: For a discrete formulation look <a href="http://www.r-tutor.com/elementary-statistics/numerical-measures/moment">here</a></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">moment &lt;-<span class="st"> </span>function(i){
-  function(x) <span class="kw">sum</span>((x -<span class="st"> </span><span class="kw">mean</span>(x)) ^<span class="st"> </span>i) /<span class="st"> </span><span class="kw">length</span>(x)
-  }</code></pre></div></li>
+<p><strong><span style="color:green">A</span></strong>:</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Create a function <code>pick()</code> that takes an index, <code>i</code>, as an argument and returns a function with an argument <code>x</code> that subsets <code>x</code> with <code>i</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lapply</span>(mtcars, <span class="kw">pick</span>(<span class="dv">5</span>))
 <span class="co"># should do the same as this</span>
 <span class="kw">lapply</span>(mtcars, function(x) x[[<span class="dv">5</span>]])</code></pre></div>
-<p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pick &lt;-<span class="st"> </span>function(i){
-  function(x) x[[i]]
-  }
-
-<span class="kw">stopifnot</span>(<span class="kw">identical</span>(<span class="kw">lapply</span>(mtcars, <span class="kw">pick</span>(<span class="dv">5</span>)),
-                    <span class="kw">lapply</span>(mtcars, function(x) x[[<span class="dv">5</span>]]))
-          )</code></pre></div></li>
+<p><strong><span style="color:green">A</span></strong>:</p></li>
 </ol>
 </div>
 <div id="lists-of-functions" class="section level2">
 <h2><span class="header-section-number">7.3</span> Lists of functions</h2>
 <ol style="list-style-type: decimal">
-<li><p><strong><span style="color:red">Q</span></strong>: Implement a summary function that works like <code>base::summary()</code>, but uses a list of functions. Modify the function so it returns a closure, making it possible to use it as a function factory.</p>
-<p><strong><span style="color:green">A</span></strong>: We have two possibilities, we can imitate <code>base::summary()</code> completely or create a new summary based on our preferences. Both is not so easy, since it involves a lot of design decisions. We choose the second option, since we just like to create a first draft to apply what we have learned and get some feeling for the challenges that might appear.</p>
-<p>Some properties, that our new summary function <code>summary2</code> should have are nice default actions for specific data types and they should of course be changeable as this is also a part of the exercise. To limit our efforts, we focus on summaries for data frames. Everything else will be explained, via comments on the code:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># The arguments of our function factory are the lists of functions that are</span>
-<span class="co"># applied to data frame columns, depending on their type.</span>
-<span class="co"># We focus on the most important, so they can be set for characters, integer,</span>
-<span class="co"># double, logical, factor and date. By default they are set to NULL, but if you </span>
-<span class="co"># supply a list with functions, this will override the real default, for the</span>
-<span class="co"># specific type, which is set inside the function factory.</span>
-summary2 &lt;-<span class="st"> </span>function(<span class="dt">character_functions =</span> <span class="ot">NULL</span>, <span class="dt">integer_functions =</span> <span class="ot">NULL</span>,
-                     <span class="dt">double_functions =</span> <span class="ot">NULL</span>, <span class="dt">logical_functions =</span> <span class="ot">NULL</span>, 
-                     <span class="dt">factor_functions =</span> <span class="ot">NULL</span>, <span class="dt">date_functions =</span> <span class="ot">NULL</span>){
-
-  <span class="co"># The following functional will later be six times applied on the data frame,</span>
-  <span class="co"># one time for every column type in the scope of our function</span>
-  apply_typefunction &lt;-<span class="st"> </span>function(df, pred, functions){
-    <span class="kw">lapply</span>(df[<span class="kw">vapply</span>(df, pred, <span class="kw">logical</span>(<span class="dv">1</span>))],
-           function(x) <span class="kw">unlist</span>(<span class="kw">lapply</span>(functions, function(y) <span class="kw">y</span>(x))))
-  }
-
-  <span class="co"># The following lists of functions are &quot;somehow&quot; similar to those, that are used</span>
-  <span class="co"># by base::summary, so we define them once...</span>
-  default_1 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">Table =</span> table)
-  default_2 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">Min =</span> min, <span class="st">`</span><span class="dt">1st Qu.</span><span class="st">`</span> =<span class="st"> </span>function(x) <span class="kw">quantile</span>(x)[[<span class="dv">2</span>]],
-                    <span class="dt">Median =</span> median, <span class="dt">Mean =</span> mean,
-                    <span class="st">`</span><span class="dt">3rd Qu.</span><span class="st">`</span> =<span class="st"> </span>function(x) <span class="kw">quantile</span>(x)[[<span class="dv">4</span>]], <span class="dt">Max =</span> max)
-
-  <span class="co"># All those function list, that are not specified, when calling the </span>
-  <span class="co"># function factory, are now set to their default values</span>
-  if(<span class="kw">is.null</span>(character_functions)) {character_functions =<span class="st"> </span>default_1}
-  if(<span class="kw">is.null</span>(integer_functions))   {integer_functions   =<span class="st"> </span>default_2}
-  if(<span class="kw">is.null</span>(double_functions))    {double_functions    =<span class="st"> </span>default_2}
-  if(<span class="kw">is.null</span>(logical_functions))   {logical_functions   =<span class="st"> </span>default_1}
-  if(<span class="kw">is.null</span>(factor_functions))    {factor_functions    =<span class="st"> </span>default_1}
-  if(<span class="kw">is.null</span>(date_functions))      {date_functions      =<span class="st"> </span>default_2}
-
-  <span class="co"># Finally the returned function is created</span>
-  function(df){
-
-    <span class="co"># For every column type, the specific functions will be applied to the</span>
-    <span class="co"># appropriate columns. </span>
-    characters &lt;-<span class="st"> </span><span class="kw">apply_typefunction</span>(df, is.character, character_functions)
-    integers   &lt;-<span class="st"> </span><span class="kw">apply_typefunction</span>(df, is.integer  , integer_functions  )
-    doubles    &lt;-<span class="st"> </span><span class="kw">apply_typefunction</span>(df, is.double   , double_functions   )
-    logicals   &lt;-<span class="st"> </span><span class="kw">apply_typefunction</span>(df, is.logical  , logical_functions  )
-
-    factors    &lt;-<span class="st"> </span><span class="kw">apply_typefunction</span>(df, is.factor   , factor_functions   )
-    dates      &lt;-<span class="st"> </span><span class="kw">apply_typefunction</span>(df, function(x) <span class="kw">inherits</span>(x, <span class="st">&#39;Date&#39;</span>), 
-                                     date_functions)
-
-    <span class="co"># The results will be collected in a list and if empty lists appear, because</span>
-    <span class="co"># of non occuring columntypes, these empty lists will be removed from the output.</span>
-    <span class="co"># There are a lot of formatting steps, like ordering, naming and converting</span>
-    <span class="co"># output, that we could do, but we think that the idea is more important for now</span>
-    out &lt;-<span class="st"> </span><span class="kw">list</span>(characters, integers, doubles, logicals, 
-            factors, dates)
-    out[<span class="kw">lengths</span>(out) !=<span class="st"> </span><span class="dv">0</span>]
-  }
-}
-
-<span class="co"># Now we can apply the function factory</span>
-summary2_default &lt;-<span class="st"> </span><span class="kw">summary2</span>()
-<span class="co"># And the resulting function</span>
-<span class="kw">summary2_default</span>(<span class="dt">df =</span> iris)
-<span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt; [[1]]$Sepal.Length</span>
-<span class="co">#&gt;      Min  1st Qu.   Median     Mean  3rd Qu.      Max </span>
-<span class="co">#&gt; 4.300000 5.100000 5.800000 5.843333 6.400000 7.900000 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [[1]]$Sepal.Width</span>
-<span class="co">#&gt;      Min  1st Qu.   Median     Mean  3rd Qu.      Max </span>
-<span class="co">#&gt; 2.000000 2.800000 3.000000 3.057333 3.300000 4.400000 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [[1]]$Petal.Length</span>
-<span class="co">#&gt;     Min 1st Qu.  Median    Mean 3rd Qu.     Max </span>
-<span class="co">#&gt;   1.000   1.600   4.350   3.758   5.100   6.900 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [[1]]$Petal.Width</span>
-<span class="co">#&gt;      Min  1st Qu.   Median     Mean  3rd Qu.      Max </span>
-<span class="co">#&gt; 0.100000 0.300000 1.300000 1.199333 1.800000 2.500000 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [[2]]</span>
-<span class="co">#&gt; [[2]]$Species</span>
-<span class="co">#&gt;     Table.setosa Table.versicolor  Table.virginica </span>
-<span class="co">#&gt;               50               50               50</span>
-
-<span class="co"># Unfortunately, we will fail if there are any NAs in integer columns</span>
-df_nas &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">integers_na =</span> <span class="kw">c</span>(<span class="ot">NA</span>, <span class="dv">2</span>:<span class="dv">19</span>))
-<span class="kw">summary2_default</span>(df_nas)
-<span class="co">#&gt; Error in quantile.default(x): missing values and NaN&#39;s not allowed if &#39;na.rm&#39; is FALSE</span>
-
-<span class="co"># But since, we can define new functions for integer columns, we can solve this</span>
-summary2_naversion &lt;-<span class="st"> </span><span class="kw">summary2</span>(<span class="dt">integer_functions =</span> <span class="kw">list</span>(
-  <span class="dt">Mean_na =</span> function(x) <span class="kw">mean</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
-  <span class="dt">Median_na =</span> function(x) <span class="kw">median</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
-  <span class="dt">NAs =</span> function(x) <span class="kw">sum</span>(<span class="kw">is.na</span>(x)))
-  )
-<span class="kw">summary2_naversion</span>(df_nas)
-<span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt; [[1]]$integers_na</span>
-<span class="co">#&gt;   Mean_na Median_na       NAs </span>
-<span class="co">#&gt;      10.5      10.5       1.0</span></code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Implement a summary function that works like <code>base::summary()</code>, but uses a list of functions. Modify the function so it returns a closure, making it possible to use it as a function factory.<br />
+<strong><span style="color:green">A</span></strong>:</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Which of the following commands is equivalent to <code>with(x, f(z))</code>?</p>
 <ol style="list-style-type: lower-alpha">
 <li><code>x$f(x$z)</code>.</li>
@@ -433,7 +211,7 @@ summary2_naversion &lt;-<span class="st"> </span><span class="kw">summary2</span
 <li><code>f(z)</code>.</li>
 <li>It depends.</li>
 </ol>
-<p><strong><span style="color:green">A</span></strong>: b is equivalent. If <code>x</code> is the current environment, also d would work.</p></li>
+<p><strong><span style="color:green">A</span></strong>:</p></li>
 </ol>
 </div>
 <div id="case-study-numerical-integration" class="section level2">
@@ -466,7 +244,6 @@ summary2_naversion &lt;-<span class="st"> </span><span class="kw">summary2</span
 require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
-"github": false,
 "facebook": true,
 "twitter": true,
 "google": false,
@@ -481,13 +258,12 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/Tazinho/Advanced-R-Solutions/edit/master/07-Functional_programming.Rmd",
-"text": "Edit"
+"link": null,
+"text": null
 },
 "download": null,
 "toc": {
-"collapse": "section",
-"scroll_highlight": true
+"collapse": "subsection"
 }
 });
 });
