@@ -39,7 +39,7 @@
     
     This formats at least the spaces to a unified single space. However note that it is not possible to capture the exact input in every case:
     
-    ```{r, eval = FALSE}
+    ```{r, eval = TRUE}
     # spaces are unified
     substitute(1 + 1  + 1   + 1)
     quote(1 + 1  + 1   + 1)
@@ -117,7 +117,6 @@
     sample_df2 <- data.frame(x = 1:10)
     subset2(sample_df2, x > 8)
     ```
-
     
     __<span style="color:green">A</span>__: Well what does `base::subset` return?
     
@@ -136,7 +135,23 @@
 4.  __<span style="color:red">Q</span>__: What happens if you use `quote()` instead of `substitute()` inside of
     `subset2()`?
     
-    __<span style="color:orange">A</span>__: We will get ```"Error in eval(expr, envir, enclos) : object 'x' not found"``` in the above example. We are not sure if the problem relates to finding the right expression or the correct environment for evaluation.
+    __<span style="color:orange">A</span>__: We will get ```"Error in eval(expr, envir, enclos) : object 'x' not found"``` in the above example. We were not sure if the problem relates to finding the right expression or the correct environment for evaluation. But fortunately we can find some more information in another [repository](https://github.com/asnr/advanced-r-answers/blob/master/metaprogramming/nse.md):
+    
+    To understand why this occurs, try setting the `enclos` argument of `eval()` to be `NULL`:
+    
+    ```{r, error = TRUE}
+    subset2 <- function(x, condition) {
+      condition_call <- quote(condition)
+      r <- eval(condition_call, x, enclos = NULL)
+      x[r, ]
+    }
+    
+    subset2(sample_df2, x > 8)
+    ```
+    
+    We can see that this time R is looking for the symbol `condition` and can't find it. In the default case (`enclos = parent.frame()`), where R is looking for `x`, the promise related to `x > 8` was already recognized by R. So in both `quote()`-cases, `x > 8` is not found by R, when `condition_call` should be evaluated in `x`. So in the first case (default), R looks in `eval`'s calling environment, and finds the promise `x > 8`. So it looks in the global environment to evaluate it. In the other case (`enclos = NULL`) `condition` is not found in `x` (the environment) and R is not looking in further environemts, since `enclos = NULL`. So the search is already finished before the condition related to `condition call` is even found.
+    
+    This is opposed to `substitute()`, which isn't only capturing the symbol `condition`, but the expression slot of the condition promise object. (Still need to show this!)
 
 5.  __<span style="color:red">Q</span>__: The second argument in `subset()` allows you to select variables. It
     treats variable names as if they were positions. This allows you to do 
@@ -389,14 +404,72 @@
     automatically determine whether you want standard or non-standard
     evaluation. Each uses a different approach. Figure out the essence
     of each approach then compare and contrast.
+    
+    __<span style="color:green">A</span>__: 
+    
+    * `match.fun` uses NSE if you pass something other than a length-one character or symbol, and does not use NSE otherwise.
+    * `page` uses NSE if you pass something other than a length-one character. Symbols would still trigger NSE.
+    * `ls` triggers NSE substitute if it cannot evaluate the directory passed as a variable, and triggers NSE deparse if the result is not a character.
+    
+    The `ls` method seems safest of the three approaches, but is also the least performant.
 
 3.  __<span style="color:red">Q</span>__: Add an escape hatch to `plyr::mutate()` by splitting it into two functions.
     One function should capture the unevaluated inputs. The other should take a 
     data frame and list of expressions and perform the computation.
+    
+    __<span style="color:green">A</span>__: We look again at the source code of `plyr::mutate()`:
+    
+    ```{r, eval = TRUE}
+    plyr::mutate
+    ```
+    
+    What we want is to have the local variable "cols" as an argument of our new (wrapped) escape hatch function (analogously as shown with `subset2_q()` in the textbook).
+    
+    Therefore we create:
+    
+    ```{r, eval = TRUE}
+    get_cols <- function(...) {
+      ll <- as.list(substitute(list(...)))
+      ll[names(ll) != ""]
+    }
+    ```
+    
+    We also want a function, that works with "cols" and performs the computation (the for loop in the original `plyr::mutate()`):
+    
+    ```{r, eval = TRUE}
+    mutate_cols <- function(df, cols) {
+      for (col in names(cols)) {
+        df[[col]] <- eval(cols[[col]], df, parent.frame())
+        }
+      df
+    }
+    ```
+    
+    Now we can wrap these with our new mutate function and have a nice interface:
+    
+    ```{r, eval = TRUE}
+    mutate2 <- function(df, ...) {
+      mutate_cols(df, get_cols(df, ...))
+    }
+    
+    # a little test
+    df <- data.frame(x = 1:5)
+    identical(
+      plyr::mutate(df, x2 = x * x, x3 = x2 * x),
+      mutate2(df, x2 = x * x, x3 = x2 * x)
+    )
+    ```
 
 4.  __<span style="color:red">Q</span>__: What's the escape hatch for `ggplot2::aes()`? What about `plyr::.()`?
     What do they have in common? What are the advantages and disadvantages
     of their differences?
+    
+    * One can call `rename_aes` directly.
+    * `plyr::.` lets you specify an env in which to evaluate `...`.
+    
+    Both evaluate `...` using `match.call()` and create a structure out of them.
+    
+    `plyr::.` probably requires less knowledge about internals, but is also less customizable.
 
 5.  __<span style="color:red">Q</span>__: The version of `subset2_q()` I presented is a simplification of real
     code. Why is the following version better?
@@ -407,9 +480,37 @@
       x[r, ]
     }
     ```
-
+    
     Rewrite `subset2()` and `subscramble()` to use this improved version.
-
+    
+    __<span style="color:green">A</span>__: 
+    
+    ```{r}
+    subset2_q_old <- function(x, condition) {
+      r <- eval(condition, x, parent.frame())
+      x[r, ]
+    }
+    
+    subset2_q <- function(x, cond, env = parent.frame()) {
+      r <- eval(cond, x, env)
+      x[r, ]
+    }
+    ```
+    
+    The modified version of subset2_q allows you to specify an environment in which to evaluate the condition, which allows you to run `subset2_q()` in more situations (such as within a dataframe).
+    
+    ```{r}
+    subset2 <- function(x, condition, env = parent.frame()) {
+      subset2_q(x, substitute(condition), env)
+    }
+    
+    scramble <- function(x) x[sample(nrow(x)), ]
+    subscramble <- function(x, condition, env = parent.frame()) {
+      condition <- substitute(condition, env)
+      scramble(subset2_q(x, condition, env))
+    }
+    ```
+    
 ## Substitute
 
 1.  __<span style="color:red">Q</span>__: Use `pryr::subs()` to convert the LHS to the RHS for each of the following pairs:
@@ -433,18 +534,48 @@
     * `a + b + c` -> `a + b * c`
     * `f(a, b)` -> `f(a, b, c)`
     * `f(a, b, c)` -> `f(a, b)`
+    
+    __<span style="color:green">A</span>__: 
+    * `a + b + c` -> `a + b * c`
+    You can't convert one "+" to "+" and the other to "*", because `subs()` converts either all instances of the "+" or no instances of the "+".
+    * `f(a, b)` -> `f(a, b, c)`
+    `subs()` cannot be used to add new arguments, only convert.
+    * f(a, b, c) -> f(a, b)
+    `subs()` cannot be used to subtract new arguments, only convert.
 
 3.  __<span style="color:red">Q</span>__: How does `pryr::named_dots()` work? Read the source.
+    
+    __<span style="color:green">A</span>__: 
+    It captures the dot arguments using `pryr::dots` (which is just `eval(substitute(alist(...)))`), and then gets the names of the arguments, using "" for the arguments without names.
+    
+    If all the args are "", it simply returns the args. Otherwise, it names the args with their values, and returns the renamed list of args.
 
 ## The downsides of non-standard evaluation
 
 1. __<span style="color:red">Q</span>__: What does the following function do? What’s the escape hatch? Do you think that this is an appropriate use of NSE?
 
+    ```{r, eval = TRUE}
     nl <- function(...) {
-      dots <- named_dots(...)
+      dots <- pryr::named_dots(...)
       lapply(dots, eval, parent.frame())
     }
+    ```
+    
+    __<span style="color:green">A</span>__: 
+    `nl()` extracts the dots, names them, and then evaluates them in the global namespace. This returns a list of arguments that are named by what is literally in the dots, with the values of what the dots evaluate to.
+    
+    For example:
+    
+    ```{r, eval = TRUE}
+    nl(1, 2 + 2, mean(c(3, 5)))
+    ```
+    
+    You can always call the underlying `lapply` directly as an escape hatch.
+    
+    However, it is a toy example and we are not really sure what you would gain from actually using this.
 
 2. __<span style="color:red">Q</span>__: Instead of relying on promises, you can use formulas created with ~ to explicitly capture an expression and its environment. What are the advantages and disadvantages of making quoting explicit? How does it impact referential transparency?
+    
+    __<span style="color:green">A</span>__: Using formulas in this manner would allow for referential transparency, but it would make working with NSE much more verbose. In any situation in which it is worth using NSE, it would also be worth not using formulas like this.
 
 3. __<span style="color:red">Q</span>__: Read the standard non-standard evaluation rules found at http://developer.r-project.org/nonstandard-eval.pdf.
