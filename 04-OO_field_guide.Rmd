@@ -47,37 +47,37 @@ library(methods)
     ```{r}
     
     #get method information for the two classes
-    ct_ms=attr(methods(class='POSIXct'),'info')
-    lt_ms=attr(methods(class='POSIXlt'),'info')
+    ct_ms<-attr(methods(class='POSIXct'),'info')
+    lt_ms<-attr(methods(class='POSIXlt'),'info')
     
     #get corresponding functions 
-    ct_fs=lapply(1:NROW(ct_ms),function(i){
-      x=ct_ms[i,]
+    ct_fs<-lapply(1:NROW(ct_ms),function(i){
+      x<-ct_ms[i,]
       if(x$isS4=='TRUE'){
-        a=rownames(ct_ms)[i]
-        sigs=strsplit(a,',|-method')[[1]][-1]
+        a<-rownames(ct_ms)[i]
+        sigs<-strsplit(a,',|-method')[[1]][-1]
         return(getMethod(x$generic,sigs))
       }else{
         return(getS3method(x$generic,'POSIXct'))
       }
     })
-    names(ct_fs)=ct_ms$generic
+    names(ct_fs)<-ct_ms$generic
     
-    lt_fs=lapply(1:NROW(lt_ms),function(i){
-      x=lt_ms[i,]
+    lt_fs<-lapply(1:NROW(lt_ms),function(i){
+      x<-lt_ms[i,]
       if(x$isS4=='TRUE'){
-        a=rownames(lt_ms)[i]
-        sigs=strsplit(a,',|-method')[[1]][-1]
+        a<-rownames(lt_ms)[i]
+        sigs<-strsplit(a,',|-method')[[1]][-1]
         return(getMethod(x$generic,sigs))
       }else{
         return(getS3method(x$generic,'POSIXlt'))
       }
     })
-    names(lt_fs)=lt_ms$generic
+    names(lt_fs)<-lt_ms$generic
     
     #compare functions (with the same function names) between POSIXct and POSIXlt
-    com_names=intersect(names(lt_fs),names(ct_fs))
-    is_m_equal=sapply(com_names,function(x){
+    com_names<-intersect(names(lt_fs),names(ct_fs))
+    is_m_equal<-sapply(com_names,function(x){
       identical(lt_fs[[x]],ct_fs[[x]])
     })
     
