@@ -135,24 +135,23 @@
 4.  __<span style="color:red">Q</span>__: What happens if you use `quote()` instead of `substitute()` inside of
     `subset2()`?
     
-    __<span style="color:orange">A</span>__: We will get ```"Error in eval(expr, envir, enclos) : object 'x' not found"``` in the above example. We were not sure if the problem relates to finding the right expression or the correct environment for evaluation. But fortunately we can find some more information in another [repository](https://github.com/asnr/advanced-r-answers/blob/master/metaprogramming/nse.md):
+    __<span style="color:green">A</span>__: R looks for `condition` within `sample_df`
+    but can't find it, so it is looking in the execution environment for `condition`
+    and evaluates it to `a >= 4` (as supplied in the input). In the actual environment and the
+    remaining environments (the global environment and the search path) `a` can't
+    be found and we get the error "Error in eval(expr, envir, enclos) : object 'a' not found".
+    To understand this in detail, it is very important to 
+    forget about `substitute()` for a moment and just explore where `eval()` 
+    evaluates its supplied expressions for all kind of supplied `envir` and `enclos`
+    arguments. Before you get crazy (since a lot of stuff is coming togetehr here),
+    look also [here](https://stackoverflow.com/questions/43701281/r-eval-has-misleading-documentation-for-the-case-that-the-envir-argument-is-list) and [here](http://stackoverflow.com/questions/15504960/when-how-where-is-parent-frame-in-a-default-argument-interpreted).
     
-    To understand why this occurs, try setting the `enclos` argument of `eval()` to be `NULL`:
+    The above is opposed to `substitute()`, which isn't only capturing the symbol `condition`, but the expression slot of the condition promise object, which means, that `substitute()`
+    notices, when a promise is assigned as it's first argument and also stores this
+    information. To be more precise, we quote from [R Language Definition](https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Argument-evaluation)
     
-    ```{r, error = TRUE}
-    subset2 <- function(x, condition) {
-      condition_call <- quote(condition)
-      r <- eval(condition_call, x, enclos = NULL)
-      x[r, ]
-    }
+    > A formal argument is really a promise, an object with three slots, one for the expression that defines it, one for the environment in which to evaluate that expression, and one for the value of that expression once evaluated. substitute will recognize a promise variable and substitute the value of its expression slot. 
     
-    subset2(sample_df2, x > 8)
-    ```
-    
-    We can see that this time R is looking for the symbol `condition` and can't find it. In the default case (`enclos = parent.frame()`), where R is looking for `x`, the promise related to `x > 8` was already recognized by R. So in both `quote()`-cases, `x > 8` is not found by R, when `condition_call` should be evaluated in `x`. So in the first case (default), R looks in `eval`'s calling environment, and finds the promise `x > 8`. So it looks in the global environment to evaluate it. In the other case (`enclos = NULL`) `condition` is not found in `x` (the environment) and R is not looking in further environemts, since `enclos = NULL`. So the search is already finished before the condition related to `condition call` is even found.
-    
-    This is opposed to `substitute()`, which isn't only capturing the symbol `condition`, but the expression slot of the condition promise object. (Still need to show this!)
-
 5.  __<span style="color:red">Q</span>__: The second argument in `subset()` allows you to select variables. It
     treats variable names as if they were positions. This allows you to do 
     things like `subset(mtcars, , -cyl)` to drop the cylinder variable, or

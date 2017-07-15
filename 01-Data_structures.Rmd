@@ -32,12 +32,12 @@ cannot handle recursion within lists.  Only `unlist()` (or `purrr::flatten()`
 functions) can do that.
 
 5. __<span style="color:red">Q</span>__: Why is `1 == "1"` true? Why is `-1 < FALSE` true? Why is `"one" < 2` false?  
-__<span style="color:green">A</span>__: These operators are all functions which coerce their arguments (in these cases) to character, double and character. To enlighten the latter case: "one" comes after "2" in ASCI.
+__<span style="color:green">A</span>__: These operators are all functions which coerce their arguments (in these cases) to character, double and character. To enlighten the latter case: "one" comes after "2" in ASCII.
 
 6. __<span style="color:red">Q</span>__: Why is the default missing value, `NA`, a logical vector? What's special
    about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)  
 __<span style="color:green">A</span>__: It is a practical thought. When you combine `NA`s in `c()` with other atomic types they will be coerced
-like `TRUE` and `FALSE` to integer `(NA_integer_)`, double `(NA_real_)`, complex `(NA_complex_)` and character `(NA_character_)`. Recall that in R is a hierarchy of recursion that
+like `TRUE` and `FALSE` to integer `(NA_integer_)`, double `(NA_real_)`, complex `(NA_complex_)` and character `(NA_character_)`. Recall that in R there is a hierarchy of recursion that
 goes logical -> integer -> double -> character.  If `NA` were, for example, a character,
 including `NA` in a set of integers or logicals would result in them getting coerced
 to characters which would be undesirable. Making `NA` a logical means that involving an `NA`
@@ -124,9 +124,13 @@ __<span style="color:green">A</span>__: names, row.names and class.
 __<span style="color:green">A</span>__: Yes, you can create them easily. Also both dimensions can be 0:
 
     ```{r}
-    head(iris)[-(1:6),]
+    # here we use the recycling rules for logical subsetting, but you could
+    # also subset with 0, a negative index or a zero length atomic (i.e.
+    # logical(0), character(0), integer(0), double(0))
     
-    head(iris)[ , -(1:5)]
+    iris[FALSE,]
     
-    head(iris)[-(1:6), -(1:5)] # or just data.frame()
+    iris[ , FALSE] # or iris[FALSE]
+    
+    iris[FALSE, FALSE] # or just data.frame()
     ```
