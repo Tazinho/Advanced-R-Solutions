@@ -15,7 +15,7 @@
     t.test
     #> function (x, ...) 
     #> UseMethod("t.test")
-    #> <bytecode: 0x0000000014fa7ba8>
+    #> <bytecode: 0x00000000178332c0>
     #> <environment: namespace:stats>
     ```
     
@@ -78,10 +78,13 @@ __<span style="color:green">A</span>__:
     
     
     ```r
+    library(methods)
     objs <- mget(ls("package:base"), inherits = TRUE)
     funs <- Filter(is.function, objs)
     generics <- Filter(function(x) ("generic" %in% pryr::ftype(x)), funs)
-    sort(sapply(generics, function(x) length(methods(x))), decreasing = TRUE)[1]
+    sort(sapply(names(generics),
+                function(x) length(methods(x))),
+         decreasing = TRUE)[1]
     #> print 
     #>   203
     ```
@@ -111,13 +114,15 @@ __<span style="color:green">A</span>__:
     h("a")
     ```
     
-    __<span style="color:green">A</span>__: `g(10)` will return `2`. Since only `x` is in the execution environment of `g.numeric` R will search for `y` in the enclosing environment, where `y` is defined as `2`. `h("a")` will return `"class a"`, because `x = "a"` is given as input to the called method. From `?UseMethod`:
+    __<span style="color:green">A</span>__: `g(10)` will return `2`. Since `2` is of class numeric, `g.numeric()` is called. It has only `x` in its execution environment and R will search for `y` in the enclosing environment, where `y` is defined as `2`. From `?UseMethod`:
     
-    > UseMethod creates a new function call with arguments matched as they came in to the generic. Any local variables defined before the call to UseMethod are retained (unlike S).
+    > UseMethod creates a new function call with arguments matched as they came in to the generic. Any local variables defined before the call to UseMethod are retained (unlike S). 
     
     So generics look at the class of their first argument (default) for method dispatch.
-    Then a call to the particular method is made. Since the methods are created by the generic, R will look in the generics environment (including all objects defined before the `UseMethod` statement) when an object is not found in the environment of the called method.
-
+    Then a call to the particular method is made. Since the methods are created by the generic, R will look in the generics environment (including all objects defined before (!) the `UseMethod` statement) when an object is not found in the environment of the called method.
+    
+    `h("a")` will return `"char a"`, because `x = "a"` is given as input to the called method, which is of class character and so `h.character` is called and R also doesn't need to look elsewhere for `x`.
+    
 6.  __<span style="color:red">Q</span>__: Internal generics don't dispatch on the implicit class of base types.
     Carefully read `?"internal generic"` to determine why the length of `f` 
     and `g` is different in the example below. What function helps 
@@ -130,11 +135,15 @@ __<span style="color:green">A</span>__:
     class(g) <- "function"
     
     class(f)
+    #> [1] "function"
     class(g)
+    #> [1] "function"
     
     length.function <- function(x) "function"
     length(f)
+    #> [1] 1
     length(g)
+    #> [1] "function"
     ```
     
     __<span style="color:green">A</span>__: From `?"internal generic"`:  

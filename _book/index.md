@@ -1,8 +1,8 @@
 
 --- 
 title: "Advanced R Solutions"
-author: "Malte Grosser & Henning Bumann"
-date: "2017-04-13"
+author: "Malte Grosser, Henning Bumann, Peter Hurford & Robert Krzyzanowski"
+date: "2017-07-16"
 knit: "bookdown::render_book"
 site: bookdown::bookdown_site
 output:
@@ -34,27 +34,15 @@ cover-image: images/advrs_cover.png
 <img src="images/advrs_cover.png" style="display: block; margin: auto;" />
 
 This book aims to contribute solutions to Hadley Wickham's book [Advanced R](http://adv-r.had.co.nz/).
-It is planned to finish until end of 2016. The code can be found on [github](https://github.com/Tazinho/Advanced-R-Solutions.git).
+It is planned to finish until July 2017. The code can be found on [github](https://github.com/Tazinho/Advanced-R-Solutions.git).
 
 The date of the exercise versions in Hadley's book is January 25th 2017.
 
 
 
 
-
-```
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
-```
-
-<img src="index_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+<img src="index_files/figure-html/unnamed-chunk-4-1.png" width="672" />
 
 
 
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work by Malte Grosser and Henning Bumann is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work by Malte Grosser, Henning Bumann, Peter Hurford & Robert Krzyzanowski is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>
