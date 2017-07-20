@@ -186,32 +186,62 @@ require(["gitbook", "lodash", "jQuery"], function(gitbook, _, $) {
     gs.set('bodyScrollTop', {
       body: bookBody.scrollTop(),
       inner: bookInner.scrollTop(),
+<<<<<<< HEAD
       focused: document.hasFocus(),
       title: chapterTitle()
+||||||| merged common ancestors
+      focused: document.hasFocus(),
+      title: bookInner.find('.page-inner').find('h1,h2').first().text()
+=======
+      title: bookInner.find('.page-inner').find('h1,h2').first().text()
+>>>>>>> 4ce30ced5e3b5a8c0a3d77967443497759ca1fb0
     });
   };
   $(document).on('servr:reload', saveScrollPos);
 
-  // check if the page is loaded in an iframe (e.g. the RStudio preview window)
-  var inIFrame = function() {
+  // check if the page is loaded in the RStudio preview window
+  var inRStudio = function() {
     var inIframe = true;
     try { inIframe = window.self !== window.top; } catch (e) {}
-    return inIframe;
+    if (!inIframe) return false;
+    return /^\/rmd_output\/[0-9]+\/.*$/.test(window.location.pathname);
   };
+<<<<<<< HEAD
   $(window).on('blur unload', function(e) {
     if (inIFrame()) saveScrollPos(e);
     gs.set('bookTitle', bookTitle());
   });
+||||||| merged common ancestors
+  if (inIFrame()) {
+    $(window).on('blur unload', saveScrollPos);
+  }
+=======
+  if (inRStudio()) $(window).on('blur', saveScrollPos);
+  if (inRStudio()) $(window).on('unload', saveScrollPos);
+>>>>>>> 4ce30ced5e3b5a8c0a3d77967443497759ca1fb0
 
   $(function(e) {
     if (gs.get('bookTitle', '') !== bookTitle()) localStorage.clear();
     var pos = gs.get('bodyScrollTop');
+<<<<<<< HEAD
     if (pos) {
       if (pos.title === chapterTitle()) {
         if (pos.body !== 0) bookBody.scrollTop(pos.body);
         if (pos.inner !== 0) bookInner.scrollTop(pos.inner);
       }
       if (pos.focused) bookInner.find('.page-wrapper').focus();
+||||||| merged common ancestors
+    if (pos) {
+      if (pos.title === bookInner.find('.page-inner').find('h1,h2').first().text()) {
+        if (pos.body !== 0) bookBody.scrollTop(pos.body);
+        if (pos.inner !== 0) bookInner.scrollTop(pos.inner);
+      }
+      if (pos.focused) bookInner.find('.page-wrapper').focus();
+=======
+    if (pos && pos.title === bookInner.find('.page-inner').find('h1,h2').first().text()) {
+      if (pos.body !== 0) bookBody.scrollTop(pos.body);
+      if (pos.inner !== 0) bookInner.scrollTop(pos.inner);
+>>>>>>> 4ce30ced5e3b5a8c0a3d77967443497759ca1fb0
     }
     // clear book body scroll position
     gs.remove('bodyScrollTop');
