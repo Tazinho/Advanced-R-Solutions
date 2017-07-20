@@ -81,20 +81,10 @@ __<span style="color:green">A</span>__:
     > UseMethod creates a new function call with arguments matched as they came in to the generic. Any local variables defined before the call to UseMethod are retained (unlike S).
     
     So generics look at the class of their first argument (default) for method dispatch.
-<<<<<<< HEAD
     Then a call to the particular method is made. Since the methods are created by the generic, R will look in the generics environment (including all objects defined before (!) the `UseMethod` statement) when an object is not found in the environment of the called method.
     
     `h("a")` will return `"char a"`, because `x = "a"` is given as input to the called method, which is of class character and so `h.character` is called and R also doesn't need to look elsewhere for `x`.
     
-||||||| merged common ancestors
-    Then a call to the particular method is made. Since the methods are created by the generic, R will look in the generics environment (including all objects defined before (!) the `UseMethod` statement) when an object is not found in the environment of the called method.
-    
-    `h("a")` will return `"char a"`, because `x = "a"` is given as input to the called method, which is of class character `h.character` is called and R also doesn't need to look elsewhere for `x`. 
-    
-=======
-    Then a call to the particular method is made. Since the methods are created by the generic, R will look in the generics environment (including all objects defined before the `UseMethod` statement) when an object is not found in the environment of the called method.
-
->>>>>>> 4ce30ced5e3b5a8c0a3d77967443497759ca1fb0
 6.  __<span style="color:red">Q</span>__: Internal generics don't dispatch on the implicit class of base types.
     Carefully read `?"internal generic"` to determine why the length of `f` 
     and `g` is different in the example below. What function helps 
