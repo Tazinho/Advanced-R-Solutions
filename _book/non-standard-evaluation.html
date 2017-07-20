@@ -6,9 +6,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Advanced R Solutions</title>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
   <meta name="description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R.">
-  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
 
   <meta property="og:title" content="Advanced R Solutions" />
   <meta property="og:type" content="book" />
@@ -23,10 +22,10 @@
   <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R." />
   <meta name="twitter:image" content="images/advrs_cover.png" />
 
-<meta name="author" content="Malte Grosser &amp; Henning Bumann">
+<meta name="author" content="Malte Grosser, Henning Bumann, Peter Hurford &amp; Robert Krzyzanowski">
 
 
-<meta name="date" content="2017-04-13">
+<meta name="date" content="2017-07-16">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -35,7 +34,6 @@
   
 <link rel="prev" href="function-operators.html">
 <link rel="next" href="expressions.html">
-
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -129,6 +127,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </head>
 
 <body>
+
 
 
   <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
@@ -233,6 +232,22 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="16.3" data-path="rcpp.html"><a href="rcpp.html#the-stl"><i class="fa fa-check"></i><b>16.3</b> The STL</a></li>
 </ul></li>
 <li class="chapter" data-level="17" data-path="testchapter.html"><a href="testchapter.html"><i class="fa fa-check"></i><b>17</b> Testchapter</a></li>
+<li class="chapter" data-level="18" data-path="s3-1.html"><a href="s3-1.html"><i class="fa fa-check"></i><b>18</b> S3</a><ul>
+<li class="chapter" data-level="18.1" data-path="s3-1.html"><a href="s3-1.html#basics"><i class="fa fa-check"></i><b>18.1</b> Basics</a></li>
+<li class="chapter" data-level="18.2" data-path="s3-1.html"><a href="s3-1.html#classes"><i class="fa fa-check"></i><b>18.2</b> Classes</a></li>
+<li class="chapter" data-level="18.3" data-path="s3-1.html"><a href="s3-1.html#generics-and-methods"><i class="fa fa-check"></i><b>18.3</b> Generics and methods</a></li>
+<li class="chapter" data-level="18.4" data-path="s3-1.html"><a href="s3-1.html#method-dispatch"><i class="fa fa-check"></i><b>18.4</b> Method dispatch</a></li>
+<li class="chapter" data-level="18.5" data-path="s3-1.html"><a href="s3-1.html#inheritance"><i class="fa fa-check"></i><b>18.5</b> Inheritance</a></li>
+<li class="chapter" data-level="18.6" data-path="s3-1.html"><a href="s3-1.html#dispatch-details"><i class="fa fa-check"></i><b>18.6</b> Dispatch details</a></li>
+</ul></li>
+<li class="chapter" data-level="19" data-path="s4-1.html"><a href="s4-1.html"><i class="fa fa-check"></i><b>19</b> S4</a><ul>
+<li class="chapter" data-level="19.1" data-path="s4-1.html"><a href="s4-1.html#classes-1"><i class="fa fa-check"></i><b>19.1</b> Classes</a></li>
+<li class="chapter" data-level="19.2" data-path="s4-1.html"><a href="s4-1.html#generics-and-methods-1"><i class="fa fa-check"></i><b>19.2</b> Generics and methods</a></li>
+<li class="chapter" data-level="19.3" data-path="s4-1.html"><a href="s4-1.html#method-dispatch-1"><i class="fa fa-check"></i><b>19.3</b> Method dispatch</a></li>
+<li class="chapter" data-level="19.4" data-path="s4-1.html"><a href="s4-1.html#s4-and-existing-code"><i class="fa fa-check"></i><b>19.4</b> S4 and existing code</a><ul>
+<li class="chapter" data-level="19.4.1" data-path="s4-1.html"><a href="s4-1.html#exercises"><i class="fa fa-check"></i><b>19.4.1</b> Exercises</a></li>
+</ul></li>
+</ul></li>
 </ul>
 
       </nav>
@@ -256,11 +271,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2><span class="header-section-number">10.1</span> Capturing expressions</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: One important feature of <code>deparse()</code> to be aware of when programming is that it can return multiple strings if the input is too long. For example, the following call produces a vector of length two:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">g &lt;-<span class="st"> </span>function(x) <span class="kw">deparse</span>(<span class="kw">substitute</span>(x))
-<span class="kw">g</span>(a +<span class="st"> </span>b +<span class="st"> </span>c +<span class="st"> </span>d +<span class="st"> </span>e +<span class="st"> </span>f +<span class="st"> </span>g +<span class="st"> </span>h +<span class="st"> </span>i +<span class="st"> </span>j +<span class="st"> </span>k +<span class="st"> </span>l +<span class="st"> </span>m +
-<span class="st">  </span>n +<span class="st"> </span>o +<span class="st"> </span>p +<span class="st"> </span>q +<span class="st"> </span>r +<span class="st"> </span>s +<span class="st"> </span>t +<span class="st"> </span>u +<span class="st"> </span>v +<span class="st"> </span>w +<span class="st"> </span>x +<span class="st"> </span>y +<span class="st"> </span>z)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">g &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">deparse</span>(<span class="kw">substitute</span>(x))
+<span class="kw">g</span>(a <span class="op">+</span><span class="st"> </span>b <span class="op">+</span><span class="st"> </span>c <span class="op">+</span><span class="st"> </span>d <span class="op">+</span><span class="st"> </span>e <span class="op">+</span><span class="st"> </span>f <span class="op">+</span><span class="st"> </span>g <span class="op">+</span><span class="st"> </span>h <span class="op">+</span><span class="st"> </span>i <span class="op">+</span><span class="st"> </span>j <span class="op">+</span><span class="st"> </span>k <span class="op">+</span><span class="st"> </span>l <span class="op">+</span><span class="st"> </span>m <span class="op">+</span>
+<span class="st">  </span>n <span class="op">+</span><span class="st"> </span>o <span class="op">+</span><span class="st"> </span>p <span class="op">+</span><span class="st"> </span>q <span class="op">+</span><span class="st"> </span>r <span class="op">+</span><span class="st"> </span>s <span class="op">+</span><span class="st"> </span>t <span class="op">+</span><span class="st"> </span>u <span class="op">+</span><span class="st"> </span>v <span class="op">+</span><span class="st"> </span>w <span class="op">+</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span>y <span class="op">+</span><span class="st"> </span>z)</code></pre></div>
 <p>Why does this happen? Carefully read the documentation for <code>?deparse</code>. Can you write a wrapper around <code>deparse()</code> so that it always returns a single string?</p>
-<p><strong><span style="color:green">A</span></strong>: <code>deparse()</code> has a <code>width.cutoff</code> argument, which is according to <code>?deparse</code> an:</p>
+<p><strong><span style="color:green">A</span></strong>: <code>deparse()</code> has a <code>width.cutoff</code> argument (default 60 byte), which is according to <code>?deparse</code> an:</p>
 <blockquote>
 <p>integer in [20, 500] determining the cutoff (in bytes) at which line-breaking is tried.</p>
 </blockquote>
@@ -268,17 +283,31 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <blockquote>
 <p>width.cutoff is a lower bound for the line lengths: deparsing a line proceeds until at least width.cutoff bytes have been output and e.g. arg = value expressions will not be split across lines.</p>
 </blockquote>
-<p>You can wrap it with <code>paste0()</code> for example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">deparse_without_cutoff &lt;-<span class="st"> </span>function(x){
+<p>You can wrap it with for example with <code>paste0()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">deparse_without_cutoff &lt;-<span class="st"> </span><span class="cf">function</span>(x){
   <span class="kw">paste0</span>(<span class="kw">deparse</span>(x), <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span>)
-}</code></pre></div></li>
+}</code></pre></div>
+<p>It can be a little bit enhanced with a <code>gsub()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">s+&quot;</span>, <span class="st">&quot; &quot;</span>, <span class="kw">paste0</span>(<span class="kw">deparse</span>(<span class="kw">substitute</span>(x))))</code></pre></div>
+<p>This formats at least the spaces to a unified single space. However note that it is not possible to capture the exact input in every case:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># spaces are unified</span>
+<span class="kw">substitute</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span>  <span class="op">+</span><span class="st"> </span><span class="dv">1</span>   <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)
+<span class="co">#&gt; 1 + 1 + 1 + 1</span>
+<span class="kw">quote</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span>  <span class="op">+</span><span class="st"> </span><span class="dv">1</span>   <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)
+<span class="co">#&gt; 1 + 1 + 1 + 1</span>
+
+<span class="co"># leading zeros in numeric input are trimmed</span>
+<span class="kw">substitute</span>(<span class="dv">01</span>)
+<span class="co">#&gt; [1] 1</span>
+<span class="kw">quote</span>(<span class="dv">01</span>)
+<span class="co">#&gt; [1] 1</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Why does <code>as.Date.default()</code> use <code>substitute()</code> and <code>deparse()</code>? Why does <code>pairwise.t.test()</code> use them? Read the source code.</p>
 <p><strong><span style="color:green">A</span></strong>: <code>as.Date.default()</code> uses them to convert unexpected input expressions (neither dates, nor <code>NAs</code>) into a character string and return it within an error message.</p>
 <p><code>pairwise.t.test()</code> uses them to convert the names of its datainputs (response vector <code>x</code> and grouping factor <code>g</code>) into character strings to format these further into a part of the desired output.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: <code>pairwise.t.test()</code> assumes that <code>deparse()</code> always returns a length one character vector. Can you construct an input that violates this expectation? What happens?</p>
-<p><strong><span style="color:green">A</span></strong>: We can pass an expression to one of <code>pairwise.t.test()</code>’s data input arguments, which exceeds the default cutoff width in <code>deparse()</code>. The expression will be split into a character vector of length greater 1. Since the deparsed data inputs are directly pasted (read the source code!) with “and” as separator, and the result is just used to be displayed in the output. Just the data.name output will change (it will include more than one “and”).</p>
+<p><strong><span style="color:green">A</span></strong>: We can pass an expression to one of <code>pairwise.t.test()</code>’s data input arguments, which exceeds the default cutoff width in <code>deparse()</code>. The expression will be split into a character vector of length greater 1. The deparsed data inputs are directly pasted (read the source code!) with “and” as separator and the result is just used to be displayed in the output. Just the data.name output will change (it will include more than one “and”).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">d=<span class="dv">1</span>
-<span class="kw">pairwise.t.test</span>(<span class="dv">2</span>, d+d+d+d+d+d+d+d+d+d+d+d+d+d+d+d+d)
+<span class="kw">pairwise.t.test</span>(<span class="dv">2</span>, d<span class="op">+</span>d<span class="op">+</span>d<span class="op">+</span>d<span class="op">+</span>d<span class="op">+</span>d<span class="op">+</span>d<span class="op">+</span>d<span class="op">+</span>d<span class="op">+</span>d<span class="op">+</span>d<span class="op">+</span>d<span class="op">+</span>d<span class="op">+</span>d<span class="op">+</span>d<span class="op">+</span>d<span class="op">+</span>d)
 <span class="co">#&gt; </span>
 <span class="co">#&gt;  Pairwise comparisons using t tests with pooled SD </span>
 <span class="co">#&gt; </span>
@@ -288,52 +317,61 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="co">#&gt; </span>
 <span class="co">#&gt; P value adjustment method: holm</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: <code>f()</code>, defined above, just calls <code>substitute()</code>. Why can’t we use it to define <code>g()</code>? In other words, what will the following code return? First make a prediction. Then run the code and think about the results.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span>function(x) <span class="kw">substitute</span>(x) 
-g &lt;-<span class="st"> </span>function(x) <span class="kw">deparse</span>(<span class="kw">f</span>(x)) 
-<span class="kw">g</span>(<span class="dv">1</span>:<span class="dv">10</span>)                             <span class="co"># -&gt; x</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">substitute</span>(x) 
+g &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">deparse</span>(<span class="kw">f</span>(x)) 
+<span class="kw">g</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)                             <span class="co"># -&gt; x</span>
 <span class="kw">g</span>(x)                                <span class="co"># -&gt; x</span>
-<span class="kw">g</span>(x +<span class="st"> </span>y ^<span class="st"> </span><span class="dv">2</span> /<span class="st"> </span>z +<span class="st"> </span><span class="kw">exp</span>(a *<span class="st"> </span><span class="kw">sin</span>(b)))  <span class="co"># -&gt; x</span></code></pre></div>
+<span class="kw">g</span>(x <span class="op">+</span><span class="st"> </span>y <span class="op">^</span><span class="st"> </span><span class="dv">2</span> <span class="op">/</span><span class="st"> </span>z <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(a <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(b)))  <span class="co"># -&gt; x</span></code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: All return x, because <code>substitute()</code>’s second argument <code>env</code> is the current evaluation environment <code>environment()</code>. If you call <code>substitute</code> from another function, you may want to set the <code>env</code> argument to <code>parent.frame()</code>, which refers to the calling environment:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span>function(x) <span class="kw">substitute</span>(x, <span class="dt">env =</span> <span class="kw">parent.frame</span>()) 
-g &lt;-<span class="st"> </span>function(x) <span class="kw">deparse</span>(<span class="kw">f</span>(x)) 
-<span class="kw">g</span>(<span class="dv">1</span>:<span class="dv">10</span>)                             <span class="co"># -&gt; 1:10</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">substitute</span>(x, <span class="dt">env =</span> <span class="kw">parent.frame</span>()) 
+g &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">deparse</span>(<span class="kw">f</span>(x)) 
+<span class="kw">g</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)                             <span class="co"># -&gt; 1:10</span>
 <span class="kw">g</span>(x)                                <span class="co"># -&gt; x</span>
-<span class="kw">g</span>(x +<span class="st"> </span>y ^<span class="st"> </span><span class="dv">2</span> /<span class="st"> </span>z +<span class="st"> </span><span class="kw">exp</span>(a *<span class="st"> </span><span class="kw">sin</span>(b)))  <span class="co"># -&gt; x + y ^ 2 / z + exp(a * sin(b))</span></code></pre></div></li>
+<span class="kw">g</span>(x <span class="op">+</span><span class="st"> </span>y <span class="op">^</span><span class="st"> </span><span class="dv">2</span> <span class="op">/</span><span class="st"> </span>z <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(a <span class="op">*</span><span class="st"> </span><span class="kw">sin</span>(b)))  <span class="co"># -&gt; x + y ^ 2 / z + exp(a * sin(b))</span></code></pre></div></li>
 </ol>
 </div>
 <div id="non-standard-evaluation-in-subset" class="section level2">
 <h2><span class="header-section-number">10.2</span> Non standard evaluation in subset</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: Predict the results of the following lines of code:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="dv">2</span> +<span class="st"> </span><span class="dv">2</span>))))))        <span class="co"># -&gt; 4</span>
-<span class="kw">eval</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="dv">2</span> +<span class="st"> </span><span class="dv">2</span>)))))))  <span class="co"># -&gt; 4</span>
-<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="dv">2</span> +<span class="st"> </span><span class="dv">2</span>))))))) 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span>))))))        <span class="co"># -&gt; 4</span>
+<span class="kw">eval</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span>)))))))  <span class="co"># -&gt; 4</span>
+<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span>))))))) 
     <span class="co"># eval(quote(eval(quote(eval(quote(2 + 2))))))</span></code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: An outside <code>quote()</code> always wins…</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: <code>subset2()</code> has a bug if you use it with a single column data frame. What should the following code return? How can you modify <code>subset2()</code> so it returns the correct type of object?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">subset2 &lt;-<span class="st"> </span>function(x, condition) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">subset2 &lt;-<span class="st"> </span><span class="cf">function</span>(x, condition) {
   condition_call &lt;-<span class="st"> </span><span class="kw">substitute</span>(condition)
   r &lt;-<span class="st"> </span><span class="kw">eval</span>(condition_call, x)
   x[r, ]
 }
-sample_df2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="dv">1</span>:<span class="dv">10</span>)
-<span class="kw">subset2</span>(sample_df2, x &gt;<span class="st"> </span><span class="dv">8</span>)
+sample_df2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)
+<span class="kw">subset2</span>(sample_df2, x <span class="op">&gt;</span><span class="st"> </span><span class="dv">8</span>)
 <span class="co">#&gt; [1]  9 10</span></code></pre></div>
-<p><strong><span style="color:green">A</span></strong>: The output is an atomic vector. To return always a data.frame change the last row in <code>subset2</code> to <code>x[r, , drop = FALSE]</code>.</p></li>
+<p><strong><span style="color:green">A</span></strong>: Well what does <code>base::subset</code> return?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">subset</span>(sample_df2, x <span class="op">&gt;</span><span class="st"> </span><span class="dv">8</span>)
+<span class="co">#&gt;     x</span>
+<span class="co">#&gt; 9   9</span>
+<span class="co">#&gt; 10 10</span></code></pre></div>
+<p>So we want that the output is always a data frame and not an atomic vector like above. To return always a data frame change the last row in <code>subset2()</code> to <code>x[r, , drop = FALSE]</code>.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: The real subset function (<code>subset.data.frame()</code>) removes missing values in the condition. Modify <code>subset2()</code> to do the same: drop the offending rows.</p>
-<p><strong><span style="color:green">A</span></strong>: This time change the last row to <code>x[!is.na(r) &amp; r, , drop = FALSE]</code>.</p></li>
+<p><strong><span style="color:green">A</span></strong>: This time change the last row to <code>x[!is.na(r) &amp; r, , drop = FALSE]</code>. Alternatively you can also exclude <code>NA</code>s from the subset via setting them to <code>FALSE</code> with <code>r[is.na(r)] &lt;- FALSE</code>.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What happens if you use <code>quote()</code> instead of <code>substitute()</code> inside of <code>subset2()</code>?</p>
-<p><strong><span style="color:orange">A</span></strong>: We will get <code>&quot;Error in eval(expr, envir, enclos) : object 'x' not found&quot;</code> in the above example. We are not sure if the problem relates to finding the right expression or the correct environment for evaluation.</p></li>
+<p><strong><span style="color:green">A</span></strong>: R looks for <code>condition</code> within <code>sample_df</code> but can’t find it, so it is looking in the execution environment for <code>condition</code> and evaluates it to <code>a &gt;= 4</code> (as supplied in the input). In the actual environment and the remaining environments (the global environment and the search path) <code>a</code> can’t be found and we get the error “Error in eval(expr, envir, enclos) : object ‘a’ not found”. To understand this in detail, it is very important to forget about <code>substitute()</code> for a moment and just explore where <code>eval()</code> evaluates its supplied expressions for all kind of supplied <code>envir</code> and <code>enclos</code> arguments. Before you get crazy (since a lot of stuff is coming togetehr here), look also <a href="https://stackoverflow.com/questions/43701281/r-eval-has-misleading-documentation-for-the-case-that-the-envir-argument-is-list">here</a> and <a href="http://stackoverflow.com/questions/15504960/when-how-where-is-parent-frame-in-a-default-argument-interpreted">here</a>.</p>
+<p>The above is opposed to <code>substitute()</code>, which isn’t only capturing the symbol <code>condition</code>, but the expression slot of the condition promise object, which means, that <code>substitute()</code> notices, when a promise is assigned as it’s first argument and also stores this information. To be more precise, we quote from <a href="https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Argument-evaluation">R Language Definition</a></p>
+<blockquote>
+<p>A formal argument is really a promise, an object with three slots, one for the expression that defines it, one for the environment in which to evaluate that expression, and one for the value of that expression once evaluated. substitute will recognize a promise variable and substitute the value of its expression slot.</p>
+</blockquote></li>
 <li><p><strong><span style="color:red">Q</span></strong>: The second argument in <code>subset()</code> allows you to select variables. It treats variable names as if they were positions. This allows you to do things like <code>subset(mtcars, , -cyl)</code> to drop the cylinder variable, or <code>subset(mtcars, , disp:drat)</code> to select all the variables between <code>disp</code> and <code>drat</code>. How does this work? I’ve made this easier to understand by extracting it out into its own function.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">select &lt;-<span class="st"> </span>function(df, vars) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">select &lt;-<span class="st"> </span><span class="cf">function</span>(df, vars) {
   vars &lt;-<span class="st"> </span><span class="kw">substitute</span>(vars)
   var_pos &lt;-<span class="st"> </span><span class="kw">setNames</span>(<span class="kw">as.list</span>(<span class="kw">seq_along</span>(df)), <span class="kw">names</span>(df))
   pos &lt;-<span class="st"> </span><span class="kw">eval</span>(vars, var_pos)
   df[, pos, drop =<span class="st"> </span><span class="ot">FALSE</span>]
 }
-<span class="kw">select</span>(mtcars, -cyl)</code></pre></div>
+<span class="kw">select</span>(mtcars, <span class="op">-</span>cyl)</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: We can comment what happens</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">select &lt;-<span class="st"> </span>function(df, vars) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">select &lt;-<span class="st"> </span><span class="cf">function</span>(df, vars) {
   vars &lt;-<span class="st"> </span><span class="kw">substitute</span>(vars)
   var_pos &lt;-<span class="st"> </span><span class="kw">setNames</span>(<span class="kw">as.list</span>(<span class="kw">seq_along</span>(df)), <span class="kw">names</span>(df)) <span class="co"># We create a list with </span>
   <span class="co"># columnnumbers and -names of the original data.frame.</span>
@@ -343,7 +381,10 @@ sample_df2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<spa
   <span class="co"># within the supplied data.frame).</span>
   df[, pos, drop =<span class="st"> </span><span class="ot">FALSE</span>] <span class="co"># now we just subset the data.frame by its column index.</span>
 }
-<span class="kw">select</span>(mtcars, -cyl)</code></pre></div></li>
+<span class="kw">select</span>(mtcars, <span class="op">-</span>cyl)</code></pre></div>
+<p>This works also for ranges, i.e.,</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">select</span>(mtcars, cyl<span class="op">:</span>drat)</code></pre></div>
+<p>because of the usual precedences <code>cyl:drat</code> becomes <code>2:5</code>.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What does <code>evalq()</code> do? Use it to reduce the amount of typing for the examples above that use both <code>eval()</code> and <code>quote()</code>.</p>
 <p><strong><span style="color:green">A</span></strong>: From the help of <code>eval()</code>:</p>
 <blockquote>
@@ -352,14 +393,14 @@ sample_df2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<spa
 <p>In other “words”:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">identical</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(x)), <span class="kw">evalq</span>(x)) <span class="co"># -&gt; TRUE</span></code></pre></div>
 <p>The examples above can be written as:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="dv">2</span> +<span class="st"> </span><span class="dv">2</span>)))))) <span class="co">#-&gt;</span>
-<span class="kw">evalq</span>(<span class="kw">evalq</span>(<span class="kw">evalq</span>(<span class="dv">2</span> +<span class="st"> </span><span class="dv">2</span>)))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span>)))))) <span class="co">#-&gt;</span>
+<span class="kw">evalq</span>(<span class="kw">evalq</span>(<span class="kw">evalq</span>(<span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span>)))
 
-<span class="kw">eval</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="dv">2</span> +<span class="st"> </span><span class="dv">2</span>))))))) <span class="co">#-&gt;</span>
-<span class="kw">eval</span>(<span class="kw">evalq</span>(<span class="kw">evalq</span>(<span class="kw">evalq</span>(<span class="dv">2</span> +<span class="st"> </span><span class="dv">2</span>))))
+<span class="kw">eval</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span>))))))) <span class="co">#-&gt;</span>
+<span class="kw">eval</span>(<span class="kw">evalq</span>(<span class="kw">evalq</span>(<span class="kw">evalq</span>(<span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span>))))
 
-<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="dv">2</span> +<span class="st"> </span><span class="dv">2</span>))))))) <span class="co">#-&gt;</span>
-<span class="kw">quote</span>(<span class="kw">evalq</span>(<span class="kw">evalq</span>(<span class="kw">evalq</span>(<span class="dv">2</span> +<span class="st"> </span><span class="dv">2</span>)))) </code></pre></div></li>
+<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="kw">eval</span>(<span class="kw">quote</span>(<span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span>))))))) <span class="co">#-&gt;</span>
+<span class="kw">quote</span>(<span class="kw">evalq</span>(<span class="kw">evalq</span>(<span class="kw">evalq</span>(<span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span>)))) </code></pre></div></li>
 </ol>
 </div>
 <div id="scoping-issues" class="section level2">
@@ -367,22 +408,22 @@ sample_df2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<spa
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: <code>plyr::arrange()</code> works similarly to <code>subset()</code>, but instead of selecting rows, it reorders them. How does it work? What does <code>substitute(order(...))</code> do? Create a function that does only that and experiment with it.</p>
 <p><strong><span style="color:green">A</span></strong>: <code>substitute(order(...))</code> orders the indices of the supplied columns in <code>...</code> in the context of the submitted data.frame argument, beginning with the first submitted column.</p>
-<p>We can just copy the part of the source code and see if it does what we expect:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">arrange_indices &lt;-<span class="st"> </span>function (df, ...){
+<p>We can just copy the part of the source code from <code>plyr::arrange()</code> and see if it does what we expect:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">arrange_indices &lt;-<span class="st"> </span><span class="cf">function</span> (df, ...){
   <span class="kw">stopifnot</span>(<span class="kw">is.data.frame</span>(df))
   ord &lt;-<span class="st"> </span><span class="kw">eval</span>(<span class="kw">substitute</span>(<span class="kw">order</span>(...)), df, <span class="kw">parent.frame</span>())
   ord
   }
 
 <span class="kw">identical</span>(<span class="kw">arrange_indices</span>(iris, Species, Sepal.Length),
-          <span class="kw">order</span>(iris$Species, iris$Sepal.Length))</code></pre></div></li>
+          <span class="kw">order</span>(iris<span class="op">$</span>Species, iris<span class="op">$</span>Sepal.Length))</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What does <code>transform()</code> do? Read the documentation. How does it work? Read the source code for <code>transform.data.frame()</code>. What does <code>substitute(list(...))</code> do?</p>
 <p><strong><span style="color:green">A</span></strong>: As stated in the next question <code>transform()</code> is similar to <code>plyr::mutate()</code> but <code>plyr::mutate()</code> applies the transformations sequentially so that transformation can refer to columns that were just created. The rest of the question can be answered, by just commenting the source code:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Setting &quot;...&quot; as function argument allows the user to specify any kind of extra </span>
 <span class="co"># argument to the function. In this case we can expect arguments of the form </span>
 <span class="co"># new_col1 = foo(col_in_data_argument), new_col2 = foo(col_in_data_argument),... </span>
-&gt;<span class="st"> </span>transform.data.frame
-function (<span class="st">`</span><span class="dt">_data</span><span class="st">`</span>, ...) 
+<span class="op">&gt;</span><span class="st"> </span>transform.data.frame
+<span class="cf">function</span> (<span class="st">`</span><span class="dt">_data</span><span class="st">`</span>, ...) 
 {
   <span class="co"># subsitute(list(...)) takes the dots into a list and just returns the expression</span>
   <span class="co"># `list(...)`. Nothing is evaluated until now (which is important). </span>
@@ -404,35 +445,35 @@ function (<span class="st">`</span><span class="dt">_data</span><span class="st"
   inx &lt;-<span class="st"> </span><span class="kw">match</span>(tags, <span class="kw">names</span>(<span class="st">`</span><span class="dt">_data</span><span class="st">`</span>))
   <span class="co"># We create a logical vector, which is telling us if a column_name is already in the</span>
   <span class="co"># data.frame (TRUE) or really new (FALSE)</span>
-  matched &lt;-<span class="st"> </span>!<span class="kw">is.na</span>(inx)
+  matched &lt;-<span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(inx)
   <span class="co"># If any new column is corresponding to an old column name,</span>
   <span class="co"># the correspong old columns will be overwritten</span>
-  if (<span class="kw">any</span>(matched)) {
+  <span class="cf">if</span> (<span class="kw">any</span>(matched)) {
     <span class="st">`</span><span class="dt">_data</span><span class="st">`</span>[inx[matched]] &lt;-<span class="st"> </span>e[matched]
     <span class="st">`</span><span class="dt">_data</span><span class="st">`</span> &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">`</span><span class="dt">_data</span><span class="st">`</span>)
   }
   <span class="co"># If there is at least one new column name, all of these new columns will be bound</span>
   <span class="co"># on the old data.frame (which might have changed a bit during the first if). Then the</span>
   <span class="co"># transformed `data_` is returned</span>
-  if (!<span class="kw">all</span>(matched)) 
-    <span class="kw">do.call</span>(<span class="st">&quot;data.frame&quot;</span>, <span class="kw">c</span>(<span class="kw">list</span>(<span class="st">`</span><span class="dt">_data</span><span class="st">`</span>), e[!matched]))
+  <span class="cf">if</span> (<span class="op">!</span><span class="kw">all</span>(matched)) 
+    <span class="kw">do.call</span>(<span class="st">&quot;data.frame&quot;</span>, <span class="kw">c</span>(<span class="kw">list</span>(<span class="st">`</span><span class="dt">_data</span><span class="st">`</span>), e[<span class="op">!</span>matched]))
   <span class="co"># Also in case of no new column names the transformed `data_` is returned</span>
-  else <span class="st">`</span><span class="dt">_data</span><span class="st">`</span>
+  <span class="cf">else</span> <span class="st">`</span><span class="dt">_data</span><span class="st">`</span>
 }</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: <code>plyr::mutate()</code> is similar to <code>transform()</code> but it applies the transformations sequentially so that transformation can refer to columns that were just created:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="dv">1</span>:<span class="dv">5</span>)
-<span class="kw">transform</span>(df, <span class="dt">x2 =</span> x *<span class="st"> </span>x, <span class="dt">x3 =</span> x2 *<span class="st"> </span>x)
-plyr::<span class="kw">mutate</span>(df, <span class="dt">x2 =</span> x *<span class="st"> </span>x, <span class="dt">x3 =</span> x2 *<span class="st"> </span>x)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)
+<span class="kw">transform</span>(df, <span class="dt">x2 =</span> x <span class="op">*</span><span class="st"> </span>x, <span class="dt">x3 =</span> x2 <span class="op">*</span><span class="st"> </span>x)
+plyr<span class="op">::</span><span class="kw">mutate</span>(df, <span class="dt">x2 =</span> x <span class="op">*</span><span class="st"> </span>x, <span class="dt">x3 =</span> x2 <span class="op">*</span><span class="st"> </span>x)</code></pre></div>
 <p>How does mutate work? What’s the key difference between <code>mutate()</code> and <code>transform()</code>?</p>
 <p><strong><span style="color:green">A</span></strong>: The main difference is the possibility of sequential transformations. Another difference is that unnamed added columns will be thrown away. For the implementation many ideas are are the same. However the key difference is that for the sequential transformations, a for loop is created which iterates over a list of expressions and simultaneously changes the environment for the evaluation of the next expression (which is the supplied data). This should become clear with some comments on the code:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span>mutate
-function (.data, ...) 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span>mutate
+<span class="cf">function</span> (.data, ...) 
 {
-  <span class="kw">stopifnot</span>(<span class="kw">is.data.frame</span>(.data) ||<span class="st"> </span><span class="kw">is.list</span>(.data) ||<span class="st"> </span><span class="kw">is.environment</span>(.data))
+  <span class="kw">stopifnot</span>(<span class="kw">is.data.frame</span>(.data) <span class="op">||</span><span class="st"> </span><span class="kw">is.list</span>(.data) <span class="op">||</span><span class="st"> </span><span class="kw">is.environment</span>(.data))
   <span class="co"># we catch everything supplied in `...`. But this time we save this in a list of expressions.</span>
   <span class="co"># However, again the added column names will be the names of this list.</span>
-  cols &lt;-<span class="st"> </span><span class="kw">as.list</span>(<span class="kw">substitute</span>(<span class="kw">list</span>(...))[-<span class="dv">1</span>])
-  cols &lt;-<span class="st"> </span>cols[<span class="kw">names</span>(cols) !=<span class="st"> &quot;&quot;</span>] <span class="co"># all unnamed arguments in `...` will be thrown away, in </span>
+  cols &lt;-<span class="st"> </span><span class="kw">as.list</span>(<span class="kw">substitute</span>(<span class="kw">list</span>(...))[<span class="op">-</span><span class="dv">1</span>])
+  cols &lt;-<span class="st"> </span>cols[<span class="kw">names</span>(cols) <span class="op">!=</span><span class="st"> &quot;&quot;</span>] <span class="co"># all unnamed arguments in `...` will be thrown away, in </span>
   <span class="co"># contrast to `transform()` above, which just creates new columnnames.</span>
 
   <span class="co"># Now a for loop evaluates all added columns iteratively in the context (environment)</span>
@@ -443,18 +484,18 @@ function (.data, ...)
   <span class="co"># Since the underlying data (the environment for the evaluation) gets automatically</span>
   <span class="co"># &quot;updated&quot; in every iteration of the for loop, it will be possible to use the new columns</span>
   <span class="co"># directly in the next iteration (which relates to the next added column)</span>
-  for (col in <span class="kw">names</span>(cols)) {
+  <span class="cf">for</span> (col <span class="cf">in</span> <span class="kw">names</span>(cols)) {
     .data[[col]] &lt;-<span class="st"> </span><span class="kw">eval</span>(cols[[col]], .data, <span class="kw">parent.frame</span>())
   }
   <span class="co"># Afterwards the data gets returned</span>
   .data
 }</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What does <code>with()</code> do? How does it work? Read the source code for <code>with.default()</code>. What does <code>within()</code> do? How does it work? Read the source code for <code>within.data.frame()</code>. Why is the code so much more complex than <code>with()</code>?</p>
-<p><strong><span style="color:orange">A</span></strong>: <code>with()</code> is a generic function that allows writing an expression (second argument) that refers to variablenames of <code>data</code> (first argument) as if the corresponding variables were objects themselves.</p>
+<p><strong><span style="color:green">A</span></strong>: <code>with()</code> is a generic function that allows writing an expression (second argument) that refers to variablenames of <code>data</code> (first argument) as if the corresponding variables were objects themselves.</p>
 <p><code>with()</code> evaluates the expression via an</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">eval</span>(<span class="kw">substitute</span>(expr), data, <span class="dt">enclos =</span> <span class="kw">parent.frame</span>())</code></pre></div>
 <p>construct in a temporary environment, which has the calling frame as a parent. This also means that variables that aren’t found in <code>data</code>, will be looked up in <code>with()</code>’s calling environment. As stated in <code>?with</code>, this is useful for modelling functions.</p>
-<p>In contrast to <code>with()</code>, which returns the value of the evaluated expression, <code>within()</code> returns the modified object. So <code>within()</code> can be used as an alternative to <code>base::transform()</code>. There is also a subtile difference regarding the non standard evaluation technique (which I don’t understand in detail). <code>within()</code> first creates an environment with <code>data</code> as parent and <code>within()</code>’s calling environment as grandparent. This environment becomes changed, since afterwards the expression is evaluated inside of it. The rest of the code converts this environment into a list and ensures that new variables are not overriden by the former ones.</p></li>
+<p>In contrast to <code>with()</code>, which returns the value of the evaluated expression, <code>within()</code> returns the modified object. So <code>within()</code> can be used as an alternative to <code>base::transform()</code>. <code>within()</code> first creates an environment with <code>data</code> as parent and <code>within()</code>’s calling environment as grandparent. This environment becomes changed, since afterwards the expression is evaluated inside of it. The rest of the code converts this environment into a list and ensures that new variables are not overriden by the former ones.</p></li>
 </ol>
 </div>
 <div id="calling-from-another-function" class="section level2">
@@ -473,15 +514,86 @@ function (.data, ...)
 <p><code>substitute()</code> and <code>eval()</code>/<code>quote</code> are the basic functions for NSE. To see how it’s done one has to understand parse trees and/or look into the underlying C code. The problematic behaviour of <code>substitute()</code> is pretty obvious. There might be some insights that make it predictable, but since <code>substitute()</code> is written for NSE and only contains the arguments <code>expr</code> and <code>env</code>, it seems that no escape hatch exists.</p>
 <p>Like <code>rm()</code> <code>data()</code> has the first arguments <code>...</code> and <code>list = character()</code>. Again you can supply unquoted or quoted names to <code>...</code>. These will be caught, converted to character via <code>as.character(substitute(list(...))[-1L])</code> and concatenated with the character input of the <code>list</code> argument. The escape hatch is similar to <code>rm()</code>: use explicitly the <code>list</code> argument.</p>
 <p><code>data.frame()</code>’s first argument, <code>...</code>, gets caught once via <code>object &lt;- as.list(substitute(list(...)))[-1L]</code> and once <code>x &lt;- list(...)</code>. First one is used among others to create rownames. This can be suppressed via the setting of the argument <code>row.names</code>, which lets you supply a vector or specifing a column of the data.frame for the explicit naming of rows. <code>x</code> will be deparsed later and is then used to create the columnnames. Since this process underlies several complex rules in cases of “special namings”, <code>data.frame()</code> provides the <code>check.names</code> argument. One can set <code>check.names = FALSE</code>, to ensure that columns will be named however they are supplied to <code>data.frame()</code>.</p></li>
-<li><p><strong><span style="color:red">Q</span></strong>: Base functions <code>match.fun()</code>, <code>page()</code>, and <code>ls()</code> all try to automatically determine whether you want standard or non-standard evaluation. Each uses a different approach. Figure out the essence of each approach then compare and contrast.</p></li>
-<li><p><strong><span style="color:red">Q</span></strong>: Add an escape hatch to <code>plyr::mutate()</code> by splitting it into two functions. One function should capture the unevaluated inputs. The other should take a data frame and list of expressions and perform the computation.</p></li>
-<li><p><strong><span style="color:red">Q</span></strong>: What’s the escape hatch for <code>ggplot2::aes()</code>? What about <code>plyr::.()</code>? What do they have in common? What are the advantages and disadvantages of their differences?</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Base functions <code>match.fun()</code>, <code>page()</code>, and <code>ls()</code> all try to automatically determine whether you want standard or non-standard evaluation. Each uses a different approach. Figure out the essence of each approach then compare and contrast.</p>
+<p><strong><span style="color:green">A</span></strong>:</p>
+<ul>
+<li><code>match.fun</code> uses NSE if you pass something other than a length-one character or symbol, and does not use NSE otherwise.</li>
+<li><code>page</code> uses NSE if you pass something other than a length-one character. Symbols would still trigger NSE.</li>
+<li><code>ls</code> triggers NSE substitute if it cannot evaluate the directory passed as a variable, and triggers NSE deparse if the result is not a character.</li>
+</ul>
+<p>The <code>ls</code> method seems safest of the three approaches, but is also the least performant.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Add an escape hatch to <code>plyr::mutate()</code> by splitting it into two functions. One function should capture the unevaluated inputs. The other should take a data frame and list of expressions and perform the computation.</p>
+<p><strong><span style="color:green">A</span></strong>: We look again at the source code of <code>plyr::mutate()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plyr<span class="op">::</span>mutate
+<span class="co">#&gt; function (.data, ...) </span>
+<span class="co">#&gt; {</span>
+<span class="co">#&gt;     stopifnot(is.data.frame(.data) || is.list(.data) || is.environment(.data))</span>
+<span class="co">#&gt;     cols &lt;- as.list(substitute(list(...))[-1])</span>
+<span class="co">#&gt;     cols &lt;- cols[names(cols) != &quot;&quot;]</span>
+<span class="co">#&gt;     for (col in names(cols)) {</span>
+<span class="co">#&gt;         .data[[col]] &lt;- eval(cols[[col]], .data, parent.frame())</span>
+<span class="co">#&gt;     }</span>
+<span class="co">#&gt;     .data</span>
+<span class="co">#&gt; }</span>
+<span class="co">#&gt; &lt;environment: namespace:plyr&gt;</span></code></pre></div>
+<p>What we want is to have the local variable “cols” as an argument of our new (wrapped) escape hatch function (analogously as shown with <code>subset2_q()</code> in the textbook).</p>
+<p>Therefore we create:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">get_cols &lt;-<span class="st"> </span><span class="cf">function</span>(...) {
+  ll &lt;-<span class="st"> </span><span class="kw">as.list</span>(<span class="kw">substitute</span>(<span class="kw">list</span>(...)))
+  ll[<span class="kw">names</span>(ll) <span class="op">!=</span><span class="st"> &quot;&quot;</span>]
+}</code></pre></div>
+<p>We also want a function, that works with “cols” and performs the computation (the for loop in the original <code>plyr::mutate()</code>):</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mutate_cols &lt;-<span class="st"> </span><span class="cf">function</span>(df, cols) {
+  <span class="cf">for</span> (col <span class="cf">in</span> <span class="kw">names</span>(cols)) {
+    df[[col]] &lt;-<span class="st"> </span><span class="kw">eval</span>(cols[[col]], df, <span class="kw">parent.frame</span>())
+    }
+  df
+}</code></pre></div>
+<p>Now we can wrap these with our new mutate function and have a nice interface:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mutate2 &lt;-<span class="st"> </span><span class="cf">function</span>(df, ...) {
+  <span class="kw">mutate_cols</span>(df, <span class="kw">get_cols</span>(df, ...))
+}
+
+<span class="co"># a little test</span>
+df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)
+<span class="kw">identical</span>(
+  plyr<span class="op">::</span><span class="kw">mutate</span>(df, <span class="dt">x2 =</span> x <span class="op">*</span><span class="st"> </span>x, <span class="dt">x3 =</span> x2 <span class="op">*</span><span class="st"> </span>x),
+  <span class="kw">mutate2</span>(df, <span class="dt">x2 =</span> x <span class="op">*</span><span class="st"> </span>x, <span class="dt">x3 =</span> x2 <span class="op">*</span><span class="st"> </span>x)
+)
+<span class="co">#&gt; [1] TRUE</span></code></pre></div></li>
+<li><p><strong><span style="color:red">Q</span></strong>: What’s the escape hatch for <code>ggplot2::aes()</code>? What about <code>plyr::.()</code>? What do they have in common? What are the advantages and disadvantages of their differences?</p>
+<ul>
+<li>One can call <code>rename_aes</code> directly.</li>
+<li><code>plyr::.</code> lets you specify an env in which to evaluate <code>...</code>.</li>
+</ul>
+<p>Both evaluate <code>...</code> using <code>match.call()</code> and create a structure out of them.</p>
+<p><code>plyr::.</code> probably requires less knowledge about internals, but is also less customizable.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: The version of <code>subset2_q()</code> I presented is a simplification of real code. Why is the following version better?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">subset2_q &lt;-<span class="st"> </span>function(x, cond, <span class="dt">env =</span> <span class="kw">parent.frame</span>()) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">subset2_q &lt;-<span class="st"> </span><span class="cf">function</span>(x, cond, <span class="dt">env =</span> <span class="kw">parent.frame</span>()) {
   r &lt;-<span class="st"> </span><span class="kw">eval</span>(cond, x, env)
   x[r, ]
 }</code></pre></div>
-<p>Rewrite <code>subset2()</code> and <code>subscramble()</code> to use this improved version.</p></li>
+<p>Rewrite <code>subset2()</code> and <code>subscramble()</code> to use this improved version.</p>
+<p><strong><span style="color:green">A</span></strong>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">subset2_q_old &lt;-<span class="st"> </span><span class="cf">function</span>(x, condition) {
+  r &lt;-<span class="st"> </span><span class="kw">eval</span>(condition, x, <span class="kw">parent.frame</span>())
+  x[r, ]
+}
+
+subset2_q &lt;-<span class="st"> </span><span class="cf">function</span>(x, cond, <span class="dt">env =</span> <span class="kw">parent.frame</span>()) {
+  r &lt;-<span class="st"> </span><span class="kw">eval</span>(cond, x, env)
+  x[r, ]
+}</code></pre></div>
+<p>The modified version of subset2_q allows you to specify an environment in which to evaluate the condition, which allows you to run <code>subset2_q()</code> in more situations (such as within a dataframe).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">subset2 &lt;-<span class="st"> </span><span class="cf">function</span>(x, condition, <span class="dt">env =</span> <span class="kw">parent.frame</span>()) {
+  <span class="kw">subset2_q</span>(x, <span class="kw">substitute</span>(condition), env)
+}
+
+scramble &lt;-<span class="st"> </span><span class="cf">function</span>(x) x[<span class="kw">sample</span>(<span class="kw">nrow</span>(x)), ]
+subscramble &lt;-<span class="st"> </span><span class="cf">function</span>(x, condition, <span class="dt">env =</span> <span class="kw">parent.frame</span>()) {
+  condition &lt;-<span class="st"> </span><span class="kw">substitute</span>(condition, env)
+  <span class="kw">scramble</span>(<span class="kw">subset2_q</span>(x, condition, env))
+}</code></pre></div></li>
 </ol>
 </div>
 <div id="substitute" class="section level2">
@@ -494,25 +606,50 @@ function (.data, ...)
 <li><code>f(a &lt; b, c, d)</code> -&gt; <code>if (a &lt; b) c else d</code></li>
 </ul>
 <p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">subs</span>(a +<span class="st"> </span>b +<span class="st"> </span>c, <span class="kw">list</span>(<span class="st">&quot;+&quot;</span> =<span class="st"> </span><span class="kw">quote</span>(<span class="st">`</span><span class="dt">*</span><span class="st">`</span>)))     <span class="co"># -&gt; `a * b * c`</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">subs</span>(a <span class="op">+</span><span class="st"> </span>b <span class="op">+</span><span class="st"> </span>c, <span class="kw">list</span>(<span class="st">&quot;+&quot;</span> =<span class="st"> </span><span class="kw">quote</span>(<span class="st">`</span><span class="dt">*</span><span class="st">`</span>)))     <span class="co"># -&gt; `a * b * c`</span>
 <span class="kw">subs</span>(<span class="kw">f</span>(<span class="kw">g</span>(a, b), c), <span class="kw">list</span>(<span class="dt">g =</span> <span class="kw">quote</span>(<span class="st">`</span><span class="dt">+</span><span class="st">`</span>),
                          <span class="dt">f =</span> <span class="kw">quote</span>(<span class="st">`</span><span class="dt">*</span><span class="st">`</span>)))   <span class="co"># -&gt; `(a + b) * c`</span>
-<span class="kw">subs</span>(<span class="kw">f</span>(a &lt;<span class="st"> </span>b, c, d), <span class="kw">list</span>(<span class="dt">f =</span> <span class="kw">quote</span>(<span class="st">`</span><span class="dt">if</span><span class="st">`</span>))) <span class="co"># -&gt; `if (a &lt; b) c else d`</span></code></pre></div></li>
+<span class="kw">subs</span>(<span class="kw">f</span>(a <span class="op">&lt;</span><span class="st"> </span>b, c, d), <span class="kw">list</span>(<span class="dt">f =</span> <span class="kw">quote</span>(<span class="st">`</span><span class="dt">if</span><span class="st">`</span>))) <span class="co"># -&gt; `if (a &lt; b) c else d`</span></code></pre></div></li>
 <li><strong><span style="color:red">Q</span></strong>: For each of the following pairs of expressions, describe why you can’t use <code>subs()</code> to convert one to the other.
 <ul>
 <li><code>a + b + c</code> -&gt; <code>a + b * c</code></li>
 <li><code>f(a, b)</code> -&gt; <code>f(a, b, c)</code></li>
 <li><code>f(a, b, c)</code> -&gt; <code>f(a, b)</code></li>
+</ul>
+<strong><span style="color:green">A</span></strong>:
+<ul>
+<li><code>a + b + c</code> -&gt; <code>a + b * c</code> You can’t convert one “+” to “+” and the other to “*“, because <code>subs()</code> converts either all instances of the”+&quot; or no instances of the “+”.</li>
+<li><code>f(a, b)</code> -&gt; <code>f(a, b, c)</code> <code>subs()</code> cannot be used to add new arguments, only convert.</li>
+<li>f(a, b, c) -&gt; f(a, b) <code>subs()</code> cannot be used to subtract new arguments, only convert.</li>
 </ul></li>
-<li><p><strong><span style="color:red">Q</span></strong>: How does <code>pryr::named_dots()</code> work? Read the source.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: How does <code>pryr::named_dots()</code> work? Read the source.</p>
+<p><strong><span style="color:green">A</span></strong>: It captures the dot arguments using <code>pryr::dots</code> (which is just <code>eval(substitute(alist(...)))</code>), and then gets the names of the arguments, using “” for the arguments without names.</p>
+<p>If all the args are “”, it simply returns the args. Otherwise, it names the args with their values, and returns the renamed list of args.</p></li>
 </ol>
 </div>
 <div id="the-downsides-of-non-standard-evaluation" class="section level2">
 <h2><span class="header-section-number">10.6</span> The downsides of non-standard evaluation</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: What does the following function do? What’s the escape hatch? Do you think that this is an appropriate use of NSE?</p>
-<p>nl &lt;- function(…) { dots &lt;- named_dots(…) lapply(dots, eval, parent.frame()) }</p></li>
-<li><p><strong><span style="color:red">Q</span></strong>: Instead of relying on promises, you can use formulas created with ~ to explicitly capture an expression and its environment. What are the advantages and disadvantages of making quoting explicit? How does it impact referential transparency?</p></li>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nl &lt;-<span class="st"> </span><span class="cf">function</span>(...) {
+  dots &lt;-<span class="st"> </span>pryr<span class="op">::</span><span class="kw">named_dots</span>(...)
+  <span class="kw">lapply</span>(dots, eval, <span class="kw">parent.frame</span>())
+}</code></pre></div>
+<p><strong><span style="color:green">A</span></strong>: <code>nl()</code> extracts the dots, names them, and then evaluates them in the global namespace. This returns a list of arguments that are named by what is literally in the dots, with the values of what the dots evaluate to.</p>
+<p>For example:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">nl</span>(<span class="dv">1</span>, <span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span>, <span class="kw">mean</span>(<span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">5</span>)))
+<span class="co">#&gt; $`1`</span>
+<span class="co">#&gt; [1] 1</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $`2 + 2`</span>
+<span class="co">#&gt; [1] 4</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $`mean(c(3, 5))`</span>
+<span class="co">#&gt; [1] 4</span></code></pre></div>
+<p>You can always call the underlying <code>lapply</code> directly as an escape hatch.</p>
+<p>However, it is a toy example and we are not really sure what you would gain from actually using this.</p></li>
+<li><p><strong><span style="color:red">Q</span></strong>: Instead of relying on promises, you can use formulas created with ~ to explicitly capture an expression and its environment. What are the advantages and disadvantages of making quoting explicit? How does it impact referential transparency?</p>
+<p><strong><span style="color:green">A</span></strong>: Using formulas in this manner would allow for referential transparency, but it would make working with NSE much more verbose. In any situation in which it is worth using NSE, it would also be worth not using formulas like this.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Read the standard non-standard evaluation rules found at <a href="http://developer.r-project.org/nonstandard-eval.pdf" class="uri">http://developer.r-project.org/nonstandard-eval.pdf</a>.</p></li>
 </ol>
 
@@ -524,8 +661,9 @@ function (.data, ...)
         </div>
       </div>
 <a href="function-operators.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="expressions.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
-
+<a href="expressions.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
@@ -569,7 +707,7 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:" && /^https?:/.test(script.src))
       script.src  = script.src.replace(/^https?:/, '');
     document.getElementsByTagName("head")[0].appendChild(script);

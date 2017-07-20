@@ -6,9 +6,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Advanced R Solutions</title>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
   <meta name="description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R.">
-  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
 
   <meta property="og:title" content="Advanced R Solutions" />
   <meta property="og:type" content="book" />
@@ -23,10 +22,10 @@
   <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R." />
   <meta name="twitter:image" content="images/advrs_cover.png" />
 
-<meta name="author" content="Malte Grosser &amp; Henning Bumann">
+<meta name="author" content="Malte Grosser, Henning Bumann, Peter Hurford &amp; Robert Krzyzanowski">
 
 
-<meta name="date" content="2017-04-13">
+<meta name="date" content="2017-07-16">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -35,7 +34,6 @@
   
 <link rel="prev" href="functionals.html">
 <link rel="next" href="non-standard-evaluation.html">
-
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -129,6 +127,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </head>
 
 <body>
+
 
 
   <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
@@ -233,6 +232,22 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="16.3" data-path="rcpp.html"><a href="rcpp.html#the-stl"><i class="fa fa-check"></i><b>16.3</b> The STL</a></li>
 </ul></li>
 <li class="chapter" data-level="17" data-path="testchapter.html"><a href="testchapter.html"><i class="fa fa-check"></i><b>17</b> Testchapter</a></li>
+<li class="chapter" data-level="18" data-path="s3-1.html"><a href="s3-1.html"><i class="fa fa-check"></i><b>18</b> S3</a><ul>
+<li class="chapter" data-level="18.1" data-path="s3-1.html"><a href="s3-1.html#basics"><i class="fa fa-check"></i><b>18.1</b> Basics</a></li>
+<li class="chapter" data-level="18.2" data-path="s3-1.html"><a href="s3-1.html#classes"><i class="fa fa-check"></i><b>18.2</b> Classes</a></li>
+<li class="chapter" data-level="18.3" data-path="s3-1.html"><a href="s3-1.html#generics-and-methods"><i class="fa fa-check"></i><b>18.3</b> Generics and methods</a></li>
+<li class="chapter" data-level="18.4" data-path="s3-1.html"><a href="s3-1.html#method-dispatch"><i class="fa fa-check"></i><b>18.4</b> Method dispatch</a></li>
+<li class="chapter" data-level="18.5" data-path="s3-1.html"><a href="s3-1.html#inheritance"><i class="fa fa-check"></i><b>18.5</b> Inheritance</a></li>
+<li class="chapter" data-level="18.6" data-path="s3-1.html"><a href="s3-1.html#dispatch-details"><i class="fa fa-check"></i><b>18.6</b> Dispatch details</a></li>
+</ul></li>
+<li class="chapter" data-level="19" data-path="s4-1.html"><a href="s4-1.html"><i class="fa fa-check"></i><b>19</b> S4</a><ul>
+<li class="chapter" data-level="19.1" data-path="s4-1.html"><a href="s4-1.html#classes-1"><i class="fa fa-check"></i><b>19.1</b> Classes</a></li>
+<li class="chapter" data-level="19.2" data-path="s4-1.html"><a href="s4-1.html#generics-and-methods-1"><i class="fa fa-check"></i><b>19.2</b> Generics and methods</a></li>
+<li class="chapter" data-level="19.3" data-path="s4-1.html"><a href="s4-1.html#method-dispatch-1"><i class="fa fa-check"></i><b>19.3</b> Method dispatch</a></li>
+<li class="chapter" data-level="19.4" data-path="s4-1.html"><a href="s4-1.html#s4-and-existing-code"><i class="fa fa-check"></i><b>19.4</b> S4 and existing code</a><ul>
+<li class="chapter" data-level="19.4.1" data-path="s4-1.html"><a href="s4-1.html#exercises"><i class="fa fa-check"></i><b>19.4.1</b> Exercises</a></li>
+</ul></li>
+</ul></li>
 </ul>
 
       </nav>
@@ -257,11 +272,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: Write a FO that logs a time stamp and message to a file every time a function is run.</p>
 <p><strong><span style="color:green">A</span></strong>: Note that the example will create a file file in your current working directory:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">logger &lt;-<span class="st"> </span>function(f, filename){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">logger &lt;-<span class="st"> </span><span class="cf">function</span>(f, filename){
   <span class="kw">force</span>(f)
   filename_tmp &lt;-<span class="st"> </span><span class="kw">paste</span>(filename, <span class="kw">basename</span>(<span class="kw">tempfile</span>()), <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>)
   <span class="kw">write</span>(<span class="kw">paste</span>(<span class="st">&quot;created at:&quot;</span>, <span class="kw">Sys.time</span>()), filename_tmp, <span class="dt">append =</span> <span class="ot">TRUE</span>)
-  function(..., <span class="dt">message =</span> <span class="st">&quot;you can add a message at each call&quot;</span>) {
+  <span class="cf">function</span>(..., <span class="dt">message =</span> <span class="st">&quot;you can add a message at each call&quot;</span>) {
     <span class="kw">write</span>(<span class="kw">paste0</span>(<span class="st">&quot;used at: &quot;</span>, <span class="kw">Sys.time</span>(), <span class="st">&quot;, &quot;</span>, message), filename_tmp, <span class="dt">append =</span> <span class="ot">TRUE</span>)
     <span class="kw">f</span>(...)
   }
@@ -269,14 +284,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <span class="co"># the following line creates a file, which name starts with &quot;mean_log_&quot;</span>
 mean2 &lt;-<span class="st"> </span><span class="kw">logger</span>(mean, <span class="st">&quot;mean_log&quot;</span>) 
-<span class="kw">mean2</span>(<span class="dv">1</span>:<span class="dv">4</span>, <span class="dt">message =</span> <span class="st">&quot;first time&quot;</span>) 
-<span class="kw">mean2</span>(<span class="dv">1</span>:<span class="dv">4</span>, <span class="dt">message =</span> <span class="st">&quot;second_time&quot;</span>)</code></pre></div></li>
+<span class="kw">mean2</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">message =</span> <span class="st">&quot;first time&quot;</span>) 
+<span class="kw">mean2</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">message =</span> <span class="st">&quot;second_time&quot;</span>)</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What does the following function do? What would be a good name for it?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span>function(g) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span><span class="cf">function</span>(g) {
   <span class="kw">force</span>(g)
   result &lt;-<span class="st"> </span><span class="ot">NULL</span>
-  function(...) {
-    if (<span class="kw">is.null</span>(result)) {
+  <span class="cf">function</span>(...) {
+    <span class="cf">if</span> (<span class="kw">is.null</span>(result)) {
       result &lt;&lt;-<span class="st"> </span><span class="kw">g</span>(...)
     }
     result
@@ -284,20 +299,20 @@ mean2 &lt;-<span class="st"> </span><span class="kw">logger</span>(mean, <span c
 }
 runif2 &lt;-<span class="st"> </span><span class="kw">f</span>(runif)
 <span class="kw">runif2</span>(<span class="dv">5</span>)
-<span class="co">#&gt; [1] 0.38117830 0.62566813 0.01181258 0.56624290 0.79400080</span>
+<span class="co">#&gt; [1] 0.1090973 0.8933546 0.6849637 0.7362727 0.8324138</span>
 <span class="kw">runif2</span>(<span class="dv">10</span>)
-<span class="co">#&gt; [1] 0.38117830 0.62566813 0.01181258 0.56624290 0.79400080</span></code></pre></div>
+<span class="co">#&gt; [1] 0.1090973 0.8933546 0.6849637 0.7362727 0.8324138</span></code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: It returns a new version of the inputfunction. That version will always return the result of it’s first run (in case this not <code>NULL</code>), no matter how the input changes. Good names could be <code>first_run()</code> or <code>initial_return()</code>.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Modify <code>delay_by()</code> so that instead of delaying by a fixed amount of time, it ensures that a certain amount of time has elapsed since the function was last called. That is, if you called <code>g &lt;- delay_by(1, f); g(); Sys.sleep(2); g()</code> there shouldn’t be an extra delay.</p>
 <p><strong><span style="color:green">A</span></strong>: We can do this with three little tricks (and the help of 42):</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">delay_by_v2 &lt;-<span class="st"> </span>function(delay, f) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">delay_by_v2 &lt;-<span class="st"> </span><span class="cf">function</span>(delay, f) {
   <span class="kw">force</span>(f)
   <span class="co"># we initialise the timestamp for the last run. We set a specific default value,</span>
   <span class="co"># to ensure that the first run of the returned function will never be delayed</span>
-  last_runtime &lt;-<span class="st"> </span><span class="kw">Sys.time</span>() -<span class="st"> </span>(delay +<span class="st"> </span><span class="dv">42</span>)
-  function(...) {
+  last_runtime &lt;-<span class="st"> </span><span class="kw">Sys.time</span>() <span class="op">-</span><span class="st"> </span>(delay <span class="op">+</span><span class="st"> </span><span class="dv">42</span>)
+  <span class="cf">function</span>(...) {
     <span class="co"># we continually check if enough time passed with an (empty) while statement.</span>
-    while (<span class="kw">Sys.time</span>() &lt;<span class="st"> </span>last_runtime +<span class="st"> </span>delay) {}
+    <span class="cf">while</span> (<span class="kw">Sys.time</span>() <span class="op">&lt;</span><span class="st"> </span>last_runtime <span class="op">+</span><span class="st"> </span>delay) {}
     <span class="co"># we override the start for the next waiting interval.</span>
     <span class="co"># Note that this is done on exit (after the function is evaluated)</span>
     <span class="kw">on.exit</span>(last_runtime &lt;&lt;-<span class="st"> </span><span class="kw">Sys.time</span>()) 
@@ -307,19 +322,19 @@ runif2 &lt;-<span class="st"> </span><span class="kw">f</span>(runif)
 <p>Alternatively to the empty while statement we could have used <code>Sys.sleep()</code>. I would not recommend this solution, since <code>?Sys.sleep</code> indicates that <code>Sys.sleep()</code> might have some overhead and seems not to be as exact as we need.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Write <code>wait_until()</code> which delays execution until a specific time.</p>
 <p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">wait_until &lt;-<span class="st"> </span>function(time, f) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">wait_until &lt;-<span class="st"> </span><span class="cf">function</span>(time, f) {
   <span class="kw">force</span>(f)
-  function(...) {
-    while (<span class="kw">Sys.time</span>() &lt;<span class="st"> </span>time) {}
+  <span class="cf">function</span>(...) {
+    <span class="cf">while</span> (<span class="kw">Sys.time</span>() <span class="op">&lt;</span><span class="st"> </span>time) {}
     <span class="kw">return</span>(<span class="kw">f</span>(...))
   }
 }
 
 <span class="co"># a little test</span>
 ptm &lt;-<span class="st"> </span><span class="kw">proc.time</span>()
-m &lt;-<span class="st"> </span><span class="kw">wait_until</span>(<span class="kw">Sys.time</span>() +<span class="st"> </span><span class="dv">10</span>, mean)
-<span class="kw">m</span>(<span class="dv">1</span>:<span class="dv">3</span>)
-<span class="kw">proc.time</span>() -<span class="st"> </span>ptm</code></pre></div></li>
+m &lt;-<span class="st"> </span><span class="kw">wait_until</span>(<span class="kw">Sys.time</span>() <span class="op">+</span><span class="st"> </span><span class="dv">10</span>, mean)
+<span class="kw">m</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)
+<span class="kw">proc.time</span>() <span class="op">-</span><span class="st"> </span>ptm</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: There are three places we could have added a memoise call: why did we choose the one we did?</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">download &lt;-<span class="st"> </span><span class="kw">memoise</span>(<span class="kw">dot_every</span>(<span class="dv">10</span>, <span class="kw">delay_by</span>(<span class="dv">1</span>, download_file)))
 download &lt;-<span class="st"> </span><span class="kw">dot_every</span>(<span class="dv">10</span>, <span class="kw">memoise</span>(<span class="kw">delay_by</span>(<span class="dv">1</span>, download_file)))
@@ -332,7 +347,7 @@ download &lt;-<span class="st"> </span><span class="kw">dot_every</span>(<span c
 <li><p><strong><span style="color:red">Q</span></strong>: Why is the <code>remember()</code> function inefficient? How could you implement it in more efficient way?</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Why does the following code, from <a href="http://stackoverflow.com/questions/8440675">stackoverflow</a>, not do what you expect?</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># return a linear function with slope a and intercept b.</span>
-f &lt;-<span class="st"> </span>function(a, b) function(x) a *<span class="st"> </span>x +<span class="st"> </span>b
+f &lt;-<span class="st"> </span><span class="cf">function</span>(a, b) <span class="cf">function</span>(x) a <span class="op">*</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span>b
 
 <span class="co"># create a list of functions with different parameters.</span>
 fs &lt;-<span class="st"> </span><span class="kw">Map</span>(f, <span class="dt">a =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="dt">b =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))
@@ -342,7 +357,7 @@ fs[[<span class="dv">1</span>]](<span class="dv">3</span>)
 <span class="co"># should return 0 * 3 + 0 = 0</span></code></pre></div>
 <p>How can you modify <code>f</code> so that it works correctly?</p>
 <p><strong><span style="color:green">A</span></strong>: You can read in the <a href="http://stackoverflow.com/questions/8440675">stackoverflow</a> link that the question arose, because the original return of <code>fs[[1]](3)</code> was <code>4</code>, which is due to lazy evaluation and could be solved by two users via <code>force()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span>function(a, b) {<span class="kw">force</span>(a); <span class="kw">force</span>(b); function(x) a *<span class="st"> </span>x +<span class="st"> </span>b}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span><span class="cf">function</span>(a, b) {<span class="kw">force</span>(a); <span class="kw">force</span>(b); <span class="cf">function</span>(x) a <span class="op">*</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span>b}</code></pre></div>
 <p>However you can see in the result within the question that <strong>R</strong>’s behaviour was changed in this case and as Jan Kislinger points out on <a href="https://twitter.com/JanKislinger/status/794433891486547968">twitter</a>:</p>
 <blockquote>
 <p>The real question should be: “How did they modify #rstats so that it works correctly?” otherwise it’s a tricky question :D</p>
@@ -354,7 +369,7 @@ fs[[<span class="dv">1</span>]](<span class="dv">3</span>)
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">funs &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">mean =</span> mean, <span class="dt">sum =</span> sum)
 funs_m &lt;-<span class="st"> </span><span class="kw">lapply</span>(funs, delay_by, <span class="dt">delay =</span> <span class="fl">0.1</span>)
 
-funs_m$<span class="kw">mean</span>(<span class="dv">1</span>:<span class="dv">10</span>)
+funs_m<span class="op">$</span><span class="kw">mean</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)
 <span class="co">#&gt; [1] 5.5</span></code></pre></div>
 <p>Which (as one can see) is not true anymore…actually it changed in R version <a href="https://stat.ethz.ch/pipermail/r-announce/2015/000583.html"><strong>3.2</strong></a>:</p>
 <blockquote>
@@ -368,28 +383,28 @@ funs_m$<span class="kw">mean</span>(<span class="dv">1</span>:<span class="dv">1
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: Create a <code>negative()</code> FO that flips the sign of the output of the function to which it is applied.</p>
 <p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">negative &lt;-<span class="st"> </span>function(f){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">negative &lt;-<span class="st"> </span><span class="cf">function</span>(f){
   <span class="kw">force</span>(f)
-  function(...){
-    -<span class="kw">f</span>(...)
+  <span class="cf">function</span>(...){
+    <span class="op">-</span><span class="kw">f</span>(...)
   }
 }</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: The <code>evaluate</code> package makes it easy to capture all the outputs (results, text, messages, warnings, errors, and plots) from an expression. Create a function like <code>capture_it()</code> that also captures the warnings and errors generated by a function.</p>
 <p><strong><span style="color:green">A</span></strong>: One way is just to capture the output of <code>tryCatch()</code> with identity handlers for errors and warnings:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">capture_trials &lt;-<span class="st"> </span>function(f){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">capture_trials &lt;-<span class="st"> </span><span class="cf">function</span>(f){
   <span class="kw">force</span>(f)
-  function(...){
+  <span class="cf">function</span>(...){
     <span class="kw">capture.output</span>(<span class="kw">tryCatch</span>(<span class="kw">f</span>(...),
-                            <span class="dt">error =</span> function(e) e,
-                            <span class="dt">warning =</span> function(w) w)
+                            <span class="dt">error =</span> <span class="cf">function</span>(e) e,
+                            <span class="dt">warning =</span> <span class="cf">function</span>(w) w)
     )
   }
 }
 
 <span class="co"># we test the behaviour</span>
 log_t &lt;-<span class="st"> </span><span class="kw">capture_trials</span>(log)
-elements &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dv">1</span>:<span class="dv">10</span>, <span class="kw">c</span>(-<span class="dv">1</span>, <span class="dv">10</span>), <span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>), letters)
-results &lt;-<span class="st"> </span><span class="kw">lapply</span>(elements, function(x) <span class="kw">log_t</span>(x))
+elements &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">10</span>), <span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>), letters)
+results &lt;-<span class="st"> </span><span class="kw">lapply</span>(elements, <span class="cf">function</span>(x) <span class="kw">log_t</span>(x))
 results
 <span class="co">#&gt; [[1]]</span>
 <span class="co">#&gt; [1] &quot; [1] 0.0000000 0.6931472 1.0986123 1.3862944 1.6094379 1.7917595 1.9459101&quot;</span>
@@ -409,11 +424,11 @@ results
 <span class="co"># results_detailed</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Create a FO that tracks files created or deleted in the working directory (Hint: use <code>dir()</code> and <code>setdiff()</code>.) What other global effects of functions might you want to track?</p>
 <p><strong><span style="color:green">A</span></strong>: We start with a short version to show the idea:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">track_dir &lt;-<span class="st"> </span>function(f){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">track_dir &lt;-<span class="st"> </span><span class="cf">function</span>(f){
   <span class="kw">force</span>(f)
-  function(...){
+  <span class="cf">function</span>(...){
     dir_old &lt;-<span class="st"> </span><span class="kw">dir</span>()
-    <span class="kw">on.exit</span>(if(!<span class="kw">setequal</span>(<span class="kw">dir</span>(), dir_old)){
+    <span class="kw">on.exit</span>(<span class="cf">if</span>(<span class="op">!</span><span class="kw">setequal</span>(<span class="kw">dir</span>(), dir_old)){
       <span class="kw">message</span>(<span class="st">&quot;files in your working directory were deleted or added by this function&quot;</span>)})
     <span class="kw">f</span>(...)
   }
@@ -423,19 +438,19 @@ results
 td &lt;-<span class="st"> </span><span class="kw">track_dir</span>(dir.create)
 <span class="kw">td</span>(<span class="st">&quot;delete_me&quot;</span>)</code></pre></div>
 <p>Of course we can provide more information on the type of changes:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">track_dir &lt;-<span class="st"> </span>function(f){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">track_dir &lt;-<span class="st"> </span><span class="cf">function</span>(f){
   <span class="kw">force</span>(f)
-  function(...){
+  <span class="cf">function</span>(...){
     dir_old &lt;-<span class="st"> </span><span class="kw">dir</span>()
 
-    <span class="kw">on.exit</span>(if(!<span class="kw">setequal</span>(<span class="kw">dir</span>(), dir_old)){
+    <span class="kw">on.exit</span>(<span class="cf">if</span>(<span class="op">!</span><span class="kw">setequal</span>(<span class="kw">dir</span>(), dir_old)){
       <span class="kw">message</span>(<span class="st">&quot;Files in your working directory were deleted or added by this</span>
 <span class="st">              function.&quot;</span>)}, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-    <span class="kw">on.exit</span>(if(<span class="kw">length</span>(<span class="kw">setdiff</span>(dir_old, <span class="kw">dir</span>()) !=<span class="st"> </span><span class="dv">0</span>)){
+    <span class="kw">on.exit</span>(<span class="cf">if</span>(<span class="kw">length</span>(<span class="kw">setdiff</span>(dir_old, <span class="kw">dir</span>()) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>)){
       <span class="kw">message</span>(<span class="kw">paste0</span>(<span class="st">&quot;The following files were deleted: &quot;</span>,
                      <span class="kw">paste</span>(<span class="kw">setdiff</span>(dir_old, <span class="kw">dir</span>()), <span class="dt">collapse =</span> <span class="st">&quot;, &quot;</span>)
                      ))}, <span class="dt">add =</span> <span class="ot">TRUE</span>)
-    <span class="kw">on.exit</span>(if(<span class="kw">length</span>(<span class="kw">setdiff</span>(<span class="kw">dir</span>(), dir_old) !=<span class="st"> </span><span class="dv">0</span>)){
+    <span class="kw">on.exit</span>(<span class="cf">if</span>(<span class="kw">length</span>(<span class="kw">setdiff</span>(<span class="kw">dir</span>(), dir_old) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>)){
       <span class="kw">message</span>(<span class="kw">paste0</span>(<span class="st">&quot;The following files were added: &quot;</span>, 
                      <span class="kw">paste</span>(<span class="kw">setdiff</span>(<span class="kw">dir</span>(), dir_old), <span class="dt">collapse =</span> <span class="st">&quot;, &quot;</span>)
                      ))}, <span class="dt">add =</span> <span class="ot">TRUE</span>)
@@ -463,26 +478,26 @@ td &lt;-<span class="st"> </span><span class="kw">track_dir</span>(sapply)
 <li><p><strong><span style="color:red">Q</span></strong>: Our previous <code>download()</code> function only downloads a single file. How can you use <code>partial()</code> and <code>lapply()</code> to create a function that downloads multiple files at once? What are the pros and cons of using <code>partial()</code> vs. writing a function by hand?</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Read the source code for <code>plyr::colwise()</code>. How does the code work? What are <code>colwise()</code>’s three main tasks? How could you make <code>colwise()</code> simpler by implementing each task as a function operator? (Hint: think about <code>partial()</code>.)</p>
 <p><strong><span style="color:orange">A</span></strong>: We describe how it works by commenting the source code:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">function (.fun, <span class="dt">.cols =</span> true, ...) 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">function</span> (.fun, <span class="dt">.cols =</span> true, ...) 
   {
   <span class="co"># We check if .cols is not a function, since it is possible to supply a</span>
   <span class="co"># predicate function.</span>
   <span class="co"># if so, the .cols arguments will be &quot;quoted&quot;, and filter() will </span>
   <span class="co"># be a function that checks and evaluates these .cols within its other argument</span>
-  if (!<span class="kw">is.function</span>(.cols)) {
+  <span class="cf">if</span> (<span class="op">!</span><span class="kw">is.function</span>(.cols)) {
     .cols &lt;-<span class="st"> </span><span class="kw">as.quoted</span>(.cols)
-    filter &lt;-<span class="st"> </span>function(df) <span class="kw">eval.quoted</span>(.cols, df)
+    filter &lt;-<span class="st"> </span><span class="cf">function</span>(df) <span class="kw">eval.quoted</span>(.cols, df)
   }
   <span class="co"># otherwise, filter will be be Filter(), which applies the function </span>
   <span class="co"># in .cols to every element of its other argument</span>
-  else {
-    filter &lt;-<span class="st"> </span>function(df) <span class="kw">Filter</span>(.cols, df)
+  <span class="cf">else</span> {
+    filter &lt;-<span class="st"> </span><span class="cf">function</span>(df) <span class="kw">Filter</span>(.cols, df)
   }
   <span class="co"># the ... arguments are caught in the list dots</span>
   dots &lt;-<span class="st"> </span><span class="kw">list</span>(...)
   <span class="co"># a function is created, which will also be the return value.</span>
   <span class="co"># it checks if its input is a data frame</span>
-  function(df, ...) {
+  <span class="cf">function</span>(df, ...) {
     <span class="kw">stopifnot</span>(<span class="kw">is.data.frame</span>(df))
     <span class="co"># if df is split (in &quot;plyr&quot; speaking), this will be taken into account...</span>
     df &lt;-<span class="st"> </span><span class="kw">strip_splits</span>(df)
@@ -490,7 +505,7 @@ td &lt;-<span class="st"> </span><span class="kw">track_dir</span>(sapply)
     <span class="co"># this can chosen directly, via a predicate function, or all columns (default)</span>
     filtered &lt;-<span class="st"> </span><span class="kw">filter</span>(df)
     <span class="co"># if this means, that no columns are selected, an empty data frame will be returned</span>
-    if (<span class="kw">length</span>(filtered) ==<span class="st"> </span><span class="dv">0</span>) 
+    <span class="cf">if</span> (<span class="kw">length</span>(filtered) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) 
       <span class="kw">return</span>(<span class="kw">data.frame</span>())
     <span class="co"># otherwise lapply will be called on all filtered columns, with </span>
     <span class="co"># the .fun argument, which has to be provided by the user, and some other</span>
@@ -504,19 +519,19 @@ td &lt;-<span class="st"> </span><span class="kw">track_dir</span>(sapply)
   }
 }
 
-&lt;environment:<span class="st"> </span>namespace:plyr&gt;</code></pre></div></li>
+<span class="op">&lt;</span>environment<span class="op">:</span><span class="st"> </span>namespace<span class="op">:</span>plyr<span class="op">&gt;</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Write FOs that convert a function to return a matrix instead of a data frame, or a data frame instead of a matrix. If you understand S3, call them <code>as.data.frame.function()</code> and <code>as.matrix.function()</code>.</p>
 <p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">as.matrix.function &lt;-<span class="st"> </span>function(f){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">as.matrix.function &lt;-<span class="st"> </span><span class="cf">function</span>(f){
   <span class="kw">force</span>(f)
-  function(...){
+  <span class="cf">function</span>(...){
     <span class="kw">as.matrix</span>(<span class="kw">f</span>(...))
   }
 }
 
-as.data.frame.function &lt;-<span class="st"> </span>function(f){
+as.data.frame.function &lt;-<span class="st"> </span><span class="cf">function</span>(f){
   <span class="kw">force</span>(f)
-  function(...){
+  <span class="cf">function</span>(...){
     <span class="kw">as.data.frame</span>(<span class="kw">f</span>(...))
   }
 }</code></pre></div></li>
@@ -533,78 +548,78 @@ as.data.frame.function &lt;-<span class="st"> </span>function(f){
 <span class="co"># 1</span>
 trims &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.5</span>)
 x &lt;-<span class="st"> </span><span class="kw">rcauchy</span>(<span class="dv">1000</span>)
-<span class="kw">unlist</span>(<span class="kw">lapply</span>(trims, function(trim) <span class="kw">mean</span>(x, <span class="dt">trim =</span> trim)))
-<span class="co">#&gt; [1] -0.086973156 -0.039487297 -0.011210230 -0.008979957</span>
+<span class="kw">unlist</span>(<span class="kw">lapply</span>(trims, <span class="cf">function</span>(trim) <span class="kw">mean</span>(x, <span class="dt">trim =</span> trim)))
+<span class="co">#&gt; [1] -2.14471243  0.09442859  0.07433510  0.07655498</span>
 <span class="kw">unlist</span>(<span class="kw">lapply</span>(trims, <span class="kw">partial</span>(mean, x)))
-<span class="co">#&gt; [1] -0.086973156 -0.039487297 -0.011210230 -0.008979957</span>
+<span class="co">#&gt; [1] -2.14471243  0.09442859  0.07433510  0.07655498</span>
 
 <span class="co"># 2</span>
 xs &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dv">5</span>, <span class="kw">runif</span>(<span class="dv">10</span>), <span class="dt">simplify =</span> <span class="ot">FALSE</span>)
-ws &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dv">5</span>, <span class="kw">rpois</span>(<span class="dv">10</span>, <span class="dv">5</span>) +<span class="st"> </span><span class="dv">1</span>, <span class="dt">simplify =</span> <span class="ot">FALSE</span>)
-<span class="kw">unlist</span>(<span class="kw">Map</span>(function(x, w) <span class="kw">weighted.mean</span>(x, w, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), xs, ws))
-<span class="co">#&gt; [1] 0.5157080 0.3917117 0.3148246 0.6154536 0.4376859</span>
+ws &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dv">5</span>, <span class="kw">rpois</span>(<span class="dv">10</span>, <span class="dv">5</span>) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">simplify =</span> <span class="ot">FALSE</span>)
+<span class="kw">unlist</span>(<span class="kw">Map</span>(<span class="cf">function</span>(x, w) <span class="kw">weighted.mean</span>(x, w, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), xs, ws))
+<span class="co">#&gt; [1] 0.5024602 0.4685572 0.5303112 0.5839586 0.6122118</span>
 <span class="kw">unlist</span>(<span class="kw">Map</span>(<span class="kw">partial</span>(weighted.mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), xs, ws))
-<span class="co">#&gt; [1] 0.5157080 0.3917117 0.3148246 0.6154536 0.4376859</span>
+<span class="co">#&gt; [1] 0.5024602 0.4685572 0.5303112 0.5839586 0.6122118</span>
 
 <span class="co"># 3</span>
-add &lt;-<span class="st"> </span>function(x, y, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
-  if (na.rm &amp;&amp;<span class="st"> </span>(<span class="kw">is.na</span>(x) ||<span class="st"> </span><span class="kw">is.na</span>(y))) <span class="kw">rm_na</span>(x, y, <span class="dv">0</span>) else x +<span class="st"> </span>y
+add &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
+  <span class="cf">if</span> (na.rm <span class="op">&amp;&amp;</span><span class="st"> </span>(<span class="kw">is.na</span>(x) <span class="op">||</span><span class="st"> </span><span class="kw">is.na</span>(y))) <span class="kw">rm_na</span>(x, y, <span class="dv">0</span>) <span class="cf">else</span> x <span class="op">+</span><span class="st"> </span>y
 }
 
-r_add &lt;-<span class="st"> </span>function(xs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) {
-  <span class="kw">Reduce</span>(function(x, y) <span class="kw">add</span>(x, y, <span class="dt">na.rm =</span> na.rm), xs)
+r_add &lt;-<span class="st"> </span><span class="cf">function</span>(xs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) {
+  <span class="kw">Reduce</span>(<span class="cf">function</span>(x, y) <span class="kw">add</span>(x, y, <span class="dt">na.rm =</span> na.rm), xs)
 }
 
-r_add_compact &lt;-<span class="st"> </span>function(xs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) {
+r_add_compact &lt;-<span class="st"> </span><span class="cf">function</span>(xs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) {
   <span class="kw">Reduce</span>(<span class="kw">partial</span>(add, <span class="dt">na.rm =</span> na.rm), xs)
 }
 
-<span class="kw">r_add</span>(<span class="dv">1</span>:<span class="dv">4</span>)
+<span class="kw">r_add</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>)
 <span class="co">#&gt; [1] 10</span>
-<span class="kw">r_add_compact</span>(<span class="dv">1</span>:<span class="dv">4</span>)
+<span class="kw">r_add_compact</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>)
 <span class="co">#&gt; [1] 10</span>
 
 <span class="co"># 4</span>
-v_add1 &lt;-<span class="st"> </span>function(x, y, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
-  <span class="kw">stopifnot</span>(<span class="kw">length</span>(x) ==<span class="st"> </span><span class="kw">length</span>(y), <span class="kw">is.numeric</span>(x), <span class="kw">is.numeric</span>(y))
-  if (<span class="kw">length</span>(x) ==<span class="st"> </span><span class="dv">0</span>) <span class="kw">return</span>(<span class="kw">numeric</span>())
+v_add1 &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
+  <span class="kw">stopifnot</span>(<span class="kw">length</span>(x) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(y), <span class="kw">is.numeric</span>(x), <span class="kw">is.numeric</span>(y))
+  <span class="cf">if</span> (<span class="kw">length</span>(x) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) <span class="kw">return</span>(<span class="kw">numeric</span>())
   <span class="kw">simplify2array</span>(
-    <span class="kw">Map</span>(function(x, y) <span class="kw">add</span>(x, y, <span class="dt">na.rm =</span> na.rm), x, y)
+    <span class="kw">Map</span>(<span class="cf">function</span>(x, y) <span class="kw">add</span>(x, y, <span class="dt">na.rm =</span> na.rm), x, y)
   )
 }
 
-v_add1_compact &lt;-<span class="st"> </span>function(x, y, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
-  <span class="kw">stopifnot</span>(<span class="kw">length</span>(x) ==<span class="st"> </span><span class="kw">length</span>(y), <span class="kw">is.numeric</span>(x), <span class="kw">is.numeric</span>(y))
-  if (<span class="kw">length</span>(x) ==<span class="st"> </span><span class="dv">0</span>) <span class="kw">return</span>(<span class="kw">numeric</span>())
+v_add1_compact &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
+  <span class="kw">stopifnot</span>(<span class="kw">length</span>(x) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(y), <span class="kw">is.numeric</span>(x), <span class="kw">is.numeric</span>(y))
+  <span class="cf">if</span> (<span class="kw">length</span>(x) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) <span class="kw">return</span>(<span class="kw">numeric</span>())
   <span class="kw">simplify2array</span>(
     <span class="kw">Map</span>(<span class="kw">partial</span>(add, <span class="dt">na.rm =</span> na.rm), x, y)
   )
 }
 
-<span class="kw">v_add1</span>(<span class="dv">1</span>:<span class="dv">3</span>, <span class="dv">2</span>:<span class="dv">4</span>)
+<span class="kw">v_add1</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">2</span><span class="op">:</span><span class="dv">4</span>)
 <span class="co">#&gt; [1] 3 5 7</span>
-<span class="kw">v_add1_compact</span>(<span class="dv">1</span>:<span class="dv">3</span>, <span class="dv">2</span>:<span class="dv">4</span>)
+<span class="kw">v_add1_compact</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">2</span><span class="op">:</span><span class="dv">4</span>)
 <span class="co">#&gt; [1] 3 5 7</span>
 
 <span class="co"># 5</span>
-c_add &lt;-<span class="st"> </span>function(xs, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
-  <span class="kw">Reduce</span>(function(x, y) <span class="kw">add</span>(x, y, <span class="dt">na.rm =</span> na.rm), xs,
+c_add &lt;-<span class="st"> </span><span class="cf">function</span>(xs, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
+  <span class="kw">Reduce</span>(<span class="cf">function</span>(x, y) <span class="kw">add</span>(x, y, <span class="dt">na.rm =</span> na.rm), xs,
          <span class="dt">accumulate =</span> <span class="ot">TRUE</span>)
 }
 
-c_add_compact &lt;-<span class="st"> </span>function(xs, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
+c_add_compact &lt;-<span class="st"> </span><span class="cf">function</span>(xs, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
   <span class="kw">Reduce</span>(<span class="kw">partial</span>(add, <span class="dt">na.rm =</span> na.rm), xs,
          <span class="dt">accumulate =</span> <span class="ot">TRUE</span>)
 }
 
-<span class="kw">c_add</span>(<span class="dv">1</span>:<span class="dv">3</span>)
+<span class="kw">c_add</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)
 <span class="co">#&gt; [1] 1 3 6</span>
-<span class="kw">c_add_compact</span>(<span class="dv">1</span>:<span class="dv">3</span>)
+<span class="kw">c_add_compact</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)
 <span class="co">#&gt; [1] 1 3 6</span>
 
 ## From Function operators
 <span class="co"># 6</span>
-f &lt;-<span class="st"> </span>function(x) x ^<span class="st"> </span><span class="dv">2</span>
+f &lt;-<span class="st"> </span><span class="cf">function</span>(x) x <span class="op">^</span><span class="st"> </span><span class="dv">2</span>
 <span class="kw">partial</span>(f)
 <span class="co">#&gt; function (...) </span>
 <span class="co">#&gt; f(...)</span>
@@ -618,7 +633,7 @@ f &lt;-<span class="st"> </span>function(x) x ^<span class="st"> </span><span cl
 <span class="co"># f &lt;- partial(g, b = 1)</span>
 
 <span class="co"># 9</span>
-compact &lt;-<span class="st"> </span>function(x) <span class="kw">Filter</span>(<span class="kw">Negate</span>(is.null), x)
+compact &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">Filter</span>(<span class="kw">Negate</span>(is.null), x)
 compact &lt;-<span class="st"> </span><span class="kw">partial</span>(Filter, <span class="kw">Negate</span>(is.null))
 
 <span class="co"># 10</span>
@@ -627,9 +642,9 @@ compact &lt;-<span class="st"> </span><span class="kw">partial</span>(Filter, <s
 
 <span class="co"># 11</span>
 funs2 &lt;-<span class="st"> </span><span class="kw">list</span>(
-  <span class="dt">sum =</span> function(...) <span class="kw">sum</span>(..., <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
-  <span class="dt">mean =</span> function(...) <span class="kw">mean</span>(..., <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
-  <span class="dt">median =</span> function(...) <span class="kw">median</span>(..., <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+  <span class="dt">sum =</span> <span class="cf">function</span>(...) <span class="kw">sum</span>(..., <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
+  <span class="dt">mean =</span> <span class="cf">function</span>(...) <span class="kw">mean</span>(..., <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
+  <span class="dt">median =</span> <span class="cf">function</span>(...) <span class="kw">median</span>(..., <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
 )
 
 funs2 &lt;-<span class="st"> </span><span class="kw">list</span>(
@@ -644,51 +659,51 @@ funs2 &lt;-<span class="st"> </span><span class="kw">list</span>(
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: Implement your own version of <code>compose()</code> using <code>Reduce</code> and <code>%o%</code>. For bonus points, do it without calling <code>function</code>.</p>
 <p><strong><span style="color:green">A</span></strong>: We use the definition from the textbook:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">compose &lt;-<span class="st"> </span>function(f, g) {
-  function(...) <span class="kw">f</span>(<span class="kw">g</span>(...))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">compose &lt;-<span class="st"> </span><span class="cf">function</span>(f, g) {
+  <span class="cf">function</span>(...) <span class="kw">f</span>(<span class="kw">g</span>(...))
 }
 
 <span class="st">&quot;%o%&quot;</span> &lt;-<span class="st"> </span>compose</code></pre></div>
 <p>And then we build two versions. One via an anonymous function and one via <code>partial()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">compose_red &lt;-<span class="st"> </span>function(fs) {
-  <span class="kw">Reduce</span>(function(f, g) function(...) <span class="kw">f</span>(<span class="kw">g</span>(...)), fs)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">compose_red &lt;-<span class="st"> </span><span class="cf">function</span>(fs) {
+  <span class="kw">Reduce</span>(<span class="cf">function</span>(f, g) <span class="cf">function</span>(...) <span class="kw">f</span>(<span class="kw">g</span>(...)), fs)
 }
-<span class="kw">compose_red</span>(<span class="kw">c</span>(mean, length, unique))(<span class="dv">1</span>:<span class="dv">10</span>)
+<span class="kw">compose_red</span>(<span class="kw">c</span>(mean, length, unique))(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)
 <span class="co">#&gt; [1] 10</span>
 
-compose_red_bonus &lt;-<span class="st"> </span>function(fs) {
+compose_red_bonus &lt;-<span class="st"> </span><span class="cf">function</span>(fs) {
   <span class="kw">Reduce</span>(<span class="kw">partial</span>(<span class="kw">partial</span>(<span class="st">`</span><span class="dt">%o%</span><span class="st">`</span>)), fs)
 }
-<span class="kw">compose_red_bonus</span>(<span class="kw">c</span>(mean, length, unique))(<span class="dv">1</span>:<span class="dv">10</span>)
+<span class="kw">compose_red_bonus</span>(<span class="kw">c</span>(mean, length, unique))(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)
 <span class="co">#&gt; [1] 10</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Extend <code>and()</code> and <code>or()</code> to deal with any number of input functions. Can you do it with <code>Reduce()</code>? Can you keep them lazy (e.g., for <code>and()</code>, the function returns once it sees the first <code>FALSE</code>)?</p>
 <p><strong><span style="color:green">A</span></strong>: We use <code>and()</code> and <code>or()</code> as defined in the textbook. They are lazy, since they are build up on <code>&amp;&amp;</code> and <code>||</code>. Also their reduced versions stay lazy, as we will show at the end of the code</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">and &lt;-<span class="st"> </span>function(f1, f2) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">and &lt;-<span class="st"> </span><span class="cf">function</span>(f1, f2) {
   <span class="kw">force</span>(f1); <span class="kw">force</span>(f2)
-  function(...) {
-    <span class="kw">f1</span>(...) &amp;&amp;<span class="st"> </span><span class="kw">f2</span>(...)
+  <span class="cf">function</span>(...) {
+    <span class="kw">f1</span>(...) <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">f2</span>(...)
   }
 }
 
-and_red &lt;-<span class="st"> </span>function(fs){
-  <span class="kw">Reduce</span>(function(f, g) <span class="kw">and</span>(f, g), fs)
+and_red &lt;-<span class="st"> </span><span class="cf">function</span>(fs){
+  <span class="kw">Reduce</span>(<span class="cf">function</span>(f, g) <span class="kw">and</span>(f, g), fs)
 }
 
-or &lt;-<span class="st"> </span>function(f1, f2) {
+or &lt;-<span class="st"> </span><span class="cf">function</span>(f1, f2) {
   <span class="kw">force</span>(f1); <span class="kw">force</span>(f2)
-  function(...) {
-    <span class="kw">f1</span>(...) ||<span class="st"> </span><span class="kw">f2</span>(...)
+  <span class="cf">function</span>(...) {
+    <span class="kw">f1</span>(...) <span class="op">||</span><span class="st"> </span><span class="kw">f2</span>(...)
   }
 }
 
-or_red &lt;-<span class="st"> </span>function(fs){
-  <span class="kw">Reduce</span>(function(f, g) <span class="kw">or</span>(f, g), fs)
+or_red &lt;-<span class="st"> </span><span class="cf">function</span>(fs){
+  <span class="kw">Reduce</span>(<span class="cf">function</span>(f, g) <span class="kw">or</span>(f, g), fs)
 }
 
 <span class="co"># Errors before the first TRUE will be returned</span>
 <span class="kw">tryCatch</span>(
   <span class="kw">or_red</span>(<span class="kw">c</span>(is.logical, is.logical, stop, is.character))(<span class="st">&quot;a&quot;</span>), 
-  <span class="dt">error =</span> function(e) e
+  <span class="dt">error =</span> <span class="cf">function</span>(e) e
 )
 <span class="co">#&gt; &lt;simpleError in f1(...): a&gt;</span>
 
@@ -697,17 +712,17 @@ or_red &lt;-<span class="st"> </span>function(fs){
 <span class="co">#&gt; [1] TRUE</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Implement the <code>xor()</code> binary operator. Implement it using the existing <code>xor()</code> function. Implement it as a combination of <code>and()</code> and <code>or()</code>. What are the advantages and disadvantages of each approach? Also think about what you’ll call the resulting function to avoid a clash with the existing <code>xor()</code> function, and how you might change the names of <code>and()</code>, <code>not()</code>, and <code>or()</code> to keep them consistent.</p>
 <p><strong><span style="color:orange">A</span></strong>: Both versions are implemented straight forward, as also the reduced versions. However, the parallel versions need a little bit more care:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">xor_fb1 &lt;-<span class="st"> </span>function(f1, f2){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">xor_fb1 &lt;-<span class="st"> </span><span class="cf">function</span>(f1, f2){
   <span class="kw">force</span>(f1); <span class="kw">force</span>(f2)
-  function(...){
+  <span class="cf">function</span>(...){
     <span class="kw">xor</span>(<span class="kw">f1</span>(...), <span class="kw">f2</span>(...)) 
   }
 }
 
-xor_fb2 &lt;-<span class="st"> </span>function(f1, f2){
+xor_fb2 &lt;-<span class="st"> </span><span class="cf">function</span>(f1, f2){
   <span class="kw">force</span>(f1); <span class="kw">force</span>(f2)
-  function(...){
-    <span class="kw">or</span>(f1, f2)(...) &amp;&amp;<span class="st"> </span>!(<span class="kw">and</span>(f1, f2)(...))
+  <span class="cf">function</span>(...){
+    <span class="kw">or</span>(f1, f2)(...) <span class="op">&amp;&amp;</span><span class="st"> </span><span class="op">!</span>(<span class="kw">and</span>(f1, f2)(...))
   }
 }
 
@@ -719,9 +734,9 @@ xor_fb2 &lt;-<span class="st"> </span>function(f1, f2){
 
 <span class="co"># parallel combination (results in an error)</span>
 <span class="kw">xor_fb1</span>(<span class="kw">c</span>(is.logical, is.character), <span class="kw">c</span>(is.logical, is.character))(<span class="st">&quot;a&quot;</span>)
-<span class="co">#&gt; Error in xor(f1(...), f2(...)): could not find function &quot;f1&quot;</span>
+<span class="co">#&gt; Error in f1(...): could not find function &quot;f1&quot;</span>
 <span class="kw">xor_fb2</span>(<span class="kw">c</span>(is.logical, is.character), <span class="kw">c</span>(is.logical, is.character))(<span class="st">&quot;a&quot;</span>)
-<span class="co">#&gt; Error in or(f1, f2)(...): could not find function &quot;f1&quot;</span>
+<span class="co">#&gt; Error in f1(...): could not find function &quot;f1&quot;</span>
 
 <span class="co"># reduced combination (results in an error)</span>
 <span class="kw">xor_fb1</span>(<span class="kw">c</span>(is.logical, is.character, is.logical, is.character))(<span class="st">&quot;a&quot;</span>)
@@ -730,12 +745,12 @@ xor_fb2 &lt;-<span class="st"> </span>function(f1, f2){
 <span class="co">#&gt; Error in force(f2): argument &quot;f2&quot; is missing, with no default</span>
 
 ### Reduced version
-xor_fb1_red &lt;-<span class="st"> </span>function(fs){
-  <span class="kw">Reduce</span>(function(f, g) <span class="kw">xor_fb1</span>(f, g), fs)
+xor_fb1_red &lt;-<span class="st"> </span><span class="cf">function</span>(fs){
+  <span class="kw">Reduce</span>(<span class="cf">function</span>(f, g) <span class="kw">xor_fb1</span>(f, g), fs)
 }
 
-xor_fb2_red &lt;-<span class="st"> </span>function(fs){
-  <span class="kw">Reduce</span>(function(f, g) <span class="kw">xor_fb2</span>(f, g), fs)
+xor_fb2_red &lt;-<span class="st"> </span><span class="cf">function</span>(fs){
+  <span class="kw">Reduce</span>(<span class="cf">function</span>(f, g) <span class="kw">xor_fb2</span>(f, g), fs)
 }
 
 <span class="co"># should return TRUE</span>
@@ -757,52 +772,52 @@ xor_fb2_red &lt;-<span class="st"> </span>function(fs){
 <span class="co">#&gt; [1] FALSE</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Above, we implemented boolean algebra for functions that return a logical function. Implement elementary algebra (<code>plus()</code>, <code>minus()</code>, <code>multiply()</code>, <code>divide()</code>, <code>exponentiate()</code>, <code>log()</code>) for functions that return numeric vectors.</p>
 <p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plus &lt;-<span class="st"> </span>function(f1, f2) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plus &lt;-<span class="st"> </span><span class="cf">function</span>(f1, f2) {
   <span class="kw">force</span>(f1); <span class="kw">force</span>(f2)
-  function(...) {
-    <span class="kw">f1</span>(...) +<span class="st"> </span><span class="kw">f2</span>(...)
+  <span class="cf">function</span>(...) {
+    <span class="kw">f1</span>(...) <span class="op">+</span><span class="st"> </span><span class="kw">f2</span>(...)
   }
 }
 
-minus &lt;-<span class="st"> </span>function(f1, f2) {
+minus &lt;-<span class="st"> </span><span class="cf">function</span>(f1, f2) {
   <span class="kw">force</span>(f1); <span class="kw">force</span>(f2)
-  function(...) {
-    <span class="kw">f1</span>(...) -<span class="st"> </span><span class="kw">f2</span>(...)
+  <span class="cf">function</span>(...) {
+    <span class="kw">f1</span>(...) <span class="op">-</span><span class="st"> </span><span class="kw">f2</span>(...)
   }
 }
 
-multiply &lt;-<span class="st"> </span>function(f1, f2) {
+multiply &lt;-<span class="st"> </span><span class="cf">function</span>(f1, f2) {
   <span class="kw">force</span>(f1); <span class="kw">force</span>(f2)
-  function(...) {
-    <span class="kw">f1</span>(...) *<span class="st"> </span><span class="kw">f2</span>(...)
+  <span class="cf">function</span>(...) {
+    <span class="kw">f1</span>(...) <span class="op">*</span><span class="st"> </span><span class="kw">f2</span>(...)
   }
 }
 
-divide &lt;-<span class="st"> </span>function(f1, f2) {
+divide &lt;-<span class="st"> </span><span class="cf">function</span>(f1, f2) {
   <span class="kw">force</span>(f1); <span class="kw">force</span>(f2)
-  function(...) {
-    <span class="kw">f1</span>(...) /<span class="st"> </span><span class="kw">f2</span>(...)
+  <span class="cf">function</span>(...) {
+    <span class="kw">f1</span>(...) <span class="op">/</span><span class="st"> </span><span class="kw">f2</span>(...)
   }
 }
 
-exponentiate &lt;-<span class="st"> </span>function(f1, f2) {
+exponentiate &lt;-<span class="st"> </span><span class="cf">function</span>(f1, f2) {
   <span class="kw">force</span>(f1); <span class="kw">force</span>(f2)
-  function(...) {
-    <span class="kw">f1</span>(...) ^<span class="st"> </span><span class="kw">f2</span>(...)
+  <span class="cf">function</span>(...) {
+    <span class="kw">f1</span>(...) <span class="op">^</span><span class="st"> </span><span class="kw">f2</span>(...)
   }
 }
 
 <span class="co"># we rename log to log_ since log() already exists</span>
-log_ &lt;-<span class="st"> </span>function(f1, f2) {
+log_ &lt;-<span class="st"> </span><span class="cf">function</span>(f1, f2) {
   <span class="kw">force</span>(f1); <span class="kw">force</span>(f2)
-  function(...) {
+  <span class="cf">function</span>(...) {
     <span class="kw">log</span>(<span class="kw">f1</span>(...), <span class="kw">f2</span>(...))
   }
 }
 
 <span class="co"># Test</span>
-mns &lt;-<span class="st"> </span><span class="kw">minus</span>(mean, function(x) x^<span class="dv">2</span>)
-<span class="kw">mns</span>(<span class="dv">1</span>:<span class="dv">5</span>)</code></pre></div></li>
+mns &lt;-<span class="st"> </span><span class="kw">minus</span>(mean, <span class="cf">function</span>(x) x<span class="op">^</span><span class="dv">2</span>)
+<span class="kw">mns</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)</code></pre></div></li>
 </ol>
 
 </div>
@@ -813,8 +828,9 @@ mns &lt;-<span class="st"> </span><span class="kw">minus</span>(mean, function(x
         </div>
       </div>
 <a href="functionals.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="non-standard-evaluation.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
-
+<a href="non-standard-evaluation.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
@@ -858,7 +874,7 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:" && /^https?:/.test(script.src))
       script.src  = script.src.replace(/^https?:/, '');
     document.getElementsByTagName("head")[0].appendChild(script);

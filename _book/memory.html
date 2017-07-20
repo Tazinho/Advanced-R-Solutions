@@ -6,9 +6,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Advanced R Solutions</title>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
   <meta name="description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R.">
-  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
 
   <meta property="og:title" content="Advanced R Solutions" />
   <meta property="og:type" content="book" />
@@ -23,10 +22,10 @@
   <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R." />
   <meta name="twitter:image" content="images/advrs_cover.png" />
 
-<meta name="author" content="Malte Grosser &amp; Henning Bumann">
+<meta name="author" content="Malte Grosser, Henning Bumann, Peter Hurford &amp; Robert Krzyzanowski">
 
 
-<meta name="date" content="2017-04-13">
+<meta name="date" content="2017-07-16">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -35,7 +34,6 @@
   
 <link rel="prev" href="profiling.html">
 <link rel="next" href="rcpp.html">
-
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -129,6 +127,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </head>
 
 <body>
+
 
 
   <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
@@ -233,6 +232,22 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="16.3" data-path="rcpp.html"><a href="rcpp.html#the-stl"><i class="fa fa-check"></i><b>16.3</b> The STL</a></li>
 </ul></li>
 <li class="chapter" data-level="17" data-path="testchapter.html"><a href="testchapter.html"><i class="fa fa-check"></i><b>17</b> Testchapter</a></li>
+<li class="chapter" data-level="18" data-path="s3-1.html"><a href="s3-1.html"><i class="fa fa-check"></i><b>18</b> S3</a><ul>
+<li class="chapter" data-level="18.1" data-path="s3-1.html"><a href="s3-1.html#basics"><i class="fa fa-check"></i><b>18.1</b> Basics</a></li>
+<li class="chapter" data-level="18.2" data-path="s3-1.html"><a href="s3-1.html#classes"><i class="fa fa-check"></i><b>18.2</b> Classes</a></li>
+<li class="chapter" data-level="18.3" data-path="s3-1.html"><a href="s3-1.html#generics-and-methods"><i class="fa fa-check"></i><b>18.3</b> Generics and methods</a></li>
+<li class="chapter" data-level="18.4" data-path="s3-1.html"><a href="s3-1.html#method-dispatch"><i class="fa fa-check"></i><b>18.4</b> Method dispatch</a></li>
+<li class="chapter" data-level="18.5" data-path="s3-1.html"><a href="s3-1.html#inheritance"><i class="fa fa-check"></i><b>18.5</b> Inheritance</a></li>
+<li class="chapter" data-level="18.6" data-path="s3-1.html"><a href="s3-1.html#dispatch-details"><i class="fa fa-check"></i><b>18.6</b> Dispatch details</a></li>
+</ul></li>
+<li class="chapter" data-level="19" data-path="s4-1.html"><a href="s4-1.html"><i class="fa fa-check"></i><b>19</b> S4</a><ul>
+<li class="chapter" data-level="19.1" data-path="s4-1.html"><a href="s4-1.html#classes-1"><i class="fa fa-check"></i><b>19.1</b> Classes</a></li>
+<li class="chapter" data-level="19.2" data-path="s4-1.html"><a href="s4-1.html#generics-and-methods-1"><i class="fa fa-check"></i><b>19.2</b> Generics and methods</a></li>
+<li class="chapter" data-level="19.3" data-path="s4-1.html"><a href="s4-1.html#method-dispatch-1"><i class="fa fa-check"></i><b>19.3</b> Method dispatch</a></li>
+<li class="chapter" data-level="19.4" data-path="s4-1.html"><a href="s4-1.html#s4-and-existing-code"><i class="fa fa-check"></i><b>19.4</b> S4 and existing code</a><ul>
+<li class="chapter" data-level="19.4.1" data-path="s4-1.html"><a href="s4-1.html#exercises"><i class="fa fa-check"></i><b>19.4.1</b> Exercises</a></li>
+</ul></li>
+</ul></li>
 </ul>
 
       </nav>
@@ -259,17 +274,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p><strong><span style="color:green">A</span></strong>:</p>
 <p><strong>numeric:</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(pryr)
-sizes &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">0</span>:<span class="dv">50</span>, function(n) <span class="kw">object_size</span>(<span class="kw">vector</span>(<span class="st">&quot;numeric&quot;</span>, n)))
-<span class="kw">plot</span>(<span class="dv">0</span>:<span class="dv">50</span>, sizes, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;Size (bytes)&quot;</span>, 
+sizes &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">50</span>, <span class="cf">function</span>(n) <span class="kw">object_size</span>(<span class="kw">vector</span>(<span class="st">&quot;numeric&quot;</span>, n)))
+<span class="kw">plot</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">50</span>, sizes, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;Size (bytes)&quot;</span>, 
      <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>)</code></pre></div>
 <p><img src="15-Memory_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-<span class="kw">plot</span>(<span class="dv">0</span>:<span class="dv">50</span>, sizes -<span class="st"> </span><span class="dv">40</span>, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, 
+<span class="kw">plot</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">50</span>, sizes <span class="op">-</span><span class="st"> </span><span class="dv">40</span>, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, 
      <span class="dt">ylab =</span> <span class="st">&quot;Bytes excluding overhead&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;n&quot;</span>)
 <span class="kw">abline</span>(<span class="dt">h =</span> <span class="dv">0</span>, <span class="dt">col =</span> <span class="st">&quot;grey80&quot;</span>)
 <span class="kw">abline</span>(<span class="dt">h =</span> <span class="kw">c</span>(<span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">48</span>, <span class="dv">64</span>, <span class="dv">128</span>), <span class="dt">col =</span> <span class="st">&quot;grey80&quot;</span>)
 <span class="kw">abline</span>(<span class="dt">a =</span> <span class="dv">0</span>, <span class="dt">b =</span> <span class="dv">4</span>, <span class="dt">col =</span> <span class="st">&quot;grey90&quot;</span>, <span class="dt">lwd =</span> <span class="dv">4</span>)
-<span class="kw">lines</span>(sizes -<span class="st"> </span><span class="dv">40</span>, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>)</code></pre></div>
+<span class="kw">lines</span>(sizes <span class="op">-</span><span class="st"> </span><span class="dv">40</span>, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>)</code></pre></div>
 <p><img src="15-Memory_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 x &lt;-<span class="st"> </span><span class="kw">numeric</span>(<span class="fl">1e6</span>)
@@ -279,17 +294,17 @@ y &lt;-<span class="st"> </span><span class="kw">list</span>(x, x, x)
 <span class="kw">object_size</span>(y)
 <span class="co">#&gt; 8 MB</span></code></pre></div>
 <p><strong>logical:</strong></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sizes &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">0</span>:<span class="dv">50</span>, function(n) <span class="kw">object_size</span>(<span class="kw">vector</span>(<span class="st">&quot;logical&quot;</span>, n)))
-<span class="kw">plot</span>(<span class="dv">0</span>:<span class="dv">50</span>, sizes, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;Size (bytes)&quot;</span>, 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sizes &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">50</span>, <span class="cf">function</span>(n) <span class="kw">object_size</span>(<span class="kw">vector</span>(<span class="st">&quot;logical&quot;</span>, n)))
+<span class="kw">plot</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">50</span>, sizes, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;Size (bytes)&quot;</span>, 
      <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>)</code></pre></div>
 <p><img src="15-Memory_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-<span class="kw">plot</span>(<span class="dv">0</span>:<span class="dv">50</span>, sizes -<span class="st"> </span><span class="dv">40</span>, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, 
+<span class="kw">plot</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">50</span>, sizes <span class="op">-</span><span class="st"> </span><span class="dv">40</span>, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, 
      <span class="dt">ylab =</span> <span class="st">&quot;Bytes excluding overhead&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;n&quot;</span>)
 <span class="kw">abline</span>(<span class="dt">h =</span> <span class="dv">0</span>, <span class="dt">col =</span> <span class="st">&quot;grey80&quot;</span>)
 <span class="kw">abline</span>(<span class="dt">h =</span> <span class="kw">c</span>(<span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">48</span>, <span class="dv">64</span>, <span class="dv">128</span>), <span class="dt">col =</span> <span class="st">&quot;grey80&quot;</span>)
 <span class="kw">abline</span>(<span class="dt">a =</span> <span class="dv">0</span>, <span class="dt">b =</span> <span class="dv">4</span>, <span class="dt">col =</span> <span class="st">&quot;grey90&quot;</span>, <span class="dt">lwd =</span> <span class="dv">4</span>)
-<span class="kw">lines</span>(sizes -<span class="st"> </span><span class="dv">40</span>, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>)</code></pre></div>
+<span class="kw">lines</span>(sizes <span class="op">-</span><span class="st"> </span><span class="dv">40</span>, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>)</code></pre></div>
 <p><img src="15-Memory_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 x &lt;-<span class="st"> </span><span class="kw">logical</span>(<span class="fl">1e6</span>)
@@ -299,17 +314,17 @@ y &lt;-<span class="st"> </span><span class="kw">list</span>(x, x, x)
 <span class="kw">object_size</span>(y)
 <span class="co">#&gt; 4 MB</span></code></pre></div>
 <p><strong>complex:</strong></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sizes &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">0</span>:<span class="dv">50</span>, function(n) <span class="kw">object_size</span>(<span class="kw">vector</span>(<span class="st">&quot;complex&quot;</span>, n)))
-<span class="kw">plot</span>(<span class="dv">0</span>:<span class="dv">50</span>, sizes, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;Size (bytes)&quot;</span>, 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sizes &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">50</span>, <span class="cf">function</span>(n) <span class="kw">object_size</span>(<span class="kw">vector</span>(<span class="st">&quot;complex&quot;</span>, n)))
+<span class="kw">plot</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">50</span>, sizes, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;Size (bytes)&quot;</span>, 
      <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>)</code></pre></div>
 <p><img src="15-Memory_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-<span class="kw">plot</span>(<span class="dv">0</span>:<span class="dv">50</span>, sizes -<span class="st"> </span><span class="dv">40</span>, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, 
+<span class="kw">plot</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">50</span>, sizes <span class="op">-</span><span class="st"> </span><span class="dv">40</span>, <span class="dt">xlab =</span> <span class="st">&quot;Length&quot;</span>, 
      <span class="dt">ylab =</span> <span class="st">&quot;Bytes excluding overhead&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;n&quot;</span>)
 <span class="kw">abline</span>(<span class="dt">h =</span> <span class="dv">0</span>, <span class="dt">col =</span> <span class="st">&quot;grey80&quot;</span>)
 <span class="kw">abline</span>(<span class="dt">h =</span> <span class="kw">c</span>(<span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">48</span>, <span class="dv">64</span>, <span class="dv">128</span>), <span class="dt">col =</span> <span class="st">&quot;grey80&quot;</span>)
 <span class="kw">abline</span>(<span class="dt">a =</span> <span class="dv">0</span>, <span class="dt">b =</span> <span class="dv">4</span>, <span class="dt">col =</span> <span class="st">&quot;grey90&quot;</span>, <span class="dt">lwd =</span> <span class="dv">4</span>)
-<span class="kw">lines</span>(sizes -<span class="st"> </span><span class="dv">40</span>, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>)</code></pre></div>
+<span class="kw">lines</span>(sizes <span class="op">-</span><span class="st"> </span><span class="dv">40</span>, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>)</code></pre></div>
 <p><img src="15-Memory_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 x &lt;-<span class="st"> </span><span class="kw">complex</span>(<span class="fl">1e6</span>)
@@ -334,10 +349,10 @@ y &lt;-<span class="st"> </span><span class="kw">list</span>(x, x, x)
 <span class="co">#&gt; [1] 20000896</span></code></pre></div>
 <p>Note that we observe a small difference, because we didn’t include the costs for creating the <code>data.frame()</code> in our previous calculations.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Compare the sizes of the elements in the following two lists. Each contains basically the same data, but one contains vectors of small strings while the other contains a single long string.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vec &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">0</span>:<span class="dv">50</span>, function(i) <span class="kw">c</span>(<span class="st">&quot;ba&quot;</span>, <span class="kw">rep</span>(<span class="st">&quot;na&quot;</span>, i)))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vec &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">50</span>, <span class="cf">function</span>(i) <span class="kw">c</span>(<span class="st">&quot;ba&quot;</span>, <span class="kw">rep</span>(<span class="st">&quot;na&quot;</span>, i)))
 str &lt;-<span class="st"> </span><span class="kw">lapply</span>(vec, paste0, <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span>)</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vec &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">0</span>:<span class="dv">50</span>, function(i) <span class="kw">c</span>(<span class="st">&quot;ba&quot;</span>, <span class="kw">rep</span>(<span class="st">&quot;na&quot;</span>, i)))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vec &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">50</span>, <span class="cf">function</span>(i) <span class="kw">c</span>(<span class="st">&quot;ba&quot;</span>, <span class="kw">rep</span>(<span class="st">&quot;na&quot;</span>, i)))
 str &lt;-<span class="st"> </span><span class="kw">lapply</span>(vec, paste0, <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span>)
 <span class="kw">object_size</span>(vec)
 <span class="co">#&gt; 13.4 kB</span>
@@ -350,21 +365,21 @@ str &lt;-<span class="st"> </span><span class="kw">lapply</span>(vec, paste0, <s
 <ul>
 <li>In case of a long vector with only a few levels, the character takes approximately twice the memory of a factor:</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">object_size</span>(<span class="kw">rep</span>(letters[<span class="dv">1</span>:<span class="dv">20</span>], <span class="dv">1000</span>))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">object_size</span>(<span class="kw">rep</span>(letters[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>], <span class="dv">1000</span>))
 <span class="co">#&gt; 161 kB</span>
-<span class="kw">object_size</span>(<span class="kw">factor</span>(<span class="kw">rep</span>(letters[<span class="dv">1</span>:<span class="dv">20</span>], <span class="dv">1000</span>)))
+<span class="kw">object_size</span>(<span class="kw">factor</span>(<span class="kw">rep</span>(letters[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>], <span class="dv">1000</span>)))
 <span class="co">#&gt; 81.5 kB</span></code></pre></div>
 <p>That is, because a character allocates 8 bytes per entry (if the entry has less than 8 signs, otherwise roughly one byte per sign) and a factor equals an integer (allocates only 4 byte per entry) with a character vector attribute that contains the levels (unique elements) of the vector:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">object_size</span>(<span class="dv">1</span>:<span class="dv">20000</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">object_size</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20000</span>)
 <span class="co">#&gt; 80 kB</span>
-<span class="kw">object_size</span>(letters[<span class="dv">1</span>:<span class="dv">20</span>])
+<span class="kw">object_size</span>(letters[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>])
 <span class="co">#&gt; 1.16 kB</span></code></pre></div>
 <ul>
 <li>Of course the factor will allocate more memory, if all entries are unique:</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">object_size</span>(letters[<span class="dv">1</span>:<span class="dv">20</span>])
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">object_size</span>(letters[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>])
 <span class="co">#&gt; 1.16 kB</span>
-<span class="kw">object_size</span>(<span class="kw">factor</span>(letters[<span class="dv">1</span>:<span class="dv">20</span>]))
+<span class="kw">object_size</span>(<span class="kw">factor</span>(letters[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>]))
 <span class="co">#&gt; 1.65 kB</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Explain the difference in size between <code>1:5</code> and <code>list(1:5)</code>.</p>
 <p><strong><span style="color:green">A</span></strong>: An empty list needs 40 bytes. For each entry 8 bytes are added (note that for short lists memory is allocated in chunks, similar as explained for integers in the textbook). We can see this via:</p>
@@ -379,14 +394,14 @@ str &lt;-<span class="st"> </span><span class="kw">lapply</span>(vec, paste0, <s
 <h2><span class="header-section-number">15.2</span> Memory profiling with lineprof</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: When the input is a list, we can make a more efficient <code>as.data.frame()</code> by using special knowledge. A data frame is a list with class <code>data.frame</code> and <code>row.names</code> attribute. <code>row.names</code> is either a character vector or vector of sequential integers, stored in a special format created by <code>.set_row_names()</code>. This leads to an alternative <code>as.data.frame()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">to_df &lt;-<span class="st"> </span>function(x) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">to_df &lt;-<span class="st"> </span><span class="cf">function</span>(x) {
   <span class="kw">class</span>(x) &lt;-<span class="st"> &quot;data.frame&quot;</span>
   <span class="kw">attr</span>(x, <span class="st">&quot;row.names&quot;</span>) &lt;-<span class="st"> </span><span class="kw">.set_row_names</span>(<span class="kw">length</span>(x[[<span class="dv">1</span>]]))
   x
 }</code></pre></div>
 <p>What impact does this function have on <code>read_delim()</code>? What are the downsides of this function?</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Line profile the following function with <code>torture = TRUE</code>. What is surprising? Read the source code of <code>rm()</code> to figure out what’s going on.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span>function(<span class="dt">n =</span> <span class="fl">1e5</span>) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">n =</span> <span class="fl">1e5</span>) {
   x &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span>, n)
   <span class="kw">rm</span>(x)
 }</code></pre></div></li>
@@ -396,26 +411,26 @@ str &lt;-<span class="st"> </span><span class="kw">lapply</span>(vec, paste0, <s
 <h2><span class="header-section-number">15.3</span> Modification in place</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: The code below makes one duplication. Where does it occur and why? (Hint: look at <code>refs(y)</code>.)</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="kw">runif</span>(<span class="dv">100</span> *<span class="st"> </span><span class="fl">1e4</span>), <span class="dt">ncol =</span> <span class="dv">100</span>))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="kw">runif</span>(<span class="dv">100</span> <span class="op">*</span><span class="st"> </span><span class="fl">1e4</span>), <span class="dt">ncol =</span> <span class="dv">100</span>))
 medians &lt;-<span class="st"> </span><span class="kw">vapply</span>(x, median, <span class="kw">numeric</span>(<span class="dv">1</span>))
 y &lt;-<span class="st"> </span><span class="kw">as.list</span>(x)
-for(i in <span class="kw">seq_along</span>(medians)) {
-  y[[i]] &lt;-<span class="st"> </span>y[[i]] -<span class="st"> </span>medians[i]
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(medians)) {
+  y[[i]] &lt;-<span class="st"> </span>y[[i]] <span class="op">-</span><span class="st"> </span>medians[i]
 }</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: It occurs in the first iteration of the for loop. <code>refs(y)</code> is 2 before the for loop, because <code>y</code> is created via <code>as.list()</code>, which is not a primitive and so sets the refs counter up to two. Therefore <strong>R</strong> makes a copy, <code>refs(y)</code> becomes 1 and the following modifications will occur in place. The following code illustrates this behaviour, when run in the <strong>R</strong>Gui. (Note that <code>refs()</code> will always return 2, when run in RStudio, as stated in the textbook. Note also, that you could detect this behaviour with the <code>tracemem()</code> function).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(pryr)
 <span class="kw">rm</span>(<span class="dt">list =</span> <span class="kw">ls</span>(<span class="dt">all =</span> <span class="ot">TRUE</span>))
 
-x &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="kw">runif</span>(<span class="dv">100</span> *<span class="st"> </span><span class="fl">1e4</span>), <span class="dt">ncol =</span> <span class="dv">4</span>))
+x &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="kw">runif</span>(<span class="dv">100</span> <span class="op">*</span><span class="st"> </span><span class="fl">1e4</span>), <span class="dt">ncol =</span> <span class="dv">4</span>))
 medians &lt;-<span class="st"> </span><span class="kw">vapply</span>(x, median, <span class="kw">numeric</span>(<span class="dv">1</span>))
 
 y &lt;-<span class="st"> </span><span class="kw">as.list</span>(x)
 <span class="kw">is.primitive</span>(as.list)
 <span class="co"># [1] FALSE</span>
 
-for(i in <span class="kw">seq_along</span>(medians)) {
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(medians)) {
   <span class="kw">print</span>(<span class="kw">c</span>(<span class="kw">address</span>(y), <span class="kw">refs</span>(y)))
-  y[[i]] &lt;-<span class="st"> </span>y[[i]] -<span class="st"> </span>medians[i]
+  y[[i]] &lt;-<span class="st"> </span>y[[i]] <span class="op">-</span><span class="st"> </span>medians[i]
 }
 <span class="co"># [1] &quot;0x46c4a98&quot; &quot;2&quot;</span>
 <span class="co"># [1] &quot;0x11de30c8&quot; &quot;1&quot; </span>
@@ -432,8 +447,9 @@ for(i in <span class="kw">seq_along</span>(medians)) {
         </div>
       </div>
 <a href="profiling.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="rcpp.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
-
+<a href="rcpp.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
@@ -477,7 +493,7 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:" && /^https?:/.test(script.src))
       script.src  = script.src.replace(/^https?:/, '');
     document.getElementsByTagName("head")[0].appendChild(script);

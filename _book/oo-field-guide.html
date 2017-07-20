@@ -6,9 +6,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Advanced R Solutions</title>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
   <meta name="description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R.">
-  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
 
   <meta property="og:title" content="Advanced R Solutions" />
   <meta property="og:type" content="book" />
@@ -23,10 +22,10 @@
   <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R." />
   <meta name="twitter:image" content="images/advrs_cover.png" />
 
-<meta name="author" content="Malte Grosser &amp; Henning Bumann">
+<meta name="author" content="Malte Grosser, Henning Bumann, Peter Hurford &amp; Robert Krzyzanowski">
 
 
-<meta name="date" content="2017-04-13">
+<meta name="date" content="2017-07-16">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -35,7 +34,6 @@
   
 <link rel="prev" href="functions.html">
 <link rel="next" href="environments.html">
-
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -129,6 +127,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </head>
 
 <body>
+
 
 
   <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
@@ -233,6 +232,22 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="16.3" data-path="rcpp.html"><a href="rcpp.html#the-stl"><i class="fa fa-check"></i><b>16.3</b> The STL</a></li>
 </ul></li>
 <li class="chapter" data-level="17" data-path="testchapter.html"><a href="testchapter.html"><i class="fa fa-check"></i><b>17</b> Testchapter</a></li>
+<li class="chapter" data-level="18" data-path="s3-1.html"><a href="s3-1.html"><i class="fa fa-check"></i><b>18</b> S3</a><ul>
+<li class="chapter" data-level="18.1" data-path="s3-1.html"><a href="s3-1.html#basics"><i class="fa fa-check"></i><b>18.1</b> Basics</a></li>
+<li class="chapter" data-level="18.2" data-path="s3-1.html"><a href="s3-1.html#classes"><i class="fa fa-check"></i><b>18.2</b> Classes</a></li>
+<li class="chapter" data-level="18.3" data-path="s3-1.html"><a href="s3-1.html#generics-and-methods"><i class="fa fa-check"></i><b>18.3</b> Generics and methods</a></li>
+<li class="chapter" data-level="18.4" data-path="s3-1.html"><a href="s3-1.html#method-dispatch"><i class="fa fa-check"></i><b>18.4</b> Method dispatch</a></li>
+<li class="chapter" data-level="18.5" data-path="s3-1.html"><a href="s3-1.html#inheritance"><i class="fa fa-check"></i><b>18.5</b> Inheritance</a></li>
+<li class="chapter" data-level="18.6" data-path="s3-1.html"><a href="s3-1.html#dispatch-details"><i class="fa fa-check"></i><b>18.6</b> Dispatch details</a></li>
+</ul></li>
+<li class="chapter" data-level="19" data-path="s4-1.html"><a href="s4-1.html"><i class="fa fa-check"></i><b>19</b> S4</a><ul>
+<li class="chapter" data-level="19.1" data-path="s4-1.html"><a href="s4-1.html#classes-1"><i class="fa fa-check"></i><b>19.1</b> Classes</a></li>
+<li class="chapter" data-level="19.2" data-path="s4-1.html"><a href="s4-1.html#generics-and-methods-1"><i class="fa fa-check"></i><b>19.2</b> Generics and methods</a></li>
+<li class="chapter" data-level="19.3" data-path="s4-1.html"><a href="s4-1.html#method-dispatch-1"><i class="fa fa-check"></i><b>19.3</b> Method dispatch</a></li>
+<li class="chapter" data-level="19.4" data-path="s4-1.html"><a href="s4-1.html#s4-and-existing-code"><i class="fa fa-check"></i><b>19.4</b> S4 and existing code</a><ul>
+<li class="chapter" data-level="19.4.1" data-path="s4-1.html"><a href="s4-1.html#exercises"><i class="fa fa-check"></i><b>19.4.1</b> Exercises</a></li>
+</ul></li>
+</ul></li>
 </ul>
 
       </nav>
@@ -260,7 +275,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t.test
 <span class="co">#&gt; function (x, ...) </span>
 <span class="co">#&gt; UseMethod(&quot;t.test&quot;)</span>
-<span class="co">#&gt; &lt;bytecode: 0x0000000014fa7ba8&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x00000000178332c0&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:stats&gt;</span></code></pre></div>
 <p>If we create an object with class “test” <code>t.test()</code> will cause R to call <code>t.test.default()</code> unless you create a method <code>t.test()</code> for the generic <code>t()</code>.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What classes have a method for the <code>Math</code> group generic in base R? Read the source code. How do the methods work?<br />
@@ -298,45 +313,53 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="co">#&gt; see &#39;?methods&#39; for accessing help and source code</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Which base generic has the greatest number of defined methods?<br />
 <strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">objs &lt;-<span class="st"> </span><span class="kw">mget</span>(<span class="kw">ls</span>(<span class="st">&quot;package:base&quot;</span>), <span class="dt">inherits =</span> <span class="ot">TRUE</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(methods)
+objs &lt;-<span class="st"> </span><span class="kw">mget</span>(<span class="kw">ls</span>(<span class="st">&quot;package:base&quot;</span>), <span class="dt">inherits =</span> <span class="ot">TRUE</span>)
 funs &lt;-<span class="st"> </span><span class="kw">Filter</span>(is.function, objs)
-generics &lt;-<span class="st"> </span><span class="kw">Filter</span>(function(x) (<span class="st">&quot;generic&quot;</span> %in%<span class="st"> </span>pryr::<span class="kw">ftype</span>(x)), funs)
-<span class="kw">sort</span>(<span class="kw">sapply</span>(generics, function(x) <span class="kw">length</span>(<span class="kw">methods</span>(x))), <span class="dt">decreasing =</span> <span class="ot">TRUE</span>)[<span class="dv">1</span>]
+generics &lt;-<span class="st"> </span><span class="kw">Filter</span>(<span class="cf">function</span>(x) (<span class="st">&quot;generic&quot;</span> <span class="op">%in%</span><span class="st"> </span>pryr<span class="op">::</span><span class="kw">ftype</span>(x)), funs)
+<span class="kw">sort</span>(<span class="kw">sapply</span>(<span class="kw">names</span>(generics),
+            <span class="cf">function</span>(x) <span class="kw">length</span>(<span class="kw">methods</span>(x))),
+     <span class="dt">decreasing =</span> <span class="ot">TRUE</span>)[<span class="dv">1</span>]
 <span class="co">#&gt; print </span>
 <span class="co">#&gt;   203</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: <code>UseMethod()</code> calls methods in a special way. Predict what the following code will return, then run it and read the help for <code>UseMethod()</code> to figure out what’s going on. Write down the rules in the simplest form possible.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">y &lt;-<span class="st"> </span><span class="dv">1</span>
-g &lt;-<span class="st"> </span>function(x) {
+g &lt;-<span class="st"> </span><span class="cf">function</span>(x) {
   y &lt;-<span class="st"> </span><span class="dv">2</span>
   <span class="kw">UseMethod</span>(<span class="st">&quot;g&quot;</span>)
 }
-g.numeric &lt;-<span class="st"> </span>function(x) y
+g.numeric &lt;-<span class="st"> </span><span class="cf">function</span>(x) y
 <span class="kw">g</span>(<span class="dv">10</span>)
 
-h &lt;-<span class="st"> </span>function(x) {
+h &lt;-<span class="st"> </span><span class="cf">function</span>(x) {
   x &lt;-<span class="st"> </span><span class="dv">10</span>
   <span class="kw">UseMethod</span>(<span class="st">&quot;h&quot;</span>)
 }
-h.character &lt;-<span class="st"> </span>function(x) <span class="kw">paste</span>(<span class="st">&quot;char&quot;</span>, x)
-h.numeric &lt;-<span class="st"> </span>function(x) <span class="kw">paste</span>(<span class="st">&quot;num&quot;</span>, x)
+h.character &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">paste</span>(<span class="st">&quot;char&quot;</span>, x)
+h.numeric &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">paste</span>(<span class="st">&quot;num&quot;</span>, x)
 
 <span class="kw">h</span>(<span class="st">&quot;a&quot;</span>)</code></pre></div>
-<p><strong><span style="color:green">A</span></strong>: <code>g(10)</code> will return <code>2</code>. Since only <code>x</code> is in the execution environment of <code>g.numeric</code> R will search for <code>y</code> in the enclosing environment, where <code>y</code> is defined as <code>2</code>. <code>h(&quot;a&quot;)</code> will return <code>&quot;class a&quot;</code>, because <code>x = &quot;a&quot;</code> is given as input to the called method. From <code>?UseMethod</code>:</p>
+<p><strong><span style="color:green">A</span></strong>: <code>g(10)</code> will return <code>2</code>. Since <code>2</code> is of class numeric, <code>g.numeric()</code> is called. It has only <code>x</code> in its execution environment and R will search for <code>y</code> in the enclosing environment, where <code>y</code> is defined as <code>2</code>. From <code>?UseMethod</code>:</p>
 <blockquote>
 <p>UseMethod creates a new function call with arguments matched as they came in to the generic. Any local variables defined before the call to UseMethod are retained (unlike S).</p>
 </blockquote>
-<p>So generics look at the class of their first argument (default) for method dispatch. Then a call to the particular method is made. Since the methods are created by the generic, R will look in the generics environment (including all objects defined before the <code>UseMethod</code> statement) when an object is not found in the environment of the called method.</p></li>
+<p>So generics look at the class of their first argument (default) for method dispatch. Then a call to the particular method is made. Since the methods are created by the generic, R will look in the generics environment (including all objects defined before (!) the <code>UseMethod</code> statement) when an object is not found in the environment of the called method.</p>
+<p><code>h(&quot;a&quot;)</code> will return <code>&quot;char a&quot;</code>, because <code>x = &quot;a&quot;</code> is given as input to the called method, which is of class character and so <code>h.character</code> is called and R also doesn’t need to look elsewhere for <code>x</code>.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Internal generics don’t dispatch on the implicit class of base types. Carefully read <code>?&quot;internal generic&quot;</code> to determine why the length of <code>f</code> and <code>g</code> is different in the example below. What function helps distinguish between the behaviour of <code>f</code> and <code>g</code>?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span>function() <span class="dv">1</span>
-g &lt;-<span class="st"> </span>function() <span class="dv">2</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span><span class="cf">function</span>() <span class="dv">1</span>
+g &lt;-<span class="st"> </span><span class="cf">function</span>() <span class="dv">2</span>
 <span class="kw">class</span>(g) &lt;-<span class="st"> &quot;function&quot;</span>
 
 <span class="kw">class</span>(f)
+<span class="co">#&gt; [1] &quot;function&quot;</span>
 <span class="kw">class</span>(g)
+<span class="co">#&gt; [1] &quot;function&quot;</span>
 
-length.function &lt;-<span class="st"> </span>function(x) <span class="st">&quot;function&quot;</span>
+length.function &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="st">&quot;function&quot;</span>
 <span class="kw">length</span>(f)
-<span class="kw">length</span>(g)</code></pre></div>
+<span class="co">#&gt; [1] 1</span>
+<span class="kw">length</span>(g)
+<span class="co">#&gt; [1] &quot;function&quot;</span></code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: From <code>?&quot;internal generic&quot;</code>:</p>
 <blockquote>
 <p>Many R objects have a class attribute, a character vector giving the names of the classes from which the object inherits. If the object does not have a class attribute, it has an implicit class, “matrix”, “array” or the result of mode(x) (except that integer vectors have implicit class “integer”). (Functions oldClass and oldClass&lt;- get and set the attribute, which can also be done directly.)</p>
@@ -365,18 +388,18 @@ You can check if a class is only implicit by using one of the following approach
 <span class="co">#&gt; [7] &quot;package:datasets&quot;  &quot;Autoloads&quot;         &quot;package:base&quot;</span></code></pre></div>
 <p>Then we start our search for generics and keep those of otype S4:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">generics &lt;-<span class="st"> </span><span class="kw">getGenerics</span>(<span class="dt">where =</span> <span class="kw">search</span>())
-is_gen_s4 &lt;-<span class="st"> </span><span class="kw">vapply</span>(generics@.Data, 
-                    function(x) pryr::<span class="kw">otype</span>(<span class="kw">get</span>(x)) ==<span class="st"> &quot;S4&quot;</span>, <span class="kw">logical</span>(<span class="dv">1</span>))
+is_gen_s4 &lt;-<span class="st"> </span><span class="kw">vapply</span>(generics<span class="op">@</span>.Data, 
+                    <span class="cf">function</span>(x) pryr<span class="op">::</span><span class="kw">otype</span>(<span class="kw">get</span>(x)) <span class="op">==</span><span class="st"> &quot;S4&quot;</span>, <span class="kw">logical</span>(<span class="dv">1</span>))
 generics &lt;-<span class="st"> </span>generics[is_gen_s4]</code></pre></div>
 <p>Finally we calculate the S4-generic with the most methods:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sort</span>(<span class="kw">sapply</span>(generics, function(x) <span class="kw">length</span>(<span class="kw">methods</span>(x))), <span class="dt">decreasing =</span> <span class="ot">TRUE</span>)[<span class="dv">1</span>]
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sort</span>(<span class="kw">sapply</span>(generics, <span class="cf">function</span>(x) <span class="kw">length</span>(<span class="kw">methods</span>(x))), <span class="dt">decreasing =</span> <span class="ot">TRUE</span>)[<span class="dv">1</span>]
 <span class="co">#&gt; coerce </span>
 <span class="co">#&gt;     27</span></code></pre></div>
 <p><strong>classes:</strong></p>
 <p>We collect all S4 classes within a character vector:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">s4classes &lt;-<span class="st"> </span><span class="kw">getClasses</span>(<span class="dt">where =</span> .GlobalEnv, <span class="dt">inherits =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p>Then we are going to steal the following function from <a href="http://www.bioconductor.org/help/course-materials/2010/AdvancedR/S4InBioconductor.pdf">S4 system development in Bioconductor</a> that returns all methods to a given class</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">s4Methods &lt;-<span class="st"> </span>function(class){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">s4Methods &lt;-<span class="st"> </span><span class="cf">function</span>(class){
   methods &lt;-<span class="st"> </span><span class="kw">showMethods</span>(<span class="dt">classes =</span> class, <span class="dt">printTo =</span> <span class="ot">FALSE</span>) <span class="co"># notice the last setting</span>
   methods &lt;-<span class="st"> </span>methods[<span class="kw">grep</span>(<span class="st">&quot;^Function:&quot;</span>, methods)]
   <span class="kw">sapply</span>(<span class="kw">strsplit</span>(methods, <span class="st">&quot; &quot;</span>), <span class="st">&quot;[&quot;</span>, <span class="dv">2</span>)
@@ -403,17 +426,17 @@ generics &lt;-<span class="st"> </span>generics[is_gen_s4]</code></pre></div>
 <li><p><strong><span style="color:red">Q</span></strong>: Use a field function to prevent the account balance from being directly manipulated. (Hint: create a “hidden” <code>.balance</code> field, and read the help for the fields argument in <code>setRefClass()</code>.)<br />
 <strong><span style="color:green">A</span></strong>: We are not that experienced in general RC classes, but it is easy with R6 classes. You can find all the information you need <a href="https://github.com/wch/R6">here</a>. To solve the exercise this <a href="https://cran.r-project.org/web/packages/R6/vignettes/Introduction.html">introduction</a> should be sufficient:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># definition of the class</span>
-Account2 &lt;-<span class="st"> </span>R6::<span class="kw">R6Class</span>(<span class="st">&quot;Account&quot;</span>,
+Account2 &lt;-<span class="st"> </span>R6<span class="op">::</span><span class="kw">R6Class</span>(<span class="st">&quot;Account&quot;</span>,
                         <span class="dt">public =</span> <span class="kw">list</span>(
-                          <span class="dt">initialize =</span> function(<span class="dt">balance =</span> <span class="dv">0</span>){
-                            private$balance =<span class="st"> </span>balance
+                          <span class="dt">initialize =</span> <span class="cf">function</span>(<span class="dt">balance =</span> <span class="dv">0</span>){
+                            private<span class="op">$</span>balance =<span class="st"> </span>balance
                             },
-                          <span class="dt">withdraw =</span> function(x){
-                            if (private$balance &lt;<span class="st"> </span>x) <span class="kw">stop</span>(<span class="st">&quot;Not enough money&quot;</span>)
-                            private$balance &lt;-<span class="st"> </span>private$balance -<span class="st"> </span>x
+                          <span class="dt">withdraw =</span> <span class="cf">function</span>(x){
+                            <span class="cf">if</span> (private<span class="op">$</span>balance <span class="op">&lt;</span><span class="st"> </span>x) <span class="kw">stop</span>(<span class="st">&quot;Not enough money&quot;</span>)
+                            private<span class="op">$</span>balance &lt;-<span class="st"> </span>private<span class="op">$</span>balance <span class="op">-</span><span class="st"> </span>x
                             },
-                          <span class="dt">deposit =</span> function(x) {
-                            private$balance &lt;-<span class="st"> </span>private$balance +<span class="st"> </span>x
+                          <span class="dt">deposit =</span> <span class="cf">function</span>(x) {
+                            private<span class="op">$</span>balance &lt;-<span class="st"> </span>private<span class="op">$</span>balance <span class="op">+</span><span class="st"> </span>x
                             }
                           ),
                         <span class="dt">private =</span> <span class="kw">list</span>(
@@ -430,7 +453,7 @@ Account2 &lt;-<span class="st"> </span>R6::<span class="kw">R6Class</span>(<span
 <li><p><strong><span style="color:red">Q</span></strong>: I claimed that there aren’t any RC classes in base R, but that was a bit of a simplification. Use <code>getClasses()</code> and find which classes <code>extend()</code> from <code>envRefClass</code>. What are the classes used for? (Hint: recall how to look up the documentation for a class.)<br />
 <strong><span style="color:green">A</span></strong>: We get these classes as described in the exercise:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">classes &lt;-<span class="st"> </span><span class="kw">getClasses</span>(<span class="dt">where =</span> .GlobalEnv, <span class="dt">inherits =</span> <span class="ot">TRUE</span>)
-classes[<span class="kw">unlist</span>(<span class="kw">lapply</span>(classes, function(x) methods::<span class="kw">extends</span>(x, <span class="st">&quot;envRefClass&quot;</span>)))]
+classes[<span class="kw">unlist</span>(<span class="kw">lapply</span>(classes, <span class="cf">function</span>(x) methods<span class="op">::</span><span class="kw">extends</span>(x, <span class="st">&quot;envRefClass&quot;</span>)))]
 <span class="co">#&gt; [1] &quot;envRefClass&quot;      &quot;refGeneratorSlot&quot; &quot;localRefClass&quot;</span></code></pre></div>
 <p>Their need is best described in <code>class?envRefClass</code> “Purpose of the Class”:</p>
 <blockquote>
@@ -446,8 +469,9 @@ classes[<span class="kw">unlist</span>(<span class="kw">lapply</span>(classes, f
         </div>
       </div>
 <a href="functions.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="environments.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
-
+<a href="environments.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
@@ -491,7 +515,7 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:" && /^https?:/.test(script.src))
       script.src  = script.src.replace(/^https?:/, '');
     document.getElementsByTagName("head")[0].appendChild(script);

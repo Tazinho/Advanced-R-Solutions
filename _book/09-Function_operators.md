@@ -42,9 +42,9 @@
     }
     runif2 <- f(runif)
     runif2(5)
-    #> [1] 0.38117830 0.62566813 0.01181258 0.56624290 0.79400080
+    #> [1] 0.1090973 0.8933546 0.6849637 0.7362727 0.8324138
     runif2(10)
-    #> [1] 0.38117830 0.62566813 0.01181258 0.56624290 0.79400080
+    #> [1] 0.1090973 0.8933546 0.6849637 0.7362727 0.8324138
     ```
     
     __<span style="color:green">A</span>__: It returns a new version of the inputfunction. That version will always return the result of it's first run (in case this not `NULL`), no matter how the input changes. Good names could be `first_run()` or `initial_return()`. 
@@ -403,17 +403,17 @@
     trims <- c(0, 0.1, 0.2, 0.5)
     x <- rcauchy(1000)
     unlist(lapply(trims, function(trim) mean(x, trim = trim)))
-    #> [1] -0.086973156 -0.039487297 -0.011210230 -0.008979957
+    #> [1] -2.14471243  0.09442859  0.07433510  0.07655498
     unlist(lapply(trims, partial(mean, x)))
-    #> [1] -0.086973156 -0.039487297 -0.011210230 -0.008979957
+    #> [1] -2.14471243  0.09442859  0.07433510  0.07655498
     
     # 2
     xs <- replicate(5, runif(10), simplify = FALSE)
     ws <- replicate(5, rpois(10, 5) + 1, simplify = FALSE)
     unlist(Map(function(x, w) weighted.mean(x, w, na.rm = TRUE), xs, ws))
-    #> [1] 0.5157080 0.3917117 0.3148246 0.6154536 0.4376859
+    #> [1] 0.5024602 0.4685572 0.5303112 0.5839586 0.6122118
     unlist(Map(partial(weighted.mean, na.rm = TRUE), xs, ws))
-    #> [1] 0.5157080 0.3917117 0.3148246 0.6154536 0.4376859
+    #> [1] 0.5024602 0.4685572 0.5303112 0.5839586 0.6122118
     
     # 3
     add <- function(x, y, na.rm = FALSE) {
@@ -616,9 +616,9 @@
     
     # parallel combination (results in an error)
     xor_fb1(c(is.logical, is.character), c(is.logical, is.character))("a")
-    #> Error in xor(f1(...), f2(...)): could not find function "f1"
+    #> Error in f1(...): could not find function "f1"
     xor_fb2(c(is.logical, is.character), c(is.logical, is.character))("a")
-    #> Error in or(f1, f2)(...): could not find function "f1"
+    #> Error in f1(...): could not find function "f1"
     
     # reduced combination (results in an error)
     xor_fb1(c(is.logical, is.character, is.logical, is.character))("a")
