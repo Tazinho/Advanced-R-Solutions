@@ -8,3 +8,160 @@ knitr::opts_chunk$set(
 Sys.setenv(LANGUAGE = "en")
 ```
 # Testchapter
+
+# S3
+
+## Basics
+
+1.  The most important S3 objects in base R are factors, data frames,
+    and date/times (Dates, POSIXct, POSIXlt). You've already seen the 
+    attributes and base type that factors are built on. What base types and 
+    attributes are the others built on?
+
+1.  Describe the difference in behaviour in these two calls.
+
+    ```{r}
+    some_days <- as.Date("2017-01-31") + sample(10, 5)
+    
+    mean(some_days)
+    mean(unclass(some_days))
+    ```
+
+1.  Draw a Venn diagram illustrating the relationships between
+    functions, generics, and methods.
+
+1.  What does the `as.data.frame.data.frame()` method do? Why is
+    it confusing? How should you avoid this confusion in your own
+    code?
+
+1.  What does the following code return? What base type is built on?
+    What attributes does it use?
+    
+    ```{r}
+    x <- ecdf(rpois(100, 10))
+    x
+    ```
+
+## Classes
+
+1.  Categorise the objects returned by `lm()`, `factor()`, `table()`, 
+    `as.Date()`, `ecdf()`, `ordered()`, `I()` into "vector", "scalar", and 
+    "other".
+
+1.  Write a constructor for `difftime` objects. What base type are they
+    built on? What attributes do they use? You'll need to consult the
+    documentation, read some code, and perform some experiments.
+
+1.  Write a constructor for `data.frame` objects. What base type is a data 
+    frame built on? What attributes does it use? What are the restrictions 
+    placed on the individual elements? What about the names?
+
+1.  Enhance our `factor()` helper to have better behaviour when one or
+    more `values` is not found in `levels`. What does `base::factor()` do
+    in this situation?
+
+1.  Carefully read the source code of `factor()`. What does it do that
+    our constructor does not?
+
+1.  What would a constructor function for `lm` objects, `new_lm()`, look like?
+    Why is a constructor function less useful for linear models?
+
+## Generics and methods
+
+1.  Read the source code for `t()` and `t.test()` and confirm that 
+    `t.test()` is an S3 generic and not an S3 method. What happens if 
+    you create an object with class `test` and call `t()` with it? Why?
+    
+    ```{r}
+    x <- structure(1:10, class = "test")
+    t(x)
+    ```
+
+1.  Carefully read the documentation for `UseMethod()` and explain why the
+    following code returns the results that it does. What two usual rules
+    of function evaluation does `UseMethod()` violate?
+    
+    ```{r}
+    g <- function(x) {
+      x <- 10
+      y <- 10
+      UseMethod("g")
+    }
+    g.default <- function(x) c(x = x, y = y)
+    
+    x <- 1
+    y <- 1
+    g(x)
+    ```
+
+## Method dispatch
+
+1.  Which base generic has the greatest number of defined methods?
+
+1.  Explain what is happening in the following code.
+
+    ```{r}
+    generic2 <- function(x) UseMethod("generic2")
+    generic2.a1 <- function(x) "a1"
+    generic2.a2 <- function(x) "a2"
+    generic2.b <- function(x) {
+      class(x) <- "a1"
+      NextMethod()
+    }
+
+    generic2(S3::new_s3_scalar(class = c("b", "a2")))
+    ```
+
+## Inheritance
+
+1.  The `ordered` class is a subclass of `factor`, but it's implemented in
+    a very ad hoc way in base R. Implement it in a principled way by
+    building a constructor and an `as_ordered` generic.
+    
+    ```{r}
+    f1 <- factor("a", c("a", "b"))
+    as.factor(f1)  
+    as.ordered(f1) # loses levels
+    ```
+
+## Dispatch details
+
+1.  `Math.difftime()` is more complicated than I described. Why?
+
+
+# S4
+
+## Classes
+
+1.  What happens if you define a new S4 class that doesn't "contain" an 
+    existing class?  (Hint: read about virtual classes in `?setClass`.)
+
+1.  Imagine you were going to rewrite ordered factors, dates, and 
+    data frames in S4. Sketch out the `setClass()` calls that you would
+    use to define the classes.
+
+## Generics and methods
+
+1.  In the defintion of the generic, why is it necessary to repeat the
+    name of the generic twice?
+    
+1.  What happens if you define a method with different argument names to
+    the generic?
+
+1.  What other ways can you find help for a method? Read `?"?"` and
+    summarise the details.
+
+## Method dispatch 
+
+1.  Take the last example which shows multiple dispatch over two classes that
+    use multiple inheritance. What happens if you define a method for all
+    terminal classes? Why does method dispatch not save us much work here?
+
+## S4 and existing code
+
+### Exercises
+
+[S4-bioconductor]: http://www.bioconductor.org/help/course-materials/2010/AdvancedR/S4InBioconductor.pdf
+[S4DA]: http://amzn.com/0387759352?tag=devtools-20
+[SO-Morgan]: http://stackoverflow.com/search?tab=votes&q=user%3a547331%20%5bs4%5d%20is%3aanswe
+
