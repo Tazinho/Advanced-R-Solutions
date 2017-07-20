@@ -25,7 +25,7 @@
 <meta name="author" content="Malte Grosser, Henning Bumann, Peter Hurford &amp; Robert Krzyzanowski">
 
 
-<meta name="date" content="2017-07-16">
+<meta name="date" content="2017-07-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -281,9 +281,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><code>y = exp(x) / x</code>, x in [10, 20]</li>
 </ol>
 <p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">integrate</span>(<span class="cf">function</span>(x) x<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span>x, <span class="dv">0</span>, <span class="dv">10</span>)
-<span class="kw">integrate</span>(<span class="cf">function</span>(x) <span class="kw">sin</span>(x) <span class="op">+</span><span class="st"> </span><span class="kw">cos</span>(x), <span class="op">-</span>pi, pi)
-<span class="kw">integrate</span>(<span class="cf">function</span>(x) <span class="kw">exp</span>(x) <span class="op">/</span><span class="st"> </span>x, <span class="dv">10</span>, <span class="dv">20</span>)</code></pre></div></li>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">integrate</span>(function(x) x^<span class="dv">2</span> -<span class="st"> </span>x, <span class="dv">0</span>, <span class="dv">10</span>)
+<span class="kw">integrate</span>(function(x) <span class="kw">sin</span>(x) +<span class="st"> </span><span class="kw">cos</span>(x), -pi, pi)
+<span class="kw">integrate</span>(function(x) <span class="kw">exp</span>(x) /<span class="st"> </span>x, <span class="dv">10</span>, <span class="dv">20</span>)</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: A good rule of thumb is that an anonymous function should fit on one line and shouldn’t need to use <code>{}</code>. Review your code. Where could you have used an anonymous function instead of a named function? Where should you have used a named function instead of an anonymous function?<br />
 <strong><span style="color:green">A</span></strong>:</p></li>
 </ol>
@@ -297,11 +297,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>because they enclose the environment of the parent function and can access all its variables.</p>
 </blockquote></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What does the following statistical function do? What would be a better name for it? (The existing name is a bit of a hint.)</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bc &lt;-<span class="st"> </span><span class="cf">function</span>(lambda) {
-  <span class="cf">if</span> (lambda <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) {
-    <span class="cf">function</span>(x) <span class="kw">log</span>(x)
-  } <span class="cf">else</span> {
-    <span class="cf">function</span>(x) (x <span class="op">^</span><span class="st"> </span>lambda <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span>lambda
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bc &lt;-<span class="st"> </span>function(lambda) {
+  if (lambda ==<span class="st"> </span><span class="dv">0</span>) {
+    function(x) <span class="kw">log</span>(x)
+  } else {
+    function(x) (x ^<span class="st"> </span>lambda -<span class="st"> </span><span class="dv">1</span>) /<span class="st"> </span>lambda
   }
 }</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: It is the logarithm, when lambda equals zero and <code>x ^ lambda - 1 / lambda</code> otherwise. A better name might be <code>box_cox_transformation</code> (one parametric), you can read about it (here)[<a href="https://en.wikipedia.org/wiki/Power_transform" class="uri">https://en.wikipedia.org/wiki/Power_transform</a>].</p></li>
@@ -315,22 +315,22 @@ m2 &lt;-<span class="st"> </span><span class="kw">moment</span>(<span class="dv"
 
 x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">100</span>)
 <span class="kw">stopifnot</span>(<span class="kw">all.equal</span>(<span class="kw">m1</span>(x), <span class="dv">0</span>))
-<span class="kw">stopifnot</span>(<span class="kw">all.equal</span>(<span class="kw">m2</span>(x), <span class="kw">var</span>(x) <span class="op">*</span><span class="st"> </span><span class="dv">99</span> <span class="op">/</span><span class="st"> </span><span class="dv">100</span>))</code></pre></div>
+<span class="kw">stopifnot</span>(<span class="kw">all.equal</span>(<span class="kw">m2</span>(x), <span class="kw">var</span>(x) *<span class="st"> </span><span class="dv">99</span> /<span class="st"> </span><span class="dv">100</span>))</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: For a discrete formulation look <a href="http://www.r-tutor.com/elementary-statistics/numerical-measures/moment">here</a></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">moment &lt;-<span class="st"> </span><span class="cf">function</span>(i){
-  <span class="cf">function</span>(x) <span class="kw">sum</span>((x <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(x)) <span class="op">^</span><span class="st"> </span>i) <span class="op">/</span><span class="st"> </span><span class="kw">length</span>(x)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">moment &lt;-<span class="st"> </span>function(i){
+  function(x) <span class="kw">sum</span>((x -<span class="st"> </span><span class="kw">mean</span>(x)) ^<span class="st"> </span>i) /<span class="st"> </span><span class="kw">length</span>(x)
   }</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Create a function <code>pick()</code> that takes an index, <code>i</code>, as an argument and returns a function with an argument <code>x</code> that subsets <code>x</code> with <code>i</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lapply</span>(mtcars, <span class="kw">pick</span>(<span class="dv">5</span>))
 <span class="co"># should do the same as this</span>
-<span class="kw">lapply</span>(mtcars, <span class="cf">function</span>(x) x[[<span class="dv">5</span>]])</code></pre></div>
+<span class="kw">lapply</span>(mtcars, function(x) x[[<span class="dv">5</span>]])</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pick &lt;-<span class="st"> </span><span class="cf">function</span>(i){
-  <span class="cf">function</span>(x) x[[i]]
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pick &lt;-<span class="st"> </span>function(i){
+  function(x) x[[i]]
   }
 
 <span class="kw">stopifnot</span>(<span class="kw">identical</span>(<span class="kw">lapply</span>(mtcars, <span class="kw">pick</span>(<span class="dv">5</span>)),
-                    <span class="kw">lapply</span>(mtcars, <span class="cf">function</span>(x) x[[<span class="dv">5</span>]]))
+                    <span class="kw">lapply</span>(mtcars, function(x) x[[<span class="dv">5</span>]]))
           )</code></pre></div></li>
 </ol>
 </div>
@@ -346,35 +346,35 @@ x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1
 <span class="co"># double, logical, factor and date. By default they are set to NULL, but if you </span>
 <span class="co"># supply a list with functions, this will override the real default, for the</span>
 <span class="co"># specific type, which is set inside the function factory.</span>
-summary2 &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">character_functions =</span> <span class="ot">NULL</span>, <span class="dt">integer_functions =</span> <span class="ot">NULL</span>,
+summary2 &lt;-<span class="st"> </span>function(<span class="dt">character_functions =</span> <span class="ot">NULL</span>, <span class="dt">integer_functions =</span> <span class="ot">NULL</span>,
                      <span class="dt">double_functions =</span> <span class="ot">NULL</span>, <span class="dt">logical_functions =</span> <span class="ot">NULL</span>, 
                      <span class="dt">factor_functions =</span> <span class="ot">NULL</span>, <span class="dt">date_functions =</span> <span class="ot">NULL</span>){
 
   <span class="co"># The following functional will later be six times applied on the data frame,</span>
   <span class="co"># one time for every column type in the scope of our function</span>
-  apply_typefunction &lt;-<span class="st"> </span><span class="cf">function</span>(df, pred, functions){
+  apply_typefunction &lt;-<span class="st"> </span>function(df, pred, functions){
     <span class="kw">lapply</span>(df[<span class="kw">vapply</span>(df, pred, <span class="kw">logical</span>(<span class="dv">1</span>))],
-           <span class="cf">function</span>(x) <span class="kw">unlist</span>(<span class="kw">lapply</span>(functions, <span class="cf">function</span>(y) <span class="kw">y</span>(x))))
+           function(x) <span class="kw">unlist</span>(<span class="kw">lapply</span>(functions, function(y) <span class="kw">y</span>(x))))
   }
 
   <span class="co"># The following lists of functions are &quot;somehow&quot; similar to those, that are used</span>
   <span class="co"># by base::summary, so we define them once...</span>
-  default_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">Table =</span> table)
-  default_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">Min =</span> min, <span class="st">`</span><span class="dt">1st Qu.</span><span class="st">`</span> =<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">quantile</span>(x)[[<span class="dv">2</span>]],
+  default_1 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">Table =</span> table)
+  default_2 &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">Min =</span> min, <span class="st">`</span><span class="dt">1st Qu.</span><span class="st">`</span> =<span class="st"> </span>function(x) <span class="kw">quantile</span>(x)[[<span class="dv">2</span>]],
                     <span class="dt">Median =</span> median, <span class="dt">Mean =</span> mean,
-                    <span class="st">`</span><span class="dt">3rd Qu.</span><span class="st">`</span> =<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">quantile</span>(x)[[<span class="dv">4</span>]], <span class="dt">Max =</span> max)
+                    <span class="st">`</span><span class="dt">3rd Qu.</span><span class="st">`</span> =<span class="st"> </span>function(x) <span class="kw">quantile</span>(x)[[<span class="dv">4</span>]], <span class="dt">Max =</span> max)
 
   <span class="co"># All those function list, that are not specified, when calling the </span>
   <span class="co"># function factory, are now set to their default values</span>
-  <span class="cf">if</span>(<span class="kw">is.null</span>(character_functions)) {character_functions =<span class="st"> </span>default_<span class="dv">1</span>}
-  <span class="cf">if</span>(<span class="kw">is.null</span>(integer_functions))   {integer_functions   =<span class="st"> </span>default_<span class="dv">2</span>}
-  <span class="cf">if</span>(<span class="kw">is.null</span>(double_functions))    {double_functions    =<span class="st"> </span>default_<span class="dv">2</span>}
-  <span class="cf">if</span>(<span class="kw">is.null</span>(logical_functions))   {logical_functions   =<span class="st"> </span>default_<span class="dv">1</span>}
-  <span class="cf">if</span>(<span class="kw">is.null</span>(factor_functions))    {factor_functions    =<span class="st"> </span>default_<span class="dv">1</span>}
-  <span class="cf">if</span>(<span class="kw">is.null</span>(date_functions))      {date_functions      =<span class="st"> </span>default_<span class="dv">2</span>}
+  if(<span class="kw">is.null</span>(character_functions)) {character_functions =<span class="st"> </span>default_1}
+  if(<span class="kw">is.null</span>(integer_functions))   {integer_functions   =<span class="st"> </span>default_2}
+  if(<span class="kw">is.null</span>(double_functions))    {double_functions    =<span class="st"> </span>default_2}
+  if(<span class="kw">is.null</span>(logical_functions))   {logical_functions   =<span class="st"> </span>default_1}
+  if(<span class="kw">is.null</span>(factor_functions))    {factor_functions    =<span class="st"> </span>default_1}
+  if(<span class="kw">is.null</span>(date_functions))      {date_functions      =<span class="st"> </span>default_2}
 
   <span class="co"># Finally the returned function is created</span>
-  <span class="cf">function</span>(df){
+  function(df){
 
     <span class="co"># For every column type, the specific functions will be applied to the</span>
     <span class="co"># appropriate columns. </span>
@@ -384,7 +384,7 @@ summary2 &lt;-<span class="st"> </span><span class="cf">function</span>(<span cl
     logicals   &lt;-<span class="st"> </span><span class="kw">apply_typefunction</span>(df, is.logical  , logical_functions  )
 
     factors    &lt;-<span class="st"> </span><span class="kw">apply_typefunction</span>(df, is.factor   , factor_functions   )
-    dates      &lt;-<span class="st"> </span><span class="kw">apply_typefunction</span>(df, <span class="cf">function</span>(x) <span class="kw">inherits</span>(x, <span class="st">&#39;Date&#39;</span>), 
+    dates      &lt;-<span class="st"> </span><span class="kw">apply_typefunction</span>(df, function(x) <span class="kw">inherits</span>(x, <span class="st">&#39;Date&#39;</span>), 
                                      date_functions)
 
     <span class="co"># The results will be collected in a list and if empty lists appear, because</span>
@@ -393,7 +393,7 @@ summary2 &lt;-<span class="st"> </span><span class="cf">function</span>(<span cl
     <span class="co"># output, that we could do, but we think that the idea is more important for now</span>
     out &lt;-<span class="st"> </span><span class="kw">list</span>(characters, integers, doubles, logicals, 
             factors, dates)
-    out[<span class="kw">lengths</span>(out) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>]
+    out[<span class="kw">lengths</span>(out) !=<span class="st"> </span><span class="dv">0</span>]
   }
 }
 
@@ -425,15 +425,15 @@ summary2_default &lt;-<span class="st"> </span><span class="kw">summary2</span>(
 <span class="co">#&gt;               50               50               50</span>
 
 <span class="co"># Unfortunately, we will fail if there are any NAs in integer columns</span>
-df_nas &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">integers_na =</span> <span class="kw">c</span>(<span class="ot">NA</span>, <span class="dv">2</span><span class="op">:</span><span class="dv">19</span>))
+df_nas &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">integers_na =</span> <span class="kw">c</span>(<span class="ot">NA</span>, <span class="dv">2</span>:<span class="dv">19</span>))
 <span class="kw">summary2_default</span>(df_nas)
 <span class="co">#&gt; Error in quantile.default(x): missing values and NaN&#39;s not allowed if &#39;na.rm&#39; is FALSE</span>
 
 <span class="co"># But since, we can define new functions for integer columns, we can solve this</span>
 summary2_naversion &lt;-<span class="st"> </span><span class="kw">summary2</span>(<span class="dt">integer_functions =</span> <span class="kw">list</span>(
-  <span class="dt">Mean_na =</span> <span class="cf">function</span>(x) <span class="kw">mean</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
-  <span class="dt">Median_na =</span> <span class="cf">function</span>(x) <span class="kw">median</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
-  <span class="dt">NAs =</span> <span class="cf">function</span>(x) <span class="kw">sum</span>(<span class="kw">is.na</span>(x)))
+  <span class="dt">Mean_na =</span> function(x) <span class="kw">mean</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
+  <span class="dt">Median_na =</span> function(x) <span class="kw">median</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
+  <span class="dt">NAs =</span> function(x) <span class="kw">sum</span>(<span class="kw">is.na</span>(x)))
   )
 <span class="kw">summary2_naversion</span>(df_nas)
 <span class="co">#&gt; [[1]]</span>

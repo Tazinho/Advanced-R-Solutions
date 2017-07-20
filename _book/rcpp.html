@@ -25,7 +25,7 @@
 <meta name="author" content="Malte Grosser, Henning Bumann, Peter Hurford &amp; Robert Krzyzanowski">
 
 
-<meta name="date" content="2017-07-16">
+<meta name="date" content="2017-07-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -275,10 +275,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
   <span class="dt">int</span> n = x.size();
   <span class="dt">double</span> y = <span class="dv">0</span>;
 
-  <span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; ++i) {
+  <span class="kw">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; ++i) {
     y += x[i] / n;
   }
-  <span class="cf">return</span> y;
+  <span class="kw">return</span> y;
 }
 
 NumericVector f2(NumericVector x) {
@@ -286,43 +286,43 @@ NumericVector f2(NumericVector x) {
   NumericVector out(n);
 
   out[<span class="dv">0</span>] = x[<span class="dv">0</span>];
-  <span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">1</span>; i &lt; n; ++i) {
+  <span class="kw">for</span>(<span class="dt">int</span> i = <span class="dv">1</span>; i &lt; n; ++i) {
     out[i] = out[i - <span class="dv">1</span>] + x[i];
   }
-  <span class="cf">return</span> out;
+  <span class="kw">return</span> out;
 }
 
 <span class="dt">bool</span> f3(LogicalVector x) {
   <span class="dt">int</span> n = x.size();
 
-  <span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; ++i) {
-    <span class="cf">if</span> (x[i]) <span class="cf">return</span> <span class="kw">true</span>;
+  <span class="kw">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; ++i) {
+    <span class="kw">if</span> (x[i]) <span class="kw">return</span> <span class="kw">true</span>;
   }
-  <span class="cf">return</span> <span class="kw">false</span>;
+  <span class="kw">return</span> <span class="kw">false</span>;
 }
 
 <span class="dt">int</span> f4(Function pred, List x) {
   <span class="dt">int</span> n = x.size();
 
-  <span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; ++i) {
+  <span class="kw">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; ++i) {
     LogicalVector res = pred(x[i]);
-    <span class="cf">if</span> (res[<span class="dv">0</span>]) <span class="cf">return</span> i + <span class="dv">1</span>;
+    <span class="kw">if</span> (res[<span class="dv">0</span>]) <span class="kw">return</span> i + <span class="dv">1</span>;
   }
-  <span class="cf">return</span> <span class="dv">0</span>;
+  <span class="kw">return</span> <span class="dv">0</span>;
 }
 
 NumericVector f5(NumericVector x, NumericVector y) {
-  <span class="dt">int</span> n = <span class="bu">std::</span>max(x.size(), y.size());
+  <span class="dt">int</span> n = std::max(x.size(), y.size());
   NumericVector x1 = rep_len(x, n);
   NumericVector y1 = rep_len(y, n);
 
   NumericVector out(n);
 
-  <span class="cf">for</span> (<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; ++i) {
-    out[i] = <span class="bu">std::</span>min(x1[i], y1[i]);
+  <span class="kw">for</span> (<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; ++i) {
+    out[i] = std::min(x1[i], y1[i]);
   }
 
-  <span class="cf">return</span> out;
+  <span class="kw">return</span> out;
 }</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: The R equivalents are:</p>
 <ul>
@@ -355,8 +355,8 @@ int n =<span class="st"> </span><span class="kw">x.size</span>();
 NumericVector <span class="kw">out</span>(n);
 
 out[<span class="dv">0</span>] =<span class="st"> </span>x[<span class="dv">0</span>];
-<span class="cf">for</span>(int <span class="dt">i =</span> <span class="dv">1</span>; i <span class="op">&lt;</span><span class="st"> </span>n; <span class="op">++</span>i) {
-  out[i]  =<span class="st"> </span>out[i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>] <span class="op">*</span><span class="st"> </span>x[i];
+for(int <span class="dt">i =</span> <span class="dv">1</span>; i &lt;<span class="st"> </span>n; ++i) {
+  out[i]  =<span class="st"> </span>out[i -<span class="st"> </span><span class="dv">1</span>] *<span class="st"> </span>x[i];
 }
 return out;
 }<span class="st">&#39;)</span>
@@ -368,8 +368,8 @@ int n =<span class="st"> </span><span class="kw">x.size</span>();
 NumericVector <span class="kw">out</span>(n);
 
 out[<span class="dv">0</span>] =<span class="st"> </span>x[<span class="dv">0</span>];
-<span class="cf">for</span>(int <span class="dt">i =</span> <span class="dv">1</span>; i <span class="op">&lt;</span><span class="st"> </span>n; <span class="op">++</span>i) {
-  out[i]  =<span class="st"> </span>std<span class="op">::</span><span class="kw">min</span>(out[i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>], x[i]);
+for(int <span class="dt">i =</span> <span class="dv">1</span>; i &lt;<span class="st"> </span>n; ++i) {
+  out[i]  =<span class="st"> </span>std::<span class="kw">min</span>(out[i -<span class="st"> </span><span class="dv">1</span>], x[i]);
 }
 return out;
 }<span class="st">&#39;)</span>
@@ -380,8 +380,8 @@ int n =<span class="st"> </span><span class="kw">x.size</span>();
 NumericVector <span class="kw">out</span>(n);
 
 out[<span class="dv">0</span>] =<span class="st"> </span>x[<span class="dv">0</span>];
-<span class="cf">for</span>(int <span class="dt">i =</span> <span class="dv">1</span>; i <span class="op">&lt;</span><span class="st"> </span>n; <span class="op">++</span>i) {
-  out[i]  =<span class="st"> </span>std<span class="op">::</span><span class="kw">max</span>(out[i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>], x[i]);
+for(int <span class="dt">i =</span> <span class="dv">1</span>; i &lt;<span class="st"> </span>n; ++i) {
+  out[i]  =<span class="st"> </span>std::<span class="kw">max</span>(out[i -<span class="st"> </span><span class="dv">1</span>], x[i]);
 }
 return out;
 }<span class="st">&#39;)</span></code></pre></div>
@@ -671,37 +671,37 @@ return out;
 <span class="co">#include &lt;Rcpp.h&gt;</span>
 using namespace Rcpp;
 
-<span class="op">/</span><span class="er">/</span><span class="st"> </span>[[Rcpp<span class="op">::</span>export]]
+/<span class="er">/</span><span class="st"> </span>[[Rcpp::export]]
 double <span class="kw">medianC</span>(NumericVector x) {
   int n =<span class="st"> </span><span class="kw">x.size</span>();
   double out;
-  <span class="cf">if</span> (n % <span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){
-    std<span class="op">::</span><span class="kw">partial_sort</span> (<span class="kw">x.begin</span>(), <span class="kw">x.begin</span>() <span class="op">+</span><span class="st"> </span>n <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="kw">x.end</span>());
-    out =<span class="st"> </span>(x[n <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>x[n <span class="op">/</span><span class="st"> </span><span class="dv">2</span>]) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>;
-  } <span class="cf">else</span> {
-    std<span class="op">::</span><span class="kw">partial_sort</span> (<span class="kw">x.begin</span>(), <span class="kw">x.begin</span>() <span class="op">+</span><span class="st"> </span>(n <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>, <span class="kw">x.end</span>());
-    out =<span class="st"> </span>x[(n <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">1</span>];
+  if (n % <span class="dv">2</span> ==<span class="st"> </span><span class="dv">0</span>){
+    std::<span class="kw">partial_sort</span> (<span class="kw">x.begin</span>(), <span class="kw">x.begin</span>() +<span class="st"> </span>n /<span class="st"> </span><span class="dv">2</span> +<span class="st"> </span><span class="dv">1</span>, <span class="kw">x.end</span>());
+    out =<span class="st"> </span>(x[n /<span class="st"> </span><span class="dv">2</span> -<span class="st"> </span><span class="dv">1</span>] +<span class="st"> </span>x[n /<span class="st"> </span><span class="dv">2</span>]) /<span class="st"> </span><span class="dv">2</span>;
+  } else {
+    std::<span class="kw">partial_sort</span> (<span class="kw">x.begin</span>(), <span class="kw">x.begin</span>() +<span class="st"> </span>(n +<span class="st"> </span><span class="dv">1</span>) /<span class="st"> </span><span class="dv">2</span>, <span class="kw">x.end</span>());
+    out =<span class="st"> </span>x[(n +<span class="st"> </span><span class="dv">1</span>) /<span class="st"> </span><span class="dv">2</span> -<span class="st"> </span><span class="dv">1</span>];
   }
 
   return out;
 }</code></pre></div></li>
 <li><p><code>%in%</code> using <code>unordered_set</code> and the <code>find()</code> or <code>count()</code> methods.</p></li>
 <li><p><code>unique()</code> using an <code>unordered_set</code> (challenge: do it in one line!).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">/</span><span class="er">/</span><span class="st"> </span>[[Rcpp<span class="op">::</span><span class="kw">plugins</span>(cpp11)]]
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">/<span class="er">/</span><span class="st"> </span>[[Rcpp::<span class="kw">plugins</span>(cpp11)]]
 <span class="co">#include &lt;Rcpp.h&gt;</span>
 <span class="co">#include &lt;unordered_set&gt;</span>
 using namespace Rcpp;
 
-<span class="op">/</span><span class="er">/</span><span class="st"> </span>[[Rcpp<span class="op">::</span>export]]
+/<span class="er">/</span><span class="st"> </span>[[Rcpp::export]]
 NumericVector <span class="kw">uniqueC</span>(NumericVector x) {
-std<span class="op">::</span>unordered_set<span class="op">&lt;</span>int<span class="op">&gt;</span><span class="st"> </span>seen;
+std::unordered_set&lt;int&gt;<span class="st"> </span>seen;
 int n =<span class="st"> </span><span class="kw">x.size</span>();
 LogicalVector <span class="kw">dup</span>(n);
-std<span class="op">::</span>vector<span class="op">&lt;</span>double<span class="op">&gt;</span><span class="st"> </span>out;
+std::vector&lt;double&gt;<span class="st"> </span>out;
 
-<span class="cf">for</span> (int <span class="dt">i =</span> <span class="dv">0</span>; i <span class="op">&lt;</span><span class="st"> </span>n; <span class="op">++</span>i) {
-  dup[i] =<span class="st"> </span><span class="op">!</span><span class="kw">seen.insert</span>(x[i]).second;
-  <span class="cf">if</span> (<span class="op">!</span>dup[i]) {
+for (int <span class="dt">i =</span> <span class="dv">0</span>; i &lt;<span class="st"> </span>n; ++i) {
+  dup[i] =<span class="st"> </span>!<span class="kw">seen.insert</span>(x[i]).second;
+  if (!dup[i]) {
       <span class="kw">out.push_back</span>(x[i]);
   }
 }
@@ -712,13 +712,13 @@ return <span class="kw">wrap</span>(out);
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#include &lt;Rcpp.h&gt;</span>
 using namespace Rcpp;
 
-<span class="op">/</span><span class="er">/</span><span class="st"> </span>[[Rcpp<span class="op">::</span>export]]
+/<span class="er">/</span><span class="st"> </span>[[Rcpp::export]]
 double <span class="kw">minC</span>(NumericVector x){
   int n =<span class="st"> </span><span class="kw">x.size</span>();
   double out;
 
-  <span class="cf">for</span> (int <span class="dt">i =</span> <span class="dv">0</span>; i <span class="op">&lt;</span><span class="st"> </span>n; i<span class="op">++</span>){
-    out =<span class="st"> </span>std<span class="op">::</span><span class="kw">min</span>(out, x[i]);
+  for (int <span class="dt">i =</span> <span class="dv">0</span>; i &lt;<span class="st"> </span>n; i++){
+    out =<span class="st"> </span>std::<span class="kw">min</span>(out, x[i]);
   }
 
   return out;
@@ -730,11 +730,11 @@ double <span class="kw">minC</span>(NumericVector x){
 
 using namespace Rcpp;
 
-<span class="op">/</span><span class="er">/</span><span class="st"> </span>[[Rcpp<span class="op">::</span>export]]
+/<span class="er">/</span><span class="st"> </span>[[Rcpp::export]]
 double <span class="kw">which_minC</span>(NumericVector x){
   int out;
-  out =<span class="st"> </span>std<span class="op">::</span><span class="kw">distance</span>(<span class="kw">x.begin</span>(),std<span class="op">::</span><span class="kw">min_element</span>(<span class="kw">x.begin</span>(),<span class="kw">x.end</span>()));
-  out<span class="op">++</span>;
+  out =<span class="st"> </span>std::<span class="kw">distance</span>(<span class="kw">x.begin</span>(),std::<span class="kw">min_element</span>(<span class="kw">x.begin</span>(),<span class="kw">x.end</span>()));
+  out++;
 
   return out;
 }</code></pre></div></li>

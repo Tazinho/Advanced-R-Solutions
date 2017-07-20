@@ -25,7 +25,7 @@
 <meta name="author" content="Malte Grosser, Henning Bumann, Peter Hurford &amp; Robert Krzyzanowski">
 
 
-<meta name="date" content="2017-07-16">
+<meta name="date" content="2017-07-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -272,21 +272,21 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: There’s no existing base function that checks if an element is a valid component of an expression (i.e., it’s a constant, name, call, or pairlist). Implement one by guessing the names of the “is” functions for calls, names, and pairlists.</p>
 <p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">is.valid &lt;-<span class="st"> </span><span class="cf">function</span>(x){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">is.valid &lt;-<span class="st"> </span>function(x){
   out &lt;-<span class="st"> </span><span class="ot">FALSE</span>
-  <span class="cf">if</span>(<span class="kw">is.atomic</span>(x) <span class="op">&amp;</span><span class="st"> </span><span class="kw">length</span>(x) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>){out &lt;-<span class="st"> </span><span class="ot">TRUE</span>}
+  if(<span class="kw">is.atomic</span>(x) &amp;<span class="st"> </span><span class="kw">length</span>(x) ==<span class="st"> </span><span class="dv">1</span>){out &lt;-<span class="st"> </span><span class="ot">TRUE</span>}
   <span class="co"># another possibility to check for constants would be</span>
   <span class="co"># identical(x, substitute(x))</span>
-  <span class="cf">if</span>(<span class="kw">is.call</span>(x)){out &lt;-<span class="st"> </span><span class="ot">TRUE</span>}
-  <span class="cf">if</span>(<span class="kw">is.name</span>(x)){out &lt;-<span class="st"> </span><span class="ot">TRUE</span>}
-  <span class="cf">if</span>(<span class="kw">is.pairlist</span>(x)){out &lt;-<span class="st"> </span><span class="ot">TRUE</span>}
+  if(<span class="kw">is.call</span>(x)){out &lt;-<span class="st"> </span><span class="ot">TRUE</span>}
+  if(<span class="kw">is.name</span>(x)){out &lt;-<span class="st"> </span><span class="ot">TRUE</span>}
+  if(<span class="kw">is.pairlist</span>(x)){out &lt;-<span class="st"> </span><span class="ot">TRUE</span>}
   out
 }</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: <code>pryr::ast()</code> uses non-standard evaluation. What’s its escape hatch to standard evaluation?</p>
 <p><strong><span style="color:green">A</span></strong>: You can call <code>pryr::call_tree</code> directly.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What does the call tree of an if statement with multiple else conditions look like?</p>
 <p><strong><span style="color:green">A</span></strong>: It depends a little bit how it is written. Here the infix version:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pryr<span class="op">::</span><span class="kw">ast</span>(<span class="st">`</span><span class="dt">if</span><span class="st">`</span>(<span class="ot">FALSE</span>, <span class="st">&quot;first&quot;</span>,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pryr::<span class="kw">ast</span>(<span class="st">`</span><span class="dt">if</span><span class="st">`</span>(<span class="ot">FALSE</span>, <span class="st">&quot;first&quot;</span>,
                <span class="st">`</span><span class="dt">if</span><span class="st">`</span>(<span class="ot">TRUE</span>, <span class="st">&quot;second&quot;</span>,
                     <span class="st">`</span><span class="dt">if</span><span class="st">`</span>(<span class="ot">TRUE</span>, <span class="st">&quot;third&quot;</span>, <span class="st">&quot;fourth&quot;</span>))))
 <span class="co">#&gt; \- ()</span>
@@ -303,15 +303,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="co">#&gt;       \-  &quot;third&quot;</span>
 <span class="co">#&gt;       \-  &quot;fourth&quot;</span></code></pre></div>
 <p>And here the “normal” version:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pryr<span class="op">::</span><span class="kw">ast</span>(<span class="cf">if</span> (<span class="ot">FALSE</span>) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pryr::<span class="kw">ast</span>(if (<span class="ot">FALSE</span>) {
   <span class="st">&quot;first&quot;</span>
-  } <span class="cf">else</span> (
-    <span class="cf">if</span> (<span class="ot">TRUE</span>) {
+  } else (
+    if (<span class="ot">TRUE</span>) {
       <span class="st">&quot;second&quot;</span>
-      } <span class="cf">else</span> (
-        <span class="cf">if</span> (<span class="ot">TRUE</span>) {
+      } else (
+        if (<span class="ot">TRUE</span>) {
           <span class="st">&quot;third&quot;</span>
-          } <span class="cf">else</span> (
+          } else (
             <span class="st">&quot;fourth&quot;</span>
             )
         )
@@ -346,7 +346,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p><strong><span style="color:green">A</span></strong>: Comparison of the syntax trees:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># for ast(x + y %+% z)</span>
 <span class="co"># y %+% z will be calculated first and the result will be added to x</span>
-pryr<span class="op">::</span><span class="kw">ast</span>(x <span class="op">+</span><span class="st"> </span>y <span class="op">%+%</span><span class="st"> </span>z)
+pryr::<span class="kw">ast</span>(x +<span class="st"> </span>y %+%<span class="st"> </span>z)
 <span class="co">#&gt; \- ()</span>
 <span class="co">#&gt;   \- `+</span>
 <span class="co">#&gt;   \- `x</span>
@@ -357,7 +357,7 @@ pryr<span class="op">::</span><span class="kw">ast</span>(x <span class="op">+</
 
 <span class="co"># for ast(x ^ y %+% z)</span>
 <span class="co"># x^y will be calculated first, and the result will be used as first argument of `%+%()`</span>
-pryr<span class="op">::</span><span class="kw">ast</span>(x <span class="op">^</span><span class="st"> </span>y <span class="op">%+%</span><span class="st"> </span>z)
+pryr::<span class="kw">ast</span>(x ^<span class="st"> </span>y %+%<span class="st"> </span>z)
 <span class="co">#&gt; \- ()</span>
 <span class="co">#&gt;   \- `%+%</span>
 <span class="co">#&gt;   \- ()</span>
@@ -369,7 +369,7 @@ pryr<span class="op">::</span><span class="kw">ast</span>(x <span class="op">^</
 <li><p><strong><span style="color:red">Q</span></strong>: Why can’t an expression contain an atomic vector of length greater than one? Which one of the six types of atomic vector can’t appear in an expression? Why?</p>
 <p><strong><span style="color:green">A</span></strong>: Because you can’t type an expression that evaluates to an atomic of greater length than one without using a function, which means that these expressions would be calls. Also raws can’t appear in expressions, because of a similar reason. We think they are impossible to construct without using <code>as.raw</code>, which would mean that we will also end up with a call.</p>
 <p>Note also that imaginary parts of complex numbers work:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pryr<span class="op">::</span><span class="kw">ast</span>(1i)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pryr::<span class="kw">ast</span>(1i)
 <span class="co">#&gt; \-  0+1i</span></code></pre></div></li>
 </ol>
 </div>
@@ -377,21 +377,21 @@ pryr<span class="op">::</span><span class="kw">ast</span>(x <span class="op">^</
 <h2><span class="header-section-number">11.2</span> Names</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: You can use <code>formals()</code> to both get and set the arguments of a function. Use <code>formals()</code> to modify the following function so that the default value of <code>x</code> is missing and <code>y</code> is 10.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">g &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">x =</span> <span class="dv">20</span>, y) {
-  x <span class="op">+</span><span class="st"> </span>y
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">g &lt;-<span class="st"> </span>function(<span class="dt">x =</span> <span class="dv">20</span>, y) {
+  x +<span class="st"> </span>y
 }</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">formals</span>(g) &lt;-<span class="st"> </span><span class="kw">alist</span>(<span class="dt">x =</span> , <span class="dt">y =</span> <span class="dv">10</span>)</code></pre></div>
 <p>Similarly one can change the body of the function through <code>body&lt;-()</code> and also the environment via <code>environment&lt;-()</code>.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Write an equivalent to <code>get()</code> using <code>as.name()</code> and <code>eval()</code>. Write an equivalent to <code>assign()</code> using <code>as.name()</code>, <code>substitute()</code>, and <code>eval()</code>. (Don’t worry about the multiple ways of choosing an environment; assume that the user supplies it explicitly.)</p>
 <p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">get3 &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">env =</span> <span class="kw">parent.frame</span>()){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">get3 &lt;-<span class="st"> </span>function(x, <span class="dt">env =</span> <span class="kw">parent.frame</span>()){
   <span class="kw">eval</span>(<span class="kw">as.name</span>(x), env)
 }
 
-assign3 &lt;-<span class="st"> </span><span class="cf">function</span>(x, value, env) {
+assign3 &lt;-<span class="st"> </span>function(x, value, env) {
   <span class="kw">eval</span>(<span class="kw">substitute</span>(x &lt;-<span class="st"> </span>value,<span class="kw">list</span>(<span class="dt">x =</span> <span class="kw">as.name</span>(x), <span class="dt">value =</span> value)), env)
-  <span class="cf">if</span> (<span class="kw">length</span>(x) <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>)
+  if (<span class="kw">length</span>(x) &gt;<span class="st"> </span><span class="dv">1</span>)
     <span class="kw">warning</span>(<span class="st">&#39;only the first element is used as variable name&#39;</span>)
 }</code></pre></div></li>
 </ol>
@@ -400,9 +400,9 @@ assign3 &lt;-<span class="st"> </span><span class="cf">function</span>(x, value,
 <h2><span class="header-section-number">11.3</span> Calls</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: The following two calls look the same, but are actually different:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(a &lt;-<span class="st"> </span><span class="kw">call</span>(<span class="st">&quot;mean&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(a &lt;-<span class="st"> </span><span class="kw">call</span>(<span class="st">&quot;mean&quot;</span>, <span class="dv">1</span>:<span class="dv">10</span>))
 <span class="co">#&gt; mean(1:10)</span>
-(b &lt;-<span class="st"> </span><span class="kw">call</span>(<span class="st">&quot;mean&quot;</span>, <span class="kw">quote</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)))
+(b &lt;-<span class="st"> </span><span class="kw">call</span>(<span class="st">&quot;mean&quot;</span>, <span class="kw">quote</span>(<span class="dv">1</span>:<span class="dv">10</span>)))
 <span class="co">#&gt; mean(1:10)</span>
 <span class="kw">identical</span>(a, b)
 <span class="co">#&gt; [1] FALSE</span></code></pre></div>
@@ -427,16 +427,16 @@ assign3 &lt;-<span class="st"> </span><span class="cf">function</span>(x, value,
 h &lt;-<span class="st"> </span><span class="kw">call</span>(<span class="st">&quot;mean&quot;</span>, <span class="kw">quote</span>(z))
 <span class="co"># eval(h)</span>
 ##&gt; Error in mean(z) : object &#39;z&#39; not found
-z &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">10</span>
+z &lt;-<span class="st"> </span><span class="dv">1</span>:<span class="dv">10</span>
 <span class="kw">eval</span>(h)
 <span class="co">#&gt; [1] 5.5</span></code></pre></div>
 <p>From my intuition I would prefer the second version, since it behaves more like lazy evaluation, but I am not sure if this is the correct answer as indended by the exercise.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Implement a pure R version of <code>do.call()</code>.</p>
 <p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">do.call2 &lt;-<span class="st"> </span><span class="cf">function</span>(what, args, <span class="dt">quote =</span> <span class="ot">FALSE</span>, <span class="dt">env =</span> <span class="kw">parent.frame</span>()){
-  <span class="cf">if</span>(<span class="op">!</span><span class="kw">is.list</span>(args))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">do.call2 &lt;-<span class="st"> </span>function(what, args, <span class="dt">quote =</span> <span class="ot">FALSE</span>, <span class="dt">env =</span> <span class="kw">parent.frame</span>()){
+  if(!<span class="kw">is.list</span>(args))
     <span class="kw">stop</span>(<span class="st">&quot;second argument must be a list&quot;</span>)
-  <span class="cf">if</span> (quote) 
+  if (quote) 
     args &lt;-<span class="st"> </span><span class="kw">lapply</span>(args, enquote)
   <span class="kw">eval</span>(<span class="kw">as.call</span>(<span class="kw">c</span>(what, args)), env)
 }</code></pre></div></li>
@@ -444,7 +444,7 @@ z &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</spa
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">concat</span>(<span class="kw">quote</span>(f), <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">b =</span> <span class="kw">quote</span>(<span class="kw">mean</span>(a)))
 <span class="co">#&gt; f(a = 1, b = mean(a))</span></code></pre></div>
 <p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">concat &lt;-<span class="st"> </span><span class="cf">function</span>(f, ...){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">concat &lt;-<span class="st"> </span>function(f, ...){
   <span class="kw">as.call</span>(<span class="kw">c</span>(f, <span class="kw">list</span>(...)))
 }
 <span class="kw">concat</span>(<span class="kw">quote</span>(f), <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">b =</span> <span class="kw">quote</span>(<span class="kw">mean</span>(a)))
@@ -455,7 +455,7 @@ z &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</spa
 <span class="kw">make_call</span>(<span class="kw">quote</span>(mean), <span class="kw">quote</span>(x), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
 <span class="co">#&gt; mean(x, na.rm = TRUE)</span></code></pre></div>
 <p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">make_call &lt;-<span class="st"> </span><span class="cf">function</span>(x, ...){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">make_call &lt;-<span class="st"> </span>function(x, ...){
   <span class="kw">as.call</span>(<span class="kw">c</span>(x, ...))
 }
 
@@ -465,63 +465,63 @@ z &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</spa
 <span class="co">#&gt; mean(x, na.rm = TRUE)</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: How does <code>mode&lt;-</code> work? How does it use <code>call()</code>?</p>
 <p><strong><span style="color:green">A</span></strong>: We can explain it best, when we comment the source code:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">function</span> (x) 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">function (x) 
   {
   <span class="co"># when x is an expression, mode will(x) return &quot;expression&quot;</span>
-  <span class="cf">if</span> (<span class="kw">is.expression</span>(x)) 
+  if (<span class="kw">is.expression</span>(x)) 
     <span class="kw">return</span>(<span class="st">&quot;expression&quot;</span>)
   <span class="co"># when x is a call (or language, which is exactly the same), the first element </span>
   <span class="co"># of the call will be coerced to character. </span>
   <span class="co"># If the call is an autoprinting (like in quote((1))), mode will return &quot;(&quot;.</span>
   <span class="co"># For any other call, mode will return &quot;call&quot; </span>
-  <span class="cf">if</span> (<span class="kw">is.call</span>(x)) 
-    <span class="kw">return</span>(<span class="cf">switch</span>(<span class="kw">deparse</span>(x[[1L]])[1L], <span class="st">`</span><span class="dt">(</span><span class="st">`</span> =<span class="st"> &quot;(&quot;</span>, <span class="st">&quot;call&quot;</span>))
+  if (<span class="kw">is.call</span>(x)) 
+    <span class="kw">return</span>(switch(<span class="kw">deparse</span>(x[[1L]])[1L], <span class="st">`</span><span class="dt">(</span><span class="st">`</span> =<span class="st"> &quot;(&quot;</span>, <span class="st">&quot;call&quot;</span>))
   <span class="co"># if x is a name (or a symbol, which is exactly the same), then mode will return &quot;name&quot;</span>
-  <span class="cf">if</span> (<span class="kw">is.name</span>(x)) 
+  if (<span class="kw">is.name</span>(x)) 
     <span class="st">&quot;name&quot;</span>
   <span class="co"># otherwise, mode will return dependent on typeof(x). If typeof(x) is double or integer, </span>
   <span class="co"># mode will return &quot;numeric&quot;. If typeof(x) is closure, builtin or special, mode(x) will</span>
   <span class="co"># return &quot;function&quot;. And in all other cases, mode will just return typeof(x)</span>
-  <span class="cf">else</span> <span class="cf">switch</span>(tx &lt;-<span class="st"> </span><span class="kw">typeof</span>(x), <span class="dt">double =</span> , <span class="dt">integer =</span> <span class="st">&quot;numeric&quot;</span>, 
+  else switch(tx &lt;-<span class="st"> </span><span class="kw">typeof</span>(x), <span class="dt">double =</span> , <span class="dt">integer =</span> <span class="st">&quot;numeric&quot;</span>, 
               <span class="dt">closure =</span> , <span class="dt">builtin =</span> , <span class="dt">special =</span> <span class="st">&quot;function&quot;</span>, tx)
   }
-<span class="op">&lt;</span>bytecode<span class="op">:</span><span class="st"> </span><span class="dv">0x000000000c4e66e0</span><span class="op">&gt;</span>
-<span class="st">  </span><span class="er">&lt;</span>environment<span class="op">:</span><span class="st"> </span>namespace<span class="op">:</span>base<span class="op">&gt;</span></code></pre></div>
+&lt;bytecode:<span class="st"> </span><span class="dv">0x000000000c4e66e0</span>&gt;
+<span class="st">  </span><span class="er">&lt;</span>environment:<span class="st"> </span>namespace:base&gt;</code></pre></div>
 <p>As commented above, <code>mode()</code> uses <code>is.call()</code> to distinguish autoprint- and “normal” calls with the help of a separate <code>switch()</code>.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Read the source for <code>pryr::standardise_call()</code>. How does it work? Why is <code>is.primitive()</code> needed?</p>
 <p><strong><span style="color:green">A</span></strong>: It evaluates the first element of the call, which is usually the name of a function, but can also be another call. Then is uses <code>match.call()</code> to get the standard names for all the arguments.</p>
 <p><code>is.primitive()</code> is used as an escape to just return the call instead of using <code>match.call()</code> if the function passed is a primitive. This is done because <code>match.call()</code> does not work for primitives.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: <code>standardise_call()</code> doesn’t work so well for the following calls. Why?</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(pryr)
-<span class="kw">standardise_call</span>(<span class="kw">quote</span>(<span class="kw">mean</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)))
+<span class="kw">standardise_call</span>(<span class="kw">quote</span>(<span class="kw">mean</span>(<span class="dv">1</span>:<span class="dv">10</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)))
 <span class="co">#&gt; mean(x = 1:10, na.rm = TRUE)</span>
-<span class="kw">standardise_call</span>(<span class="kw">quote</span>(<span class="kw">mean</span>(<span class="dt">n =</span> T, <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)))
+<span class="kw">standardise_call</span>(<span class="kw">quote</span>(<span class="kw">mean</span>(<span class="dt">n =</span> T, <span class="dv">1</span>:<span class="dv">10</span>)))
 <span class="co">#&gt; mean(x = 1:10, n = T)</span>
-<span class="kw">standardise_call</span>(<span class="kw">quote</span>(<span class="kw">mean</span>(<span class="dt">x =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, , <span class="ot">TRUE</span>)))
+<span class="kw">standardise_call</span>(<span class="kw">quote</span>(<span class="kw">mean</span>(<span class="dt">x =</span> <span class="dv">1</span>:<span class="dv">10</span>, , <span class="ot">TRUE</span>)))
 <span class="co">#&gt; mean(x = 1:10, , TRUE)</span></code></pre></div>
 <p><strong><span style="color:green">A</span></strong>:</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Read the documentation for <code>pryr::modify_call()</code>. How do you think it works? Read the source code.</p>
 <p><strong><span style="color:green">A</span></strong>: Again, we explain by commenting the source</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">function</span> (call, new_args) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">function (call, new_args) {
   <span class="co"># check if call is a call and new_args is a list</span>
   <span class="kw">stopifnot</span>(<span class="kw">is.call</span>(call), <span class="kw">is.list</span>(new_args))
   <span class="co"># standardise the call</span>
   call &lt;-<span class="st"> </span><span class="kw">standardise_call</span>(call)
   <span class="co"># check if the supplied new_args list has any unnamed elements.</span>
   <span class="co"># if so, an error occurs.</span>
-  nms &lt;-<span class="st"> </span><span class="kw">names</span>(new_args) <span class="op">%||%</span><span class="st"> </span><span class="kw">rep</span>(<span class="st">&quot;&quot;</span>, <span class="kw">length</span>(new_args))
-  <span class="cf">if</span> (<span class="kw">any</span>(nms <span class="op">==</span><span class="st"> &quot;&quot;</span>)) {
+  nms &lt;-<span class="st"> </span><span class="kw">names</span>(new_args) %||%<span class="st"> </span><span class="kw">rep</span>(<span class="st">&quot;&quot;</span>, <span class="kw">length</span>(new_args))
+  if (<span class="kw">any</span>(nms ==<span class="st"> &quot;&quot;</span>)) {
     <span class="kw">stop</span>(<span class="st">&quot;All new arguments must be named&quot;</span>, <span class="dt">call. =</span> <span class="ot">FALSE</span>)
     }
   <span class="co"># every name element of the call, for which a new argument was supplied by the user,</span>
   <span class="co"># becomes overwritten</span>
-  <span class="cf">for</span> (nm <span class="cf">in</span> nms) {
+  for (nm in nms) {
     call[[nm]] &lt;-<span class="st"> </span>new_args[[nm]]
     }
   <span class="co"># finally the modified call is returned</span>
   call
 }
-<span class="op">&lt;</span>environment<span class="op">:</span><span class="st"> </span>namespace<span class="op">:</span>pryr<span class="op">&gt;</span></code></pre></div></li>
+&lt;environment:<span class="st"> </span>namespace:pryr&gt;</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Use <code>ast()</code> and experimentation to figure out the three arguments in an <code>if()</code> call. Which components are required? What are the arguments to the <code>for()</code> and <code>while()</code> calls?</p>
 <p><strong><span style="color:green">A</span></strong>:</p>
 <p><strong>if:</strong></p>
@@ -533,7 +533,7 @@ z &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</spa
 <span class="co"># pryr::ast(if(TRUE))</span>
 
 ## This is the minimum required
-pryr<span class="op">::</span><span class="kw">ast</span>(<span class="cf">if</span>(<span class="ot">TRUE</span>){<span class="dv">1</span>})
+pryr::<span class="kw">ast</span>(if(<span class="ot">TRUE</span>){<span class="dv">1</span>})
 <span class="co">#&gt; \- ()</span>
 <span class="co">#&gt;   \- `if</span>
 <span class="co">#&gt;   \-  TRUE</span>
@@ -542,8 +542,8 @@ pryr<span class="op">::</span><span class="kw">ast</span>(<span class="cf">if</s
 <span class="co">#&gt;     \-  1</span>
 
 ## One can also supply an alternative expression
-pryr<span class="op">::</span><span class="kw">ast</span>(<span class="cf">if</span>(<span class="ot">TRUE</span>){}
-          <span class="cf">else</span> {<span class="dv">3</span>})
+pryr::<span class="kw">ast</span>(if(<span class="ot">TRUE</span>){}
+          else {<span class="dv">3</span>})
 <span class="co">#&gt; \- ()</span>
 <span class="co">#&gt;   \- `if</span>
 <span class="co">#&gt;   \-  TRUE</span>
@@ -559,7 +559,7 @@ pryr<span class="op">::</span><span class="kw">ast</span>(<span class="cf">if</s
 <span class="co">#           else {3})</span>
 
 <span class="co"># So this is how if basically works</span>
-pryr<span class="op">::</span><span class="kw">ast</span>(<span class="cf">if</span>(cond)expr)
+pryr::<span class="kw">ast</span>(if(cond)expr)
 <span class="co">#&gt; \- ()</span>
 <span class="co">#&gt;   \- `if</span>
 <span class="co">#&gt;   \- `cond</span>
@@ -584,7 +584,7 @@ pryr<span class="op">::</span><span class="kw">ast</span>(<span class="cf">if</s
 <span class="co"># pryr::ast(for(in 10){})</span>
 
 ## This is the minimum required
-pryr<span class="op">::</span><span class="kw">ast</span>(<span class="cf">for</span>(var <span class="cf">in</span> <span class="dv">10</span>){})
+pryr::<span class="kw">ast</span>(for(var in <span class="dv">10</span>){})
 <span class="co">#&gt; \- ()</span>
 <span class="co">#&gt;   \- `for</span>
 <span class="co">#&gt;   \- `var</span>
@@ -593,7 +593,7 @@ pryr<span class="op">::</span><span class="kw">ast</span>(<span class="cf">for</
 <span class="co">#&gt;     \- `{</span>
 
 ## So this is how for basically works
-pryr<span class="op">::</span><span class="kw">ast</span>(<span class="cf">for</span>(var <span class="cf">in</span> seq)expr)
+pryr::<span class="kw">ast</span>(for(var in seq)expr)
 <span class="co">#&gt; \- ()</span>
 <span class="co">#&gt;   \- `for</span>
 <span class="co">#&gt;   \- `var</span>
@@ -602,13 +602,13 @@ pryr<span class="op">::</span><span class="kw">ast</span>(<span class="cf">for</
 
 ## And here within a call (note that we need quote, since var has to be a nanme
 ## and expr has to be an expression)
-<span class="kw">eval</span>(<span class="kw">call</span>(<span class="st">&quot;for&quot;</span>, <span class="dt">var =</span> <span class="kw">quote</span>(i), <span class="dt">seq =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dt">expr =</span> <span class="kw">quote</span>(<span class="kw">print</span>(i))))
+<span class="kw">eval</span>(<span class="kw">call</span>(<span class="st">&quot;for&quot;</span>, <span class="dt">var =</span> <span class="kw">quote</span>(i), <span class="dt">seq =</span> <span class="dv">1</span>:<span class="dv">3</span>, <span class="dt">expr =</span> <span class="kw">quote</span>(<span class="kw">print</span>(i))))
 <span class="co">#&gt; [1] 1</span>
 <span class="co">#&gt; [1] 2</span>
 <span class="co">#&gt; [1] 3</span>
 
 ## as infix function it looks a little bit easier
-<span class="st">`</span><span class="dt">for</span><span class="st">`</span>(i, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="kw">print</span>(i))
+<span class="st">`</span><span class="dt">for</span><span class="st">`</span>(i, <span class="dv">1</span>:<span class="dv">3</span>, <span class="kw">print</span>(i))
 <span class="co">#&gt; [1] 1</span>
 <span class="co">#&gt; [1] 2</span>
 <span class="co">#&gt; [1] 3</span></code></pre></div>
@@ -622,14 +622,14 @@ pryr<span class="op">::</span><span class="kw">ast</span>(<span class="cf">for</
 <span class="co"># pryr::ast(while(TRUE){})</span>
 
 ## This is the minimum required
-pryr<span class="op">::</span><span class="kw">ast</span>(<span class="cf">while</span>(<span class="ot">TRUE</span>)<span class="dv">1</span>)
+pryr::<span class="kw">ast</span>(while(<span class="ot">TRUE</span>)<span class="dv">1</span>)
 <span class="co">#&gt; \- ()</span>
 <span class="co">#&gt;   \- `while</span>
 <span class="co">#&gt;   \-  TRUE</span>
 <span class="co">#&gt;   \-  1</span>
 
 ## So this is how while basically works
-pryr<span class="op">::</span><span class="kw">ast</span>(<span class="cf">while</span>(cond)expr)
+pryr::<span class="kw">ast</span>(while(cond)expr)
 <span class="co">#&gt; \- ()</span>
 <span class="co">#&gt;   \- `while</span>
 <span class="co">#&gt;   \- `cond</span>
@@ -660,13 +660,13 @@ pryr<span class="op">::</span><span class="kw">ast</span>(<span class="cf">while
 <li><p><strong><span style="color:red">Q</span></strong>: Read the documentation and source code for <code>pryr::partial()</code>. What does it do? How does it work? Read the documentation and source code for <code>pryr::unenclose()</code>. What does it do and how does it work?</p>
 <p><strong><span style="color:green">A</span></strong>:</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: The actual implementation of <code>curve()</code> looks more like</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">curve3 &lt;-<span class="st"> </span><span class="cf">function</span>(expr, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="dt">n =</span> <span class="dv">100</span>,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">curve3 &lt;-<span class="st"> </span>function(expr, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="dt">n =</span> <span class="dv">100</span>,
                    <span class="dt">env =</span> <span class="kw">parent.frame</span>()) {
   env2 &lt;-<span class="st"> </span><span class="kw">new.env</span>(<span class="dt">parent =</span> env)
-  env2<span class="op">$</span>x &lt;-<span class="st"> </span><span class="kw">seq</span>(xlim[<span class="dv">1</span>], xlim[<span class="dv">2</span>], <span class="dt">length =</span> n)
+  env2$x &lt;-<span class="st"> </span><span class="kw">seq</span>(xlim[<span class="dv">1</span>], xlim[<span class="dv">2</span>], <span class="dt">length =</span> n)
 
   y &lt;-<span class="st"> </span><span class="kw">eval</span>(<span class="kw">substitute</span>(expr), env2)
-  <span class="kw">plot</span>(env2<span class="op">$</span>x, y, <span class="dt">type =</span> <span class="st">&quot;l&quot;</span>, 
+  <span class="kw">plot</span>(env2$x, y, <span class="dt">type =</span> <span class="st">&quot;l&quot;</span>, 
     <span class="dt">ylab =</span> <span class="kw">deparse</span>(<span class="kw">substitute</span>(expr)))
 }</code></pre></div>
 <p>How does this approach differ from <code>curve2()</code> defined above?</p>
@@ -694,8 +694,8 @@ pryr<span class="op">::</span><span class="kw">ast</span>(<span class="cf">while
 <li><p><strong><span style="color:red">Q</span></strong>: Why does <code>logical_abbr()</code> use a for loop instead of a functional like <code>lapply()</code>?</p>
 <p><strong><span style="color:green">A</span></strong>:</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: <code>logical_abbr()</code> works when given quoted objects, but doesn’t work when given an existing function, as in the example below. Why not? How could you modify <code>logical_abbr()</code> to work with functions? Think about what components make up a function.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">x =</span> <span class="ot">TRUE</span>) {
-  <span class="kw">g</span>(x <span class="op">+</span><span class="st"> </span>T)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span>function(<span class="dt">x =</span> <span class="ot">TRUE</span>) {
+  <span class="kw">g</span>(x +<span class="st"> </span>T)
 }
 <span class="kw">logical_abbr</span>(f)</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>:</p></li>

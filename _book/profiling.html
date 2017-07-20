@@ -25,7 +25,7 @@
 <meta name="author" content="Malte Grosser, Henning Bumann, Peter Hurford &amp; Robert Krzyzanowski">
 
 
-<meta name="date" content="2017-07-16">
+<meta name="date" content="2017-07-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -273,12 +273,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><p><strong><span style="color:red">Q</span></strong>: What are faster alternatives to <code>lm</code>? Which are specifically designed to work with larger datasets?</p>
 <p><strong><span style="color:green">A</span></strong>: Within the <a href="https://cran.rstudio.com/web/views/">Cran task view</a> for <a href="https://cran.rstudio.com/web/views/HighPerformanceComputing.html">HighPerformanceComputing</a> we can find for example the <code>speedglm</code> package and it’s <code>speedlm()</code> function. We might not gain any performance improvements on small datasets:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">stopifnot</span>(<span class="kw">all.equal</span>(
-  <span class="kw">coef</span>(speedglm<span class="op">::</span><span class="kw">speedlm</span>(Sepal.Length <span class="op">~</span><span class="st"> </span>Sepal.Width <span class="op">+</span><span class="st"> </span>Species, <span class="dt">data =</span> iris)),
-  <span class="kw">coef</span>(<span class="kw">lm</span>(Sepal.Length <span class="op">~</span><span class="st"> </span>Sepal.Width <span class="op">+</span><span class="st"> </span>Species, <span class="dt">data =</span> iris))))
+  <span class="kw">coef</span>(speedglm::<span class="kw">speedlm</span>(Sepal.Length ~<span class="st"> </span>Sepal.Width +<span class="st"> </span>Species, <span class="dt">data =</span> iris)),
+  <span class="kw">coef</span>(<span class="kw">lm</span>(Sepal.Length ~<span class="st"> </span>Sepal.Width +<span class="st"> </span>Species, <span class="dt">data =</span> iris))))
 
-microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
-  speedglm<span class="op">::</span><span class="kw">speedlm</span>(Sepal.Length <span class="op">~</span><span class="st"> </span>Sepal.Width <span class="op">+</span><span class="st"> </span>Species, <span class="dt">data =</span> iris),
-  <span class="kw">lm</span>(Sepal.Length <span class="op">~</span><span class="st"> </span>Sepal.Width <span class="op">+</span><span class="st"> </span>Species, <span class="dt">data =</span> iris)
+microbenchmark::<span class="kw">microbenchmark</span>(
+  speedglm::<span class="kw">speedlm</span>(Sepal.Length ~<span class="st"> </span>Sepal.Width +<span class="st"> </span>Species, <span class="dt">data =</span> iris),
+  <span class="kw">lm</span>(Sepal.Length ~<span class="st"> </span>Sepal.Width +<span class="st"> </span>Species, <span class="dt">data =</span> iris)
 )
 <span class="co">#&gt; Unit: microseconds</span>
 <span class="co">#&gt;                                                                  expr</span>
@@ -291,16 +291,16 @@ microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">eps &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100000</span>)
 x1 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100000</span>, <span class="dv">5</span>, <span class="dv">3</span>)
 x2 &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>), <span class="dv">50000</span>)
-y &lt;-<span class="st"> </span><span class="dv">7</span> <span class="op">*</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>(x2 <span class="op">==</span><span class="st"> &quot;a&quot;</span>) <span class="op">+</span><span class="st"> </span>eps
+y &lt;-<span class="st"> </span><span class="dv">7</span> *<span class="st"> </span>x1 +<span class="st"> </span>(x2 ==<span class="st"> &quot;a&quot;</span>) +<span class="st"> </span>eps
 td &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">y =</span> y, <span class="dt">x1 =</span> x1, <span class="dt">x2 =</span> x2, <span class="dt">eps =</span> eps)
 
 <span class="kw">stopifnot</span>(<span class="kw">all.equal</span>(
-  <span class="kw">coef</span>(speedglm<span class="op">::</span><span class="kw">speedlm</span>(y <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>x2, <span class="dt">data =</span> td)),
-  <span class="kw">coef</span>(<span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>x2, <span class="dt">data =</span> td))))
+  <span class="kw">coef</span>(speedglm::<span class="kw">speedlm</span>(y ~<span class="st"> </span>x1 +<span class="st"> </span>x2, <span class="dt">data =</span> td)),
+  <span class="kw">coef</span>(<span class="kw">lm</span>(y ~<span class="st"> </span>x1 +<span class="st"> </span>x2, <span class="dt">data =</span> td))))
 
-microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
-  speedglm<span class="op">::</span><span class="kw">speedlm</span>(y <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>x2, <span class="dt">data =</span> td),
-  <span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>x2, <span class="dt">data =</span> td)
+microbenchmark::<span class="kw">microbenchmark</span>(
+  speedglm::<span class="kw">speedlm</span>(y ~<span class="st"> </span>x1 +<span class="st"> </span>x2, <span class="dt">data =</span> td),
+  <span class="kw">lm</span>(y ~<span class="st"> </span>x1 +<span class="st"> </span>x2, <span class="dt">data =</span> td)
 )
 <span class="co">#&gt; Unit: milliseconds</span>
 <span class="co">#&gt;                                       expr      min       lq      mean</span>
@@ -318,14 +318,14 @@ microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
 <li><p><strong><span style="color:red">Q</span></strong>: What package implements a version of <code>match()</code> that’s faster for repeated lookups? How much faster is it?</p>
 <p><strong><span style="color:green">A</span></strong>: Again google gives a good recommendation for the searchterm <a href="http://stackoverflow.com/questions/32934933/faster-in-operator">r faster match</a>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1</span>)
-table &lt;-<span class="st"> </span>1L<span class="op">:</span>100000L
+table &lt;-<span class="st"> </span>1L:100000L
 x &lt;-<span class="st"> </span><span class="kw">sample</span>(table, <span class="dv">10000</span>, <span class="dt">replace=</span><span class="ot">TRUE</span>)
 
-<span class="kw">stopifnot</span>(<span class="kw">all.equal</span>(<span class="kw">match</span>(x, table), fastmatch<span class="op">::</span><span class="kw">fmatch</span>(x, table)))
+<span class="kw">stopifnot</span>(<span class="kw">all.equal</span>(<span class="kw">match</span>(x, table), fastmatch::<span class="kw">fmatch</span>(x, table)))
 
-microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
+microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">match</span>(x, table),
-  fastmatch<span class="op">::</span><span class="kw">fmatch</span>(x, table)
+  fastmatch::<span class="kw">fmatch</span>(x, table)
 )
 <span class="co">#&gt; Unit: microseconds</span>
 <span class="co">#&gt;                         expr       min         lq       mean     median</span>
@@ -344,24 +344,24 @@ microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
 <ul>
 <li><code>zoo</code></li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">zoo<span class="op">::</span><span class="kw">rollmean</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dv">2</span>, <span class="dt">na.pad =</span> <span class="ot">TRUE</span>, <span class="dt">align =</span> <span class="st">&quot;left&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">zoo::<span class="kw">rollmean</span>(<span class="dv">1</span>:<span class="dv">10</span>, <span class="dv">2</span>, <span class="dt">na.pad =</span> <span class="ot">TRUE</span>, <span class="dt">align =</span> <span class="st">&quot;left&quot;</span>)
 <span class="co">#&gt;  [1] 1.5 2.5 3.5 4.5 5.5 6.5 7.5 8.5 9.5  NA</span>
-zoo<span class="op">::</span><span class="kw">rollapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dv">2</span>, mean, <span class="dt">fill =</span> <span class="ot">NA</span>, <span class="dt">align =</span> <span class="st">&quot;left&quot;</span>)
+zoo::<span class="kw">rollapply</span>(<span class="dv">1</span>:<span class="dv">10</span>, <span class="dv">2</span>, mean, <span class="dt">fill =</span> <span class="ot">NA</span>, <span class="dt">align =</span> <span class="st">&quot;left&quot;</span>)
 <span class="co">#&gt;  [1] 1.5 2.5 3.5 4.5 5.5 6.5 7.5 8.5 9.5  NA</span></code></pre></div>
 <ul>
 <li><code>TTR</code></li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">TTR<span class="op">::</span><span class="kw">SMA</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dv">2</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">TTR::<span class="kw">SMA</span>(<span class="dv">1</span>:<span class="dv">10</span>, <span class="dv">2</span>)
 <span class="co">#&gt;  [1]  NA 1.5 2.5 3.5 4.5 5.5 6.5 7.5 8.5 9.5</span></code></pre></div>
 <ul>
 <li><code>RcppRoll</code></li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">RcppRoll<span class="op">::</span><span class="kw">roll_mean</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dt">n =</span> <span class="dv">2</span>, <span class="dt">fill =</span> <span class="ot">NA</span>, <span class="dt">align =</span> <span class="st">&quot;left&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">RcppRoll::<span class="kw">roll_mean</span>(<span class="dv">1</span>:<span class="dv">10</span>, <span class="dt">n =</span> <span class="dv">2</span>, <span class="dt">fill =</span> <span class="ot">NA</span>, <span class="dt">align =</span> <span class="st">&quot;left&quot;</span>)
 <span class="co">#&gt;  [1] 1.5 2.5 3.5 4.5 5.5 6.5 7.5 8.5 9.5  NA</span></code></pre></div>
 <ul>
 <li><code>caTools</code></li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">caTools<span class="op">::</span><span class="kw">runmean</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dt">k =</span> <span class="dv">2</span>, <span class="dt">endrule =</span> <span class="st">&quot;NA&quot;</span>, <span class="dt">align =</span> <span class="st">&quot;left&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">caTools::<span class="kw">runmean</span>(<span class="dv">1</span>:<span class="dv">10</span>, <span class="dt">k =</span> <span class="dv">2</span>, <span class="dt">endrule =</span> <span class="st">&quot;NA&quot;</span>, <span class="dt">align =</span> <span class="st">&quot;left&quot;</span>)
 <span class="co">#&gt;  [1] 1.5 2.5 3.5 4.5 5.5 6.5 7.5 8.5 9.5  NA</span></code></pre></div>
 <p>Note that an exhaustive example on how to create a rolling mean function is provided in the <a href="http://adv-r.had.co.nz/Functionals.html">textbook</a>.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What are the alternatives to <code>optim()</code>?</p>
@@ -374,7 +374,7 @@ zoo<span class="op">::</span><span class="kw">rollapply</span>(<span class="dv">
 <li><p><strong><span style="color:red">Q</span></strong>: How do the results change if you compare <code>mean()</code> and <code>mean.default()</code> on 10,000 observations, rather than on 100?</p>
 <p><strong><span style="color:green">A</span></strong>: We start with 100 observations as shown in the textbook:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="fl">1e2</span>)
-microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
+microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">mean</span>(x),
   <span class="kw">mean.default</span>(x)
 )
@@ -384,7 +384,7 @@ microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
 <span class="co">#&gt;  mean.default(x)  733  734 1103.85   1100 1101  3666   100  a</span></code></pre></div>
 <p>In case of 10000 observations we can observe that using <code>mean.default()</code> preserves only a small advantage over the use of <code>mean()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="fl">1e4</span>)
-microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
+microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">mean</span>(x),
   <span class="kw">mean.default</span>(x),
   <span class="dt">unit =</span> <span class="st">&quot;ns&quot;</span>
@@ -395,7 +395,7 @@ microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
 <span class="co">#&gt;  mean.default(x) 17228 17595 19157.02  17596 17962 122433   100   a</span></code></pre></div>
 <p>When using even more observations - like in the next lines - it seems that <code>mean.default</code> doesn’t preserve anymore any advantage at all:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="fl">1e6</span>)
-microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
+microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">mean</span>(x),
   <span class="kw">mean.default</span>(x),
   <span class="dt">unit =</span> <span class="st">&quot;ns&quot;</span>
@@ -405,12 +405,12 @@ microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
 <span class="co">#&gt;          mean(x) 1736402 1769759 1885408 1870563 1949923 2489318   100   a</span>
 <span class="co">#&gt;  mean.default(x) 1713675 1786620 1880863 1870196 1956705 2330597   100   a</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: The following code provides an alternative implementation of <code>rowSums()</code>. Why is it faster for this input?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rowSums2 &lt;-<span class="st"> </span><span class="cf">function</span>(df) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rowSums2 &lt;-<span class="st"> </span>function(df) {
   out &lt;-<span class="st"> </span>df[[1L]]
-  <span class="cf">if</span> (<span class="kw">ncol</span>(df) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="kw">return</span>(out)
+  if (<span class="kw">ncol</span>(df) ==<span class="st"> </span><span class="dv">1</span>) <span class="kw">return</span>(out)
 
-  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="op">:</span><span class="kw">ncol</span>(df)) {
-    out &lt;-<span class="st"> </span>out <span class="op">+</span><span class="st"> </span>df[[i]]
+  for (i in <span class="dv">2</span>:<span class="kw">ncol</span>(df)) {
+    out &lt;-<span class="st"> </span>out +<span class="st"> </span>df[[i]]
   }
   out
 }
@@ -464,22 +464,22 @@ df &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(
 <span class="co">#&gt; &lt;environment: namespace:base&gt;</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Make a faster version of <code>chisq.test()</code> that only computes the chi-square test statistic when the input is two numeric vectors with no missing values. You can try simplifying <code>chisq.test()</code> or by coding from the <a href="http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test">mathematical definition</a>.</p>
 <p><strong><span style="color:green">A</span></strong>: Since <code>chisq.test()</code> has a relatively long source code, we try a new implementation from scratch:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">chisq.test2 &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">chisq.test2 &lt;-<span class="st"> </span>function(x, y){
 
   <span class="co"># Input</span>
-  <span class="cf">if</span>(<span class="op">!</span><span class="kw">is.numeric</span>(x)){
+  if(!<span class="kw">is.numeric</span>(x)){
     <span class="kw">stop</span>(<span class="st">&quot;x must be numeric&quot;</span>)}
-  <span class="cf">if</span>(<span class="op">!</span><span class="kw">is.numeric</span>(y)){
+  if(!<span class="kw">is.numeric</span>(y)){
     <span class="kw">stop</span>(<span class="st">&quot;y must be numeric&quot;</span>)}
-  <span class="cf">if</span>(<span class="kw">length</span>(x) <span class="op">!=</span><span class="st"> </span><span class="kw">length</span>(y)){
+  if(<span class="kw">length</span>(x) !=<span class="st"> </span><span class="kw">length</span>(y)){
     <span class="kw">stop</span>(<span class="st">&quot;x and y must have the same length&quot;</span>)}
-  <span class="cf">if</span>(<span class="kw">length</span>(x) <span class="op">&lt;=</span><span class="st"> </span><span class="dv">1</span>){
+  if(<span class="kw">length</span>(x) &lt;=<span class="st"> </span><span class="dv">1</span>){
     <span class="kw">stop</span>(<span class="st">&quot;length of x must be greater one&quot;</span>)}
-  <span class="cf">if</span>(<span class="kw">any</span>(<span class="kw">c</span>(x,y) <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>)){
+  if(<span class="kw">any</span>(<span class="kw">c</span>(x,y) &lt;<span class="st"> </span><span class="dv">0</span>)){
     <span class="kw">stop</span>(<span class="st">&quot;all entries of x and y must be greater or equal zero&quot;</span>)}
-  <span class="cf">if</span>(<span class="kw">sum</span>(<span class="kw">complete.cases</span>(x, y)) <span class="op">!=</span><span class="st"> </span><span class="kw">length</span>(x)){
+  if(<span class="kw">sum</span>(<span class="kw">complete.cases</span>(x, y)) !=<span class="st"> </span><span class="kw">length</span>(x)){
     <span class="kw">stop</span>(<span class="st">&quot;there must be no missing values in x and y&quot;</span>)}
-  <span class="cf">if</span>(<span class="kw">any</span>(<span class="kw">is.null</span>(<span class="kw">c</span>(x,y)))){
+  if(<span class="kw">any</span>(<span class="kw">is.null</span>(<span class="kw">c</span>(x,y)))){
     <span class="kw">stop</span>(<span class="st">&quot;entries of x and y must not be NULL&quot;</span>)}
 
   <span class="co"># Help variables</span>
@@ -487,17 +487,17 @@ df &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(
   margin1 &lt;-<span class="st"> </span><span class="kw">rowSums</span>(m)
   margin2 &lt;-<span class="st"> </span><span class="kw">colSums</span>(m)
   n &lt;-<span class="st"> </span><span class="kw">sum</span>(m)
-  me &lt;-<span class="st"> </span><span class="kw">tcrossprod</span>(margin1, margin2) <span class="op">/</span><span class="st"> </span>n
+  me &lt;-<span class="st"> </span><span class="kw">tcrossprod</span>(margin1, margin2) /<span class="st"> </span>n
 
   <span class="co"># Output</span>
-  x_stat =<span class="st"> </span><span class="kw">sum</span>((m <span class="op">-</span><span class="st"> </span>me)<span class="op">^</span><span class="dv">2</span> <span class="op">/</span><span class="st"> </span>me)
-  dof &lt;-<span class="st"> </span>(<span class="kw">length</span>(margin1) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>(<span class="kw">length</span>(margin2) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)
+  x_stat =<span class="st"> </span><span class="kw">sum</span>((m -<span class="st"> </span>me)^<span class="dv">2</span> /<span class="st"> </span>me)
+  dof &lt;-<span class="st"> </span>(<span class="kw">length</span>(margin1) -<span class="st"> </span><span class="dv">1</span>) *<span class="st"> </span>(<span class="kw">length</span>(margin2) -<span class="st"> </span><span class="dv">1</span>)
   p &lt;-<span class="st"> </span><span class="kw">pchisq</span>(x_stat, <span class="dt">df =</span> dof, <span class="dt">lower.tail =</span> <span class="ot">FALSE</span>)
 
   <span class="kw">return</span>(<span class="kw">list</span>(<span class="dt">x_stat =</span> x_stat, <span class="dt">df =</span> dof, <span class="st">`</span><span class="dt">p-value</span><span class="st">`</span> =<span class="st"> </span>p))
 }</code></pre></div>
 <p>We check if our new implementation returns the same results</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="dv">21</span><span class="op">:</span><span class="dv">25</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="dv">21</span>:<span class="dv">25</span>
 b &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">21</span>,<span class="dv">23</span>,<span class="dv">25</span>,<span class="dv">27</span>,<span class="dv">29</span>)
 m_test &lt;-<span class="st"> </span><span class="kw">cbind</span>(a, b)
 
@@ -517,9 +517,9 @@ m_test &lt;-<span class="st"> </span><span class="kw">cbind</span>(a, b)
 <span class="co">#&gt; $`p-value`</span>
 <span class="co">#&gt; [1] 0.9968937</span></code></pre></div>
 <p>Finally we benchmark this implementation against a compiled version of itself and the original <code>stats::chisq.test()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">chisq.test2c &lt;-<span class="st"> </span>compiler<span class="op">::</span><span class="kw">cmpfun</span>(chisq.test2)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">chisq.test2c &lt;-<span class="st"> </span>compiler::<span class="kw">cmpfun</span>(chisq.test2)
 
-microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
+microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">chisq.test</span>(m_test),
   <span class="kw">chisq.test2</span>(a, b),
   <span class="kw">chisq.test2c</span>(a, b)
@@ -539,7 +539,7 @@ microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="fl">1e6</span>
 df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">a =</span> <span class="kw">rnorm</span>(n), <span class="dt">b =</span> <span class="kw">rnorm</span>(n))
 
-cor_df &lt;-<span class="st"> </span><span class="cf">function</span>(df, n) {
+cor_df &lt;-<span class="st"> </span>function(df, n) {
   i &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">seq</span>(n), n, <span class="dt">replace =</span> <span class="ot">FALSE</span> )
   <span class="kw">cor</span>(df[i, , <span class="dt">drop =</span> <span class="ot">FALSE</span>])[<span class="dv">2</span>,<span class="dv">1</span>]
   <span class="co"># note also that in the last line the textbook says q[] instead of df[]. Since</span>
@@ -556,7 +556,7 @@ cor_df &lt;-<span class="st"> </span><span class="cf">function</span>(df, n) {
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="fl">1e6</span>
 df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">a =</span> <span class="kw">rnorm</span>(n), <span class="dt">b =</span> <span class="kw">rnorm</span>(n))</code></pre></div>
 <p>Remember the outgoing function:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cor_df &lt;-<span class="st"> </span><span class="cf">function</span>() {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cor_df &lt;-<span class="st"> </span>function() {
   i &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">seq</span>(n), n, <span class="dt">replace =</span> <span class="ot">FALSE</span>)
   <span class="kw">cor</span>(df[i, , <span class="dt">drop =</span> <span class="ot">FALSE</span>])[<span class="dv">2</span>,<span class="dv">1</span>]
 }</code></pre></div>
@@ -564,36 +564,36 @@ df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class=
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">i &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">seq</span>(n), n)</code></pre></div>
 <p>Then we define our approaches, check that their behaviour is correct and do the first benchmark:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># old version</span>
-cor_v1 &lt;-<span class="st"> </span><span class="cf">function</span>() {
+cor_v1 &lt;-<span class="st"> </span>function() {
   <span class="kw">cor</span>(df[i, , <span class="dt">drop =</span> <span class="ot">FALSE</span>])[<span class="dv">2</span>,<span class="dv">1</span>]
 }
 
 <span class="co"># cbind instead of internal as.matrix</span>
-cor_v2 &lt;-<span class="st"> </span><span class="cf">function</span>() {
-  m &lt;-<span class="st"> </span><span class="kw">cbind</span>(df<span class="op">$</span>a[i], df<span class="op">$</span>b[i])
+cor_v2 &lt;-<span class="st"> </span>function() {
+  m &lt;-<span class="st"> </span><span class="kw">cbind</span>(df$a[i], df$b[i])
   <span class="kw">cor</span>(m)[<span class="dv">2</span>, <span class="dv">1</span>]
 }
 
 <span class="co"># cbind + vector subsetting of the output matrix</span>
-cor_v3 &lt;-<span class="st"> </span><span class="cf">function</span>() {
-  m &lt;-<span class="st"> </span><span class="kw">cbind</span>(df<span class="op">$</span>a[i], df<span class="op">$</span>b[i])
+cor_v3 &lt;-<span class="st"> </span>function() {
+  m &lt;-<span class="st"> </span><span class="kw">cbind</span>(df$a[i], df$b[i])
   <span class="kw">cor</span>(m)[<span class="dv">2</span>]
 }
 
 <span class="co"># Use vector input within the cor function, so that no conversion is needed</span>
-cor_v4 &lt;-<span class="st"> </span><span class="cf">function</span>() {
-  <span class="kw">cor</span>(df<span class="op">$</span>a[i], df<span class="op">$</span>b[i])
+cor_v4 &lt;-<span class="st"> </span>function() {
+  <span class="kw">cor</span>(df$a[i], df$b[i])
 }
 
 <span class="co"># check if all return the same result</span>
 cor_list &lt;-<span class="st"> </span><span class="kw">list</span>(cor_v1, cor_v2, cor_v3, cor_v4)
-ulapply &lt;-<span class="st"> </span><span class="cf">function</span>(X, FUN, ...) <span class="kw">unlist</span>(<span class="kw">lapply</span>(X, FUN, ...))
-<span class="kw">ulapply</span>(cor_list, <span class="cf">function</span>(x) <span class="kw">identical</span>(<span class="kw">x</span>(), <span class="kw">cor_v1</span>()))
+ulapply &lt;-<span class="st"> </span>function(X, FUN, ...) <span class="kw">unlist</span>(<span class="kw">lapply</span>(X, FUN, ...))
+<span class="kw">ulapply</span>(cor_list, function(x) <span class="kw">identical</span>(<span class="kw">x</span>(), <span class="kw">cor_v1</span>()))
 <span class="co">#&gt; [1] TRUE TRUE TRUE TRUE</span>
 
 <span class="co"># benchmark</span>
 <span class="kw">set.seed</span>(<span class="dv">1</span>)
-microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
+microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">cor_v1</span>(),
   <span class="kw">cor_v2</span>(),
   <span class="kw">cor_v3</span>(),
@@ -611,13 +611,13 @@ microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
 <span class="co">#&gt;   b </span>
 <span class="co">#&gt;  a</span></code></pre></div>
 <p>According to the resulting medians, lower and upper quartiles of our benchmark all three new versions seem to provide more or less the same speed benefit (note that the maximum and mean can vary a lot for these approaches). Since the second version is most similar to the code we started, we implement this line into a second version of <code>cor_df()</code> (if this sounds too arbitrary, note that in the final solution we will come back to the vector input version anyway) and do a benchmark to get the overall speedup:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cor_df2 &lt;-<span class="st"> </span><span class="cf">function</span>() {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cor_df2 &lt;-<span class="st"> </span>function() {
   i &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">seq</span>(n), n)
-  m &lt;-<span class="st"> </span><span class="kw">cbind</span>(df<span class="op">$</span>a[i], df<span class="op">$</span>b[i])
+  m &lt;-<span class="st"> </span><span class="kw">cbind</span>(df$a[i], df$b[i])
   <span class="kw">cor</span>(m)[<span class="dv">2</span>, <span class="dv">1</span>]
 }
 
-microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
+microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">cor_df</span>(),
   <span class="kw">cor_df2</span>()
 )
@@ -631,7 +631,7 @@ microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
 <p>Now we can focus on a speedup for the random generation of indices. (Note that a run of linepfrof suggests to optimize <code>cbind()</code>. However, after rewriting <code>cor()</code> to a version that only works with vector input, this step will be unnecessary anyway). We could try differnt approaches for the sequence generation within <code>sample()</code> (like <code>seq(n)</code>, <code>seq.int(n)</code>, <code>seq_len(n)</code>, <code>a:n</code>) and a direct call of <code>sample.int()</code>. In the following, we will see, that <code>sample.int()</code> is always faster (since we don’t include the generation of the sequence into our benchmark). When we look into <code>sample.int()</code> we see that it calls two different internal sample versions depending on the input. Since in our usecase always the second version will be called, we also provide this version in our benchmark:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">seq_n &lt;-<span class="st"> </span><span class="kw">seq</span>(n)
 
-microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
+microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">sample</span>(seq_n, n),
   <span class="kw">sample.int</span>(n, n),
   <span class="kw">.Internal</span>(<span class="kw">sample</span>(n, n, <span class="dt">replace =</span> <span class="ot">FALSE</span>, <span class="dt">prob =</span> <span class="ot">NULL</span>))
@@ -646,13 +646,13 @@ microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
 <span class="co">#&gt;  20.49919 18.41036 22.72442 39.22095   100  a </span>
 <span class="co">#&gt;  20.18159 18.53957 21.33441 37.93359   100  a</span></code></pre></div>
 <p>The <code>sample.int()</code> versions give clearly the biggest improvement. Since the internal version doesn’t provide any clear improvement, but restricts the general scope of our function, we choose to implement <code>sample.int()</code> in a third version of <code>cor_df()</code> and benchmark our actual achievements:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cor_df3 &lt;-<span class="st"> </span><span class="cf">function</span>() {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cor_df3 &lt;-<span class="st"> </span>function() {
   i &lt;-<span class="st"> </span><span class="kw">sample.int</span>(n, n)
-  m &lt;-<span class="st"> </span><span class="kw">cbind</span>(df<span class="op">$</span>a[i], df<span class="op">$</span>b[i])
+  m &lt;-<span class="st"> </span><span class="kw">cbind</span>(df$a[i], df$b[i])
   <span class="kw">cor</span>(m)[<span class="dv">2</span>, <span class="dv">1</span>]
 }
 
-microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
+microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">cor_df</span>(),
   <span class="kw">cor_df2</span>(),
   <span class="kw">cor_df3</span>()
@@ -669,45 +669,45 @@ microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
 <p>As a last step, we try to speedup the calculation of the pearson correlation coefficient. Since quite a lot of functionality is build into the <code>stats::cor()</code> function this seems like a reasonable approach. We try this by working with another <code>cor()</code> function from the <code>WGNA</code> package and an own implementation which should give a small improvement, because we use <code>sum(x) / length(x)</code> instead of <code>mean(x)</code> for internal calculations:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#WGCNA version (matrix and vector). Note that I don&#39;t use a local setup which uses</span>
 <span class="co">#the full potential of this function. For furter information see ?WGCNA::cor</span>
-cor_df4m &lt;-<span class="st"> </span><span class="cf">function</span>() {
+cor_df4m &lt;-<span class="st"> </span>function() {
   i &lt;-<span class="st"> </span><span class="kw">sample.int</span>(n, n)
-  m &lt;-<span class="st"> </span><span class="kw">cbind</span>(df<span class="op">$</span>a[i], df<span class="op">$</span>b[i])
-  WGCNA<span class="op">::</span><span class="kw">cor</span>(m)[<span class="dv">2</span>]
+  m &lt;-<span class="st"> </span><span class="kw">cbind</span>(df$a[i], df$b[i])
+  WGCNA::<span class="kw">cor</span>(m)[<span class="dv">2</span>]
 }
 
-cor_df4v &lt;-<span class="st"> </span><span class="cf">function</span>() {
+cor_df4v &lt;-<span class="st"> </span>function() {
   i &lt;-<span class="st"> </span><span class="kw">sample.int</span>(n, n)
-  WGCNA<span class="op">::</span><span class="kw">cor</span>(df<span class="op">$</span>a[i], df<span class="op">$</span>b[i], <span class="dt">quick =</span> <span class="dv">1</span>)[<span class="dv">1</span>]
+  WGCNA::<span class="kw">cor</span>(df$a[i], df$b[i], <span class="dt">quick =</span> <span class="dv">1</span>)[<span class="dv">1</span>]
 }
 
 <span class="co">#New implementation of underlying cor function</span>
 <span class="co">#A definition can be found for example here</span>
 <span class="co">#http://www.socscistatistics.com/tests/pearson/</span>
-cor2 &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){
-  xm &lt;-<span class="st"> </span><span class="kw">sum</span>(x) <span class="op">/</span><span class="st"> </span><span class="kw">length</span>(x)
-  ym &lt;-<span class="st"> </span><span class="kw">sum</span>(y) <span class="op">/</span><span class="st"> </span><span class="kw">length</span>(y)
-  x_xm &lt;-<span class="st"> </span>x <span class="op">-</span><span class="st"> </span>xm
-  y_ym &lt;-<span class="st"> </span>y <span class="op">-</span><span class="st"> </span>ym
-  numerator &lt;-<span class="st"> </span><span class="kw">sum</span>((x_xm) <span class="op">*</span><span class="st"> </span>(y_ym))
-  denominator &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">sum</span>(x_xm<span class="op">^</span><span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">sum</span>(y_ym<span class="op">^</span><span class="dv">2</span>))
-  <span class="kw">return</span>(numerator <span class="op">/</span><span class="st"> </span>denominator)
+cor2 &lt;-<span class="st"> </span>function(x, y){
+  xm &lt;-<span class="st"> </span><span class="kw">sum</span>(x) /<span class="st"> </span><span class="kw">length</span>(x)
+  ym &lt;-<span class="st"> </span><span class="kw">sum</span>(y) /<span class="st"> </span><span class="kw">length</span>(y)
+  x_xm &lt;-<span class="st"> </span>x -<span class="st"> </span>xm
+  y_ym &lt;-<span class="st"> </span>y -<span class="st"> </span>ym
+  numerator &lt;-<span class="st"> </span><span class="kw">sum</span>((x_xm) *<span class="st"> </span>(y_ym))
+  denominator &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">sum</span>(x_xm^<span class="dv">2</span>)) *<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">sum</span>(y_ym^<span class="dv">2</span>))
+  <span class="kw">return</span>(numerator /<span class="st"> </span>denominator)
 }
 
-cor2 &lt;-<span class="st"> </span>compiler<span class="op">::</span><span class="kw">cmpfun</span>(cor2)
+cor2 &lt;-<span class="st"> </span>compiler::<span class="kw">cmpfun</span>(cor2)
 
-cor_df5 &lt;-<span class="st"> </span><span class="cf">function</span>() {
+cor_df5 &lt;-<span class="st"> </span>function() {
   i &lt;-<span class="st"> </span><span class="kw">sample.int</span>(n, n)
-  <span class="kw">cor2</span>(df<span class="op">$</span>a[i], df<span class="op">$</span>b[i])
+  <span class="kw">cor2</span>(df$a[i], df$b[i])
 }</code></pre></div>
 <p>In our final benchmark, we also include compiled verions of all our attempts:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cor_df_c &lt;-<span class="st"> </span>compiler<span class="op">::</span><span class="kw">cmpfun</span>(cor_df)
-cor_df2_c &lt;-<span class="st"> </span>compiler<span class="op">::</span><span class="kw">cmpfun</span>(cor_df2)
-cor_df3_c &lt;-<span class="st"> </span>compiler<span class="op">::</span><span class="kw">cmpfun</span>(cor_df3)
-cor_df4m_c &lt;-<span class="st"> </span>compiler<span class="op">::</span><span class="kw">cmpfun</span>(cor_df4m)
-cor_df4v_c &lt;-<span class="st"> </span>compiler<span class="op">::</span><span class="kw">cmpfun</span>(cor_df4v)
-cor_df5_c &lt;-<span class="st"> </span>compiler<span class="op">::</span><span class="kw">cmpfun</span>(cor_df5)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cor_df_c &lt;-<span class="st"> </span>compiler::<span class="kw">cmpfun</span>(cor_df)
+cor_df2_c &lt;-<span class="st"> </span>compiler::<span class="kw">cmpfun</span>(cor_df2)
+cor_df3_c &lt;-<span class="st"> </span>compiler::<span class="kw">cmpfun</span>(cor_df3)
+cor_df4m_c &lt;-<span class="st"> </span>compiler::<span class="kw">cmpfun</span>(cor_df4m)
+cor_df4v_c &lt;-<span class="st"> </span>compiler::<span class="kw">cmpfun</span>(cor_df4v)
+cor_df5_c &lt;-<span class="st"> </span>compiler::<span class="kw">cmpfun</span>(cor_df5)
 
-microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
+microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">cor_df</span>(),
   <span class="kw">cor_df2</span>(),
   <span class="kw">cor_df3</span>(),
@@ -759,30 +759,30 @@ microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
 <span class="co">#&gt; [1] -0.001441277</span></code></pre></div>
 <p>Vectorisation of this problem seems rather difficult, since attempts of using matrix calculus, always depend on building and handling big matrices in the first place.</p>
 <p>We can for example rewrite our correlation function to work with matrices and build a new (vectorised) version of <code>cor_df()</code> on top of that</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cor2m &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cor2m &lt;-<span class="st"> </span>function(x, y){
   n_row &lt;-<span class="st"> </span><span class="kw">nrow</span>(x)
-  xm &lt;-<span class="st"> </span><span class="kw">colSums</span>(x) <span class="op">/</span><span class="st"> </span>n_row
-  ym &lt;-<span class="st"> </span><span class="kw">colSums</span>(y) <span class="op">/</span><span class="st"> </span>n_row
-  x_xm &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">t</span>(x) <span class="op">-</span><span class="st"> </span>xm)
-  y_ym &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">t</span>(y) <span class="op">-</span><span class="st"> </span>ym)
-  numerator &lt;-<span class="st"> </span><span class="kw">colSums</span>((x_xm) <span class="op">*</span><span class="st"> </span>(y_ym))
-  denominator &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">colSums</span>(x_xm<span class="op">^</span><span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">colSums</span>(y_ym<span class="op">^</span><span class="dv">2</span>))
-  <span class="kw">return</span>(numerator <span class="op">/</span><span class="st"> </span>denominator)
+  xm &lt;-<span class="st"> </span><span class="kw">colSums</span>(x) /<span class="st"> </span>n_row
+  ym &lt;-<span class="st"> </span><span class="kw">colSums</span>(y) /<span class="st"> </span>n_row
+  x_xm &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">t</span>(x) -<span class="st"> </span>xm)
+  y_ym &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">t</span>(y) -<span class="st"> </span>ym)
+  numerator &lt;-<span class="st"> </span><span class="kw">colSums</span>((x_xm) *<span class="st"> </span>(y_ym))
+  denominator &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">colSums</span>(x_xm^<span class="dv">2</span>)) *<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">colSums</span>(y_ym^<span class="dv">2</span>))
+  <span class="kw">return</span>(numerator /<span class="st"> </span>denominator)
 }
 
-cor_df_v &lt;-<span class="st"> </span><span class="cf">function</span>(i){
+cor_df_v &lt;-<span class="st"> </span>function(i){
   indices &lt;-<span class="st"> </span><span class="kw">replicate</span>(i, <span class="kw">sample.int</span>(n, n), <span class="dt">simplify =</span> <span class="st">&quot;array&quot;</span>)
-  x &lt;-<span class="st"> </span><span class="kw">matrix</span>(df<span class="op">$</span>a[indices], <span class="dt">ncol =</span> i)
-  y &lt;-<span class="st"> </span><span class="kw">matrix</span>(df<span class="op">$</span>b[indices], <span class="dt">ncol =</span> i)
+  x &lt;-<span class="st"> </span><span class="kw">matrix</span>(df$a[indices], <span class="dt">ncol =</span> i)
+  y &lt;-<span class="st"> </span><span class="kw">matrix</span>(df$b[indices], <span class="dt">ncol =</span> i)
   <span class="kw">cor2m</span>(x, y)
 }
-cor_df_v &lt;-<span class="st"> </span>compiler<span class="op">::</span><span class="kw">cmpfun</span>(cor_df_v)</code></pre></div>
+cor_df_v &lt;-<span class="st"> </span>compiler::<span class="kw">cmpfun</span>(cor_df_v)</code></pre></div>
 <p>However this still doesn’t provide any improvement over the use of <code>lapply()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ulapply2 &lt;-<span class="st"> </span><span class="cf">function</span>(X, FUN, ...) <span class="kw">unlist</span>(<span class="kw">lapply</span>(X, FUN, ...), <span class="dt">use.names =</span> <span class="ot">FALSE</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ulapply2 &lt;-<span class="st"> </span>function(X, FUN, ...) <span class="kw">unlist</span>(<span class="kw">lapply</span>(X, FUN, ...), <span class="dt">use.names =</span> <span class="ot">FALSE</span>)
 
-microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(
+microbenchmark::<span class="kw">microbenchmark</span>(
   <span class="kw">cor_df5_c</span>(),
-  <span class="kw">ulapply2</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>, <span class="cf">function</span>(x) <span class="kw">cor_df5_c</span>()),
+  <span class="kw">ulapply2</span>(<span class="dv">1</span>:<span class="dv">100</span>, function(x) <span class="kw">cor_df5_c</span>()),
   <span class="kw">cor_df_v</span>(<span class="dv">100</span>)
 )
 <span class="co">#&gt; Unit: milliseconds</span>
@@ -813,33 +813,33 @@ rnorm(n, mean = 0, sd = 1).</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(microbenchmark)
 dimensions &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1e0</span>, <span class="fl">1e1</span>, <span class="fl">1e2</span>, <span class="fl">1e3</span>, <span class="fl">0.5e4</span>, <span class="fl">1e4</span>)
 matrices &lt;-<span class="st">  </span><span class="kw">lapply</span>(dimensions,
-                <span class="cf">function</span>(x) <span class="kw">tcrossprod</span>(<span class="kw">rnorm</span>(x), <span class="kw">rnorm</span>(x)))
+                function(x) <span class="kw">tcrossprod</span>(<span class="kw">rnorm</span>(x), <span class="kw">rnorm</span>(x)))
 
 bench_rs &lt;-<span class="st"> </span><span class="kw">lapply</span>(matrices,
-                   <span class="cf">function</span>(x) <span class="kw">fivenum</span>(<span class="kw">microbenchmark</span>(<span class="kw">rowSums</span>(x),
-                                                      <span class="dt">unit =</span> <span class="st">&quot;ns&quot;</span>)<span class="op">$</span>time))
+                   function(x) <span class="kw">fivenum</span>(<span class="kw">microbenchmark</span>(<span class="kw">rowSums</span>(x),
+                                                      <span class="dt">unit =</span> <span class="st">&quot;ns&quot;</span>)$time))
 bench_rs &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">time =</span> <span class="kw">unlist</span>(bench_rs), 
                        <span class="dt">call =</span> <span class="st">&quot;rowSums&quot;</span>,
                        <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)
 
 bench_apply &lt;-<span class="st"> </span><span class="kw">lapply</span>(matrices,
-                      <span class="cf">function</span>(x) <span class="kw">fivenum</span>(<span class="kw">microbenchmark</span>(<span class="kw">apply</span>(x, <span class="dv">1</span>, sum),
-                                                         <span class="dt">unit =</span> <span class="st">&quot;ns&quot;</span>)<span class="op">$</span>time))
+                      function(x) <span class="kw">fivenum</span>(<span class="kw">microbenchmark</span>(<span class="kw">apply</span>(x, <span class="dv">1</span>, sum),
+                                                         <span class="dt">unit =</span> <span class="st">&quot;ns&quot;</span>)$time))
 bench_apply &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">time =</span> <span class="kw">unlist</span>(bench_apply),
                           <span class="dt">call =</span> <span class="st">&quot;apply&quot;</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)
 
 df &lt;-<span class="st"> </span><span class="kw">rbind</span>(bench_rs, bench_apply)
 
-df<span class="op">$</span>dimension &lt;-<span class="st"> </span><span class="kw">rep</span>(dimensions, <span class="dt">each =</span> <span class="dv">5</span>)
-df<span class="op">$</span>aggr &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&quot;min&quot;</span>, <span class="st">&quot;lq&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;uq&quot;</span>, <span class="st">&quot;max&quot;</span>),
+df$dimension &lt;-<span class="st"> </span><span class="kw">rep</span>(dimensions, <span class="dt">each =</span> <span class="dv">5</span>)
+df$aggr &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&quot;min&quot;</span>, <span class="st">&quot;lq&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;uq&quot;</span>, <span class="st">&quot;max&quot;</span>),
                <span class="dt">times =</span> <span class="kw">length</span>(dimensions))
-df<span class="op">$</span>aggr_size &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">1</span>), <span class="dt">times =</span> <span class="kw">length</span>(dimensions))
-df<span class="op">$</span>group &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="kw">as.character</span>(df<span class="op">$</span>call), <span class="kw">as.character</span>(df<span class="op">$</span>aggr), <span class="dt">sep =</span> <span class="st">&quot; &quot;</span>)
+df$aggr_size &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">1</span>), <span class="dt">times =</span> <span class="kw">length</span>(dimensions))
+df$group &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="kw">as.character</span>(df$call), <span class="kw">as.character</span>(df$aggr), <span class="dt">sep =</span> <span class="st">&quot; &quot;</span>)
 
 <span class="kw">library</span>(ggplot2)
 
-<span class="kw">ggplot</span>(df, <span class="kw">aes</span>(<span class="dt">x =</span> dimension, <span class="dt">y =</span> time, <span class="dt">colour =</span> call, <span class="dt">group =</span> group)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span>
+<span class="kw">ggplot</span>(df, <span class="kw">aes</span>(<span class="dt">x =</span> dimension, <span class="dt">y =</span> time, <span class="dt">colour =</span> call, <span class="dt">group =</span> group)) +
+<span class="st">  </span><span class="kw">geom_point</span>() +<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">linetype =</span> <span class="kw">factor</span>(aggr_size, <span class="dt">levels =</span> <span class="kw">c</span>(<span class="st">&quot;3&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;1&quot;</span>))),
         <span class="dt">show.legend =</span> <span class="ot">FALSE</span>) </code></pre></div>
 <p><img src="14-Profiling_files/figure-html/long%20calculation-1.png" width="672" /></p>
@@ -848,19 +848,19 @@ df<span class="op">$</span>group &lt;-<span class="st"> </span><span class="kw">
 <p><strong><span style="color:green">A</span></strong>: We can just give the vectors to <code>crossprod()</code> which converts them to row- and columnvectors and then multiplies these. The result is the dot product which is also a weighted sum.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">10</span>)
 b &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">10</span>)
-<span class="kw">sum</span>(a <span class="op">*</span><span class="st"> </span>b) <span class="op">-</span><span class="st"> </span><span class="kw">crossprod</span>(a, b)[<span class="dv">1</span>]
+<span class="kw">sum</span>(a *<span class="st"> </span>b) -<span class="st"> </span><span class="kw">crossprod</span>(a, b)[<span class="dv">1</span>]
 <span class="co">#&gt; [1] 0</span></code></pre></div>
 <p>A benchmark of both alternatives for different vector lengths indicates, that the <code>crossprod()</code> variant is about 2.5 times faster than <code>sum()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dimensions &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1e1</span>, <span class="fl">1e2</span>, <span class="fl">1e3</span>, <span class="fl">1e4</span>, <span class="fl">1e5</span>, <span class="fl">1e6</span>, <span class="fl">0.5e7</span>, <span class="fl">1e7</span>)
 xvector &lt;-<span class="st"> </span><span class="kw">lapply</span>(dimensions, rnorm)
 weights &lt;-<span class="st"> </span><span class="kw">lapply</span>(dimensions, rnorm)
 
-bench_sum &lt;-<span class="st"> </span><span class="kw">Map</span>(<span class="cf">function</span>(x, y) <span class="kw">fivenum</span>(<span class="kw">microbenchmark</span>(<span class="kw">sum</span>(x <span class="op">*</span><span class="st"> </span>y))<span class="op">$</span>time),
+bench_sum &lt;-<span class="st"> </span><span class="kw">Map</span>(function(x, y) <span class="kw">fivenum</span>(<span class="kw">microbenchmark</span>(<span class="kw">sum</span>(x *<span class="st"> </span>y))$time),
                  xvector, weights)
 bench_sum &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">time =</span> <span class="kw">unlist</span>(bench_sum),
                         <span class="dt">call =</span> <span class="st">&quot;sum&quot;</span>,
                         <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)
-bench_cp &lt;-<span class="st"> </span><span class="kw">Map</span>(<span class="cf">function</span>(x, y) <span class="kw">fivenum</span>(<span class="kw">microbenchmark</span>(<span class="kw">crossprod</span>(x, y)[<span class="dv">1</span>])<span class="op">$</span>time),
+bench_cp &lt;-<span class="st"> </span><span class="kw">Map</span>(function(x, y) <span class="kw">fivenum</span>(<span class="kw">microbenchmark</span>(<span class="kw">crossprod</span>(x, y)[<span class="dv">1</span>])$time),
                 xvector, weights)
 bench_cp &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">time =</span> <span class="kw">unlist</span>(bench_cp),
                        <span class="dt">call =</span> <span class="st">&quot;crossproduct&quot;</span>,
@@ -868,15 +868,15 @@ bench_cp &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span 
 
 df &lt;-<span class="st"> </span><span class="kw">rbind</span>(bench_sum, bench_cp)
 
-df<span class="op">$</span>dimension &lt;-<span class="st"> </span><span class="kw">rep</span>(dimensions, <span class="dt">each =</span> <span class="dv">5</span>)
-df<span class="op">$</span>aggr &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&quot;min&quot;</span>, <span class="st">&quot;lq&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;uq&quot;</span>, <span class="st">&quot;max&quot;</span>), <span class="dt">times =</span> <span class="kw">length</span>(dimensions))
-df<span class="op">$</span>aggr_size &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">1</span>), <span class="dt">times =</span> <span class="kw">length</span>(dimensions))
-df<span class="op">$</span>group &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="kw">as.character</span>(df<span class="op">$</span>call), <span class="kw">as.character</span>(df<span class="op">$</span>aggr), <span class="dt">sep =</span> <span class="st">&quot; &quot;</span>)
+df$dimension &lt;-<span class="st"> </span><span class="kw">rep</span>(dimensions, <span class="dt">each =</span> <span class="dv">5</span>)
+df$aggr &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&quot;min&quot;</span>, <span class="st">&quot;lq&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;uq&quot;</span>, <span class="st">&quot;max&quot;</span>), <span class="dt">times =</span> <span class="kw">length</span>(dimensions))
+df$aggr_size &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">1</span>), <span class="dt">times =</span> <span class="kw">length</span>(dimensions))
+df$group &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="kw">as.character</span>(df$call), <span class="kw">as.character</span>(df$aggr), <span class="dt">sep =</span> <span class="st">&quot; &quot;</span>)
 
-<span class="kw">ggplot</span>(df, <span class="kw">aes</span>(<span class="dt">x =</span> dimension, <span class="dt">y =</span> time, <span class="dt">colour =</span> call, <span class="dt">group =</span> group)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span>
+<span class="kw">ggplot</span>(df, <span class="kw">aes</span>(<span class="dt">x =</span> dimension, <span class="dt">y =</span> time, <span class="dt">colour =</span> call, <span class="dt">group =</span> group)) +
+<span class="st">  </span><span class="kw">geom_point</span>() +<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">linetype =</span> <span class="kw">factor</span>(aggr_size, <span class="dt">levels =</span> <span class="kw">c</span>(<span class="st">&quot;3&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;1&quot;</span>))),
-            <span class="dt">show.legend =</span> <span class="ot">FALSE</span>) <span class="op">+</span>
+            <span class="dt">show.legend =</span> <span class="ot">FALSE</span>) +
 <span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">expand =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>))</code></pre></div>
 <p><img src="14-Profiling_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p></li>
 </ol>
