@@ -6,9 +6,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Advanced R Solutions</title>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
   <meta name="description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R.">
-  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
 
   <meta property="og:title" content="Advanced R Solutions" />
   <meta property="og:type" content="book" />
@@ -23,10 +22,10 @@
   <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R." />
   <meta name="twitter:image" content="images/advrs_cover.png" />
 
-<meta name="author" content="Malte Grosser &amp; Henning Bumann">
+<meta name="author" content="Malte Grosser, Henning Bumann, Peter Hurford &amp; Robert Krzyzanowski">
 
 
-<meta name="date" content="2017-04-13">
+<meta name="date" content="2017-07-16">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -35,7 +34,6 @@
   
 <link rel="prev" href="memory.html">
 <link rel="next" href="testchapter.html">
-
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -129,6 +127,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </head>
 
 <body>
+
 
 
   <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
@@ -233,6 +232,22 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="16.3" data-path="rcpp.html"><a href="rcpp.html#the-stl"><i class="fa fa-check"></i><b>16.3</b> The STL</a></li>
 </ul></li>
 <li class="chapter" data-level="17" data-path="testchapter.html"><a href="testchapter.html"><i class="fa fa-check"></i><b>17</b> Testchapter</a></li>
+<li class="chapter" data-level="18" data-path="s3-1.html"><a href="s3-1.html"><i class="fa fa-check"></i><b>18</b> S3</a><ul>
+<li class="chapter" data-level="18.1" data-path="s3-1.html"><a href="s3-1.html#basics"><i class="fa fa-check"></i><b>18.1</b> Basics</a></li>
+<li class="chapter" data-level="18.2" data-path="s3-1.html"><a href="s3-1.html#classes"><i class="fa fa-check"></i><b>18.2</b> Classes</a></li>
+<li class="chapter" data-level="18.3" data-path="s3-1.html"><a href="s3-1.html#generics-and-methods"><i class="fa fa-check"></i><b>18.3</b> Generics and methods</a></li>
+<li class="chapter" data-level="18.4" data-path="s3-1.html"><a href="s3-1.html#method-dispatch"><i class="fa fa-check"></i><b>18.4</b> Method dispatch</a></li>
+<li class="chapter" data-level="18.5" data-path="s3-1.html"><a href="s3-1.html#inheritance"><i class="fa fa-check"></i><b>18.5</b> Inheritance</a></li>
+<li class="chapter" data-level="18.6" data-path="s3-1.html"><a href="s3-1.html#dispatch-details"><i class="fa fa-check"></i><b>18.6</b> Dispatch details</a></li>
+</ul></li>
+<li class="chapter" data-level="19" data-path="s4-1.html"><a href="s4-1.html"><i class="fa fa-check"></i><b>19</b> S4</a><ul>
+<li class="chapter" data-level="19.1" data-path="s4-1.html"><a href="s4-1.html#classes-1"><i class="fa fa-check"></i><b>19.1</b> Classes</a></li>
+<li class="chapter" data-level="19.2" data-path="s4-1.html"><a href="s4-1.html#generics-and-methods-1"><i class="fa fa-check"></i><b>19.2</b> Generics and methods</a></li>
+<li class="chapter" data-level="19.3" data-path="s4-1.html"><a href="s4-1.html#method-dispatch-1"><i class="fa fa-check"></i><b>19.3</b> Method dispatch</a></li>
+<li class="chapter" data-level="19.4" data-path="s4-1.html"><a href="s4-1.html#s4-and-existing-code"><i class="fa fa-check"></i><b>19.4</b> S4 and existing code</a><ul>
+<li class="chapter" data-level="19.4.1" data-path="s4-1.html"><a href="s4-1.html#exercises"><i class="fa fa-check"></i><b>19.4.1</b> Exercises</a></li>
+</ul></li>
+</ul></li>
 </ul>
 
       </nav>
@@ -260,10 +275,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
   <span class="dt">int</span> n = x.size();
   <span class="dt">double</span> y = <span class="dv">0</span>;
 
-  <span class="kw">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; ++i) {
+  <span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; ++i) {
     y += x[i] / n;
   }
-  <span class="kw">return</span> y;
+  <span class="cf">return</span> y;
 }
 
 NumericVector f2(NumericVector x) {
@@ -271,43 +286,43 @@ NumericVector f2(NumericVector x) {
   NumericVector out(n);
 
   out[<span class="dv">0</span>] = x[<span class="dv">0</span>];
-  <span class="kw">for</span>(<span class="dt">int</span> i = <span class="dv">1</span>; i &lt; n; ++i) {
+  <span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">1</span>; i &lt; n; ++i) {
     out[i] = out[i - <span class="dv">1</span>] + x[i];
   }
-  <span class="kw">return</span> out;
+  <span class="cf">return</span> out;
 }
 
 <span class="dt">bool</span> f3(LogicalVector x) {
   <span class="dt">int</span> n = x.size();
 
-  <span class="kw">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; ++i) {
-    <span class="kw">if</span> (x[i]) <span class="kw">return</span> <span class="kw">true</span>;
+  <span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; ++i) {
+    <span class="cf">if</span> (x[i]) <span class="cf">return</span> <span class="kw">true</span>;
   }
-  <span class="kw">return</span> <span class="kw">false</span>;
+  <span class="cf">return</span> <span class="kw">false</span>;
 }
 
 <span class="dt">int</span> f4(Function pred, List x) {
   <span class="dt">int</span> n = x.size();
 
-  <span class="kw">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; ++i) {
+  <span class="cf">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; ++i) {
     LogicalVector res = pred(x[i]);
-    <span class="kw">if</span> (res[<span class="dv">0</span>]) <span class="kw">return</span> i + <span class="dv">1</span>;
+    <span class="cf">if</span> (res[<span class="dv">0</span>]) <span class="cf">return</span> i + <span class="dv">1</span>;
   }
-  <span class="kw">return</span> <span class="dv">0</span>;
+  <span class="cf">return</span> <span class="dv">0</span>;
 }
 
 NumericVector f5(NumericVector x, NumericVector y) {
-  <span class="dt">int</span> n = std::max(x.size(), y.size());
+  <span class="dt">int</span> n = <span class="bu">std::</span>max(x.size(), y.size());
   NumericVector x1 = rep_len(x, n);
   NumericVector y1 = rep_len(y, n);
 
   NumericVector out(n);
 
-  <span class="kw">for</span> (<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; ++i) {
-    out[i] = std::min(x1[i], y1[i]);
+  <span class="cf">for</span> (<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; n; ++i) {
+    out[i] = <span class="bu">std::</span>min(x1[i], y1[i]);
   }
 
-  <span class="kw">return</span> out;
+  <span class="cf">return</span> out;
 }</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: The R equivalents are:</p>
 <ul>
@@ -340,8 +355,8 @@ int n =<span class="st"> </span><span class="kw">x.size</span>();
 NumericVector <span class="kw">out</span>(n);
 
 out[<span class="dv">0</span>] =<span class="st"> </span>x[<span class="dv">0</span>];
-for(int <span class="dt">i =</span> <span class="dv">1</span>; i &lt;<span class="st"> </span>n; ++i) {
-  out[i]  =<span class="st"> </span>out[i -<span class="st"> </span><span class="dv">1</span>] *<span class="st"> </span>x[i];
+<span class="cf">for</span>(int <span class="dt">i =</span> <span class="dv">1</span>; i <span class="op">&lt;</span><span class="st"> </span>n; <span class="op">++</span>i) {
+  out[i]  =<span class="st"> </span>out[i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>] <span class="op">*</span><span class="st"> </span>x[i];
 }
 return out;
 }<span class="st">&#39;)</span>
@@ -353,8 +368,8 @@ int n =<span class="st"> </span><span class="kw">x.size</span>();
 NumericVector <span class="kw">out</span>(n);
 
 out[<span class="dv">0</span>] =<span class="st"> </span>x[<span class="dv">0</span>];
-for(int <span class="dt">i =</span> <span class="dv">1</span>; i &lt;<span class="st"> </span>n; ++i) {
-  out[i]  =<span class="st"> </span>std::<span class="kw">min</span>(out[i -<span class="st"> </span><span class="dv">1</span>], x[i]);
+<span class="cf">for</span>(int <span class="dt">i =</span> <span class="dv">1</span>; i <span class="op">&lt;</span><span class="st"> </span>n; <span class="op">++</span>i) {
+  out[i]  =<span class="st"> </span>std<span class="op">::</span><span class="kw">min</span>(out[i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>], x[i]);
 }
 return out;
 }<span class="st">&#39;)</span>
@@ -365,8 +380,8 @@ int n =<span class="st"> </span><span class="kw">x.size</span>();
 NumericVector <span class="kw">out</span>(n);
 
 out[<span class="dv">0</span>] =<span class="st"> </span>x[<span class="dv">0</span>];
-for(int <span class="dt">i =</span> <span class="dv">1</span>; i &lt;<span class="st"> </span>n; ++i) {
-  out[i]  =<span class="st"> </span>std::<span class="kw">max</span>(out[i -<span class="st"> </span><span class="dv">1</span>], x[i]);
+<span class="cf">for</span>(int <span class="dt">i =</span> <span class="dv">1</span>; i <span class="op">&lt;</span><span class="st"> </span>n; <span class="op">++</span>i) {
+  out[i]  =<span class="st"> </span>std<span class="op">::</span><span class="kw">max</span>(out[i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>], x[i]);
 }
 return out;
 }<span class="st">&#39;)</span></code></pre></div>
@@ -656,37 +671,37 @@ return out;
 <span class="co">#include &lt;Rcpp.h&gt;</span>
 using namespace Rcpp;
 
-/<span class="er">/</span><span class="st"> </span>[[Rcpp::export]]
+<span class="op">/</span><span class="er">/</span><span class="st"> </span>[[Rcpp<span class="op">::</span>export]]
 double <span class="kw">medianC</span>(NumericVector x) {
   int n =<span class="st"> </span><span class="kw">x.size</span>();
   double out;
-  if (n % <span class="dv">2</span> ==<span class="st"> </span><span class="dv">0</span>){
-    std::<span class="kw">partial_sort</span> (<span class="kw">x.begin</span>(), <span class="kw">x.begin</span>() +<span class="st"> </span>n /<span class="st"> </span><span class="dv">2</span> +<span class="st"> </span><span class="dv">1</span>, <span class="kw">x.end</span>());
-    out =<span class="st"> </span>(x[n /<span class="st"> </span><span class="dv">2</span> -<span class="st"> </span><span class="dv">1</span>] +<span class="st"> </span>x[n /<span class="st"> </span><span class="dv">2</span>]) /<span class="st"> </span><span class="dv">2</span>;
-  } else {
-    std::<span class="kw">partial_sort</span> (<span class="kw">x.begin</span>(), <span class="kw">x.begin</span>() +<span class="st"> </span>(n +<span class="st"> </span><span class="dv">1</span>) /<span class="st"> </span><span class="dv">2</span>, <span class="kw">x.end</span>());
-    out =<span class="st"> </span>x[(n +<span class="st"> </span><span class="dv">1</span>) /<span class="st"> </span><span class="dv">2</span> -<span class="st"> </span><span class="dv">1</span>];
+  <span class="cf">if</span> (n % <span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){
+    std<span class="op">::</span><span class="kw">partial_sort</span> (<span class="kw">x.begin</span>(), <span class="kw">x.begin</span>() <span class="op">+</span><span class="st"> </span>n <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="kw">x.end</span>());
+    out =<span class="st"> </span>(x[n <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>x[n <span class="op">/</span><span class="st"> </span><span class="dv">2</span>]) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>;
+  } <span class="cf">else</span> {
+    std<span class="op">::</span><span class="kw">partial_sort</span> (<span class="kw">x.begin</span>(), <span class="kw">x.begin</span>() <span class="op">+</span><span class="st"> </span>(n <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>, <span class="kw">x.end</span>());
+    out =<span class="st"> </span>x[(n <span class="op">+</span><span class="st"> </span><span class="dv">1</span>) <span class="op">/</span><span class="st"> </span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">1</span>];
   }
 
   return out;
 }</code></pre></div></li>
 <li><p><code>%in%</code> using <code>unordered_set</code> and the <code>find()</code> or <code>count()</code> methods.</p></li>
 <li><p><code>unique()</code> using an <code>unordered_set</code> (challenge: do it in one line!).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">/<span class="er">/</span><span class="st"> </span>[[Rcpp::<span class="kw">plugins</span>(cpp11)]]
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">/</span><span class="er">/</span><span class="st"> </span>[[Rcpp<span class="op">::</span><span class="kw">plugins</span>(cpp11)]]
 <span class="co">#include &lt;Rcpp.h&gt;</span>
 <span class="co">#include &lt;unordered_set&gt;</span>
 using namespace Rcpp;
 
-/<span class="er">/</span><span class="st"> </span>[[Rcpp::export]]
+<span class="op">/</span><span class="er">/</span><span class="st"> </span>[[Rcpp<span class="op">::</span>export]]
 NumericVector <span class="kw">uniqueC</span>(NumericVector x) {
-std::unordered_set&lt;int&gt;<span class="st"> </span>seen;
+std<span class="op">::</span>unordered_set<span class="op">&lt;</span>int<span class="op">&gt;</span><span class="st"> </span>seen;
 int n =<span class="st"> </span><span class="kw">x.size</span>();
 LogicalVector <span class="kw">dup</span>(n);
-std::vector&lt;double&gt;<span class="st"> </span>out;
+std<span class="op">::</span>vector<span class="op">&lt;</span>double<span class="op">&gt;</span><span class="st"> </span>out;
 
-for (int <span class="dt">i =</span> <span class="dv">0</span>; i &lt;<span class="st"> </span>n; ++i) {
-  dup[i] =<span class="st"> </span>!<span class="kw">seen.insert</span>(x[i]).second;
-  if (!dup[i]) {
+<span class="cf">for</span> (int <span class="dt">i =</span> <span class="dv">0</span>; i <span class="op">&lt;</span><span class="st"> </span>n; <span class="op">++</span>i) {
+  dup[i] =<span class="st"> </span><span class="op">!</span><span class="kw">seen.insert</span>(x[i]).second;
+  <span class="cf">if</span> (<span class="op">!</span>dup[i]) {
       <span class="kw">out.push_back</span>(x[i]);
   }
 }
@@ -697,13 +712,13 @@ return <span class="kw">wrap</span>(out);
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#include &lt;Rcpp.h&gt;</span>
 using namespace Rcpp;
 
-/<span class="er">/</span><span class="st"> </span>[[Rcpp::export]]
+<span class="op">/</span><span class="er">/</span><span class="st"> </span>[[Rcpp<span class="op">::</span>export]]
 double <span class="kw">minC</span>(NumericVector x){
   int n =<span class="st"> </span><span class="kw">x.size</span>();
   double out;
 
-  for (int <span class="dt">i =</span> <span class="dv">0</span>; i &lt;<span class="st"> </span>n; i++){
-    out =<span class="st"> </span>std::<span class="kw">min</span>(out, x[i]);
+  <span class="cf">for</span> (int <span class="dt">i =</span> <span class="dv">0</span>; i <span class="op">&lt;</span><span class="st"> </span>n; i<span class="op">++</span>){
+    out =<span class="st"> </span>std<span class="op">::</span><span class="kw">min</span>(out, x[i]);
   }
 
   return out;
@@ -715,11 +730,11 @@ double <span class="kw">minC</span>(NumericVector x){
 
 using namespace Rcpp;
 
-/<span class="er">/</span><span class="st"> </span>[[Rcpp::export]]
+<span class="op">/</span><span class="er">/</span><span class="st"> </span>[[Rcpp<span class="op">::</span>export]]
 double <span class="kw">which_minC</span>(NumericVector x){
   int out;
-  out =<span class="st"> </span>std::<span class="kw">distance</span>(<span class="kw">x.begin</span>(),std::<span class="kw">min_element</span>(<span class="kw">x.begin</span>(),<span class="kw">x.end</span>()));
-  out++;
+  out =<span class="st"> </span>std<span class="op">::</span><span class="kw">distance</span>(<span class="kw">x.begin</span>(),std<span class="op">::</span><span class="kw">min_element</span>(<span class="kw">x.begin</span>(),<span class="kw">x.end</span>()));
+  out<span class="op">++</span>;
 
   return out;
 }</code></pre></div></li>
@@ -734,8 +749,9 @@ double <span class="kw">which_minC</span>(NumericVector x){
         </div>
       </div>
 <a href="memory.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="testchapter.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
-
+<a href="testchapter.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
@@ -779,7 +795,7 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:" && /^https?:/.test(script.src))
       script.src  = script.src.replace(/^https?:/, '');
     document.getElementsByTagName("head")[0].appendChild(script);

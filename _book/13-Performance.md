@@ -40,11 +40,11 @@
       exp(log(x) / 2)
     )
     #> Unit: nanoseconds
-    #>           expr  min   lq    mean median   uq   max neval
-    #>        sqrt(x)  367  367  517.40    367  733  1833   100
-    #>          x^0.5 3666 4032 4131.70   4033 4033 15397   100
-    #>        x^(1/2) 3666 4033 4388.31   4033 4400 13930   100
-    #>  exp(log(x)/2) 8064 8431 9039.99   8432 8432 52052   100
+    #>           expr  min   lq    mean median     uq   max neval cld
+    #>        sqrt(x)  367  367  649.34    367  734.0 11364   100 a  
+    #>          x^0.5 3666 4033 4120.82   4033 4033.0  6599   100  b 
+    #>        x^(1/2) 4032 4033 4377.28   4399 4399.5  9898   100  b 
+    #>  exp(log(x)/2) 8064 8431 8666.02   8432 8798.0 14663   100   c
     ```
 
 1.  __<span style="color:red">Q</span>__: Use microbenchmarking to rank the basic arithmetic operators (`+`, `-`,
@@ -137,13 +137,13 @@
     f8 <- function(a = 1, b = 2, c = 4, d = 4, e = 5, f = 6, g = 7, h = 8) NULL
     microbenchmark::microbenchmark(f5(), f6(), f7(), f8(), times = 10000)
     #> Warning in microbenchmark::microbenchmark(f5(), f6(), f7(), f8(), times =
-    #> 10000): Could not measure a positive execution time for 2422 evaluations.
+    #> 10000): Could not measure a positive execution time for 1249 evaluations.
     #> Unit: nanoseconds
-    #>  expr min lq     mean median  uq     max neval
-    #>  f5()   0  0 372.6307      1   1 2468792 10000
-    #>  f6()   0  0 151.6164      1 367   15763 10000
-    #>  f7()   0  0 190.0170      1 367   13564 10000
-    #>  f8()   0  0 242.4798      1 367   44721 10000
+    #>  expr min lq     mean median  uq    max neval cld
+    #>  f5()   0  0 221.0407      1 367 718094 10000   a
+    #>  f6()   0  0 249.4341      1 367 480562 10000   a
+    #>  f7()   0  0 289.4435      1 367 494492 10000   a
+    #>  f8()   0  1 340.5510    367 367 514286 10000   a
     ```
     
     However, for now we just assume that 20 nanosecods are correct and in kind of doubt, we recommend to benchmark this value individually. With this assumption we calculate `21 * 20 = 420` nanoseconds of extra time for each call of `scan()`.
@@ -159,15 +159,15 @@
       control = list(warmup = 1000)
       ))
     #> Unit: nanoseconds
-    #>                             expr   min    lq     mean median    uq
-    #>  scan(text = "1 2 3", quiet = T) 32624 39223 52652.02  41788 59017
-    #>       max neval
-    #>  49670553 1e+05
+    #>                             expr   min    lq    mean median    uq
+    #>  scan(text = "1 2 3", quiet = T) 30058 34824 45014.1  36657 39956
+    #>        max neval
+    #>  133242818 1e+05
     
     mb_prom_median <- broom::tidy(mb_prom)[2,]$median
     ```
     
-    This lets us calculate, that ~1.01% of the median run time are caused by the extra arguments.
+    This lets us calculate, that ~1.15% of the median run time are caused by the extra arguments.
 
 1.  __<span style="color:red">Q</span>__: Read ["Evaluating the Design of the R Language"](http://r.cs.purdue.edu/pub/ecoop12.pdf). What other aspects of the R-language slow it
     down? Construct microbenchmarks to illustrate. 

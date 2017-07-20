@@ -6,9 +6,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Advanced R Solutions</title>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
   <meta name="description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R.">
-  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
 
   <meta property="og:title" content="Advanced R Solutions" />
   <meta property="og:type" content="book" />
@@ -23,10 +22,10 @@
   <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R." />
   <meta name="twitter:image" content="images/advrs_cover.png" />
 
-<meta name="author" content="Malte Grosser &amp; Henning Bumann">
+<meta name="author" content="Malte Grosser, Henning Bumann, Peter Hurford &amp; Robert Krzyzanowski">
 
 
-<meta name="date" content="2017-04-13">
+<meta name="date" content="2017-07-16">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -35,7 +34,6 @@
   
 <link rel="prev" href="expressions.html">
 <link rel="next" href="performance.html">
-
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -129,6 +127,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </head>
 
 <body>
+
 
 
   <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
@@ -233,6 +232,22 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="16.3" data-path="rcpp.html"><a href="rcpp.html#the-stl"><i class="fa fa-check"></i><b>16.3</b> The STL</a></li>
 </ul></li>
 <li class="chapter" data-level="17" data-path="testchapter.html"><a href="testchapter.html"><i class="fa fa-check"></i><b>17</b> Testchapter</a></li>
+<li class="chapter" data-level="18" data-path="s3-1.html"><a href="s3-1.html"><i class="fa fa-check"></i><b>18</b> S3</a><ul>
+<li class="chapter" data-level="18.1" data-path="s3-1.html"><a href="s3-1.html#basics"><i class="fa fa-check"></i><b>18.1</b> Basics</a></li>
+<li class="chapter" data-level="18.2" data-path="s3-1.html"><a href="s3-1.html#classes"><i class="fa fa-check"></i><b>18.2</b> Classes</a></li>
+<li class="chapter" data-level="18.3" data-path="s3-1.html"><a href="s3-1.html#generics-and-methods"><i class="fa fa-check"></i><b>18.3</b> Generics and methods</a></li>
+<li class="chapter" data-level="18.4" data-path="s3-1.html"><a href="s3-1.html#method-dispatch"><i class="fa fa-check"></i><b>18.4</b> Method dispatch</a></li>
+<li class="chapter" data-level="18.5" data-path="s3-1.html"><a href="s3-1.html#inheritance"><i class="fa fa-check"></i><b>18.5</b> Inheritance</a></li>
+<li class="chapter" data-level="18.6" data-path="s3-1.html"><a href="s3-1.html#dispatch-details"><i class="fa fa-check"></i><b>18.6</b> Dispatch details</a></li>
+</ul></li>
+<li class="chapter" data-level="19" data-path="s4-1.html"><a href="s4-1.html"><i class="fa fa-check"></i><b>19</b> S4</a><ul>
+<li class="chapter" data-level="19.1" data-path="s4-1.html"><a href="s4-1.html#classes-1"><i class="fa fa-check"></i><b>19.1</b> Classes</a></li>
+<li class="chapter" data-level="19.2" data-path="s4-1.html"><a href="s4-1.html#generics-and-methods-1"><i class="fa fa-check"></i><b>19.2</b> Generics and methods</a></li>
+<li class="chapter" data-level="19.3" data-path="s4-1.html"><a href="s4-1.html#method-dispatch-1"><i class="fa fa-check"></i><b>19.3</b> Method dispatch</a></li>
+<li class="chapter" data-level="19.4" data-path="s4-1.html"><a href="s4-1.html#s4-and-existing-code"><i class="fa fa-check"></i><b>19.4</b> S4 and existing code</a><ul>
+<li class="chapter" data-level="19.4.1" data-path="s4-1.html"><a href="s4-1.html#exercises"><i class="fa fa-check"></i><b>19.4.1</b> Exercises</a></li>
+</ul></li>
+</ul></li>
 </ul>
 
       </nav>
@@ -290,8 +305,9 @@ attribute names (like below), creates functions which address this problem.</p>
         </div>
       </div>
 <a href="expressions.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="performance.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
-
+<a href="performance.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
@@ -335,7 +351,7 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:" && /^https?:/.test(script.src))
       script.src  = script.src.replace(/^https?:/, '');
     document.getElementsByTagName("head")[0].appendChild(script);

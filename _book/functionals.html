@@ -6,9 +6,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Advanced R Solutions</title>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
   <meta name="description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R.">
-  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
 
   <meta property="og:title" content="Advanced R Solutions" />
   <meta property="og:type" content="book" />
@@ -23,10 +22,10 @@
   <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R." />
   <meta name="twitter:image" content="images/advrs_cover.png" />
 
-<meta name="author" content="Malte Grosser &amp; Henning Bumann">
+<meta name="author" content="Malte Grosser, Henning Bumann, Peter Hurford &amp; Robert Krzyzanowski">
 
 
-<meta name="date" content="2017-04-13">
+<meta name="date" content="2017-07-16">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -35,7 +34,6 @@
   
 <link rel="prev" href="functional-programming.html">
 <link rel="next" href="function-operators.html">
-
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -129,6 +127,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </head>
 
 <body>
+
 
 
   <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
@@ -233,6 +232,22 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="16.3" data-path="rcpp.html"><a href="rcpp.html#the-stl"><i class="fa fa-check"></i><b>16.3</b> The STL</a></li>
 </ul></li>
 <li class="chapter" data-level="17" data-path="testchapter.html"><a href="testchapter.html"><i class="fa fa-check"></i><b>17</b> Testchapter</a></li>
+<li class="chapter" data-level="18" data-path="s3-1.html"><a href="s3-1.html"><i class="fa fa-check"></i><b>18</b> S3</a><ul>
+<li class="chapter" data-level="18.1" data-path="s3-1.html"><a href="s3-1.html#basics"><i class="fa fa-check"></i><b>18.1</b> Basics</a></li>
+<li class="chapter" data-level="18.2" data-path="s3-1.html"><a href="s3-1.html#classes"><i class="fa fa-check"></i><b>18.2</b> Classes</a></li>
+<li class="chapter" data-level="18.3" data-path="s3-1.html"><a href="s3-1.html#generics-and-methods"><i class="fa fa-check"></i><b>18.3</b> Generics and methods</a></li>
+<li class="chapter" data-level="18.4" data-path="s3-1.html"><a href="s3-1.html#method-dispatch"><i class="fa fa-check"></i><b>18.4</b> Method dispatch</a></li>
+<li class="chapter" data-level="18.5" data-path="s3-1.html"><a href="s3-1.html#inheritance"><i class="fa fa-check"></i><b>18.5</b> Inheritance</a></li>
+<li class="chapter" data-level="18.6" data-path="s3-1.html"><a href="s3-1.html#dispatch-details"><i class="fa fa-check"></i><b>18.6</b> Dispatch details</a></li>
+</ul></li>
+<li class="chapter" data-level="19" data-path="s4-1.html"><a href="s4-1.html"><i class="fa fa-check"></i><b>19</b> S4</a><ul>
+<li class="chapter" data-level="19.1" data-path="s4-1.html"><a href="s4-1.html#classes-1"><i class="fa fa-check"></i><b>19.1</b> Classes</a></li>
+<li class="chapter" data-level="19.2" data-path="s4-1.html"><a href="s4-1.html#generics-and-methods-1"><i class="fa fa-check"></i><b>19.2</b> Generics and methods</a></li>
+<li class="chapter" data-level="19.3" data-path="s4-1.html"><a href="s4-1.html#method-dispatch-1"><i class="fa fa-check"></i><b>19.3</b> Method dispatch</a></li>
+<li class="chapter" data-level="19.4" data-path="s4-1.html"><a href="s4-1.html#s4-and-existing-code"><i class="fa fa-check"></i><b>19.4</b> S4 and existing code</a><ul>
+<li class="chapter" data-level="19.4.1" data-path="s4-1.html"><a href="s4-1.html#exercises"><i class="fa fa-check"></i><b>19.4.1</b> Exercises</a></li>
+</ul></li>
+</ul></li>
 </ul>
 
       </nav>
@@ -259,50 +274,50 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">trims &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.5</span>)
 x &lt;-<span class="st"> </span><span class="kw">rcauchy</span>(<span class="dv">100</span>)
 
-<span class="kw">lapply</span>(trims, function(trim) <span class="kw">mean</span>(x, <span class="dt">trim =</span> trim))
+<span class="kw">lapply</span>(trims, <span class="cf">function</span>(trim) <span class="kw">mean</span>(x, <span class="dt">trim =</span> trim))
 <span class="kw">lapply</span>(trims, mean, <span class="dt">x =</span> x)</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: In the first statement each element of <code>trims</code> is explicitly supplied to <code>mean()</code>’s second argument. In the latter statement this happens via positional matching, since <code>mean()</code>’s first argument is supplied via name in <code>lapply()</code>’s third argument (<code>...</code>).</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: The function below scales a vector so it falls in the range [0, 1]. How would you apply it to every column of a data frame? How would you apply it to every numeric column in a data frame?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">scale01 &lt;-<span class="st"> </span>function(x) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">scale01 &lt;-<span class="st"> </span><span class="cf">function</span>(x) {
   rng &lt;-<span class="st"> </span><span class="kw">range</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
-  (x -<span class="st"> </span>rng[<span class="dv">1</span>]) /<span class="st"> </span>(rng[<span class="dv">2</span>] -<span class="st"> </span>rng[<span class="dv">1</span>])
+  (x <span class="op">-</span><span class="st"> </span>rng[<span class="dv">1</span>]) <span class="op">/</span><span class="st"> </span>(rng[<span class="dv">2</span>] <span class="op">-</span><span class="st"> </span>rng[<span class="dv">1</span>])
 }</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: Since this function needs numeric input, one can check this via an if clause. If one also wants to return non-numeric input columns, these can be supplied to the <code>else</code> argument of the <code>if()</code> “function”:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data.frame</span>(<span class="kw">lapply</span>(iris, function(x) if (<span class="kw">is.numeric</span>(x)) <span class="kw">scale01</span>(x) else x))</code></pre></div></li>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data.frame</span>(<span class="kw">lapply</span>(iris, <span class="cf">function</span>(x) <span class="cf">if</span> (<span class="kw">is.numeric</span>(x)) <span class="kw">scale01</span>(x) <span class="cf">else</span> x))</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Use both for loops and <code>lapply()</code> to fit linear models to the <code>mtcars</code> using the formulas stored in this list:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">formulas &lt;-<span class="st"> </span><span class="kw">list</span>(
-  mpg ~<span class="st"> </span>disp,
-  mpg ~<span class="st"> </span><span class="kw">I</span>(<span class="dv">1</span> /<span class="st"> </span>disp),
-  mpg ~<span class="st"> </span>disp +<span class="st"> </span>wt,
-  mpg ~<span class="st"> </span><span class="kw">I</span>(<span class="dv">1</span> /<span class="st"> </span>disp) +<span class="st"> </span>wt
+  mpg <span class="op">~</span><span class="st"> </span>disp,
+  mpg <span class="op">~</span><span class="st"> </span><span class="kw">I</span>(<span class="dv">1</span> <span class="op">/</span><span class="st"> </span>disp),
+  mpg <span class="op">~</span><span class="st"> </span>disp <span class="op">+</span><span class="st"> </span>wt,
+  mpg <span class="op">~</span><span class="st"> </span><span class="kw">I</span>(<span class="dv">1</span> <span class="op">/</span><span class="st"> </span>disp) <span class="op">+</span><span class="st"> </span>wt
 )</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: Like in the first exercise, we can create two <code>lapply()</code> versions:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># lapply (2 versions)</span>
 la1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(formulas, lm, <span class="dt">data =</span> mtcars)
-la2 &lt;-<span class="st"> </span><span class="kw">lapply</span>(formulas, function(x) <span class="kw">lm</span>(<span class="dt">formula =</span> x, <span class="dt">data =</span> mtcars))
+la2 &lt;-<span class="st"> </span><span class="kw">lapply</span>(formulas, <span class="cf">function</span>(x) <span class="kw">lm</span>(<span class="dt">formula =</span> x, <span class="dt">data =</span> mtcars))
 
 <span class="co"># for loop</span>
 lf1 &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>, <span class="kw">length</span>(formulas))
-for (i in <span class="kw">seq_along</span>(formulas)){
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="kw">seq_along</span>(formulas)){
   lf1[[i]] &lt;-<span class="st"> </span><span class="kw">lm</span>(formulas[[i]], <span class="dt">data =</span> mtcars)
 }</code></pre></div>
 <p>Note that all versions return the same content, but they won’t be identical, since the values of the “call” element will differ between each version.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Fit the model <code>mpg ~ disp</code> to each of the bootstrap replicates of <code>mtcars</code> in the list below by using a for loop and <code>lapply()</code>. Can you do it without an anonymous function?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bootstraps &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">1</span>:<span class="dv">10</span>, function(i) {
-  rows &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">nrow</span>(mtcars), <span class="dt">rep =</span> <span class="ot">TRUE</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bootstraps &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="cf">function</span>(i) {
+  rows &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(mtcars), <span class="dt">rep =</span> <span class="ot">TRUE</span>)
   mtcars[rows, ]
 })</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># lapply without anonymous function</span>
-la &lt;-<span class="st"> </span><span class="kw">lapply</span>(bootstraps, lm, <span class="dt">formula =</span> mpg ~<span class="st"> </span>disp)
+la &lt;-<span class="st"> </span><span class="kw">lapply</span>(bootstraps, lm, <span class="dt">formula =</span> mpg <span class="op">~</span><span class="st"> </span>disp)
 
 <span class="co"># for loop</span>
 lf &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;list&quot;</span>, <span class="kw">length</span>(bootstraps))
-for (i in <span class="kw">seq_along</span>(bootstraps)){
-  lf[[i]] &lt;-<span class="st"> </span><span class="kw">lm</span>(mpg ~<span class="st"> </span>disp, <span class="dt">data =</span> bootstraps[[i]])
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="kw">seq_along</span>(bootstraps)){
+  lf[[i]] &lt;-<span class="st"> </span><span class="kw">lm</span>(mpg <span class="op">~</span><span class="st"> </span>disp, <span class="dt">data =</span> bootstraps[[i]])
 }</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: For each model in the previous two exercises, extract <span class="math inline">\(R^2\)</span> using the function below.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rsq &lt;-<span class="st"> </span>function(mod) <span class="kw">summary</span>(mod)$r.squared</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rsq &lt;-<span class="st"> </span><span class="cf">function</span>(mod) <span class="kw">summary</span>(mod)<span class="op">$</span>r.squared</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: For the models in exercise 3:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sapply</span>(la1, rsq)
 <span class="co">#&gt; [1] 0.7183433 0.8596865 0.7809306 0.8838038</span>
@@ -312,11 +327,11 @@ for (i in <span class="kw">seq_along</span>(bootstraps)){
 <span class="co">#&gt; [1] 0.7183433 0.8596865 0.7809306 0.8838038</span></code></pre></div>
 <p>And the models in exercise 4:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sapply</span>(la, rsq)
-<span class="co">#&gt;  [1] 0.7990792 0.7009245 0.7216638 0.6738844 0.7795533 0.7347545 0.6512762</span>
-<span class="co">#&gt;  [8] 0.6943613 0.5996738 0.7131770</span>
+<span class="co">#&gt;  [1] 0.7207897 0.6324568 0.7241623 0.7637960 0.7478840 0.6720768 0.6811906</span>
+<span class="co">#&gt;  [8] 0.6742183 0.7644756 0.7440796</span>
 <span class="kw">sapply</span>(lf, rsq)
-<span class="co">#&gt;  [1] 0.7990792 0.7009245 0.7216638 0.6738844 0.7795533 0.7347545 0.6512762</span>
-<span class="co">#&gt;  [8] 0.6943613 0.5996738 0.7131770</span></code></pre></div></li>
+<span class="co">#&gt;  [1] 0.7207897 0.6324568 0.7241623 0.7637960 0.7478840 0.6720768 0.6811906</span>
+<span class="co">#&gt;  [8] 0.6742183 0.7644756 0.7440796</span></code></pre></div></li>
 </ol>
 </div>
 <div id="for-loops-functionals-friends-of-lapply" class="section level2">
@@ -341,11 +356,11 @@ for (i in <span class="kw">seq_along</span>(bootstraps)){
 <li>all columns have the same number of classes, which is more than one: <code>sapply()</code> returns a matrix</li>
 </ul>
 <p>For example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span>letters[<span class="dv">1</span>:<span class="dv">3</span>]
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span>letters[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>]
 <span class="kw">class</span>(a) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;class1&quot;</span>, <span class="st">&quot;class2&quot;</span>)
 df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">a =</span> <span class="kw">character</span>(<span class="dv">3</span>))
-df$a &lt;-<span class="st"> </span>a
-df$b &lt;-<span class="st"> </span>a
+df<span class="op">$</span>a &lt;-<span class="st"> </span>a
+df<span class="op">$</span>b &lt;-<span class="st"> </span>a
 <span class="kw">class</span>(<span class="kw">sapply</span>(df, class))
 <span class="co">#&gt; [1] &quot;matrix&quot;</span></code></pre></div>
 <p>Note that this case often appears, wile working with the POSIXt types, POSIXct and POSIXlt.</p></li>
@@ -358,7 +373,7 @@ df$b &lt;-<span class="st"> </span>a
 <p>Extra challenge: get rid of the anonymous function by using <code>[[</code> directly.</p>
 <p><strong><span style="color:green">A</span></strong>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># anonymous function:</span>
-<span class="kw">sapply</span>(trials, function(x) x[[<span class="st">&quot;p.value&quot;</span>]])
+<span class="kw">sapply</span>(trials, <span class="cf">function</span>(x) x[[<span class="st">&quot;p.value&quot;</span>]])
 <span class="co"># without anonymous function:</span>
 <span class="kw">sapply</span>(trials, <span class="st">&quot;[[&quot;</span>, <span class="st">&quot;p.value&quot;</span>)</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What does <code>replicate()</code> do? What sort of for loop does it eliminate? Why do its arguments differ from <code>lapply()</code> and friends?</p>
@@ -370,15 +385,15 @@ df$b &lt;-<span class="st"> </span>a
 <pre><code>#&gt; function (n, expr, simplify = &quot;array&quot;) 
 #&gt; sapply(integer(n), eval.parent(substitute(function(...) expr)), 
 #&gt;     simplify = simplify)
-#&gt; &lt;bytecode: 0x000000001507c918&gt;
+#&gt; &lt;bytecode: 0x00000000175406f0&gt;
 #&gt; &lt;environment: namespace:base&gt;</code></pre>
 <p>Like <code>sapply()</code> <code>replicate()</code> eliminates a for loop. As explained for <code>Map()</code> in the textbook, also every <code>replicate()</code> could have been written via <code>lapply()</code>. But using <code>replicate()</code> is more concise, and more clearly indicates what you’re trying to do.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Implement a version of <code>lapply()</code> that supplies <code>FUN</code> with both the name and the value of each component.</p>
 <p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lapply_nms &lt;-<span class="st"> </span>function(X, FUN, ...){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lapply_nms &lt;-<span class="st"> </span><span class="cf">function</span>(X, FUN, ...){
   <span class="kw">Map</span>(FUN, X, <span class="kw">names</span>(X), ...)
 }
-<span class="kw">lapply_nms</span>(iris, function(x, y) <span class="kw">c</span>(<span class="kw">class</span>(x), y))
+<span class="kw">lapply_nms</span>(iris, <span class="cf">function</span>(x, y) <span class="kw">c</span>(<span class="kw">class</span>(x), y))
 <span class="co">#&gt; $Sepal.Length</span>
 <span class="co">#&gt; [1] &quot;numeric&quot;      &quot;Sepal.Length&quot;</span>
 <span class="co">#&gt; </span>
@@ -396,7 +411,7 @@ df$b &lt;-<span class="st"> </span>a
 <li><p><strong><span style="color:red">Q</span></strong>: Implement a combination of <code>Map()</code> and <code>vapply()</code> to create an <code>lapply()</code> variant that iterates in parallel over all of its inputs and stores its outputs in a vector (or a matrix). What arguments should the function take?</p>
 <p><strong><span style="color:green">A</span></strong> As we understand this exercise, it is about working with a list of lists, like in the following example:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">testlist &lt;-<span class="st"> </span><span class="kw">list</span>(iris, mtcars, cars)
-<span class="kw">lapply</span>(testlist, function(x) <span class="kw">vapply</span>(x, mean, <span class="kw">numeric</span>(<span class="dv">1</span>)))
+<span class="kw">lapply</span>(testlist, <span class="cf">function</span>(x) <span class="kw">vapply</span>(x, mean, <span class="kw">numeric</span>(<span class="dv">1</span>)))
 <span class="co">#&gt; Warning in mean.default(X[[i]], ...): argument is not numeric or logical:</span>
 <span class="co">#&gt; returning NA</span>
 <span class="co">#&gt; [[1]]</span>
@@ -413,9 +428,9 @@ df$b &lt;-<span class="st"> </span>a
 <span class="co">#&gt; speed  dist </span>
 <span class="co">#&gt; 15.40 42.98</span></code></pre></div>
 <p>So we can get the same result with a more specialized function:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lmapply &lt;-<span class="st"> </span>function(X, FUN, FUN.VALUE, <span class="dt">simplify =</span> <span class="ot">FALSE</span>){
-  out &lt;-<span class="st"> </span><span class="kw">Map</span>(function(x) <span class="kw">vapply</span>(x, FUN, FUN.VALUE), X)
-  if(simplify ==<span class="st"> </span><span class="ot">TRUE</span>){<span class="kw">return</span>(<span class="kw">simplify2array</span>(out))}
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lmapply &lt;-<span class="st"> </span><span class="cf">function</span>(X, FUN, FUN.VALUE, <span class="dt">simplify =</span> <span class="ot">FALSE</span>){
+  out &lt;-<span class="st"> </span><span class="kw">Map</span>(<span class="cf">function</span>(x) <span class="kw">vapply</span>(x, FUN, FUN.VALUE), X)
+  <span class="cf">if</span>(simplify <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span>){<span class="kw">return</span>(<span class="kw">simplify2array</span>(out))}
   out
 }
 
@@ -445,8 +460,8 @@ df$b &lt;-<span class="st"> </span>a
 <p><strong><span style="color:green">A</span></strong>:</p>
 <p><code>apply()</code> arranges its output columns (or list elements) according to the order of the margin. The rows are ordered by the other dimensions, starting with the “last” dimension of the input object. What this means should become clear by looking at the three and four dimensional cases of the following example:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># for two dimensional cases everything is sorted by the other dimension</span>
-arr2 &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">1</span>:<span class="dv">9</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">3</span>), <span class="dt">dimnames =</span> <span class="kw">list</span>(<span class="kw">paste0</span>(<span class="st">&quot;row&quot;</span>, <span class="dv">1</span>:<span class="dv">3</span>),
-                                              <span class="kw">paste0</span>(<span class="st">&quot;col&quot;</span>, <span class="dv">1</span>:<span class="dv">3</span>)))
+arr2 &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">3</span>), <span class="dt">dimnames =</span> <span class="kw">list</span>(<span class="kw">paste0</span>(<span class="st">&quot;row&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>),
+                                              <span class="kw">paste0</span>(<span class="st">&quot;col&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)))
 arr2
 <span class="kw">apply</span>(arr2, <span class="dv">1</span>, head, <span class="dv">1</span>) <span class="co"># Margin is row</span>
 <span class="kw">apply</span>(arr2, <span class="dv">1</span>, head, <span class="dv">9</span>) <span class="co"># sorts by col</span>
@@ -455,9 +470,9 @@ arr2
 <span class="kw">apply</span>(arr2, <span class="dv">2</span>, head, <span class="dv">9</span>) <span class="co"># sorts by row</span>
 
 <span class="co"># 3 dimensional</span>
-arr3 &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">1</span>:<span class="dv">27</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>), <span class="dt">dimnames =</span> <span class="kw">list</span>(<span class="kw">paste0</span>(<span class="st">&quot;row&quot;</span>, <span class="dv">1</span>:<span class="dv">3</span>),
-                                                <span class="kw">paste0</span>(<span class="st">&quot;col&quot;</span>, <span class="dv">1</span>:<span class="dv">3</span>),
-                                                <span class="kw">paste0</span>(<span class="st">&quot;time&quot;</span>, <span class="dv">1</span>:<span class="dv">3</span>)))
+arr3 &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">27</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>), <span class="dt">dimnames =</span> <span class="kw">list</span>(<span class="kw">paste0</span>(<span class="st">&quot;row&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>),
+                                                <span class="kw">paste0</span>(<span class="st">&quot;col&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>),
+                                                <span class="kw">paste0</span>(<span class="st">&quot;time&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)))
 arr3
 <span class="kw">apply</span>(arr3, <span class="dv">1</span>, head, <span class="dv">1</span>) <span class="co"># Margin is row</span>
 <span class="kw">apply</span>(arr3, <span class="dv">1</span>, head, <span class="dv">27</span>) <span class="co"># sorts by time and col</span>
@@ -469,10 +484,10 @@ arr3
 <span class="kw">apply</span>(arr3, <span class="dv">3</span>, head, <span class="dv">27</span>) <span class="co"># sorts by col and row</span>
 
 <span class="co"># 4 dimensional</span>
-arr4 &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">1</span>:<span class="dv">81</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>), <span class="dt">dimnames =</span> <span class="kw">list</span>(<span class="kw">paste0</span>(<span class="st">&quot;row&quot;</span>, <span class="dv">1</span>:<span class="dv">3</span>),
-                                                  <span class="kw">paste0</span>(<span class="st">&quot;col&quot;</span>, <span class="dv">1</span>:<span class="dv">3</span>),
-                                                  <span class="kw">paste0</span>(<span class="st">&quot;time&quot;</span>, <span class="dv">1</span>:<span class="dv">3</span>),
-                                                  <span class="kw">paste0</span>(<span class="st">&quot;var&quot;</span>, <span class="dv">1</span>:<span class="dv">3</span>)))
+arr4 &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">81</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>), <span class="dt">dimnames =</span> <span class="kw">list</span>(<span class="kw">paste0</span>(<span class="st">&quot;row&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>),
+                                                  <span class="kw">paste0</span>(<span class="st">&quot;col&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>),
+                                                  <span class="kw">paste0</span>(<span class="st">&quot;time&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>),
+                                                  <span class="kw">paste0</span>(<span class="st">&quot;var&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)))
 arr4
 
 <span class="kw">apply</span>(arr4, <span class="dv">1</span>, head, <span class="dv">1</span>) <span class="co"># Margin is row</span>
@@ -488,14 +503,14 @@ arr4
 <span class="kw">apply</span>(arr4, <span class="dv">4</span>, head, <span class="dv">81</span>) <span class="co"># sorts by time, col, row</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: There’s no equivalent to <code>split()</code> + <code>vapply()</code>. Should there be? When would it be useful? Implement one yourself.</p>
 <p><strong><span style="color:green">A</span></strong>: We can modify the <code>tapply2()</code> approach from the book, where <code>split()</code> and <code>sapply()</code> were combined:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">v_tapply &lt;-<span class="st"> </span>function(x, group, f, FUN.VALUE, ..., <span class="dt">USE.NAMES =</span> <span class="ot">TRUE</span>) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">v_tapply &lt;-<span class="st"> </span><span class="cf">function</span>(x, group, f, FUN.VALUE, ..., <span class="dt">USE.NAMES =</span> <span class="ot">TRUE</span>) {
   pieces &lt;-<span class="st"> </span><span class="kw">split</span>(x, group)
   <span class="kw">vapply</span>(pieces, f, FUN.VALUE, ..., <span class="dt">USE.NAMES =</span> <span class="ot">TRUE</span>)
 }</code></pre></div>
 <p><code>tapply()</code> has a <code>SIMPLIFY</code> argument. When you set it to <code>FALSE</code>, <code>tapply()</code> will always return a list. It is easy to create cases where the length and the types/classes of the list elements vary depending on the input. The <code>vapply()</code> version could be useful, if you want to control the structure of the output to get an error according to some logic of a specific usecase or you want typestable output to build up other functions on top of it.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Implement a pure R version of <code>split()</code>. (Hint: use <code>unique()</code> and subsetting.) Can you do it without a for loop?</p>
 <p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">split2 &lt;-<span class="st"> </span>function(x, f, <span class="dt">drop =</span> <span class="ot">FALSE</span>, ...){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">split2 &lt;-<span class="st"> </span><span class="cf">function</span>(x, f, <span class="dt">drop =</span> <span class="ot">FALSE</span>, ...){
   <span class="co"># there are three relevant cases for f. f is a character, f is a factor and all</span>
   <span class="co"># levels occur, f is a factor and some levels don&#39;t occur.</span>
 
@@ -504,13 +519,13 @@ arr4
 
   <span class="co"># if drop it set to TRUE, we drop the non occuring levels.</span>
   <span class="co"># (If f is a character, this has no effect.)</span>
-  if(drop){f &lt;-<span class="st"> </span>f[, drop =<span class="st"> </span><span class="ot">TRUE</span>]}
+  <span class="cf">if</span>(drop){f &lt;-<span class="st"> </span>f[, drop =<span class="st"> </span><span class="ot">TRUE</span>]}
 
   <span class="co"># now we want all unique elements/levels of f</span>
-  levs &lt;-<span class="st"> </span>if (fact) {<span class="kw">unique</span>(<span class="kw">levels</span>(f))} else {<span class="kw">as.character</span>(<span class="kw">unique</span>(f))}
+  levs &lt;-<span class="st"> </span><span class="cf">if</span> (fact) {<span class="kw">unique</span>(<span class="kw">levels</span>(f))} <span class="cf">else</span> {<span class="kw">as.character</span>(<span class="kw">unique</span>(f))}
 
   <span class="co"># we use these levels to subset x and supply names for the resulting output.</span>
-  <span class="kw">setNames</span>(<span class="kw">lapply</span>(levs, function(lv) x[f ==<span class="st"> </span>lv, , <span class="dt">drop =</span> <span class="ot">FALSE</span>]), levs)
+  <span class="kw">setNames</span>(<span class="kw">lapply</span>(levs, <span class="cf">function</span>(lv) x[f <span class="op">==</span><span class="st"> </span>lv, , <span class="dt">drop =</span> <span class="ot">FALSE</span>]), levs)
 }</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What other types of input and output are missing? Brainstorm before you look up some answers in the <a href="http://www.jstatsoft.org/v40/i01/">plyr paper</a>.</p>
 <p><strong><span style="color:green">A</span></strong>: From the suggested plyr paper, we can extract a lot of possible combinations and list them up on a table. Sean C. Anderson already has done this based on a presentation from Hadley Wickham and provided the following result <a href="http://seananderson.ca/2013/12/01/plyr.html">here</a>.</p>
@@ -572,51 +587,51 @@ arr4
 <p><strong><span style="color:green">A</span></strong>: Because a predicate function always returns <code>TRUE</code> or <code>FALSE</code>. <code>is.na(NULL)</code> returns <code>logical(0)</code>, which excludes it from being a predicate function. The closest in base that we are aware of is <code>anyNA()</code>, if one applies it elementwise.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Use <code>Filter()</code> and <code>vapply()</code> to create a function that applies a summary statistic to every numeric column in a data frame.</p>
 <p><strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vapply_num &lt;-<span class="st"> </span>function(X, FUN, FUN.VALUE){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vapply_num &lt;-<span class="st"> </span><span class="cf">function</span>(X, FUN, FUN.VALUE){
   <span class="kw">vapply</span>(<span class="kw">Filter</span>(is.numeric, X), FUN, FUN.VALUE)
 }</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What’s the relationship between <code>which()</code> and <code>Position()</code>? What’s the relationship between <code>where()</code> and <code>Filter()</code>?</p>
 <p><strong><span style="color:green">A</span></strong>: <code>which()</code> returns all indices of true entries from a logical vector. <code>Position()</code> returns just the first (default) or the last integer index of all true entries that occur by applying a predicate function on a vector. So the default relation is <code>Position(f, x) &lt;=&gt; min(which(f(x)))</code>.</p>
 <p><code>where()</code>, defined in the book as:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">where &lt;-<span class="st"> </span>function(f, x) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">where &lt;-<span class="st"> </span><span class="cf">function</span>(f, x) {
   <span class="kw">vapply</span>(x, f, <span class="kw">logical</span>(<span class="dv">1</span>))
 } </code></pre></div>
 <p>is useful to return a logical vector from a condition asked on elements of a list or a data frame. <code>Filter(f, x)</code> returns all elements of a list or a data frame, where the supplied predicate function returns <code>TRUE</code>. So the relation is <code>Filter(f, x) &lt;=&gt; x[where(f, x)]</code>.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Implement <code>Any()</code>, a function that takes a list and a predicate function, and returns <code>TRUE</code> if the predicate function returns <code>TRUE</code> for any of the inputs. Implement <code>All()</code> similarly.</p>
 <p><strong><span style="color:green">A</span></strong>: <code>Any()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Any &lt;-<span class="st"> </span>function(l, pred){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Any &lt;-<span class="st"> </span><span class="cf">function</span>(l, pred){
   <span class="kw">stopifnot</span>(<span class="kw">is.list</span>(l))
 
-  for (i in <span class="kw">seq_along</span>(l)){
-    if (<span class="kw">pred</span>(l[[i]])) <span class="kw">return</span>(<span class="ot">TRUE</span>)
+  <span class="cf">for</span> (i <span class="cf">in</span> <span class="kw">seq_along</span>(l)){
+    <span class="cf">if</span> (<span class="kw">pred</span>(l[[i]])) <span class="kw">return</span>(<span class="ot">TRUE</span>)
   }
 
   <span class="kw">return</span>(<span class="ot">FALSE</span>)
 }</code></pre></div>
 <p><code>All()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">All &lt;-<span class="st"> </span>function(l, pred){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">All &lt;-<span class="st"> </span><span class="cf">function</span>(l, pred){
   <span class="kw">stopifnot</span>(<span class="kw">is.list</span>(l))
 
-  for (i in <span class="kw">seq_along</span>(l)){
-    if (!<span class="kw">pred</span>(l[[i]])) <span class="kw">return</span>(<span class="ot">FALSE</span>)
+  <span class="cf">for</span> (i <span class="cf">in</span> <span class="kw">seq_along</span>(l)){
+    <span class="cf">if</span> (<span class="op">!</span><span class="kw">pred</span>(l[[i]])) <span class="kw">return</span>(<span class="ot">FALSE</span>)
   }
 
   <span class="kw">return</span>(<span class="ot">TRUE</span>)
 }</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Implement the <code>span()</code> function from Haskell: given a list <code>x</code> and a predicate function <code>f</code>, <code>span</code> returns the location of the longest sequential run of elements where the predicate is true. (Hint: you might find <code>rle()</code> helpful.)</p>
 <p><strong><span style="color:green">A</span></strong>: Our <code>span_r()</code> function returns the first index of the longest sequential run of elements where the predicate is true. In case of more than one longest sequenital, more than one first_index is returned.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">span_r &lt;-<span class="st"> </span>function(l, pred){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">span_r &lt;-<span class="st"> </span><span class="cf">function</span>(l, pred){
   <span class="co"># We test if l is a list</span>
   <span class="kw">stopifnot</span>(<span class="kw">is.list</span>(l))
 
   <span class="co"># we preallocate a logical vector and save the result</span>
   <span class="co"># of the predicate function applied to each element of the list</span>
   test &lt;-<span class="st"> </span><span class="kw">vector</span>(<span class="st">&quot;logical&quot;</span>, <span class="kw">length</span>(l))
-  for (i in <span class="kw">seq_along</span>(l)){
+  <span class="cf">for</span> (i <span class="cf">in</span> <span class="kw">seq_along</span>(l)){
     test[i] &lt;-<span class="st"> </span>(<span class="kw">pred</span>(l[[i]]))
   }
   <span class="co"># we return NA, if the output of pred is always FALSE</span>
-  if(!<span class="kw">any</span>(test)) <span class="kw">return</span>(<span class="ot">NA_integer_</span>)
+  <span class="cf">if</span>(<span class="op">!</span><span class="kw">any</span>(test)) <span class="kw">return</span>(<span class="ot">NA_integer_</span>)
 
   <span class="co"># Otherwise we look at the length encoding of TRUE and FALSE values.</span>
   rle_test &lt;-<span class="st"> </span><span class="kw">rle</span>(test)
@@ -626,14 +641,14 @@ arr4
   rle_test &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">lengths =</span> rle_test[[<span class="st">&quot;lengths&quot;</span>]],
                           <span class="dt">values =</span> rle_test[[<span class="st">&quot;values&quot;</span>]],
                           <span class="dt">cumsum =</span> <span class="kw">cumsum</span>(rle_test[[<span class="st">&quot;lengths&quot;</span>]]))
-  rle_test[[<span class="st">&quot;first_index&quot;</span>]] &lt;-<span class="st"> </span>rle_test[[<span class="st">&quot;cumsum&quot;</span>]] -<span class="st"> </span>rle_test[[<span class="st">&quot;lengths&quot;</span>]] +<span class="st"> </span><span class="dv">1</span>
+  rle_test[[<span class="st">&quot;first_index&quot;</span>]] &lt;-<span class="st"> </span>rle_test[[<span class="st">&quot;cumsum&quot;</span>]] <span class="op">-</span><span class="st"> </span>rle_test[[<span class="st">&quot;lengths&quot;</span>]] <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
   <span class="co"># In the last line we calculated the first index in the original list for every encoding</span>
   <span class="co"># In the next line we calculate a column, which gives the maximum </span>
   <span class="co"># encoding length among all encodings with the value TRUE</span>
-  rle_test[[<span class="st">&quot;max&quot;</span>]] &lt;-<span class="st">  </span><span class="kw">max</span>(rle_test[rle_test[, <span class="st">&quot;values&quot;</span>] ==<span class="st"> </span><span class="ot">TRUE</span>, ][,<span class="st">&quot;lengths&quot;</span>])
+  rle_test[[<span class="st">&quot;max&quot;</span>]] &lt;-<span class="st">  </span><span class="kw">max</span>(rle_test[rle_test[, <span class="st">&quot;values&quot;</span>] <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span>, ][,<span class="st">&quot;lengths&quot;</span>])
   <span class="co"># Now we just have to subset for maximum length among all TRUE values and return the</span>
   <span class="co"># according &quot;first index&quot;:</span>
-  rle_test[rle_test$lengths ==<span class="st"> </span>rle_test$max &amp;<span class="st"> </span>rle_test$values ==<span class="st"> </span><span class="ot">TRUE</span>, ]$first_index
+  rle_test[rle_test<span class="op">$</span>lengths <span class="op">==</span><span class="st"> </span>rle_test<span class="op">$</span>max <span class="op">&amp;</span><span class="st"> </span>rle_test<span class="op">$</span>values <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span>, ]<span class="op">$</span>first_index
 }</code></pre></div></li>
 </ol>
 </div>
@@ -642,12 +657,12 @@ arr4
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: Implement <code>arg_max()</code>. It should take a function and a vector of inputs, and return the elements of the input where the function returns the highest value. For example, <code>arg_max(-10:5, function(x) x ^ 2)</code> should return -10. <code>arg_max(-5:5, function(x) x ^ 2)</code> should return <code>c(-5, 5)</code>. Also implement the matching <code>arg_min()</code> function.</p>
 <p><strong><span style="color:green">A</span></strong>: <code>arg_max()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">arg_max &lt;-<span class="st"> </span>function(x, f){
-  x[<span class="kw">f</span>(x) ==<span class="st"> </span><span class="kw">max</span>(<span class="kw">f</span>(x))]
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">arg_max &lt;-<span class="st"> </span><span class="cf">function</span>(x, f){
+  x[<span class="kw">f</span>(x) <span class="op">==</span><span class="st"> </span><span class="kw">max</span>(<span class="kw">f</span>(x))]
 }</code></pre></div>
 <p><code>arg_min()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">arg_min &lt;-<span class="st"> </span>function(x, f){
-  x[<span class="kw">f</span>(x) ==<span class="st"> </span><span class="kw">min</span>(<span class="kw">f</span>(x))]
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">arg_min &lt;-<span class="st"> </span><span class="cf">function</span>(x, f){
+  x[<span class="kw">f</span>(x) <span class="op">==</span><span class="st"> </span><span class="kw">min</span>(<span class="kw">f</span>(x))]
 }</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Challenge: read about the <a href="http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-12.html#%_sec_1.3">fixed point algorithm</a>. Complete the exercises using R.</p></li>
 </ol>
@@ -657,86 +672,86 @@ arr4
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: Implement <code>smaller</code> and <code>larger</code> functions that, given two inputs, return either the smaller or the larger value. Implement <code>na.rm = TRUE</code>: what should the identity be? (Hint: <code>smaller(x, smaller(NA, NA, na.rm = TRUE), na.rm = TRUE)</code> must be <code>x</code>, so <code>smaller(NA, NA, na.rm = TRUE)</code> must be bigger than any other value of x.) Use <code>smaller</code> and <code>larger</code> to implement equivalents of <code>min()</code>, <code>max()</code>, <code>pmin()</code>, <code>pmax()</code>, and new functions <code>row_min()</code> and <code>row_max()</code>.</p>
 <p><strong><span style="color:green">A</span></strong>: We can do almost everything as shown in the case study in the textbook. First we define the functions <code>smaller_()</code> and <code>larger_()</code>. We use the underscore suffix, to built up non suffixed versions on top, which will include the <code>na.rm</code> parameter. In contrast to the <code>add()</code> example from the book, we change two things at this step. We won’t include errorchecking, since this is done later at the top level and we return <code>NA_integer_</code> if any of the arguments is <code>NA</code> (this is important, if na.rm is set to <code>FALSE</code> and wasn’t needed by the <code>add()</code> example, since <code>+</code> already returns <code>NA</code> in this case.)</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">smaller_ &lt;-<span class="st"> </span>function(x, y){
-  if(<span class="kw">anyNA</span>(<span class="kw">c</span>(x, y))){<span class="kw">return</span>(<span class="ot">NA_integer_</span>)}
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">smaller_ &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){
+  <span class="cf">if</span>(<span class="kw">anyNA</span>(<span class="kw">c</span>(x, y))){<span class="kw">return</span>(<span class="ot">NA_integer_</span>)}
   out &lt;-<span class="st"> </span>x
-  if(y &lt;<span class="st"> </span>x) {out &lt;-<span class="st"> </span>y}
+  <span class="cf">if</span>(y <span class="op">&lt;</span><span class="st"> </span>x) {out &lt;-<span class="st"> </span>y}
   out
 }
 
-larger_ &lt;-<span class="st"> </span>function(x, y){
-  if(<span class="kw">anyNA</span>(<span class="kw">c</span>(x, y))){<span class="kw">return</span>(<span class="ot">NA_integer_</span>)}
+larger_ &lt;-<span class="st"> </span><span class="cf">function</span>(x, y){
+  <span class="cf">if</span>(<span class="kw">anyNA</span>(<span class="kw">c</span>(x, y))){<span class="kw">return</span>(<span class="ot">NA_integer_</span>)}
   out &lt;-<span class="st"> </span>x
-  if(y &gt;<span class="st"> </span>x) {out &lt;-<span class="st"> </span>y}
+  <span class="cf">if</span>(y <span class="op">&gt;</span><span class="st"> </span>x) {out &lt;-<span class="st"> </span>y}
   out
 }</code></pre></div>
 <p>We can take <code>na.rm()</code> from the book:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rm_na &lt;-<span class="st"> </span>function(x, y, identity) {
-  if (<span class="kw">is.na</span>(x) &amp;&amp;<span class="st"> </span><span class="kw">is.na</span>(y)) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rm_na &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, identity) {
+  <span class="cf">if</span> (<span class="kw">is.na</span>(x) <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">is.na</span>(y)) {
     identity
-    } else if (<span class="kw">is.na</span>(x)) {
+    } <span class="cf">else</span> <span class="cf">if</span> (<span class="kw">is.na</span>(x)) {
       y
-      } else {
+      } <span class="cf">else</span> {
         x
       }
 }</code></pre></div>
 <p>To find the identity value, we can apply the same argument as in the textbook, hence our functions are also associative and the following equation should hold:</p>
 <pre><code>3 = smaller(smaller(3, NA), NA) = smaller(3, smaller(NA, NA)) = 3</code></pre>
 <p>So the identidy has to be greater than 3. When we generalize from 3 to any real number this means that the identity has to be greater than any number, which leads us to infinity. Hence identity has to be <code>Inf</code> for <code>smaller()</code> (and <code>-Inf</code> for <code>larger()</code>), which we implement next:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">smaller &lt;-<span class="st"> </span>function(x, y, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
-  <span class="kw">stopifnot</span>(<span class="kw">length</span>(x) ==<span class="st"> </span><span class="dv">1</span>, <span class="kw">length</span>(y) ==<span class="st"> </span><span class="dv">1</span>, <span class="kw">is.numeric</span>(x) |<span class="st"> </span><span class="kw">is.logical</span>(x),
-            <span class="kw">is.numeric</span>(y) |<span class="st"> </span><span class="kw">is.logical</span>(y))
-  if (na.rm &amp;&amp;<span class="st"> </span>(<span class="kw">is.na</span>(x) ||<span class="st"> </span><span class="kw">is.na</span>(y))) <span class="kw">rm_na</span>(x, y, <span class="ot">Inf</span>) else <span class="kw">smaller_</span>(x,y)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">smaller &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
+  <span class="kw">stopifnot</span>(<span class="kw">length</span>(x) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="kw">length</span>(y) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="kw">is.numeric</span>(x) <span class="op">|</span><span class="st"> </span><span class="kw">is.logical</span>(x),
+            <span class="kw">is.numeric</span>(y) <span class="op">|</span><span class="st"> </span><span class="kw">is.logical</span>(y))
+  <span class="cf">if</span> (na.rm <span class="op">&amp;&amp;</span><span class="st"> </span>(<span class="kw">is.na</span>(x) <span class="op">||</span><span class="st"> </span><span class="kw">is.na</span>(y))) <span class="kw">rm_na</span>(x, y, <span class="ot">Inf</span>) <span class="cf">else</span> <span class="kw">smaller_</span>(x,y)
 }
 
-larger &lt;-<span class="st"> </span>function(x, y, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
-  <span class="kw">stopifnot</span>(<span class="kw">length</span>(x) ==<span class="st"> </span><span class="dv">1</span>, <span class="kw">length</span>(y) ==<span class="st"> </span><span class="dv">1</span>, <span class="kw">is.numeric</span>(x) |<span class="st"> </span><span class="kw">is.logical</span>(x),
-            <span class="kw">is.numeric</span>(y) |<span class="st"> </span><span class="kw">is.logical</span>(y))
-  if (na.rm &amp;&amp;<span class="st"> </span>(<span class="kw">is.na</span>(x) ||<span class="st"> </span><span class="kw">is.na</span>(y))) <span class="kw">rm_na</span>(x, y, -<span class="ot">Inf</span>) else <span class="kw">larger_</span>(x,y)
+larger &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
+  <span class="kw">stopifnot</span>(<span class="kw">length</span>(x) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="kw">length</span>(y) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="kw">is.numeric</span>(x) <span class="op">|</span><span class="st"> </span><span class="kw">is.logical</span>(x),
+            <span class="kw">is.numeric</span>(y) <span class="op">|</span><span class="st"> </span><span class="kw">is.logical</span>(y))
+  <span class="cf">if</span> (na.rm <span class="op">&amp;&amp;</span><span class="st"> </span>(<span class="kw">is.na</span>(x) <span class="op">||</span><span class="st"> </span><span class="kw">is.na</span>(y))) <span class="kw">rm_na</span>(x, y, <span class="op">-</span><span class="ot">Inf</span>) <span class="cf">else</span> <span class="kw">larger_</span>(x,y)
 }</code></pre></div>
 <p>Like <code>min()</code> and <code>max()</code> can act on vectors, we can implement this easyly for our new functions. As shown in the book, we also have to set the <code>init</code> parameter to the identity value.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">r_smaller &lt;-<span class="st"> </span>function(xs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) {
-  <span class="kw">Reduce</span>(function(x, y) <span class="kw">smaller</span>(x, y, <span class="dt">na.rm =</span> na.rm), xs, <span class="dt">init =</span> <span class="ot">Inf</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">r_smaller &lt;-<span class="st"> </span><span class="cf">function</span>(xs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) {
+  <span class="kw">Reduce</span>(<span class="cf">function</span>(x, y) <span class="kw">smaller</span>(x, y, <span class="dt">na.rm =</span> na.rm), xs, <span class="dt">init =</span> <span class="ot">Inf</span>)
 }
 <span class="co"># some tests</span>
-<span class="kw">r_smaller</span>(<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">3</span>, <span class="dv">4</span>:(-<span class="dv">1</span>)))
+<span class="kw">r_smaller</span>(<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">4</span><span class="op">:</span>(<span class="op">-</span><span class="dv">1</span>)))
 <span class="co">#&gt; [1] -1</span>
 <span class="kw">r_smaller</span>(<span class="ot">NA</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
 <span class="co">#&gt; [1] Inf</span>
 <span class="kw">r_smaller</span>(<span class="kw">numeric</span>())
 <span class="co">#&gt; [1] Inf</span>
 
-r_larger &lt;-<span class="st"> </span>function(xs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) {
-  <span class="kw">Reduce</span>(function(x, y) <span class="kw">larger</span>(x, y, <span class="dt">na.rm =</span> na.rm), xs, <span class="dt">init =</span> -<span class="ot">Inf</span>)
+r_larger &lt;-<span class="st"> </span><span class="cf">function</span>(xs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) {
+  <span class="kw">Reduce</span>(<span class="cf">function</span>(x, y) <span class="kw">larger</span>(x, y, <span class="dt">na.rm =</span> na.rm), xs, <span class="dt">init =</span> <span class="op">-</span><span class="ot">Inf</span>)
 }
 <span class="co"># some tests</span>
-<span class="kw">r_larger</span>(<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">3</span>), <span class="kw">c</span>(<span class="dv">4</span>:<span class="dv">1</span>))
+<span class="kw">r_larger</span>(<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>), <span class="kw">c</span>(<span class="dv">4</span><span class="op">:</span><span class="dv">1</span>))
 <span class="co">#&gt; [1] 3</span>
 <span class="kw">r_larger</span>(<span class="ot">NA</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
 <span class="co">#&gt; [1] -Inf</span>
 <span class="kw">r_larger</span>(<span class="kw">numeric</span>())
 <span class="co">#&gt; [1] -Inf</span></code></pre></div>
 <p>We can also create vectorised versions as shown in the book. We will just show the <code>smaller()</code> case to become not too verbose.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">v_smaller1 &lt;-<span class="st"> </span>function(x, y, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>){
-  <span class="kw">stopifnot</span>(<span class="kw">length</span>(x) ==<span class="st"> </span><span class="kw">length</span>(y), <span class="kw">is.numeric</span>(x) |<span class="st"> </span><span class="kw">is.logical</span>(x), 
-            <span class="kw">is.numeric</span>(y)|<span class="st"> </span><span class="kw">is.logical</span>(x))
-  if (<span class="kw">length</span>(x) ==<span class="st"> </span><span class="dv">0</span>) <span class="kw">return</span>(<span class="kw">numeric</span>())
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">v_smaller1 &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>){
+  <span class="kw">stopifnot</span>(<span class="kw">length</span>(x) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(y), <span class="kw">is.numeric</span>(x) <span class="op">|</span><span class="st"> </span><span class="kw">is.logical</span>(x), 
+            <span class="kw">is.numeric</span>(y)<span class="op">|</span><span class="st"> </span><span class="kw">is.logical</span>(x))
+  <span class="cf">if</span> (<span class="kw">length</span>(x) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) <span class="kw">return</span>(<span class="kw">numeric</span>())
   <span class="kw">simplify2array</span>(
-    <span class="kw">Map</span>(function(x, y) <span class="kw">smaller</span>(x, y, <span class="dt">na.rm =</span> na.rm), x, y)
+    <span class="kw">Map</span>(<span class="cf">function</span>(x, y) <span class="kw">smaller</span>(x, y, <span class="dt">na.rm =</span> na.rm), x, y)
   )
 }
 
-v_smaller2 &lt;-<span class="st"> </span>function(x, y, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
-  <span class="kw">stopifnot</span>(<span class="kw">length</span>(x) ==<span class="st"> </span><span class="kw">length</span>(y), <span class="kw">is.numeric</span>(x) |<span class="st"> </span><span class="kw">is.logical</span>(x), 
-            <span class="kw">is.numeric</span>(y)|<span class="st"> </span><span class="kw">is.logical</span>(x))
-  <span class="kw">vapply</span>(<span class="kw">seq_along</span>(x), function(i) <span class="kw">smaller</span>(x[i], y[i], <span class="dt">na.rm =</span> na.rm),
+v_smaller2 &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
+  <span class="kw">stopifnot</span>(<span class="kw">length</span>(x) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(y), <span class="kw">is.numeric</span>(x) <span class="op">|</span><span class="st"> </span><span class="kw">is.logical</span>(x), 
+            <span class="kw">is.numeric</span>(y)<span class="op">|</span><span class="st"> </span><span class="kw">is.logical</span>(x))
+  <span class="kw">vapply</span>(<span class="kw">seq_along</span>(x), <span class="cf">function</span>(i) <span class="kw">smaller</span>(x[i], y[i], <span class="dt">na.rm =</span> na.rm),
          <span class="kw">numeric</span>(<span class="dv">1</span>))
 }
 
 <span class="co"># Both versions give the same results</span>
-<span class="kw">v_smaller1</span>(<span class="dv">1</span>:<span class="dv">10</span>, <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">3</span>,<span class="dv">6</span>,<span class="dv">5</span>,<span class="dv">8</span>,<span class="dv">7</span>,<span class="dv">10</span>,<span class="dv">9</span>))
+<span class="kw">v_smaller1</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">3</span>,<span class="dv">6</span>,<span class="dv">5</span>,<span class="dv">8</span>,<span class="dv">7</span>,<span class="dv">10</span>,<span class="dv">9</span>))
 <span class="co">#&gt;  [1] 1 1 3 3 5 5 7 7 9 9</span>
-<span class="kw">v_smaller2</span>(<span class="dv">1</span>:<span class="dv">10</span>, <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">3</span>,<span class="dv">6</span>,<span class="dv">5</span>,<span class="dv">8</span>,<span class="dv">7</span>,<span class="dv">10</span>,<span class="dv">9</span>))
+<span class="kw">v_smaller2</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">3</span>,<span class="dv">6</span>,<span class="dv">5</span>,<span class="dv">8</span>,<span class="dv">7</span>,<span class="dv">10</span>,<span class="dv">9</span>))
 <span class="co">#&gt;  [1] 1 1 3 3 5 5 7 7 9 9</span>
 
 <span class="kw">v_smaller1</span>(<span class="kw">numeric</span>(), <span class="kw">numeric</span>())
@@ -754,13 +769,13 @@ v_smaller2 &lt;-<span class="st"> </span>function(x, y, <span class="dt">na.rm =
 <span class="kw">v_smaller2</span>(<span class="ot">NA</span>,<span class="ot">NA</span>)
 <span class="co">#&gt; [1] NA</span></code></pre></div>
 <p>Of course, we are also able to copy paste the rest from the textbook, to solve the last part of the exercise:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">row_min &lt;-<span class="st"> </span>function(x, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">row_min &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
   <span class="kw">apply</span>(x, <span class="dv">1</span>, r_smaller, <span class="dt">na.rm =</span> na.rm)
 }
-col_min &lt;-<span class="st"> </span>function(x, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
+col_min &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
   <span class="kw">apply</span>(x, <span class="dv">2</span>, r_smaller, <span class="dt">na.rm =</span> na.rm)
 }
-arr_min &lt;-<span class="st"> </span>function(x, dim, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
+arr_min &lt;-<span class="st"> </span><span class="cf">function</span>(x, dim, <span class="dt">na.rm =</span> <span class="ot">FALSE</span>) {
   <span class="kw">apply</span>(x, dim, r_smaller, <span class="dt">na.rm =</span> na.rm)
 }</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Create a table that has <em>and</em>, <em>or</em>, <em>add</em>, <em>multiply</em>, <em>smaller</em>, and <em>larger</em> in the columns and <em>binary operator</em>, <em>reducing variant</em>, <em>vectorised variant</em>, and <em>array variants</em> in the rows.</p>
@@ -1070,15 +1085,15 @@ arr_min &lt;-<span class="st"> </span>function(x, dim, <span class="dt">na.rm =<
 <span class="kw">paste</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>,<span class="st">&quot;&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>) 
 <span class="co">#&gt; [1] &quot;ab&quot;</span></code></pre></div>
 <p>If you supply at least one element with length greater then one, it behaves like a vectorised function, i.e. :</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">paste</span>(<span class="dv">1</span>:<span class="dv">3</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">paste</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)
 <span class="co">#&gt; [1] &quot;1&quot; &quot;2&quot; &quot;3&quot;</span>
-<span class="kw">paste</span>(<span class="dv">1</span>:<span class="dv">3</span>, <span class="dv">1</span>:<span class="dv">2</span>)
+<span class="kw">paste</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)
 <span class="co">#&gt; [1] &quot;1 1&quot; &quot;2 2&quot; &quot;3 1&quot;</span>
-<span class="kw">paste</span>(<span class="dv">1</span>:<span class="dv">3</span>, <span class="dv">1</span>:<span class="dv">2</span>, <span class="dv">1</span>)
+<span class="kw">paste</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="dv">1</span>)
 <span class="co">#&gt; [1] &quot;1 1 1&quot; &quot;2 2 1&quot; &quot;3 1 1&quot;</span></code></pre></div>
 <p>We think it should be possible to implement a new <code>paste()</code> starting from</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p_binary &lt;-<span class="st"> </span>function(x, <span class="dt">y =</span> <span class="st">&quot;&quot;</span>) {
-  <span class="kw">stopifnot</span>(<span class="kw">length</span>(x) ==<span class="st"> </span><span class="dv">1</span>, <span class="kw">length</span>(y) ==<span class="st"> </span><span class="dv">1</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p_binary &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">y =</span> <span class="st">&quot;&quot;</span>) {
+  <span class="kw">stopifnot</span>(<span class="kw">length</span>(x) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="kw">length</span>(y) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)
   <span class="kw">paste0</span>(x,y)
 }</code></pre></div>
 <p>The <code>sep</code> argument is equivalent to bind <code>sep</code> on every <code>...</code> input supplied to <code>paste()</code>, but the last and then bind these results together. In relations:</p>
@@ -1095,11 +1110,11 @@ paste0(paste0(n1, sep), paste0(n2, sep), ..., paste0(nn, sep), paste0(nm))</code
 <span class="co">#&gt; [1] &quot;a_b_c&quot;</span>
 
 <span class="co"># non scalar</span>
-<span class="kw">paste</span>(<span class="dv">1</span>:<span class="dv">2</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>)
+<span class="kw">paste</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>)
 <span class="co">#&gt; [1] &quot;1_b_c&quot; &quot;2_b_c&quot;</span>
-<span class="kw">paste0</span>(<span class="kw">paste0</span>(<span class="dv">1</span>:<span class="dv">2</span>, <span class="st">&quot;_&quot;</span>), <span class="kw">paste</span>(<span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>))
+<span class="kw">paste0</span>(<span class="kw">paste0</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="st">&quot;_&quot;</span>), <span class="kw">paste</span>(<span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>))
 <span class="co">#&gt; [1] &quot;1_b_c&quot; &quot;2_b_c&quot;</span>
-<span class="kw">paste0</span>(<span class="kw">paste0</span>(<span class="dv">1</span>:<span class="dv">2</span>, <span class="st">&quot;_&quot;</span>), <span class="kw">paste0</span>(<span class="st">&quot;b&quot;</span>, <span class="st">&quot;_&quot;</span>), <span class="kw">paste0</span>(<span class="st">&quot;c&quot;</span>))
+<span class="kw">paste0</span>(<span class="kw">paste0</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="st">&quot;_&quot;</span>), <span class="kw">paste0</span>(<span class="st">&quot;b&quot;</span>, <span class="st">&quot;_&quot;</span>), <span class="kw">paste0</span>(<span class="st">&quot;c&quot;</span>))
 <span class="co">#&gt; [1] &quot;1_b_c&quot; &quot;2_b_c&quot;</span></code></pre></div>
 <p>collapse just binds the outputs for non scalar input together with the collapse input. In relations:</p>
 <pre><code>for input A1, ..., An, where Ai = a1i:ami,
@@ -1114,11 +1129,11 @@ paste0(
              paste(  am1,   am2, ...,   amn)
       )</code></pre>
 <p>One can see this easily by intuition from examples:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">paste</span>(<span class="dv">1</span>:<span class="dv">5</span>, <span class="dv">1</span>:<span class="dv">5</span>, <span class="dv">6</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>, <span class="dt">collapse =</span> <span class="st">&quot;_x_&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">paste</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dv">6</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>, <span class="dt">collapse =</span> <span class="st">&quot;_x_&quot;</span>)
 <span class="co">#&gt; [1] &quot;116_x_226_x_336_x_446_x_556&quot;</span>
 <span class="kw">paste</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>, <span class="dt">collapse =</span> <span class="st">&quot;_x_&quot;</span>)
 <span class="co">#&gt; [1] &quot;1 2 3 4&quot;</span>
-<span class="kw">paste</span>(<span class="dv">1</span>:<span class="dv">2</span>,<span class="dv">1</span>:<span class="dv">2</span>,<span class="dv">2</span>:<span class="dv">3</span>,<span class="dv">3</span>:<span class="dv">4</span>, <span class="dt">collapse =</span> <span class="st">&quot;_x_&quot;</span>)
+<span class="kw">paste</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>,<span class="dv">3</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">collapse =</span> <span class="st">&quot;_x_&quot;</span>)
 <span class="co">#&gt; [1] &quot;1 1 2 3_x_2 2 3 4&quot;</span></code></pre></div>
 <p>We think the only paste version that is not implemented in base R is an array version. At least we are not aware of sth. like <code>row_paste</code> or <code>paste_apply</code> etc.</p></li>
 </ol>
@@ -1131,8 +1146,9 @@ paste0(
         </div>
       </div>
 <a href="functional-programming.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="function-operators.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
-
+<a href="function-operators.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
@@ -1176,7 +1192,7 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:" && /^https?:/.test(script.src))
       script.src  = script.src.replace(/^https?:/, '');
     document.getElementsByTagName("head")[0].appendChild(script);

@@ -6,9 +6,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Advanced R Solutions</title>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
   <meta name="description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R.">
-  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
 
   <meta property="og:title" content="Advanced R Solutions" />
   <meta property="og:type" content="book" />
@@ -23,10 +22,10 @@
   <meta name="twitter:description" content="Solutions to the exercises in Hadley Wickham’s book Advanced R." />
   <meta name="twitter:image" content="images/advrs_cover.png" />
 
-<meta name="author" content="Malte Grosser &amp; Henning Bumann">
+<meta name="author" content="Malte Grosser, Henning Bumann, Peter Hurford &amp; Robert Krzyzanowski">
 
 
-<meta name="date" content="2017-04-13">
+<meta name="date" content="2017-07-16">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -35,7 +34,6 @@
   
 <link rel="prev" href="index.html">
 <link rel="next" href="subsetting.html">
-
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -129,6 +127,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </head>
 
 <body>
+
 
 
   <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
@@ -233,6 +232,22 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="16.3" data-path="rcpp.html"><a href="rcpp.html#the-stl"><i class="fa fa-check"></i><b>16.3</b> The STL</a></li>
 </ul></li>
 <li class="chapter" data-level="17" data-path="testchapter.html"><a href="testchapter.html"><i class="fa fa-check"></i><b>17</b> Testchapter</a></li>
+<li class="chapter" data-level="18" data-path="s3-1.html"><a href="s3-1.html"><i class="fa fa-check"></i><b>18</b> S3</a><ul>
+<li class="chapter" data-level="18.1" data-path="s3-1.html"><a href="s3-1.html#basics"><i class="fa fa-check"></i><b>18.1</b> Basics</a></li>
+<li class="chapter" data-level="18.2" data-path="s3-1.html"><a href="s3-1.html#classes"><i class="fa fa-check"></i><b>18.2</b> Classes</a></li>
+<li class="chapter" data-level="18.3" data-path="s3-1.html"><a href="s3-1.html#generics-and-methods"><i class="fa fa-check"></i><b>18.3</b> Generics and methods</a></li>
+<li class="chapter" data-level="18.4" data-path="s3-1.html"><a href="s3-1.html#method-dispatch"><i class="fa fa-check"></i><b>18.4</b> Method dispatch</a></li>
+<li class="chapter" data-level="18.5" data-path="s3-1.html"><a href="s3-1.html#inheritance"><i class="fa fa-check"></i><b>18.5</b> Inheritance</a></li>
+<li class="chapter" data-level="18.6" data-path="s3-1.html"><a href="s3-1.html#dispatch-details"><i class="fa fa-check"></i><b>18.6</b> Dispatch details</a></li>
+</ul></li>
+<li class="chapter" data-level="19" data-path="s4-1.html"><a href="s4-1.html"><i class="fa fa-check"></i><b>19</b> S4</a><ul>
+<li class="chapter" data-level="19.1" data-path="s4-1.html"><a href="s4-1.html#classes-1"><i class="fa fa-check"></i><b>19.1</b> Classes</a></li>
+<li class="chapter" data-level="19.2" data-path="s4-1.html"><a href="s4-1.html#generics-and-methods-1"><i class="fa fa-check"></i><b>19.2</b> Generics and methods</a></li>
+<li class="chapter" data-level="19.3" data-path="s4-1.html"><a href="s4-1.html#method-dispatch-1"><i class="fa fa-check"></i><b>19.3</b> Method dispatch</a></li>
+<li class="chapter" data-level="19.4" data-path="s4-1.html"><a href="s4-1.html#s4-and-existing-code"><i class="fa fa-check"></i><b>19.4</b> S4 and existing code</a><ul>
+<li class="chapter" data-level="19.4.1" data-path="s4-1.html"><a href="s4-1.html#exercises"><i class="fa fa-check"></i><b>19.4.1</b> Exercises</a></li>
+</ul></li>
+</ul></li>
 </ul>
 
       </nav>
@@ -262,21 +277,22 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><p><strong><span style="color:red">Q</span></strong>: Test your knowledge of vector coercion rules by predicting the output of the following uses of <code>c()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(<span class="dv">1</span>, <span class="ot">FALSE</span>)      <span class="co"># will be coerced to numeric   -&gt; 1 0</span>
 <span class="kw">c</span>(<span class="st">&quot;a&quot;</span>, <span class="dv">1</span>)        <span class="co"># will be coerced to character -&gt; &quot;a&quot; &quot;1&quot;</span>
-<span class="kw">c</span>(<span class="kw">list</span>(<span class="dv">1</span>), <span class="st">&quot;a&quot;</span>)  <span class="co"># will be coerced to a list with two elements of type double and character </span>
+<span class="kw">c</span>(<span class="kw">list</span>(<span class="dv">1</span>), <span class="st">&quot;a&quot;</span>)  <span class="co"># will be coerced to a list (since not all elements are atomic)</span>
+                 <span class="co"># with two elements of type double and character </span>
 <span class="kw">c</span>(<span class="ot">TRUE</span>, 1L)      <span class="co"># will be coerced to integer   -&gt; 1 1</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Why do you need to use <code>unlist()</code> to convert a list to an atomic vector? Why doesn’t <code>as.vector()</code> work?<br />
-<strong><span style="color:green">A</span></strong>: To get rid of (flatten) the nested structure.</p></li>
+<strong><span style="color:green">A</span></strong>: To get rid of (flatten) the nested structure. Recall that lists are considered vectors, so <code>as.vector()</code> will leave it the same. <code>as.vector()</code> can be used to convert a non-recursive list to an atomic vector if the desired <code>mode</code> is passed explicitly. But the core problem is that <code>as.vector()</code> cannot handle recursion within lists. Only <code>unlist()</code> (or <code>purrr::flatten()</code> functions) can do that.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Why is <code>1 == &quot;1&quot;</code> true? Why is <code>-1 &lt; FALSE</code> true? Why is <code>&quot;one&quot; &lt; 2</code> false?<br />
-<strong><span style="color:green">A</span></strong>: These operators are all functions which coerce their arguments (in these cases) to character, double and character. To enlighten the latter case: “one” comes after “2” in ASCI.</p></li>
+<strong><span style="color:green">A</span></strong>: These operators are all functions which coerce their arguments (in these cases) to character, double and character. To enlighten the latter case: “one” comes after “2” in ASCII.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Why is the default missing value, <code>NA</code>, a logical vector? What’s special about logical vectors? (Hint: think about <code>c(FALSE, NA_character_)</code>.)<br />
-<strong><span style="color:green">A</span></strong>: It is a practical thought. When you combine <code>NA</code>’s in <code>c()</code> with other atomic types they will be coerced like <code>TRUE</code> and <code>FALSE</code> to integer <code>(NA_integer_)</code>, double <code>(NA_real_)</code>, complex <code>(NA_complex_)</code> and character <code>(NA_character_)</code>.</p></li>
+<strong><span style="color:green">A</span></strong>: It is a practical thought. When you combine <code>NA</code>s in <code>c()</code> with other atomic types they will be coerced like <code>TRUE</code> and <code>FALSE</code> to integer <code>(NA_integer_)</code>, double <code>(NA_real_)</code>, complex <code>(NA_complex_)</code> and character <code>(NA_character_)</code>. Recall that in R there is a hierarchy of recursion that goes logical -&gt; integer -&gt; double -&gt; character. If <code>NA</code> were, for example, a character, including <code>NA</code> in a set of integers or logicals would result in them getting coerced to characters which would be undesirable. Making <code>NA</code> a logical means that involving an <code>NA</code> in a dataset (which happens often) will not result in coercion.</p></li>
 </ol>
 </div>
 <div id="attributes" class="section level2">
 <h2><span class="header-section-number">1.2</span> Attributes</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: An early draft used this code to illustrate <code>structure()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">structure</span>(<span class="dv">1</span>:<span class="dv">5</span>, <span class="dt">comment =</span> <span class="st">&quot;my attribute&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">structure</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dt">comment =</span> <span class="st">&quot;my attribute&quot;</span>)
 <span class="co">#&gt; [1] 1 2 3 4 5</span></code></pre></div>
 <p>But when you print that object you don’t see the comment attribute. Why? Is the attribute missing, or is there something else special about it? (Hint: try using help.) </p>
 <p><strong><span style="color:green">A</span></strong>: From the help of comment <code>(?comment)</code>:</p>
@@ -311,9 +327,9 @@ f3 &lt;-<span class="st"> </span><span class="kw">factor</span>(letters, <span c
 <p>A two-dimensional array is the same thing as a matrix.</p>
 </blockquote></li>
 <li><p><strong><span style="color:red">Q</span></strong>: How would you describe the following three objects? What makes them different to <code>1:5</code>?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x1 &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">1</span>:<span class="dv">5</span>, <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">5</span>)) <span class="co"># 1 row, 1 column, 5 in third dimension</span>
-x2 &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">1</span>:<span class="dv">5</span>, <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">1</span>)) <span class="co"># 1 row, 5 columns, 1 in third dimension</span>
-x3 &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">1</span>:<span class="dv">5</span>, <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">1</span>)) <span class="co"># 5 rows, 1 column, 1 in third dimension</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x1 &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">5</span>)) <span class="co"># 1 row, 1 column, 5 in third dimension</span>
+x2 &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">1</span>)) <span class="co"># 1 row, 5 columns, 1 in third dimension</span>
+x3 &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">1</span>)) <span class="co"># 5 rows, 1 column, 1 in third dimension</span></code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: They are of class array and so they have a <code>dim</code> attribute.</p></li>
 </ol>
 </div>
@@ -329,14 +345,18 @@ x3 &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">
 </blockquote></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Can you have a data frame with 0 rows? What about 0 columns?<br />
 <strong><span style="color:green">A</span></strong>: Yes, you can create them easily. Also both dimensions can be 0:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(iris)[-(<span class="dv">1</span>:<span class="dv">6</span>),]
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># here we use the recycling rules for logical subsetting, but you could</span>
+<span class="co"># also subset with 0, a negative index or a zero length atomic (i.e.</span>
+<span class="co"># logical(0), character(0), integer(0), double(0))</span>
+
+iris[<span class="ot">FALSE</span>,]
 <span class="co">#&gt; [1] Sepal.Length Sepal.Width  Petal.Length Petal.Width  Species     </span>
 <span class="co">#&gt; &lt;0 rows&gt; (or 0-length row.names)</span>
 
-<span class="kw">head</span>(iris)[ , -(<span class="dv">1</span>:<span class="dv">5</span>)]
-<span class="co">#&gt; data frame with 0 columns and 6 rows</span>
+iris[ , <span class="ot">FALSE</span>] <span class="co"># or iris[FALSE]</span>
+<span class="co">#&gt; data frame with 0 columns and 150 rows</span>
 
-<span class="kw">head</span>(iris)[-(<span class="dv">1</span>:<span class="dv">6</span>), -(<span class="dv">1</span>:<span class="dv">5</span>)]
+iris[<span class="ot">FALSE</span>, <span class="ot">FALSE</span>] <span class="co"># or just data.frame()</span>
 <span class="co">#&gt; data frame with 0 columns and 0 rows</span></code></pre></div></li>
 </ol>
 
@@ -348,8 +368,9 @@ x3 &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">
         </div>
       </div>
 <a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="subsetting.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
-
+<a href="subsetting.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
@@ -393,7 +414,7 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:" && /^https?:/.test(script.src))
       script.src  = script.src.replace(/^https?:/, '');
     document.getElementsByTagName("head")[0].appendChild(script);

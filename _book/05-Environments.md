@@ -300,17 +300,17 @@ __<span style="color:green">A</span>__: The most important differences are:
     
     __<span style="color:green">A</span>__: 
     
-    ![](diagrams/enclosing.png)<!-- -->
+    <img src="diagrams/enclosing.png" width="943" />
     
 3.  __<span style="color:red">Q</span>__: Expand your previous diagram to show function bindings.  
 __<span style="color:green">A</span>__: 
     
-    ![](diagrams/binding.png)<!-- -->
+    <img src="diagrams/binding.png" width="943" />
 
 4.  __<span style="color:red">Q</span>__: Expand it again to show the execution and calling environments.  
 __<span style="color:green">A</span>__: 
     
-    ![](diagrams/calling_execution.png)<!-- -->
+    <img src="diagrams/calling_execution.png" width="943" />
 
 5.  __<span style="color:red">Q</span>__: Write an enhanced version of `str()` that provides more information 
     about functions. Show where the function was found and what environment 
