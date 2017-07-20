@@ -17,31 +17,37 @@ __<span style="color:green">A</span>__: The first two tests don't check for a sp
     ```{r, eval=FALSE}
     c(1, FALSE)      # will be coerced to numeric   -> 1 0
     c("a", 1)        # will be coerced to character -> "a" "1"
-    c(list(1), "a")  # will be coerced to a list (since not all elements are atomic)
-                     # with two elements of type double and character 
+    c(list(1), "a")  # will be coerced to a list with two elements of type double and character 
     c(TRUE, 1L)      # will be coerced to integer   -> 1 1
     ```
 
 4.  __<span style="color:red">Q</span>__: Why do you need to use `unlist()` to convert a list to an 
     atomic vector? Why doesn't `as.vector()` work?  
 __<span style="color:green">A</span>__: To get rid of (flatten) the nested structure.
-Recall that lists are considered vectors, so `as.vector()` will leave it the same.
-`as.vector()` can be used to convert a non-recursive list to an atomic vector if
-the desired `mode` is passed explicitly. But the core problem is that `as.vector()`
-cannot handle recursion within lists.  Only `unlist()` (or `purrr::flatten()`
-functions) can do that.
 
 5. __<span style="color:red">Q</span>__: Why is `1 == "1"` true? Why is `-1 < FALSE` true? Why is `"one" < 2` false?  
 __<span style="color:green">A</span>__: These operators are all functions which coerce their arguments (in these cases) to character, double and character. To enlighten the latter case: "one" comes after "2" in ASCII.
 
 6. __<span style="color:red">Q</span>__: Why is the default missing value, `NA`, a logical vector? What's special
    about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)  
+<<<<<<< HEAD
 __<span style="color:green">A</span>__: It is a practical thought. When you combine `NA`s in `c()` with other atomic types they will be coerced
 like `TRUE` and `FALSE` to integer `(NA_integer_)`, double `(NA_real_)`, complex `(NA_complex_)` and character `(NA_character_)`. Recall that in R there is a hierarchy of recursion that
 goes logical -> integer -> double -> character.  If `NA` were, for example, a character,
 including `NA` in a set of integers or logicals would result in them getting coerced
 to characters which would be undesirable. Making `NA` a logical means that involving an `NA`
 in a dataset (which happens often) will not result in coercion.
+||||||| merged common ancestors
+__<span style="color:green">A</span>__: It is a practical thought. When you combine `NA`s in `c()` with other atomic types they will be coerced
+like `TRUE` and `FALSE` to integer `(NA_integer_)`, double `(NA_real_)`, complex `(NA_complex_)` and character `(NA_character_)`. Recall that in R is a hierarchy of recursion that
+goes logical -> integer -> double -> character.  If `NA` were, for example, a character,
+including `NA` in a set of integers or logicals would result in them getting coerced
+to characters which would be undesirable. Making `NA` a logical means that involving an `NA`
+in a dataset (which happens often) will not result in coercion.
+=======
+__<span style="color:green">A</span>__: It is a practical thought. When you combine `NA`'s in `c()` with other atomic types they will be coerced
+like `TRUE` and `FALSE` to integer `(NA_integer_)`, double `(NA_real_)`, complex `(NA_complex_)` and character `(NA_character_)`.
+>>>>>>> 4ce30ced5e3b5a8c0a3d77967443497759ca1fb0
 
 ## Attributes
 
@@ -130,7 +136,13 @@ __<span style="color:green">A</span>__: Yes, you can create them easily. Also bo
     
     iris[FALSE,]
     
+<<<<<<< HEAD
     iris[ , FALSE] # or iris[FALSE]
     
     iris[FALSE, FALSE] # or just data.frame()
+||||||| merged common ancestors
+    head(iris)[-(1:6), -(1:5)] # or just data.frame()
+=======
+    head(iris)[-(1:6), -(1:5)]
+>>>>>>> 4ce30ced5e3b5a8c0a3d77967443497759ca1fb0
     ```
