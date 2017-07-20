@@ -2,7 +2,7 @@
 --- 
 title: "Advanced R Solutions"
 author: "Malte Grosser, Henning Bumann, Peter Hurford & Robert Krzyzanowski"
-date: "2017-07-16"
+date: "2017-07-20"
 knit: "bookdown::render_book"
 site: bookdown::bookdown_site
 output:

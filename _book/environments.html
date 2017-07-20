@@ -25,7 +25,7 @@
 <meta name="author" content="Malte Grosser, Henning Bumann, Peter Hurford &amp; Robert Krzyzanowski">
 
 
-<meta name="date" content="2017-07-16">
+<meta name="date" content="2017-07-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -290,10 +290,10 @@ From the book:</p>
 </blockquote></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Using <code>parent.env()</code> and a loop (or a recursive function), verify that the ancestors of <code>globalenv()</code> include <code>baseenv()</code> and <code>emptyenv()</code>. Use the same basic idea to implement your own version of <code>search()</code>.<br />
 <strong><span style="color:green">A</span></strong>: We can print the ancestors for example by using a recursive function:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ancestors &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">env =</span> <span class="kw">globalenv</span>()){
-  <span class="cf">if</span> (<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ancestors &lt;-<span class="st"> </span>function(<span class="dt">env =</span> <span class="kw">globalenv</span>()){
+  if (<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) {
     <span class="kw">print</span>(<span class="kw">environmentName</span>(env))} 
-  <span class="cf">else</span> {
+  else {
     <span class="kw">print</span>(<span class="kw">environmentName</span>(env))
     <span class="kw">ancestors</span>(<span class="kw">parent.env</span>(env))
   }
@@ -310,12 +310,12 @@ From the book:</p>
 <span class="co">#&gt; [1] &quot;base&quot;</span>
 <span class="co">#&gt; [1] &quot;R_EmptyEnv&quot;</span></code></pre></div>
 <p>To implement a new version of <code>search()</code> we use a while statement:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">search2 &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">env =</span> <span class="kw">globalenv</span>()){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">search2 &lt;-<span class="st"> </span>function(<span class="dt">env =</span> <span class="kw">globalenv</span>()){
   envs &lt;-<span class="st"> </span><span class="kw">character</span>()
-  <span class="cf">while</span> (<span class="op">!</span><span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) {
+  while (!<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) {
     ename &lt;-<span class="st"> </span><span class="kw">environmentName</span>(env)
-    <span class="cf">if</span> (ename <span class="op">==</span><span class="st"> &quot;base&quot;</span>) ename &lt;-<span class="st"> &quot;package:base&quot;</span>
-    <span class="cf">if</span> (ename <span class="op">==</span><span class="st"> &quot;R_GlobalEnv&quot;</span>) ename &lt;-<span class="st"> &quot;.GlobalEnv&quot;</span>
+    if (ename ==<span class="st"> &quot;base&quot;</span>) ename &lt;-<span class="st"> &quot;package:base&quot;</span>
+    if (ename ==<span class="st"> &quot;R_GlobalEnv&quot;</span>) ename &lt;-<span class="st"> &quot;.GlobalEnv&quot;</span>
     envs &lt;-<span class="st"> </span><span class="kw">c</span>(envs, ename)
     env &lt;-<span class="st"> </span><span class="kw">parent.env</span>(env)
     }
@@ -338,23 +338,23 @@ From the book:</p>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: Modify <code>where()</code> to find all environments that contain a binding for <code>name</code>.<br />
 <strong><span style="color:green">A</span></strong>: We look at the source code of the original <code>pryr::where()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pryr<span class="op">::</span>where
-<span class="cf">function</span> (name, <span class="dt">env =</span> <span class="kw">parent.frame</span>()) 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pryr::where
+function (name, <span class="dt">env =</span> <span class="kw">parent.frame</span>()) 
   {
-  <span class="kw">stopifnot</span>(<span class="kw">is.character</span>(name), <span class="kw">length</span>(name) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)
+  <span class="kw">stopifnot</span>(<span class="kw">is.character</span>(name), <span class="kw">length</span>(name) ==<span class="st"> </span><span class="dv">1</span>)
   env &lt;-<span class="st"> </span><span class="kw">to_env</span>(env)
-  <span class="cf">if</span> (<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) { <span class="co"># &quot;base case&quot;</span>
+  if (<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) { <span class="co"># &quot;base case&quot;</span>
     <span class="kw">stop</span>(<span class="st">&quot;Can&#39;t find &quot;</span>, name, <span class="dt">call. =</span> <span class="ot">FALSE</span>)
     }
-  <span class="cf">if</span> (<span class="kw">exists</span>(name, env, <span class="dt">inherits =</span> <span class="ot">FALSE</span>)) { <span class="co"># &quot;success case&quot;</span>
+  if (<span class="kw">exists</span>(name, env, <span class="dt">inherits =</span> <span class="ot">FALSE</span>)) { <span class="co"># &quot;success case&quot;</span>
     env
     }
-  <span class="cf">else</span> { <span class="co"># &quot;recursive case&quot;</span>
+  else { <span class="co"># &quot;recursive case&quot;</span>
     <span class="kw">where</span>(name, <span class="kw">parent.env</span>(env)) <span class="co"># we will copy this line in the success case</span>
   }
 }</code></pre></div>
 <p>Since <code>where()</code> stops searching when a match appears, we copy the recursive call in the <code>else</code> block to the block of the matching (“success”) case, so that our new function <code>where2</code> will look for a binding within the complete search path. We also need to pay attention to other details. We have to take care to save the bindings in an object, while not overriding it in our recursive calls. So we create a list object for that and define a new function within <code>where2()</code> that we call <code>where2.internal</code>. <code>where2.internal()</code> will do the recursive work and whenever it finds a binding it will write it via <code>&lt;&lt;-</code> to the especially created list in its enclosing environment:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">where2 &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">env =</span> <span class="kw">parent.frame</span>()){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">where2 &lt;-<span class="st"> </span>function(name, <span class="dt">env =</span> <span class="kw">parent.frame</span>()){
   <span class="co"># we need to collect all environments where name has a binding</span>
   env_list &lt;-<span class="st"> </span><span class="kw">list</span>()
 
@@ -363,26 +363,26 @@ From the book:</p>
   <span class="co"># the recursive function and concatenate every binding environment</span>
   <span class="co"># that we find via the `&lt;&lt;-` operator on its end.</span>
   <span class="co"># In the following we start by defining the recursive function:</span>
-  where2.internal &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">env =</span> <span class="kw">parent.frame</span>()) {
-    <span class="kw">stopifnot</span>(<span class="kw">is.character</span>(name), <span class="kw">length</span>(name) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)
-    env &lt;-<span class="st"> </span>pryr<span class="op">:::</span><span class="kw">to_env</span>(env) <span class="co"># note that we need to call to_env via pryr:::</span>
+  where2.internal &lt;-<span class="st"> </span>function(name, <span class="dt">env =</span> <span class="kw">parent.frame</span>()) {
+    <span class="kw">stopifnot</span>(<span class="kw">is.character</span>(name), <span class="kw">length</span>(name) ==<span class="st"> </span><span class="dv">1</span>)
+    env &lt;-<span class="st"> </span>pryr:::<span class="kw">to_env</span>(env) <span class="co"># note that we need to call to_env via pryr:::</span>
 
     <span class="co"># when we reach the empty environment, we return all binding environments</span>
     <span class="co"># (if we found some) if we found no bindings, we give the same error message</span>
     <span class="co"># as pryr::where does</span>
-    <span class="cf">if</span> (<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) {
-      <span class="cf">if</span> (<span class="kw">length</span>(env_list) <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>){
+    if (<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) {
+      if (<span class="kw">length</span>(env_list) !=<span class="st"> </span><span class="dv">0</span>){
         <span class="kw">return</span>(env_list)
         }
       <span class="kw">stop</span>(<span class="st">&quot;Can&#39;t find &quot;</span>, name, <span class="dt">call. =</span> <span class="ot">FALSE</span>)
       }
-    <span class="cf">if</span> (<span class="kw">exists</span>(name, env, <span class="dt">inherits =</span> <span class="ot">FALSE</span>)) {
+    if (<span class="kw">exists</span>(name, env, <span class="dt">inherits =</span> <span class="ot">FALSE</span>)) {
       <span class="co"># this is a case where we find a binding. the main difference to</span>
       <span class="co"># pryr::where is that we don&#39;t return immediately. Instead we save</span>
       <span class="co"># the binding environment to env_list and call where2.internal again</span>
       env_list &lt;&lt;-<span class="st"> </span><span class="kw">c</span>(env_list, env)
       <span class="kw">where2.internal</span>(name, <span class="kw">parent.env</span>(env))
-      } <span class="cf">else</span> {
+      } else {
         <span class="kw">where2.internal</span>(name, <span class="kw">parent.env</span>(env))
       }
   }
@@ -393,40 +393,40 @@ From the book:</p>
 <p>Note that <code>where2.internal()</code> still provides the same structure as <code>pryr::where</code> does and you can also divide it in “base case”, “success case” and “recursive case”.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Write your own version of <code>get()</code> using a function written in the style of <code>where()</code>.<br />
 <strong><span style="color:green">A</span></strong>: Note that <code>get()</code> provides a bit more arguments than our following version, but it should be easy to build up on that. However, we can change <code>pryr::where</code> to <code>get2()</code> with just changing one line of code (and the function name for the recursive call):</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">get2 &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">env =</span> <span class="kw">parent.frame</span>()) 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">get2 &lt;-<span class="st"> </span>function(name, <span class="dt">env =</span> <span class="kw">parent.frame</span>()) 
   {
-  <span class="kw">stopifnot</span>(<span class="kw">is.character</span>(name), <span class="kw">length</span>(name) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)
-  env &lt;-<span class="st"> </span>pryr<span class="op">:::</span><span class="kw">to_env</span>(env)
-  <span class="cf">if</span> (<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) {
+  <span class="kw">stopifnot</span>(<span class="kw">is.character</span>(name), <span class="kw">length</span>(name) ==<span class="st"> </span><span class="dv">1</span>)
+  env &lt;-<span class="st"> </span>pryr:::<span class="kw">to_env</span>(env)
+  if (<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) {
     <span class="kw">stop</span>(<span class="st">&quot;Can&#39;t find &quot;</span>, name, <span class="dt">call. =</span> <span class="ot">FALSE</span>)
     }
-  <span class="cf">if</span> (<span class="kw">exists</span>(name, env, <span class="dt">inherits =</span> <span class="ot">FALSE</span>)) {
+  if (<span class="kw">exists</span>(name, env, <span class="dt">inherits =</span> <span class="ot">FALSE</span>)) {
     <span class="co"># we cancel env and substitute it with the following line, where we subset</span>
     <span class="co"># the environment (like a list) by the name of our object and return it</span>
     <span class="kw">return</span>(env[[name]])
     }
-  <span class="cf">else</span> {
+  else {
     <span class="kw">get2</span>(name, <span class="kw">parent.env</span>(env))
   }
 }</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Write a function called <code>fget()</code> that finds only function objects. It should have two arguments, <code>name</code> and <code>env</code>, and should obey the regular scoping rules for functions: if there’s an object with a matching name that’s not a function, look in the parent. For an added challenge, also add an <code>inherits</code> argument which controls whether the function recurses up the parents or only looks in one environment.<br />
 <strong><span style="color:green">A</span></strong>: We can build up our function on the implementation of <code>get2()</code> in the last exercise. We only need to add a check via <code>is.function()</code>, change the name (also in the recursive call) and the error message:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fget2 &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">env =</span> <span class="kw">parent.frame</span>()){
-  <span class="kw">stopifnot</span>(<span class="kw">is.character</span>(name), <span class="kw">length</span>(name) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)
-  env &lt;-<span class="st"> </span>pryr<span class="op">:::</span><span class="kw">to_env</span>(env)
-  <span class="cf">if</span> (<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fget2 &lt;-<span class="st"> </span>function(name, <span class="dt">env =</span> <span class="kw">parent.frame</span>()){
+  <span class="kw">stopifnot</span>(<span class="kw">is.character</span>(name), <span class="kw">length</span>(name) ==<span class="st"> </span><span class="dv">1</span>)
+  env &lt;-<span class="st"> </span>pryr:::<span class="kw">to_env</span>(env)
+  if (<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) {
     <span class="kw">stop</span>(<span class="st">&quot;Could not find function called &quot;</span>, name, <span class="dt">call. =</span> <span class="ot">FALSE</span>) <span class="co"># </span>
     }
   <span class="co"># here we add the is.function() check</span>
-  <span class="cf">if</span> (<span class="kw">exists</span>(name, env, <span class="dt">inherits =</span> <span class="ot">FALSE</span>) <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">is.function</span>(env[[name]])) {
+  if (<span class="kw">exists</span>(name, env, <span class="dt">inherits =</span> <span class="ot">FALSE</span>) &amp;&amp;<span class="st"> </span><span class="kw">is.function</span>(env[[name]])) {
     <span class="kw">return</span>(env[[name]])
     }
-  <span class="cf">else</span> {
+  else {
     <span class="kw">fget2</span>(name, <span class="kw">parent.env</span>(env))
   }
 }</code></pre></div>
 <p>Note that this function is almost the same as the implementation of <code>pryr::fget()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pryr<span class="op">::</span>fget
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pryr::fget
 <span class="co">#&gt; function (name, env = parent.frame()) </span>
 <span class="co">#&gt; {</span>
 <span class="co">#&gt;     env &lt;- to_env(env)</span>
@@ -442,44 +442,44 @@ From the book:</p>
 <span class="co">#&gt; }</span>
 <span class="co">#&gt; &lt;environment: namespace:pryr&gt;</span></code></pre></div>
 <p>We add an <code>inherits</code> parameter as described in the exercise:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fget3 &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">env =</span> <span class="kw">parent.frame</span>(), <span class="dt">inherits =</span> <span class="ot">TRUE</span>){
-  <span class="kw">stopifnot</span>(<span class="kw">is.character</span>(name), <span class="kw">length</span>(name) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)
-  env &lt;-<span class="st"> </span>pryr<span class="op">:::</span><span class="kw">to_env</span>(env)
-  <span class="cf">if</span> (<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fget3 &lt;-<span class="st"> </span>function(name, <span class="dt">env =</span> <span class="kw">parent.frame</span>(), <span class="dt">inherits =</span> <span class="ot">TRUE</span>){
+  <span class="kw">stopifnot</span>(<span class="kw">is.character</span>(name), <span class="kw">length</span>(name) ==<span class="st"> </span><span class="dv">1</span>)
+  env &lt;-<span class="st"> </span>pryr:::<span class="kw">to_env</span>(env)
+  if (<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) {
     <span class="kw">stop</span>(<span class="st">&quot;Could not find function called &quot;</span>, name, <span class="dt">call. =</span> <span class="ot">FALSE</span>) 
     }
-  <span class="cf">if</span> (<span class="kw">exists</span>(name, env, <span class="dt">inherits =</span> <span class="ot">FALSE</span>) <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">is.function</span>(env[[name]])) {
+  if (<span class="kw">exists</span>(name, env, <span class="dt">inherits =</span> <span class="ot">FALSE</span>) &amp;&amp;<span class="st"> </span><span class="kw">is.function</span>(env[[name]])) {
     <span class="kw">return</span>(env[[name]])
     }
   <span class="co"># after the environment, which is specified in the env parameter, is checked</span>
   <span class="co"># we stop our function in case the new inherits parameter is set to FALSE</span>
-  <span class="cf">if</span>(inherits <span class="op">==</span><span class="st"> </span><span class="ot">FALSE</span>){
+  if(inherits ==<span class="st"> </span><span class="ot">FALSE</span>){
     <span class="kw">stop</span>(<span class="st">&quot;Could not find function called &quot;</span>, name,<span class="st">&quot; within &quot;</span>,
          <span class="kw">environmentName</span>(env),
          <span class="dt">call. =</span> <span class="ot">FALSE</span>)
     }
-  <span class="cf">else</span> {
+  else {
     <span class="kw">fget3</span>(name, <span class="kw">parent.env</span>(env))
   }
 }</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Write your own version of <code>exists(inherits = FALSE)</code> (Hint: use <code>ls()</code>.) Write a recursive version that behaves like <code>exists(inherits = TRUE)</code>.<br />
 <strong><span style="color:green">A</span></strong>: We write two versions. <code>exists2()</code> will be the case <code>inherits = FALSE</code> and <code>exists3()</code> <code>inherits = TRUE</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">exists2 &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">env =</span> <span class="kw">parent.frame</span>()){
-  <span class="kw">stopifnot</span>(<span class="kw">is.character</span>(name), <span class="kw">length</span>(name) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)
-  env &lt;-<span class="st"> </span>pryr<span class="op">:::</span><span class="kw">to_env</span>(env)
-  name <span class="op">%in%</span><span class="st"> </span><span class="kw">ls</span>(env, <span class="dt">sorted =</span> <span class="ot">FALSE</span>) <span class="co"># set sorted to FALSE for a small speedup</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">exists2 &lt;-<span class="st"> </span>function(name, <span class="dt">env =</span> <span class="kw">parent.frame</span>()){
+  <span class="kw">stopifnot</span>(<span class="kw">is.character</span>(name), <span class="kw">length</span>(name) ==<span class="st"> </span><span class="dv">1</span>)
+  env &lt;-<span class="st"> </span>pryr:::<span class="kw">to_env</span>(env)
+  name %in%<span class="st"> </span><span class="kw">ls</span>(env, <span class="dt">sorted =</span> <span class="ot">FALSE</span>) <span class="co"># set sorted to FALSE for a small speedup</span>
 }
 
-exists3 &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">env =</span> <span class="kw">parent.frame</span>()){
-  <span class="kw">stopifnot</span>(<span class="kw">is.character</span>(name), <span class="kw">length</span>(name) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)
-  env &lt;-<span class="st"> </span>pryr<span class="op">:::</span><span class="kw">to_env</span>(env)
-  <span class="cf">if</span> (<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) {
+exists3 &lt;-<span class="st"> </span>function(name, <span class="dt">env =</span> <span class="kw">parent.frame</span>()){
+  <span class="kw">stopifnot</span>(<span class="kw">is.character</span>(name), <span class="kw">length</span>(name) ==<span class="st"> </span><span class="dv">1</span>)
+  env &lt;-<span class="st"> </span>pryr:::<span class="kw">to_env</span>(env)
+  if (<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) {
     <span class="kw">return</span>(<span class="ot">FALSE</span>)
   }
-  <span class="cf">if</span> (name <span class="op">%in%</span><span class="st"> </span><span class="kw">ls</span>(env, <span class="dt">sorted =</span> <span class="ot">FALSE</span>)){
+  if (name %in%<span class="st"> </span><span class="kw">ls</span>(env, <span class="dt">sorted =</span> <span class="ot">FALSE</span>)){
     <span class="ot">TRUE</span>
     }
-  <span class="cf">else</span> {
+  else {
     <span class="kw">exists3</span>(name, <span class="kw">parent.env</span>(env))
   }
 }</code></pre></div></li>
@@ -498,10 +498,10 @@ exists3 &lt;-<span class="st"> </span><span class="cf">function</span>(name, <sp
 </ul>
 <p>The difference between binding and enclosing environment is important, because of R’s lexical scoping rules. If R can’t find an object in the current environment while executing a function, it will look for it in the enclosing environment.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Draw a diagram that shows the enclosing environments of this function:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f1 &lt;-<span class="st"> </span><span class="cf">function</span>(x1) {
-  f2 &lt;-<span class="st"> </span><span class="cf">function</span>(x2) {
-    f3 &lt;-<span class="st"> </span><span class="cf">function</span>(x3) {
-      x1 <span class="op">+</span><span class="st"> </span>x2 <span class="op">+</span><span class="st"> </span>x3
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f1 &lt;-<span class="st"> </span>function(x1) {
+  f2 &lt;-<span class="st"> </span>function(x2) {
+    f3 &lt;-<span class="st"> </span>function(x3) {
+      x1 +<span class="st"> </span>x2 +<span class="st"> </span>x3
     }
     <span class="kw">f3</span>(<span class="dv">3</span>)
   }
@@ -518,15 +518,15 @@ exists3 &lt;-<span class="st"> </span><span class="cf">function</span>(name, <sp
 <p><img src="diagrams/calling_execution.png" width="943" /></p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Write an enhanced version of <code>str()</code> that provides more information about functions. Show where the function was found and what environment it was defined in.<br />
 <strong><span style="color:green">A</span></strong>: Additionally we provide the function type in the sense of <code>pryr::ftype</code>. We use functions from the <code>pryr</code> package, since it provides helpers for all requested features:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fstr &lt;-<span class="st"> </span><span class="cf">function</span>(object){
-  <span class="cf">if</span>(<span class="op">!</span><span class="kw">is.function</span>(object)){<span class="kw">stop</span>(<span class="st">&quot;fstr works only for functions&quot;</span>)}
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fstr &lt;-<span class="st"> </span>function(object){
+  if(!<span class="kw">is.function</span>(object)){<span class="kw">stop</span>(<span class="st">&quot;fstr works only for functions&quot;</span>)}
 
-  object_str &lt;-<span class="st"> </span>lazyeval<span class="op">::</span><span class="kw">expr_text</span>(object)
+  object_str &lt;-<span class="st"> </span>lazyeval::<span class="kw">expr_text</span>(object)
 
-  flist &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">ftype =</span> pryr<span class="op">::</span><span class="kw">ftype</span>(object),
-             <span class="dt">where =</span> pryr<span class="op">::</span><span class="kw">where</span>(object_str),
-             <span class="dt">enclosing_env =</span> pryr<span class="op">::</span><span class="kw">enclosing_env</span>(object),
-             <span class="dt">args =</span> pryr<span class="op">::</span><span class="kw">fun_args</span>(object)
+  flist &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">ftype =</span> pryr::<span class="kw">ftype</span>(object),
+             <span class="dt">where =</span> pryr::<span class="kw">where</span>(object_str),
+             <span class="dt">enclosing_env =</span> pryr::<span class="kw">enclosing_env</span>(object),
+             <span class="dt">args =</span> pryr::<span class="kw">fun_args</span>(object)
              )
 
   <span class="kw">return</span>(flist)
@@ -538,12 +538,12 @@ exists3 &lt;-<span class="st"> </span><span class="cf">function</span>(name, <sp
 <h2><span class="header-section-number">5.4</span> Binding names to values</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: What does this function do? How does it differ from <code>&lt;&lt;-</code> and why might you prefer it?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rebind &lt;-<span class="st"> </span><span class="cf">function</span>(name, value, <span class="dt">env =</span> <span class="kw">parent.frame</span>()) {
-  <span class="cf">if</span> (<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rebind &lt;-<span class="st"> </span>function(name, value, <span class="dt">env =</span> <span class="kw">parent.frame</span>()) {
+  if (<span class="kw">identical</span>(env, <span class="kw">emptyenv</span>())) {
     <span class="kw">stop</span>(<span class="st">&quot;Can&#39;t find &quot;</span>, name, <span class="dt">call. =</span> <span class="ot">FALSE</span>)
-  } <span class="cf">else</span> <span class="cf">if</span> (<span class="kw">exists</span>(name, <span class="dt">envir =</span> env, <span class="dt">inherits =</span> <span class="ot">FALSE</span>)) {
+  } else if (<span class="kw">exists</span>(name, <span class="dt">envir =</span> env, <span class="dt">inherits =</span> <span class="ot">FALSE</span>)) {
     <span class="kw">assign</span>(name, value, <span class="dt">envir =</span> env)
-  } <span class="cf">else</span> {
+  } else {
     <span class="kw">rebind</span>(name, value, <span class="kw">parent.env</span>(env))
   }
 }
@@ -559,9 +559,9 @@ a
 </blockquote></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Create a version of <code>assign()</code> that will only bind new names, never re-bind old names. Some programming languages only do this, and are known as [single assignment languages][single assignment].<br />
 <strong><span style="color:green">A</span></strong>: We take the formals from <code>assign()</code>’s source code and define our new function. If <code>x</code> already exists, we give a message and return <code>NULL</code> (since this is the same as <code>return()</code>). Otherwise we let the body of the <code>assign()</code> function do the work:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">assign_non_existant &lt;-<span class="st"> </span><span class="cf">function</span>(x, value, <span class="dt">pos =</span> <span class="op">-</span><span class="dv">1</span>, <span class="dt">envir =</span> <span class="kw">as.environment</span>(pos),
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">assign_non_existant &lt;-<span class="st"> </span>function(x, value, <span class="dt">pos =</span> -<span class="dv">1</span>, <span class="dt">envir =</span> <span class="kw">as.environment</span>(pos),
                             <span class="dt">inherits =</span> <span class="ot">FALSE</span>, <span class="dt">immediate =</span> <span class="ot">TRUE</span>) {
-  <span class="cf">if</span>(<span class="kw">exists</span>(x)){
+  if(<span class="kw">exists</span>(x)){
     <span class="kw">message</span>(<span class="st">&quot;No new assignment: &#39;&quot;</span>, x, <span class="st">&quot;&#39; already exists&quot;</span>)
     <span class="kw">return</span>(<span class="ot">NULL</span>)}
   <span class="kw">.Internal</span>(<span class="kw">assign</span>(x, value, envir, inherits))
@@ -570,37 +570,37 @@ a
 <li><p><strong><span style="color:red">Q</span></strong>: Write an assignment function that can do active, delayed, and locked bindings. What might you call it? What arguments should it take? Can you guess which sort of assignment it should do based on the input?<br />
 <strong><span style="color:green">A</span></strong>: The following might be no optimal solution, but we can at least handle two of three cases via if statements. The problem already occured in the last exercise, were we had to do an assignment in an if statement and did a workaround. This workaround only works for one assignment (for logical reasons). We still use the workaround for the “delay case”, but we found a solution for the other two cases. The main aspect in it is to unify the environment were <code>assign()</code>, <code>makeActiveBinding()</code> and <code>delayedAssign()</code> act. We also had to test that cases like this</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">makeActiveBinding</span>(<span class="dt">sym =</span> <span class="st">&quot;test1&quot;</span>,
-                  <span class="dt">fun =</span> <span class="cf">function</span>() <span class="cf">function</span>(x, <span class="dt">y =</span> <span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">1</span>)){x<span class="op">^</span>y},
+                  <span class="dt">fun =</span> function() function(x, <span class="dt">y =</span> <span class="kw">sample</span>(<span class="dv">1</span>:<span class="dv">3</span>, <span class="dv">1</span>)){x^y},
                   <span class="dt">env =</span> <span class="kw">parent.frame</span>())</code></pre></div>
 <p>work with our new function and our function creates bindings (and so enclosing environments) in the same places as <code>assign()</code> would do, also when used inside funceions.</p>
 <p>The usage of <code>pryr:::to_env()</code> simplified this process a lot:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># found at https://github.com/hadley/pryr/blob/master/R/utils.r</span>
-<span class="cf">function</span>(x, <span class="dt">quiet =</span> <span class="ot">FALSE</span>) {
-  <span class="cf">if</span> (<span class="kw">is.environment</span>(x)) {
+function(x, <span class="dt">quiet =</span> <span class="ot">FALSE</span>) {
+  if (<span class="kw">is.environment</span>(x)) {
     x
-    } <span class="cf">else</span> <span class="cf">if</span> (<span class="kw">is.list</span>(x)) {
+    } else if (<span class="kw">is.list</span>(x)) {
       <span class="kw">list2env</span>(x)
-      } <span class="cf">else</span> <span class="cf">if</span> (<span class="kw">is.function</span>(x)) {
+      } else if (<span class="kw">is.function</span>(x)) {
         <span class="kw">environment</span>(x)
-        } <span class="cf">else</span> <span class="cf">if</span> (<span class="kw">length</span>(x) <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">is.character</span>(x)) {
-          <span class="cf">if</span> (<span class="op">!</span>quiet) <span class="kw">message</span>(<span class="st">&quot;Using environment &quot;</span>, x)
+        } else if (<span class="kw">length</span>(x) ==<span class="st"> </span><span class="dv">1</span> &amp;&amp;<span class="st"> </span><span class="kw">is.character</span>(x)) {
+          if (!quiet) <span class="kw">message</span>(<span class="st">&quot;Using environment &quot;</span>, x)
           <span class="kw">as.environment</span>(x)
-          } <span class="cf">else</span> <span class="cf">if</span> (<span class="kw">length</span>(x) <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">is.numeric</span>(x) <span class="op">&amp;&amp;</span><span class="st"> </span>x <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {
-            <span class="cf">if</span> (<span class="op">!</span>quiet) <span class="kw">message</span>(<span class="st">&quot;Using environment &quot;</span>, <span class="kw">search</span>()[x])
+          } else if (<span class="kw">length</span>(x) ==<span class="st"> </span><span class="dv">1</span> &amp;&amp;<span class="st"> </span><span class="kw">is.numeric</span>(x) &amp;&amp;<span class="st"> </span>x &gt;<span class="st"> </span><span class="dv">0</span>) {
+            if (!quiet) <span class="kw">message</span>(<span class="st">&quot;Using environment &quot;</span>, <span class="kw">search</span>()[x])
             <span class="kw">as.environment</span>(x)
-            } <span class="cf">else</span> {
+            } else {
               <span class="kw">stop</span>(<span class="st">&quot;Input can not be coerced to an environment&quot;</span>, <span class="dt">call. =</span> <span class="ot">FALSE</span>)
             }
 }</code></pre></div>
 <p>We used all these thoughts to create the following function:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">special_assign &lt;-<span class="st"> </span><span class="cf">function</span>(x, value, atype, <span class="dt">envir =</span> pryr<span class="op">:::</span><span class="kw">to_env</span>(<span class="kw">parent.frame</span>())){
-  <span class="cf">if</span>(atype <span class="op">==</span><span class="st"> &quot;locked&quot;</span>){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">special_assign &lt;-<span class="st"> </span>function(x, value, atype, <span class="dt">envir =</span> pryr:::<span class="kw">to_env</span>(<span class="kw">parent.frame</span>())){
+  if(atype ==<span class="st"> &quot;locked&quot;</span>){
     <span class="kw">assign</span>(x, value, <span class="dt">envir =</span> envir, inherits)
     <span class="kw">lockBinding</span>(<span class="dt">sym =</span> x, <span class="dt">env =</span> envir)
   }
 
-  <span class="cf">if</span>(atype <span class="op">==</span><span class="st"> &quot;active&quot;</span>){<span class="kw">makeActiveBinding</span>(<span class="dt">sym =</span> x, <span class="dt">fun =</span> value, <span class="dt">env =</span> envir)}
-  <span class="cf">if</span>(atype <span class="op">!=</span><span class="st"> &quot;delayed&quot;</span>){<span class="kw">stop</span>(<span class="st">&quot;atype must be `locked`, `active` or `delayed`&quot;</span>)}
+  if(atype ==<span class="st"> &quot;active&quot;</span>){<span class="kw">makeActiveBinding</span>(<span class="dt">sym =</span> x, <span class="dt">fun =</span> value, <span class="dt">env =</span> envir)}
+  if(atype !=<span class="st"> &quot;delayed&quot;</span>){<span class="kw">stop</span>(<span class="st">&quot;atype must be `locked`, `active` or `delayed`&quot;</span>)}
   <span class="kw">delayedAssign</span>(x, value, <span class="dt">eval.env =</span> <span class="kw">environment</span>(), <span class="dt">assign.env =</span> envir)
 }</code></pre></div>
 <p>At the moment we have no idea for a good default guess routine, so that a specific <code>atype</code> of assignment would be done based on the input.</p></li>

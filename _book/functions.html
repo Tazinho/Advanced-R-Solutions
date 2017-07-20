@@ -25,7 +25,7 @@
 <meta name="author" content="Malte Grosser, Henning Bumann, Peter Hurford &amp; Robert Krzyzanowski">
 
 
-<meta name="date" content="2017-07-16">
+<meta name="date" content="2017-07-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -285,20 +285,20 @@ funs &lt;-<span class="st"> </span><span class="kw">Filter</span>(is.function, o
 <ol style="list-style-type: lower-alpha">
 <li>First we create a named vector that returns the number of arguments per function and then we subset it with the index of it’s maximum entry:</li>
 </ol>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f_arg_length &lt;-<span class="st"> </span><span class="kw">sapply</span>(funs, <span class="cf">function</span>(x) <span class="kw">length</span>(<span class="kw">formals</span>(x)))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f_arg_length &lt;-<span class="st"> </span><span class="kw">sapply</span>(funs, function(x) <span class="kw">length</span>(<span class="kw">formals</span>(x)))
 f_arg_length[<span class="kw">which.max</span>(f_arg_length)]
 <span class="co">#&gt; scan </span>
 <span class="co">#&gt;   22</span></code></pre></div>
 <ol start="2" style="list-style-type: lower-alpha">
 <li>We check the number of functions with <code>formals()</code> returning <code>0</code> or <code>NULL</code>. Then we will see, that all of these functions have <code>formals</code> equal to <code>NULL</code>, which means, that they should be primitive functions.</li>
 </ol>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(<span class="kw">sapply</span>(funs, <span class="cf">function</span>(x) <span class="kw">is.null</span>(<span class="kw">formals</span>(x)) <span class="op">|</span><span class="st"> </span><span class="kw">length</span>(<span class="kw">formals</span>(x)) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(<span class="kw">sapply</span>(funs, function(x) <span class="kw">is.null</span>(<span class="kw">formals</span>(x)) |<span class="st"> </span><span class="kw">length</span>(<span class="kw">formals</span>(x)) ==<span class="st"> </span><span class="dv">0</span>))
 <span class="co">#&gt; [1] 226</span>
-<span class="kw">sum</span>(<span class="kw">sapply</span>(funs, <span class="cf">function</span>(x) <span class="op">!</span><span class="kw">is.null</span>(<span class="kw">formals</span>(x)) <span class="op">&amp;</span><span class="st"> </span><span class="kw">length</span>(<span class="kw">formals</span>(x)) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>))
+<span class="kw">sum</span>(<span class="kw">sapply</span>(funs, function(x) !<span class="kw">is.null</span>(<span class="kw">formals</span>(x)) &amp;<span class="st"> </span><span class="kw">length</span>(<span class="kw">formals</span>(x)) ==<span class="st"> </span><span class="dv">0</span>))
 <span class="co">#&gt; [1] 0</span>
-<span class="kw">sum</span>(<span class="kw">sapply</span>(funs, <span class="cf">function</span>(x) <span class="kw">is.null</span>(<span class="kw">formals</span>(x))))
+<span class="kw">sum</span>(<span class="kw">sapply</span>(funs, function(x) <span class="kw">is.null</span>(<span class="kw">formals</span>(x))))
 <span class="co">#&gt; [1] 226</span>
-<span class="kw">sum</span>(<span class="kw">sapply</span>(funs, <span class="cf">function</span>(x) <span class="kw">is.null</span>(<span class="kw">formals</span>(x)) <span class="op">&amp;</span><span class="st"> </span><span class="kw">is.primitive</span>(x)))
+<span class="kw">sum</span>(<span class="kw">sapply</span>(funs, function(x) <span class="kw">is.null</span>(<span class="kw">formals</span>(x)) &amp;<span class="st"> </span><span class="kw">is.primitive</span>(x)))
 <span class="co">#&gt; [1] 183</span></code></pre></div>
 Hence not all functions with <code>formals</code> equal to <code>NULL</code> are primitive functions, there must be non primitive functions with this property too.
 <ol start="3" style="list-style-type: lower-alpha">
@@ -333,14 +333,14 @@ Hence not all functions with <code>formals</code> equal to <code>NULL</code> are
 <li>dynamic lookup (R looks for values, when a function is run. Not when it is created)</li>
 </ul></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What does the following function return? Make a prediction before running the code yourself.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span><span class="cf">function</span>(x) {
-  f &lt;-<span class="st"> </span><span class="cf">function</span>(x) {
-    f &lt;-<span class="st"> </span><span class="cf">function</span>(x) {
-      x <span class="op">^</span><span class="st"> </span><span class="dv">2</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span>function(x) {
+  f &lt;-<span class="st"> </span>function(x) {
+    f &lt;-<span class="st"> </span>function(x) {
+      x ^<span class="st"> </span><span class="dv">2</span>
     }
-    <span class="kw">f</span>(x) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
+    <span class="kw">f</span>(x) +<span class="st"> </span><span class="dv">1</span>
   }
-  <span class="kw">f</span>(x) <span class="op">*</span><span class="st"> </span><span class="dv">2</span>
+  <span class="kw">f</span>(x) *<span class="st"> </span><span class="dv">2</span>
 }
 <span class="kw">f</span>(<span class="dv">10</span>)</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: 202</p></li>
@@ -350,31 +350,31 @@ Hence not all functions with <code>formals</code> equal to <code>NULL</code> are
 <h2><span class="header-section-number">3.3</span> Function arguments</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: Clarify the following list of odd function calls:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dt">replace =</span> <span class="ot">TRUE</span>, <span class="dv">20</span>, <span class="dt">x =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="ot">NA</span>))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dt">replace =</span> <span class="ot">TRUE</span>, <span class="dv">20</span>, <span class="dt">x =</span> <span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">10</span>, <span class="ot">NA</span>))
 <span class="co"># -&gt; sample(x = c(1:10, NA), size = 20, replace = TRUE)</span>
 y &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dt">min =</span> <span class="dv">0</span>, <span class="dt">max =</span> <span class="dv">1</span>, <span class="dv">20</span>)
 <span class="co"># -&gt; runif(n = 20, min = 0, max = 1)</span>
 <span class="kw">cor</span>(<span class="dt">m =</span> <span class="st">&quot;k&quot;</span>, <span class="dt">y =</span> y, <span class="dt">u =</span> <span class="st">&quot;p&quot;</span>, <span class="dt">x =</span> x)
 <span class="co"># -&gt; cor(x = x, y = y, use = &quot;pairwise.complete.obs&quot;, method = &quot;kendall&quot;)</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What does this function return? Why? Which principle does it illustrate?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f1 &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">x =</span> {y &lt;-<span class="st"> </span><span class="dv">1</span>; <span class="dv">2</span>}, <span class="dt">y =</span> <span class="dv">0</span>) {
-  x <span class="op">+</span><span class="st"> </span>y
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f1 &lt;-<span class="st"> </span>function(<span class="dt">x =</span> {y &lt;-<span class="st"> </span><span class="dv">1</span>; <span class="dv">2</span>}, <span class="dt">y =</span> <span class="dv">0</span>) {
+  x +<span class="st"> </span>y
 }
 <span class="kw">f1</span>()</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: It returns 3 and illustrates lazy evaluation. As you can see, y becomes 1, but only when <code>x</code> is evaluated (before <code>y</code>) inside the function (otherwise it is 0):</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f2 &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">x =</span> {y &lt;-<span class="st"> </span><span class="dv">1</span>; <span class="dv">2</span>}, <span class="dt">y =</span> <span class="dv">0</span>) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f2 &lt;-<span class="st"> </span>function(<span class="dt">x =</span> {y &lt;-<span class="st"> </span><span class="dv">1</span>; <span class="dv">2</span>}, <span class="dt">y =</span> <span class="dv">0</span>) {
   y
 }
 <span class="kw">f2</span>()
 <span class="co">#&gt; [1] 0</span></code></pre></div>
 <p>Note that funny things can happen if we switch the evaluation order (even within one line)</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f3 &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">x =</span> {y &lt;-<span class="st"> </span><span class="dv">1</span>; <span class="dv">2</span>}, <span class="dt">y =</span> <span class="dv">0</span>) {
-  y <span class="op">+</span><span class="st"> </span>x
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f3 &lt;-<span class="st"> </span>function(<span class="dt">x =</span> {y &lt;-<span class="st"> </span><span class="dv">1</span>; <span class="dv">2</span>}, <span class="dt">y =</span> <span class="dv">0</span>) {
+  y +<span class="st"> </span>x
 }
 <span class="kw">f3</span>()
 <span class="co">#&gt; [1] 2</span></code></pre></div>
 <p>or we evaluate <code>y</code> once before and once after the evaluation of <code>x</code></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f4 &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">x =</span> {y &lt;-<span class="st"> </span><span class="dv">1</span>; <span class="dv">2</span>}, <span class="dt">y =</span> <span class="dv">0</span>) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f4 &lt;-<span class="st"> </span>function(<span class="dt">x =</span> {y &lt;-<span class="st"> </span><span class="dv">1</span>; <span class="dv">2</span>}, <span class="dt">y =</span> <span class="dv">0</span>) {
   y_before_x &lt;-<span class="st"> </span>y
   x
   y_after_x &lt;-<span class="st"> </span>y
@@ -383,7 +383,7 @@ y &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dt">m
 <span class="kw">f4</span>()
 <span class="co">#&gt; [1] 0 1</span></code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: What does this function return? Why? Which principle does it illustrate?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f2 &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">x =</span> z) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f2 &lt;-<span class="st"> </span>function(<span class="dt">x =</span> z) {
   z &lt;-<span class="st"> </span><span class="dv">100</span>
   x
 }
@@ -423,25 +423,25 @@ y &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dt">m
 </blockquote></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Create an infix <code>xor()</code> operator.<br />
 <strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">`</span><span class="dt">%xor_%</span><span class="st">`</span> &lt;-<span class="st"> </span><span class="cf">function</span>(a, b){
-  (a <span class="op">|</span><span class="st"> </span>b) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span>(a <span class="op">&amp;</span><span class="st"> </span>b)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">`</span><span class="dt">%xor_%</span><span class="st">`</span> &lt;-<span class="st"> </span>function(a, b){
+  (a |<span class="st"> </span>b) &amp;<span class="st"> </span>!(a &amp;<span class="st"> </span>b)
 }</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Create infix versions of the set functions <code>intersect()</code>, <code>union()</code>, and <code>setdiff()</code>.<br />
 <strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">`</span><span class="dt">%intersect_%</span><span class="st">`</span> &lt;-<span class="st"> </span><span class="cf">function</span>(a, b){
-  <span class="kw">unique</span>(a[a <span class="op">%in%</span><span class="st"> </span>b])
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">`</span><span class="dt">%intersect_%</span><span class="st">`</span> &lt;-<span class="st"> </span>function(a, b){
+  <span class="kw">unique</span>(a[a %in%<span class="st"> </span>b])
   }
 
-<span class="st">`</span><span class="dt">%union_%</span><span class="st">`</span> &lt;-<span class="st"> </span><span class="cf">function</span>(a, b){
+<span class="st">`</span><span class="dt">%union_%</span><span class="st">`</span> &lt;-<span class="st"> </span>function(a, b){
   <span class="kw">unique</span>(<span class="kw">c</span>(a, b))
   }
 
-<span class="st">`</span><span class="dt">%setdiff_%</span><span class="st">`</span> &lt;-<span class="st"> </span><span class="cf">function</span>(a, b){
-  <span class="kw">unique</span>(a[<span class="op">!</span><span class="st"> </span>a <span class="op">%in%</span><span class="st"> </span>b])
+<span class="st">`</span><span class="dt">%setdiff_%</span><span class="st">`</span> &lt;-<span class="st"> </span>function(a, b){
+  <span class="kw">unique</span>(a[!<span class="st"> </span>a %in%<span class="st"> </span>b])
   }</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Create a replacement function that modifies a random location in a vector.<br />
 <strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">`</span><span class="dt">random_replacement&lt;-</span><span class="st">`</span> &lt;-<span class="st"> </span><span class="cf">function</span>(x, value){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">`</span><span class="dt">random_replacement&lt;-</span><span class="st">`</span> &lt;-<span class="st"> </span>function(x, value){
   x[<span class="kw">sample</span>(<span class="kw">length</span>(x), <span class="dv">1</span>)] &lt;-<span class="st"> </span>value
   x
   }</code></pre></div></li>
@@ -451,7 +451,7 @@ y &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dt">m
 <h2><span class="header-section-number">3.5</span> Return Values</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: How does the <code>chdir</code> parameter of <code>source()</code> compare to <code>in_dir()</code>? Why might you prefer one approach to the other? The <code>in_dir()</code> approach was given in the book as</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">in_dir &lt;-<span class="st"> </span><span class="cf">function</span>(dir, code) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">in_dir &lt;-<span class="st"> </span>function(dir, code) {
   old &lt;-<span class="st"> </span><span class="kw">setwd</span>(dir)
   <span class="kw">on.exit</span>(<span class="kw">setwd</span>(old))
 
@@ -465,13 +465,13 @@ y &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dt">m
 Type <code>options()</code> (or <code>par()</code>) to see the actual settings and save them via <code>old_opt &lt;- options()[[&quot;optionname&quot;]]</code> (or <code>old_par &lt;- par()[[&quot;parname&quot;]]</code>). For options you could also use <code>getOption()</code> with <code>&quot;optionname&quot;</code> as argument. To restore (or overwriting) just use <code>options(optionname = old_opt)</code> or <code>par(parname = old_par)</code>.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: Write a function that opens a graphics device, runs the supplied code, and closes the graphics device (always, regardless of whether or not the plotting code worked).<br />
 <strong><span style="color:green">A</span></strong>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plot_pdf &lt;-<span class="st"> </span><span class="cf">function</span>(code){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plot_pdf &lt;-<span class="st"> </span>function(code){
   <span class="kw">pdf</span>(<span class="st">&quot;test.pdf&quot;</span>)
   <span class="kw">on.exit</span>(<span class="kw">dev.off</span>())
   code
   }</code></pre></div></li>
 <li><p><strong><span style="color:red">Q</span></strong>: We can use <code>on.exit()</code> to implement a simple version of <code>capture.output()</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">capture.output2 &lt;-<span class="st"> </span><span class="cf">function</span>(code) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">capture.output2 &lt;-<span class="st"> </span>function(code) {
   temp &lt;-<span class="st"> </span><span class="kw">tempfile</span>()
   <span class="kw">on.exit</span>(<span class="kw">file.remove</span>(temp), <span class="dt">add =</span> <span class="ot">TRUE</span>)
 

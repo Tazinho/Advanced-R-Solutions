@@ -25,7 +25,7 @@
 <meta name="author" content="Malte Grosser, Henning Bumann, Peter Hurford &amp; Robert Krzyzanowski">
 
 
-<meta name="date" content="2017-07-16">
+<meta name="date" content="2017-07-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -271,11 +271,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2><span class="header-section-number">6.1</span> Condition handling</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: Compare the following two implementations of <code>message2error()</code>. What is the main advantage of <code>withCallingHandlers()</code> in this scenario? (Hint: look carefully at the traceback.)</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">message2error &lt;-<span class="st"> </span><span class="cf">function</span>(code) {
-  <span class="kw">withCallingHandlers</span>(code, <span class="dt">message =</span> <span class="cf">function</span>(e) <span class="kw">stop</span>(e))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">message2error &lt;-<span class="st"> </span>function(code) {
+  <span class="kw">withCallingHandlers</span>(code, <span class="dt">message =</span> function(e) <span class="kw">stop</span>(e))
 }
-message2error &lt;-<span class="st"> </span><span class="cf">function</span>(code) {
-  <span class="kw">tryCatch</span>(code, <span class="dt">message =</span> <span class="cf">function</span>(e) <span class="kw">stop</span>(e))
+message2error &lt;-<span class="st"> </span>function(code) {
+  <span class="kw">tryCatch</span>(code, <span class="dt">message =</span> function(e) <span class="kw">stop</span>(e))
 }</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>:</p></li>
 </ol>
@@ -284,7 +284,7 @@ message2error &lt;-<span class="st"> </span><span class="cf">function</span>(cod
 <h2><span class="header-section-number">6.2</span> Defensive programming</h2>
 <ol style="list-style-type: decimal">
 <li><p><strong><span style="color:red">Q</span></strong>: The goal of the <code>col_means()</code> function defined below is to compute the means of all numeric columns in a data frame.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">col_means &lt;-<span class="st"> </span><span class="cf">function</span>(df) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">col_means &lt;-<span class="st"> </span>function(df) {
   numeric &lt;-<span class="st"> </span><span class="kw">sapply</span>(df, is.numeric)
   numeric_cols &lt;-<span class="st"> </span>df[, numeric]
 
@@ -295,12 +295,12 @@ message2error &lt;-<span class="st"> </span><span class="cf">function</span>(cod
 <span class="kw">col_means</span>(mtcars[, <span class="dv">0</span>])
 <span class="kw">col_means</span>(mtcars[<span class="dv">0</span>, ])
 <span class="kw">col_means</span>(mtcars[, <span class="st">&quot;mpg&quot;</span>, <span class="dt">drop =</span> F])
-<span class="kw">col_means</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)
+<span class="kw">col_means</span>(<span class="dv">1</span>:<span class="dv">10</span>)
 <span class="kw">col_means</span>(<span class="kw">as.matrix</span>(mtcars))
 <span class="kw">col_means</span>(<span class="kw">as.list</span>(mtcars))
 
 mtcars2 &lt;-<span class="st"> </span>mtcars
-mtcars2[<span class="op">-</span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">lapply</span>(mtcars2[<span class="op">-</span><span class="dv">1</span>], as.character)
+mtcars2[-<span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">lapply</span>(mtcars2[-<span class="dv">1</span>], as.character)
 <span class="kw">col_means</span>(mtcars2)</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: We divide the tests according their input types and look at the results:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># data.frame input</span>
@@ -312,17 +312,17 @@ mtcars2[<span class="op">-</span><span class="dv">1</span>] &lt;-<span class="st
   <span class="co"># data.frame with new names)</span>
 
 <span class="co"># other input</span>
-<span class="kw">col_means</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>) <span class="co"># correct (specific error)</span>
+<span class="kw">col_means</span>(<span class="dv">1</span>:<span class="dv">10</span>) <span class="co"># correct (specific error)</span>
 <span class="kw">col_means</span>(<span class="kw">as.matrix</span>(mtcars)) <span class="co"># correct (specific error)</span>
 <span class="kw">col_means</span>(<span class="kw">as.list</span>(mtcars)) <span class="co"># correct (specific error)</span>
 
 <span class="co"># data.fame (numeric + character columns)</span>
 mtcars2 &lt;-<span class="st"> </span>mtcars
-mtcars2[<span class="op">-</span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">lapply</span>(mtcars2[<span class="op">-</span><span class="dv">1</span>], as.character)
+mtcars2[-<span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">lapply</span>(mtcars2[-<span class="dv">1</span>], as.character)
 <span class="kw">col_means</span>(mtcars2) <span class="co"># incorrect (returns the complete numeric column as a data.frame</span>
   <span class="co"># with new names)</span></code></pre></div>
 <p>We can make the following changes:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">col_means2 &lt;-<span class="st"> </span><span class="cf">function</span>(df) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">col_means2 &lt;-<span class="st"> </span>function(df) {
 <span class="co">#  stopifnot(is.data.frame(df))</span>
 numeric &lt;-<span class="st"> </span><span class="kw">vapply</span>(df, is.numeric, <span class="kw">logical</span>(<span class="dv">1</span>)) <span class="co"># sapply() to vapply()</span>
 numeric_cols &lt;-<span class="st"> </span>df[, numeric, drop =<span class="st"> </span><span class="ot">FALSE</span>] <span class="co"># add drop = FALSE</span>
@@ -336,7 +336,7 @@ numeric_cols &lt;-<span class="st"> </span>df[, numeric, drop =<span class="st">
 <span class="kw">col_means2</span>(mtcars[, <span class="st">&quot;mpg&quot;</span>, <span class="dt">drop =</span> F]) <span class="co">#correct</span>
 
 <span class="co"># other input</span>
-<span class="kw">col_means2</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>) <span class="co"># correct (specific error)</span>
+<span class="kw">col_means2</span>(<span class="dv">1</span>:<span class="dv">10</span>) <span class="co"># correct (specific error)</span>
 <span class="kw">col_means2</span>(<span class="kw">as.matrix</span>(mtcars)) <span class="co"># correct (specific error)</span>
 <span class="kw">col_means2</span>(<span class="kw">as.list</span>(mtcars)) <span class="co"># correct (specific error)</span>
 
@@ -344,12 +344,12 @@ numeric_cols &lt;-<span class="st"> </span>df[, numeric, drop =<span class="st">
 <span class="kw">col_means2</span>(mtcars2) <span class="co"># correct</span></code></pre></div>
 <p>For faster failing in the error cases (where the input is not a data.frame), we can add <code>stopifnot(is.data.frame(df))</code> in the first line of <code>col_means()</code>.</p></li>
 <li><p><strong><span style="color:red">Q</span></strong>: The following function “lags” a vector, returning a version of <code>x</code> that is <code>n</code> values behind the original. Improve the function so that it (1) returns a useful error message if <code>n</code> is not a vector, and (2) has reasonable behaviour when <code>n</code> is 0 or longer than <code>x</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lag &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">n =</span> 1L) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lag &lt;-<span class="st"> </span>function(x, <span class="dt">n =</span> 1L) {
   xlen &lt;-<span class="st"> </span><span class="kw">length</span>(x)
-  <span class="kw">c</span>(<span class="kw">rep</span>(<span class="ot">NA</span>, n), x[<span class="kw">seq_len</span>(xlen <span class="op">-</span><span class="st"> </span>n)])
+  <span class="kw">c</span>(<span class="kw">rep</span>(<span class="ot">NA</span>, n), x[<span class="kw">seq_len</span>(xlen -<span class="st"> </span>n)])
 }</code></pre></div>
 <p><strong><span style="color:green">A</span></strong>: First we test <code>lag()</code>’s actual bahaviour:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">v &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">3</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">v &lt;-<span class="st"> </span><span class="dv">1</span>:<span class="dv">3</span>
 <span class="kw">lag</span>(v, <span class="dv">1</span>) <span class="co"># -&gt; NA 1 2  ; correct</span>
 <span class="kw">lag</span>(v, <span class="dv">0</span>) <span class="co"># -&gt; 1 2 3   ; correct</span>
 <span class="kw">lag</span>(v, <span class="dv">3</span>) <span class="co"># -&gt; NA NA NA; correct</span>
@@ -358,14 +358,14 @@ numeric_cols &lt;-<span class="st"> </span>df[, numeric, drop =<span class="st">
   <span class="co"># in my opinion the result should be NA NA NA</span>
 <span class="kw">lag</span>(v, iris) <span class="co"># -&gt; Error in lag(v, iris) : (list) object cannot be coerced to type &#39;integer&#39;</span></code></pre></div>
 <p>We can adjust <code>lag()</code>, to get better bahaviour in the latter two error cases:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lag2 &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">n =</span> 1L) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lag2 &lt;-<span class="st"> </span>function(x, <span class="dt">n =</span> 1L) {
   <span class="co"># we make sure that a double or integer is supplied</span>
-  <span class="cf">if</span> (<span class="op">!</span><span class="kw">is.numeric</span>(n)) <span class="kw">stop</span>(<span class="st">&quot;n is not a numeric vector&quot;</span>) 
+  if (!<span class="kw">is.numeric</span>(n)) <span class="kw">stop</span>(<span class="st">&quot;n is not a numeric vector&quot;</span>) 
   xlen &lt;-<span class="st"> </span><span class="kw">length</span>(x)
   <span class="co"># and we change n so that xlen - n will become 0 in case of n &gt; length(x)</span>
   <span class="co"># to get the desired behaviour for lag(v, 4)</span>
   n &lt;-<span class="st"> </span><span class="kw">min</span>(xlen, n)
-  <span class="kw">c</span>(<span class="kw">rep</span>(<span class="ot">NA</span>, n), x[<span class="kw">seq_len</span>(xlen <span class="op">-</span><span class="st"> </span>n)])
+  <span class="kw">c</span>(<span class="kw">rep</span>(<span class="ot">NA</span>, n), x[<span class="kw">seq_len</span>(xlen -<span class="st"> </span>n)])
 }</code></pre></div>
 <p>Now we look again at the tests:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lag2</span>(v, <span class="dv">1</span>) <span class="co"># -&gt; correct</span>
