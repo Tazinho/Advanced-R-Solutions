@@ -17,7 +17,7 @@
     Why does this happen? Carefully read the documentation for `?deparse`. Can you write a
     wrapper around `deparse()` so that it always returns a single string?
     
-    __<span style="color:green">A</span>__: `deparse()` has a `width.cutoff` argument, which is according to `?deparse` an:
+    __<span style="color:green">A</span>__: `deparse()` has a `width.cutoff` argument (default 60 byte), which is according to `?deparse` an:
     
     > integer in [20, 500] determining the cutoff (in bytes) at which line-breaking is tried.
     
@@ -25,13 +25,37 @@
     
     > width.cutoff is a lower bound for the line lengths: deparsing a line proceeds until at least width.cutoff bytes have been output and e.g. arg = value expressions will not be split across lines.
     
-    You can wrap it with `paste0()` for example:
+    You can wrap it with for example with `paste0()`:
     
     
     ```r
     deparse_without_cutoff <- function(x){
       paste0(deparse(x), collapse = "")
     }
+    ```
+    
+    It can be a little bit enhanced with a `gsub()`:
+    
+    
+    ```r
+    gsub("\\s+", " ", paste0(deparse(substitute(x))))
+    ```
+    
+    This formats at least the spaces to a unified single space. However note that it is not possible to capture the exact input in every case:
+    
+    
+    ```r
+    # spaces are unified
+    substitute(1 + 1  + 1   + 1)
+    #> 1 + 1 + 1 + 1
+    quote(1 + 1  + 1   + 1)
+    #> 1 + 1 + 1 + 1
+    
+    # leading zeros in numeric input are trimmed
+    substitute(01)
+    #> [1] 1
+    quote(01)
+    #> [1] 1
     ```
     
 2.  __<span style="color:red">Q</span>__: Why does `as.Date.default()` use `substitute()` and `deparse()`?
@@ -45,7 +69,7 @@
     character vector. Can you construct an input that violates this expectation? 
     What happens?
     
-    __<span style="color:green">A</span>__: We can pass an expression to one of `pairwise.t.test()`'s data input arguments, which exceeds the default cutoff width in `deparse()`. The expression will be split into a character vector of length greater 1. Since the deparsed data inputs are directly pasted (read the source code!) with "and" as separator, and the result is just used to be displayed in the output. Just the data.name output will change (it will include more than one "and").
+    __<span style="color:green">A</span>__: We can pass an expression to one of `pairwise.t.test()`'s data input arguments, which exceeds the default cutoff width in `deparse()`. The expression will be split into a character vector of length greater 1. The deparsed data inputs are directly pasted (read the source code!) with "and" as separator and the result is just used to be displayed in the output. Just the data.name output will change (it will include more than one "and").
     
     
     ```r
@@ -116,21 +140,45 @@
     subset2(sample_df2, x > 8)
     #> [1]  9 10
     ```
-
     
-    __<span style="color:green">A</span>__: The output is an atomic vector. To return always a data.frame change the last row in `subset2` to `x[r, , drop = FALSE]`.
+    __<span style="color:green">A</span>__: Well what does `base::subset` return?
+    
+    
+    ```r
+    subset(sample_df2, x > 8)
+    #>     x
+    #> 9   9
+    #> 10 10
+    ```
+    
+    So we want that the output is always a data frame and not an atomic vector like above. To return always a data frame change the last row in `subset2()` to `x[r, , drop = FALSE]`.
 
 3.  __<span style="color:red">Q</span>__: The real subset function (`subset.data.frame()`) removes missing
     values in the condition. Modify `subset2()` to do the same: drop the 
     offending rows.
     
-    __<span style="color:green">A</span>__: This time change the last row to `x[!is.na(r) & r, , drop = FALSE]`.
+    __<span style="color:green">A</span>__: This time change the last row to `x[!is.na(r) & r, , drop = FALSE]`. Alternatively you can also exclude `NA`s from the subset via setting them to `FALSE` with `r[is.na(r)] <- FALSE`.
 
 4.  __<span style="color:red">Q</span>__: What happens if you use `quote()` instead of `substitute()` inside of
     `subset2()`?
     
-    __<span style="color:orange">A</span>__: We will get ```"Error in eval(expr, envir, enclos) : object 'x' not found"``` in the above example. We are not sure if the problem relates to finding the right expression or the correct environment for evaluation.
-
+    __<span style="color:green">A</span>__: R looks for `condition` within `sample_df`
+    but can't find it, so it is looking in the execution environment for `condition`
+    and evaluates it to `a >= 4` (as supplied in the input). In the actual environment and the
+    remaining environments (the global environment and the search path) `a` can't
+    be found and we get the error "Error in eval(expr, envir, enclos) : object 'a' not found".
+    To understand this in detail, it is very important to 
+    forget about `substitute()` for a moment and just explore where `eval()` 
+    evaluates its supplied expressions for all kind of supplied `envir` and `enclos`
+    arguments. Before you get crazy (since a lot of stuff is coming togetehr here),
+    look also [here](https://stackoverflow.com/questions/43701281/r-eval-has-misleading-documentation-for-the-case-that-the-envir-argument-is-list) and [here](http://stackoverflow.com/questions/15504960/when-how-where-is-parent-frame-in-a-default-argument-interpreted).
+    
+    The above is opposed to `substitute()`, which isn't only capturing the symbol `condition`, but the expression slot of the condition promise object, which means, that `substitute()`
+    notices, when a promise is assigned as it's first argument and also stores this
+    information. To be more precise, we quote from [R Language Definition](https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Argument-evaluation)
+    
+    > A formal argument is really a promise, an object with three slots, one for the expression that defines it, one for the environment in which to evaluate that expression, and one for the value of that expression once evaluated. substitute will recognize a promise variable and substitute the value of its expression slot. 
+    
 5.  __<span style="color:red">Q</span>__: The second argument in `subset()` allows you to select variables. It
     treats variable names as if they were positions. This allows you to do 
     things like `subset(mtcars, , -cyl)` to drop the cylinder variable, or
@@ -165,6 +213,14 @@
     }
     select(mtcars, -cyl)
     ```
+    
+    This works also for ranges, i.e.,
+    
+    ```r
+    select(mtcars, cyl:drat)
+    ```
+    
+    because of the usual precedences `cyl:drat` becomes `2:5`.
 
 6.  __<span style="color:red">Q</span>__: What does `evalq()` do? Use it to reduce the amount of typing for the
     examples above that use both `eval()` and `quote()`. 
@@ -204,7 +260,7 @@
     __<span style="color:green">A</span>__: `substitute(order(...))` orders the indices of the supplied
     columns in `...` in the context of the submitted data.frame argument, beginning with the first submitted column.
   
-    We can just copy the part of the source code and see if it does what we expect:
+    We can just copy the part of the source code from `plyr::arrange()` and see if it does what we expect:
   
     
     ```r
@@ -323,7 +379,7 @@
     source code for `within.data.frame()`. Why is the code so much more
     complex than `with()`?
     
-    __<span style="color:orange">A</span>__: `with()` is a generic function
+    __<span style="color:green">A</span>__: `with()` is a generic function
     that allows writing an expression (second argument) that refers to variablenames of `data` (first argument) as if the corresponding variables were objects themselves.
     
     `with()` evaluates the expression via an
@@ -337,7 +393,7 @@
     parent. This also means that variables that aren't found in `data`, will be looked up in `with()`'s calling environment. As stated in `?with`, this is useful for modelling functions.
     
     In contrast to `with()`, which returns the value of the evaluated expression, `within()` returns the modified object. So `within()` can be used as an alternative to `base::transform()`.
-    There is also a subtile difference regarding the non standard evaluation technique (which I don't understand in detail). `within()` first creates an environment with `data` as parent and `within()`'s calling environment as grandparent. This environment becomes changed, since afterwards the expression is evaluated inside of it. The rest of the code converts this environment into a list and ensures that new variables are not overriden by the former ones.
+    `within()` first creates an environment with `data` as parent and `within()`'s calling environment as grandparent. This environment becomes changed, since afterwards the expression is evaluated inside of it. The rest of the code converts this environment into a list and ensures that new variables are not overriden by the former ones.
 
 ## Calling from another function
 
@@ -384,14 +440,88 @@
     automatically determine whether you want standard or non-standard
     evaluation. Each uses a different approach. Figure out the essence
     of each approach then compare and contrast.
+    
+    __<span style="color:green">A</span>__: 
+    
+    * `match.fun` uses NSE if you pass something other than a length-one character or symbol, and does not use NSE otherwise.
+    * `page` uses NSE if you pass something other than a length-one character. Symbols would still trigger NSE.
+    * `ls` triggers NSE substitute if it cannot evaluate the directory passed as a variable, and triggers NSE deparse if the result is not a character.
+    
+    The `ls` method seems safest of the three approaches, but is also the least performant.
 
 3.  __<span style="color:red">Q</span>__: Add an escape hatch to `plyr::mutate()` by splitting it into two functions.
     One function should capture the unevaluated inputs. The other should take a 
     data frame and list of expressions and perform the computation.
+    
+    __<span style="color:green">A</span>__: We look again at the source code of `plyr::mutate()`:
+    
+    
+    ```r
+    plyr::mutate
+    #> function (.data, ...) 
+    #> {
+    #>     stopifnot(is.data.frame(.data) || is.list(.data) || is.environment(.data))
+    #>     cols <- as.list(substitute(list(...))[-1])
+    #>     cols <- cols[names(cols) != ""]
+    #>     for (col in names(cols)) {
+    #>         .data[[col]] <- eval(cols[[col]], .data, parent.frame())
+    #>     }
+    #>     .data
+    #> }
+    #> <environment: namespace:plyr>
+    ```
+    
+    What we want is to have the local variable "cols" as an argument of our new (wrapped) escape hatch function (analogously as shown with `subset2_q()` in the textbook).
+    
+    Therefore we create:
+    
+    
+    ```r
+    get_cols <- function(...) {
+      ll <- as.list(substitute(list(...)))
+      ll[names(ll) != ""]
+    }
+    ```
+    
+    We also want a function, that works with "cols" and performs the computation (the for loop in the original `plyr::mutate()`):
+    
+    
+    ```r
+    mutate_cols <- function(df, cols) {
+      for (col in names(cols)) {
+        df[[col]] <- eval(cols[[col]], df, parent.frame())
+        }
+      df
+    }
+    ```
+    
+    Now we can wrap these with our new mutate function and have a nice interface:
+    
+    
+    ```r
+    mutate2 <- function(df, ...) {
+      mutate_cols(df, get_cols(df, ...))
+    }
+    
+    # a little test
+    df <- data.frame(x = 1:5)
+    identical(
+      plyr::mutate(df, x2 = x * x, x3 = x2 * x),
+      mutate2(df, x2 = x * x, x3 = x2 * x)
+    )
+    #> [1] TRUE
+    ```
 
 4.  __<span style="color:red">Q</span>__: What's the escape hatch for `ggplot2::aes()`? What about `plyr::.()`?
     What do they have in common? What are the advantages and disadvantages
     of their differences?
+    
+    * One can call `rename_aes` directly.
+    * `plyr::.` lets you specify an env in which to evaluate `...`.
+    
+    Both evaluate `...` using `match.call()` and create a structure out of them.
+    
+    `plyr::.` probably requires less knowledge about internals, but is also less customizable.
 
 5.  __<span style="color:red">Q</span>__: The version of `subset2_q()` I presented is a simplification of real
     code. Why is the following version better?
@@ -403,9 +533,39 @@
       x[r, ]
     }
     ```
-
+    
     Rewrite `subset2()` and `subscramble()` to use this improved version.
-
+    
+    __<span style="color:green">A</span>__: 
+    
+    
+    ```r
+    subset2_q_old <- function(x, condition) {
+      r <- eval(condition, x, parent.frame())
+      x[r, ]
+    }
+    
+    subset2_q <- function(x, cond, env = parent.frame()) {
+      r <- eval(cond, x, env)
+      x[r, ]
+    }
+    ```
+    
+    The modified version of subset2_q allows you to specify an environment in which to evaluate the condition, which allows you to run `subset2_q()` in more situations (such as within a dataframe).
+    
+    
+    ```r
+    subset2 <- function(x, condition, env = parent.frame()) {
+      subset2_q(x, substitute(condition), env)
+    }
+    
+    scramble <- function(x) x[sample(nrow(x)), ]
+    subscramble <- function(x, condition, env = parent.frame()) {
+      condition <- substitute(condition, env)
+      scramble(subset2_q(x, condition, env))
+    }
+    ```
+    
 ## Substitute
 
 1.  __<span style="color:red">Q</span>__: Use `pryr::subs()` to convert the LHS to the RHS for each of the following pairs:
@@ -430,18 +590,58 @@
     * `a + b + c` -> `a + b * c`
     * `f(a, b)` -> `f(a, b, c)`
     * `f(a, b, c)` -> `f(a, b)`
+    
+    __<span style="color:green">A</span>__: 
+    * `a + b + c` -> `a + b * c`
+    You can't convert one "+" to "+" and the other to "*", because `subs()` converts either all instances of the "+" or no instances of the "+".
+    * `f(a, b)` -> `f(a, b, c)`
+    `subs()` cannot be used to add new arguments, only convert.
+    * f(a, b, c) -> f(a, b)
+    `subs()` cannot be used to subtract new arguments, only convert.
 
 3.  __<span style="color:red">Q</span>__: How does `pryr::named_dots()` work? Read the source.
+    
+    __<span style="color:green">A</span>__: 
+    It captures the dot arguments using `pryr::dots` (which is just `eval(substitute(alist(...)))`), and then gets the names of the arguments, using "" for the arguments without names.
+    
+    If all the args are "", it simply returns the args. Otherwise, it names the args with their values, and returns the renamed list of args.
 
 ## The downsides of non-standard evaluation
 
 1. __<span style="color:red">Q</span>__: What does the following function do? What’s the escape hatch? Do you think that this is an appropriate use of NSE?
 
+    
+    ```r
     nl <- function(...) {
-      dots <- named_dots(...)
+      dots <- pryr::named_dots(...)
       lapply(dots, eval, parent.frame())
     }
+    ```
+    
+    __<span style="color:green">A</span>__: 
+    `nl()` extracts the dots, names them, and then evaluates them in the global namespace. This returns a list of arguments that are named by what is literally in the dots, with the values of what the dots evaluate to.
+    
+    For example:
+    
+    
+    ```r
+    nl(1, 2 + 2, mean(c(3, 5)))
+    #> $`1`
+    #> [1] 1
+    #> 
+    #> $`2 + 2`
+    #> [1] 4
+    #> 
+    #> $`mean(c(3, 5))`
+    #> [1] 4
+    ```
+    
+    You can always call the underlying `lapply` directly as an escape hatch.
+    
+    However, it is a toy example and we are not really sure what you would gain from actually using this.
 
 2. __<span style="color:red">Q</span>__: Instead of relying on promises, you can use formulas created with ~ to explicitly capture an expression and its environment. What are the advantages and disadvantages of making quoting explicit? How does it impact referential transparency?
+    
+    __<span style="color:green">A</span>__: Using formulas in this manner would allow for referential transparency, but it would make working with NSE much more verbose. In any situation in which it is worth using NSE, it would also be worth not using formulas like this.
 
 3. __<span style="color:red">Q</span>__: Read the standard non-standard evaluation rules found at http://developer.r-project.org/nonstandard-eval.pdf.

@@ -17,6 +17,8 @@
     is.valid <- function(x){
       out <- FALSE
       if(is.atomic(x) & length(x) == 1){out <- TRUE}
+      # another possibility to check for constants would be
+      # identical(x, substitute(x))
       if(is.call(x)){out <- TRUE}
       if(is.name(x)){out <- TRUE}
       if(is.pairlist(x)){out <- TRUE}
@@ -27,7 +29,7 @@
 2.  __<span style="color:red">Q</span>__: `pryr::ast()` uses non-standard evaluation. What's its escape hatch to
     standard evaluation?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: You can call `pryr::call_tree` directly.
 
 3.  __<span style="color:red">Q</span>__: What does the call tree of an if statement with multiple else conditions
     look like?
@@ -98,14 +100,17 @@
     #>             \- `(
     #>             \-  "fourth"
     ```
+    
+    However, under the hood the language will call another base `if` statement. So `else if` seems to be for human readibility.
 
 4.  __<span style="color:red">Q</span>__: Compare `ast(x + y %+% z)` to `ast(x ^ y %+% z)`. What do they
     tell you about the precedence of custom infix functions?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: Comparison of the syntax trees:
     
     
     ```r
+    # for ast(x + y %+% z)
     # y %+% z will be calculated first and the result will be added to x
     pryr::ast(x + y %+% z)
     #> \- ()
@@ -116,6 +121,7 @@
     #>     \- `y
     #>     \- `z
     
+    # for ast(x ^ y %+% z)
     # x^y will be calculated first, and the result will be used as first argument of `%+%()`
     pryr::ast(x ^ y %+% z)
     #> \- ()
@@ -126,12 +132,22 @@
     #>     \- `y
     #>   \- `z
     ```
+    
+    So we can conclude that custom infix functions must have a precedence between addition and exponentiation. The general precedence rules can be found for example [here](https://cran.r-project.org/doc/manuals/r-release/R-lang.html)
 
 5.  __<span style="color:red">Q</span>__: Why can't an expression contain an atomic vector of length greater than one?
     Which one of the six types of atomic vector can't appear in an expression?
     Why?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: Because you can't type an expression that evaluates to an atomic of greater length than one without using a function, which means that these expressions would be calls. Also raws can't appear in expressions, because of a similar reason. We think they are impossible to construct without using `as.raw`, which would mean that we will also end up with a call.
+    
+    Note also that imaginary parts of complex numbers work:
+
+    
+    ```r
+    pryr::ast(1i)
+    #> \-  0+1i
+    ```
 
 ## Names
 
@@ -152,6 +168,9 @@
     ```r
     formals(g) <- alist(x = , y = 10)
     ```
+    
+    Similarly one can change the body of the function through `body<-()` and also the
+    environment via `environment<-()`.
 
 2.  __<span style="color:red">Q</span>__: Write an equivalent to `get()` using `as.name()` and `eval()`. Write an
     equivalent to `assign()` using `as.name()`, `substitute()`, and `eval()`.
@@ -166,9 +185,10 @@
       eval(as.name(x), env)
     }
     
-    assign3 <- function(x, value, env = parent.frame()){
-      eval(substitute(x <- as.name(x)), env)
-      eval(substitute(x <- value), env)
+    assign3 <- function(x, value, env) {
+      eval(substitute(x <- value,list(x = as.name(x), value = value)), env)
+      if (length(x) > 1)
+        warning('only the first element is used as variable name')
     }
     ```
     
@@ -321,7 +341,10 @@ with the help of a separate `switch()`.
 6.  __<span style="color:red">Q</span>__: Read the source for `pryr::standardise_call()`. How does it work?
     Why is `is.primitive()` needed?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: It evaluates the first element of the call,
+    which is usually the name of a function, but can also be another call. Then is uses `match.call()` to get the standard names for all the arguments.
+    
+    `is.primitive()` is used as an escape to just return the call instead of using `match.call()` if the function passed is a primitive. This is done because `match.call()` does not work for primitives.
 
 7.  __<span style="color:red">Q</span>__: `standardise_call()` doesn't work so well for the following calls.
     Why?
@@ -329,11 +352,6 @@ with the help of a separate `switch()`.
     
     ```r
     library(pryr)
-    #> 
-    #> Attaching package: 'pryr'
-    #> The following object is masked _by_ '.GlobalEnv':
-    #> 
-    #>     make_call
     standardise_call(quote(mean(1:10, na.rm = TRUE)))
     #> mean(x = 1:10, na.rm = TRUE)
     standardise_call(quote(mean(n = T, 1:10)))

@@ -5,7 +5,7 @@
 
 1.  __<span style="color:red">Q</span>__: What function allows you to tell if an object is a function? What function
     allows you to tell if a function is a primitive function?  
-    __<span style="color:green">A</span>__: You can test objects with `is.function` and `is.primitive`.
+    __<span style="color:green">A</span>__: You can test objects with `is.function()` and `is.primitive()`.
 
 2.  __<span style="color:red">Q</span>__: This code makes a list of all functions in the base package. 
     
@@ -43,11 +43,11 @@
     
     ```r
     sum(sapply(funs, function(x) is.null(formals(x)) | length(formals(x)) == 0))
-    #> [1] 225
+    #> [1] 226
     sum(sapply(funs, function(x) !is.null(formals(x)) & length(formals(x)) == 0))
     #> [1] 0
     sum(sapply(funs, function(x) is.null(formals(x))))
-    #> [1] 225
+    #> [1] 226
     sum(sapply(funs, function(x) is.null(formals(x)) & is.primitive(x)))
     #> [1] 183
     ```
@@ -66,7 +66,7 @@ __<span style="color:green">A</span>__: `body()`, `formals()` and `environment()
     > There is one exception to the rule that functions have three components. Primitive functions, like `sum()`, call C code directly with `.Primitive()` and contain no R code. Therefore their `formals()`, `body()`, and `environment()` are all `NULL`.
 
 4. __<span style="color:red">Q</span>__: When does printing a function not show what environment it was created in?  
-__<span style="color:green">A</span>__: When it was created in the global environment.
+__<span style="color:green">A</span>__: When the function is a primitive or it was created in the global environment.
 
 ## Lexical Scoping
 
@@ -78,16 +78,16 @@ __<span style="color:green">A</span>__: When it was created in the global enviro
     c(c = c)
     ```
     
-    __<span style="color:green">A</span>__: A named vector c, which first field has the value 10 and the name "c". The first "c" is the `c()` function, the second is the name of the first entry and the third is the value of the first entry.
+    __<span style="color:green">A</span>__: A named vector `c`, which first field has the value 10 and the name "c". The first "c" is the `c()` function, the second is the name of the first entry and the third is the value of the first entry.
        
 2. __<span style="color:red">Q</span>__: What are the four principles that govern how R looks for values?  
 __<span style="color:green">A</span>__:   As stated in the book:
     
     > There are four basic principles behind R's implementation of lexical scoping:
-    * name masking
-    * functions vs. variables
-    * a fresh start
-    * dynamic lookup
+    * name masking (Variables are evaluated according to the highest-precedence environment in which they are defined, starting from the local environment and working upwards through each parent environment.)
+    * functions vs. variables (For all intents and purposes, function names are evaluated by the same rules as for variables.  If it is implicit that a function is being used, R will ignore objects with the same name that are not functions.)
+    * a fresh start (Every time a function is called, a new environment is created to host execution.)
+    * dynamic lookup (R looks for values, when a function is run. Not when it is created)
 
 3. __<span style="color:red">Q</span>__: What does the following function return? Make a prediction before 
    running the code yourself.
@@ -119,7 +119,7 @@ __<span style="color:green">A</span>__:   As stated in the book:
     y <- runif(min = 0, max = 1, 20)
     # -> runif(n = 20, min = 0, max = 1)
     cor(m = "k", y = y, u = "p", x = x)
-    # -> cor(x = x, y = y, use = "pairwise.complete.obs", method = "pearson")
+    # -> cor(x = x, y = y, use = "pairwise.complete.obs", method = "kendall")
     ```
 
 2.  __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
@@ -180,22 +180,42 @@ __<span style="color:green">A</span>__:   As stated in the book:
     f2()
     ```
     
-    __<span style="color:green">A</span>__: 100, lazy evaluation.
+    __<span style="color:green">A</span>__: 100, lazy evaluation. If we changed the order
+    of `z <- 100` and `x` inside the body of the function, we would get an error, while assigning `z` to `x`, because `z` wouldn`t be defined.
     
 ## Special calls
 
 1. __<span style="color:red">Q</span>__: Create a list of all the replacement functions found in the base package. 
    Which ones are primitive functions?  
    __<span style="color:green">A</span>__: We can find replacementfunctions by searching for functions that end on "<-":
+   
     
     ```r
     repls <- funs[grepl("<-$", names(funs))]
-    Filter(is.primitive, repls)
+    names(repls)
+    #>  [1] "$<-"              "@<-"              "[[<-"            
+    #>  [4] "[<-"              "<-"               "<<-"             
+    #>  [7] "attr<-"           "attributes<-"     "body<-"          
+    #> [10] "class<-"          "colnames<-"       "comment<-"       
+    #> [13] "diag<-"           "dim<-"            "dimnames<-"      
+    #> [16] "Encoding<-"       "environment<-"    "formals<-"       
+    #> [19] "is.na<-"          "length<-"         "levels<-"        
+    #> [22] "mode<-"           "mostattributes<-" "names<-"         
+    #> [25] "oldClass<-"       "parent.env<-"     "regmatches<-"    
+    #> [28] "row.names<-"      "rownames<-"       "split<-"         
+    #> [31] "storage.mode<-"   "substr<-"         "substring<-"     
+    #> [34] "units<-"
+    names(Filter(is.primitive, repls))
+    #>  [1] "$<-"            "@<-"            "[[<-"           "[<-"           
+    #>  [5] "<-"             "<<-"            "attr<-"         "attributes<-"  
+    #>  [9] "class<-"        "dim<-"          "dimnames<-"     "environment<-" 
+    #> [13] "length<-"       "levels<-"       "names<-"        "oldClass<-"    
+    #> [17] "storage.mode<-"
     ```
 
 2. __<span style="color:red">Q</span>__: What are valid names for user-created infix functions?  
   
-    __<span style="color:green">A</span>__:
+    __<span style="color:green">A</span>__: From the textbook:
     
     > All user-created infix functions must start and end with `%` ... they can contain any sequence of characters (except “%”, of course).
 
@@ -215,16 +235,16 @@ __<span style="color:green">A</span>__:
    
     
     ```r
+    `%intersect_%` <- function(a, b){
+      unique(a[a %in% b])
+      }
+    
     `%union_%` <- function(a, b){
       unique(c(a, b))
       }
     
-    `%intersect_%` <- function(a, b){
-      unique(c(a[a %in% b], b[b %in% a]))
-      }
-    
     `%setdiff_%` <- function(a, b){
-      a[! a %in% b]
+      unique(a[! a %in% b])
       }
     ```
    
@@ -233,7 +253,7 @@ __<span style="color:green">A</span>__:
 
     
     ```r
-    `random<-` <- function(x, value){
+    `random_replacement<-` <- function(x, value){
       x[sample(length(x), 1)] <- value
       x
       }
@@ -258,12 +278,13 @@ __<span style="color:green">A</span>__:
     __<span style="color:green">A</span>__: `in_dir()` takes a path to a working directory as an argument. At the beginning of the function the working directory is changed to this specification and with a call to `on.exit` it is guranteed, that when the function finishes the working directory also equals to this specification.
     
     In `source()` you need the `chdir` argument to specify, if the working directory should be changed during the evaluation to the `file` argument, if this is a pathname. The difference in `source()` is, that the actual working directory as output of `getwd()` is saved to set it in `on.exit` before changing the directory to the pathname (given to the `file` argument) for the rest of the execution of the `source()` function.
+    
+    The methodology used in `in_dir()` is more free, allowing more programmer customization, whereas the methodology in `chdir()` is more constrained, reducing programmer error. This is generally a trade-off that different people will want to take different sides of, usually depending on how much they know what they are doing.
 
 2.  __<span style="color:red">Q</span>__: What function undoes the action of `library()`? How do you save and restore
     the values of `options()` and `par()`?  
-    __<span style="color:green">A</span>__: Use `detach()` with `"package:pacakgename"` as first argument.  
-    Use, getOption() with `"optionname"` as argument.
-    Type `par()` in the console and you will get a list with all actual settings.
+    __<span style="color:green">A</span>__: Use `detach()` with `"package:packagename"` as first argument.  
+    Type `options()` (or `par()`) to see the actual settings and save them via `old_opt <- options()[["optionname"]]` (or `old_par <- par()[["parname"]]`). For options you could also use `getOption()` with `"optionname"` as argument. To restore (or overwriting) just use `options(optionname = old_opt)` or `par(parname = old_par)`.
 
 3.  __<span style="color:red">Q</span>__: Write a function that opens a graphics device, runs the supplied code, and 
     closes the graphics device (always, regardless of whether or not the plotting code worked).  
@@ -293,10 +314,10 @@ __<span style="color:green">A</span>__:
       readLines(temp)
     }
     capture.output2(cat("a", "b", "c", sep = "\n"))
-    #> Warning in file.remove(temp): cannot remove file 'C:\Users\MGO\AppData
-    #> \Local\Temp\RtmpiQu8MY\file19842f913805', reason 'Permission denied'
     #> [1] "a" "b" "c"
     ```
     
     Compare `capture.output()` to `capture.output2()`. How do the functions differ? What features have I removed to make the key ideas easier to see? How have I rewritten the key ideas to be easier to understand?  
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: Using `body(capture.output)`, we can see the source code for the original `capture.output()` function. `capture.output()` is a good clip longer (39 lines vs. 7 lines). The reason for this is that `capture.output2()` is more modular, since `capture.output()` writes out entire methods like `readLines()` instead of invoking them. This makes `capture.output2` easier to understand if you understand the underlying methods.
+    
+    However, `capture.output2()` does remove potentially important functionality, as `capture.output()` appears to handle important exceptions not handled in `capture.output2()`, and `capture.output()` offers the ability to chose between overwriting or appending to a file.

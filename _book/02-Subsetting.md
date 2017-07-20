@@ -16,7 +16,7 @@
 
 2.  __<span style="color:red">Q</span>__: Why does `x <- 1:5; x[NA]` yield five missing values? (Hint: why is 
     it different from `x[NA_real_]`?)  
-    __<span style="color:green">A</span>__: `NA` is of class logical, so `x[NA]` becomes recycled to `x[NA, NA, NA, NA, NA]`. Since subsetting an atomic with `NA` leads to an `NA`, you will get 5 of them returned.
+    __<span style="color:green">A</span>__: `NA` is of class logical, so `x[NA]` becomes recycled to `x[NA, NA, NA, NA, NA]`. Since subsetting an atomic with `NA` leads to an `NA`, you will get 5 of them returned. (Note that the recycling won't happen, if you subset with `NA_real_`, `NA_integer`, `NA_character` or `NA_complex`. In fact the letter gives an error).
     
 3.  __<span style="color:red">Q</span>__: What does `upper.tri()` return? How does subsetting a matrix with it 
     work? Do we need any additional subsetting rules to describe its behaviour?
@@ -27,11 +27,11 @@
     x[upper.tri(x)]
     ```
     
-    __<span style="color:green">A</span>__: `upper.tri()` has really intuitive source code. It coerces it's input to a matrix and returns a logical matrix. Hence describing it's behaviour for the use of subsetting is based on everything that applies to subsetting with logical matrices.
+    __<span style="color:green">A</span>__: `upper.tri()` has really intuitive source code. It coerces its input to a matrix and returns a logical matrix. Hence describing it's behaviour for the use of subsetting is based on everything that applies to subsetting with logical matrices.
 
 4.  __<span style="color:red">Q</span>__: Why does `mtcars[1:20]` return an error? How does it differ from the 
     similar `mtcars[1:20, ]`?  
-    __<span style="color:green">A</span>__: In the first case `mtcar` is subsetted with a vector and the statement should return a data.frame of the first 20 columns in `mtcars`. Since `mtcars` only has 11 columns, the index is out of bounds, which explains the error. The biggest difference of `mtcars[1:20, ]` to the former case, is that now `mtcars` is subsetted with two vectors. In this case you will get returned the first 20 rows and all columns (like subsetting a matrix). 
+    __<span style="color:green">A</span>__: In the first case `mtcars` is subsetted with a vector and the statement should return a data.frame of the first 20 columns in `mtcars` (this is like listsubsetting in the sense, that each element is a column and the result is typestable). Since `mtcars` only has 11 columns, the index is out of bounds, which explains the error. The biggest difference of `mtcars[1:20, ]` to the former case, is that now `mtcars` is subsetted with two vectors. In this case you will get returned the first 20 rows and all columns (like subsetting a matrix). 
 
 5.  __<span style="color:red">Q</span>__: Implement your own function that extracts the diagonal entries from a
     matrix (it should behave like `diag(x)` where `x` is a matrix).  
@@ -107,10 +107,14 @@
       diag_m(diamonds_m)
     )
     #> Unit: microseconds
-    #>                expr    min     lq     mean median     uq    max neval
-    #>    diag(diamonds_m) 12.464 14.296 16.03761 14.663 15.396 46.187   100
-    #>  diag_v(diamonds_m) 16.130 17.229 20.01479 17.962 18.696 97.506   100
-    #>  diag_m(diamonds_m) 17.962 19.061 21.70105 19.795 20.528 67.081   100
+    #>                expr    min     lq      mean median     uq      max neval
+    #>    diag(diamonds_m) 12.464 13.929  15.81398 14.297 15.029  129.763   100
+    #>  diag_v(diamonds_m) 12.830 13.563  14.48710 14.296 14.846   24.927   100
+    #>  diag_m(diamonds_m) 14.663 15.762 115.80829 16.496 17.229 9880.293   100
+    #>  cld
+    #>    a
+    #>    a
+    #>    a
     ```
     
     The original function seems to be a little bit faster than the trimmed and our matrix version. Maybe this is due to compiling issues
@@ -129,13 +133,17 @@
       diag_m_c(diamonds_m)
     )
     #> Unit: microseconds
-    #>                  expr    min     lq     mean median     uq    max neval
-    #>    diag_c(diamonds_m) 12.464 13.197 15.24586 13.564 14.297 63.782   100
-    #>  diag_v_c(diamonds_m) 12.830 13.380 15.05523 13.930 14.846 24.560   100
-    #>  diag_m_c(diamonds_m) 14.297 15.396 17.59923 16.129 16.496 46.921   100
+    #>                  expr    min     lq     mean median     uq     max neval
+    #>    diag_c(diamonds_m) 12.830 14.297 18.54854 15.029 19.612 112.535   100
+    #>  diag_v_c(diamonds_m) 13.196 14.113 18.09037 14.663 20.162  67.081   100
+    #>  diag_m_c(diamonds_m) 14.663 16.129 19.19374 16.863 21.811  42.888   100
+    #>  cld
+    #>    a
+    #>    a
+    #>    a
     ```
     
-    We can see that our diag_m version is only a little bit slower than the 
+    We can see that our `diag_m()` version is only a little bit slower than the 
     original version. However the source code of the matrix version could be a bit
     easier to read.
     
@@ -174,21 +182,21 @@
       diag_lv_c(diamonds_m)
     )
     #> Unit: microseconds
-    #>                   expr      min        lq       mean   median        uq
-    #>       diag(diamonds_m)   13.196   15.0300   20.40337   17.962   24.7430
-    #>   diag_v_c(diamonds_m)   12.831   15.3965   21.12913   19.062   25.8435
-    #>   diag_m_c(diamonds_m)   15.396   17.9620   25.82856   26.027   30.9750
-    #>  diag_lv_c(diamonds_m) 2637.045 2893.2715 5081.68516 4589.536 5084.9440
-    #>        max neval
-    #>     39.956   100
-    #>     46.187   100
-    #>     61.216   100
-    #>  50670.185   100
+    #>                   expr      min        lq       mean    median        uq
+    #>       diag(diamonds_m)   13.930   15.7625   23.07928   20.3445   27.6760
+    #>   diag_v_c(diamonds_m)   13.564   15.3960   21.13282   18.6960   25.1100
+    #>   diag_m_c(diamonds_m)   15.763   17.2290   26.56892   27.3090   33.1745
+    #>  diag_lv_c(diamonds_m) 2481.621 2648.5890 3949.52209 3815.1700 5025.0055
+    #>       max neval cld
+    #>    94.940   100  a 
+    #>    46.554   100  a 
+    #>    51.319   100  a 
+    #>  6952.568   100   b
     ```
 
 6.  __<span style="color:red">Q</span>__: What does `df[is.na(df)] <- 0` do? How does it work?  
 __<span style="color:green">A</span>__: It replaces all `NA`s within `df` with the value
-`0`. `is.na(df)` returns a logical matrix which is used to subset df. Since you can combine subsetting and assignment, only the matched part of `df` (the `NA`s) is replaced with `0` entries.
+`0`. `is.na(df)` returns a logical matrix which is used to subset df. Since you can combine subsetting and assignment (specifically `[<-` is called), only the matched part of `df` (the `NA`s) is replaced with `0` entries.
 
 ## Subsetting operators
 
@@ -199,10 +207,10 @@ __<span style="color:green">A</span>__: It replaces all `NA`s within `df` with t
     
     
     ```r
-    mod$df.residual       # preserving output
-    mod$df.r              # preserving output with partial matching
-    mod["df.residual"]    # list output (without partial matching)
-    mod[["df.residual"]]  # preserving output (without partial matching)
+    mod$df.residual       # simplifying output
+    mod$df.r              # simplifying output with partial matching
+    mod["df.residual"]    # preserving list output (without partial matching)
+    mod[["df.residual"]]  # simplifying output (without partial matching)
     ```
     
     The same states for `summary(mod)`, so we can use for example:
@@ -223,7 +231,7 @@ __<span style="color:green">A</span>__: It replaces all `NA`s within `df` with t
     
     
     ```r
-    iris[sample(ncol(iris))] # permute rows
+    iris[sample(ncol(iris))] # permute columns
     iris[sample(nrow(iris)), sample(ncol(iris)), drop = FALSE] # permute both at the same time
     ```
 
@@ -235,7 +243,7 @@ __<span style="color:green">A</span>__: It replaces all `NA`s within `df` with t
     
     ```r
     m=10
-    iris[sample(nrow(iris), m),]
+    iris[sample(nrow(iris), m), , drop = FALSE]
     
     # Blockversion
     start <- sample(nrow(iris) - m + 1, 1)
