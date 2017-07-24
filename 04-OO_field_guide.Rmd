@@ -45,11 +45,12 @@ library(methods)
 4.  __<span style="color:red">Q</span>__: Which base generic has the greatest number of defined methods?  
 __<span style="color:green">A</span>__: 
     
-    ```{r, warning = FALSE, cache = TRUE}
+    ```{r, warning = FALSE, cache = FALSE}
+    library("methods")
     objs <- mget(ls("package:base"), inherits = TRUE)
     funs <- Filter(is.function, objs)
     generics <- Filter(function(x) ("generic" %in% pryr::ftype(x)), funs)
-    sort(sapply(generics, function(x) length(methods(x))), decreasing = TRUE)[1]
+    sort(sapply(generics, function(x) length(methods(x))), decreasing = TRUE)[1] 
     ```
     
 5.  __<span style="color:red">Q</span>__: `UseMethod()` calls methods in a special way. Predict what the following
@@ -57,9 +58,9 @@ __<span style="color:green">A</span>__:
     figure out what's going on. Write down the rules in the simplest form
     possible.
 
-    ```{r, eval = FALSE}
+    ```{r, eval = TRUE}
     y <- 1
-    g <- function(x) {
+    g <- function(x) { 
       y <- 2
       UseMethod("g")
     }
