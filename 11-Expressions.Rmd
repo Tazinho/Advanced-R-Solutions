@@ -426,10 +426,9 @@ with the help of a separate `switch()`.
 	`update_model`'s syntax is less verbose and easier to read.
 
 
-2.  __<span style="color:red">Q</span>__: Why doesn't `write.csv(mtcars, "mtcars.csv", row = FALSE)` work?
-    What property of argument matching has the original author forgotten?
+2.  __<span style="color:red">Q</span>__: Why doesn't `write.csv(mtcars, "mtcars.csv", row = FALSE)` work?  What property of argument matching has the original author forgotten?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: `write.csv` rewrites the call, which does not allow R to use it's natural `match.call` to expand `row` to `row.names`.
 
 3.  __<span style="color:red">Q</span>__: Rewrite `update.formula()` to use R code instead of C code.
     
