@@ -403,16 +403,16 @@ with the help of a separate `switch()`.
     __<span style="color:green">A</span>__: 
 
 	```{r}
-	update_call <- function (object, formula., ...) {
+	update_call <- function (object, formula_, ...) {
 		call <- object$call
-		if (!missing(formula.)) {
-			call$formula <- update.formula(formula(object), formula.)
+		if (!missing(formula_)) {
+			call$formula <- update.formula(formula(object), formula_)
 		}
 		pryr::modify_call(call, pryr::dots(...))
 	}
 
-	update_model <- function(object, formula., ...) {
-		call <- update_call(object, formula., ...)
+	update_model <- function(object, formula_, ...) {
+		call <- update_call(object, formula_, ...)
 		eval(call, environment(formula(object)))
 	}
 	```
@@ -431,8 +431,31 @@ with the help of a separate `switch()`.
     __<span style="color:green">A</span>__: `write.csv` rewrites the call, which does not allow R to use it's natural `match.call` to expand `row` to `row.names`.
 
 3.  __<span style="color:red">Q</span>__: Rewrite `update.formula()` to use R code instead of C code.
-    
+
     __<span style="color:green">A</span>__: 
+
+	```{r}
+	modify_formula <- function(old, new) {
+    old_lhs <- old[[2]]
+    old_rhs <- old[[3]]
+    if (length(new) == 2) {
+      new_lhs <- old_lhs
+      new_rhs <- new[[2]]
+    } else {
+      new_lhs <- new[[2]]
+      new_rhs <- new[[3]]
+    }
+    new_lhs_ <- gsub(".", deparse(old_lhs), deparse(new_lhs), fixed = TRUE)
+    new_rhs_ <- gsub(".", deparse(old_rhs), deparse(new_rhs), fixed = TRUE)
+    as.formula(paste(new_lhs_, "~", new_rhs_))
+	}
+  modify_formula(y ~ x, ~ . + x2)
+  update.formula(y ~ x, ~ . + x2)
+  update.formula(y ~ x, log(.) ~ .)
+  modify_formula(y ~ x, log(.) ~ .)
+  update.formula(. ~ u+v, res ~ .)
+  modify_formula(. ~ u+v, res ~ .)
+  ```
 
 4.  __<span style="color:red">Q</span>__: Sometimes it's necessary to uncover the function that called the
     function that called the current function (i.e., the grandparent, not
