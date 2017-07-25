@@ -457,12 +457,20 @@ with the help of a separate `switch()`.
   modify_formula(. ~ u+v, res ~ .)
   ```
 
-4.  __<span style="color:red">Q</span>__: Sometimes it's necessary to uncover the function that called the
-    function that called the current function (i.e., the grandparent, not
-    the parent). How can you use `sys.call()` or `match.call()` to find
-    this function?
+4.  __<span style="color:red">Q</span>__: Sometimes it's necessary to uncover the function that called the function that called the current function (i.e., the grandparent, not the parent). How can you use `sys.call()` or `match.call()` to find this function?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: You can use `sys.call(-2)`.
+
+    ```{r}
+    child_fn <- function() {
+      message("I am the child_fn")
+      message("My parent is ", sys.call(-1))
+      message("My grandparent is ", sys.call(-2))
+    }
+    daddy_fn <- function() { child_fn() }
+    grandpa_fn <- function() { daddy_fn() }
+    grandpa_fn()
+    ```
 
 ## Pairlists
 
