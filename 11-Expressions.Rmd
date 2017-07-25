@@ -474,16 +474,13 @@ with the help of a separate `switch()`.
 
 ## Pairlists
 
-1.  __<span style="color:red">Q</span>__: How are `alist(a)` and `alist(a = )` different? Think about both the
-    input and the output.
+1.  __<span style="color:red">Q</span>__: How are `alist(a)` and `alist(a = )` different? Think about both the input and the output.
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: `alist(a)` returns an unnamed list of length 1 with the first element being the name `a` (note that this refers to the `name` class, which is distinct from being named `a`), so it is unsuitable for use in a function. `alist(a = )` returns a named list with the first element having name `a` and the first element being empty.
 
-2.  __<span style="color:red">Q</span>__: Read the documentation and source code for `pryr::partial()`. What does it
-    do? How does it work? Read the documentation and source code for
-    `pryr::unenclose()`. What does it do and how does it work?
+2.  __<span style="color:red">Q</span>__: Read the documentation and source code for `pryr::partial()`. What does it do? How does it work? Read the documentation and source code for `pryr::unenclose()`. What does it do and how does it work?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: `pryr::partial` takes a function and arguments and then constructs a call of that function with those args. `pryr::unenclose` takes a closure and substitutes the variables in that closure for its values found in its environment, which results in the explicit function.
 
 3.  __<span style="color:red">Q</span>__: The actual implementation of `curve()` looks more like
 
