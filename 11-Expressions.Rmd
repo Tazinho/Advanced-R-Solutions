@@ -135,14 +135,15 @@ knitr::opts_chunk$set(
     __<span style="color:green">A</span>__: 
     
     ```{r}
-    get3 <- function(x, env = parent.frame()){
+    get3 <- function(x, env = parent.frame()) {
       eval(as.name(x), env)
     }
     
-    assign3 <- function(x, value, env) {
+    assign3 <- function(x, value, env = parent.frame()) {
       eval(substitute(x <- value,list(x = as.name(x), value = value)), env)
-      if (length(x) > 1)
-        warning('only the first element is used as variable name')
+      if (length(x) > 1) {
+        warning("Only the first element is used as variable name.")
+      }
     }
     ```
     
