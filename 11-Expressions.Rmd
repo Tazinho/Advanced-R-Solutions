@@ -237,9 +237,8 @@ knitr::opts_chunk$set(
     __<span style="color:green">A</span>__: We can explain it best, when we comment the source code:
     
     ```{r, eval = FALSE}
-    function (x) 
-      {
-      # when x is an expression, mode will(x) return "expression"
+    function (x) {
+      # when x is an expression, mode(x) will return "expression"
       if (is.expression(x)) 
         return("expression")
       # when x is a call (or language, which is exactly the same), the first element 
@@ -264,16 +263,13 @@ knitr::opts_chunk$set(
     As commented above, `mode()` uses `is.call()` to distinguish autoprint- and "normal" calls
 with the help of a separate `switch()`.
 
-6.  __<span style="color:red">Q</span>__: Read the source for `pryr::standardise_call()`. How does it work?
-    Why is `is.primitive()` needed?
+6.  __<span style="color:red">Q</span>__: Read the source for `pryr::standardise_call()`. How does it work?  Why is `is.primitive()` needed?
     
-    __<span style="color:green">A</span>__: It evaluates the first element of the call,
-    which is usually the name of a function, but can also be another call. Then is uses `match.call()` to get the standard names for all the arguments.
+    __<span style="color:green">A</span>__: It evaluates the first element of the call, which is usually the name of a function, but can also be another call. Then is uses `match.call()` to get the standard names for all the arguments.
     
     `is.primitive()` is used as an escape to just return the call instead of using `match.call()` if the function passed is a primitive. This is done because `match.call()` does not work for primitives.
 
-7.  __<span style="color:red">Q</span>__: `standardise_call()` doesn't work so well for the following calls.
-    Why?
+7.  __<span style="color:red">Q</span>__: `standardise_call()` doesn't work so well for the following calls. Why?
 
     ```{r}
     library(pryr)
@@ -282,7 +278,7 @@ with the help of a separate `switch()`.
     standardise_call(quote(mean(x = 1:10, , TRUE)))
     ```
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: The reason these don't work is not that `mean` is a primitive (as seen in exercise 6) -- it's not -- but because `mean` uses S3 dispatch (i.e., `UseMethod`) and therefore does not store its formals on `mean`, but rather `mean.default`. For example, `pryr::standardize_call` can do much better when the S3 dispatch is explicit.
 
 8.  __<span style="color:red">Q</span>__: Read the documentation for `pryr::modify_call()`. How do you think
     it works? Read the source code.
