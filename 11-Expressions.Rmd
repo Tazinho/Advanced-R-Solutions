@@ -518,14 +518,18 @@ with the help of a separate `switch()`.
     as.list(quote(2*3))
     ```
 
-2.  __<span style="color:red">Q</span>__: Read the help for `deparse()` and construct a call that `deparse()`
-    and `parse()` do not operate symmetrically on.
+2.  __<span style="color:red">Q</span>__: Read the help for `deparse()` and construct a call that `deparse()` and `parse()` do not operate symmetrically on.
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: `parse` and `deparse` handle length > 1 vectors differently.
+    
+    ```{r}
+    parse(text = c(1, 2, 3))
+    deparse(c(1, 2, 3))
+    ```
 
 3.  __<span style="color:red">Q</span>__: Compare and contrast `source()` and `sys.source()`.
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: `source` is a standardGeneric created from the base package, whereas `sys.source` is a function exported from base. `source` has many more options than `sys.source`.  `source` can accept data from connections other than files, whereas `sys.source` cannot.  `sys.source` which is a streamlined version to source a file into an environment.
 
 4.  __<span style="color:red">Q</span>__: Modify `simple_source()` so it returns the result of _every_ expression,
     not just the last one.
