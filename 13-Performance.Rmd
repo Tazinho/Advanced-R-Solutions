@@ -115,7 +115,7 @@
     
     __<span style="color:green">A</span>__: According to the textbook every extra argument slows the function down by approximately 20 nanoseconds, which I can't reproduce on my system:
     
-    ````{r}
+    ```{r}
     f5 <- function(a = 1, b = 2, c = 4, d = 4, e = 5) NULL
     f6 <- function(a = 1, b = 2, c = 4, d = 4, e = 5, f = 6) NULL
     f7 <- function(a = 1, b = 2, c = 4, d = 4, e = 5, f = 6, g = 7) NULL
@@ -123,7 +123,7 @@
     microbenchmark::microbenchmark(f5(), f6(), f7(), f8(), times = 10000)
     ```
     
-    However, for now we just assume that 20 nanosecods are correct and in kind of doubt, we recommend to benchmark this value individually. With this assumption we calculate `21 * 20 = 420` nanoseconds of extra time for each call of `scan()`.
+    However, for now we just assume that 20 nanoseconds are correct and in kind of doubt, we recommend to benchmark this value individually. With this assumption we calculate `21 * 20 = 420` nanoseconds of extra time for each call of `scan()`.
     
     For a percentage, we first benchmark a simple call of `scan()`:
     
