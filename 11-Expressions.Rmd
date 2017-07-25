@@ -212,9 +212,7 @@ knitr::opts_chunk$set(
     concat(quote(f), a = 1, b = quote(mean(a)))
     ```
 
-4.  __<span style="color:red">Q</span>__: Since `list()`s don't belong in expressions, we could create a more
-    convenient call constructor that automatically combines lists into the
-    arguments. Implement `make_call()` so that the following code works.
+4.  __<span style="color:red">Q</span>__: Since `list()`s don't belong in expressions, we could create a more convenient call constructor that automatically combines lists into the arguments. Implement `make_call()` so that the following code works.
 
     ```{r, eval = FALSE}
     make_call(quote(mean), list(quote(x), na.rm = TRUE))
@@ -226,7 +224,7 @@ knitr::opts_chunk$set(
     __<span style="color:green">A</span>__: 
     
     ```{r}
-    make_call <- function(x, ...){
+    make_call <- function(x, ...) {
       as.call(c(x, ...))
     }
     
