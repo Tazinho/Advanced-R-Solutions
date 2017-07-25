@@ -196,9 +196,7 @@ knitr::opts_chunk$set(
     }
     ```
 
-3.  __<span style="color:red">Q</span>__: Concatenating a call and an expression with `c()` creates a list. Implement
-    `concat()` so that the following code works to combine a call and
-    an additional argument.
+3.  __<span style="color:red">Q</span>__: Concatenating a call and an expression with `c()` creates a list. Implement `concat()` so that the following code works to combine a call and an additional argument.
 
     ```{r,collapse = TRUE, eval = FALSE}
     concat(quote(f), a = 1, b = quote(mean(a)))
@@ -208,7 +206,7 @@ knitr::opts_chunk$set(
     __<span style="color:green">A</span>__: 
     
     ```{r}
-    concat <- function(f, ...){
+    concat <- function(f, ...) {
       as.call(c(f, list(...)))
     }
     concat(quote(f), a = 1, b = quote(mean(a)))
