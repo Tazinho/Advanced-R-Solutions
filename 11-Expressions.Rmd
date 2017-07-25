@@ -485,20 +485,27 @@ with the help of a separate `switch()`.
 3.  __<span style="color:red">Q</span>__: The actual implementation of `curve()` looks more like
 
     ```{r curve3}
-    curve3 <- function(expr, xlim = c(0, 1), n = 100,
-                       env = parent.frame()) {
+    curve3 <- function(expr, xlim = c(0, 1), n = 100, env = parent.frame()) {
       env2 <- new.env(parent = env)
       env2$x <- seq(xlim[1], xlim[2], length = n)
-
       y <- eval(substitute(expr), env2)
-      plot(env2$x, y, type = "l", 
-        ylab = deparse(substitute(expr)))
+      plot(env2$x, y, type = "l", ylab = deparse(substitute(expr)))
     }
+    ```
+
+    ```{r curve2}
+    curve2 <- function(expr, xlim = c(0, 1), n = 100, env = parent.frame()) {
+      f <- pryr::make_function(alist(x = ), substitute(expr), env)
+      x <- seq(xlim[1], xlim[2], length = n)
+      y <- f(x)
+      plot(x, y, type = "l", ylab = deparse(substitute(expr)))
+    }
+
     ```
 
     How does this approach differ from `curve2()` defined above?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: `curve2` uses pryr::make_function instead of creating an env and evaluating within it.
 
 ## Parsing and deparsing
 
