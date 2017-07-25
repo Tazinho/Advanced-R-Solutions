@@ -280,8 +280,13 @@ with the help of a separate `switch()`.
     
     __<span style="color:green">A</span>__: The reason these don't work is not that `mean` is a primitive (as seen in exercise 6) -- it's not -- but because `mean` uses S3 dispatch (i.e., `UseMethod`) and therefore does not store its formals on `mean`, but rather `mean.default`. For example, `pryr::standardize_call` can do much better when the S3 dispatch is explicit.
 
-8.  __<span style="color:red">Q</span>__: Read the documentation for `pryr::modify_call()`. How do you think
-    it works? Read the source code.
+    For example, this works:
+
+    ```{r}
+    pryr::standardise_call(quote(mean.default(n = T, 1:10)))
+    ```
+
+8.  __<span style="color:red">Q</span>__: Read the documentation for `pryr::modify_call()`. How do you think it works? Read the source code.
     
     __<span style="color:green">A</span>__: Again, we explain by commenting the source
     
