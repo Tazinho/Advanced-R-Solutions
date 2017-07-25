@@ -757,11 +757,13 @@ with the help of a separate `switch()`.
         # Return a value
       } else if (is.name(x)) {
         # Return a value
+      } else if (is.expression(x)) {  # Expansion goes here to handle expressions!
+				# Return a value
       } else if (is.call(x)) {
         # Call recurse_call recursively
       } else if (is.pairlist(x)) {
         # Call recurse_call recursively
-      } else if (is.list(x)) {  # Expansion goes here!
+      } else if (is.list(x)) {  # Expansion goes here to handle lists!
         # Call recurse_call recursively
       } else {
         stop("Don't know how to handle type ", typeof(x), call. = FALSE)
@@ -777,12 +779,14 @@ with the help of a separate `switch()`.
 				FALSE
 			} else if (is.name(x)) {
 				identical(x, quote(T)) || identical(x, quote(F))
+			} else if (is.expression(x)) { # Added this part to `logical_abbr` to handle expressions.
+				identical(x[[1]], quote(T)) || identical(x[[1]], quote(F))
 			} else if (is.call(x) || is.pairlist(x)) {
 				for (i in seq_along(x)) {
 					if (logical_abbr(x[[i]])) return(TRUE)
 				}
 				FALSE
-			} else if (is.list(x)) {
+			} else if (is.list(x)) { # Added this part to `logical_abbr` handle lists.
 				lapply(x, logical_abbr)
 			} else {
 				stop("Don't know how to handle type ", typeof(x), call. = FALSE)
@@ -790,5 +794,7 @@ with the help of a separate `switch()`.
 		}
 		logical_abbr(quote(TRUE))
 		logical_abbr(quote(T))
+		logical_abbr(expression(TRUE))
+		logical_abbr(expression(T))
 		logical_abbr(list(quote(T), quote(F), quote(TRUE)))
 		```
