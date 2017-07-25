@@ -169,17 +169,16 @@ knitr::opts_chunk$set(
     We can create an example, where we can see the consequences directly:
     
     ```{r, eval = TRUE}
-    # h <- call("mean", z)
-    ##> Error: object 'z' not found
-    
-    h <- call("mean", quote(z))
-    # eval(h)
-    ##> Error in mean(z) : object 'z' not found
-    z <- 1:10
-    eval(h)
+    arg <- seq(10)
+    call1 <- call("mean", arg)
+    print(call1)
+    call2 <- call("mean", quote(arg))
+    print(call2)
+    eval(call1)
+    eval(call2)
     ```
     
-    From my intuition I would prefer the second version, since it behaves more like lazy evaluation, but I am not sure if this is the correct answer as indended by the exercise.
+    I would prefer the second version, since it behaves more like lazy evaluation. It's better to have call args depends on the calling environment rather than the enclosing environment,that's more similar to normal function behavior.
     
 2.  __<span style="color:red">Q</span>__: Implement a pure R version of `do.call()`.
     
@@ -187,7 +186,7 @@ knitr::opts_chunk$set(
     
     ```{r}
     do.call2 <- function(what, args, quote = FALSE, env = parent.frame()){
-      if(!is.list(args))
+      if(!is.list(args)) 
         stop("second argument must be a list")
       if (quote) 
         args <- lapply(args, enquote)
