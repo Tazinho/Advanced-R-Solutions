@@ -402,6 +402,30 @@ with the help of a separate `switch()`.
     
     __<span style="color:green">A</span>__: 
 
+	```{r}
+	update_call <- function (object, formula., ...) {
+		call <- object$call
+		if (!missing(formula.)) {
+			call$formula <- update.formula(formula(object), formula.)
+		}
+		pryr::modify_call(call, pryr::dots(...))
+	}
+
+	update_model <- function(object, formula., ...) {
+		call <- update_call(object, formula., ...)
+		eval(call, environment(formula(object)))
+	}
+	```
+
+	`update_model` always evaluates the resulting call, whereas `update.default` can return the call without evaluation if `evaluate = FALSE`.
+
+	`update.default` evaluates the call in the global environment, whereas `update_model` evaluates the call within the environment of the object passed.
+
+	`update.default` handles some extras whereas `update_model` does not.
+
+	`update_model`'s syntax is less verbose and easier to read.
+
+
 2.  __<span style="color:red">Q</span>__: Why doesn't `write.csv(mtcars, "mtcars.csv", row = FALSE)` work?
     What property of argument matching has the original author forgotten?
     
