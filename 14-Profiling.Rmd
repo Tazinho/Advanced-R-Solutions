@@ -5,7 +5,7 @@
 1.  __<span style="color:red">Q</span>__: What are faster alternatives to `lm`? Which are specifically designed 
     to work with larger datasets?
         
-    __<span style="color:green">A</span>__: Within the [Cran task view](https://cran.rstudio.com/web/views/) for [HighPerformanceComputing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and it's `speedlm()` function. We might not gain any performance improvements on small datasets:
+    __<span style="color:green">A</span>__: Within the [Cran task view](https://cran.rstudio.com/web/views/) for [HighPerformanceComputing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and its `speedlm()` function. We might not gain any performance improvements on small datasets:
     
     ```{r}
     stopifnot(all.equal(
@@ -37,22 +37,22 @@
     )
     ```
     
-    For further speedinprovements, you might consider switching your linear algebra libraries as stated in `?speedglm::speedlm`
+    For further speed improvements, you might consider switching your linear algebra libraries as stated in `?speedglm::speedlm`
     
     > The functions of class 'speedlm' may speed up the fitting of LMs to large data sets. High performances can be obtained especially if R is linked against an optimized BLAS, such as ATLAS.
     
     Note that there are many other opportunities mentioned in the task view, also some that make it possible to handle data which is not in memory. 
     
-    When it comes to pure speed a quick google search on [r fastest lm](http://stackoverflow.com/questions/25416413/is-there-a-faster-lm-function) provides a stackoverflow thread where someone already solved this problem for us...
+    When it comes to pure speed a quick google search on [r fastest lm](http://stackoverflow.com/questions/25416413/is-there-a-faster-lm-function) provides a stackoverflow thread where someone already solved this problem for us.
 
 1.  __<span style="color:red">Q</span>__: What package implements a version of `match()` that's faster for repeated lookups? How much faster is it?
     
-    __<span style="color:green">A</span>__: Again google gives a good recommendation for the searchterm [r faster match](http://stackoverflow.com/questions/32934933/faster-in-operator):
+    __<span style="color:green">A</span>__: Again google gives a good recommendation for the search term [r faster match](http://stackoverflow.com/questions/32934933/faster-in-operator):
     
     ```{r}
     set.seed(1)
     table <- 1L:100000L
-    x <- sample(table, 10000, replace=TRUE)
+    x <- sample(table, 10000, replace = TRUE)
     
     stopifnot(all.equal(match(x, table), fastmatch::fmatch(x, table)))
     
@@ -98,7 +98,7 @@ provides us with enough information and guides our attention on solutions in the
 
 1.  __<span style="color:red">Q</span>__: What are the alternatives to `optim()`?
     
-    __<span style="color:green">A</span>__: Depending on the usecase a lot of different options might be considered. For a general overview we would suggest the corresponding taskview on [Optimization](https://cran.r-project.org/web/views/Optimization.html).
+    __<span style="color:green">A</span>__: Depending on the use case a lot of different options might be considered. For a general overview we would suggest the corresponding taskview on [Optimization](https://cran.r-project.org/web/views/Optimization.html).
 
 ## Do as little as possible
 
