@@ -114,7 +114,7 @@ provides us with enough information and guides our attention on solutions in the
     )
     ```
     
-    In case of 10000 observations we can observe that using `mean.default()` preserves only a small advantage over the use of `mean()`:
+    In case of 10,000 observations we can observe that using `mean.default()` preserves only a small advantage over the use of `mean()`:
     
     ```{r,collapse = TRUE}
     x <- runif(1e4)
@@ -125,7 +125,7 @@ provides us with enough information and guides our attention on solutions in the
     )
     ```
     
-    When using even more observations - like in the next lines - it seems that `mean.default` doesn't preserve anymore any advantage at all:
+    When using even more observations - like in the next lines - it seems that `mean.default()` doesn't preserve anymore any advantage at all:
     
     ```{r}
     x <- runif(1e6)
@@ -166,14 +166,14 @@ provides us with enough information and guides our attention on solutions in the
     .rowSums
     ```
     
-    this means, that the internal `rowSums()` function is called via `.Internal()`.
+    this means that the internal `.rowSums()` function is called via `.Internal()`.
     
     > .Internal performs a call to an internal code which is built in to the R
     interpreter.
     
-    The internal `rowSums()` is a complete different function than the "normal" `rowSums()` function.
+    The internal `.rowSums()` is a complete different function than the "normal" `rowSums()` function.
     
-    Of course (since they have the same name) in this case these functions are heavily related with each other: If we look into the source code of `rowSums()`, we see that it is a wrapper around the internal `rowSums()`. Just some input checkings, conversions and the special cases (complex numbers) are added:
+    Of course (since they have the same name) in this case these functions are heavily related with each other: If we look into the source code of `rowSums()`, we see that it is a wrapper around the internal `.rowSums()`. Just some input checkings, conversions and the special cases (complex numbers) are added:
     
     ```{r}
     rowSums
@@ -187,19 +187,19 @@ provides us with enough information and guides our attention on solutions in the
     chisq.test2 <- function(x, y){
       
       # Input
-      if(!is.numeric(x)){
+      if (!is.numeric(x)) {
         stop("x must be numeric")}
-      if(!is.numeric(y)){
+      if (!is.numeric(y)) {
         stop("y must be numeric")}
-      if(length(x) != length(y)){
+      if (length(x) != length(y)) {
         stop("x and y must have the same length")}
-      if(length(x) <= 1){
+      if (length(x) <= 1) {
         stop("length of x must be greater one")}
-      if(any(c(x,y) < 0)){
+      if (any(c(x, y) < 0)) {
         stop("all entries of x and y must be greater or equal zero")}
-      if(sum(complete.cases(x, y)) != length(x)){
+      if (sum(complete.cases(x, y)) != length(x)) {
         stop("there must be no missing values in x and y")}
-      if(any(is.null(c(x,y)))){
+      if (any(is.null(c(x, y)))) {
         stop("entries of x and y must not be NULL")}
       
       # Help variables
@@ -222,7 +222,7 @@ provides us with enough information and guides our attention on solutions in the
     
     ```{r}
     a <- 21:25
-    b <- c(21,23,25,27,29)
+    b <- c(21, 23, 25, 27, 29)
     m_test <- cbind(a, b)
     
     chisq.test(m_test)
@@ -254,7 +254,7 @@ provides us with enough information and guides our attention on solutions in the
 
     cor_df <- function(df, n) {
       i <- sample(seq(n), n, replace = FALSE )
-      cor(df[i, , drop = FALSE])[2,1]
+      cor(df[i, , drop = FALSE])[2, 1]
       # note also that in the last line the textbook says q[] instead of df[]. Since
       # this is probably just a typo, we changed this to df[].
     }
@@ -280,7 +280,7 @@ provides us with enough information and guides our attention on solutions in the
     ```{r}
     cor_df <- function() {
       i <- sample(seq(n), n, replace = FALSE)
-      cor(df[i, , drop = FALSE])[2,1]
+      cor(df[i, , drop = FALSE])[2, 1]
     }
     ```
     
@@ -295,7 +295,7 @@ provides us with enough information and guides our attention on solutions in the
     ```{r}
     # old version
     cor_v1 <- function() {
-      cor(df[i, , drop = FALSE])[2,1]
+      cor(df[i, , drop = FALSE])[2, 1]
     }
     
     # cbind instead of internal as.matrix
@@ -310,7 +310,7 @@ provides us with enough information and guides our attention on solutions in the
       cor(m)[2]
     }
 
-    # Use vector input within the cor function, so that no conversion is needed
+    # use vector input within the cor function, so that no conversion is needed
     cor_v4 <- function() {
       cor(df$a[i], df$b[i])
     }
@@ -319,6 +319,7 @@ provides us with enough information and guides our attention on solutions in the
     cor_list <- list(cor_v1, cor_v2, cor_v3, cor_v4)
     ulapply <- function(X, FUN, ...) unlist(lapply(X, FUN, ...))
     ulapply(cor_list, function(x) identical(x(), cor_v1()))
+    # the result returned by cor_v4() is not identical to that of cor_v1()
     
     # benchmark
     set.seed(1)
@@ -345,7 +346,7 @@ provides us with enough information and guides our attention on solutions in the
     )
     ```
     
-    Now we can focus on a speedup for the random generation of indices. (Note that a run of linepfrof suggests to optimize `cbind()`. However, after rewriting `cor()` to a version that only works with vector input, this step will be unnecessary anyway). We could try differnt approaches for the sequence generation within `sample()` (like `seq(n)`, `seq.int(n)`, `seq_len(n)`, `a:n`) and a direct call of `sample.int()`. In the following, we will see, that `sample.int()` is always faster (since we don't include the generation of the sequence into our benchmark). When we look into `sample.int()` we see that it calls two different internal sample versions depending on the input. Since in our usecase always the second version will be called, we also provide this version in our benchmark: 
+    Now we can focus on a speedup for the random generation of indices. (Note that a run of linepfrof suggests to optimize `cbind()`. However, after rewriting `cor()` to a version that only works with vector input, this step will be unnecessary anyway). We could try differnt approaches for the sequence generation within `sample()` (like `seq(n)`, `seq.int(n)`, `seq_len(n)`, `1:n`) and a direct call of `sample.int()`. In the following, we will see, that `sample.int()` is always faster (since we don't include the generation of the sequence into our benchmark). When we look into `sample.int()` we see that it calls two different internal sample versions depending on the input. Since in our use case always the second version will be called, we also provide this version in our benchmark: 
     
     ```{r}
     seq_n <- seq(n)
@@ -373,7 +374,7 @@ provides us with enough information and guides our attention on solutions in the
     )
     ```
     
-    As a last step, we try to speedup the calculation of the pearson correlation coefficient. Since quite a lot of functionality is build into the `stats::cor()` function this seems like a reasonable approach. We try this by working with another `cor()` function from the `WGNA` package and an own implementation which should give a small improvement, because we use `sum(x) / length(x)` instead of `mean(x)` for internal calculations:
+    As a last step, we try to speedup the calculation of the pearson correlation coefficient. Since quite a lot of functionality is build into the `stats::cor()` function this seems like a reasonable approach. We try this by working with another `cor()` function from the `WGCNA` package and an own implementation which should give a small improvement, because we use `sum(x) / length(x)` instead of `mean(x)` for internal calculations:
     
     ```{r}
     #WGCNA version (matrix and vector). Note that I don't use a local setup which uses
