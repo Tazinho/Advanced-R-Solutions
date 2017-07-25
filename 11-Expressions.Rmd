@@ -694,10 +694,30 @@ with the help of a separate `switch()`.
 		`pryr::fun_calls` is also more readable.
 
 
-5.  __<span style="color:red">Q</span>__: Write a wrapper around `bquote2()` that does non-standard evaluation
-    so that you don't need to explicitly `quote()` the input.
+5.  __<span style="color:red">Q</span>__: Write a wrapper around `bquote2()` that does non-standard evaluation so that you don't need to explicitly `quote()` the input.
     
     __<span style="color:green">A</span>__: 
+
+		```{r}
+		bquote2 <- function (x, where = parent.frame()) {
+			bquote_fn <- function(x, where) {
+				if (is.atomic(x) || is.name(x)) { x }
+				else if (is.call(x)) {
+					if (identical(x[[1]], quote(.))) {
+						eval(x[[2]], where)
+					} else {
+						as.call(lapply(x, bquote_fn, where = where))
+					}
+				} else if (is.pairlist(x)) {
+					as.pairlist(lapply(x, bquote_fn, where = where))
+				} else {
+					stop("Don't know how to handle type ", typeof(x), call. = FALSE)
+				}
+			}
+			bquote_fn(substitute(x), where)
+		}
+		bquote2(x == .(x))
+		```
 
 6.  __<span style="color:red">Q</span>__: Compare `bquote2()` to `bquote()`. There is a subtle bug in `bquote()`:
     it won't replace calls to functions with no arguments. Why?
