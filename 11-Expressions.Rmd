@@ -719,8 +719,7 @@ with the help of a separate `switch()`.
 		bquote2(x == .(x))
 		```
 
-6.  __<span style="color:red">Q</span>__: Compare `bquote2()` to `bquote()`. There is a subtle bug in `bquote()`:
-    it won't replace calls to functions with no arguments. Why?
+6.  __<span style="color:red">Q</span>__: Compare `bquote2()` to `bquote()`. There is a subtle bug in `bquote()`: it won't replace calls to functions with no arguments. Why?
 
     ```{r}
     bquote(.(x)(), list(x = quote(f)))
@@ -728,6 +727,25 @@ with the help of a separate `switch()`.
     ```
     
     __<span style="color:green">A</span>__: 
+
+		Here's the source for `bquote` (from `base`):
+
+		```{r}
+		bquote <- function(expr, where = parent.frame()) {
+			unquote <- function(e) {
+				if (is.pairlist(e)) {
+					as.pairlist(lapply(e, unquote))
+				} else if (length(e) <= 1L) { e }
+				else if (e[[1L]] == as.name(".")) {
+					eval(e[[2]], where)
+				} else { as.call(lapply(e, unquote)) }
+			}
+			unquote(substitute(expr))
+		}
+		```
+
+		The subtle bug is on the line `else if (length(e) <= 1L) { e }`, where it returns `e` if `length(e)` is <= 1. `length(substitute(.(x)()))` is 1, so it will just be returned instead of parsed.
+
 
 7.  __<span style="color:red">Q</span>__: Improve the base `recurse_call()` template to also work with lists of
     functions and expressions (e.g., as from `parse(path_to_file))`.
