@@ -24,15 +24,8 @@ knitr::opts_chunk$set(
     __<span style="color:green">A</span>__: 
     
     ```{r}
-    is.valid <- function(x){
-      out <- FALSE
-      if(is.atomic(x) & length(x) == 1){out <- TRUE}
-      # another possibility to check for constants would be
-      # identical(x, substitute(x))
-      if(is.call(x)){out <- TRUE}
-      if(is.name(x)){out <- TRUE}
-      if(is.pairlist(x)){out <- TRUE}
-      out
+    is.expression_component <- function(x) {
+      (is.atomic(x) & length(x) == 1) | is.call(x) | is.name(x) | is.pairlist(x)
     }
     ```
 
