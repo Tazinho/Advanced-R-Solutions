@@ -564,10 +564,9 @@ with the help of a separate `switch()`.
 
 ## Walking the AST with recursive functions
 
-1.  __<span style="color:red">Q</span>__: Why does `logical_abbr()` use a for loop instead of a functional
-    like `lapply()`?
+1.  __<span style="color:red">Q</span>__: Why does `logical_abbr()` use a for loop instead of a functional like `lapply()`?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: The loop performs better because it allows for early returns. The `return(TRUE)` in the loop within `logical_abbr()` allows the loop to return at the first sign of `TRUE`, rather than executing the entire loop, and this saves a lot of time. Also, the loop seems a lot more readible.
 
 2.  __<span style="color:red">Q</span>__: `logical_abbr()` works when given quoted objects, but doesn't work when
     given an existing function, as in the example below. Why not? How could
