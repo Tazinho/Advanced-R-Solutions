@@ -1,4 +1,4 @@
-The content of this book might be published by Chapman & Hall, and hence we need to own the copyright for the complete content.
+The content of this book might be published, and hence we need to own the copyright for the complete content.
 We might make some money from the book, but it won't be much and it is probable, that we will donate a huge amount for a good cause.
 The book will continue to be freely available and we'll acknowledge all contributions in the printed book.
 
