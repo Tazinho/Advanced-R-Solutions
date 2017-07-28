@@ -1,6 +1,6 @@
---- 
+---
 title: "Advanced R Solutions"
-author: "Malte Grosser & Henning Bumann"
+author: "Malte Grosser, Henning Bumann, Peter Hurford & Robert Krzyzanowski"
 date: "`r Sys.Date()`"
 knit: "bookdown::render_book"
 site: bookdown::bookdown_site
@@ -22,7 +22,7 @@ link-citations: yes
 github-repo: Tazinho/Advanced-R-Solutions
 before_chapter_script: ["before_chapter_script_1.R"]
 description: "Solutions to the exercises in Hadley Wickham's book Advanced R."
-cover-image: images/advrs_cover.png
+cover-image: images/advrs_cover3.png
 ---
 
 
@@ -48,7 +48,7 @@ date()
 
 
 ```{r, echo = FALSE, warning=FALSE}
-suppressPackageStartupMessages(library(dplyr)) 
+suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(forcats))
@@ -89,13 +89,10 @@ df <- tibble::tribble(~`1 Data structures`, ~`2 Subsetting`, ~`3 Functions`, ~`4
                       NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,               NA,                      NA,                            NA,               "-",                              NA,                NA,              NA,           NA,         NA,                                   
                       NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,               NA,                      NA,                            NA,               "-",                              NA,                NA,              NA,           NA,         NA,                                   
                       NA,              NA,             NA,                  NA,                NA,                            NA,                          NA,               NA,                      NA,                            NA,               "-",                              NA,                NA,              NA,           NA,         NA)
-```
 
-```{r, echo = FALSE, warning=FALSE}
-df <- data.table::fread("D://R//Projects//Advanced R//adv_r_solved_solutions.txt", data.table = FALSE)
 df[df == "x"] <- TRUE
 df[df == "-"] <- FALSE
-df[df == ""] <- NA
+#df[df == ""] <- NA 
 
 df[] <- lapply(df, as.logical)
 
@@ -142,4 +139,4 @@ knitr::write_bib(c(
 ), 'packages.bib')
 ```
 
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work by Malte Grosser and Henning Bumann is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work by Malte Grosser, Henning Bumann, Peter Hurford & Robert Krzyzanowski is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>
