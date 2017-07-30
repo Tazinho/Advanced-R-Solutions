@@ -401,29 +401,29 @@ with the help of a separate `switch()`.
 1.  __<span style="color:red">Q</span>__: Compare and contrast `update_model()` with `update.default()`.
     
     __<span style="color:green">A</span>__: 
-
-	```{r}
-	update_call <- function (object, formula_, ...) {
-		call <- object$call
-		if (!missing(formula_)) {
-			call$formula <- update.formula(formula(object), formula_)
-		}
-		pryr::modify_call(call, pryr::dots(...))
-	}
-
-	update_model <- function(object, formula_, ...) {
-		call <- update_call(object, formula_, ...)
-		eval(call, environment(formula(object)))
-	}
-	```
-
-	`update_model` always evaluates the resulting call, whereas `update.default` can return the call without evaluation if `evaluate = FALSE`.
-
-	`update.default` evaluates the call in the global environment, whereas `update_model` evaluates the call within the environment of the object passed.
-
-	`update.default` handles some extras whereas `update_model` does not.
-
-	`update_model`'s syntax is less verbose and easier to read.
+    
+    ```{r}
+    update_call <- function (object, formula_, ...) {
+      call <- object$call
+      if (!missing(formula_)) {
+        call$formula <- update.formula(formula(object), formula_)
+        }
+      pryr::modify_call(call, pryr::dots(...))
+    }
+    
+    update_model <- function(object, formula_, ...) {
+      call <- update_call(object, formula_, ...)
+      eval(call, environment(formula(object)))
+    }
+    ```
+    
+    `update_model` always evaluates the resulting call, whereas `update.default` can return the call without evaluation if `evaluate = FALSE`.
+    
+    `update.default` evaluates the call in the global environment, whereas `update_model` evaluates the call within the environment of the object passed.
+    
+    `update.default` handles some extras whereas `update_model` does not.
+    
+    `update_model`'s syntax is less verbose and easier to read.
 
 
 2.  __<span style="color:red">Q</span>__: Why doesn't `write.csv(mtcars, "mtcars.csv", row = FALSE)` work?  What property of argument matching has the original author forgotten?
@@ -433,29 +433,31 @@ with the help of a separate `switch()`.
 3.  __<span style="color:red">Q</span>__: Rewrite `update.formula()` to use R code instead of C code.
 
     __<span style="color:green">A</span>__: 
-
-	```{r}
-	modify_formula <- function(old, new) {
-    old_lhs <- old[[2]]
-    old_rhs <- old[[3]]
-    if (length(new) == 2) {
-      new_lhs <- old_lhs
-      new_rhs <- new[[2]]
-    } else {
-      new_lhs <- new[[2]]
-      new_rhs <- new[[3]]
+    
+    ```{r}
+    modify_formula <- function(old, new) {
+      old_lhs <- old[[2]]
+      old_rhs <- old[[3]]
+      if (length(new) == 2) {
+        new_lhs <- old_lhs
+        new_rhs <- new[[2]]
+        } else {
+          new_lhs <- new[[2]]
+          new_rhs <- new[[3]]
+        }
+      
+      new_lhs_ <- gsub(".", deparse(old_lhs), deparse(new_lhs), fixed = TRUE)
+      new_rhs_ <- gsub(".", deparse(old_rhs), deparse(new_rhs), fixed = TRUE)
+      as.formula(paste(new_lhs_, "~", new_rhs_))
     }
-    new_lhs_ <- gsub(".", deparse(old_lhs), deparse(new_lhs), fixed = TRUE)
-    new_rhs_ <- gsub(".", deparse(old_rhs), deparse(new_rhs), fixed = TRUE)
-    as.formula(paste(new_lhs_, "~", new_rhs_))
-	}
-  modify_formula(y ~ x, ~ . + x2)
-  update.formula(y ~ x, ~ . + x2)
-  update.formula(y ~ x, log(.) ~ .)
-  modify_formula(y ~ x, log(.) ~ .)
-  update.formula(. ~ u+v, res ~ .)
-  modify_formula(. ~ u+v, res ~ .)
-  ```
+    
+    modify_formula(y ~ x, ~ . + x2)
+    update.formula(y ~ x, ~ . + x2)
+    update.formula(y ~ x, log(.) ~ .)
+    modify_formula(y ~ x, log(.) ~ .)
+    update.formula(. ~ u+v, res ~ .)
+    modify_formula(. ~ u+v, res ~ .)
+    ```
 
 4.  __<span style="color:red">Q</span>__: Sometimes it's necessary to uncover the function that called the function that called the current function (i.e., the grandparent, not the parent). How can you use `sys.call()` or `match.call()` to find this function?
     
@@ -467,6 +469,7 @@ with the help of a separate `switch()`.
       message("My parent is ", sys.call(-1))
       message("My grandparent is ", sys.call(-2))
     }
+    
     daddy_fn <- function() { child_fn() }
     grandpa_fn <- function() { daddy_fn() }
     grandpa_fn()
@@ -500,9 +503,8 @@ with the help of a separate `switch()`.
       y <- f(x)
       plot(x, y, type = "l", ylab = deparse(substitute(expr)))
     }
-
     ```
-
+    
     How does this approach differ from `curve2()` defined above?
     
     __<span style="color:green">A</span>__: `curve2` uses pryr::make_function instead of creating an env and evaluating within it.
@@ -534,8 +536,8 @@ with the help of a separate `switch()`.
 4.  __<span style="color:red">Q</span>__: Modify `simple_source()` so it returns the result of _every_ expression, not just the last one.
     
     __<span style="color:green">A</span>__: 
-
-		```{r}
+    
+    ```{r}
 		simple_source <- function(file, envir = new.env()) {
 			stopifnot(file.exists(file))
 			stopifnot(is.environment(envir))
@@ -544,13 +546,13 @@ with the help of a separate `switch()`.
 			if (length(exprs) == 0L) return(invisible())
 			invisible(lapply(exprs, function(expr) { eval(expr, envir) }))
 		}
-		```
+    ```
 
 5.  __<span style="color:red">Q</span>__: The code generated by `simple_source()` lacks source references. Read the source code for `sys.source()` and the help for `srcfilecopy()`, then modify `simple_source()` to preserve source references. You can test your code by sourcing a function that contains a comment. If successful, when you look at the function, you'll see the comment and not just the source code.
     
     __<span style="color:green">A</span>__: 
-
-		```{r}
+    
+    ```{r}
 		simple_source <- function(file, envir = new.env()) {
 			stopifnot(file.exists(file))
 			stopifnot(is.environment(envir))
@@ -560,7 +562,7 @@ with the help of a separate `switch()`.
 			if (length(exprs) == 0L) return(invisible())
 			invisible(lapply(exprs, function(expr) { eval(expr, envir) }))
 		}
-		```
+    ```
 
 ## Walking the AST with recursive functions
 
@@ -571,37 +573,37 @@ with the help of a separate `switch()`.
 2.  __<span style="color:red">Q</span>__: `logical_abbr()` works when given quoted objects, but doesn't work when given an existing function, as in the example below. Why not? How could you modify `logical_abbr()` to work with functions? Think about what components make up a function.
 
     __<span style="color:green">A</span>__: 
-
-		```
-		logical_abbr <- function(x) {
-			if (is.atomic(x)) {
-				FALSE
-			} else if (is.name(x)) {
-				identical(x, quote(T)) || identical(x, quote(F))
-			} else if (is.call(x) || is.pairlist(x)) {
-				for (i in seq_along(x)) {
-					if (logical_abbr(x[[i]])) return(TRUE)
-				}
-				FALSE
-			} else if (is.function(x)) {  # Add this to handle functions.
-				logical_abbr(body(x)) || logical_abbr(formals(x))
-			}  else {
-				stop("Don't know how to handle type ", typeof(x), 
-					call. = FALSE)
-			}
-		}
-
+    
+    ```{r}
+    logical_abbr <- function(x) {
+      if (is.atomic(x)) {
+        FALSE
+        } else if (is.name(x)) {
+          identical(x, quote(T)) || identical(x, quote(F))
+        } else if (is.call(x) || is.pairlist(x)) {
+          for (i in seq_along(x)) {
+            if (logical_abbr(x[[i]])) return(TRUE)
+        }
+          FALSE
+        } else if (is.function(x)) {  # Add this to handle functions.
+          logical_abbr(body(x)) || logical_abbr(formals(x))
+        }  else {
+          stop("Don't know how to handle type ", typeof(x), 
+               call. = FALSE)
+        }
+    }
 		f <- function(x = TRUE) {
-			g(x + T)
+		  g(x + T)
 		}
-		logical_abbr(f)
-		```
-
+		
+    logical_abbr(f)
+    ```
+		
 3.  __<span style="color:red">Q</span>__: Write a function called `ast_type()` that returns either "constant", "name", "call", or "pairlist". Rewrite `logical_abbr()`, `find_assign()`, and `bquote2()` to use this function with `switch()` instead of nested if statements.
     
     __<span style="color:green">A</span>__: 
-
-		```{r}
+    
+    ```{r}
 		ast_type <- function(x) {
 			if (is.atomic(x)) return("constant")
 			if (is.name(x)) return("name")
@@ -609,7 +611,7 @@ with the help of a separate `switch()`.
 			if (is.pairlist(x)) return("pairlist")
 			"Other"
 		}
-
+    
 		logical_abbr <- function(x) {
 			switch(ast_type(x),
 				"constant" = FALSE,
@@ -618,16 +620,18 @@ with the help of a separate `switch()`.
 				"pairlist" = logical_abbr.call(x)
 			)
 		}
+    
 		logical_abbr.name <- function(x) {
 			identical(x, quote(T)) || identical(x, quote(F))
 		}
+    
 		logical_abbr.call <- function(x) {
 			for (i in seq_along(x)) {
 				if (logical_abbr(x[[i]])) return(TRUE)
 			}
 			FALSE
 		}
-
+    
 		find_assign <- function(x) {
 			switch(ast_type(x),
 				"constant" = character(),
@@ -636,17 +640,18 @@ with the help of a separate `switch()`.
 				"pairlist" = find_assign.pairlist(x)
 			)
 		}
+    
 		find_assign.call <- function(x) {
 			lhs <- if (identical(x[[1]], quote(`<-`)) && is.name(x[[2]])) {
 				as.character(x[[2]])
 			} else { character() }
 			unique(c(lhs, unlist(lapply(x, find_assign))))
 		}
+    
 		find_assign.pairlist <- function(x) {
 			unique(unlist(lapply(x, find_assign)))
 		}
-
-
+    
 		bquote2 <- function(x, where = parent.frame()) {
 			switch(ast_type(x),
 				"constant" = x,
@@ -655,6 +660,7 @@ with the help of a separate `switch()`.
 				"pairlist" = bquote2.pairlist(x, where)
 			)
 		}
+    
 		bquote2.call <- function(x, where) {
 			if (identical(x[[1]], quote(.))) {
 				# Call to .(), so evaluate
@@ -664,16 +670,17 @@ with the help of a separate `switch()`.
 				as.call(lapply(x, bquote2, where = where))
 			}
 		}
-		bquote2.pairlist <- function(x, where) {
+    
+    bquote2.pairlist <- function(x, where) {
 			as.pairlist(lapply(x, bquote2, where = where))
 		}
-		```
-
+    ```
+		
 4.  __<span style="color:red">Q</span>__: Write a function that extracts all calls to a function. Compare your function to `pryr::fun_calls()`.
     
     __<span style="color:green">A</span>__: 
-
-		```{r}
+    
+    ```{r}
 		get_calls <- function(expr) {
 			to_call <- function(expr) { Filter(is.call, as.list(expr)) }
 			unique(as.character(unlist(lapply(expr, function(x) {
@@ -681,9 +688,9 @@ with the help of a separate `switch()`.
 				else if (is.call(x) || is.name(x)) { x }
 			}))))
 		}
-		```
+    ```
 
-		While both `pryr::fun_calls` and `get_calls` are recursive, `get_calls` is loop-based.  This is potentially less efficient.  Notably, `pryr::fun_calls` executes about 6x faster than `get_calls`.
+		While both `pryr::fun_calls` and `get_calls` are recursive, `get_calls` is loop-based. This is potentially less efficient. Notably, `pryr::fun_calls` executes about 6x faster than `get_calls`.
 
 		`get_calls` has the ability to extract calls from the formals of a function, whereas `pryr::fun_calls` cannot do that.
 
@@ -693,31 +700,31 @@ with the help of a separate `switch()`.
 
 		`pryr::fun_calls` is also more readable.
 
-
 5.  __<span style="color:red">Q</span>__: Write a wrapper around `bquote2()` that does non-standard evaluation so that you don't need to explicitly `quote()` the input.
     
     __<span style="color:green">A</span>__: 
-
-		```{r}
-		bquote2 <- function (x, where = parent.frame()) {
-			bquote_fn <- function(x, where) {
-				if (is.atomic(x) || is.name(x)) { x }
-				else if (is.call(x)) {
-					if (identical(x[[1]], quote(.))) {
-						eval(x[[2]], where)
-					} else {
-						as.call(lapply(x, bquote_fn, where = where))
-					}
-				} else if (is.pairlist(x)) {
-					as.pairlist(lapply(x, bquote_fn, where = where))
-				} else {
-					stop("Don't know how to handle type ", typeof(x), call. = FALSE)
-				}
-			}
-			bquote_fn(substitute(x), where)
-		}
-		bquote2(x == .(x))
-		```
+    
+    ```{r, eval = FALSE}
+    bquote2 <- function (x, where = parent.frame()) {
+      bquote_fn <- function(x, where) {
+        if (is.atomic(x) || is.name(x)) {x}
+        else if (is.call(x)) {
+          if (identical(x[[1]], quote(.))) {
+            eval(x[[2]], where)
+          } else {
+            as.call(lapply(x, bquote_fn, where = where))
+          }
+        } else if (is.pairlist(x)) {
+            as.pairlist(lapply(x, bquote_fn, where = where))
+        } else {
+            stop("Don't know how to handle type ", typeof(x), call. = FALSE)
+        }
+      }
+      bquote_fn(substitute(x), where)
+    }
+    
+    bquote2(x == .(x))
+    ```
 
 6.  __<span style="color:red">Q</span>__: Compare `bquote2()` to `bquote()`. There is a subtle bug in `bquote()`: it won't replace calls to functions with no arguments. Why?
 
@@ -729,9 +736,9 @@ with the help of a separate `switch()`.
     __<span style="color:green">A</span>__: 
 
 		Here's the source for `bquote` (from `base`):
-
-		```{r}
-		bquote <- function(expr, where = parent.frame()) {
+		
+    ```{r}
+    bquote <- function(expr, where = parent.frame()) {
 			unquote <- function(e) {
 				if (is.pairlist(e)) {
 					as.pairlist(lapply(e, unquote))
@@ -742,7 +749,7 @@ with the help of a separate `switch()`.
 			}
 			unquote(substitute(expr))
 		}
-		```
+    ```
 
 		The subtle bug is on the line `else if (length(e) <= 1L) { e }`, where it returns `e` if `length(e)` is <= 1. `length(substitute(.(x)()))` is 1, so it will just be returned instead of parsed.
 
@@ -770,10 +777,10 @@ with the help of a separate `switch()`.
       }
     }
     ```
-
+    
     For example, we can extend `logical_abbr` as follows:
-
-		```{r}
+    
+    ```{r}
 		logical_abbr <- function(x) {
 			if (is.atomic(x)) {
 				FALSE
@@ -797,4 +804,4 @@ with the help of a separate `switch()`.
 		logical_abbr(expression(TRUE))
 		logical_abbr(expression(T))
 		logical_abbr(list(quote(T), quote(F), quote(TRUE)))
-		```
+    ```
