@@ -86,24 +86,25 @@ knitr::opts_chunk$set(
     Which one of the six types of atomic vector can't appear in an expression?
     Why?
     
-    __<span style="color:green">A</span>__: Because you can't type an expression that evaluates to an atomic of greater length than one without using a function (in particular, the function `c`), which means that these expressions would be calls, which are not part of expressions.
+    __<span style="color:green">A</span>__: Because you can't type an expression that evaluates to an atomic of greater length than one without using a function (in particular, the function `c`), which means that these expressions would be calls.
+    
+    We can illustrate that via an example:
+    
+    ```{r}
+    is.atomic(quote(1)) # is an atomic
+    is.atomic(quote(c(1,1))) # is not an atomic (it just would evaluate to an atomic).
+    is.call(quote(c(1,1))) # however it is still a call (so at least a valid expression).
+    ```
     
     Also raws can't appear in expressions, because of a similar reason. We think they are impossible to construct without using `as.raw`, which would mean that we will also end up with a call.
     
-    Note also that imaginary parts of complex numbers work:
-
-    ```{r, eval = TRUE}
+    For similar reasons also complex numbers won't work
+    
+    ```{r}
+    (function(x){is.atomic(x) & length(x) == 1})(quote(1 + 1.5i))
+    
+    # however, imaginary parts of complex numbers work:
     pryr::ast(1i)
-    ```
-  
-    Doubles work, but get coerced to integers when possible:
-
-    ```{r, eval = TRUE}
-    pryr::ast(1.1)
-    ```
-
-    ```{r, eval = TRUE}
-    pryr::ast(1.0)
     ```
 
 ## Names
@@ -234,7 +235,7 @@ knitr::opts_chunk$set(
 
 5.  __<span style="color:red">Q</span>__: How does `mode<-` work? How does it use `call()`?
     
-    __<span style="color:green">A</span>__: We can explain it best, when we comment the source code:
+    __<span style="color:orange">A</span>__: We can explain it best, when we comment the source code:
     
     ```{r, eval = FALSE}
     function (x) {
@@ -400,7 +401,7 @@ with the help of a separate `switch()`.
 
 1.  __<span style="color:red">Q</span>__: Compare and contrast `update_model()` with `update.default()`.
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:orange">A</span>__: 
     
     ```{r}
     update_call <- function (object, formula_, ...) {
@@ -419,7 +420,7 @@ with the help of a separate `switch()`.
     
     `update_model` always evaluates the resulting call, whereas `update.default` can return the call without evaluation if `evaluate = FALSE`.
     
-    `update.default` evaluates the call in the global environment, whereas `update_model` evaluates the call within the environment of the object passed.
+    `update.default` evaluates the call in the environment where `update.default` was called, whereas `update_model` evaluates the call within the environment of the object passed.
     
     `update.default` handles some extras whereas `update_model` does not.
     
@@ -428,7 +429,7 @@ with the help of a separate `switch()`.
 
 2.  __<span style="color:red">Q</span>__: Why doesn't `write.csv(mtcars, "mtcars.csv", row = FALSE)` work?  What property of argument matching has the original author forgotten?
     
-    __<span style="color:green">A</span>__: `write.csv` rewrites the call, which does not allow R to use it's natural `match.call` to expand `row` to `row.names`.
+    __<span style="color:orange">A</span>__: `write.csv` rewrites the call. While doing this, the author explicitly matches the argument names, forgetting that this is too strict, since R does also partial matching.
 
 3.  __<span style="color:red">Q</span>__: Rewrite `update.formula()` to use R code instead of C code.
 
@@ -461,7 +462,7 @@ with the help of a separate `switch()`.
 
 4.  __<span style="color:red">Q</span>__: Sometimes it's necessary to uncover the function that called the function that called the current function (i.e., the grandparent, not the parent). How can you use `sys.call()` or `match.call()` to find this function?
     
-    __<span style="color:green">A</span>__: You can use `sys.call(-2)`.
+    __<span style="color:orange">A</span>__: You can use `sys.call(-2)`.
 
     ```{r}
     child_fn <- function() {
@@ -513,7 +514,7 @@ with the help of a separate `switch()`.
 
 1.  __<span style="color:red">Q</span>__: What are the differences between `quote()` and `expression()`?
     
-    __<span style="color:green">A</span>__: An expression is a list of calls, whereas a quote is a single call. See:
+    __<span style="color:green">A</span>__: The main difference is that an expression object returned by `expression` is a list of expressions, whereas a quote is a single expression. See:
 
     ```{r}
     as.list(expression( 2*3))
@@ -531,7 +532,7 @@ with the help of a separate `switch()`.
 
 3.  __<span style="color:red">Q</span>__: Compare and contrast `source()` and `sys.source()`.
     
-    __<span style="color:green">A</span>__: `source` is a standardGeneric created from the base package, whereas `sys.source` is a function exported from base. `source` has many more options than `sys.source`.  `source` can accept data from connections other than files, whereas `sys.source` cannot.  `sys.source` which is a streamlined version to source a file into an environment.
+    __<span style="color:orange">A</span>__: `source` is a standardGeneric created from the base package, whereas `sys.source` is a function exported from base. `source` has many more options than `sys.source`.  `source` can accept data from connections other than files, whereas `sys.source` cannot.  `sys.source` which is a streamlined version to source a file into an environment.
 
 4.  __<span style="color:red">Q</span>__: Modify `simple_source()` so it returns the result of _every_ expression, not just the last one.
     
@@ -572,7 +573,7 @@ with the help of a separate `switch()`.
 
 2.  __<span style="color:red">Q</span>__: `logical_abbr()` works when given quoted objects, but doesn't work when given an existing function, as in the example below. Why not? How could you modify `logical_abbr()` to work with functions? Think about what components make up a function.
 
-    __<span style="color:green">A</span>__: 
+    __<span style="color:orange">A</span>__: 
     
     ```{r}
     logical_abbr <- function(x) {
@@ -702,7 +703,7 @@ with the help of a separate `switch()`.
 
 5.  __<span style="color:red">Q</span>__: Write a wrapper around `bquote2()` that does non-standard evaluation so that you don't need to explicitly `quote()` the input.
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:orange">A</span>__: 
     
     ```{r, eval = FALSE}
     bquote2 <- function (x, where = parent.frame()) {
