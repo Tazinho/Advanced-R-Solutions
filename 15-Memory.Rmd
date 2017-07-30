@@ -71,15 +71,15 @@
     one integer), how much space will it take up? Work it out from theory, 
     then verify your work by creating a data frame and measuring its size.
     
-    __<span style="color:green">A</span>__: From the textbook we now that 
+    __<span style="color:green">A</span>__: From the textbook we know that 
     
-    * an integer`s size is 40 byte plus 4 byte per allocated entry,
-    * a numerics`s size is 40 byte plus 8 byte per allocated entry.
+    * an integer's size is 40 bytes plus 4 bytes per allocated entry,
+    * a numeric's size is 40 bytes plus 8 bytes per allocated entry.
     
     So we can calculate the size via:
     
-    `object_size(df) = 1 * (40 + 4 * 1.000.000) + 2 * (40 + 8 * 1.000.000)
-                           = 20.000.120` bytes.
+    `object_size(df) = 1 * (40 + 4 * 1,000,000) + 2 * (40 + 8 * 1,000,000)
+                           = 20,000,120` bytes.
     
     And test this via:
     
@@ -90,7 +90,7 @@
     as.integer(object_size(df))
     ```
     
-    Note that we observe a small difference, because we didn't include the costs for creating the `data.frame()` in our previous calculations.
+    Note that we observe a small difference, because we didn't include the costs for creating the `data.frame()` (560 bytes) in our previous calculations.
     
 1.  __<span style="color:red">Q</span>__: Compare the sizes of the elements in the following two lists. Each 
     contains basically the same data, but one contains vectors of small 
