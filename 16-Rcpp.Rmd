@@ -73,82 +73,76 @@
   
     1. `all()`
   
-    ```{r, eval = FALSE}
-    cppFunction('
+    ```cpp
     bool allC(LogicalVector x) {
-    int n = x.size();
-    
-    for(int i = 0; i < n; ++i) {
-      if (!x[i]) return false;
+      int n = x.size();
+      
+      for(int i = 0; i < n; ++i) {
+        if (!x[i]) return false;
+      }
+      return true;
     }
-    return true;
-    }')
     ```
   
     2. `cumprod()`, `cummin()`, `cummax()`.
   
-    ```{r, eval = FALSE}
+    ```cpp
     NumericVector cumprodC(NumericVector x) {
-    int n = x.size();
-    NumericVector out(n);
-    
-    out[0] = x[0];
-    for(int i = 1; i < n; ++i) {
-      out[i]  = out[i - 1] * x[i];
+      int n = x.size();
+      NumericVector out(n);
+      
+      out[0] = x[0];
+      for(int i = 1; i < n; ++i) {
+        out[i]  = out[i - 1] * x[i];
+      }
+      return out;
     }
-    return out;
-    }')
     
-    cppFunction('
     NumericVector cumminC(NumericVector x) {
-    
-    int n = x.size();
-    NumericVector out(n);
-    
-    out[0] = x[0];
-    for(int i = 1; i < n; ++i) {
-      out[i]  = std::min(out[i - 1], x[i]);
+      int n = x.size();
+      NumericVector out(n);
+      
+      out[0] = x[0];
+      for(int i = 1; i < n; ++i) {
+        out[i]  = std::min(out[i - 1], x[i]);
+      }
+      return out;
     }
-    return out;
-    }')
     
-    cppFunction('
     NumericVector cummaxC(NumericVector x) {
-    int n = x.size();
-    NumericVector out(n);
-    
-    out[0] = x[0];
-    for(int i = 1; i < n; ++i) {
-      out[i]  = std::max(out[i - 1], x[i]);
+      int n = x.size();
+      NumericVector out(n);
+      
+      out[0] = x[0];
+      for(int i = 1; i < n; ++i) {
+        out[i]  = std::max(out[i - 1], x[i]);
+      }
+      return out;
     }
-    return out;
-    }')
     ```
 
     3. `diff()`. Start by assuming lag 1, and then generalise for lag `n`.  
     
-    ```{r, eval = FALSE}
-    cppFunction('
+    ```cpp
     NumericVector diffC(NumericVector x){
-    int n = x.size();
-    NumericVector out(n - 1);
-    
-    for(int i = 1; i < n; i++){
+      int n = x.size();
+      NumericVector out(n - 1);
+      
+      for(int i = 1; i < n; i++){
         out[i - 1] = x[i] - x[i - 1];
+      }
+      return out ;
     }
-    return out ;
-    }')
 
-    cppFunction('
     NumericVector difflagC(NumericVector x, int lag){
-    int n = x.size();
-    NumericVector out(n - lag);
-            
-    for(int i = lag; i < n; i++){
+      int n = x.size();
+      NumericVector out(n - lag);
+      
+      for(int i = lag; i < n; i++){
         out[i - lag] = x[i] - x[i - lag];
+      }
+      return out;
     }
-    return out;
-    }')
     ```
   
     4. `range`.  
