@@ -396,7 +396,7 @@ To practice using the STL algorithms and data structures, implement the followin
     NumericVector uniqueC(NumericVector x) {
       std::unordered_set<int> seen;
       int n = x.size();
-      std::vector<double> out = x[0];
+      std::vector<double> out;
       
       for (int i = 0; i < n; ++i) {
         if (seen.insert(x[i]).second) out.push_back(x[i]);
@@ -415,7 +415,7 @@ To practice using the STL algorithms and data structures, implement the followin
     // [[Rcpp::export]]
     double minC(NumericVector x){
       int n = x.size();
-      double out;
+      double out = x[0];
       
       for (int i = 0; i < n; i++){
         out = std::min(out, x[i]);
