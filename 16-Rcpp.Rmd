@@ -396,14 +396,10 @@ To practice using the STL algorithms and data structures, implement the followin
     NumericVector uniqueC(NumericVector x) {
       std::unordered_set<int> seen;
       int n = x.size();
-      LogicalVector dup(n);
-      std::vector<double> out;
+      std::vector<double> out = x[0];
       
       for (int i = 0; i < n; ++i) {
-        dup[i] = !seen.insert(x[i]).second;
-        if (!dup[i]) {
-            out.push_back(x[i]);
-        }
+        if (seen.insert(x[i]).second) out.push_back(x[i]);
       }
       
       return wrap(out);
