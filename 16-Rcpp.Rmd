@@ -186,11 +186,11 @@
       bool na_check = false;
       bool na_check_all = true;
       
-      for(int i; i<n; i++){
+      for(int i = 0; i<n; i++){ // the default value for Integer type is 32131592 rather than 0
         if (index[i]) na_check = true;
       }
       
-      for(int i; i<n; i++){
+      for(int i = 0; i<n; i++){
         if (!index[i]) na_check_all = false;
       }
       
@@ -225,11 +225,11 @@
       bool na_check = false;
       bool na_check_all = true;
       
-      for(int i; i<n; i++){
+      for(int i = 0; i<n; i++){
         if (index[i]) na_check = true;
       }
       
-      for(int i; i<n; i++){
+      for(int i = 0; i<n; i++){
         if (!index[i]) na_check_all = false;
       }
       
@@ -258,65 +258,12 @@
     }
     
     NumericVector rangeC(NumericVector x, bool narm){
-      int n = x.size();
-      LogicalVector index = is_na(x);
       NumericVector out(2);
       NumericVector omin(1);
       NumericVector omax(1);
-      bool na_check = false;
-      bool na_check_all = true;
       
-      for(int i; i<n; i++){
-        if (index[i]) na_check = true;
-      }
-      
-      for(int i; i<n; i++){
-        if (!index[i]) na_check_all = false;
-      }
-      
-      /* Minimum */
-      if (narm) {
-        for(int i = n-1; i >= 0; i--){
-          if (!index[i]) omin[0] = x[i];
-        }
-        
-        for(int i = 1; i < n; i++) {
-          if (!index[i]) omin[0] = std::min(x[i], omin[0]);
-        }
-        
-        if (na_check_all) {
-          omin[0] = NA_REAL;
-        }
-      } else if (na_check) {
-        omin[0] = NA_REAL;
-      } else {
-        omin[0] = x[0];
-        for(int i = 1; i < n; i++){
-          omin = std::min(x[i], omin[0]);
-        }
-      }
-      
-      /* Maximum */
-      if (narm) {
-        for(int i = n-1; i >= 0; i--){
-          if (!index[i]) omax[0] = x[i];
-        }
-        
-        for(int i = 1; i < n; i++) {
-          if (!index[i]) omax[0] = std::max(x[i], omax[0]);
-        }
-        
-        if (na_check_all) {
-          omax[0] = NA_REAL;
-        }
-      } else if (na_check) {
-        omax[0] = NA_REAL;
-      } else {
-        omax[0] = x[0];
-        for(int i = 1; i < n; i++){
-          omax = std::max(x[i], omax[0]);
-        }
-      }
+      omin = minC(x, narm);
+      omax = maxC(x, narm);
       
       out[0] = omin[0];
       out[1] = omax[0];
@@ -331,15 +278,15 @@
       int n_corrected = 0;
       NumericVector out(1);
       
-      for(int i; i<n; i++){
+      for(int i = 0; i<n; i++){
         if (index[i]) na_check = true;
       }
       
-      for(int i; i<n; i++){
+      for(int i = 0; i<n; i++){
         if (!index[i]) na_check_all = false;
       }
       
-      for(int i; i<n; i++){
+      for(int i = 0; i<n; i++){
         if (!index[i]) n_corrected++;
       }
       
