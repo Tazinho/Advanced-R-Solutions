@@ -374,39 +374,38 @@
    
     __<span style="color:green">A</span>__:
    
-    ```{r, eval = FALSE}
-    cppFunction('NumericVector cumsumC(NumericVector x) {
-    int n = x.size();
-    NumericVector out(n);
-    LogicalVector index = is_na(x);
-
-    out[0] = x[0];
-    for(int i = 1; i < n; ++i) {
-      if (index[i - 1]) {
-        out[i] = NA_REAL;
-    } else{
-        out[i] = out[i - 1] + x[i];
-      }
-    }
-    
-    return out;
-    }')
-    
-    cppFunction('
-    NumericVector difflagC(NumericVector x, int lag){
-    int n = x.size();
-    NumericVector out(n - lag);
-    LogicalVector index = is_na(x);
-            
-    for(int i = lag; i < n; i++){
-        if ((index[i]) || (index[i - lag])) {
-            out[i - lag] = NA_REAL;
-        } else {
-            out[i - lag] = x[i] - x[i - lag];
+    ```cpp
+    NumericVector cumsumC(NumericVector x) {
+      int n = x.size();
+      NumericVector out(n);
+      LogicalVector index = is_na(x);
+      
+      out[0] = x[0];
+      for(int i = 1; i < n; ++i) {
+        if (index[i - 1]) {
+          out[i] = NA_REAL;
+        } else{
+          out[i] = out[i - 1] + x[i];
         }
+      }
+      
+      return out;
     }
-    return out;
-    }')
+    
+    NumericVector difflagC(NumericVector x, int lag){
+      int n = x.size();
+      NumericVector out(n - lag);
+      LogicalVector index = is_na(x);
+      
+      for(int i = lag; i < n; i++){
+        if ((index[i]) || (index[i - lag])) {
+          out[i - lag] = NA_REAL;
+        } else {
+          out[i - lag] = x[i] - x[i - lag];
+        }
+      }
+      return out;
+    }
     ```
 
 ## The STL
@@ -415,7 +414,7 @@ To practice using the STL algorithms and data structures, implement the followin
 
 1. `median.default()` using `partial_sort`.
 
-    ```{r, eval = FALSE}
+    ```cpp
     #include <algorithm>
     #include <Rcpp.h>
     using namespace Rcpp;
@@ -440,7 +439,7 @@ To practice using the STL algorithms and data structures, implement the followin
 
 1. `unique()` using an `unordered_set` (challenge: do it in one line!).  
 
-    ```{r, eval = FALSE}
+    ```cpp
     // [[Rcpp::plugins(cpp11)]]
     #include <Rcpp.h>
     #include <unordered_set>
@@ -462,11 +461,11 @@ To practice using the STL algorithms and data structures, implement the followin
     
     return wrap(out);
     }
-```
+    ```
 
 1. `min()` using `std::min()`, or `max()` using `std::max()`.
 
-    ```{r, eval = FALSE}
+    ```cpp
     #include <Rcpp.h>
     using namespace Rcpp;
     
@@ -485,7 +484,7 @@ To practice using the STL algorithms and data structures, implement the followin
 
 1. `which.min()` using `min_element`, or `which.max()` using `max_element`.  
 
-    ```{r, eval = FALSE}
+    ```cpp
     #include <Rcpp.h>
     #include <algorithm>
     #include <iterator>
@@ -500,7 +499,7 @@ To practice using the STL algorithms and data structures, implement the followin
   
       return out;
     }
-```
+    ```
 
 1. `setdiff()`, `union()`, and `intersect()` for integers using sorted ranges 
    and `set_union`, `set_intersection` and `set_difference`.
