@@ -147,24 +147,24 @@
   
     4. `range`.  
     
-    ```{r, eval = FALSE}
-    cppFunction('NumericVector rangeC(NumericVector x){
-    double omin, omax;  
-    int n = x.size();
-    NumericVector out(2);
-
-    omin = x[0];
-    omax = x[0];
-
-    for(int i = 1; i < n; i++){
+    ```cpp
+    NumericVector rangeC(NumericVector x){
+      double omin, omax;  
+      int n = x.size();
+      NumericVector out(2);
+      
+      omin = x[0];
+      omax = x[0];
+      
+      for(int i = 1; i < n; i++){
         omin = std::min(x[i], omin);
         omax = std::max(x[i], omax);
+      }
+      
+      out[0] = omin;
+      out[1] = omax;
+      return out;
     }
-
-    out[0] = omin;
-    out[1] = omax;
-    return out;
-    }')
     ```
   
     5. `var`. Read about the approaches you can take on 
