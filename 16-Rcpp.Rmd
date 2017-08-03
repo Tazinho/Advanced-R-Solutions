@@ -180,14 +180,12 @@
 
 ## Missing values
 
-1. Rewrite any of the functions from the first exercise to deal with missing 
-   values. If `na.rm` is true, ignore the missing values. If `na.rm` is false, 
-   return a missing value if the input contains any missing values. Some 
-   good functions to practice with are `min()`, `max()`, `range()`, `mean()`, 
-   and `var()`.  
+1.  __<span style="color:red">Q</span>__:  Rewrite any of the functions from the first exercise to deal with missing values. If `na.rm` is true, ignore the missing values. If `na.rm` is false, return a missing value if the input contains any missing values. Some good functions to practice with are `min()`, `max()`, `range()`, `mean()`, and `var()`.  
+
+    __<span style="color:green">A</span>__:
    
     ```{r, eval = FALSE}
-cppFunction('NumericVector minC(NumericVector x, bool narm){
+    cppFunction('NumericVector minC(NumericVector x, bool narm){
     int n = x.size();
     LogicalVector index = is_na(x);
     NumericVector omin(1);
@@ -378,7 +376,7 @@ cppFunction('NumericVector minC(NumericVector x, bool narm){
     }')
     ```
 
-1. Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that 
+2.  __<span style="color:red">Q</span>__:  Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that 
    these functions have slightly more complicated behaviour.  
    
     ```{r, eval = FALSE}
