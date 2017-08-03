@@ -184,200 +184,201 @@
 
     __<span style="color:green">A</span>__:
    
-    ```{r, eval = FALSE}
-    cppFunction('NumericVector minC(NumericVector x, bool narm){
-    int n = x.size();
-    LogicalVector index = is_na(x);
-    NumericVector omin(1);
-    bool na_check = false;
-    bool na_check_all = true;
-    
-    for(int i; i<n; i++){
-        if (index[i]) na_check = true;
-    }
-
-    for(int i; i<n; i++){
-        if (!index[i]) na_check_all = false;
-    }
-
-    if (narm) {
-        for(int i = n-1; i >= 0; i--){
-            if (!index[i]) omin[0] = x[i];
-        }
-  
-        for(int i = 1; i < n; i++) {
-            if (!index[i]) omin[0] = std::min(x[i], omin[0]);
-        }
+    ```cpp
+    NumericVector minC(NumericVector x, bool narm){
+      int n = x.size();
+      LogicalVector index = is_na(x);
+      NumericVector omin(1);
+      bool na_check = false;
+      bool na_check_all = true;
       
-        if (na_check_all) {
-            omin[0] = NA_REAL;
+      for(int i; i<n; i++){
+        if (index[i]) na_check = true;
+      }
+      
+      for(int i; i<n; i++){
+        if (!index[i]) na_check_all = false;
+      }
+      
+      if (narm) {
+        for(int i = n-1; i >= 0; i--){
+          if (!index[i]) omin[0] = x[i];
         }
-    } else if (na_check) {
+        
+        for(int i = 1; i < n; i++) {
+          if (!index[i]) omin[0] = std::min(x[i], omin[0]);
+        }
+        
+        if (na_check_all) {
+          omin[0] = NA_REAL;
+        }
+      } else if (na_check) {
         omin[0] = NA_REAL;
-    } else {
+      } else {
         omin[0] = x[0];
         for(int i = 1; i < n; i++){
-            omin = std::min(x[i], omin[0]);
+          omin = std::min(x[i], omin[0]);
         }
-    }
-    
-    return omin;
-    }')
-    
-    cppFunction('NumericVector maxC(NumericVector x, bool narm){
-    int n = x.size();
-    LogicalVector index = is_na(x);
-    NumericVector omax(1);
-    bool na_check = false;
-    bool na_check_all = true;
-    
-    for(int i; i<n; i++){
-        if (index[i]) na_check = true;
-    }
-
-    for(int i; i<n; i++){
-        if (!index[i]) na_check_all = false;
-    }
-
-    if (narm) {
-        for(int i = n-1; i >= 0; i--){
-            if (!index[i]) omax[0] = x[i];
-        }
-  
-        for(int i = 1; i < n; i++) {
-            if (!index[i]) omax[0] = std::max(x[i], omax[0]);
-        }
+      }
       
-        if (na_check_all) {
-            omax[0] = NA_REAL;
+      return omin;
+    }
+    
+    NumericVector maxC(NumericVector x, bool narm){
+      int n = x.size();
+      LogicalVector index = is_na(x);
+      NumericVector omax(1);
+      bool na_check = false;
+      bool na_check_all = true;
+      
+      for(int i; i<n; i++){
+        if (index[i]) na_check = true;
+      }
+      
+      for(int i; i<n; i++){
+        if (!index[i]) na_check_all = false;
+      }
+      
+      if (narm) {
+        for(int i = n-1; i >= 0; i--){
+          if (!index[i]) omax[0] = x[i];
         }
-    } else if (na_check) {
+        
+        for(int i = 1; i < n; i++) {
+          if (!index[i]) omax[0] = std::max(x[i], omax[0]);
+        }
+        
+        if (na_check_all) {
+          omax[0] = NA_REAL;
+        }
+      } else if (na_check) {
         omax[0] = NA_REAL;
-    } else {
+      } else {
         omax[0] = x[0];
         for(int i = 1; i < n; i++){
-            omax = std::max(x[i], omax[0]);
+          omax = std::max(x[i], omax[0]);
         }
+      }
+      
+      return omax;
     }
     
-    return omax;
-    }')
-    
-    cppFunction('NumericVector rangeC(NumericVector x, bool narm){
-    int n = x.size();
-    LogicalVector index = is_na(x);
-    NumericVector out(2);
-    NumericVector omin(1);
-    NumericVector omax(1);
-    bool na_check = false;
-    bool na_check_all = true;
-    
-    for(int i; i<n; i++){
-    if (index[i]) na_check = true;
-    }
-    
-    for(int i; i<n; i++){
-    if (!index[i]) na_check_all = false;
-    }
-  
-    /* Minimum */
-    if (narm) {
-    for(int i = n-1; i >= 0; i--){
-    if (!index[i]) omin[0] = x[i];
-    }
-            
-    for(int i = 1; i < n; i++) {
-    if (!index[i]) omin[0] = std::min(x[i], omin[0]);
-    }
-            
-    if (na_check_all) {
-    omin[0] = NA_REAL;
-    }
-    } else if (na_check) {
-    omin[0] = NA_REAL;
-    } else {
-    omin[0] = x[0];
-    for(int i = 1; i < n; i++){
-    omin = std::min(x[i], omin[0]);
-    }
-    }
-            
-    /* Maximum */
-    if (narm) {
-    for(int i = n-1; i >= 0; i--){
-    if (!index[i]) omax[0] = x[i];
-    }
-            
-    for(int i = 1; i < n; i++) {
-    if (!index[i]) omax[0] = std::max(x[i], omax[0]);
-    }
-            
-    if (na_check_all) {
-    omax[0] = NA_REAL;
-    }
-    } else if (na_check) {
-    omax[0] = NA_REAL;
-    } else {
-    omax[0] = x[0];
-    for(int i = 1; i < n; i++){
-    omax = std::max(x[i], omax[0]);
-    }
-    }
-            
-    out[0] = omin[0];
-    out[1] = omax[0];
-    return out;
-    }')
-    
-    cppFunction('NumericVector meanC(NumericVector x, bool narm){
-    int n = x.size();
-    LogicalVector index = is_na(x);
-    bool na_check = false;
-    bool na_check_all = true;
-    int n_corrected = 0;
-    NumericVector out(1);
-            
-    for(int i; i<n; i++){
+    NumericVector rangeC(NumericVector x, bool narm){
+      int n = x.size();
+      LogicalVector index = is_na(x);
+      NumericVector out(2);
+      NumericVector omin(1);
+      NumericVector omax(1);
+      bool na_check = false;
+      bool na_check_all = true;
+      
+      for(int i; i<n; i++){
         if (index[i]) na_check = true;
-    }
-            
-    for(int i; i<n; i++){
+      }
+      
+      for(int i; i<n; i++){
         if (!index[i]) na_check_all = false;
-    }
-
-    for(int i; i<n; i++){
-        if (!index[i]) n_corrected++;
-    }
-
-    /* narm = T */
-    if (narm){
+      }
+      
+      /* Minimum */
+      if (narm) {
+        for(int i = n-1; i >= 0; i--){
+          if (!index[i]) omin[0] = x[i];
+        }
+        
+        for(int i = 1; i < n; i++) {
+          if (!index[i]) omin[0] = std::min(x[i], omin[0]);
+        }
+        
         if (na_check_all) {
-            out[0] = NA_REAL;
+          omin[0] = NA_REAL;
+        }
+      } else if (na_check) {
+        omin[0] = NA_REAL;
+      } else {
+        omin[0] = x[0];
+        for(int i = 1; i < n; i++){
+          omin = std::min(x[i], omin[0]);
+        }
+      }
+      
+      /* Maximum */
+      if (narm) {
+        for(int i = n-1; i >= 0; i--){
+          if (!index[i]) omax[0] = x[i];
+        }
+        
+        for(int i = 1; i < n; i++) {
+          if (!index[i]) omax[0] = std::max(x[i], omax[0]);
+        }
+        
+        if (na_check_all) {
+          omax[0] = NA_REAL;
+        }
+      } else if (na_check) {
+        omax[0] = NA_REAL;
+      } else {
+        omax[0] = x[0];
+        for(int i = 1; i < n; i++){
+          omax = std::max(x[i], omax[0]);
+        }
+      }
+      
+      out[0] = omin[0];
+      out[1] = omax[0];
+      return out;
+    }
+    
+    NumericVector meanC(NumericVector x, bool narm){
+      int n = x.size();
+      LogicalVector index = is_na(x);
+      bool na_check = false;
+      bool na_check_all = true;
+      int n_corrected = 0;
+      NumericVector out(1);
+      
+      for(int i; i<n; i++){
+        if (index[i]) na_check = true;
+      }
+      
+      for(int i; i<n; i++){
+        if (!index[i]) na_check_all = false;
+      }
+      
+      for(int i; i<n; i++){
+        if (!index[i]) n_corrected++;
+      }
+      
+      /* narm = T */
+      if (narm){
+        if (na_check_all) {
+          out[0] = NA_REAL;
         }  else {
-            out[0] = 0;
-            for(int i = 0; i < n; ++i) {
-                if (!index[i]) out[0] += x[i] / n_corrected;
-            }
+          out[0] = 0;
+          for(int i = 0; i < n; ++i) {
+            if (!index[i]) out[0] += x[i] / n_corrected;
+          }
         }
-    }
-
-    /* narm = F */
-    if (!narm){
+      }
+      
+      /* narm = F */
+      if (!narm){
         if (na_check) {
-            out[0] = NA_REAL;
+          out[0] = NA_REAL;
         } else {
-            for(int i = 0; i < n; ++i) {
-                out[0] += x[i] / n;
-              }
+          for(int i = 0; i < n; ++i) {
+            out[0] += x[i] / n;
+          }
         }
+      }
+      
+      return out;
     }
-
-    return out;
-    }')
     ```
 
-2.  __<span style="color:red">Q</span>__:  Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that 
-   these functions have slightly more complicated behaviour.  
+2.  __<span style="color:red">Q</span>__:  Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that these functions have slightly more complicated behaviour.  
+   
+    __<span style="color:green">A</span>__:
    
     ```{r, eval = FALSE}
     cppFunction('NumericVector cumsumC(NumericVector x) {
