@@ -48,13 +48,13 @@
       1L + 1L, 1L - 1L, 1L * 1L, 1L / 1L, 1L ^ 1L, 
       times = 1000000,
       control = list(order = "random",
-                     warmup = 20000)
+                     warmup = 20000))
     
     mb_double <- microbenchmark::microbenchmark(
       1 + 1, 1 - 1, 1 * 1, 1 / 1, 1 ^ 1, 
       times = 1000000,
       control = list(order = "random",
-                     warmup = 20000)
+                     warmup = 20000))
     
     mb_integer
     # and got the following output:
@@ -80,8 +80,8 @@
     
     ```{r}
     mb_median <- data.frame(operator = c("+", "-", "*", "/", "^"),
-                            int = c(69, 71, 70, 68, 84),
-                            dbl = c(69, 68, 70, 69, 103),
+                            int = c(69, 71, 70, 68, 84),  # same as mb_integer$median
+                            dbl = c(69, 68, 70, 69, 103), # same as mb_double$median
                             stringsAsFactors = FALSE)
 
     mb_median <- tidyr::gather(mb_median, type, time, int, dbl)
@@ -98,7 +98,7 @@
             axis.title.y = element_text(size = 14),
             axis.text.x = element_text(size = 14),
             axis.text.y = element_text(size = 10)) +
-      scale_y_continuous(breaks=seq(0, max(mb_median$time), 10))
+      scale_y_continuous(breaks = seq(0, max(mb_median$time), 10))
     ```
 
 1.  __<span style="color:red">Q</span>__: You can change the units in which the microbenchmark results are
@@ -115,7 +115,7 @@
     
     __<span style="color:green">A</span>__: According to the textbook every extra argument slows the function down by approximately 20 nanoseconds, which I can't reproduce on my system:
     
-    ````{r}
+    ```{r}
     f5 <- function(a = 1, b = 2, c = 4, d = 4, e = 5) NULL
     f6 <- function(a = 1, b = 2, c = 4, d = 4, e = 5, f = 6) NULL
     f7 <- function(a = 1, b = 2, c = 4, d = 4, e = 5, f = 6, g = 7) NULL
@@ -123,7 +123,7 @@
     microbenchmark::microbenchmark(f5(), f6(), f7(), f8(), times = 10000)
     ```
     
-    However, for now we just assume that 20 nanosecods are correct and in kind of doubt, we recommend to benchmark this value individually. With this assumption we calculate `21 * 20 = 420` nanoseconds of extra time for each call of `scan()`.
+    However, for now we just assume that 20 nanoseconds are correct and in kind of doubt, we recommend to benchmark this value individually. With this assumption we calculate `21 * 20 = 420` nanoseconds of extra time for each call of `scan()`.
     
     For a percentage, we first benchmark a simple call of `scan()`:
     
