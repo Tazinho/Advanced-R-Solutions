@@ -96,7 +96,7 @@ Sys.setenv(LANGUAGE = "en")
   
     2. `cumprod()`, `cummin()`, `cummax()`.
   
-    ```{r, eval = TRUE}
+    ```{r, eval = FALSE}
     cppFunction('
     NumericVector cumprodC(NumericVector x) {
       
@@ -396,36 +396,36 @@ Sys.setenv(LANGUAGE = "en")
     ```{r, eval = FALSE}
     cppFunction('
     NumericVector cumsumC(NumericVector x) {
-    int n = x.size();
-    NumericVector out(n);
-    LogicalVector index = is_na(x);
-
-    out[0] = x[0];
-    for(int i = 1; i < n; ++i) {
-      if (index[i - 1]) {
-        out[i] = NA_REAL;
-    } else{
-        out[i] = out[i - 1] + x[i];
+      int n = x.size();
+      NumericVector out(n);
+      LogicalVector index = is_na(x);
+  
+      out[0] = x[0];
+      for(int i = 1; i < n; ++i) {
+        if (index[i - 1]) {
+          out[i] = NA_REAL;
+      } else{
+          out[i] = out[i - 1] + x[i];
+        }
       }
-    }
     
-    return out;
+      return out;
     }')
     
     cppFunction('
     NumericVector difflagC(NumericVector x, int lag){
-    int n = x.size();
-    NumericVector out(n - lag);
-    LogicalVector index = is_na(x);
-            
-    for(int i = lag; i < n; i++){
-        if ((index[i]) || (index[i - lag])) {
-            out[i - lag] = NA_REAL;
-        } else {
-            out[i - lag] = x[i] - x[i - lag];
-        }
-    }
-    return out;
+      int n = x.size();
+      NumericVector out(n - lag);
+      LogicalVector index = is_na(x);
+              
+      for(int i = lag; i < n; i++){
+          if ((index[i]) || (index[i - lag])) {
+              out[i - lag] = NA_REAL;
+          } else {
+              out[i - lag] = x[i] - x[i - lag];
+          }
+      }
+      return out;
     }')
     ```
 
