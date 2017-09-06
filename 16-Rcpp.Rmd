@@ -82,8 +82,7 @@ Sys.setenv(LANGUAGE = "en")
   
     1. `all()`
   
-    ```{r, eval = FALSE}
-    cppFunction('
+    ```cpp
     bool allC(LogicalVector x) {
       int n = x.size();
       
@@ -91,13 +90,12 @@ Sys.setenv(LANGUAGE = "en")
         if (!x[i]) return false;
       }
       return true;
-    }')
+    }
     ```
   
     2. `cumprod()`, `cummin()`, `cummax()`.
   
-    ```{r, eval = FALSE}
-    cppFunction('
+    ```cpp
     NumericVector cumprodC(NumericVector x) {
       
       int n = x.size();
@@ -108,11 +106,9 @@ Sys.setenv(LANGUAGE = "en")
         out[i]  = out[i - 1] * x[i];
       }
       return out;
-    }')
-    
-    cppFunction('
+    }
+
     NumericVector cumminC(NumericVector x) {
-    
       int n = x.size();
       NumericVector out(n);
     
@@ -121,9 +117,8 @@ Sys.setenv(LANGUAGE = "en")
         out[i]  = std::min(out[i - 1], x[i]);
       }
       return out;
-    }')
+    }
     
-    cppFunction('
     NumericVector cummaxC(NumericVector x) {
       int n = x.size();
       NumericVector out(n);
@@ -133,14 +128,13 @@ Sys.setenv(LANGUAGE = "en")
         out[i]  = std::max(out[i - 1], x[i]);
       }
     return out;
-    }')
+    }
     ```
 
-    3. `diff()`. Start by assuming lag 1, and then generalise for lag `n`.  
+    3. `diff()`. Start by assuming lag 1, and then generalise for lag `n`.
     
-    ```{r, eval = FALSE}
-    cppFunction('
-      NumericVector diffC(NumericVector x){
+    ```cpp
+    NumericVector diffC(NumericVector x){
       int n = x.size();
       NumericVector out(n - 1);
       
@@ -148,9 +142,8 @@ Sys.setenv(LANGUAGE = "en")
           out[i - 1] = x[i] - x[i - 1];
       }
       return out ;
-    }')
+    }
 
-    cppFunction('
     NumericVector difflagC(NumericVector x, int lag){
       int n = x.size();
       NumericVector out(n - lag);
@@ -159,13 +152,12 @@ Sys.setenv(LANGUAGE = "en")
           out[i - lag] = x[i] - x[i - lag];
       }
       return out;
-    }')
+    }'
     ```
   
     4. `range`.  
     
-    ```{r, eval = FALSE}
-    cppFunction('
+    ```cpp
     NumericVector rangeC(NumericVector x){
       double omin, omax;  
       int n = x.size();
@@ -182,7 +174,6 @@ Sys.setenv(LANGUAGE = "en")
       out[0] = omin;
       out[1] = omax;
       return out;
-    }')
     ```
   
     5. `var`. Read about the approaches you can take on 
@@ -196,8 +187,7 @@ Sys.setenv(LANGUAGE = "en")
 
      __<span style="color:green">A</span>__:
    
-    ```{r, eval = FALSE}
-    cppFunction('
+    ```cpp
     NumericVector minC(NumericVector x, bool narm){
       int n = x.size();
       LogicalVector index = is_na(x);
@@ -205,11 +195,11 @@ Sys.setenv(LANGUAGE = "en")
       bool na_check = false;
       bool na_check_all = true;
     
-      for(int i; i<n; i++){
+      for(int i = 0; i<n; i++){
           if (index[i]) na_check = true;
       }
 
-      for(int i; i<n; i++){
+      for(int i = 0; i<n; i++){
           if (!index[i]) na_check_all = false;
       }
 
@@ -235,9 +225,8 @@ Sys.setenv(LANGUAGE = "en")
       }
       
       return omin;
-    }')
+    }
     
-    cppFunction('
     NumericVector maxC(NumericVector x, bool narm){
       int n = x.size();
       LogicalVector index = is_na(x);
@@ -245,11 +234,11 @@ Sys.setenv(LANGUAGE = "en")
       bool na_check = false;
       bool na_check_all = true;
       
-      for(int i; i<n; i++){
+      for(int i = 0; i<n; i++){
           if (index[i]) na_check = true;
       }
 
-      for(int i; i<n; i++){
+      for(int i = 0; i<n; i++){
           if (!index[i]) na_check_all = false;
       }
   
@@ -275,76 +264,22 @@ Sys.setenv(LANGUAGE = "en")
       }
       
       return omax;
-    }')
+    }
     
-    cppFunction(
-    'NumericVector rangeC(NumericVector x, bool narm){
-      int n = x.size();
-      LogicalVector index = is_na(x);
+    NumericVector rangeC(NumericVector x, bool narm){
       NumericVector out(2);
       NumericVector omin(1);
       NumericVector omax(1);
-      bool na_check = false;
-      bool na_check_all = true;
-    
-      for(int i; i<n; i++){
-      if (index[i]) na_check = true;
-      }
-    
-      for(int i; i<n; i++){
-      if (!index[i]) na_check_all = false;
-      }
-  
-      /* Minimum */
-      if (narm) {
-      for(int i = n-1; i >= 0; i--){
-      if (!index[i]) omin[0] = x[i];
-      }
-              
-      for(int i = 1; i < n; i++) {
-      if (!index[i]) omin[0] = std::min(x[i], omin[0]);
-      }
-              
-      if (na_check_all) {
-      omin[0] = NA_REAL;
-      }
-      } else if (na_check) {
-      omin[0] = NA_REAL;
-      } else {
-      omin[0] = x[0];
-      for(int i = 1; i < n; i++){
-      omin = std::min(x[i], omin[0]);
-      }
-      }
-              
-      /* Maximum */
-      if (narm) {
-      for(int i = n-1; i >= 0; i--){
-      if (!index[i]) omax[0] = x[i];
-      }
-              
-      for(int i = 1; i < n; i++) {
-      if (!index[i]) omax[0] = std::max(x[i], omax[0]);
-      }
-              
-      if (na_check_all) {
-      omax[0] = NA_REAL;
-      }
-      } else if (na_check) {
-      omax[0] = NA_REAL;
-      } else {
-      omax[0] = x[0];
-      for(int i = 1; i < n; i++){
-      omax = std::max(x[i], omax[0]);
-      }
-      }
-              
+      
+      omin = minC(x, narm);
+      omax = maxC(x, narm);
+      
       out[0] = omin[0];
       out[1] = omax[0];
       return out;
-    }')
+      }
+    }
     
-    cppFunction('
     NumericVector meanC(NumericVector x, bool narm){
       int n = x.size();
       LogicalVector index = is_na(x);
@@ -353,15 +288,15 @@ Sys.setenv(LANGUAGE = "en")
       int n_corrected = 0;
       NumericVector out(1);
               
-      for(int i; i<n; i++){
+      for(int i = 0; i<n; i++){
           if (index[i]) na_check = true;
       }
               
-      for(int i; i<n; i++){
+      for(int i = 0; i<n; i++){
           if (!index[i]) na_check_all = false;
       }
   
-      for(int i; i<n; i++){
+      for(int i = 0; i<n; i++){
           if (!index[i]) n_corrected++;
       }
   
@@ -389,15 +324,14 @@ Sys.setenv(LANGUAGE = "en")
       }
   
       return out;
-    }')
+    }
     ```
 
 2. __<span style="color:red">Q</span>__: Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that these functions have slightly more complicated behaviour.  
     
     __<span style="color:green">A</span>__:
    
-    ```{r, eval = FALSE}
-    cppFunction('
+    ```cpp
     NumericVector cumsumC(NumericVector x) {
       int n = x.size();
       NumericVector out(n);
@@ -413,9 +347,8 @@ Sys.setenv(LANGUAGE = "en")
       }
     
       return out;
-    }')
+    }
     
-    cppFunction('
     NumericVector difflagC(NumericVector x, int lag){
       int n = x.size();
       NumericVector out(n - lag);
@@ -429,7 +362,7 @@ Sys.setenv(LANGUAGE = "en")
           }
       }
       return out;
-    }')
+    }
     ```
 
 ## The STL
@@ -473,15 +406,11 @@ To practice using the STL algorithms and data structures, implement the followin
     NumericVector uniqueC(NumericVector x) {
       std::unordered_set<int> seen;
       int n = x.size();
-      LogicalVector dup(n);
       std::vector<double> out;
       
       for (int i = 0; i < n; ++i) {
-        dup[i] = !seen.insert(x[i]).second;
-        if (!dup[i]) {
-            out.push_back(x[i]);
+        if (seen.insert(x[i]).second) out.push_back(x[i]);
         }
-      }
       
       return wrap(out);
     }
@@ -496,7 +425,7 @@ To practice using the STL algorithms and data structures, implement the followin
     // [[Rcpp::export]]
     double minC(NumericVector x){
       int n = x.size();
-      double out;
+      double out = x[0];
       
       for (int i = 0; i < n; i++){
         out = std::min(out, x[i]);
