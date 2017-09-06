@@ -471,19 +471,19 @@ To practice using the STL algorithms and data structures, implement the followin
     
     // [[Rcpp::export]]
     NumericVector uniqueC(NumericVector x) {
-    std::unordered_set<int> seen;
-    int n = x.size();
-    LogicalVector dup(n);
-    std::vector<double> out;
-    
-    for (int i = 0; i < n; ++i) {
-      dup[i] = !seen.insert(x[i]).second;
-      if (!dup[i]) {
-          out.push_back(x[i]);
+      std::unordered_set<int> seen;
+      int n = x.size();
+      LogicalVector dup(n);
+      std::vector<double> out;
+      
+      for (int i = 0; i < n; ++i) {
+        dup[i] = !seen.insert(x[i]).second;
+        if (!dup[i]) {
+            out.push_back(x[i]);
+        }
       }
-    }
-    
-    return wrap(out);
+      
+      return wrap(out);
     }
 ```
 
