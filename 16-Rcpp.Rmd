@@ -1,3 +1,12 @@
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
+
+Sys.setenv(LANGUAGE = "en")
+```
 # Rcpp
 
 ## Getting started with C++
@@ -76,51 +85,53 @@
     ```{r, eval = FALSE}
     cppFunction('
     bool allC(LogicalVector x) {
-    int n = x.size();
-    
-    for(int i = 0; i < n; ++i) {
-      if (!x[i]) return false;
-    }
-    return true;
+      int n = x.size();
+      
+      for(int i = 0; i < n; ++i) {
+        if (!x[i]) return false;
+      }
+      return true;
     }')
     ```
   
     2. `cumprod()`, `cummin()`, `cummax()`.
   
-    ```{r, eval = FALSE}
+    ```{r, eval = TRUE}
+    cppFunction('
     NumericVector cumprodC(NumericVector x) {
-    int n = x.size();
-    NumericVector out(n);
-    
-    out[0] = x[0];
-    for(int i = 1; i < n; ++i) {
-      out[i]  = out[i - 1] * x[i];
-    }
-    return out;
+      
+      int n = x.size();
+      NumericVector out(n);
+      
+      out[0] = x[0];
+      for(int i = 1; i < n; ++i) {
+        out[i]  = out[i - 1] * x[i];
+      }
+      return out;
     }')
     
     cppFunction('
     NumericVector cumminC(NumericVector x) {
     
-    int n = x.size();
-    NumericVector out(n);
+      int n = x.size();
+      NumericVector out(n);
     
-    out[0] = x[0];
-    for(int i = 1; i < n; ++i) {
-      out[i]  = std::min(out[i - 1], x[i]);
-    }
-    return out;
+      out[0] = x[0];
+      for(int i = 1; i < n; ++i) {
+        out[i]  = std::min(out[i - 1], x[i]);
+      }
+      return out;
     }')
     
     cppFunction('
     NumericVector cummaxC(NumericVector x) {
-    int n = x.size();
-    NumericVector out(n);
+      int n = x.size();
+      NumericVector out(n);
     
-    out[0] = x[0];
-    for(int i = 1; i < n; ++i) {
-      out[i]  = std::max(out[i - 1], x[i]);
-    }
+      out[0] = x[0];
+      for(int i = 1; i < n; ++i) {
+        out[i]  = std::max(out[i - 1], x[i]);
+      }
     return out;
     }')
     ```
@@ -154,7 +165,8 @@
     4. `range`.  
     
     ```{r, eval = FALSE}
-    cppFunction('NumericVector rangeC(NumericVector x){
+    cppFunction('
+    NumericVector rangeC(NumericVector x){
     double omin, omax;  
     int n = x.size();
     NumericVector out(2);
@@ -185,7 +197,8 @@
      __<span style="color:green">A</span>__:
    
     ```{r, eval = FALSE}
-    cppFunction('NumericVector minC(NumericVector x, bool narm){
+    cppFunction('
+    NumericVector minC(NumericVector x, bool narm){
     int n = x.size();
     LogicalVector index = is_na(x);
     NumericVector omin(1);
@@ -381,7 +394,8 @@
     __<span style="color:green">A</span>__:
    
     ```{r, eval = FALSE}
-    cppFunction('NumericVector cumsumC(NumericVector x) {
+    cppFunction('
+    NumericVector cumsumC(NumericVector x) {
     int n = x.size();
     NumericVector out(n);
     LogicalVector index = is_na(x);
