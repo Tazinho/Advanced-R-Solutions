@@ -6,23 +6,58 @@
 
 1.  __<span style="color:red">Q</span>__: The most important S3 objects in base R are factors, data frames, and date/times (Dates, POSIXct, POSIXlt). You've already seen the attributes and base type that factors are built on. What base types and attributes are the others built on?
     
-    __<span style="color:orange">A</span>__: 
+    __<span style="color:green">A</span>__: 
     
     **data frame:** Data frames are build up on (named) lists. Together with the `row.names` attribute and after setting the class to "data.frame", we get a classical data frame
     
     ```{r}
-    df_build <- list(a = 1:2, b = 3:4)
-    attr(df_build, "row.names") <- 1:2
-    class(df_build) <- "data.frame"
+    df_build <- structure(list(1:2, 3:4),
+                          names = c("a", "b"),
+                          row.names = 1:2, 
+                          class = "data.frame")
     
     df_classic <- data.frame(a = 1:2, b = 3:4)
     
     identical(df_build, df_classic)
     ```
     
-    **date/times (Dates, POSIXct, POSIXlt):**
+    **date/times (Dates, POSIXct, POSIXlt):** Date is just a double with the class attribute set to "Date"
+    
+    ```{r}
+    date_build <- structure(0, class = "Date")
+    date_classic <- as.Date("1970-01-01")
+    identical(date_build, date_classic)
+    ```
+    
+    POSIXct is a class for date/times that inherits from POSIXt and is built on doubles as well. The only attribute is tz (for timezone)
+    
+    ```{r}
+    POSIXct_build <- structure(1, class = c("POSIXct", "POSIXt"), tzone = "CET")
+    POSIXct_classic <- .POSIXct(1, tz = "CET") # note that tz's default is NULL
+    identical(POSIXct_build, POSIXct_classic)
+    ```
+    
+    POSIXlt is another date/time class that inherits from POSIXt. It is built on top of a named list and a tzone attribute. Differences between POSIXct and POSIXlt are described in `?DateTimeClasses`.
+    
+    ```{r}
+    POSIXlt_build <- structure(list(sec = 30,
+                                    min = 30L,
+                                    hour = 14L,
+                                    mday = 1L,
+                                    mon = 0L,
+                                    year = 70L,
+                                    wday = 4L,
+                                    yday = 0L,
+                                    isdst = 0L,
+                                    zone = "CET",
+                                    gmtoff = 3600L),
+                               tzone = c("", "CET", "CEST"),
+                               class = c("POSIXlt", "POSIXt"))
+    POSIXlt_classic <- as.POSIXlt(.POSIXct(13.5 * 3600 + 30))
+    identical(POSIXlt_build, POSIXlt_classic)
+    ```
 
-1.  Describe the difference in behaviour in these two calls.
+1.  __<span style="color:red">Q</span>__: Describe the difference in behaviour in these two calls.
 
     ```{r}
     set.seed(1014)
