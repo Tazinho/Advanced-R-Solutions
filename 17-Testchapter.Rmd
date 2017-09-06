@@ -4,14 +4,28 @@
 
 ## Basics
 
-1.  The most important S3 objects in base R are factors, data frames,
-    and date/times (Dates, POSIXct, POSIXlt). You've already seen the 
-    attributes and base type that factors are built on. What base types and 
-    attributes are the others built on?
+1.  __<span style="color:red">Q</span>__: The most important S3 objects in base R are factors, data frames, and date/times (Dates, POSIXct, POSIXlt). You've already seen the attributes and base type that factors are built on. What base types and attributes are the others built on?
+    
+    __<span style="color:orange">A</span>__: 
+    
+    **data frame:** Data frames are build up on (named) lists. Together with the `row.names` attribute and after setting the class to "data.frame", we get a classical data frame
+    
+    ```{r}
+    df_build <- list(a = 1:2, b = 3:4)
+    attr(df_build, "row.names") <- 1:2
+    class(df_build) <- "data.frame"
+    
+    df_classic <- data.frame(a = 1:2, b = 3:4)
+    
+    identical(df_build, df_classic)
+    ```
+    
+    **date/times (Dates, POSIXct, POSIXlt):**
 
 1.  Describe the difference in behaviour in these two calls.
 
     ```{r}
+    set.seed(1014)
     some_days <- as.Date("2017-01-31") + sample(10, 5)
     
     mean(some_days)
@@ -105,15 +119,19 @@
 
 ## Inheritance
 
-1.  The `ordered` class is a subclass of `factor`, but it's implemented in
-    a very ad hoc way in base R. Implement it in a principled way by
-    building a constructor and an `as_ordered` generic.
+1.  The `ordered` class is a subclass of `factor`, but it's implemented in a very ad hoc way in base R. Implement it in a principled way by building a constructor and an `as_ordered` generic.
     
     ```{r}
     f1 <- factor("a", c("a", "b"))
     as.factor(f1)  
     as.ordered(f1) # loses levels
     ```
+    
+    1.  What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
+
+1.  R has two classes for representing date time data, `POSIXct` and 
+    `POSIXlt`, which both inherit from `POSIXt`. Which generics have 
+    different behaviours for the two classes? Which generics share the same behaviour?
 
 ## Dispatch details
 
