@@ -126,8 +126,14 @@
     That is, because a character allocates 8 bytes per entry (if the entry has less than 8 signs, otherwise roughly one byte per sign) and a factor equals an integer (allocates only 4 bytes per entry) with a character vector attribute that contains the levels (unique elements) of the vector:
     
     ```{r}
-    object_size(1:20000)
-    object_size(letters[1:20])
+    a <- rep(1:20, 1000)
+    object_size(a)
+    
+    attr(a, "levels") <- letters[1:20]
+    object_size(a)
+    
+    class(a) <- "factor"
+    object_size(a)
     ```
     
     * Of course the factor will allocate more memory, if all entries are unique:
@@ -139,14 +145,14 @@
 
 1.  __<span style="color:red">Q</span>__: Explain the difference in size between `1:5` and `list(1:5)`.
 
-    __<span style="color:green">A</span>__: An empty list needs 40 bytes. For each entry 8 bytes are added (note that for short lists memory is allocated in chunks, similar as explained for integers in the textbook). We can see this via:
+    __<span style="color:green">A</span>__: An empty list needs 40 bytes. For each entry 8 bytes are added. We can see this via:
     
     ```{r}
     object_size(vector("list",0))
     object_size(vector("list",1))
     ```
     
-    Since `c(1:5)` needs 48 bytes, `list(1:5)` takes 96. So in general the cost for saving atomics within a list is 40 bytes for the list plus 8 bytes per atomic/listentry.
+    Since `1:5` needs 72 bytes (note that for memory for short integers is allocated in chunks, as explained in the textbook), `list(1:5)` takes 120 bytes (48 + 72). So in general the cost for saving atomics within a list is 40 bytes for the list plus 8 bytes per atomic/list entry.
 
 ## Memory profiling with lineprof
 
