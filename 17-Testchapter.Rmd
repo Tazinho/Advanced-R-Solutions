@@ -73,14 +73,22 @@
     
     When you look into the source code of `mean.Date()` (one line) you will see, that the difference in the resulting objects is again only the class attribute.
 
-1.  __<span style="color:red">Q</span>__: Draw a Venn diagram illustrating the relationships between
-    functions, generics, and methods.
+1.  __<span style="color:red">Q</span>__: Draw a Venn diagram illustrating the relationships between functions, generics, and methods.
+    
+    __<span style="color:orange">A</span>__ Need to check, if a method can also be a generic (should be possible). Otherwise just two distinct circles inside a third.
 
-1.  What does the `as.data.frame.data.frame()` method do? Why is
+1.  __<span style="color:red">Q</span>__: What does the `as.data.frame.data.frame()` method do? Why is
     it confusing? How should you avoid this confusion in your own
     code?
+    
+    __<span style="color:green">A</span>__: `as.data.frame.data.frame()` is the method for data frames of the `as.data.frame()` generic. Methods of this generic generally coerce objects to data frames.  
+    This specific method strips all class attributes preceding the "data.frame" class.  
+    If row names are supplied, this method will check their length and then set these as new "row.names" attribute.
+    
+    The name is confusing, because it is not clear, from the name, if it is a normal function, a generic or a method. Even if we know, that it is a method, the name doesn't tell us, which part is the name of the generic and which part is the class name.  
+We can easily avoid this confusion, by forgoing to use period separated class and function names.
 
-1.  What does the following code return? What base type is built on?
+1.  __<span style="color:red">Q</span>__: What does the following code return? What base type is built on?
     What attributes does it use?
     
     ```{r}
@@ -168,7 +176,7 @@
     as.ordered(f1) # loses levels
     ```
     
-    1.  What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
+1.  What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
 
 1.  R has two classes for representing date time data, `POSIXct` and 
     `POSIXlt`, which both inherit from `POSIXt`. Which generics have 
