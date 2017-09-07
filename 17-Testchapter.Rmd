@@ -66,8 +66,14 @@
     mean(some_days)
     mean(unclass(some_days))
     ```
+    
+    __<span style="color:green">A</span>__: Since `mean()` is a generic and `some_days` is an object of class "Date", the first call results in `mean.Date(some_days)`.  
+    
+    In the second call `unclass()` removes the class attribute from `some_days`, which means that `unclass(some_days)` is not an OO object and the call results in `mean.default(unclass(some_days))`, which calculates the mean of the underlying double.  
+    
+    When you look into the source code of `mean.Date()` (one line) you will see, that the difference in the resulting objects is again only the class attribute.
 
-1.  Draw a Venn diagram illustrating the relationships between
+1.  __<span style="color:red">Q</span>__: Draw a Venn diagram illustrating the relationships between
     functions, generics, and methods.
 
 1.  What does the `as.data.frame.data.frame()` method do? Why is
