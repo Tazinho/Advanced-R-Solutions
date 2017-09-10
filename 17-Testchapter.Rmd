@@ -100,13 +100,73 @@ We can easily avoid this confusion, by forgoing to use period separated class an
 
 ## Classes
 
-1.  Categorise the objects returned by `lm()`, `factor()`, `table()`, 
+1.  __<span style="color:red">Q</span>__: Categorise the objects returned by `lm()`, `factor()`, `table()`, 
     `as.Date()`, `ecdf()`, `ordered()`, `I()` into "vector", "scalar", and 
     "other".
+    
+    __<span style="color:green">A</span>__: 
+    
+    vector: `factor()`, `table()`, `as.Date()`, `ordered()`  
+    scalar: `lm()`  
+    other: `ecdf()`, `I()`  
 
-1.  Write a constructor for `difftime` objects. What base type are they
-    built on? What attributes do they use? You'll need to consult the
-    documentation, read some code, and perform some experiments.
+1.  __<span style="color:red">Q</span>__: Write a constructor for `difftime` objects. What base type are they built on? What attributes do they use? You'll need to consult the documentation, read some code, and perform some experiments.
+    
+    __<span style="color:green">A</span>__: Our constructor should be named `new_class_name`, have one argument for it's base type and each attribute and check the base types of these arguments as well. 
+    
+    ```{r}
+    new_difftime <- function(x, units = "auto") {
+      stopifnot(is.double(x), is.character(units))
+      
+      structure(x, units = units, class = "difftime")
+    }
+    ```
+    
+    However, since the following test prints awkward, we get a little bit more inspiration by the original `difftime()` function:
+    
+    ```{r}
+    new_difftime(3)
+    ```
+    
+    Basically we need to implement the logic for the units, when they are set to `"auto"` and convert the value of the underlying double from seconds to the regarding unit, as also commented.
+    
+    ```{r}
+    new_difftime <- function(x, units = "auto") {
+      stopifnot(is.double(x), is.character(units))
+      
+      # case units == "auto":
+      if (units == "auto") 
+        # when all timedifferences are NA, units should be "secs"
+        units <- if (all(is.na(x))){
+          "secs"
+        } else {
+          # otherwise set the units regarding to the minimal time difference
+          x_min <- min(abs(x), na.rm = TRUE)
+          if (!is.finite(x_min) || x_min < 60) {
+            "secs"
+          } else if (x_min < 3600){
+            "mins"
+          } else if (x_min < 86400){
+            "hours"
+          } else {
+            "days"
+          }
+        }
+      
+      # we rescale the underlying double, according to the units
+      x <- switch(units, 
+                  secs = x,
+                  mins = x/60,
+                  hours = x/3600,
+                  days = x/86400,
+                  weeks = x/(7 * 86400))
+      
+      structure(x, units = units, class = "difftime")
+    }
+    
+    # test
+    new_difftime(c(NA, -3600, 86400))
+    ```
 
 1.  Write a constructor for `data.frame` objects. What base type is a data 
     frame built on? What attributes does it use? What are the restrictions 
