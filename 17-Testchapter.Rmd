@@ -67,7 +67,7 @@
     mean(unclass(some_days))
     ```
     
-    __<span style="color:green">A</span>__: Since `mean()` is a generic and `some_days` is an object of class "Date", the first call results in `mean.Date(some_days)`.  
+    __<span style="color:green">A</span>__: Since `mean()` is a generic and `some_days` is an object of class Date, the first call results in `mean.Date(some_days)`.  
     
     In the second call `unclass()` removes the class attribute from `some_days`, which means that `unclass(some_days)` is not an OO object and the call results in `mean.default(unclass(some_days))`, which calculates the mean of the underlying double.  
     
@@ -122,7 +122,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     }
     ```
     
-    However, since the following test prints awkward, we get a little bit more inspiration by the original `difftime()` function:
+    However, since the following test prints awkward, we get a little bit more "inspiration" by the original `difftime()` function:
     
     ```{r}
     new_difftime(3)
@@ -168,18 +168,40 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     new_difftime(c(NA, -3600, 86400))
     ```
 
-1.  Write a constructor for `data.frame` objects. What base type is a data 
+1.  __<span style="color:red">Q</span>__: Write a constructor for `data.frame` objects. What base type is a data 
     frame built on? What attributes does it use? What are the restrictions 
     placed on the individual elements? What about the names?
+    
+    __<span style="color:green">A</span>__: Data frames are built on (named) lists and their only attribute is row.names. Row names must be unique and have the same length as observations within the data. They must be of type integer or character. Also all elements must have the same length. Technically there are no restrictions to column names apart to those of lists, so one could surround special names via backticks at creation (of course this is not recommended). A very good constructor regarding these criteria is already implemented within the S3 package.
+    
+    ```{r, comment = ""}
+    S3::new_data.frame
+    ```
 
-1.  Enhance our `factor()` helper to have better behaviour when one or
-    more `values` is not found in `levels`. What does `base::factor()` do
-    in this situation?
+1.  __<span style="color:red">Q</span>__: Enhance our `factor()` helper to have better behaviour when one or more `values` is not found in `levels`. What does `base::factor()` do in this situation?
+    
+    __<span style="color:green">A</span>__: `base::factor()` converts these values (silently) into `NA`'s. To improve our `factor()` helper, we write a more informative error message.
+    
+    ```{r, eval = FALSE}
+    factor <- function(x, levels = unique(x)) {
+      ind <- match(x, levels)
+      
+      # error when values occur, which are not in the levels
+      if(any(is.na(ind))){
+        stop("The following values do not occur in the levels: ",
+             paste(setdiff(x,levels), collapse = ", "), ".", 
+             call. = FALSE)
+        }
+      
+      validate_factor(new_factor(ind, levels))
+    }
+    ```
 
-1.  Carefully read the source code of `factor()`. What does it do that
-    our constructor does not?
+1.  __<span style="color:red">Q</span>__: Carefully read the source code of `factor()`. What does it do that our constructor does not?
+    
+    __<span style="color:green">A</span>__: It allows more general values as `x` input and converts them to character or replaces them by `character(0)` (in case of `NULL`). It also ensures that the levels are unique. This is done by setting the levels via the `base::levels<-` function, which fails when one tries to supply duplicated level values.
 
-1.  What would a constructor function for `lm` objects, `new_lm()`, look like?
+1.  __<span style="color:red">Q</span>__: What would a constructor function for `lm` objects, `new_lm()`, look like?
     Why is a constructor function less useful for linear models?
 
 ## Generics and methods
