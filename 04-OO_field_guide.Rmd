@@ -50,7 +50,11 @@ __<span style="color:green">A</span>__:
     objs <- mget(ls("package:base"), inherits = TRUE)
     funs <- Filter(is.function, objs)
     generics <- Filter(function(x) ("generic" %in% pryr::ftype(x)), funs)
-    sort(sapply(generics, function(x) length(methods(x))), decreasing = TRUE)[1] 
+    
+    sort(
+      lengths(sapply(names(generics), function(x) methods(x), USE.NAMES = TRUE)),
+      decreasing = TRUE
+      )[1]
     ```
     
 5.  __<span style="color:red">Q</span>__: `UseMethod()` calls methods in a special way. Predict what the following
