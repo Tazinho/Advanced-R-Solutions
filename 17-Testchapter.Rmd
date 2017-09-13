@@ -1,3 +1,12 @@
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
+
+Sys.setenv(LANGUAGE = "en")
+```
 # Testchapter
 
 # S3
@@ -114,7 +123,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
 
 1.  __<span style="color:red">Q</span>__: Write a constructor for `difftime` objects. What base type are they built on? What attributes do they use? You'll need to consult the documentation, read some code, and perform some experiments.
     
-    __<span style="color:green">A</span>__: Our constructor should be named `new_class_name`, have one argument for it's base type and each attribute and check the base types of these arguments as well. 
+    __<span style="color:green">A</span>__: Our constructor should be named `new_class_name`, have one argument for its base type and each attribute and check the base types of these arguments as well. 
     
     ```{r}
     new_difftime <- function(x, units = "auto") {
@@ -289,6 +298,18 @@ We can easily avoid this confusion, by forgoing to use period separated class an
 1.  __<span style="color:red">Q</span>__: Which base generic has the greatest number of defined methods?
     
     __<span style="color:green">A</span>__: 
+    
+    ```{r}
+    library(methods)
+    objs <- mget(ls("package:base"), inherits = TRUE)
+    funs <- Filter(is.function, objs)
+    generics <- Filter(function(x) ("generic" %in% pryr::ftype(x)), funs)
+    
+    sort(
+      lengths(sapply(names(generics), function(x) methods(x), USE.NAMES = TRUE)),
+      decreasing = TRUE
+      )[1]
+    ```
 
 1.  __<span style="color:red">Q</span>__: Explain what is happening in the following code.
 
@@ -305,6 +326,15 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     ```
     
     __<span style="color:green">A</span>__: 
+    
+    * We supply an object of classes `b` and `a2` to `generic2()`, so R will look for a method`generic2.b()`
+    * `generic2.b()` changes the class to `a1` and then calls `NextMethod()`
+    * One could think, that R calls now`generic2.a1()`. But in fact, as mentioned
+    in the textbook, `NextMethod()` 
+    
+        > doesn’t actually work with the class attribute of the object, but instead uses a special global variable (.Class) to keep track of which method to call next.
+
+    * We can easily verify (for example via `print()`) that `.Class` is `c("b", "a2")` at this stage and so `generic2.a2` gets called.
 
 ## Inheritance
 
