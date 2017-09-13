@@ -203,21 +203,69 @@ We can easily avoid this confusion, by forgoing to use period separated class an
 
 1.  __<span style="color:red">Q</span>__: What would a constructor function for `lm` objects, `new_lm()`, look like?
     Why is a constructor function less useful for linear models?
+    
+    __<span style="color:orange">A</span>__: 
+    
+    ```{r}
+    new_lm <- function(coefficiets, residuals, effects, rank, fitted.values, assign,
+                       qr, df.residual, xlevels, call, terms, model) {
+      
+      stopifnot(is.double(coefficients), is.double(residuals), is.double(effects),
+                is.integer(rank), is.double(fitted.values), is.integer(assign),
+                is.list(qr), is.integer(df.residual), is.list(xlevels),
+                is.language(call), is.language(terms), is.list(model))
+      
+      structure(
+        list(
+          coefficients = coefficients,
+          residuals = residuals,
+          effects = effects,
+          rank = rank, 
+          fitted.values = fitted.values,
+          assign = assign,
+          qr = qr,
+          df.residual = df.residual,
+          xlevels = xlevels,
+          call = call,
+          terms = terms, 
+          model = model
+          ),
+        class = "lm"
+      )
+      }
+    ```
 
 ## Generics and methods
 
-1.  Read the source code for `t()` and `t.test()` and confirm that 
-    `t.test()` is an S3 generic and not an S3 method. What happens if 
-    you create an object with class `test` and call `t()` with it? Why?
+1.  __<span style="color:red">Q</span>__: Read the source code for `t()` and `t.test()` and confirm that `t.test()` is an S3 generic and not an S3 method. What happens if you create an object with class `test` and call `t()` with it? Why?
     
     ```{r}
     x <- structure(1:10, class = "test")
     t(x)
     ```
+    
+    __<span style="color:green">A</span>__: We can see that `t.test()` is a generic, because it calls `UseMethod()`
+    
+    ```{r}
+    t.test
+    ```  
+    
+    There are also other (programmatic) possibilities to check this like `pryr::ftype()`, which checks via its internal `pryr:::is_s3_generic`, which uses `codetools::findGlobals()` that `t.test()` contains a call to `UseMethod()`.
+    
+    Interestingly, while digging a bit around in the pryr package, one can also find some dependencies to the tools package, where a list of functions exists, which tells you about some functions that look like methods, but are not.
+    
+    ```{r}
+    tools::nonS3methods("stats")
+    ```
+    
+    However, if we create an object with class `test`, `t.()` will cause R to call `t.test.default()` (unless you overwrite `t.test()` with a new method). This happens, because `t()` dispatches on `test` and finds only `t.test()`, which is erroneously treated like a method, because of his name. Since `t.test()` is a generic and doesn't find a method called `t.test.test()`, `t.test.default()` gets called. Just to proof the latter quickly, we specify a method `t.test.test()` and see what happens:
+    
+    ```{r}
+    t.test.test <- function(x) t.default(x)
+    t(x)
+    ```
 
-1.  Carefully read the documentation for `UseMethod()` and explain why the
-    following code returns the results that it does. What two usual rules
-    of function evaluation does `UseMethod()` violate?
+1.  __<span style="color:red">Q</span>__: Carefully read the documentation for `UseMethod()` and explain why the following code returns the results that it does. What two usual rules of function evaluation does `UseMethod()` violate?
     
     ```{r}
     g <- function(x) {
@@ -231,12 +279,16 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     y <- 1
     g(x)
     ```
+    
+    __<span style="color:green">A</span>__: 
 
 ## Method dispatch
 
-1.  Which base generic has the greatest number of defined methods?
+1.  __<span style="color:red">Q</span>__: Which base generic has the greatest number of defined methods?
+    
+    __<span style="color:green">A</span>__: 
 
-1.  Explain what is happening in the following code.
+1.  __<span style="color:red">Q</span>__: Explain what is happening in the following code.
 
     ```{r}
     generic2 <- function(x) UseMethod("generic2")
@@ -249,10 +301,12 @@ We can easily avoid this confusion, by forgoing to use period separated class an
 
     generic2(S3::new_s3_scalar(class = c("b", "a2")))
     ```
+    
+    __<span style="color:green">A</span>__: 
 
 ## Inheritance
 
-1.  The `ordered` class is a subclass of `factor`, but it's implemented in a very ad hoc way in base R. Implement it in a principled way by building a constructor and an `as_ordered` generic.
+1.  __<span style="color:red">Q</span>__: The `ordered` class is a subclass of `factor`, but it's implemented in a very ad hoc way in base R. Implement it in a principled way by building a constructor and an `as_ordered` generic.
     
     ```{r}
     f1 <- factor("a", c("a", "b"))
@@ -260,15 +314,21 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     as.ordered(f1) # loses levels
     ```
     
-1.  What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
+    __<span style="color:green">A</span>__: 
+    
+1.  __<span style="color:red">Q</span>__: What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
 
-1.  R has two classes for representing date time data, `POSIXct` and 
-    `POSIXlt`, which both inherit from `POSIXt`. Which generics have 
-    different behaviours for the two classes? Which generics share the same behaviour?
+    __<span style="color:green">A</span>__: 
+
+1.  __<span style="color:red">Q</span>__: R has two classes for representing date time data, `POSIXct` and `POSIXlt`, which both inherit from `POSIXt`. Which generics have different behaviours for the two classes? Which generics share the same behaviour?
+
+    __<span style="color:green">A</span>__: 
 
 ## Dispatch details
 
-1.  `Math.difftime()` is more complicated than I described. Why?
+1.  __<span style="color:red">Q</span>__: `Math.difftime()` is more complicated than I described. Why?
+
+    __<span style="color:green">A</span>__: 
 
 
 # S4
