@@ -350,11 +350,39 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     
 1.  __<span style="color:red">Q</span>__: What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
 
-    __<span style="color:green">A</span>__: 
+    __<span style="color:orange">A</span>__: 
+    
+    ```{r}
+    methods("Math")
+    ```
 
 1.  __<span style="color:red">Q</span>__: R has two classes for representing date time data, `POSIXct` and `POSIXlt`, which both inherit from `POSIXt`. Which generics have different behaviours for the two classes? Which generics share the same behaviour?
-
-    __<span style="color:green">A</span>__: 
+    
+    __<span style="color:green">A</span>__: To answer this question, we have to get the regarding generics
+    
+    ```{r}
+    # generics of POSIXt
+    generics_t <- attr(methods(class = "POSIXt"), "info")[["generic"]]
+    # Generics of POSIXct
+    generics_ct <- attr(methods(class = "POSIXct"), "info")[["generic"]]
+    # generics of POSIXlt
+    generics_lt <- attr(methods(class = "POSIXlt"), "info")[["generic"]]
+    ```
+    
+    Those generics that have a method for POSIXt are potentially sharing the same behaviour (`generics_t`). However, those generics that have a specific method for one of the sublcases have to be subtractet:
+    
+    ```{r}
+    generics_same <- setdiff(generics_t, union(generics_ct, generics_lt))
+    generics_same
+    ```
+    
+    The rest is different
+    
+    ```{r}
+    generics_different <- setdiff(unique(c(generics_t, generics_ct, generics_lt)),
+                                  generics_same)
+    generics_different
+    ```
 
 ## Dispatch details
 
