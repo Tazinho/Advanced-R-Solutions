@@ -1,12 +1,3 @@
-```{r include=FALSE, cache=FALSE}
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE
-)
-
-Sys.setenv(LANGUAGE = "en")
-```
 # Testchapter
 
 # S3
@@ -88,9 +79,7 @@ Sys.setenv(LANGUAGE = "en")
 
     > This function figures out whether the input function is a regular/primitive/internal function, a internal/S3/S4 generic, or a S3/S4/RC method. This is function is slightly simplified as it's possible for a method from one class to be a generic for another class, but that seems like such a bad idea that hopefully no one has done it.
 
-1.  __<span style="color:red">Q</span>__: What does the `as.data.frame.data.frame()` method do? Why is
-    it confusing? How should you avoid this confusion in your own
-    code?
+1.  __<span style="color:red">Q</span>__: What does the `as.data.frame.data.frame()` method do? Why is it confusing? How should you avoid this confusion in your own code?
     
     __<span style="color:green">A</span>__: `as.data.frame.data.frame()` is the method for data frames of the `as.data.frame()` generic. Methods of this generic generally coerce objects to data frames.  
     This specific method strips all class attributes preceding the "data.frame" class.  
@@ -291,7 +280,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     g(x)
     ```
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:orange">A</span>__: R looks for the `x` argument in `g()`'s calling environment (the global environment), where `x` is defined as 1. Then `g()` dispatches to `g.default()`. The `x` argument is given to `g.default()`. `y` is not defined inside it, so `g.default()` takes `y`'s value from the environment where `UseMethod()` created the call. There `y` is defined as 10.
 
 ## Method dispatch
 
