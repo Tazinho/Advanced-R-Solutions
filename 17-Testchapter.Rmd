@@ -280,7 +280,20 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     g(x)
     ```
     
-    __<span style="color:orange">A</span>__: R looks for the `x` argument in `g()`'s calling environment (the global environment), where `x` is defined as 1. Then `g()` dispatches to `g.default()`. The `x` argument is given to `g.default()`. `y` is not defined inside it, so `g.default()` takes `y`'s value from the environment where `UseMethod()` created the call. There `y` is defined as 10.
+    __<span style="color:green">A</span>__: R looks for the `x` argument in `g()`'s calling environment (the global environment), where `x` is defined as 1. Then `g()` dispatches to `g.default()`. The `x` argument is given to `g.default()`. `y` is not defined inside it, so `g.default()` takes `y`'s value from the environment where `UseMethod()` created the call. There `y` is defined as 10.  
+    
+    `UseMethod()` behaves special in many ways, two of them are:
+    
+    * it never "returns" (any statement after `UseMethod` won't be evaluated)
+    * the argument matching can become a bit tricky (generic and methods should have the same order of arguments or you must name them)
+    
+    ```{r}
+    g <- function(x, y) {UseMethod("g")}
+    g.default <- function(y, x) c(x = x, y = y)
+    
+    g(10, 100)
+    g(x = 10, y = 100)
+    ```
 
 ## Method dispatch
 
