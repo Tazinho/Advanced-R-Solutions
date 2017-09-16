@@ -347,9 +347,105 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     as.factor(f1)  
     as.ordered(f1) # loses levels
     ```
+
+    __<span style="color:green">A</span>__: ordered is a subclass of factor, so we need to do the following
     
-    __<span style="color:green">A</span>__: 
+    * for factors: add a subclass argument to the constructor and helper
+    * for ordered: add a constructor
+    * write an as_ordered generic with methods for ordered, factors, default
     
+    We use the **factor** constructor from the textbook and add the subclass argument
+    
+    ```{r}
+    new_factor <- function(x, levels, ..., subclass = NULL) {
+      stopifnot(is.integer(x))
+      stopifnot(is.character(levels))
+      
+      structure(
+        x,
+        levels = levels,
+        class = c(subclass, "factor")
+      )
+    }
+    ```
+    
+    We also use the validator for factors from the textbook
+    
+    ```{r}
+    validate_factor <- function(x) {
+      values <- unclass(x)
+      levels <- attr(x, "levels")
+      
+      if (!all(!is.na(values) & values > 0)) {
+        stop(
+          "All `x` values must be non-missing and greater than zero",
+          call. = FALSE
+        )
+      }
+      
+      if (length(levels) < max(values)) {
+        stop(
+          "There must at least as many `levels` as possible values in `x`",
+          call. = FALSE
+        )
+      }
+      
+      x
+    }
+    ```
+    
+    And we add the subclass argument for the helper from the textbook and the exercises
+    
+    ```{r}
+    factor <- function(x, levels = unique(x), ... , subclass = NULL) {
+      ind <- match(x, levels)
+      
+      # error when values occur, which are not in the levels
+      if(any(is.na(ind))){
+        stop("The following values do not occur in the levels: ",
+             paste(setdiff(x,levels), collapse = ", "), ".", 
+             call. = FALSE)
+        }
+      
+      validate_factor(new_factor(ind, levels, subclass = subclass))
+    }
+    ```
+    
+    A constructor for ordered is already implemented in the S3 package:
+    
+    ```{r}
+    new_ordered <- function (x, levels) {
+      stopifnot(is.integer(x))
+      stopifnot(is.character(levels))
+      structure(x, levels = levels, class = c("ordered", "factor"))
+    }
+    ```
+    
+    The implementation of the **generic** and the first two methods is straight forward
+    
+    ```{r}
+    as_ordered <- function(x, ...) {
+      UseMethod("as_ordered")
+    }
+    
+    as_ordered.ordered <- function(x, ...) x
+    as_ordered.default <- function(x, ...) {
+      stop(
+        "Don't know how to coerce object of class ", 
+        paste(class(x), collapse = "/"), " into an ordered factor", 
+        call. = FALSE
+      )
+    }
+    ```
+    
+    For the factor method of `as_ordered()` we use the factor helper, since it saves us some typing:
+    
+    ```{r}
+    as_ordered.factor <- function(x, ...) {
+      factor(x, attr(x, "levels"), subclass = "ordered")
+    }
+    ```
+        
 1.  __<span style="color:red">Q</span>__: What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
 
     __<span style="color:orange">A</span>__: 
