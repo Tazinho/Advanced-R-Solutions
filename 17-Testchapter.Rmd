@@ -352,7 +352,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     
     * for factors: add a subclass argument to the constructor and helper
     * for ordered: add a constructor
-    * write an as_ordered generic with methods for ordered, factors, default
+    * write an as_ordered generic with methods for .ordered, .factor and .default
     
     We use the **factor** constructor from the textbook and add the subclass argument
     
@@ -445,6 +445,8 @@ We can easily avoid this confusion, by forgoing to use period separated class an
       factor(x, attr(x, "levels"), subclass = "ordered")
     }
     ```
+    
+    For a real scenario, we might want to add an `as_factor()` generic with methods .factor, .ordered and .default.
         
 1.  __<span style="color:red">Q</span>__: What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
 
