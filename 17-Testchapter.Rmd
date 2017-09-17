@@ -71,22 +71,22 @@
     
     In the second call `unclass()` removes the class attribute from `some_days`, which means that `unclass(some_days)` is not an OO object and the call results in `mean.default(unclass(some_days))`, which calculates the mean of the underlying double.  
     
-    When you look into the source code of `mean.Date()` (one line) you will see, that the difference in the resulting objects is again only the class attribute.
+    When you look into the source code of `mean.Date()` (one line), you will see that the difference in the resulting objects is only the class attribute.
 
 1.  __<span style="color:red">Q</span>__: Draw a Venn diagram illustrating the relationships between functions, generics, and methods.
     
-    __<span style="color:orange">A</span>__: Funtions don't have to be generics or methods, but both the latter are functions. It is also possible that a method is a generic, which seems to be relatively awkward, so that also the author of the textbook doesn't recommend it, see `?pryr::ftype`
+    __<span style="color:orange">A</span>__: Funtions don't have to be generics or methods, but both the latter are functions. It is also possible that a function is both, a method and a generic, at the same time, which seems to be relatively awkward, so that also the author of the textbook doesn't recommend it, see `?pryr::ftype`
 
     > This function figures out whether the input function is a regular/primitive/internal function, a internal/S3/S4 generic, or a S3/S4/RC method. This is function is slightly simplified as it's possible for a method from one class to be a generic for another class, but that seems like such a bad idea that hopefully no one has done it.
 
 1.  __<span style="color:red">Q</span>__: What does the `as.data.frame.data.frame()` method do? Why is it confusing? How should you avoid this confusion in your own code?
     
-    __<span style="color:green">A</span>__: `as.data.frame.data.frame()` is the method for data frames of the `as.data.frame()` generic. Methods of this generic generally coerce objects to data frames.  
+    __<span style="color:green">A</span>__: The name is confusing, because it is not clear, from the name, if it is a normal function, a generic or a method. Even if we know, that it is a method, the name doesn't tell us, which part is the name of the generic and which part is the class name.  
+We can easily avoid this confusion, by forgoing to use period separated class and function names.
+
+    To reveal the solution: `as.data.frame.data.frame()` is the data frame method of the `as.data.frame()` generic. Methods of this generic generally coerce objects to data frames.  
     This specific method strips all class attributes preceding the "data.frame" class.  
     If row names are supplied, this method will check their length and then set these as new "row.names" attribute.
-    
-    The name is confusing, because it is not clear, from the name, if it is a normal function, a generic or a method. Even if we know, that it is a method, the name doesn't tell us, which part is the name of the generic and which part is the class name.  
-We can easily avoid this confusion, by forgoing to use period separated class and function names.
 
 1.  __<span style="color:red">Q</span>__: What does the following code return? What base type is built on?
     What attributes does it use?
@@ -122,13 +122,13 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     }
     ```
     
-    However, since the following test prints awkward, we get a little bit more "inspiration" by the original `difftime()` function:
+    However, since the following result prints awkward
     
     ```{r}
     new_difftime(3)
     ```
     
-    Basically we need to implement the logic for the units, when they are set to `"auto"` and convert the value of the underlying double from seconds to the regarding unit, as also commented.
+    we get a little bit more "inspiration" by the original `difftime()` function and make the regarding changes. Basically we need to implement logic for the units attribute, in case it is set to `"auto"` and convert the value of the underlying double from seconds to the regarding unit, as commented in the following
     
     ```{r}
     new_difftime <- function(x, units = "auto") {
@@ -258,7 +258,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     tools::nonS3methods("stats")
     ```
     
-    However, if we create an object with class `test`, `t.()` will cause R to call `t.test.default()` (unless you overwrite `t.test()` with a new method). This happens, because `t()` dispatches on `test` and finds only `t.test()`, which is erroneously treated like a method, because of his name. Since `t.test()` is a generic and doesn't find a method called `t.test.test()`, `t.test.default()` gets called. Just to proof the latter quickly, we specify a method `t.test.test()` and see what happens:
+    However, if we create an object with class `test`, `t()`, will dispatch to `t.test()`. This simply happens, because `UseMethod()` just looks for functions named `paste0("generic", ".", c(class(x), "default"))`. So `t.test()` is erroneously treated like a method of `t()`. Since `t.test()` is a generic itself and doesn't find a method called `t.test.test()`, it dispatches to `t.test.default()`. Just to proof the latter quickly, we specify a method `t.test.test()` and see what happens:
     
     ```{r}
     t.test.test <- function(x) t.default(x)
@@ -299,7 +299,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
 
 1.  __<span style="color:red">Q</span>__: Which base generic has the greatest number of defined methods?
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: `print()` has clearly the most
     
     ```{r}
     library(methods)
@@ -310,7 +310,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     sort(
       lengths(sapply(names(generics), function(x) methods(x), USE.NAMES = TRUE)),
       decreasing = TRUE
-      )[1]
+      )[1:3]
     ```
 
 1.  __<span style="color:red">Q</span>__: Explain what is happening in the following code.
@@ -336,7 +336,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     
         > doesn’t actually work with the class attribute of the object, but instead uses a special global variable (.Class) to keep track of which method to call next.
 
-    * We can easily verify (for example via `print()`) that `.Class` is `c("b", "a2")` at this stage and so `generic2.a2()` gets called.
+    * We can easily verify (for example via `print()`) that `.Class` is still `c("b", "a2")` and so `generic2.a2()` gets called.
 
 ## Inheritance
 
@@ -352,7 +352,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     
     * for factors: add a subclass argument to the constructor and helper
     * for ordered: add a constructor
-    * write an as_ordered generic with methods for .ordered, .factor and .default
+    * write an `as_ordered()` generic with methods ordered, factor and default
     
     We use the **factor** constructor from the textbook and add the subclass argument
     
@@ -485,7 +485,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     lgamma(iris)
     ```
     
-    So, I hope the idea is clear. However, of course different functions should perform different calculations. Here `.Generic` comes into play, which provides us the function as a string inside the body
+    So, I hope the idea is clear. However, of course different functions should perform different calculations. Here `.Generic` comes into play, which provides us the calling generic as a string
 
     ```{r}
     Math.data.frame <- function(x, ...){
