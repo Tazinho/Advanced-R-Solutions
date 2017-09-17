@@ -456,11 +456,50 @@ We can easily avoid this confusion, by forgoing to use period separated class an
         
 1.  __<span style="color:red">Q</span>__: What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
 
-    __<span style="color:orange">A</span>__: 
+    __<span style="color:green">A</span>__: The following functions belong to this group (see ?`Math`):
+    
+    * abs, sign, sqrt, floor, ceiling, trunc, round, signif
+    * exp, log, expm1, log1p, cos, sin, tan, cospi, sinpi, tanpi, acos, asin, atan, cosh, sinh, tanh, acosh, asinh, atanh
+    * lgamma, gamma, digamma, trigamma
+    * cumsum, cumprod, cummax, cummin
+    
+    The following classes have a method for this group generic:
     
     ```{r}
     methods("Math")
     ```
+    
+    To read the source code of the S3 classes, we can just enter the name of the method into the console. To get the source code of the S4 classes, we can use `getMethod()`, i. e. `getMethod("Math", "nonStructure")`.
+    
+    To explain the basic idea, we just overwrite the data frame method:
+    
+    ```{r}
+    Math.data.frame <- function(x){"hello"}
+    ```
+    
+    Now all functions from the math generic group, will return `"hello"`
+    
+    ```{r}
+    abs(iris)
+    exp(iris)
+    lgamma(iris)
+    ```
+    
+    So, I hope the idea is clear. However, of course different functions should perform different calculations. Here `.Generic` comes into play, which provides us the function as a string inside the body
+
+    ```{r}
+    Math.data.frame <- function(x, ...){
+      .Generic
+    }
+    
+    abs(iris)
+    exp(iris)
+    lgamma(iris)
+    
+    rm(Math.data.frame)
+    ```
+    
+    `Math.data.frame()` is a good example, how to invoke `.Generic` to build sth. constructive up on `.Generic`. `Math.factor()` is a good example of a method, which is simply defined for better error messages.
 
 1.  __<span style="color:red">Q</span>__: R has two classes for representing date time data, `POSIXct` and `POSIXlt`, which both inherit from `POSIXt`. Which generics have different behaviours for the two classes? Which generics share the same behaviour?
     
