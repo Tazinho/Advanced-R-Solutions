@@ -5,3 +5,4 @@ knitr::opts_chunk$set(
 )
 
 Sys.setenv(LANGUAGE = "en")
+library("methods")
