@@ -539,8 +539,37 @@ We can easily avoid this confusion, by forgoing to use period separated class an
 
 ## Classes
 
-1.  __<span style="color:red">Q</span>__: What happens if you define a new S4 class that doesn't "contain" an 
-    existing class?  (Hint: read about virtual classes in `?setClass`.)
+1.  __<span style="color:red">Q</span>__: What happens if you define a new S4 class that doesn't "contain" an existing class?  (Hint: read about virtual classes in `?setClass`.)
+    
+    __<span style="color:orange">A</span>__: It depends on the other arguments.
+    If we supply a class that doesn't exist, we'll get an error
+    
+    ```{r, error = TRUE}
+    setClass("Programmer", slots = c(slotname = "ANY"), contains = "Human")
+    ```
+    
+    However, we can get around that, if we register the class before
+    
+    ```{r}
+    setOldClass("Human")
+    .Programmer <- setClass("Programmer", slots = c(Skill = "ANY"), contains = "Human")
+    ```
+    
+    Supplying neither `slots`, nor `contains` results in a contructor for virtual classes 
+    
+    ```{r}
+    .VirtualProgrammer <- setClass("VirtualProgrammer")
+    # The same as contains = "VIRTUAL" (here you could also supply slots)
+    .VirtualProgrammer <- setClass("VirtualProgrammer", contains = "VIRTUAL")
+    ```
+    
+    Just leaving out `contains`, but supplying slots results in a constructor without superclass
+    
+    ```{r}
+    .DataScientist <- setClass("RProgrammer", slots = c(stats = "ANY",
+                                                        math = "ANY",
+                                                        programming = "ANY"))
+    ```
 
 1.  __<span style="color:red">Q</span>__: Imagine you were going to reimplement ordered factors, dates, and data frames in S4. Sketch out the `setClass()` calls that you would use to define the classes. What should they inherit from? What slots should they use?
 
