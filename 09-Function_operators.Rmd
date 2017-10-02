@@ -478,8 +478,8 @@
     And then we build two versions. One via an anonymous function and one via `partial()`:
     
     ```{r, eval}
-    compose_red <- function(fs) {
-      Reduce(function(f, g) function(...) f(g(...)), fs)
+    compose_red <- function(...) {
+      Reduce(function(f, g) function(...) f(g(...)), list(...))
     }
     compose_red(c(mean, length, unique))(1:10)
     
