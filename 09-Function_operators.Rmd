@@ -481,12 +481,12 @@
     compose_red <- function(...) {
       Reduce(function(f, g) function(...) f(g(...)), list(...))
     }
-    compose_red(c(mean, length, unique))(1:10)
+    compose_red(mean, length, unique)(1:10)
     
-    compose_red_bonus <- function(fs) {
-      Reduce(partial(partial(`%o%`)), fs)
+    compose_red_bonus <- function(...) {
+      Reduce(partial(partial(`%o%`)), list(...))
     }
-    compose_red_bonus(c(mean, length, unique))(1:10)
+    compose_red_bonus(mean, length, unique)(1:10)
     ```
 
 2.  __<span style="color:red">Q</span>__: Extend `and()` and `or()` to deal with any number of input functions. Can 
