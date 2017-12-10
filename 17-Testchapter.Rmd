@@ -600,7 +600,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     })
     ```
     
-    __<span style="color:orange">A</span>__: The first call defines a standard generic and the second one creates a nonstandard generic. One can confirm this directly whlie printing (showing in S4 slang) the function.
+    __<span style="color:orange">A</span>__: The first call defines a standard generic and the second one creates a nonstandard generic. One can confirm this directly whlie printing (showing in S4 jargon) the function.
     
     ```{r, eval = TRUE}
     setGeneric("myGeneric", function(x) standardGeneric("myGeneric"))
@@ -614,7 +614,64 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     
 1.  __<span style="color:red">Q</span>__: What happens if you define a method with different argument names to the generic?
 
-    __<span style="color:green">A</span>__: 
+    __<span style="color:orange">A</span>__: It depends. Lets first create the object `hadley` of class "Person":
+    
+    ```{r, eval = TRUE}
+    .Person <- setClass("Person", 
+                        slots = c(
+                          name = "character", 
+                          age = "numeric"
+                        )
+                      )
+    
+    hadley <- .Person(name = "Hadley")
+    hadley
+    ```
+    
+    Now let us see, which arguments can be supplied to the `show()` generic
+    
+    ```{r, eval = TRUE}
+    formals("show")
+    ```
+    
+    Usually we would use this argument when defining a new method
+    
+    ```{r, eval = TRUE}
+    setMethod("show", "Person", 
+              function(object){
+                cat(object@name, "creates hard exercises")
+              })
+    hadley
+    ```
+    
+    When we supply another name, for example `x` instead of `object`, as a first element of our method, this becomes matched to the correct `object` argument and we get a warning.
+    However, our method will work
+    
+    ```{r, eval = TRUE}
+    setMethod("show", "Person", 
+              function(x){
+                cat(x@name, "creates hard exercises")
+              })
+    hadley
+    ```
+    
+    If we add more arguments to our method than our generic can handle, we will get an error
+    
+    ```{r, eval = TRUE, error = TRUE}
+    setMethod("show", "Person", 
+              function(x, y){
+                cat(x@name, "is", x@age, "years old")
+              })
+    ```
+    
+    However, if we do this with arguments added to the correctly written `object` argument, we will get the informative error message, that we could in general add other argument names for generics, which can take the `...` argument
+    
+    ```{r, eval = TRUE, error = TRUE}
+    setMethod("show", "Person", 
+              function(object, y){
+                cat(object@name, "is", object@age, "years old")
+              })
+    ```
 
 1.  __<span style="color:red">Q</span>__: What other ways can you find help for a method? Read `?"?"` and summarise the details.
 
