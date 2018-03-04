@@ -802,7 +802,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     lobstr::ast(-1)
     ```
     
-    Of course also this doesn't make too much sense, since in `?Syntax` one can read, that R clearly differntiates between unary and binary `+` and `-` operators. (The former may not be used as an infix operator).
+    Of course also this doesn't make too much sense, since in `?Syntax` one can read, that R clearly differentiates between unary and binary `+` and `-` operators and a unary operator is not really what we mean, when we speak about infix operators.
 
 ## R's grammar
 
@@ -831,6 +831,29 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     
 1.  __<span style="color:red">Q</span>__: `=` can also be used in two ways. Construct a simple example that shows 
     both uses.
+    
+    __<span style="color:green">A</span>__: I was not exactly aware of a similar case with multiple syntactical meanings for the `=` symbol, but one can get there somehow. `=` is used as an operator for assignment. It is also part of the logical operators `==`, `>=`, `<=`, `!=` and is also used within functions to assign parameters or the definition of default settings.
+    
+    The question probably aims at the difference of global assignment and parameter definition within functions.
+    
+    So when we play with `ast()`, we can directly see that the following is not possible
+    
+    ```{r, error = TRUE}
+    lobstr::ast(a = 1)
+    ```
+    
+    We get an error, because `a = ` makes R looking for an argument called `a`. Since `x` is the only argument of `lobstr::ast()`, we get an error.
+    
+    When we build our workaround for the problem, the solution to the question becomes obvious.
+    
+    Instead `a = 1`, we pass the expression via brackets to `ast()`. Once via matching by position and once via matching by name
+    
+    ```{r}
+    lobstr::ast((a = 1))
+    lobstr::ast(x = (a = 1))
+    ```
+    
+    The second way is more explicit, but both return the same syntax tree. When wee ignore the `brackets` and compare the trees, we can finally see from the second tree, that the first `=` is just part of the syntax and the second one is for the usage of assignment.
 
 1.  __<span style="color:red">Q</span>__: What does `!1 + !1` return? Why?
 
