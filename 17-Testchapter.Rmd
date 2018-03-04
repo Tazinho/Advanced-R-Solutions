@@ -809,6 +809,26 @@ We can easily avoid this confusion, by forgoing to use period separated class an
 1.  __<span style="color:red">Q</span>__: R uses parentheses in two slightly different ways as illustrated by 
     this simple call: `f((1))`. Compare and contrast the two uses. 
     
+    __<span style="color:green">A</span>__: `(` is a primitive function and at the same time `(` is part of R's general prefix function syntax.
+    
+    So in the first example, we will see only the outer `(`, which  belongs to `f()` and is not shown in the Syntax, while the inner `(` is treated as a function (symbol) 
+    
+    ```{r}
+    lobstr::ast(f((1)))
+    ```
+    
+    In the second example, we can see that the outer `(` is treated as a function and the inner `(` belongs to its syntax
+    
+    ```{r}
+    lobstr::ast(`(`(1 + 1))
+    ```
+    
+    For clearness, lets also create a third example, where none of the `(` is part of another functions syntax
+    
+    ```{r}
+    lobstr::ast(((1 + 1)))
+    ```
+    
 1.  __<span style="color:red">Q</span>__: `=` can also be used in two ways. Construct a simple example that shows 
     both uses.
 
