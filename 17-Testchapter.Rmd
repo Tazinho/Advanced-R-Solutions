@@ -857,6 +857,26 @@ We can easily avoid this confusion, by forgoing to use period separated class an
 
 1.  __<span style="color:red">Q</span>__: What does `!1 + !1` return? Why?
 
+    __<span style="color:green">A</span>__: The first answer is quite simple
+    
+    ```{r}
+    !1 + !1
+    ```
+    
+    To answer the "Why", we have a look at the syntax tree first
+    
+    ```{r}
+    lobstr::ast(!1 + !1)
+    ```
+    
+    So first, the second `!1` becomes evaluated, which results in `FALSE`, because in R every non 0 numeric, becomes coerced to `TRUE`, when a logical operator is applied on it.
+    
+    Next `1 + FALSE` is evaluated to `1`, since `FALSE` is coerced to `0`.
+    
+    Finally `!1` is evaluated to `FALSE`, because it is the opposite of `TRUE`, which is what `1` becomes coerced to.
+    
+    However, note that if `!` had a higher precedence, the result would get `FALSE + FALSE` as intermediate result, which would be evalutated (again involving coercion) to `0`.
+
 1.  __<span style="color:red">Q</span>__: Which arithmetic operation is right associative?
 
 1.  __<span style="color:red">Q</span>__: Why does `x1 <- x2 <- x3 <- 0` work? There are two reasons.
