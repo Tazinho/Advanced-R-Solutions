@@ -879,10 +879,39 @@ We can easily avoid this confusion, by forgoing to use period separated class an
 
 1.  __<span style="color:red">Q</span>__: Which arithmetic operation is right associative?
 
+    __<span style="color:green">A</span>__: Exponentiation, as also mentioned in the text and easily shown via
+    
+    ```{r}
+    lobstr::ast(a ^ b ^ c)
+    lobstr::ast(a ^ (b ^ c))
+    ```
+
 1.  __<span style="color:red">Q</span>__: Why does `x1 <- x2 <- x3 <- 0` work? There are two reasons.
+
+    __<span style="color:orange">A</span>__: One reason is that `<-` is right-associative.
 
 1.  __<span style="color:red">Q</span>__: Compare `x + y %+% z` to `x ^ y %+% z`. What does that tell you about 
     the precedence of custom infix functions?
+    
+    
+    Q: Compare ast(x + y %+% z) to ast(x ^ y %+% z). What do they tell you about the precedence of custom infix functions?
+    
+    __<span style="color:green">A</span>__: Comparison of the syntax trees:
+    
+    ```{r}
+    # for ast(x + y %+% z)
+    # y %+% z will be calculated first and the result will be added to x
+    lobstr::ast(x + y %+% z)
+    ```
+    
+    ```{r}
+    # for ast(x ^ y %+% z) 
+    # x ^ y will be calculated first, and the result will be used as 
+    # first argument of %+%()
+    lobstr::ast(x ^ y %+% z)
+    ```
+    
+    So we can conclude that custom infix functions must have a precedence between addition and exponentiation. The general precedence rules can be found for example [here](https://cran.r-project.org/doc/manuals/r-release/R-lang.html).
 
 1.  __<span style="color:red">Q</span>__: `deparse()` produces vectors when the input is long. For example, the 
     following call produces a vector of length two:
