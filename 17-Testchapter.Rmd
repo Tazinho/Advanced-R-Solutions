@@ -806,8 +806,14 @@ We can easily avoid this confusion, by forgoing to use period separated class an
 
 ## R's grammar
 
-1.  __<span style="color:red">Q</span>__: R uses parentheses in two slightly different ways as illustrated by 
-    this simple call: `f((1))`. Compare and contrast the two uses. 
+1.  __<span style="color:red">Q</span>__: R uses parentheses in two slightly different ways as illustrated by these two calls:
+
+    ```{r, eval = FALSE}
+    f((1))
+    `(`(1 + 1)
+    ```
+    
+    Compare and contrast the two uses by referencing the AST.
     
     __<span style="color:green">A</span>__: `(` is a primitive function and at the same time `(` is part of R's general prefix function syntax.
     
@@ -829,8 +835,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     lobstr::ast(((1 + 1)))
     ```
     
-1.  __<span style="color:red">Q</span>__: `=` can also be used in two ways. Construct a simple example that shows 
-    both uses.
+1.  __<span style="color:red">Q</span>__: `=` can also be used in two ways. Construct a simple example that shows both uses.
     
     __<span style="color:green">A</span>__: I was not exactly aware of a similar case with multiple syntactical meanings for the `=` symbol, but one can get there somehow. `=` is used as an operator for assignment. It is also part of the logical operators `==`, `>=`, `<=`, `!=` and is also used within functions to assign parameters or the definition of default settings.
     
@@ -890,21 +895,15 @@ We can easily avoid this confusion, by forgoing to use period separated class an
 
     __<span style="color:orange">A</span>__: One reason is that `<-` is right-associative.
 
-1.  __<span style="color:red">Q</span>__: Compare `x + y %+% z` to `x ^ y %+% z`. What does that tell you about 
-    the precedence of custom infix functions?
-    
-    
-    Q: Compare ast(x + y %+% z) to ast(x ^ y %+% z). What do they tell you about the precedence of custom infix functions?
-    
+1.  __<span style="color:red">Q</span>__: Compare `x + y %+% z` to `x ^ y %+% z`. What does that tell you about the precedence of custom infix functions?
+
     __<span style="color:green">A</span>__: Comparison of the syntax trees:
     
     ```{r}
     # for ast(x + y %+% z)
     # y %+% z will be calculated first and the result will be added to x
     lobstr::ast(x + y %+% z)
-    ```
     
-    ```{r}
     # for ast(x ^ y %+% z) 
     # x ^ y will be calculated first, and the result will be used as 
     # first argument of %+%()
@@ -913,23 +912,59 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     
     So we can conclude that custom infix functions must have a precedence between addition and exponentiation. The general precedence rules can be found for example [here](https://cran.r-project.org/doc/manuals/r-release/R-lang.html).
 
-1.  __<span style="color:red">Q</span>__: `deparse()` produces vectors when the input is long. For example, the 
-    following call produces a vector of length two:
-
-    ```{r, eval = FALSE}
-    expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + m +
-      n + o + p + q + r + s + t + u + v + w + x + y + z))
-    
-    deparse(expr)
-    ```
-
-    What do `expr_text()`, `expr_name()`, and `expr_label()` do?
-
 ## Data structures
 
 1.  __<span style="color:red">Q</span>__: Which two of the six types of atomic vector can't appear in an expression? 
     Why? Why can't you create an expression that contains an atomic vector of 
     length greater than one? 
+    
+    __<span style="color:green">A</span>__: Because you can't type an expression that evaluates to an atomic of greater length than one without using a function (i.e. the `c()` function), which means that these expressions would be calls.
+    
+    We can illustrate that via an example:
+    
+    ```{r}
+    is.atomic(quote(1)) # is an atomic
+    is.atomic(quote(c(1,1))) # is not an atomic (it just would evaluate to an atomic).
+    is.call(quote(c(1,1))) # however it is still a call (so at least a valid expression).
+    ```
+    
+    Also raws can't appear in expressions, because of a similar reason. We think they are impossible to construct without using `as.raw()`, which would mean that we will also end up with a call.
+    
+    For similar reasons also complex numbers won't work
+    
+    ```{r}
+    (function(x){is.atomic(x) & length(x) == 1})(quote(1 + 1.5i))
+    
+    # however, imaginary parts of complex numbers work:
+    lobstr::ast(1i)
+    ```
+    
+1.  __<span style="color:red">Q</span>__: How is `rlang::maybe_missing()` implemented? Why
+does it work?
+
+    __<span style="color:green">A</span>__: We can simply inspect the source code
+    
+    ```{r, eval = FALSE}
+    lang::maybe_missing
+    function (x) 
+      {
+      # first it is checked if the argument is missing. If so, the missing arg is 
+      # returned (which is implemented in lower level code -> .Call()).
+      #
+      # (is_missing checks if one of the following is TRUE
+      # 1. check via substitute if type_of(x) is symbol and missing(x) is TRUE
+      # 2. check if x identical to missing_arg())
+      if (is_missing(x)) {
+        missing_arg()
+      }
+      # when it's not missing, x is simply returned
+      else {
+        x
+      }
+    }
+    <bytecode: 0x00000000195ed740>
+    <environment: namespace:rlang>
+    ```
 
 1.  __<span style="color:red">Q</span>__: `standardise_call()` doesn't work so well for the following calls.
     Why?
@@ -967,6 +1002,20 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     concat(quote(f), a = 1, b = quote(mean(a)))
     #> f(a = 1, b = mean(a))
     ```
+
+# Parsing and deparsing
+
+1.  __<span style="color:red">Q</span>__: `deparse()` produces vectors when the input is long. For example, the 
+    following call produces a vector of length two:
+
+    ```{r, eval = FALSE}
+    expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + m +
+      n + o + p + q + r + s + t + u + v + w + x + y + z))
+    
+    deparse(expr)
+    ```
+
+    What do `expr_text()`, `expr_name()`, and `expr_label()` do?
 
 ## Case study: anaphoric functions
 
