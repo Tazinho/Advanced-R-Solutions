@@ -1122,9 +1122,9 @@ does it work?
 
 ## Case study: Walking the AST with recursive functions {#ast-funs}
 
-1.  __<span style="color:red">Q</span>__: `logical_abbr()` works with expressions. It currently fails when you give it
-    a function. Why not? How could you modify `logical_abbr()` to make it 
-    work? What components will you need to recurse over?
+1.  __<span style="color:red">Q</span>__: `logical_abbr()` returns `TRUE` for `T(1, 2, 3)`. How could you modify `logical_abbr_rec()` so that it ignores function calls that use `T` or `F`?
+
+1.  __<span style="color:red">Q</span>__: `logical_abbr()` works with expressions. It currently fails when you give it a function. Why not? How could you modify `logical_abbr()` to make it work? What components of a function will you need to recurse over?
 
     ```{r, eval = FALSE}
     f <- function(x = TRUE) {
@@ -1133,11 +1133,10 @@ does it work?
     logical_abbr(!!f)
     ```
 
-1.  __<span style="color:red">Q</span>__: Write a function that extracts all calls to a function.
+1.  __<span style="color:red">Q</span>__: Modify find assignment to also detect assignment using replacement functions, i.e. `names(x) <- y`.
+  
+1.  __<span style="color:red">Q</span>__: Write a function that extracts all calls to a specified function.
 
-1.  __<span style="color:red">Q</span>__: Instead of writing a wrapper that quotes its input, we could have made 
-    the recursive function itself a quoting function. Why is this suboptimal?
-    
 1.  __<span style="color:red">Q</span>__: `base::alist()` is useful for creating pairlists to be used for function arguments:
     
     ```{r}
