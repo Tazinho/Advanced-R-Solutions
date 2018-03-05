@@ -952,7 +952,7 @@ does it work?
       # returned (which is implemented in lower level code -> .Call()).
       #
       # (is_missing checks if one of the following is TRUE
-      # 1. check via substitute if type_of(x) is symbol and missing(x) is TRUE
+      # 1. check via substitute if typeof(x) is symbol and missing(x) is TRUE
       # 2. check if x identical to missing_arg())
       if (is_missing(x)) {
         missing_arg()
@@ -974,6 +974,14 @@ does it work?
     lang_standardise(quote(mean(n = T, 1:10)))
     lang_standardise(quote(mean(x = 1:10, , TRUE)))
     ```
+    
+    __<span style="color:green">A</span>__: The reason is that `mean()` uses S3 dispatch (i.e., `UseMethod`) and therefore does not store its formals on `mean()`, but rather `mean.default()`. For example, `rlang::standardize_call()` can do much better when the S3 dispatch is explicit.
+    
+    ```{r}
+    rlang::lang_standardise(quote(mean(1:10, na.rm = TRUE)))
+    rlang::lang_standardise(quote(mean(n = T, 1:10)))
+    rlang::lang_standardise(quote(mean(x = 1:10, , TRUE)))
+    ```
 
 1.  __<span style="color:red">Q</span>__: Why does this code not make sense?
 
@@ -981,17 +989,100 @@ does it work?
     x <- expr(foo(x = 1))
     names(x) <- c("x", "")
     ```
-
-1.  __<span style="color:red">Q</span>__: `base::alist()` is useful for creating pairlists to be used for function
-    arguments:
+    
+    __<span style="color:green">A</span>__: As stated in the book
+    
+    > The first element of a call is always the function that gets called.
+    
+    We can just look what will happen
     
     ```{r}
-    foo <- function() {}
-    formals(foo) <- alist(x = , y = 1)
-    foo
+    x <- rlang::expr(foo(x = 1))
+    x
+    
+    names(x) <- c("x", "")
+    x
+    
+    names(x) <- c("", "x")
+    x
     ```
     
-    What makes `alist()` special compared to `list()`?
+    So giving the first element a name just adds useless metadata.
+
+1.  __<span style="color:red">Q</span>__: Construct the expression `if(x > 1) "a" else "b"` using multiple calls to `lang()`. How does the structure code reflect the structure of the AST?
+
+    __<span style="color:green">A</span>__: Similar to the prefix version we get
+    
+    ```{r}
+    rlang::lang("if", rlang::expr(x > 1), "a", "b")
+    ```
+    
+    When we reed the AST from left to right, we get the same structure:
+    Function to evaluate, expression, which is another function and becomes evaluated first and two constants which will be evaluated next
+    
+    ```{r}
+    lobstr::ast(`if`(x > 1, "a", "b"))
+    ```
+
+## Parsing and deparsing
+
+1.  __<span style="color:red">Q</span>__: What happens if you attempt to parse an invalid expression? e.g. `"a +"` or `"f())"`.
+
+    __<span style="color:green">A</span>__: We get an error from the underlying `parse` function
+    
+    ```{r, error = TRUE}
+    rlang::parse_expr("a +")
+    rlang::parse_expr("f())")
+    
+    parse(text = "a +")
+    parse(text = "f())")
+    ```
+
+1.  __<span style="color:red">Q</span>__: `deparse()` produces vectors when the input is long. For example, the following call produces a vector of length two:
+
+    ```{r, eval = TRUE}
+    expr <- rlang::expr(g(a + b + c + d + e + f + g + h + i + j + k + l + m +
+      n + o + p + q + r + s + t + u + v + w + x + y + z))
+    
+    deparse(expr)
+    ```
+
+    What do `expr_text()`, `expr_name()`, and `expr_label()` do with this input?
+    
+    __<span style="color:green">A</span>__: 
+    
+    * `expr_text()` pastes the output string into one and inserts `\n` (new line identifiers) as separators
+    
+    ```{r}
+    cat(rlang::expr_text(expr)) # cat is used for printing with linebreak
+    ```
+    
+    * `expr_name()` recreates the call into the form f(...) and deparses this expression into a string
+    
+    ```{r}
+    rlang::expr_name(expr)
+    ```
+    
+    * `expr_label()` does the same as `expr_name()`, but surrounds the output also with backticks
+    
+    ```{r}
+    rlang::expr_label(expr)
+    ```
+
+1.  __<span style="color:red">Q</span>__: Why does `as.Date.default()` use `substitute()` and `deparse()`? Why does `pairwise.t.test()` use them? Read the source code.
+
+    __<span style="color:green">A</span>__: `as.Date.default()` uses them to convert unexpected input expressions (neither dates, nor `NAs`) into a character string and return it within an error message.
+    
+    `pairwise.t.test()` uses them to convert the names of its datainputs (response vector `x` and grouping factor `g`) into character strings to format these further into a part of the desired output.
+
+1.  __<span style="color:red">Q</span>__: `pairwise.t.test()` assumes that `deparse()` always returns a length one character vector. Can you construct an input that violates this expectation? What happens? 
+
+    __<span style="color:green">A</span>__: We can pass an expression to one of `pairwise.t.test()`'s data input arguments, which exceeds the default cutoff width in `deparse()`. The expression will be split into a character vector of length greater 1. The deparsed data inputs are directly pasted (read the source code!) with "and" as separator and the result is just used to be displayed in the output. Just the data.name output will change (it will include more than one "and").
+    
+    ```{r}
+    d=1
+    pairwise.t.test(2, d+d+d+d+d+d+d+d+d+d+d+d+d+d+d+d+d)
+    ```
 
 1.  __<span style="color:red">Q</span>__: Concatenating a call and an expression with `c()` creates a list. Implement
     `concat()` so that the following code works to combine a call and
@@ -1002,20 +1093,6 @@ does it work?
     concat(quote(f), a = 1, b = quote(mean(a)))
     #> f(a = 1, b = mean(a))
     ```
-
-# Parsing and deparsing
-
-1.  __<span style="color:red">Q</span>__: `deparse()` produces vectors when the input is long. For example, the 
-    following call produces a vector of length two:
-
-    ```{r, eval = FALSE}
-    expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + m +
-      n + o + p + q + r + s + t + u + v + w + x + y + z))
-    
-    deparse(expr)
-    ```
-
-    What do `expr_text()`, `expr_name()`, and `expr_label()` do?
 
 ## Case study: anaphoric functions
 
@@ -1061,6 +1138,20 @@ does it work?
 1.  __<span style="color:red">Q</span>__: Instead of writing a wrapper that quotes its input, we could have made 
     the recursive function itself a quoting function. Why is this suboptimal?
     
+1.  __<span style="color:red">Q</span>__: `base::alist()` is useful for creating pairlists to be used for function arguments:
+    
+    ```{r}
+    foo <- function() {}
+    formals(foo) <- alist(x = , y = 1)
+    foo
+    ```
+    
+    What makes `alist()` special compared to `list()`?
+    
+    __<span style="color:green">A</span>__: From `?alist`:
+    
+    > alist handles its arguments as if they described function arguments. So the values are not evaluated, and tagged arguments with no value are allowed whereas list simply ignores them. alist is most often used in conjunction with formals.
+
 # Quasiquotation
 
 ## Quotation
