@@ -740,21 +740,21 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     
 1.  __<span style="color:red">Q</span>__: What does the call tree of an `if` statement with multiple `else if` conditions look like? Why?
 
-    __<span style="color:green">A</span>__: It might look a bit confusing with all
-    those brackets, however, basically we can see that in the `else` part just 
-    another expression gets evaluated, which is an `if` statement in this case
+    __<span style="color:green">A</span>__: The ast of nested `else if` statements might look a bit confusing because it contains multiple brackets. However, we can see that in the `else` part of the *ast* just another expression is being evaluated, which happens to be an `if` statement and so forth.
     
     ```{r}
-    lobstr::ast(if (FALSE) {
+    lobstr::ast(
+    if (FALSE) {
       1
-    }  else if (FALSE) {
+    } else if (FALSE) {
       2
-    }  else if (TRUE) {
+    } else if (TRUE) {
       3
-    })
+    }
+    )
     ```
     
-    Here more clearly without curly brackets in prefix notation
+    We can see the structure more clearly when we avoid the curly brackets through prefix notation.
     
     ```{r}
     lobstr::ast(`if`(FALSE, 1, `if`(FALSE, 2, `if`(TRUE, 3))))
