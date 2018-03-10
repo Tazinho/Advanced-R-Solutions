@@ -815,21 +815,21 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     
     Compare and contrast the two uses by referencing the AST.
     
-    __<span style="color:green">A</span>__: `(` is a primitive function and at the same time `(` is part of R's general prefix function syntax.
+    __<span style="color:green">A</span>__: The trick with these examples lies in the fact, that `(` can represent a primitive function but also as be part of R's general prefix function syntax.
     
-    So in the first example, we will see only the outer `(`, which  belongs to `f()` and is not shown in the Syntax, while the inner `(` is treated as a function (symbol) 
+    So in the AST of the first example, we will not see the outer `(`, which belongs to `f()` and is therefore not shown in the syntax, while the inner `(` is treated as a function (symbol).
     
     ```{r}
     lobstr::ast(f((1)))
     ```
     
-    In the second example, we can see that the outer `(` is treated as a function and the inner `(` belongs to its syntax
+    In the second example, we can see that the outer `(` is treated as a function and the inner `(` belongs to its syntax.
     
     ```{r}
     lobstr::ast(`(`(1 + 1))
     ```
     
-    For clearness, lets also create a third example, where none of the `(` is part of another functions syntax
+    For the sake of clarity, let's also create a third example, where none of the `(` is part of another functions syntax.
     
     ```{r}
     lobstr::ast(((1 + 1)))
