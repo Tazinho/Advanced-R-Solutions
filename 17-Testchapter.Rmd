@@ -1153,6 +1153,38 @@ does it work?
 
 # Quasiquotation
 
+## Motivation
+
+1.  __<span style="color:red">Q</span>__: For each function in the following base R code, identify which arguments are quoted and which are evaluated.
+
+    ```{r, eval = FALSE}
+    library(MASS)
+
+    mtcars2 <- subset(mtcars, cyl == 4)
+
+    with(mtcars2, sum(vs))
+    sum(mtcars2$am)
+
+    rm(mtcars2)
+    ```
+
+    __<span style="color:green">A</span>__: see https://speakerdeck.com/hadley/tidy-evaluation-programming-with-ggplot2-and-dplyr?slide=28 ;)
+
+1.  __<span style="color:red">Q</span>__: For each function in the following tidyverse code, identify which arguments are quoted and which are evaluated.
+
+    ```{r, eval = FALSE}
+    library(dplyr)
+    library(ggplot2)
+
+    by_cyl <- mtcars %>%
+      group_by(cyl) %>%
+      summarise(mean = mean(mpg))
+
+    ggplot(by_cyl, aes(cyl, mean)) + geom_point()
+    ```
+
+    __<span style="color:green">A</span>__: https://speakerdeck.com/hadley/tidy-evaluation-programming-with-ggplot2-and-dplyr?slide=31 tbc...
+
 ## Quotation
 
 1.  __<span style="color:red">Q</span>__: What happens if you try and use `enexpr()` with an expression?
