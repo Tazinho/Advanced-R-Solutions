@@ -918,19 +918,20 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     Why? Why can't you create an expression that contains an atomic vector of 
     length greater than one? 
     
-    __<span style="color:green">A</span>__: Because you can't type an expression that evaluates to an atomic of greater length than one without using a function (i.e. the `c()` function), which means that these expressions would be calls.
+    __<span style="color:green">A</span>__: It is not possible to create an expression that evaluates to an atomic of length greater than one without using a function (i.e. the `c()` function). But expressions that incluede a function would be calls.
     
-    We can illustrate that via an example:
+    Let us illustrate this observation via the following example:
     
     ```{r}
-    is.atomic(quote(1)) # is an atomic
-    is.atomic(quote(c(1,1))) # is not an atomic (it just would evaluate to an atomic).
-    is.call(quote(c(1,1))) # however it is still a call (so at least a valid expression).
+    is.atomic(quote(1))       # atomic
+    is.atomic(quote(c(1,1)))  # not an atomic (it would just evaluate to an atomic).
+    is.call(quote(c(1,1)))    # still a call! (so at least a valid expression).
     ```
+    <!-- HB: a little more explanation would be nice, I think. -->
     
-    Also raws can't appear in expressions, because of a similar reason. We think they are impossible to construct without using `as.raw()`, which would mean that we will also end up with a call.
+    Two of the six atomic vector types of R do not work with expressions, the first one being raws. We assume, that raws may only be constructed through using `as.raw()`, but this function would then creating another call in the AST.
     
-    For similar reasons also complex numbers won't work
+    For similar reasons complex numbers also won't work:
     
     ```{r}
     (function(x){is.atomic(x) & length(x) == 1})(quote(1 + 1.5i))
@@ -938,6 +939,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     # however, imaginary parts of complex numbers work:
     lobstr::ast(1i)
     ```
+    <!-- HB: don't fully understand the first line of code in the above code-chunk -->
     
 1.  __<span style="color:red">Q</span>__: How is `rlang::maybe_missing()` implemented? Why
 does it work?
