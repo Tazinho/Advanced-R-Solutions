@@ -781,28 +781,35 @@ We can easily avoid this confusion, by forgoing to use period separated class an
 1.  __<span style="color:red">Q</span>__: Two arithmetic operators can be used in both prefix and infix style.
     What are they?
     
-    __<span style="color:orange">A</span>__: I am not sure how this is meant to be. Theoretically every arithmetic operator can be written in prefix notation via backticks. On the other hand, `+` and `-` seem to be the only ones, which can be written in infix notation without backticks.
+    __<span style="color:green">A</span>__: I am not sure how this is meant to be. Theoretically every arithmetic operator can be written in prefix notation via backticks. On the other hand, `+` and `-` seem to be the only ones, which can be written in infix notation without backticks.
     
     ```{r}
-    +(1)
-    -(1)
+    +(x)
+    -(x)
     ```
     
     However, when we look more closely, the call tree is not what we would expect from a prefix function
     
     ```{r}
-    lobstr::ast(+(1))  
-    lobstr::ast(-(1))  
+    lobstr::ast(+ (x))  
+    lobstr::ast(- (x))  
     ```
     
     So maybe it is meant to look like this...
     
     ```{r}
-    lobstr::ast(+1)
-    lobstr::ast(-1)
+    lobstr::ast(+ x)
+    lobstr::ast(- x)
     ```
     
     Of course also this doesn't make too much sense, since in `?Syntax` one can read, that R clearly differentiates between unary and binary `+` and `-` operators and a unary operator is not really what we mean, when we speak about infix operators.
+    
+    However, if we don't differentiate in this way, this is probably the solution, since it's obviously also an infix function:
+    
+    ```{r}
+    lobstr::ast(x + y)
+    lobstr::ast(x - y)
+    ```
 
 ## R's grammar
 
