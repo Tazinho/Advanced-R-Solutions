@@ -976,21 +976,21 @@ does it work?
     First it is checked if the argument is missing. If so, the missing arg is returned, otherwise the argument (x) itsself is returned.
     
 
-1.  __<span style="color:red">Q</span>__: `standardise_call()` doesn't work so well for the following calls.
+1.  __<span style="color:red">Q</span>__: `call_standardise()` doesn't work so well for the following calls.
     Why?
 
     ```{r}
-    lang_standardise(quote(mean(1:10, na.rm = TRUE)))
-    lang_standardise(quote(mean(n = T, 1:10)))
-    lang_standardise(quote(mean(x = 1:10, , TRUE)))
+    call_standardise(quote(mean(1:10, na.rm = TRUE)))
+    call_standardise(quote(mean(n = T, 1:10)))
+    call_standardise(quote(mean(x = 1:10, , TRUE)))
     ```
     
-    __<span style="color:green">A</span>__: The reason is that `mean()` uses S3 dispatch (i.e., `UseMethod`) and therefore does not store its formals on `mean()`, but rather `mean.default()`. For example, `rlang::standardize_call()` can do much better when the S3 dispatch is explicit.
+    __<span style="color:green">A</span>__: The reason for this unexpected behaviour lies in the fact that `mean()` uses S3 dispatch (i.e., `UseMethod`) and therefore does not store its formals on `mean()`, but rather on `mean.default()`. `rlang::call_standardise()` can do much better when the S3 dispatch is explicit.
     
     ```{r}
-    rlang::lang_standardise(quote(mean(1:10, na.rm = TRUE)))
-    rlang::lang_standardise(quote(mean(n = T, 1:10)))
-    rlang::lang_standardise(quote(mean(x = 1:10, , TRUE)))
+    call_standardise(quote(mean.default(1:10, na.rm = TRUE)))
+    call_standardise(quote(mean.default(n = T, 1:10)))
+    call_standardise(quote(mean.default(x = 1:10, , TRUE)))
     ```
 
 1.  __<span style="color:red">Q</span>__: Why does this code not make sense?
