@@ -8,17 +8,113 @@ knitr::opts_chunk$set(
 Sys.setenv(LANGUAGE = "en")
 library("methods")
 ```
-```{r include=FALSE, cache=FALSE}
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE
-)
 
-Sys.setenv(LANGUAGE = "en")
-library("methods")
-```
 # Testchapter
+
+# Names and values
+
+## Binding basics
+
+1.  Explain the relationship between `a`, `b`, `c` and `d` in the following 
+    code:
+
+    ```{r}
+    a <- 1:10
+    b <- a
+    c <- b
+    d <- 1:10
+    ```
+
+1.  The following code accesses the mean function in multiple different ways.
+    Do they all point to the same underlying function object? Verify with
+    `lobstr::obj_addr()`.
+    
+    ```{r, eval = FALSE}
+    mean
+    base::mean
+    get("mean")
+    evalq(mean)
+    match.fun("mean")
+    ```
+    
+1.  By default, base R data import functions, like `read.csv()`, will automatically
+    convert non-syntactic names to syntactic names. Why might this be 
+    problematic? What option allows you to suppress this behaviour?
+    
+1.  What rules does `make.names()` use to convert non-syntactic names into
+    syntactic names?
+
+1.  I slightly simplified the rules that govern syntactic names. Why is `.123e1`
+    not a syntactic name? Read `?make.names`.
+
+## Copy-on-modify
+
+1.  Why is `tracemem(1:10)` not useful?
+
+1.  Explain why `tracemem()` records two copies when you run this code.
+    Hint: carefully look at the difference between this code and the code 
+    show earlier in the section.
+     
+    ```{r, results = FALSE}
+    x <- 1:3
+    tracemem(x)
+    
+    x[[3]] <- 4
+    ```
+
+1.  Sketch out the relationship between the following objects:
+
+    ```{r}
+    a <- 1:10
+    b <- list(a, a)
+    c <- list(b, a, 1:10)
+    ```
+
+1.  What happens when you run this code:
+
+    ```{r}
+    x <- list(1:10)
+    x[[2]] <- x
+    ```
+    
+    Draw a picture.
+
+## Object size
+
+1.  Take the following list. Why is its size somewhat misleading?
+
+    ```{r, return = FALSE}
+    x <- list(mean, sd, var)
+    # obj_size(x)
+    #> 16,928 B
+    ```
+
+1.  Predict the output of the following code:
+
+    ```{r, eval = FALSE}
+    # x <- 1:1e6
+    # obj_size(x)
+    # 
+    # y <- list(x, x)
+    # obj_size(y)
+    # obj_size(x, y)
+    # 
+    # y[[1]][[1]] <- 10
+    # obj_size(y)
+    # obj_size(x, y)
+    # 
+    # y[[2]][[1]] <- 10
+    # obj_size(y)
+    # obj_size(x, y)
+    ```
+
+## Modify-in-place
+
+1.  Wrap the two methods for subtracting medians into two functions, then
+    use the microbenchmark to carefully compare their speeds. How does
+    performance change as the number of columns increase?
+
+1.  What happens if you attempt to use `tracemem()` on an environment?
 
 # S3
 
