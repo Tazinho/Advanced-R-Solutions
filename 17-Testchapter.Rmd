@@ -951,29 +951,30 @@ We can easily avoid this confusion, by forgoing to use period separated class an
 1.  __<span style="color:red">Q</span>__: How is `rlang::maybe_missing()` implemented? Why
 does it work?
 
-    __<span style="color:green">A</span>__: We can simply inspect the source code
+    __<span style="color:green">A</span>__: Let us take a look at the functions source code to see what's going on
     
     ```{r, eval = FALSE}
     lang::maybe_missing
     function (x) 
       {
-      # first it is checked if the argument is missing. If so, the missing arg is 
-      # returned (which is implemented in lower level code -> .Call()).
-      #
-      # (is_missing checks if one of the following is TRUE
+      # is_missing checks if one of the following is TRUE
       # 1. check via substitute if typeof(x) is symbol and missing(x) is TRUE
-      # 2. check if x identical to missing_arg())
+      # 2. check if x identical to missing_arg()
       if (is_missing(x)) {
-        missing_arg()
+        missing_arg()  # returns missing argument
+                       # implemented in lower level code -> .Call())
       }
-      # when it's not missing, x is simply returned
       else {
-        x
+        x  # when it's not missing, x is simply returned
       }
     }
     <bytecode: 0x00000000195ed740>
     <environment: namespace:rlang>
     ```
+    <!-- HB: I think, I would try to split the explanation into two parts. One Overfiew with comments in the functions source code and then some prose summarising what's going on at a little higher level. Why does it work?-->    
+    
+    First it is checked if the argument is missing. If so, the missing arg is returned, otherwise the argument (x) itsself is returned.
+    
 
 1.  __<span style="color:red">Q</span>__: `standardise_call()` doesn't work so well for the following calls.
     Why?
