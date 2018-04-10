@@ -985,15 +985,6 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     
     However, note that if `!` had a higher precedence, the result would get `FALSE + FALSE` as intermediate result, which would be evalutated (again involving coercion) to `0`.
 
-1.  __<span style="color:red">Q</span>__: Which arithmetic operation is right associative?
-
-    __<span style="color:green">A</span>__: Exponentiation, as also mentioned in the text and easily shown via
-    
-    ```{r}
-    lobstr::ast(a ^ b ^ c)
-    lobstr::ast(a ^ (b ^ c))
-    ```
-
 1.  __<span style="color:red">Q</span>__: Why does `x1 <- x2 <- x3 <- 0` work? There are two reasons.
 
     __<span style="color:orange">A</span>__: One reason is that `<-` is right-associative.
@@ -1021,7 +1012,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     Why? Why can't you create an expression that contains an atomic vector of 
     length greater than one? 
     
-    __<span style="color:green">A</span>__: It is not possible to create an expression that evaluates to an atomic of length greater than one without using a function (i.e. the `c()` function). But expressions that incluede a function would be calls.
+    __<span style="color:green">A</span>__: It is not possible to create an expression that evaluates to an atomic of length greater than one without using a function (i.e. the `c()` function). But expressions that include a function would be calls.
     
     Let us illustrate this observation via the following example:
     
@@ -1069,7 +1060,7 @@ does it work?
     ```
     <!-- HB: I think, I would try to split the explanation into two parts. One Overfiew with comments in the functions source code and then some prose summarising what's going on at a little higher level. Why does it work?-->    
     
-    First it is checked if the argument is missing. If so, the missing arg is returned, otherwise the argument (x) itsself is returned.
+    First it is checked if the argument is missing. If so, the missing arg is returned, otherwise the argument (`x`) itsself is returned.
     
 
 1.  __<span style="color:red">Q</span>__: `call_standardise()` doesn't work so well for the following calls.
@@ -1190,45 +1181,72 @@ does it work?
     pairwise.t.test(2, d+d+d+d+d+d+d+d+d+d+d+d+d+d+d+d+d)
     ```
 
-1.  __<span style="color:red">Q</span>__: Concatenating a call and an expression with `c()` creates a list. Implement
-    `concat()` so that the following code works to combine a call and
-    an additional argument.
-
-    ```{r, eval = FALSE}
-    c(quote(f()), list(a = 1, b = quote(mean(a)))
-    concat(quote(f), a = 1, b = quote(mean(a)))
-    #> f(a = 1, b = mean(a))
-    ```
-
-## Case study: anaphoric functions
-
-1.  __<span style="color:red">Q</span>__: How are `alist(a)` and `alist(a = )` different? Think about both the
-    input and the output.
-
-1.  __<span style="color:red">Q</span>__: Read the documentation and source code for `pryr::partial()`. What does it
-    do? How does it work? Read the documentation and source code for
-    `pryr::unenclose()`. What does it do and how does it work?
-
-1.  __<span style="color:red">Q</span>__: The actual implementation of `curve()` looks more like
-
-    ```{r curve3}
-    curve3 <- function(expr, xlim = c(0, 1), n = 100,
-                       env = parent.frame()) {
-      env2 <- new.env(parent = env)
-      env2$x <- seq(xlim[1], xlim[2], length = n)
-
-      y <- eval(substitute(expr), env2)
-      plot(env2$x, y, type = "l", 
-        ylab = deparse(substitute(expr)))
-    }
-    ```
-
-    How does this approach differ from `curve2()` defined above?
-
-
 ## Case study: Walking the AST with recursive functions {#ast-funs}
 
 1.  __<span style="color:red">Q</span>__: `logical_abbr()` returns `TRUE` for `T(1, 2, 3)`. How could you modify `logical_abbr_rec()` so that it ignores function calls that use `T` or `F`?
+
+    __<span style="color:green">A</span>__: We can apply a similar logic as in the multiple assignment example from the textbook and just treat this case as a special case handled within a sub function called `find_T_call()` which finds `T()` calls and and "bounces them out":
+    
+    ```{r, include = FALSE}
+    expr_type <- function(x) {
+      if (rlang::is_syntactic_literal(x)) {
+      "constant"
+      } else if (is.symbol(x)) {
+      "symbol"
+      } else if (is.call(x)) {
+      "call"
+      } else if (is.pairlist(x)) {
+      "pairlist"
+      } else {
+      typeof(x)
+      }
+    }
+  
+    switch_expr <- function(x, ...) {
+      switch(expr_type(x),
+      ...,
+      stop("Don't know how to handle type ", typeof(x), call. = FALSE))
+    }
+    ```
+    
+    ```{r}
+    find_T_call <- function(x) {
+      if (is_call(x, "T")) {
+      x <- as.list(x)[-1]
+      purrr::some(x, logical_abbr_rec)
+      } else {
+      purrr::some(x, logical_abbr_rec)
+      }
+    }
+    
+    logical_abbr_rec <- function(x) {
+      switch_expr(
+      x,
+      # Base cases
+      constant = FALSE,
+      symbol = as_string(x) %in% c("F", "T"),
+      
+      # Recursive cases
+      pairlist = purrr::some(x, logical_abbr_rec),
+      call = find_T_call(x)
+      )
+    }
+    
+    logical_abbr <- function(x) {
+      logical_abbr_rec(enexpr(x))
+    }
+    ```
+    
+    Now lets test our new `logical_abbr()` function:
+    
+    ```{r}
+    logical_abbr(T(1, 2, 3))
+    logical_abbr(T(T, T(3, 4)))
+    logical_abbr(T(T))
+    logical_abbr(T())
+    logical_abbr()
+    logical_abbr(c(T, T, T))
+    ```
 
 1.  __<span style="color:red">Q</span>__: `logical_abbr()` works with expressions. It currently fails when you give it a function. Why not? How could you modify `logical_abbr()` to make it work? What components of a function will you need to recurse over?
 
@@ -1238,6 +1256,8 @@ does it work?
     }
     logical_abbr(!!f)
     ```
+    
+    __<span style="color:green">A</span>__: It currently fails, because `"closure"` is not handled within `switch_expr()` within `logical_abbr_rec()`. If we wanted to make it work, we must open a case there and write a function to inspect the formals and the body of the input function.
 
 1.  __<span style="color:red">Q</span>__: Modify find assignment to also detect assignment using replacement functions, i.e. `names(x) <- y`.
   
