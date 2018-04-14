@@ -1388,8 +1388,19 @@ does it work?
 
     rm(mtcars2)
     ```
-
-    __<span style="color:green">A</span>__: see https://speakerdeck.com/hadley/tidy-evaluation-programming-with-ggplot2-and-dplyr?slide=28 ;)
+    
+    __<span style="color:green">A</span>__: 
+    
+    ```{r, eval = FALSE}
+    library(MASS) # quoted
+    
+    mtcars2 <- subset(mtcars, cyl == 4) # 1st: evaluated; 2nd: quoted
+    
+    with(mtcars2, sum(vs)) # 1st: evaluated; 2nd: quoted
+    sum(mtcars2$am) # evaluated (am is quoted via `$`)
+    
+    rm(mtcars2) # quoted
+    ```
 
 1.  __<span style="color:red">Q</span>__: For each function in the following tidyverse code, identify which arguments are quoted and which are evaluated.
 
@@ -1404,12 +1415,40 @@ does it work?
     ggplot(by_cyl, aes(cyl, mean)) + geom_point()
     ```
 
-    __<span style="color:green">A</span>__: https://speakerdeck.com/hadley/tidy-evaluation-programming-with-ggplot2-and-dplyr?slide=31 tbc...
+    __<span style="color:green">A</span>__:
+    
+    ```{r, eval = FALSE}
+    library(dplyr) # quoted
+    library(ggplot2) # quoted
+    
+    by_cyl <- mtcars %>% # evaluated
+      group_by(cyl) %>% # quoted
+      summarise(mean = mean(mpg)) #quoted (`mean`, `mean()` and `mpg`)
+    
+    ggplot(by_cyl, # evaluated
+           aes(cyl, mean)) + #evaluated (cyl and mean are quoted via aes)
+      geom_point() 
+    ```
 
 ## Quotation
 
 1.  __<span style="color:red">Q</span>__: What happens if you try and use `enexpr()` with an expression?
     What happens if you try and use `enexpr()` with a missing argument?
+    
+    __<span style="color:green">A</span>__: In the first case we'll get an error:
+    
+    ```{r, error = TRUE}
+    on_expr <- function(x) {enexpr(expr(x))}
+    on_expr(x + y)
+    ```
+    
+    In the second case a missing argument is returned:
+    
+    ```{r}
+    on_missing <- function(x) {enexpr(x)}
+    on_missing()
+    is_missing(on_missing())
+    ```
 
 1.  __<span style="color:red">Q</span>__: Compare and contrast the following two functions. Can you predict the
     ouput before running them?
@@ -1424,6 +1463,14 @@ does it work?
     f1(a + b, c + d)
     f2(a + b, c + d)
     ```
+    
+    __<span style="color:green">A</span>__: Both return a named list of expressions. `f1()` will return the arguments supplied to `exprs()` within the body of `f1()`. `f2()` will return the arguments suppleid to `f2()`.
+    
+1.  __<span style="color:red">Q</span>__: How are `exprs(a)` and `exprs(a = )` different? Think about both the input and the output.
+    
+    __<span style="color:green">A</span>__: In `exprs(a)` the input of the first unnamed argument is the symbol `a`. So the output is an unnamed list with the first element containing the symbol `a`. In `exprs(a = )` the first argument is named `a` and missing. So the output is a named list with the first element named `a` and containing the missing argument.
+    
+# missing a
 
 1.  __<span style="color:red">Q</span>__: What does the following command return? What information is lost? Why?
 
@@ -1431,6 +1478,14 @@ does it work?
     expr({
       x +              y # comment  
     })
+    ```
+
+    __<span style="color:green">A</span>__: We get the expression `{x + y}`. Whitespaces and comments are lost, because R`s parsing ignores them. However, you can get the source information from the attributes of the expression:
+    
+    ```{r}
+    attributes(expr({
+      x +              y # comment  
+    }))
     ```
 
 1.  __<span style="color:red">Q</span>__: The documentation for `substitute()` says:
