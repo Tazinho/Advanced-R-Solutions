@@ -1469,8 +1469,6 @@ does it work?
 1.  __<span style="color:red">Q</span>__: How are `exprs(a)` and `exprs(a = )` different? Think about both the input and the output.
     
     __<span style="color:green">A</span>__: In `exprs(a)` the input of the first unnamed argument is the symbol `a`. So the output is an unnamed list with the first element containing the symbol `a`. In `exprs(a = )` the first argument is named `a` and missing. So the output is a named list with the first element named `a` and containing the missing argument.
-    
-# missing a
 
 1.  __<span style="color:red">Q</span>__: What does the following command return? What information is lost? Why?
 
@@ -1529,9 +1527,51 @@ does it work?
     mean(c(a, b, c), na.rm = TRUE)
     foo(a = x + y, b = y + z)
     ```
+    
+    __<span style="color:green">A</span>__: 
+    
+    ```{r}
+    #1  (x + y) / (y + z)
+    expr(!!xy / !!yz)
+    #2  -(x + z) ^ (y + z)
+    expr(-(!!xz)^(!!yz))
+    #3  (x + y) + (y + z) - (x + y)
+    expr(!!xy + !!yz - !!xz)
+    #4  atan2(x + y, y + z)
+    expr(atan2(!!xy, !!yz))
+    #5  sum(x + y, x + y, y + z)
+    expr(sum(!!xy, !!xy, !!yz))
+    #6  sum(a, b, c)
+    expr(sum(!!!abc))
+    #7  mean(c(a, b, c), na.rm = TRUE)
+    expr(mean(!!!abc, na.rm = TRUE))
+    #8  foo(a = x + y, b = y + z)
+    expr(foo(a = xy, b = yz))
+    ```
 
 1.  __<span style="color:red">Q</span>__: Explain why both `!0 + !0` and `!1 + !1` return `FALSE` while
     `!0 + !1` returns `TRUE`.
+    
+    __<span style="color:green">A</span>__: To answer this question we look at the AST of the first example:
+    
+    ```{r}
+    ast(!0 + !0)
+    ```
+    
+    As the coercion rules are the same in all examples, we can use the precedence order (right to left) to explain all three examples:
+    
+    * `!0 + !0`:  
+      So the second zero gets coerced to `FALSE` and `!FALSE` becomes `TRUE`.  
+      `0 + TRUE` gets coerced to 1.  
+      `!1` becomes `!TRUE` which is `FALSE`  
+    * `!1 + !1`:  
+      So `!1` is `FALSE`.  
+      `1 + FALSE` is `1`.  
+      `!1` is `!TRUE` so `FALSE`.  
+    * `!0 + !1`:  
+      `!1` is `FALSE`.  
+      `0 + FALSE` is `0`.  
+      `!0` is `TRUE`.  
 
 1.  __<span style="color:red">Q</span>__: Base functions `match.fun()`, `page()`, and `ls()` all try to
     automatically determine whether you want standard or non-standard
@@ -1548,6 +1588,27 @@ does it work?
     ```
 
     What's the difference? Which one is more natural?
+    
+    __<span style="color:green">A</span>__: `call` evalulates its `...` arguments. So in the first call `1:10` will be evaluated to an integer (1, 2, 3, ..., 10) and in the second call `quote()` compensates the effect of the evaluation, so that `b`'s second element will be the expression `1:10` (which is again a call):
+    
+    ```{r, eval = TRUE}
+    as.list(a)
+    as.list(b)
+    ```
+    
+    We can create an example, where we can see the consequences directly:
+    
+    ```{r, eval = TRUE}
+    arg <- seq(10)
+    call1 <- call("mean", arg)
+    print(call1)
+    call2 <- call("mean", quote(arg))
+    print(call2)
+    eval(call1)
+    eval(call2)
+    ```
+    
+    I would prefer the second version, since it behaves more like lazy evaluation. It's better to have call args depends on the calling environment rather than the enclosing environment,that's more similar to normal function behavior.
 
 ## Case studies {#quasi-case-studies}
 
