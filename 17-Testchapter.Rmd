@@ -1636,6 +1636,23 @@ does it work?
 1.  __<span style="color:red">Q</span>__:Implement `partition_rows()` which, like `partition_cols()`, returns two
     data frames, one containing the selected rows, and the other containing
     the rows that weren't selected.
+    
+    __<span style="color:green">A</span>__: We just have to decide if we focus on integer subsetting via `dplyr::slice()` or logical subsetting via `dplyr::filter()`. The rest is straightforward. Since the implementations of both subsetting styles are completely equivalent we just choose one without any particular reason:
+    
+    ```{r}
+    partition_rows <- function(.data, ...){
+      included <- enexprs(...)
+      excluded <- map(included, ~ expr(!(!!.x)))
+      
+      list(
+        incl = filter(.data, !!!included),
+        excl = filter(.data, !!!excluded)
+      )
+    }
+    
+    d <- data.frame(x = 1:6, y = 6:1)
+    partition_rows(d, x <= 3)
+    ```
 
 1.  __<span style="color:red">Q</span>__:Add error handling to `slice()`. Give clear error messages if either
     `along` or `index` have invalid values (i.e. not numeric, not length 1,
@@ -1653,6 +1670,24 @@ does it work?
       }
     }
     ```
+    
+    __<span style="color:green">A</span>__:
+    
+    ```{r}
+    bc2 <- function(lambda){
+      lambda <- enexpr(lambda)
+      
+      if(!!lambda == 0) {
+        new_function(exprs(x = ), expr(log(x)))
+        } else {
+          new_function(exprs(x = ), expr((x^(!!lambda) - 1) / !!lambda))
+        }
+      }
+    
+    bc2(0)
+    bc2(2)
+    bc2(2)(2)
+    ```
 
 1.  __<span style="color:red">Q</span>__:Re-implement the simple `compose()` defined below using quasiquotation and 
     `new_function()`:
@@ -1662,7 +1697,22 @@ does it work?
       function(...) f(g(...))
     }
     ```
-
+    
+    __<span style="color:green">A</span>__: The implementation is straight forward. However, it can become tough to handle all bracktes correct at the first try:
+    
+    ```{r}
+    compose2 <- function(f, g){
+      f <- enexpr(f)
+      g <- enexpr(g)
+      
+      new_function(exprs(... = ), expr((!!f)((!!g)(...))))
+    }
+    
+    compose(sin, cos)
+    compose(sin, cos)(pi)
+    compose2(sin, cos)
+    compose2(sin, cos)(pi)
+    ```
 
 ## Dot-dot-dot (`...`)
 
