@@ -1733,6 +1733,20 @@ does it work?
     set_attr(1:10, x = 10)
     ```
     
+    In this example we first learn that attributes must be named, as correctly given out by the error message. However, this behaviour mainly occures, because the first argument of `set_attr()` is named `x` as in the function call below. So the other argument in the `set_attr()` function call (`1:10`) is the only one, which is supplied as (unnamed) usage of the ellipsis. Therefore `set_attr()` tries to assign `1:10` as attribute to `x = 10` and the error occures.
+
+The function becomes probably clearer and less error-prone when we name the first argument `.x` again. In this case `1:10` will get the (named) attribute `x = 10` assigned:
+
+    ```{r}
+    set_attr <- function(.x, ...) {
+      attr <- rlang::list2(...)
+      
+      attributes(.x) <- attr
+      .x
+    }
+    
+    set_attr(1:10, x = 10)
+    ```
     
 # Evaluation
 
