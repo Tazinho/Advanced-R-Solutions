@@ -8,6 +8,26 @@ knitr::opts_chunk$set(
 Sys.setenv(LANGUAGE = "en")
 library("methods")
 ```
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
+
+Sys.setenv(LANGUAGE = "en")
+library("methods")
+```
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
+
+Sys.setenv(LANGUAGE = "en")
+library("methods")
+```
 
 # Testchapter
 
@@ -24,6 +44,8 @@ library("methods")
     c <- b
     d <- 1:10
     ```
+    
+    __<span style="color:green">A</span>__: `a`, `b`, `c` point to the same object (same address in memory) with the value `1:10`. So this object gets three name bindings. `d` points to another object with the same value.
 
 1.  The following code accesses the mean function in multiple different ways.
     Do they all point to the same underlying function object? Verify with
@@ -37,19 +59,73 @@ library("methods")
     match.fun("mean")
     ```
     
+    __<span style="color:green">A</span>__: Yes, they point to the same object. To confirm that we look at the address of the underlying function object. Since `lobstr::obj_addr()` currently returns an error, we assign each option to a new name and inspect the address via `pryr::address()`:
+    
+    ```{r}
+    pryr::address(mean)
+    
+    x1 <- mean
+    pryr::address(x1)
+    
+    x2 <- base::mean
+    pryr::address(x2)
+    
+    x3 <- get("mean")
+    pryr::address(x3)
+    
+    x4 <- evalq(mean)
+    pryr::address(x4)
+    
+    x5 <- match.fun("mean")
+    pryr::address(x5)
+    ```
+    
 1.  By default, base R data import functions, like `read.csv()`, will automatically
     convert non-syntactic names to syntactic names. Why might this be 
     problematic? What option allows you to suppress this behaviour?
     
+    __<span style="color:green">A</span>__: This might be especially problematic in non-interactive R usage, when R reads and writes data and the output is expected to contain the same names as used in the data source. One can suppress the name conversion via setting the `check.names` argument to `FALSE`.
+    
 1.  What rules does `make.names()` use to convert non-syntactic names into
     syntactic names?
+    
+    __<span style="color:green">A</span>__: A valid name starts with a letter or a dot (not followed by a number). It also consists only of letter, numbers, dots and underscores (since R version 1.9.0). There three main strategies applied to construct syntactically valid names (see also `?make.names`):
+    
+    * prepend an `X`: This strategy is applied d to names which don't start with a letter or start with a dot followed by a number:
+    
+    ```{r}
+    make.names("")
+    make.names(".1")
+    ```
+    
+    * (additionally) non valid characters are replaced by a dot:
+    
+    ```{r}
+    make.names("@")  # prepending + . replacement 
+    make.names("  ")  # prepending + .. replacement
+    make.names("non-valid")  # . replacement
+    ```
+    
+    * reserved R keywords (see `?reserved`) get prepended by a dot:
+    
+    ```{r}
+    make.names("if")
+    ```
+    
+Also mentioned in the help file:
+
+> The definition of a letter depends on the current locale, but only ASCII digits are considered to be digits.
 
 1.  I slightly simplified the rules that govern syntactic names. Why is `.123e1`
     not a syntactic name? Read `?make.names`.
+    
+    __<span style="color:green">A</span>__: It is not syntactically valid as it starts with one dot and is followed by a number.
 
 ## Copy-on-modify
 
 1.  Why is `tracemem(1:10)` not useful?
+
+    __<span style="color:green">A</span>__: Without a binding `1:10` will not stay in memory (there will be no reference) and it makes no sense to track an object for copies which doesn't exist. Also when we assign `1:10` to a name, it will be clear, that `1:10` will only be the value of the object created and there is no "general" object `1:10`, which one would wan't to track.
 
 1.  Explain why `tracemem()` records two copies when you run this code.
     Hint: carefully look at the difference between this code and the code 
@@ -61,6 +137,29 @@ library("methods")
     
     x[[3]] <- 4
     ```
+    
+    __<span style="color:green">A</span>__: Initially `x` is an integer vector. Within the replacement call, we assign a double to the third element of `x`. So besides the new value of the third element also a type conversion (coercion) is triggered affecting whole vector:
+    
+    ```{r}
+    # two copies
+    x <- 1:3
+    tracemem(x)
+    
+    x[[3]] <- 4
+    
+    # the same as 
+    x <- 1:3
+    tracemem(x)
+    
+    x <- 4L
+    x <- as.double(x)
+    
+    # one copy
+    x <- 1:3
+    
+    tracemem(x)
+    x[[3]] <- 4L
+    ```
 
 1.  Sketch out the relationship between the following objects:
 
@@ -69,6 +168,8 @@ library("methods")
     b <- list(a, a)
     c <- list(b, a, 1:10)
     ```
+    
+    __<span style="color:green">A</span>__: `a` contains a reference to an address with the value `1:10`. `b` contains a list of the same reference as `a` (twice). `c` contains a list of `b`, `a` (both containing the same reference three times) and a reference pointing to a different address containing the same value (`1:10`).
 
 1.  What happens when you run this code:
 
@@ -1802,21 +1903,14 @@ The function becomes probably clearer and less error-prone when we name the firs
 1.  __<span style="color:red">Q</span>__: Predict the results of the following lines of code:
 
     ```{r, eval = FALSE}
-    eval(quote(eval(quote(eval(quote(2 + 2))))))
-    eval(eval(quote(eval(quote(eval(quote(2 + 2)))))))
-    quote(eval(quote(eval(quote(eval(quote(2 + 2)))))))
-    ```
-    
-    __<span style="color:green">A</span>__: Quoting add one level of quoting, while evaluation strips it. When there are as many `eval()` commands as `quote()`, the outermost command defines wether the expression will be evaluated or quoted.
-
-    ```{r}
-    ## Some other interesting examples
-    eval(eval(eval(quote(quote(quote(2 + 2))))))  # the outermost eval is needed
-    eval(quote(quote(quote(2 + 2))))  # one eval() is not enough to unqote the expression     completely
-    quote(eval(eval(eval(2 + 2))))  # if the outermost command is a quote, the expression     will always be a quote
+    eval(quote(eval(quote(eval(quote(2 + 2))))))        # -> 4
+    eval(eval(quote(eval(quote(eval(quote(2 + 2)))))))  # -> 4
+    quote(eval(quote(eval(quote(eval(quote(2 + 2))))))) 
+        # eval(quote(eval(quote(eval(quote(2 + 2))))))
     ```
 
-    [needs to be clarified]
+
+    __<span style="color:green">A</span>__: An outside `quote()` always wins...
 
 1.  __<span style="color:red">Q</span>__: Write an equivalent to `get()` using `sym()` and `eval_bare()`. Write an
     equivalent to `assign()` using `sym()`, `expr()`, and `eval_bare()`.
@@ -1886,8 +1980,21 @@ The function becomes probably clearer and less error-prone when we name the firs
 
     ```{r}
     q1 <- new_quosure(expr(x), env(x = 1))
+    q1
+    
     q2 <- new_quosure(expr(x + !!q1), env(x = 10))
+    q2
+    
     q3 <- new_quosure(expr(x + !!q2), env(x = 100))
+    q3
+    ```
+    
+    __<span style="color:green">A</span>__: Each quosure will be evaluated in it's own environment. Hence we get:
+    
+    ```{r}
+    eval_tidy(q1)
+    eval_tidy(q2)
+    eval_tidy(q3)
     ```
 
 1.  __<span style="color:red">Q</span>__: Run this code in your head and predict what it will print. Confirm or 
