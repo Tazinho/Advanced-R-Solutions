@@ -208,6 +208,54 @@ Also mentioned in the help file:
     # obj_size(y)
     # obj_size(x, y)
     ```
+    
+    __<span style="color:green">A</span>__: Since `lobstr::obj_size()` currently throws an error, we use `unclass(pryr::obj_size())` instead. 
+    
+    To predict the size of `x`, we first find out via `object_size(integer(0))` that an integer takes 40 B. For every element of the integer vector additionally 4 B are needed and R allocates memory in chunks of 2, so 8 B at a time. This can be verified for example via `sapply(1:100, function(x) pryr::object_size(integer(x)))`. Overall our prediction will result in 40 B + 1000000 * 4 B = 4000040 B:
+    
+    ```{r}
+    x <- 1:1e6
+    unclass(pryr::object_size(x))
+    ```
+    
+    To predict the size of `y <- list(x, x)` we make usage of the fact that both list elements point to the same memory and hence are the same reference which means neither one needs additional memory. A list takes 40 B in memory and 8 B for each element (we can verify this in the same way as for integers). Overall our prediction will result in x (4000040 B) + list of length 2 (40 B + 16 B):
+    
+    ```{r}
+    y <- list(x, x)
+    unclass(pryr::object_size(y))
+    ```
+    
+    Since `x` and `y` names with bindings to objects that point to the same reference, no additional memory is needed and our prediction is the maximum memory of both objects (y; 4000040 B):
+    
+    ```{r}
+    unclass(pryr::object_size(x, y))
+    ```
+    
+    The next one gets a bit more tricky. Since the first element of `y` becomes different to `x`, a completely new object is created in memory. Hence 10 is of type double, the new object will take more memory. A double needs 40 B + length * 8 B (overall 8000040 B). So we get: first element of `y` (8000040 B) + second element of `y` (`x`; 4000040 B) + list of length 2 (40 B + 16 B) = 12000136 B as our prediction:
+    
+    ```{r}
+    y[[1]][[1]] <- 10
+    unclass(pryr::object_size(y))
+    ```
+    
+    Again all elements of `x` are shared within `y` (`x` is the second element of `y`). So there overall memory usages corresponds to `y``s:
+    
+    ```{r}
+    unclass(pryr::object_size(x, y))
+    ```
+    
+    In the next example also the second element of `y` gets the same value as the first one. However, R does not now, that it is the same as the first element, so a new object is created taking the same amount of memory:
+    
+    ```{r}
+    y[[2]][[1]] <- 10
+    unclass(pryr::object_size(y))
+    ```
+    
+    Now `x` and `y` don't share any values anymore (from Rs perspective) and their memory add up:
+    
+    ```{r}
+    unclass(pryr::object_size(x, y))
+    ```
 
 ## Modify-in-place
 
