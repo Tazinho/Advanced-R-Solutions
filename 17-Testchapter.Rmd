@@ -59,7 +59,7 @@ library("methods")
     match.fun("mean")
     ```
     
-    __<span style="color:green">A</span>__: Yes, they point to the same object. To confirm that we look at the address of the underlying function object. Since `lobstr::obj_addr()` currently returns an error, we assign each option to a new name and inspect the address via `pryr::address()`:
+    __<span style="color:green">A</span>__: Yes, they point to the same object. To confirm that, we look at the address of the underlying function object. Since `lobstr::obj_addr()` currently returns an error, we use `pryr::address()` to inspect the addresses:
     
     ```{r}
     pryr::address(mean)
@@ -89,7 +89,7 @@ library("methods")
 1.  What rules does `make.names()` use to convert non-syntactic names into
     syntactic names?
     
-    __<span style="color:green">A</span>__: A valid name starts with a letter or a dot (not followed by a number). It also consists only of letter, numbers, dots and underscores (since R version 1.9.0). There three main strategies applied to construct syntactically valid names (see also `?make.names`):
+    __<span style="color:green">A</span>__: A valid name starts with a letter or a dot (which must not be followed by a number). It also consists only of letters, numbers, dots and underscores (`"_"` are allowed since R version 1.9.0). There are three main strategies applied to construct syntactically valid names (see also `?make.names`):
     
     * prepend an `X`: This strategy is applied d to names which don't start with a letter or start with a dot followed by a number:
     
@@ -106,7 +106,7 @@ library("methods")
     make.names("non-valid")  # . replacement
     ```
     
-    * reserved R keywords (see `?reserved`) get prepended by a dot:
+    * reserved R keywords (see `?reserved`) get a dot appended:
     
     ```{r}
     make.names("if")
@@ -119,7 +119,7 @@ Also mentioned in the help file:
 1.  I slightly simplified the rules that govern syntactic names. Why is `.123e1`
     not a syntactic name? Read `?make.names`.
     
-    __<span style="color:green">A</span>__: It is not syntactically valid as it starts with one dot and is followed by a number.
+    __<span style="color:green">A</span>__: It is not syntactically valid as it starts with one dot which is followed by a number.
 
 ## Copy-on-modify
 
