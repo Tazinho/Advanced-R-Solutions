@@ -35,8 +35,7 @@ library("methods")
 
 ## Binding basics
 
-1.  Explain the relationship between `a`, `b`, `c` and `d` in the following 
-    code:
+1.  __<span style="color:red">Q</span>__: Explain the relationship between `a`, `b`, `c` and `d` in the following code:
 
     ```{r}
     a <- 1:10
@@ -47,9 +46,7 @@ library("methods")
     
     __<span style="color:green">A</span>__: `a`, `b`, `c` point to the same object (same address in memory) with the value `1:10`. So this object gets three name bindings. `d` points to another object with the same value.
 
-1.  The following code accesses the mean function in multiple different ways.
-    Do they all point to the same underlying function object? Verify with
-    `lobstr::obj_addr()`.
+1.  __<span style="color:red">Q</span>__: The following code accesses the mean function in multiple different ways. Do they all point to the same underlying function object? Verify with `lobstr::obj_addr()`.
     
     ```{r, eval = FALSE}
     mean
@@ -80,14 +77,11 @@ library("methods")
     pryr::address(x5)
     ```
     
-1.  By default, base R data import functions, like `read.csv()`, will automatically
-    convert non-syntactic names to syntactic names. Why might this be 
-    problematic? What option allows you to suppress this behaviour?
+1.  __<span style="color:red">Q</span>__: By default, base R data import functions, like `read.csv()`, will automatically convert non-syntactic names to syntactic names. Why might this be problematic? What option allows you to suppress this behaviour?
     
     __<span style="color:green">A</span>__: This might be especially problematic in non-interactive R usage, when R reads and writes data and the output is expected to contain the same names as used in the data source. One can suppress the name conversion via setting the `check.names` argument to `FALSE`.
     
-1.  What rules does `make.names()` use to convert non-syntactic names into
-    syntactic names?
+1.  __<span style="color:red">Q</span>__: What rules does `make.names()` use to convert non-syntactic names into syntactic names?
     
     __<span style="color:green">A</span>__: A valid name starts with a letter or a dot (which must not be followed by a number). It also consists only of letters, numbers, dots and underscores (`"_"` are allowed since R version 1.9.0). There are three main strategies applied to construct syntactically valid names (see also `?make.names`):
     
@@ -112,24 +106,22 @@ library("methods")
     make.names("if")
     ```
     
-Also mentioned in the help file:
+    Also mentioned in the help file:
 
-> The definition of a letter depends on the current locale, but only ASCII digits are considered to be digits.
+    > The definition of a letter depends on the current locale, but only ASCII digits are considered to be digits.
 
-1.  I slightly simplified the rules that govern syntactic names. Why is `.123e1`
-    not a syntactic name? Read `?make.names`.
+1.  __<span style="color:red">Q</span>__: I slightly simplified the rules that govern syntactic names. Why is `.123e1` not a syntactic name? Read `?make.names`.
     
     __<span style="color:green">A</span>__: It is not syntactically valid as it starts with one dot which is followed by a number.
 
 ## Copy-on-modify
 
-1.  Why is `tracemem(1:10)` not useful?
+1.  __<span style="color:red">Q</span>__: Why is `tracemem(1:10)` not useful?
 
     __<span style="color:green">A</span>__: Without a binding `1:10` will not stay in memory (there will be no reference) and it makes no sense to track an object for copies which doesn't exist. Also when we assign `1:10` to a name, it will be clear, that `1:10` will only be the value of the object created and there is no "general" object `1:10`, which one would wan't to track.
 
-1.  Explain why `tracemem()` records two copies when you run this code.
-    Hint: carefully look at the difference between this code and the code 
-    show earlier in the section.
+1.  __<span style="color:red">Q</span>__: Explain why `tracemem()` records two copies when you run this code. 
+    Hint: carefully look at the difference between this code and the code show earlier in the section.
      
     ```{r, results = FALSE}
     x <- 1:3
@@ -161,7 +153,7 @@ Also mentioned in the help file:
     x[[3]] <- 4L
     ```
 
-1.  Sketch out the relationship between the following objects:
+1.  __<span style="color:red">Q</span>__: Sketch out the relationship between the following objects:
 
     ```{r}
     a <- 1:10
@@ -171,7 +163,7 @@ Also mentioned in the help file:
     
     __<span style="color:green">A</span>__: `a` contains a reference to an address with the value `1:10`. `b` contains a list of the same reference as `a` (twice). `c` contains a list of `b`, `a` (both containing the same reference three times) and a reference pointing to a different address containing the same value (`1:10`).
 
-1.  What happens when you run this code:
+1.  __<span style="color:red">Q</span>__: What happens when you run this code:
 
     ```{r}
     x <- list(1:10)
@@ -182,7 +174,7 @@ Also mentioned in the help file:
 
 ## Object size
 
-1.  Take the following list. Why is its size somewhat misleading?
+1.  __<span style="color:red">Q</span>__: Take the following list. Why is its size somewhat misleading?
 
     ```{r, return = FALSE}
     x <- list(mean, sd, var)
@@ -190,7 +182,7 @@ Also mentioned in the help file:
     #> 16,928 B
     ```
 
-1.  Predict the output of the following code:
+1.  __<span style="color:red">Q</span>__: Predict the output of the following code:
 
     ```{r, eval = FALSE}
     # x <- 1:1e6
@@ -225,20 +217,20 @@ Also mentioned in the help file:
     unclass(pryr::object_size(y))
     ```
     
-    Since `x` and `y` names with bindings to objects that point to the same reference, no additional memory is needed and our prediction is the maximum memory of both objects (y; 4000040 B):
+    Since `x` and `y` are names with bindings to objects that point to the same reference, no additional memory is needed and our prediction is the maximum memory of both objects (y; 4000040 B):
     
     ```{r}
     unclass(pryr::object_size(x, y))
     ```
     
-    The next one gets a bit more tricky. Since the first element of `y` becomes different to `x`, a completely new object is created in memory. Hence 10 is of type double, the new object will take more memory. A double needs 40 B + length * 8 B (overall 8000040 B). So we get: first element of `y` (8000040 B) + second element of `y` (`x`; 4000040 B) + list of length 2 (40 B + 16 B) = 12000136 B as our prediction:
+    The next one gets a bit more tricky. Since the first element of `y` becomes different to `x`, a completely new object is created in memory. Hence 10 is of type double (which triggers a silent coercion), the new object will take more memory. A double needs 40 B + length * 8 B (overall 8000040 B). So we get: first element of `y` (8000040 B) + second element of `y` (`x`; 4000040 B) + list of length 2 (40 B + 16 B) = 12000136 B as our prediction:
     
     ```{r}
     y[[1]][[1]] <- 10
     unclass(pryr::object_size(y))
     ```
     
-    Again all elements of `x` are shared within `y` (`x` is the second element of `y`). So there overall memory usages corresponds to `y``s:
+    Again all elements of `x` are shared within `y` (`x` is the second element of `y`). So the overall memory usage corresponds to `y`'s:
     
     ```{r}
     unclass(pryr::object_size(x, y))
@@ -251,7 +243,7 @@ Also mentioned in the help file:
     unclass(pryr::object_size(y))
     ```
     
-    Now `x` and `y` don't share any values anymore (from Rs perspective) and their memory add up:
+    Now `x` and `y` don't share any values anymore (from Rs perspective) and their memory adds up:
     
     ```{r}
     unclass(pryr::object_size(x, y))
@@ -259,11 +251,69 @@ Also mentioned in the help file:
 
 ## Modify-in-place
 
-1.  Wrap the two methods for subtracting medians into two functions, then
-    use the microbenchmark to carefully compare their speeds. How does
-    performance change as the number of columns increase?
+1.  __<span style="color:red">Q</span>__: Wrap the two methods for subtracting medians into two functions, then use the microbenchmark to carefully compare their speeds. How does performance change as the number of columns increase?
+    
+    __<span style="color:green">A</span>__: We can write one function that handles data frames and lists:
+    
+    ```{r}
+    subtract_medians <- function(x, med){
+      for (i in seq_along(medians)) {
+        x[[i]] <- x[[i]] - medians[[i]]
+      }
+      x
+    }
+    ```
+    
+    The grid we choose is relatively dense to highlight the progress in the plot below:
+    
+    ```{r}
+    n_grid <- c(seq(from = 1   , to = 9   , by = 1),
+                seq(from = 10  , to = 90  , by = 10),
+                seq(from = 100 , to = 900 , by = 100),
+                seq(from = 1000, to = 5000, by = 1000), 
+                10000L)
+    ```
 
-1.  What happens if you attempt to use `tracemem()` on an environment?
+    Let's do our benchmark:
+    
+    ```{r, cache = TRUE}
+    benchmarks <- vector(mode = "list", length = length(n_grid))
+    
+    for (n in seq_along(n_grid)){
+      
+      x <- data.frame(matrix(runif(n_grid[n] * 1e4), ncol = n_grid[n]))
+      xl <- as.list(x)
+      
+      medians <- vapply(x, median, numeric(1))
+      
+      benchmarks[[n]] <- microbenchmark::microbenchmark(
+        subtract_medians(x , median),
+        subtract_medians(xl, median),
+        times = 50L, unit = "ms"
+      )
+    }
+    
+    benchmarks <- dplyr::bind_rows(lapply(benchmarks, function(x) summary(x)))
+    benchmarks[["n"]] <- rep(n_grid, each = 2)
+    ```
+    
+    And plot the results:
+    
+    ```{r}
+    plot(median ~ n, data = benchmarks, col = expr,
+         ylab = "median", xlab = "n")
+    ```
+    
+    Overall the performance difference rises more than linear in the range from 1 to 10000 columns:
+    
+    ```{r}
+    plot(n_grid,
+         abs(diff(benchmarks[["median"]])[c(TRUE, FALSE)]),
+         xlab = "n",
+         ylab = "difference between list and data frame performance in ms")
+    ```
+
+1.  __<span style="color:red">Q</span>__: What happens if you attempt to use `tracemem()` on an environment?
 
 # S3
 
