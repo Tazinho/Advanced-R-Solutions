@@ -1588,17 +1588,25 @@ does it work?
     __<span style="color:green">A</span>__:
     
     ```{r, eval = FALSE}
-    library(dplyr) # quoted
-    library(ggplot2) # quoted
+    library(dplyr)    # dplyr -> quoted
+    library(ggplot2)  # ggplot2 -> quoted
     
-    by_cyl <- mtcars %>% # evaluated
-      group_by(cyl) %>% # quoted
-      summarise(mean = mean(mpg)) #quoted (`mean`, `mean()` and `mpg`)
+    by_cyl <- mtcars %>%  # mtcars -> evaluated
+      group_by(cyl) %>%   # cyl -> quoted
+      summarise(mean = mean(mpg))  # mean, mean() and mpg -> quoted
     
-    ggplot(by_cyl, # evaluated
-           aes(cyl, mean)) + #evaluated (cyl and mean are quoted via aes)
+    ggplot(by_cyl,  # by_cyl -> evaluated
+           aes(cyl, mean)) +  # aes() -> evaluated
+                              # cyl, mean -> quoted (via aes)
       geom_point() 
     ```
+    
+The column names in piped dplyr-statements need to be quoted, so they can be found in the specified dataframe. The names of new variables as defined on the LHS of the `summarise`-expression are also quoted, while the function calls on the RHS will be evaluated.
+
+<!-- TODO: Possibly add a hyperlink to the programming with dplyr-vignette or so. -->
+
+<!-- QUESTION: is `mean(mpg)` really quoted and not evaluated? -->
+<!-- thinking of mean = mean(!! mpg_quo) style, which doesn't unquote the function itsself. -->
 
 ## Quotation
 
