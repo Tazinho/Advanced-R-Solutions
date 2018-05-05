@@ -1608,9 +1608,19 @@ does it work?
     __<span style="color:green">A</span>__: In the first case we'll get an error:
     
     ```{r, error = TRUE}
+    library(rlang)
+    
     on_expr <- function(x) {enexpr(expr(x))}
     on_expr(x + y)
     ```
+    
+    ```{r}
+    expr(x)
+    ```
+    
+    
+<!-- TODO: explain, why this is an error. What is this question aiming at?
+    it seems, that enexpr quotes an argument, where the argument should be evaluated, not quoted.-->
     
     In the second case a missing argument is returned:
     
@@ -1619,6 +1629,8 @@ does it work?
     on_missing()
     is_missing(on_missing())
     ```
+    
+<!-- QUESTION: why is this working. What is the purpose of the missing-argument? -->
 
 1.  __<span style="color:red">Q</span>__: Compare and contrast the following two functions. Can you predict the
     ouput before running them?
