@@ -1562,15 +1562,22 @@ does it work?
     __<span style="color:green">A</span>__: 
     
     ```{r, eval = FALSE}
-    library(MASS) # quoted
+    library(MASS)  # MASS -> quoted
+    # library also accepts "MASS", which would be evaluated
     
-    mtcars2 <- subset(mtcars, cyl == 4) # 1st: evaluated; 2nd: quoted
+    mtcars2 <- subset(mtcars, cyl == 4)  # mtcars -> evaluated
+                                         # cyl    -> quoted
+    with(mtcars2, sum(vs))  # mtcars2 -> evaluated
+                            # sum(vs) -> quoted
+    sum(mtcars2$am)  # matcars$am -> evaluated
+                     # am -> quoted (via `$`)
     
-    with(mtcars2, sum(vs)) # 1st: evaluated; 2nd: quoted
-    sum(mtcars2$am) # evaluated (am is quoted via `$`)
-    
-    rm(mtcars2) # quoted
-    ```
+    rm(mtcars2)  # mtcars2 -> quoted
+```
+
+Some of the arguments (`mtcars` or `mtcars2`) are objects, which can be found in the global environment. When you type them into the console, the object will be returned. Others such as `cyl`, `sum(vs)` or `am` will need to be evaluated within a certain environment. That's why they are quoted.
+
+<!-- TODO: improve explanation, escpecially the last part. -->
 
 1.  __<span style="color:red">Q</span>__: For each function in the following tidyverse code, identify which arguments are quoted and which are evaluated.
 
