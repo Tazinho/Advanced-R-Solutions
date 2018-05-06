@@ -1620,8 +1620,7 @@ does it work?
     is_missing(on_missing())
     ```
 
-1.  __<span style="color:red">Q</span>__: Compare and contrast the following two functions. Can you predict the
-    ouput before running them?
+1.  __<span style="color:red">Q</span>__: Compare and contrast the following two functions. Can you predict the ouput before running them?
 
     ```{r, result = FALSE}
     f1 <- function(x, y) {
@@ -1634,7 +1633,9 @@ does it work?
     f2(a + b, c + d)
     ```
     
-    __<span style="color:green">A</span>__: Both return a named list of expressions. `f1()` will return the arguments supplied to `exprs()` within the body of `f1()`. `f2()` will return the arguments suppleid to `f2()`.
+    __<span style="color:green">A</span>__: Both functions are able to capture multiple arguments and will return a named list of expressions. `f1()` will return the arguments defined within the body of `f1()`, because `exprs()` captures the expressions as specified by the developer during the definition of `f1`.
+    `f2()` will return the arguments supplied to `f2()` as specified by the user when the function is called.
+
     
 1.  __<span style="color:red">Q</span>__: How are `exprs(a)` and `exprs(a = )` different? Think about both the input and the output.
     
