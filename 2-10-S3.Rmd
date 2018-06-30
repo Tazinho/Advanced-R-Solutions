@@ -184,10 +184,10 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     frame built on? What attributes does it use? What are the restrictions 
     placed on the individual elements? What about the names?
     
-    __<span style="color:green">A</span>__: Data frames are built on (named) lists and their only attribute is row.names. Row names must be unique and have the same length as observations within the data. They must be of type integer or character. Also all elements must have the same length. Technically there are no restrictions to column names apart to those of lists, so one could surround special names via backticks at creation (of course this is not recommended). A very good constructor regarding these criteria is already implemented within the S3 package.
+    __<span style="color:green">A</span>__: Data frames are built on (named) lists and their only attribute is row.names. Row names must be unique and have the same length as observations within the data. They must be of type integer or character. Also all elements must have the same length. Technically there are no restrictions to column names apart to those of lists, so one could surround special names via backticks at creation (of course this is not recommended). A very good constructor regarding these criteria is already implemented within the sloop package.
     
     ```{r, comment = ""}
-    S3::new_data.frame
+    sloop::new_data.frame
     ```
 
 1.  __<span style="color:red">Q</span>__: Enhance our `factor()` helper to have better behaviour when one or more `values` is not found in `levels`. What does `base::factor()` do in this situation?
@@ -336,7 +336,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
       NextMethod()
     }
 
-    generic2(S3::new_s3_scalar(class = c("b", "a2")))
+    generic2(sloop::new_s3_scalar(class = c("b", "a2")))
     ```
     
     __<span style="color:green">A</span>__: 
@@ -423,7 +423,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     }
     ```
     
-    A constructor for ordered is already implemented in the S3 package:
+    A constructor for ordered is already implemented in the sloop package:
     
     ```{r}
     new_ordered <- function (x, levels) {
