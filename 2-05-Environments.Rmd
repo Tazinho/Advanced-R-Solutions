@@ -1,0 +1,234 @@
+# Environments
+
+## Environment basics
+
+1.  __<span style="color:red">Q</span>__: List three ways in which an environment differs from a list.  
+__<span style="color:green">A</span>__: The most important differences are:
+    * environments have reference semantics
+    * environments have parents
+    * environments are not ordered
+    * elements of environments need to be (uniquely) named
+
+2.  Create an environment as illustrated by this picture.
+
+    ```{r, echo = FALSE, out.width = NULL}
+    knitr::include_graphics("diagrams/environments/recursive-1.png", dpi = 300)
+    ```
+
+3.  Create a pair of environments as illustrated by this picture.
+
+    ```{r, echo = FALSE, out.width = NULL}
+    knitr::include_graphics("diagrams/environments/recursive-2.png", dpi = 300)
+    ```
+
+4.  Explain why `e[[1]]` and `e[c("a", "b")]` don't make sense when `e` is
+    an environment.
+
+5.  Create a version of `env_poke()` that will only bind new names, never 
+    re-bind old names. Some programming languages only do this, and are known 
+    as [single assignment languages](http://en.wikipedia.org/wiki/Assignment_(computer_science)#Single_assignment).
+
+    
+## Recursing over environments
+
+1.  __<span style="color:red">Q</span>__: Modify `where()` to return all environments that contain a binding for
+    `name`. Carefully think through what type of object the function will need to return.
+    __<span style="color:green">A</span>__: We look at the source code of the original `pryr::where()`:  
+    
+    ```{r, eval = FALSE}
+    pryr::where
+    function (name, env = parent.frame()) 
+      {
+      stopifnot(is.character(name), length(name) == 1)
+      env <- to_env(env)
+      if (identical(env, emptyenv())) { # "base case"
+        stop("Can't find ", name, call. = FALSE)
+        }
+      if (exists(name, env, inherits = FALSE)) { # "success case"
+        env
+        }
+      else { # "recursive case"
+        where(name, parent.env(env)) # we will copy this line in the success case
+      }
+    }
+    ```
+    
+    Since `where()` stops searching when a match appears, we copy the recursive call in the `else` block to the block of the matching ("success") case, so that our new function `where2` will look for a binding within the complete search path. We also need to pay attention to other details. We have to take care to save the bindings in an object, while not overriding it in our recursive calls. So we create a list object for that and define a new function within `where2()` that we call `where2.internal`. `where2.internal()` will do the recursive work and whenever it finds a binding it will write it via `<<-` to the especially created list in its enclosing environment:
+
+    ```{r, eval = FALSE}
+    where2 <- function(name, env = parent.frame()){
+      # we need to collect all environments where name has a binding
+      env_list <- list()
+      
+      # since our function will be recursive and env_list would be overwritten
+      # when it is inside the recursive function, we put it on the outside of
+      # the recursive function and concatenate every binding environment
+      # that we find via the `<<-` operator on its end.
+      # In the following we start by defining the recursive function:
+      where2.internal <- function(name, env = parent.frame()) {
+        stopifnot(is.character(name), length(name) == 1)
+        env <- pryr:::to_env(env) # note that we need to call to_env via pryr:::
+        
+        # when we reach the empty environment, we return all binding environments
+        # (if we found some) if we found no bindings, we give the same error message
+        # as pryr::where does
+        if (identical(env, emptyenv())) {
+          if (length(env_list) != 0){
+            return(env_list)
+            }
+          stop("Can't find ", name, call. = FALSE)
+          }
+        if (exists(name, env, inherits = FALSE)) {
+          # this is a case where we find a binding. the main difference to
+          # pryr::where is that we don't return immediately. Instead we save
+          # the binding environment to env_list and call where2.internal again
+          env_list <<- c(env_list, env)
+          where2.internal(name, parent.env(env))
+          } else {
+            where2.internal(name, parent.env(env))
+          }
+      }
+      
+      # as a last step we just call where2.internal() to start the recursion
+      where2.internal(name, env = parent.frame())
+    }
+    ```   
+    
+    Note that `where2.internal()` still provides the same structure as `pryr::where` does and you can also divide it in "base case", "success case" and "recursive case".
+    
+    TODO: Second part of the question.
+
+2.  __<span style="color:red">Q</span>__: Write a function called `fget()` that finds only function objects. It 
+    should have two arguments, `name` and `env`, and should obey the regular 
+    scoping rules for functions: if there's an object with a matching name 
+    that's not a function, look in the parent. For an added challenge, also 
+    add an `inherits` argument which controls whether the function recurses up 
+    the parents or only looks in one environment.  
+    __<span style="color:green">A</span>__: We can build up our function on the implementation of `get2()` in the last exercise. We only need to add a check via `is.function()`, change the name (also in the recursive call) and the error message:
+    
+    ```{r}
+    fget2 <- function(name, env = parent.frame()){
+      stopifnot(is.character(name), length(name) == 1)
+      env <- pryr:::to_env(env)
+      if (identical(env, emptyenv())) {
+        stop("Could not find function called ", name, call. = FALSE) # 
+        }
+      # here we add the is.function() check
+      if (exists(name, env, inherits = FALSE) && is.function(env[[name]])) {
+        return(env[[name]])
+        }
+      else {
+        fget2(name, parent.env(env))
+      }
+    }
+    ```
+    
+    Note that this function is almost the same as the implementation of `pryr::fget()`:
+    
+    ```{r}
+    pryr::fget
+    ```
+    
+    We add an `inherits` parameter as described in the exercise:
+    
+    ```{r}
+    fget3 <- function(name, env = parent.frame(), inherits = TRUE){
+      stopifnot(is.character(name), length(name) == 1)
+      env <- pryr:::to_env(env)
+      if (identical(env, emptyenv())) {
+        stop("Could not find function called ", name, call. = FALSE) 
+        }
+      if (exists(name, env, inherits = FALSE) && is.function(env[[name]])) {
+        return(env[[name]])
+        }
+      # after the environment, which is specified in the env parameter, is checked
+      # we stop our function in case the new inherits parameter is set to FALSE
+      if(inherits == FALSE){
+        stop("Could not find function called ", name," within ",
+             environmentName(env),
+             call. = FALSE)
+        }
+      else {
+        fget3(name, parent.env(env))
+      }
+    }
+    ```
+
+## Special environments
+
+1.  __<span style="color:red">Q</span>__: How is `search_envs()` different fo `env_parents(global_env())`?
+
+2.  __<span style="color:red">Q</span>__: Draw a diagram that shows the enclosing environments of this function:
+    
+    ```{r, eval = FALSE}
+    f1 <- function(x1) {
+      f2 <- function(x2) {
+        f3 <- function(x3) {
+          x1 + x2 + x3
+        }
+        f3(3)
+      }
+      f2(2)
+    }
+    f1(1)
+    ```  
+    
+    __<span style="color:green">A</span>__: 
+    
+    ```{r, echo = FALSE}
+    knitr::include_graphics("diagrams/enclosing.png", dpi = 96)
+    ```
+    
+3.  __<span style="color:red">Q</span>__: Write an enhanced version of `str()` that provides more information 
+    about functions. Show where the function was found and what environment 
+    it was defined in.  
+    __<span style="color:green">A</span>__: Additionally we provide the function type in the sense of `pryr::ftype`. We use functions from the `pryr` package, since it provides helpers for all requested features:
+    
+    ```{r}
+    fstr <- function(object){
+      if(!is.function(object)){stop("fstr works only for functions")}
+      
+      object_str <- lazyeval::expr_text(object)
+      
+      flist <- list(ftype = pryr::ftype(object),
+                 where = pryr::where(object_str),
+                 enclosing_env = pryr::enclosing_env(object),
+                 args = pryr::fun_args(object)
+                 )
+      
+      return(flist)
+    }
+    ```
+    
+    Note that we wanted to have non standard evaluation like the original `str()` function. Since `pryr::where()` doesn't support non standard evaluation, we needed to catch the name of the supplied `object`. Therefore we used `expr_text()` from the [lazyeval](https://github.com/hadley/lazyeval) package. As a result, `fstr(object = packagename::functionname)` will result in an error in contrast to `str()`.
+
+## Dynamic scope
+
+1.  __<span style="color:red">Q</span>__: Write a function that lists all the variables defined in the environment in which it was called. It should return the same results as `ls()`.
+    __<span style="color:green">A</span>__: 
+
+## `<<-`
+
+2.  __<span style="color:red">Q</span>__: What does this function do? How does it differ from `<<-` and why
+    might you prefer it?
+    
+    ```{r, error = TRUE}
+    rebind <- function(name, value, env = caller_env()) {
+      if (identical(env, empty_env())) {
+        stop("Can't find `", name, "`", call. = FALSE)
+      } else if (env_has(env, name)) {
+        env_poke(env, name, value)
+      } else {
+        rebind(name, value, env_parent(env))
+      }
+    }
+    rebind("a", 10)
+    a <- 5
+    rebind("a", 10)
+    a
+    ```  
+    
+    __<span style="color:green">A</span>__: The function does "more or less" the same as `<<-`. Additionally to `<<-` it has an `env` argument, but this is not a big advantage, since also `assign()` provides this functionality. The main difference is that `rebind()` only does an assignment, when it finds a binding in one of the parent environments of `env`. Whereas:
+    
+    > If `<<-` doesn't find an existing variable, it will create one in the global environment. This is usually undesirable, because global variables introduce non-obvious dependencies between functions.
+    __<span style="color:green">A</span>__: 

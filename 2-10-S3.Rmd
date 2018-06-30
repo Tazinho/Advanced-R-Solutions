@@ -1,0 +1,547 @@
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
+```
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
+```
+# S3
+
+## Basics
+
+1.  __<span style="color:red">Q</span>__: The most important S3 objects in base R are factors, data frames, and date/times (Dates, POSIXct, POSIXlt). You've already seen the attributes and base type that factors are built on. What base types and attributes are the others built on?
+    
+    __<span style="color:green">A</span>__: 
+    
+    **data frame:** Data frames are build up on (named) lists. Together with the `row.names` attribute and after setting the class to "data.frame", we get a classical data frame
+    
+    ```{r}
+    df_build <- structure(list(1:2, 3:4),
+                          names = c("a", "b"),
+                          row.names = 1:2, 
+                          class = "data.frame")
+    
+    df_classic <- data.frame(a = 1:2, b = 3:4)
+    
+    identical(df_build, df_classic)
+    ```
+    
+    **date/times (Dates, POSIXct, POSIXlt):** Date is just a double with the class attribute set to "Date"
+    
+    ```{r}
+    date_build <- structure(0, class = "Date")
+    date_classic <- as.Date("1970-01-01")
+    identical(date_build, date_classic)
+    ```
+    
+    POSIXct is a class for date/times that inherits from POSIXt and is built on doubles as well. The only attribute is tz (for timezone)
+    
+    ```{r}
+    POSIXct_build <- structure(1, class = c("POSIXct", "POSIXt"), tzone = "CET")
+    POSIXct_classic <- .POSIXct(1, tz = "CET") # note that tz's default is NULL
+    identical(POSIXct_build, POSIXct_classic)
+    ```
+    
+    POSIXlt is another date/time class that inherits from POSIXt. It is built on top of a named list and a tzone attribute. Differences between POSIXct and POSIXlt are described in `?DateTimeClasses`.
+    
+    ```{r}
+    POSIXlt_build <- structure(list(sec = 30,
+                                    min = 30L,
+                                    hour = 14L,
+                                    mday = 1L,
+                                    mon = 0L,
+                                    year = 70L,
+                                    wday = 4L,
+                                    yday = 0L,
+                                    isdst = 0L,
+                                    zone = "CET",
+                                    gmtoff = 3600L),
+                               tzone = c("", "CET", "CEST"),
+                               class = c("POSIXlt", "POSIXt"))
+    POSIXlt_classic <- as.POSIXlt(.POSIXct(13.5 * 3600 + 30))
+    identical(POSIXlt_build, POSIXlt_classic)
+    ```
+
+1.  __<span style="color:red">Q</span>__: Describe the difference in behaviour in these two calls.
+
+    ```{r}
+    set.seed(1014)
+    some_days <- as.Date("2017-01-31") + sample(10, 5)
+    
+    mean(some_days)
+    mean(unclass(some_days))
+    ```
+    
+    __<span style="color:green">A</span>__: Since `mean()` is a generic and `some_days` is an object of class Date, the first call results in `mean.Date(some_days)`.  
+    
+    In the second call `unclass()` removes the class attribute from `some_days`, which means that `unclass(some_days)` is not an OO object and the call results in `mean.default(unclass(some_days))`, which calculates the mean of the underlying double.  
+    
+    When you look into the source code of `mean.Date()` (one line), you will see that the difference in the resulting objects is only the class attribute.
+
+1.  __<span style="color:red">Q</span>__: Draw a Venn diagram illustrating the relationships between functions, generics, and methods.
+    
+    __<span style="color:orange">A</span>__: Funtions don't have to be generics or methods, but both the latter are functions. It is also possible that a function is both, a method and a generic, at the same time, which seems to be relatively awkward, so that also the author of the textbook doesn't recommend it, see `?pryr::ftype`
+
+    > This function figures out whether the input function is a regular/primitive/internal function, a internal/S3/S4 generic, or a S3/S4/RC method. This is function is slightly simplified as it's possible for a method from one class to be a generic for another class, but that seems like such a bad idea that hopefully no one has done it.
+
+1.  __<span style="color:red">Q</span>__: What does the `as.data.frame.data.frame()` method do? Why is it confusing? How should you avoid this confusion in your own code?
+    
+    __<span style="color:green">A</span>__: The name is confusing, because it is not clear, from the name, if it is a normal function, a generic or a method. Even if we know, that it is a method, the name doesn't tell us, which part is the name of the generic and which part is the class name.  
+We can easily avoid this confusion, by forgoing to use period separated class and function names.
+
+    To reveal the solution: `as.data.frame.data.frame()` is the data frame method of the `as.data.frame()` generic. Methods of this generic generally coerce objects to data frames.  
+    This specific method strips all class attributes preceding the "data.frame" class.  
+    If row names are supplied, this method will check their length and then set these as new "row.names" attribute.
+
+1.  __<span style="color:red">Q</span>__: What does the following code return? What base type is built on?
+    What attributes does it use?
+    
+    ```{r}
+    x <- ecdf(rpois(100, 10))
+    x
+    ```
+    
+    __<span style="color:green">A</span>__: It returns the Empirical Cumulative Distribution Function of `rpois(100, 10)`. It is built on the base type "closure" and it saves the expression, which was used to create it, in its `call` attribute.
+
+## Classes
+
+1.  __<span style="color:red">Q</span>__: Categorise the objects returned by `lm()`, `factor()`, `table()`, 
+    `as.Date()`, `ecdf()`, `ordered()`, `I()` into "vector", "scalar", and 
+    "other".
+    
+    __<span style="color:green">A</span>__: 
+    
+    vector: `factor()`, `table()`, `as.Date()`, `ordered()`  
+    scalar: `lm()`  
+    other: `ecdf()`, `I()`  
+
+1.  __<span style="color:red">Q</span>__: Write a constructor for `difftime` objects. What base type are they built on? What attributes do they use? You'll need to consult the documentation, read some code, and perform some experiments.
+    
+    __<span style="color:green">A</span>__: Our constructor should be named `new_class_name`, have one argument for its base type and each attribute and check the base types of these arguments as well. 
+    
+    ```{r}
+    new_difftime <- function(x, units = "auto") {
+      stopifnot(is.double(x), is.character(units))
+      
+      structure(x, units = units, class = "difftime")
+    }
+    ```
+    
+    However, since the following result prints awkward
+    
+    ```{r}
+    new_difftime(3)
+    ```
+    
+    we get a little bit more "inspiration" by the original `difftime()` function and make the regarding changes. Basically we need to implement logic for the units attribute, in case it is set to `"auto"` and convert the value of the underlying double from seconds to the regarding unit, as commented in the following
+    
+    ```{r}
+    new_difftime <- function(x, units = "auto") {
+      stopifnot(is.double(x), is.character(units))
+      
+      # case units == "auto":
+      if (units == "auto") 
+        # when all time differences are NA, units should be "secs"
+        units <- if (all(is.na(x))){
+          "secs"
+        } else {
+          # otherwise set the units regarding to the minimal time difference
+          x_min <- min(abs(x), na.rm = TRUE)
+          if (!is.finite(x_min) || x_min < 60) {
+            "secs"
+          } else if (x_min < 3600){
+            "mins"
+          } else if (x_min < 86400){
+            "hours"
+          } else {
+            "days"
+          }
+        }
+      
+      # we rescale the underlying double, according to the units
+      x <- switch(units, 
+                  secs = x,
+                  mins = x/60,
+                  hours = x/3600,
+                  days = x/86400,
+                  weeks = x/(7 * 86400))
+      
+      structure(x, units = units, class = "difftime")
+    }
+    
+    # test
+    new_difftime(c(NA, -3600, 86400))
+    ```
+
+1.  __<span style="color:red">Q</span>__: Write a constructor for `data.frame` objects. What base type is a data 
+    frame built on? What attributes does it use? What are the restrictions 
+    placed on the individual elements? What about the names?
+    
+    __<span style="color:green">A</span>__: Data frames are built on (named) lists and their only attribute is row.names. Row names must be unique and have the same length as observations within the data. They must be of type integer or character. Also all elements must have the same length. Technically there are no restrictions to column names apart to those of lists, so one could surround special names via backticks at creation (of course this is not recommended). A very good constructor regarding these criteria is already implemented within the sloop package.
+    
+    ```{r, comment = ""}
+    sloop::new_data.frame
+    ```
+
+1.  __<span style="color:red">Q</span>__: Enhance our `factor()` helper to have better behaviour when one or more `values` is not found in `levels`. What does `base::factor()` do in this situation?
+    
+    __<span style="color:green">A</span>__: `base::factor()` converts these values (silently) into `NA`'s. To improve our `factor()` helper, we write a more informative error message.
+    
+    ```{r, eval = FALSE}
+    factor <- function(x, levels = unique(x)) {
+      ind <- match(x, levels)
+      
+      # error when values occur, which are not in the levels
+      if(any(is.na(ind))){
+        stop("The following values do not occur in the levels: ",
+             paste(setdiff(x,levels), collapse = ", "), ".", 
+             call. = FALSE)
+        }
+      
+      validate_factor(new_factor(ind, levels))
+    }
+    ```
+
+1.  __<span style="color:red">Q</span>__: Carefully read the source code of `factor()`. What does it do that our constructor does not?
+    
+    __<span style="color:green">A</span>__: It allows more general values as `x` input and converts them to character or replaces them by `character(0)` (in case of `NULL`). It also ensures that the levels are unique. This is done by setting the levels via the `base::levels<-` function, which fails when one tries to supply duplicated level values.
+
+1.  __<span style="color:red">Q</span>__: What would a constructor function for `lm` objects, `new_lm()`, look like?
+    Why is a constructor function less useful for linear models?
+    
+    __<span style="color:orange">A</span>__: 
+    
+    ```{r}
+    new_lm <- function(coefficiets, residuals, effects, rank, fitted.values, assign,
+                       qr, df.residual, xlevels, call, terms, model) {
+      
+      stopifnot(is.double(coefficients), is.double(residuals), is.double(effects),
+                is.integer(rank), is.double(fitted.values), is.integer(assign),
+                is.list(qr), is.integer(df.residual), is.list(xlevels),
+                is.language(call), is.language(terms), is.list(model))
+      
+      structure(
+        list(
+          coefficients = coefficients,
+          residuals = residuals,
+          effects = effects,
+          rank = rank, 
+          fitted.values = fitted.values,
+          assign = assign,
+          qr = qr,
+          df.residual = df.residual,
+          xlevels = xlevels,
+          call = call,
+          terms = terms, 
+          model = model
+          ),
+        class = "lm"
+      )
+      }
+    ```
+
+## Generics and methods
+
+1.  __<span style="color:red">Q</span>__: Read the source code for `t()` and `t.test()` and confirm that `t.test()` is an S3 generic and not an S3 method. What happens if you create an object with class `test` and call `t()` with it? Why?
+    
+    ```{r}
+    x <- structure(1:10, class = "test")
+    t(x)
+    ```
+    
+    __<span style="color:green">A</span>__: We can see that `t.test()` is a generic, because it calls `UseMethod()`
+    
+    ```{r}
+    t.test
+    ```  
+    
+    There are also other (programmatic) possibilities to check this like `pryr::ftype()`, which checks via its internal `pryr:::is_s3_generic`, which uses `codetools::findGlobals()` that `t.test()` contains a call to `UseMethod()`.
+    
+    Interestingly, while digging a bit around in the pryr package, one can also find some dependencies to the tools package, where a list of functions exists, which tells you about some functions that look like methods, but are not.
+    
+    ```{r}
+    tools::nonS3methods("stats")
+    ```
+    
+    However, if we create an object with class `test`, `t()`, will dispatch to `t.test()`. This simply happens, because `UseMethod()` just looks for functions named `paste0("generic", ".", c(class(x), "default"))`. So `t.test()` is erroneously treated like a method of `t()`. Since `t.test()` is a generic itself and doesn't find a method called `t.test.test()`, it dispatches to `t.test.default()`. Just to proof the latter quickly, we specify a method `t.test.test()` and see what happens:
+    
+    ```{r}
+    t.test.test <- function(x) t.default(x)
+    t(x)
+    ```
+
+1.  __<span style="color:red">Q</span>__: Carefully read the documentation for `UseMethod()` and explain why the following code returns the results that it does. What two usual rules of function evaluation does `UseMethod()` violate?
+    
+    ```{r}
+    g <- function(x) {
+      x <- 10
+      y <- 10
+      UseMethod("g")
+    }
+    g.default <- function(x) c(x = x, y = y)
+    
+    x <- 1
+    y <- 1
+    g(x)
+    ```
+    
+    __<span style="color:green">A</span>__: R looks for the `x` argument in `g()`'s calling environment (the global environment), where `x` is defined as 1. Then `g()` dispatches to `g.default()`. The `x` argument is given to `g.default()`. `y` is not defined inside it, so `g.default()` takes `y`'s value from the environment where `UseMethod()` created the call. There `y` is defined as 10.  
+    
+    `UseMethod()` behaves special in many ways, two of them are:
+    
+    * it never "returns" (any statement after `UseMethod` won't be evaluated)
+    * the argument matching can become a bit tricky (generic and methods should have the same order of arguments or you must name them)
+    
+    ```{r}
+    g <- function(x, y) {UseMethod("g")}
+    g.default <- function(y, x) c(x = x, y = y)
+    
+    g(10, 100)
+    g(x = 10, y = 100)
+    ```
+
+## Method dispatch
+
+1.  __<span style="color:red">Q</span>__: Which base generic has the greatest number of defined methods?
+    
+    __<span style="color:green">A</span>__: `print()` has clearly the most
+    
+    ```{r}
+    library(methods)
+    objs <- mget(ls("package:base"), inherits = TRUE)
+    funs <- Filter(is.function, objs)
+    generics <- Filter(function(x) ("generic" %in% pryr::ftype(x)), funs)
+    
+    sort(
+      lengths(sapply(names(generics), function(x) methods(x), USE.NAMES = TRUE)),
+      decreasing = TRUE
+      )[1:3]
+    ```
+
+1.  __<span style="color:red">Q</span>__: Explain what is happening in the following code.
+
+    ```{r}
+    generic2 <- function(x) UseMethod("generic2")
+    generic2.a1 <- function(x) "a1"
+    generic2.a2 <- function(x) "a2"
+    generic2.b <- function(x) {
+      class(x) <- "a1"
+      NextMethod()
+    }
+
+    generic2(sloop::new_s3_scalar(class = c("b", "a2")))
+    ```
+    
+    __<span style="color:green">A</span>__: 
+    
+    * We supply an object of classes `b` and `a2` to `generic2()`, so R will look for a method`generic2.b()`
+    * `generic2.b()` changes the class to `a1` and then calls `NextMethod()`
+    * One could think, that R calls now`generic2.a1()`. But in fact, as mentioned
+    in the textbook, `NextMethod()` 
+    
+        > doesn’t actually work with the class attribute of the object, but instead uses a special global variable (.Class) to keep track of which method to call next.
+
+    * We can easily verify (for example via `print()`) that `.Class` is still `c("b", "a2")` and so `generic2.a2()` gets called.
+
+## Inheritance
+
+1.  __<span style="color:red">Q</span>__: The `ordered` class is a subclass of `factor`, but it's implemented in a very ad hoc way in base R. Implement it in a principled way by building a constructor and an `as_ordered` generic.
+    
+    ```{r}
+    f1 <- factor("a", c("a", "b"))
+    as.factor(f1)  
+    as.ordered(f1) # loses levels
+    ```
+
+    __<span style="color:green">A</span>__: ordered is a subclass of factor, so we need to do the following
+    
+    * for factors: add a subclass argument to the constructor and helper
+    * for ordered: add a constructor
+    * write an `as_ordered()` generic with methods ordered, factor and default
+    
+    We use the **factor** constructor from the textbook and add the subclass argument
+    
+    ```{r}
+    new_factor <- function(x, levels, ..., subclass = NULL) {
+      stopifnot(is.integer(x))
+      stopifnot(is.character(levels))
+      
+      structure(
+        x,
+        levels = levels,
+        class = c(subclass, "factor")
+      )
+    }
+    ```
+    
+    We also use the validator for factors from the textbook
+    
+    ```{r}
+    validate_factor <- function(x) {
+      values <- unclass(x)
+      levels <- attr(x, "levels")
+      
+      if (!all(!is.na(values) & values > 0)) {
+        stop(
+          "All `x` values must be non-missing and greater than zero",
+          call. = FALSE
+        )
+      }
+      
+      if (length(levels) < max(values)) {
+        stop(
+          "There must at least as many `levels` as possible values in `x`",
+          call. = FALSE
+        )
+      }
+      
+      x
+    }
+    ```
+    
+    And we add the subclass argument for the helper from the textbook and the exercises
+    
+    ```{r}
+    factor <- function(x, levels = unique(x), ... , subclass = NULL) {
+      ind <- match(x, levels)
+      
+      # error when values occur, which are not in the levels
+      if(any(is.na(ind))){
+        stop("The following values do not occur in the levels: ",
+             paste(setdiff(x,levels), collapse = ", "), ".", 
+             call. = FALSE)
+        }
+      
+      validate_factor(new_factor(ind, levels, subclass = subclass))
+    }
+    ```
+    
+    A constructor for ordered is already implemented in the sloop package:
+    
+    ```{r}
+    new_ordered <- function (x, levels) {
+      stopifnot(is.integer(x))
+      stopifnot(is.character(levels))
+      structure(x, levels = levels, class = c("ordered", "factor"))
+    }
+    ```
+    
+    The implementation of the **generic** and the first two methods is straight forward
+    
+    ```{r}
+    as_ordered <- function(x, ...) {
+      UseMethod("as_ordered")
+    }
+    
+    as_ordered.ordered <- function(x, ...) x
+    as_ordered.default <- function(x, ...) {
+      stop(
+        "Don't know how to coerce object of class ", 
+        paste(class(x), collapse = "/"), " into an ordered factor", 
+        call. = FALSE
+      )
+    }
+    ```
+    
+    For the factor method of `as_ordered()` we use the factor helper, since it saves us some typing:
+    
+    ```{r}
+    as_ordered.factor <- function(x, ...) {
+      factor(x, attr(x, "levels"), subclass = "ordered")
+    }
+    ```
+    
+    Finally, our new method preserves all levels:
+    
+    ```{r}
+    as_ordered(f1)
+    ```
+    
+    For a real scenario, we might want to add an `as_factor.ordered()` method to the `as_factor()` generic from the textbook.
+        
+1.  __<span style="color:red">Q</span>__: What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
+
+    __<span style="color:green">A</span>__: The following functions belong to this group (see ?`Math`):
+    
+    * abs, sign, sqrt, floor, ceiling, trunc, round, signif
+    * exp, log, expm1, log1p, cos, sin, tan, cospi, sinpi, tanpi, acos, asin, atan, cosh, sinh, tanh, acosh, asinh, atanh
+    * lgamma, gamma, digamma, trigamma
+    * cumsum, cumprod, cummax, cummin
+    
+    The following classes have a method for this group generic:
+    
+    ```{r}
+    methods("Math")
+    ```
+    
+    To read the source code of the S3 classes, we can just enter the name of the method into the console. To get the source code of the S4 classes, we can use `getMethod()`, i. e. `getMethod("Math", "nonStructure")`.
+    
+    To explain the basic idea, we just overwrite the data frame method:
+    
+    ```{r}
+    Math.data.frame <- function(x){"hello"}
+    ```
+    
+    Now all functions from the math generic group, will return `"hello"`
+    
+    ```{r}
+    abs(iris)
+    exp(iris)
+    lgamma(iris)
+    ```
+    
+    So, I hope the idea is clear. However, of course different functions should perform different calculations. Here `.Generic` comes into play, which provides us the calling generic as a string
+
+    ```{r}
+    Math.data.frame <- function(x, ...){
+      .Generic
+    }
+    
+    abs(iris)
+    exp(iris)
+    lgamma(iris)
+    
+    rm(Math.data.frame)
+    ```
+    
+    `Math.data.frame()` is a good example, how to invoke `.Generic` to build sth. constructive up on `.Generic`. `Math.factor()` is a good example of a method, which is simply defined for better error messages.
+
+1.  __<span style="color:red">Q</span>__: R has two classes for representing date time data, `POSIXct` and `POSIXlt`, which both inherit from `POSIXt`. Which generics have different behaviours for the two classes? Which generics share the same behaviour?
+    
+    __<span style="color:green">A</span>__: To answer this question, we have to get the regarding generics
+    
+    ```{r}
+    # generics of POSIXt
+    generics_t <- attr(methods(class = "POSIXt"), "info")[["generic"]]
+    # Generics of POSIXct
+    generics_ct <- attr(methods(class = "POSIXct"), "info")[["generic"]]
+    # generics of POSIXlt
+    generics_lt <- attr(methods(class = "POSIXlt"), "info")[["generic"]]
+    ```
+    
+    Those generics that have a method for POSIXt are potentially sharing the same behaviour (`generics_t`). However, those generics that have a specific method for one of the sublcases have to be subtractet:
+    
+    ```{r}
+    generics_same <- setdiff(generics_t, union(generics_ct, generics_lt))
+    generics_same
+    ```
+    
+    The rest is different
+    
+    ```{r}
+    generics_different <- union(generics_ct, generics_lt)
+    generics_different
+    ```
+
+## Dispatch details
+
+1.  __<span style="color:red">Q</span>__: `Math.difftime()` is more complicated than I described. Why?
+
+    __<span style="color:green">A</span>__: `Math.difftime()` needs to exclude other cases than abs, sign, floor, ceiling, trunc, round and signif and supply an according error message.

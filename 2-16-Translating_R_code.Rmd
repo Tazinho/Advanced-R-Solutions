@@ -1,0 +1,74 @@
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
+```
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
+```
+# Translating R Code
+
+### HTML
+
+1.  __<span style="color:red">Q</span>__: The escaping rules for `<script>` and `<style>` tags are different: you
+    don't want to escape angle brackets or ampersands, but you do want to
+    escape `</script>` or `</style>`.  Adapt the code above to follow these
+    rules.
+    
+    __<span style="color:green">A</span>__: 
+
+1.  __<span style="color:red">Q</span>__: The use of `...` for all functions has some big downsides. There's no
+    input validation and there will be little information in the
+    documentation or autocomplete about how they are used in the function. 
+    Create a new function that, when given a named list of tags and their   
+    attribute names (like below), creates functions which address this problem.
+
+    ```{r, eval = FALSE}
+    list(
+      a = c("href"),
+      img = c("src", "width", "height")
+    )
+    ```
+
+    All tags should get `class` and `id` attributes.
+    
+    __<span style="color:green">A</span>__: 
+
+1.  __<span style="color:red">Q</span>__: Currently the HTML doesn't look terribly pretty, and it's hard to see the
+   structure. How could you adapt `tag()` to do indenting and formatting?
+   
+    __<span style="color:green">A</span>__: 
+
+1.  __<span style="color:red">Q</span>__: Reason about the following code that calls `with_html()` referening objects
+    from the environment. Will it work or fail? Why? Run the code to 
+    verify your predictions.
+    
+    ```{r, eval = FALSE}
+    greeting <- "Hello!"
+    with_html(p(greeting))
+    
+    address <- "123 anywhere street"
+    with_html(p(address))
+    ```
+    
+    __<span style="color:green">A</span>__: 
+    
+## LaTeX
+
+1.  __<span style="color:red">Q</span>__: Add escaping. The special symbols that should be escaped by adding a backslash
+    in front of them are `\`, `$`, and `%`. Just as with HTML, you'll need to 
+    make sure you don't end up double-escaping. So you'll need to create a small 
+    S3 class and then use that in function operators. That will also allow you 
+    to embed arbitrary LaTeX if needed.
+    
+    __<span style="color:green">A</span>__: 
+
+1.  __<span style="color:red">Q</span>__: Complete the DSL to support all the functions that `plotmath` supports.
+
+    __<span style="color:green">A</span>__: 

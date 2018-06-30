@@ -36,8 +36,88 @@ knitr::opts_chunk$set(collapse = TRUE)
 knitr::include_graphics('images/advrs_cover3.png', dpi = NA)
 ```
 
-This book aims to contribute solutions to Hadley Wickham's book [Advanced R](http://adv-r.had.co.nz/).
-We hope to finish the answers to all the exercises in the first half of 2018. The code of the book can be found on [github](https://github.com/Tazinho/Advanced-R-Solutions.git). 
+This book aims to contribute solutions to Hadley Wickham's book [Advanced R](https://adv-r.hadley.nz/). We hope to finish the answers to all the exercises till the end of 2018. The code of the book can be found on [github](https://github.com/Tazinho/Advanced-R-Solutions.git). 
+
+The date of the exercise versions in Hadley’s book (2nd edition) is June 29th 2018.
+
+```{r, echo = FALSE, warning = FALSE}
+df_new <- tibble::tribble(~ `1 Names and values`, ~ `2 Vectors`, ~ `3 Subsetting`, ~ `4 Functions`, ~ `5 Environments`, ~ `6 Conditions`, ~ `7 Functionals`, ~ `8 Function factories`,  ~ `9 Function operators`,  ~ `10 S3`, ~`11 S4`, ~`12 R6`, ~`13 Expressions`, ~`14 Quasiquotation`, ~`15 Evaluation`, ~`16 Translating R code`, ~ `17 Performance`, ~ `18 Optimising code`, ~ `19 High performance functions with Rcpp`,
+                       "x",  "x",  "x",   "x",  "-",  "-",  "x",  "x",  "x",   "x",    "x",  "-",   "x",     "x",   "-",  "-",  "-",  "-",  "x",
+                       "x",  "x",  "x",   "-",  "-",  "-",  "x",  "x",  "x",   "x",    "-",  "-",   "x",     "x",   "x",  "-",  "x",  "-",  "x",
+                       "x",  "x",  "x",   "x",  "-",  "-",  "x",  "x",  "x",   "-",    "x",   NA,   "x",     "x",   "-",  "-",  "x",  "x",  "x",
+                       "x",  "x",  "x",   "x",  "-",  "-",  "x",  "x",  "x",   "x",    "x",   NA,   "x",     "x",   "-",  "-",  "-",  "x",  "x",
+                       "x",  "x",  "x",   "x",  "-",  "-",  "x",  "x",  "x",   "x",    "x",   NA,   "x",     "x",   "-",  "-",  "x",  "x",  "x",
+                       "x",  "x",  "x",   "x",  "x",  "-",  "x",  "x",  "-",   "x",    "-",   NA,   "x",     "x",   "-",  "-",  "-",  "x",  "-",
+                       "x",  "x",  "-",   "x",  "x",  "-",  "x",  "-",  "x",   "x",    "x",   NA,   "x",     "-",   "x",   NA,  "-",  "x",  "x",
+                       "x",  "x",  "x",   "x",  "-",  "-",  "x",  "-",  "x",   "x",     NA,   NA,   "x",     "x",   "-",   NA,  "-",  "x",  "x",
+                       "-",  "x",  "x",   "x",  "x",  "-",  "x",   NA,  "x",   "x",     NA,   NA,   "-",     "x",   "-",   NA,  "-",  "x",  "x",
+                       "-",  "x",  "x",   "x",  "x",  "-",  "x",   NA,  "x",   "x",     NA,   NA,   "x",     "-",   "-",   NA,  "-",  "-",  "-",
+                       "x",  "-",  "x",   "-",  "-",  "-",  "x",   NA,  "-",   "-",     NA,   NA,   "x",     "x",   "-",   NA,  "-",  "x",   NA,
+                       "x",  "x",   NA,   "-",  "x",  "-",  "-",   NA,  "x",   "x",     NA,   NA,   "x",     "-",   "-",   NA,   NA,  "x",   NA,
+                       "-",  "x",   NA,   "x",   NA,  "-",  "x",   NA,  "x",   "x",     NA,   NA,   "x",     "x",   "-",   NA,   NA,  "-",   NA,
+                        NA,  "x",   NA,   "x",   NA,  "-",  "x",   NA,  "-",   "x",     NA,   NA,   "x",     "x",   "-",   NA,   NA,  "x",   NA,
+                        NA,  "-",   NA,   "-",   NA,   NA,  "x",   NA,  "x",   "x",     NA,   NA,   "x",     "x",   "-",   NA,   NA,  "x",   NA,
+                        NA,  "x",   NA,   "-",   NA,   NA,  "x",   NA,  "x",   "x",     NA,   NA,   "x",     "-",   "-",   NA,   NA,  "x",   NA,
+                        NA,   NA,   NA,   "-",   NA,   NA,  "x",   NA,  "-",   "x",     NA,   NA,   "x",     "x",   "-",   NA,   NA,  "x",   NA,
+                        NA,   NA,   NA,   "-",   NA,   NA,  "x",   NA,  "x",   "x",     NA,   NA,   "x",     "x",   "-",   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "-",   NA,   NA,  "x",   NA,  "x",   "x",     NA,   NA,   "x",     "-",   "-",   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "-",   NA,   NA,  "x",   NA,   NA,    NA,     NA,   NA,   "x",     "x",   "-",   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "-",   NA,   NA,  "x",   NA,   NA,    NA,     NA,   NA,   "x",      NA,   "-",   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "-",   NA,   NA,  "x",   NA,   NA,    NA,     NA,   NA,   "x",      NA,    NA,   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "x",   NA,   NA,  "-",   NA,   NA,    NA,     NA,   NA,   "x",      NA,    NA,   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "x",   NA,   NA,  "-",   NA,   NA,    NA,     NA,   NA,   NA,       NA,    NA,   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "x",   NA,   NA,  "-",   NA,   NA,    NA,     NA,   NA,   NA,       NA,    NA,   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "-",   NA,   NA,  "x",   NA,   NA,    NA,     NA,   NA,   NA,       NA,    NA,   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "x",   NA,   NA,  "x",   NA,   NA,    NA,     NA,   NA,   NA,       NA,    NA,   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "-",   NA,   NA,  "x",   NA,   NA,    NA,     NA,   NA,   NA,       NA,    NA,   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "x",   NA,   NA,   NA,   NA,   NA,    NA,     NA,   NA,   NA,       NA,    NA,   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "-",   NA,   NA,   NA,   NA,   NA,    NA,     NA,   NA,   NA,       NA,    NA,   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "x",   NA,   NA,   NA,   NA,   NA,    NA,     NA,   NA,   NA,       NA,    NA,   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "x",   NA,   NA,   NA,   NA,   NA,    NA,     NA,   NA,   NA,       NA,    NA,   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "x",   NA,   NA,   NA,   NA,   NA,    NA,     NA,   NA,   NA,       NA,    NA,   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "x",   NA,   NA,   NA,   NA,   NA,    NA,     NA,   NA,   NA,       NA,    NA,   NA,   NA,   NA,   NA)
+
+df_new[df_new == "x"] <- TRUE
+df_new[df_new == "-"] <- FALSE
+#df_new[df_new == ""] <- NA 
+
+df_new[] <- lapply(df_new, as.logical)
+
+df_new <- df_new %>% mutate(exercise = 1:n())
+
+df_new <- gather_(df_new, "chapter", "solved", setdiff(names(df_new), "exercise"))
+df_new <- df_new %>% filter(!is.na(solved))
+
+quote_solutions <- mean(df_new$solved)
+
+df_new <- df_new %>% separate(chapter, "nr", sep = " ", remove = FALSE) %>% 
+  mutate(nr = as.integer(nr), 
+         chapter = factor(chapter),
+         chapter = fct_reorder(chapter, nr, .desc = TRUE),
+         solved = as.character(solved),
+         id = 1:n())
+df_new <- as_data_frame(df_new)
+
+solved_exercises <- 
+  ggplot(df_new, aes(x = chapter, fill = solved, group = -id)) +
+  scale_y_continuous(expand = c(0,0)) +
+  geom_bar(colour = "white") + 
+  theme(legend.position="none",
+        axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_text(size=12),
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank()) +
+  coord_flip() +
+  theme(axis.line = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank()) +
+  ggtitle(paste0("Solved exercises (", round(100 * quote_solutions), "%)"))
+solved_exercises
+```
 
 The date of the exercise versions in Hadley's book (1st edition) is January 25th 2017.
 
@@ -132,75 +212,6 @@ solved_exercises <-
 solved_exercises
 ```
 
-For the [2nd edition of Advanced R](https://adv-r.hadley.nz/), we are working on solutions of new/updated chapters:
-
-```{r, echo = FALSE, warning = FALSE}
-df_new <- tibble::tribble(~ `1 Names and values`, ~`2 S3`, ~`3 S4`, ~`4 R6`, ~`5 Expressions`, ~`6 Quasiquotation`, ~`7 Evaluation`,
-                       "x",   "x",    "x",  "-",   "x",     "x",   "-",
-                       "x",   "x",    "-",  "-",   "x",     "x",   "x",
-                       "x",   "-",    "x",   NA,   "x",     "x",   "-",
-                       "x",   "x",    "x",   NA,   "x",     "x",   "-",
-                       "x",   "x",    "x",   NA,   "x",     "x",   "-",
-                       "x",   "x",    "-",   NA,   "x",     "x",   "-",
-                       "x",   "x",    "x",   NA,   "x",     "-",   "x",
-                       "x",   "x",     NA,   NA,   "x",     "x",   "-",
-                       "-",   "x",     NA,   NA,   "-",     "x",   "-",
-                       "-",   "x",     NA,   NA,   "x",     "-",   "-",
-                       "x",   "-",     NA,   NA,   "x",     "x",   "-",
-                       "x",   "x",     NA,   NA,   "x",     "-",   "-",
-                       "-",   "x",     NA,   NA,   "x",     "x",   "-",
-                        NA,   "x",     NA,   NA,   "x",     "x",   "-",
-                        NA,   "x",     NA,   NA,   "x",     "x",   "-",
-                        NA,   "x",     NA,   NA,   "x",     "-",   "-",
-                        NA,   "x",     NA,   NA,   "x",     "x",   "-",
-                        NA,   "x",     NA,   NA,   "x",     "x",   "-",
-                        NA,   "x",     NA,   NA,   "x",     "-",   "-",
-                        NA,    NA,     NA,   NA,   "x",     "x",   "-",
-                        NA,    NA,     NA,   NA,   "x",      NA,   "-",  
-                        NA,    NA,     NA,   NA,   "x",      NA,    NA,
-                        NA,    NA,     NA,   NA,   "x",      NA,    NA )
-
-df_new[df_new == "x"] <- TRUE
-df_new[df_new == "-"] <- FALSE
-#df_new[df_new == ""] <- NA 
-
-df_new[] <- lapply(df_new, as.logical)
-
-df_new <- df_new %>% mutate(exercise = 1:n())
-
-df_new <- gather_(df_new, "chapter", "solved", setdiff(names(df_new), "exercise"))
-df_new <- df_new %>% filter(!is.na(solved))
-
-quote_solutions <- mean(df_new$solved)
-
-df_new <- df_new %>% separate(chapter, "nr", sep = " ", remove = FALSE) %>% 
-  mutate(nr = as.integer(nr), 
-         chapter = factor(chapter),
-         chapter = fct_reorder(chapter, nr, .desc = TRUE),
-         solved = as.character(solved),
-         id = 1:n())
-df_new <- as_data_frame(df_new)
-
-solved_exercises <- 
-  ggplot(df_new, aes(x = chapter, fill = solved, group = -id)) +
-  scale_y_continuous(expand = c(0,0)) +
-  geom_bar(colour = "white") + 
-  theme(legend.position="none",
-        axis.text.x = element_blank(),
-        axis.title.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_text(size=12),
-        axis.title.y = element_blank(),
-        axis.ticks.y = element_blank()) +
-  coord_flip() +
-  theme(axis.line = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.border = element_blank(),
-        panel.background = element_blank()) +
-  ggtitle(paste0("Solved exercises (", round(100 * quote_solutions), "%)"))
-solved_exercises
-```
 
 ```{r include=FALSE}
 # automatically create a bib database for R packages
