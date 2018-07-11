@@ -41,15 +41,21 @@ This book aims to contribute solutions to Hadley Wickham's book [Advanced R](htt
 The date of the exercise versions in Hadley’s book (2nd edition) is June 29th 2018.
 
 ```{r, echo = FALSE, warning = FALSE}
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyr))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(forcats))
+suppressPackageStartupMessages(library(methods))
+
 df_new <- tibble::tribble(~ `1 Names and values`, ~ `2 Vectors`, ~ `3 Subsetting`, ~ `4 Functions`, ~ `5 Environments`, ~ `6 Conditions`, ~ `7 Functionals`, ~ `8 Function factories`,  ~ `9 Function operators`,  ~ `10 S3`, ~`11 S4`, ~`12 R6`, ~`13 Expressions`, ~`14 Quasiquotation`, ~`15 Evaluation`, ~`16 Translating R code`, ~ `17 Performance`, ~ `18 Optimising code`, ~ `19 High performance functions with Rcpp`,
-                       "x",  "x",  "x",   "x",  "-",  "-",  "x",  "x",  "x",   "x",    "x",  "-",   "x",     "x",   "-",  "-",  "-",  "-",  "x",
-                       "x",  "x",  "x",   "-",  "-",  "-",  "x",  "x",  "x",   "x",    "-",  "-",   "x",     "x",   "x",  "-",  "x",  "-",  "x",
-                       "x",  "x",  "x",   "x",  "-",  "-",  "x",  "x",  "x",   "-",    "x",   NA,   "x",     "x",   "-",  "-",  "x",  "x",  "x",
-                       "x",  "x",  "x",   "x",  "-",  "-",  "x",  "x",  "x",   "x",    "x",   NA,   "x",     "x",   "-",  "-",  "-",  "x",  "x",
-                       "x",  "x",  "x",   "x",  "-",  "-",  "x",  "x",  "x",   "x",    "x",   NA,   "x",     "x",   "-",  "-",  "x",  "x",  "x",
-                       "x",  "x",  "x",   "x",  "x",  "-",  "x",  "x",  "-",   "x",    "-",   NA,   "x",     "x",   "-",  "-",  "-",  "x",  "-",
-                       "x",  "x",  "-",   "x",  "x",  "-",  "x",  "-",  "x",   "x",    "x",   NA,   "x",     "-",   "x",   NA,  "-",  "x",  "x",
-                       "x",  "x",  "x",   "x",  "-",  "-",  "x",  "-",  "x",   "x",     NA,   NA,   "x",     "x",   "-",   NA,  "-",  "x",  "x",
+                       "x",  "x",  "x",   "x",  "-",  "x",  "x",  "x",  "x",   "x",    "x",  "-",   "x",     "x",   "-",  "-",  "-",  "-",  "x",
+                       "x",  "x",  "x",   "-",  "-",  "x",  "x",  "x",  "x",   "x",    "-",  "-",   "x",     "x",   "x",  "-",  "x",  "-",  "x",
+                       "x",  "x",  "x",   "x",  "-",  "x",  "x",  "x",  "x",   "-",    "x",   NA,   "x",     "x",   "-",  "-",  "x",  "x",  "x",
+                       "x",  "x",  "x",   "x",  "-",  "x",  "x",  "x",  "x",   "x",    "x",   NA,   "x",     "x",   "-",  "-",  "-",  "x",  "x",
+                       "x",  "x",  "x",   "x",  "-",  "x",  "x",  "x",  "x",   "x",    "x",   NA,   "x",     "x",   "-",  "-",  "x",  "x",  "x",
+                       "x",  "x",  "x",   "x",  "x",  "x",  "x",  "x",  "-",   "x",    "-",   NA,   "x",     "x",   "-",  "-",  "-",  "x",  "-",
+                       "x",  "x",  "-",   "x",  "x",  "x",  "x",  "-",  "x",   "x",    "x",   NA,   "x",     "-",   "x",   NA,  "-",  "x",  "x",
+                       "x",  "x",  "x",   "x",  "-",  "x",  "x",  "-",  "x",   "x",     NA,   NA,   "x",     "x",   "-",   NA,  "-",  "x",  "x",
                        "-",  "x",  "x",   "x",  "x",  "-",  "x",   NA,  "x",   "x",     NA,   NA,   "-",     "x",   "-",   NA,  "-",  "x",  "x",
                        "-",  "x",  "x",   "x",  "x",  "-",  "x",   NA,  "x",   "x",     NA,   NA,   "x",     "-",   "-",   NA,  "-",  "-",  "-",
                        "x",  "-",  "x",   "-",  "-",  "-",  "x",   NA,  "-",   "-",     NA,   NA,   "x",     "x",   "-",   NA,  "-",  "x",   NA,
@@ -128,11 +134,6 @@ date()
 
 
 ```{r, echo = FALSE, warning=FALSE}
-suppressPackageStartupMessages(library(dplyr))
-suppressPackageStartupMessages(library(tidyr))
-suppressPackageStartupMessages(library(ggplot2))
-suppressPackageStartupMessages(library(forcats))
-suppressPackageStartupMessages(library(methods))
 df <- tibble::tribble(~`1 Data structures`, ~`2 Subsetting`, ~`3 Functions`, ~`4 OO field guide`, ~`5 Environments`, ~`6 Exceptions and debugging`, ~`7 Functional programming`, ~`8 Functionals`, ~`9 Function operators`, ~`10 Non standard evaluation`, ~`11 Expressions`, ~`12 Domain specific languages`, ~`13 Performance`, ~`14 Profiling`, ~`15 Memory`, ~`16 Rcpp`,
                       "x",             "x",            "x",                 "x",               "x",                           "-",                         "x",              "x",                     "x",                           "x",               "x",                             "-",               "-",             "x",          "x",        "x",
                       "x",             "x",            "x",                 "x",               "x",                           "x",                         "x",              "x",                     "x",                           "x",               "x",                             "-",               "x",             "x",          "x",        "x",                                                                      
