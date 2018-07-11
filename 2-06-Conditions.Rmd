@@ -4,11 +4,58 @@
 
 1.  __<span style="color:red">Q</span>__: Write a wrapper around `file.remove()` that throws an error if the file to be deleted does not exist.
 
+    __<span style="color:green">A</span>__: We have several options here, but for simplicity we use a combination of `options()` and `on.exit()`:
+    
+    ```{r}
+    file_remove_strict <- function(...) {
+      old_warn <- getOption("warn")
+      on.exit(options("warn" = old_warn))
+      options("warn" = 2L)
+      try(file.remove(...))
+    }
+    
+    # Test
+    saveRDS(iris, "iris.RDS")
+    file_remove_strict("iris.RDS")
+    file_remove_strict("iris.RDS")
+    getOption("warn")
+    ```
+
 2.  __<span style="color:red">Q</span>__: What does the `appendLF` argument to `message()` do? How is it related to `cat()`?
+
+    __<span style="color:green">A</span>__: The `appendLF` argument allows to append a new line on the message. Let us illustrate this with a small example function:
+
+    ```{r}
+    bla <- function(appendLF = TRUE) {
+      message("example message", appendLF = appendLF)
+      cat("something to print")
+    }
+    
+    bla(appendLF = TRUE)
+    bla(appendLF = FALSE)
+    ```
+
+    The almost equivalent `cat()` argument is `fill`:
+    
+    ```{r}
+    bla2 <- function(fill = TRUE) {
+      cat("something to print", fill = fill)
+      message("example message")
+    }
+    
+    bla2(fill = TRUE)
+    bla2(fill = FALSE)
+    ```
+    
+    However, in both cases one can ensure a new line via `\n` at the end of the message string.
 
 3.  __<span style="color:red">Q</span>__: What does `options(error = recover)` do? Why might you use it?
 
+    __<span style="color:green">A</span>__: In case of `options(error = recover)` `utils::recover()` will be called (without arguments) in case of an error. This will print out a list of calls which precede the error and lets the user choose to incorporate `browser()` directly in any of the regarding environments allowing a practical mode for debugging.
+
 4.  __<span style="color:red">Q</span>__: What does `options(error = quote(dump.frames(to.file = TRUE)))` do? Why might you use it?
+
+    __<span style="color:green">A</span>__: This options writes a dump of the evaluation environment where an error occurs into a file ending on `.rda`. When this option is set, R will continue to run after the first error. To stop R at the first error use `quote({dump.frames(to.file=TRUE); q()})`. These options are especially useful for debugging non-interactive R scripts afterwards ("post mortem debugging").
 
 ## Handling conditions
 
@@ -27,14 +74,14 @@
       )
     }
     
-    show_condition(stop("!"))
-    show_condition(10)
-    show_condition(warning("?!"))
-    show_condition({
+    show_condition(stop("!"))      # "error"
+    show_condition(10)             # NULL (because no condition is found)
+    show_condition(warning("?!"))  # "warning"
+    show_condition({               
       10
       message("?")
       warning("?!")
-    })
+    })                             # "message"
     ```
 
 1.  __<span style="color:red">Q</span>__: Explain the results of running this code:
@@ -48,10 +95,64 @@
       )
     )
     ```
+    
+    __<span style="color:green">A</span>__: Lets look at the inner `withCallingHandlers()` first:
+    The first message printed by this statement would be `a`, so the outer `withCallingHandlers` prints `b` (1). 
+    Afterwards the message of the inner handler gets printed: `a` (2).
+    Next the inner `withCallingHandlers()` would print `c`, so the outer `withCallingHandlers()` prints again `b` (3). Finally `c` (4) gets printed.
 
 1.  __<span style="color:red">Q</span>__: Read the source code for `catch_cnd()` and explain how it works.
 
+    __<span style="color:green">A</span>__: It basically returns the default result from a wrapped `tryCatch()`, where the expression is forced and ensured that in case of no signalled condition `NULL` is returned instead of the expression's return value. This ensures that we always get the first condition in a list (containing message and call) or `NULL`.
+    
+    ```{r}
+    rlang::catch_cnd
+    ```
+
 1.  __<span style="color:red">Q</span>__: How could you rewrite `show_condition()` to use a single handler?
+
+    __<span style="color:green">A</span>__: We can simply use the `condition` argument of `tryCatch` as shown in `rlang::catch_cond()` above:
+    
+    ```{r}
+    show_condition2 <- function(code) {
+      tryCatch(
+        condition = function(cnd) {
+          if (inherits(cnd, "error"))   {return("error")}
+          if (inherits(cnd, "warning")) {return("warning")}
+          if (inherits(cnd, "message")) {return("message")}
+          },
+        {
+          code
+          NULL
+          }
+      )
+    }
+
+    show_condition2(stop("!"))
+    show_condition2(10)
+    show_condition2(warning("?!"))
+    show_condition2({
+      10
+      message("?")
+      warning("?!")
+    })
+    ```
+    
+    If one can ensure that `"error"`, `"warning"` and `"message"` are always in the next position of the `"condition"` class, this would also work:
+    
+    ```{r}
+    show_condition2 <- function(code) {
+      tryCatch(
+        condition = function(cnd) {
+          class(cnd)[length(class(cnd)) - 1L]
+          },
+        {
+          code
+          NULL
+        }
+      )
+    }
+    ```
 
 ## Custom conditions
 
