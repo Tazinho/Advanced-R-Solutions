@@ -21,7 +21,85 @@ knitr::opts_chunk$set(
     escape `</script>` or `</style>`.  Adapt the code above to follow these
     rules.
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: We can basically just add an `argument` to our `tag()` function and escape the content depending if `tag` is set to `TRUE` (default) or not.
+    
+    Therefore, we first define the regarding functions similar to the textbook:
+    
+    ```{r}
+    library(rlang)
+    library(purrr)
+
+    html <- function(x) structure(x, class = "advr_html")
+    cat_line <- function(...) cat(..., "\n", sep = "")
+
+    print.advr_html <- function(x, ...) {
+      out <- paste0("<HTML> ", x)
+      cat_line(paste(strwrap(out), collapse = "\n"))
+    }
+    
+    escape <- function(x) UseMethod("escape")
+    
+    escape.character <- function(x) {
+      x <- gsub("&", "&amp;", x)
+      x <- gsub("<", "&lt;", x)
+      x <- gsub(">", "&gt;", x)
+  
+      html(x)
+    }
+    
+    escape.advr_html <- function(x) x
+    
+    dots_partition <- function(...) {
+      dots <- dots_list(...)
+      
+      is_named <- names(dots) != ""
+      list(
+        named = dots[is_named],
+        unnamed = dots[!is_named]
+      )
+    }
+    
+    source("dsl-html-attributes.r", local = TRUE)
+    ```
+    
+    And in the `tag()` function we apply the regarding changes:
+    
+    ```{r}
+    tag <- function(tag, escape = TRUE) {
+      new_function(
+        exprs(... = ),
+        expr({
+          dots <- dots_partition(...)
+          attribs <- html_attributes(dots$named)
+          children <- map_chr(dots$unnamed,
+                              # HERE
+                              ~ if (isTRUE(!!escape)){
+                                  escape(.x)
+                                } else {
+                                  .x
+                                })
+          
+          html(paste0(
+            !!paste0("<", tag), attribs, ">",
+            paste(children, collapse = ""),
+            !!paste0("</", tag, ">")
+            ))
+          }),
+      caller_env()
+      )
+    }
+    ```
+
+To test our new `tag()` function we create some HTML:
+
+    ```{r}
+    p <- tag("p")
+    b <- tag("b")
+    script <- tag("script", escape = FALSE)
+    
+    p("Text &", "with &escaping!", b("BOLD &escape!"))
+    script("Script has no escape &&&!")
+    ```
 
 1.  __<span style="color:red">Q</span>__: The use of `...` for all functions has some big downsides. There's no
     input validation and there will be little information in the
