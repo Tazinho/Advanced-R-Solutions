@@ -162,7 +162,28 @@ __<span style="color:green">A</span>__: It replaces all `NA`s within `df` with t
 ## Selecting a single argument
 
 1.  __<span style="color:red">Q</span>__: Come up with as many ways as possible to extract the third value from the `cyl` variable in the `mtcars` dataset.
-    __<span style="color:green">A</span>__: 
+
+    __<span style="color:green">A</span>__: Lets first look at the usual base R options:
+    
+    ```{r}
+    mtcars$cyl[3]  
+    mtcars$cyl[[3]]
+    mtcars[ , "cyl"][3]
+    mtcars[ , "cyl"][[3]]
+    mtcars[["cyl"]][3]
+    mtcars[["cyl"]][[3]]
+    with(mtcars, cyl[3])
+    with(mtcars, cyl[[3]])
+    ```
+    
+    Of course we could also use addon packages like the tidyverse for the subsetting of the `cyl` variable and its third element:
+    
+    ```{r}
+    library(magrittr)
+    mtcars %>% dplyr::pull(cyl) %>% purrr::pluck(3)
+    ```
+    
+    Many more packages, which we are currently not aware of might provide similar functionality.
 
 1.  __<span style="color:red">Q</span>__: Given a linear model, e.g., `mod <- lm(mpg ~ wt, data = mtcars)`, extract
     the residual degrees of freedom. Extract the R squared from the model
