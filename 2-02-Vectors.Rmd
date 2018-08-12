@@ -114,11 +114,40 @@ __<span style="color:green">A</span>__: names, row.names and class.
 
 2.  __<span style="color:red">Q</span>__: What does `as.matrix()` do when applied to a data frame with 
     columns of different types? How does it differ from `data.matrix()`?
+    
     __<span style="color:orange">A</span>__: From `?as.matrix`:
     
     > The method for data frames will return a character matrix if there is only atomic columns and any non-(numeric/logical/complex) column, applying as.vector to factors and format to other non-character columns. Otherwise the usual coercion hierarchy (logical < integer < double < complex) will be used, e.g., all-logical data frames will be coerced to a logical matrix, mixed logical-integer will give a integer matrix, etc.
     
-    TODO: Add second part of the answer
+    To illustrate this, we create an easy example where the data frame gets coerced to a character matrix:
+
+    ```{r}
+    a <- c("a", "b", "c")
+    b <- c(TRUE, FALSE, FALSE)
+    c <- c("TRUE", "FALSE", "FALSE")
+    d <- c(1L, 0L, 2L)
+    e <- c(1.5, 2, 3)
+    f <- c("one" = 1, "two" = 2, "three" = 3)
+    g <- c("first" = 1, "second" = 2, "third" = 3)
+    h <- factor(c("f1", "f2", "f3"))
+    
+    df_cols <- data.frame(a, b, c, d, e, f, g, h, stringsAsFactors = FALSE)
+    
+    # Note that format is applied to the characters, which can complicate
+    # inverse conversion (back to the previous type).
+    # For example TRUE in the b variable becomes " TRUE" (starting with a space)
+    as.matrix(df_cols)
+    ```
+    
+    From ?as.data.matrix:
+    
+    > Return the matrix obtained by converting all the variables in a data frame to numeric mode and then binding them together as the columns of a matrix. Factors and ordered factors are replaced by their internal codes.
+    
+    So for `data.matrix` we'll get a numerix matrix containing `NA`s for original character columns:
+    
+    ```{r}
+    data.matrix(df_cols)
+    ```
 
 3.  __<span style="color:red">Q</span>__: Can you have a data frame with 0 rows? What about 0 columns?  
 __<span style="color:green">A</span>__: Yes, you can create them easily. Also both dimensions can be 0:
