@@ -147,8 +147,23 @@ __<span style="color:green">A</span>__:   As stated in the book:
     x_ok(1:3)
     ```
     
-    __<span style="color:green">A</span>__:
+    __<span style="color:green">A</span>__: The intended usage of `x_ok` is to check if an argument provided to a function is not NULL, has length 1 and is greater then 0. To work with this function, we only want to know if this is `TRUE`, `FALSE` or NA (unknown). Therefore the first version behaves as desired as we can see in the first and the third example.
     
+    `&&` works because it checks from left to right, if **the first element** of every side of the operator evaluates to `TRUE`, `FALSE` or sth. else (another valid value, which gets coerced to logical). In case of `FALSE`, it stops and returns `FALSE`. If none is `FALSE` but at least one is not `TRUE` (after checking all sides), `NA` is returned. This makes sense, since if sth. is neither true nor false, it's logical value is unknown, corresponding to `NA`.
+    
+    Apart from the undesired elementwise evaluation of the `&` operator (at least in this case) it almost works the same. From `?`??``:
+    
+    > ... The shorter form performs elementwise comparisons in much the same way as arithmetic operators. Evaluation proceeds only until the result is determined.
+    
+    However, when combining the results, it takes the lengths of it's arguments into account. Therefore `FALSE & logical(0)` returns `logical(0)`, in contrast `FALSE && logical(0)`, which returns `FALSE`.
+    
+    Returning to the first example, we can see now that this is what leads to the (in this case) undesired behaviour, where neither `TRUE`, `FALSE` nor `NA` gets returend:
+  
+    ```{r}
+    FALSE && NULL > 0
+    FALSE &  NULL > 0
+    ```
+
 2.  The definition of `force()` is simple:
 
     ```{r}
