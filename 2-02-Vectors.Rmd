@@ -89,7 +89,19 @@ in a dataset (which happens often) will not result in coercion.
 __<span style="color:green">A</span>__: `NULL`
 
 2.  __<span style="color:red">Q</span>__: When might you use `NROW()` or `NCOL()`?
-    __<span style="color:orange">A</span>__: 
+    
+    __<span style="color:orange">A</span>__: From `?nrow`:
+    
+    > nrow and ncol return the number of rows or columns present in x. NCOL and NROW do the same treating a vector as 1-column matrix.
+    
+    This behaviour might be useful, to guarantee a numeric result even in cases one is not sure if the result is an atomic or a data frame, i. e. when subsetting of a data frame without `drop = TRUE` is involved:
+    
+    ```{r}
+    nrow(iris[ , "Sepal.Width"])
+    ncol(iris[ , "Sepal.Width"])
+    NROW(iris[ , "Sepal.Width"])
+    NCOL(iris[ , "Sepal.Width"])
+    ```
 
 3.  __<span style="color:red">Q</span>__: If `is.matrix(x)` is `TRUE`, what will `is.array(x)` return?  
     __<span style="color:green">A</span>__: `TRUE`, as also documented in `?array`:
@@ -115,7 +127,7 @@ __<span style="color:green">A</span>__: names, row.names and class.
 2.  __<span style="color:red">Q</span>__: What does `as.matrix()` do when applied to a data frame with 
     columns of different types? How does it differ from `data.matrix()`?
     
-    __<span style="color:orange">A</span>__: From `?as.matrix`:
+    __<span style="color:green">A</span>__: From `?as.matrix`:
     
     > The method for data frames will return a character matrix if there is only atomic columns and any non-(numeric/logical/complex) column, applying as.vector to factors and format to other non-character columns. Otherwise the usual coercion hierarchy (logical < integer < double < complex) will be used, e.g., all-logical data frames will be coerced to a logical matrix, mixed logical-integer will give a integer matrix, etc.
     
@@ -139,7 +151,7 @@ __<span style="color:green">A</span>__: names, row.names and class.
     as.matrix(df_cols)
     ```
     
-    From ?as.data.matrix:
+    From `?as.data.matrix`:
     
     > Return the matrix obtained by converting all the variables in a data frame to numeric mode and then binding them together as the columns of a matrix. Factors and ordered factors are replaced by their internal codes.
     
