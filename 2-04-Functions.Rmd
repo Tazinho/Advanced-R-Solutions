@@ -274,11 +274,22 @@ __<span style="color:green">A</span>__:   As stated in the book:
     show_time()
     ```
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: It works because functions are objects, that can be modified and overwritten, and because of of lazy evaluation. Before the `x` argument is evaluated, the `stop()` function is overwritten by another function which gets called in the last line where `x` is finally evaluated.
+    
+    It's quite confusing, since there is no relation between the default value of `x` and its actual meaning in the context of the `show_time()` function. The user won't have any chance to guess the meaning of `x` or it's default value without looking up a possibly written documentation or analyzing of the source code.
 
 7.  __<span style="color:red">Q</span>__: How many arguments are required when calling `library()`?
 
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: Surprisingly no argument is required. When looking at `?library` we can see under usage, that library has nine arguments and two of them are without default arguments:
+    
+    library(package, help, pos = 2, lib.loc = NULL,
+        character.only = FALSE, logical.return = FALSE,
+        warn.conflicts = TRUE, quietly = FALSE,
+        verbose = getOption("verbose"))
+        
+    However, when we call `library()` without any arguments, we get a list of all available libraries under the current library path (`.libPaths()`) as also document under the details section of the help file:
+    
+    > If library is called with no package or help argument, it lists all available packages in the libraries specified by lib.loc, and returns the corresponding information in an object of class "libraryIQR". (The structure of this class may change in future versions.) Use .packages(all = TRUE) to obtain just the names of all available packages, and installed.packages() for even more information.
 
 ## `...` (dot-dot-dot)
 
@@ -292,7 +303,13 @@ __<span style="color:green">A</span>__:   As stated in the book:
     mean(1, 2, 3, na.omit = TRUE)
     ```
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: The arguments of `sum()` are `...` and `na.rm`. For `...` `sum()` expects "numeric or complex or logical vectors" as documented in `?sum`. So any input not explicitly supplied named with `na.rm` is treated as part of the `...` argument and used for summation.
+    
+    In contrast `mean()` expects as first argument `x` typically a vector, as second argument `trim` a fraction of observations to be trimmed from each end of `x` and again `na.rm`. As both: `trim = 2` and `na.rm = 3` have not effect on the calculation of the mean of `1`, we get `1` as the result.
+    
+    In the next call, `na.omit` is supplied via the `...` argument to `sum()`, which treats it as logical vector and builds its sum with the other arguments.
+    
+    Finally in the last call to `mean` `na.omit = TRUE` is neither needed as part of the default method nor is it used for the mean calculation, since `mean()` calculates it's value only from its `x` argument.
 
 2.  __<span style="color:red">Q</span>__: In the following call, explain how to find the documentation for the
     named arguments in the following function call:
@@ -301,7 +318,17 @@ __<span style="color:green">A</span>__:   As stated in the book:
     plot(1:10, col = "red", pch = 20, xlab = "x", col.lab = "blue")
     ```
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: First we type `?plot` in the console and scan the usage section:
+    
+    ```
+    plot(x, y, ...)
+    ```
+    
+    Obviously we have to look under the `...` bullet in the arguments section.
+    
+    There we can find a bullet for `xlab` (check), and follow the recommendation to visit `?par` for further arguments. 
+    
+    From there we type "col" into the search bar, which leads us to a recommentation to search further under `Color Specification` (check). Again using the search we find a bullet for the `pch` argument. From there we get also the recommendation to look under `?points` for more specific settings (check). Finally we use the search functionality to find `col.lab` also as a bullet inside `?par`.
     
 3.  __<span style="color:red">Q</span>__: Why does `plot(1:10, col = "red")` only colour the points, not the axes 
     or labels? Read the source code of `plot.default()` to find out.
