@@ -26,10 +26,12 @@
    and shouldn't need to use `{}`. Review your code. Where could you have 
    used an anonymous function instead of a named function? Where should you 
    have used a named function instead of an anonymous function?  
+    
     __<span style="color:green">A</span>__: 
    
 4.  __<span style="color:red">Q</span>__: What function allows you to tell if an object is a function? What function
-    allows you to tell if a function is a primitive function?  
+    allows you to tell if a function is a primitive function?
+    
     __<span style="color:green">A</span>__: You can test objects with `is.function` and `is.primitive`.
 
 5.  __<span style="color:red">Q</span>__: This code makes a list of all functions in the base package. 
@@ -76,12 +78,14 @@
     ```  
     
 6. __<span style="color:red">Q</span>__: What are the three important components of a function?  
-__<span style="color:green">A</span>__: `body()`, `formals()` and `environment()`.
+    
+    __<span style="color:green">A</span>__: `body()`, `formals()` and `environment()`.
     
     > There is one exception to the rule that functions have three components. Primitive functions, like `sum()`, call C code directly with `.Primitive()` and contain no R code. Therefore their `formals()`, `body()`, and `environment()` are all `NULL`.
 
 7. __<span style="color:red">Q</span>__: When does printing a function not show what environment it was created in?  
-__<span style="color:green">A</span>__: When it was created in the global environment.
+
+    __<span style="color:green">A</span>__: When it was created in the global environment.
 
 ## Lexical Scoping
 
@@ -95,7 +99,8 @@ __<span style="color:green">A</span>__: When it was created in the global enviro
     __<span style="color:green">A</span>__: A named vector c, which first field has the value 10 and the name "c". The first "c" is the `c()` function, the second is the name of the first entry and the third is the value of the first entry.
        
 2. __<span style="color:red">Q</span>__: What are the four principles that govern how R looks for values?  
-__<span style="color:green">A</span>__:   As stated in the book:
+    
+    __<span style="color:green">A</span>__:   As stated in the book:
     
     > There are four basic principles behind R's implementation of lexical scoping:
     * name masking
@@ -217,7 +222,6 @@ __<span style="color:green">A</span>__:   As stated in the book:
     f3()
     ```
 
-
     or we evaluate `y` once before and once after the evaluation of `x`
     
     ```{r}    
@@ -333,17 +337,29 @@ __<span style="color:green">A</span>__:   As stated in the book:
 3.  __<span style="color:red">Q</span>__: Why does `plot(1:10, col = "red")` only colour the points, not the axes 
     or labels? Read the source code of `plot.default()` to find out.
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: It is easiest to start by adding `browser()` to the first line of `plot.default()` and interactively run `plot(1:10, col = "red")`. In this way we can see how the plot is build during the last lines and especially find out where the axis are added. This leads us to the function call:
+
+    ```{r, eval = FALSE}
+    localTitle(main = main, sub = sub, xlab = xlab, ylab = ylab, ...)
+    ```
+    
+    The `localTitle()` function was defined in the first lines of `plot.default()` as:
+
+    ```{r, eval = FALSE}
+    localTitle <- function(..., col, bg, pch, cex, lty, lwd) title(...)
+    ```
+    
+    So the call to `localTitle()` clearly gets the `col` parameter as part of `...` argument. To find out if it is used we try following the source code of `title()`, which leads us to a line of C code. Instead of following further, can we stay in R and look at `?title`, which brings some clarity on the fact that the `title()` function specifies four parts of the plot: Main (title of the plot), sub (sub-title of the plot) and both axis labels. Therefore it would introduce ambiguity inside `title()` to use `col` directly. Instead on has the option to supply `col` via the `...` argument as `col.labs` or as part of `xlab` (similar for `ylab`) in the form `xlab = list(c("index"), col = "red")`.
 
 ## Exiting a function
 
 1. __<span style="color:red">Q</span>__: What does `load()` return? Why don’t you normally see these values?
 
-    __<span style="color:green">A</span>__:
+    __<span style="color:green">A</span>__: `load()` reloads datasets written with the function `save()`. It returns a character vector of the names of objects created, invisibly. To see the names of the objects, one can set the `verbose` argument to `TRUE`, which triggers a regarding `if` statement in the function`s body. However, to print the value of the names it is also feasible to use brackets around the `load()` call to autoprint the returned value.
 
 2. __<span style="color:red">Q</span>__: What does `write.table()` return? What would be more useful?
 
-    __<span style="color:green">A</span>__:
+    __<span style="color:green">A</span>__: It invisibly returns `NULL`. It would be more useful to invisibly return the (data frame) object to be written as for example the **readr** package does. In this way it would be possible to save intermediate results from a sequence of processing steps directly, i.e. within a magrittr pipeline.
     
 3.  __<span style="color:red">Q</span>__: How does the `chdir` parameter of `source()` compare to `in_dir()`? Why 
     might you prefer one approach to the other?
@@ -364,6 +380,7 @@ __<span style="color:green">A</span>__:   As stated in the book:
 
 4.  __<span style="color:red">Q</span>__: Write a function that opens a graphics device, runs the supplied code, and 
     closes the graphics device (always, regardless of whether or not the plotting code worked).  
+    
     __<span style="color:green">A</span>__: 
     
     ```{r, eval = FALSE}
@@ -409,6 +426,14 @@ __<span style="color:green">A</span>__:   As stated in the book:
     ```
     
     __<span style="color:green">A</span>__: 
+    
+    ```{r, eval = FALSE}
+    `+`(`+`(1, 2), 3)
+    
+    `+`(1, `(`(`+`(2, 3)))
+    
+    `if`(`<=`(length(x), 5), `[[`(x, 5), `[[`(x, n))
+    ```
 
 2.  __<span style="color:red">Q</span>__: Clarify the following list of odd function calls:
 
@@ -430,8 +455,9 @@ __<span style="color:green">A</span>__:   As stated in the book:
     
     __<span style="color:green">A</span>__: 
     
-4.  __<span style="color:red">Q</span>__: Create a replacement function that modifies a random location in a vector.  
-__<span style="color:green">A</span>__: 
+4.  __<span style="color:red">Q</span>__: Create a replacement function that modifies a random location in a vector.
+    
+    __<span style="color:green">A</span>__: 
 
     ```{r, eval = FALSE}
     `random<-` <- function(x, value){
@@ -451,11 +477,29 @@ __<span style="color:green">A</span>__:
     #> [1] "ab"
     ```
 
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: We can simply override the `+` operator. In this case we need to take a bit of care to not use the `+` operator itself inside of the function definition, since otherwise we would end in an infinite recursion (a special case of an infinite loop). We also add `b = 0L` as a default value keep the behaviour of `+` as a unary operator, i.e. to keep `+ 1` working and not throwing an error:
+    
+    ```{r}
+    `+` <- function(a, b = 0L){
+      if (is.character(a) && is.character(b)) {return(paste0(a, b))}
+      a -- b
+    }
+    
+    # tests
+    + 1
+    
+    1 + 2
+    
+    "a" + "b"
+    
+    # return back to the original `+` operator behaviour
+    rm(`+`)
+    ```
 
 6. __<span style="color:red">Q</span>__: Create a list of all the replacement functions found in the base package. 
    Which ones are primitive functions? (Hint use `apropros()`)
-   __<span style="color:green">A</span>__: We can find replacementfunctions by searching for functions that end on "<-":
+   
+    __<span style="color:green">A</span>__: We can find replacementfunctions by searching for functions that end on "<-":
     ```{r, eval = FALSE}
     repls <- funs[grepl("<-$", names(funs))]
     Filter(is.primitive, repls)
@@ -467,8 +511,9 @@ __<span style="color:green">A</span>__:
     
     > All user-created infix functions must start and end with `%` ... they can contain any sequence of characters (except “%”, of course).
 
-8. __<span style="color:red">Q</span>__: Create an infix `xor()` operator.  
-__<span style="color:green">A</span>__: 
+8. __<span style="color:red">Q</span>__: Create an infix `xor()` operator.
+    
+    __<span style="color:green">A</span>__: 
 
     ```{r}
     `%xor_%` <- function(a, b){
@@ -479,7 +524,8 @@ __<span style="color:green">A</span>__:
 9. __<span style="color:red">Q</span>__: Create infix versions of the set functions `intersect()`, `union()`, and
    `setdiff()`. You might call them `%n%`, `%u%`, and `%/%` to match 
    conventions from mathematics.
-   __<span style="color:green">A</span>__: 
+   
+    __<span style="color:green">A</span>__: 
    
     ```{r}
     `%union_%` <- function(a, b){
