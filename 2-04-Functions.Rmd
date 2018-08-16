@@ -453,7 +453,37 @@
     #> Error: target of assignment expands to non-language object
     ```
     
-    __<span style="color:green">A</span>__: 
+    __<span style="color:green">A</span>__: First let define `x` and recall the definition of `modify()` from the textbook:
+    
+    ```{r}
+    x <- 1:3
+    
+    `modify<-` <- function(x, position, value) {
+      x[position] <- value
+      x
+    }
+    ```
+    
+    As described in the textbook R turns the code behind the scenes into
+    
+    ```{r, eval = FALSE}
+    get("x") <- `modify<-`(get("x"), 1, 10)
+    #> Error in get("x") <- `modify<-`(get("x"), 1, 10) : target of assignment expands to non-language object
+    ```
+    
+    which can not work, because `get()` has no equivalent replacement function. To confirm this claim, we can reproduce the error via an easier example
+    
+    ```{r, eval = FALSE}
+    get("x") <- 2
+    #> Error in get("x") <- 2 : target of assignment expands to non-language object
+    ```
+    
+    and modify the example to use a function with an available replacement function:
+    
+    ```{r}
+    modify(names(x), 1) <- 10
+    names(x)
+    ```
     
 4.  __<span style="color:red">Q</span>__: Create a replacement function that modifies a random location in a vector.
     
