@@ -2,37 +2,62 @@
 
 ## Environment basics
 
-1.  __<span style="color:red">Q</span>__: List three ways in which an environment differs from a list.  
-__<span style="color:green">A</span>__: The most important differences are:
+1.  __<span style="color:red">Q</span>__: List three ways in which an environment differs from a list.
+
+    __<span style="color:green">A</span>__: The most important differences are:
     * environments have reference semantics
     * environments have parents
     * environments are not ordered
     * elements of environments need to be (uniquely) named
 
-2.  Create an environment as illustrated by this picture.
+2.  __<span style="color:red">Q</span>__: Create an environment as illustrated by this picture.
 
     ```{r, echo = FALSE, out.width = NULL}
     knitr::include_graphics("diagrams/environments/recursive-1.png", dpi = 300)
     ```
+    
+    __<span style="color:green">A</span>__: 
+    
+    ```{r}
+    e1 <- rlang::env()
+    e1$loop <- e1
+    ```
 
-3.  Create a pair of environments as illustrated by this picture.
+3.  __<span style="color:red">Q</span>__: Create a pair of environments as illustrated by this picture.
 
     ```{r, echo = FALSE, out.width = NULL}
     knitr::include_graphics("diagrams/environments/recursive-2.png", dpi = 300)
     ```
+    
+    __<span style="color:green">A</span>__: 
+    
+    ```{r}
+    e1 <- rlang::env()
+    e2 <- rlang::env()
+    
+    e1$loop   <- e2
+    e2$dedoop <- e1
+    ```
 
-4.  Explain why `e[[1]]` and `e[c("a", "b")]` don't make sense when `e` is
+4.  __<span style="color:red">Q</span>__: Explain why `e[[1]]` and `e[c("a", "b")]` don't make sense when `e` is
     an environment.
+    
+    __<span style="color:orange">A</span>__: The first option doesn't make sense, because elements of an environment are not ordered. 
+    
+    TODO: 2nd part of the question...
 
-5.  Create a version of `env_poke()` that will only bind new names, never 
+5.  __<span style="color:red">Q</span>__: Create a version of `env_poke()` that will only bind new names, never 
     re-bind old names. Some programming languages only do this, and are known 
     as [single assignment languages](http://en.wikipedia.org/wiki/Assignment_(computer_science)#Single_assignment).
+    
+    __<span style="color:green">A</span>__: 
 
     
 ## Recursing over environments
 
 1.  __<span style="color:red">Q</span>__: Modify `where()` to return all environments that contain a binding for
     `name`. Carefully think through what type of object the function will need to return.
+    
     __<span style="color:green">A</span>__: We look at the source code of the original `pryr::where()`:  
     
     ```{r, eval = FALSE}
