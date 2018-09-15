@@ -172,6 +172,18 @@
 
 ## Object size
 
+1.  __<span style="color:red">Q</span>__: In the following example, why are `object.size(y)` and `obj_size(y)`
+    so radically different? Consult the documentation of `object.size()`.
+
+    ```{r}
+    y <- rep(list(runif(1e4)), 100)
+    
+    object.size(y)
+    obj_size(y)
+    ```
+    
+    __<span style="color:green">A</span>__: `object.size()` doesn't account for shared elements within lists.
+
 1.  __<span style="color:red">Q</span>__: Take the following list. Why is its size somewhat misleading?
 
     
