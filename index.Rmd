@@ -48,10 +48,10 @@ suppressPackageStartupMessages(library(forcats))
 suppressPackageStartupMessages(library(methods))
 
 df_new <- tibble::tribble(~ `1 Names and values`, ~ `2 Vectors`, ~ `3 Subsetting`, ~ `4 Functions`, ~ `5 Environments`, ~ `6 Conditions`, ~ `7 Functionals`, ~ `8 Function factories`,  ~ `9 Function operators`,  ~ `10 S3`, ~`11 S4`, ~`12 R6`, ~`13 Expressions`, ~`14 Quasiquotation`, ~`15 Evaluation`, ~`16 Translating R code`, ~ `17 Performance`, ~ `18 Optimising code`, ~ `19 High performance functions with Rcpp`,
-                       "x",  "x",  "x",   "x",  "x",  "x",  "x",  "x",  "x",   "x",    "x",  "-",   "x",     "x",   "-",  "x",  "-",  "-",  "x",
-                       "x",  "x",  "x",   "x",  "x",  "x",  "x",  "x",  "x",   "x",    "-",  "-",   "x",     "x",   "x",  "-",  "x",  "-",  "x",
-                       "x",  "x",  "x",   "x",  "x",  "x",  "x",  "x",  "x",   "-",    "x",   NA,   "x",     "x",   "-",  "-",  "x",  "x",  "x",
-                       "x",  "x",  "x",   "x",  "-",  "x",  "x",  "x",  "x",   "x",    "x",   NA,   "x",     "x",   "-",  "-",  "-",  "x",  "x",
+                       "x",  "x",  "x",   "x",  "x",  "x",  "x",  "x",  "x",   "x",    "x",  "-",   "x",     "x",   "x",  "x",  "-",  "-",  "x",
+                       "x",  "x",  "x",   "x",  "x",  "x",  "x",  "x",  "x",   "x",    "-",  "-",   "x",     "x",   "o",  "o",  "x",  "-",  "x",
+                       "x",  "x",  "x",   "x",  "x",  "x",  "x",  "x",  "x",   "-",    "x",   NA,   "x",     "x",   "-",  "x",  "x",  "x",  "x",
+                       "x",  "x",  "x",   "x",  "-",  "x",  "x",  "x",  "x",   "x",    "x",   NA,   "x",     "x",   "-",  "x",  "-",  "x",  "x",
                        "x",  "x",  "x",   "x",  "-",  "x",  "x",  "x",  "x",   "x",    "x",   NA,   "x",     "x",   "-",  "-",  "x",  "x",  "x",
                        "x",  "x",  "x",   "x",  "x",  "x",  "x",  "x",  "-",   "x",    "-",   NA,   "x",     "x",   "-",  "-",  "-",  "x",  "-",
                        "x",  "x",  "x",   "x",  "x",  "x",  "x",  "-",  "x",   "x",    "x",   NA,   "x",     "-",   "x",   NA,  "-",  "x",  "x",
@@ -83,18 +83,14 @@ df_new <- tibble::tribble(~ `1 Names and values`, ~ `2 Vectors`, ~ `3 Subsetting
                         NA,   NA,   NA,   "x",   NA,   NA,   NA,   NA,   NA,    NA,     NA,   NA,   NA,       NA,    NA,   NA,   NA,   NA,   NA,
                         NA,   NA,   NA,   "x",   NA,   NA,   NA,   NA,   NA,    NA,     NA,   NA,   NA,       NA,    NA,   NA,   NA,   NA,   NA)
 
-df_new[df_new == "x"] <- TRUE
-df_new[df_new == "-"] <- FALSE
-#df_new[df_new == ""] <- NA 
-
-df_new[] <- lapply(df_new, as.logical)
+df_new[] <- lapply(df_new, as.character)
 
 df_new <- df_new %>% mutate(exercise = 1:n())
 
 df_new <- gather_(df_new, "chapter", "solved", setdiff(names(df_new), "exercise"))
 df_new <- df_new %>% filter(!is.na(solved))
 
-quote_solutions <- mean(df_new$solved)
+quote_solutions <- mean(df_new$solved == "x")
 
 df_new <- df_new %>% separate(chapter, "nr", sep = " ", remove = FALSE) %>% 
   mutate(nr = as.integer(nr), 
@@ -104,25 +100,30 @@ df_new <- df_new %>% separate(chapter, "nr", sep = " ", remove = FALSE) %>%
          id = 1:n())
 df_new <- as_data_frame(df_new)
 
-solved_exercises <- 
+solved_exercises <-
   ggplot(df_new, aes(x = chapter, fill = solved, group = -id)) +
-  scale_y_continuous(expand = c(0,0)) +
-  geom_bar(colour = "white") + 
-  theme(legend.position="none",
-        axis.text.x = element_blank(),
-        axis.title.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_text(size=12),
-        axis.title.y = element_blank(),
-        axis.ticks.y = element_blank()) +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_fill_manual(values = c("#F99992", "orange", "#00BFC4")) +
+  geom_bar(colour = "white") +
+  theme(
+  legend.position = "none",
+  axis.text.x = element_blank(),
+  axis.title.x = element_blank(),
+  axis.ticks.x = element_blank(),
+  axis.text.y = element_text(size = 12),
+  axis.title.y = element_blank(),
+  axis.ticks.y = element_blank()
+  ) +
   coord_flip() +
-  theme(axis.line = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.border = element_blank(),
-        panel.background = element_blank()) +
-  ggtitle(paste0("Solved exercises (", round(100 * quote_solutions), "%)"))
-solved_exercises
+  theme(
+  axis.line = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.border = element_blank(),
+  panel.background = element_blank()
+  ) +
+  ggtitle(paste0("Solved exercises (", round(100 * quote_solutions, 2), "%)"))
+  solved_exercises
 ```
 
 The date of the exercise versions in Hadley's book (1st edition) is January 25th 2017.
@@ -220,5 +221,9 @@ knitr::write_bib(c(
   .packages(), 'bookdown', 'knitr', 'rmarkdown'
 ), 'packages.bib')
 ```
+
+# Acknowledgements
+
+We would like to thank everyone who contrihubted to our project via fixing typos, grammer or revising whole exercises. Thank you: @caijun, @3zhang, @lotgon 
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work by Malte Grosser, Henning Bumann, Peter Hurford & Robert Krzyzanowski is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>
