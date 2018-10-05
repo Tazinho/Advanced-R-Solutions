@@ -110,7 +110,15 @@ knitr::opts_chunk$set(
     
 1.  __<span style="color:red">Q</span>__: How are `exprs(a)` and `exprs(a = )` different? Think about both the input and the output.
     
-    __<span style="color:green">A</span>__: In `exprs(a)` the input of the first unnamed argument is the symbol `a`. So the output is an unnamed list with the first element containing the symbol `a`. In `exprs(a = )` the first argument is named `a` and missing. So the output is a named list with the first element named `a` and containing the missing argument.
+    __<span style="color:green">A</span>__: In `exprs(a)` the input `a` is interpreted as a symbol for an unnamed argument. Consequently the output shows an unnamed list with the first element containing the symbol `a`. In `exprs(a = )` the first argument is named `a`, but then no value is provided. This leads to the output of a named list with the first element named `a`, which contains the missing argument.
+    
+    ```{r}
+    out1 <- exprs(a)
+    str(out1)
+    out2 <- exprs(a = )
+    str(out2)
+    is_missing(out2$a)
+    ```
 
 1.  __<span style="color:red">Q</span>__: What does the following command return? What information is lost? Why?
 
