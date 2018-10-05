@@ -16,64 +16,66 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-1.  __<span style="color:red">Q</span>__: Carefully read the documentation for `source()`. What environment does it
-    use by default? What if you supply `local = TRUE`? How do you provide 
-    a custom argument?
+1.  __<span style="color:red">Q</span>__: Carefully read the documentation for `source()`. What environment does it use by default? What if you supply `local = TRUE`? How do you provide a custom argument?
     
     __<span style="color:green">A</span>__:
     
     ```{r}
-    tmp <- tempfile()
-    writeLines("print(x)", tmp)  # create a temporary R-script
-
-    x <- 2
-
-    local({
-      x <- 3
-      source(tmp, local = FALSE)
-    })    
+    # create temporary, sourcable R script
+    tmp_file <- tempfile()
+    writeLines("print(x)", tmp_file)
     
-    local({
-      x <- 3
-      source(tmp, local = TRUE)
-    })
+    # prepare testing "probes"
+    x <- "global environment"
     
-    env2 <- rlang::env(x = 4)
-    local({
-      x <- 3
-      source(tmp, local = env2)
-    })
-    
-    # Alternative:
-    source_local <- function(file, local){
-      local({
-        x <- 3
-        source(file, local = local)
-      })      
+    locate_evaluation <- function(file, local){
+      x <- "local environment"
+      source(file, local = local)
     }
     
-    source_local(tmp, FALSE)
-    source_local(tmp, TRUE)
-    source_local(tmp, env2)
+    env2 <- rlang::env(x = "specified envirionment")
+    
+    # where will source() be evaluated?
+    locate_evaluation(tmp_file, local = FALSE)
+    locate_evaluation(tmp_file, local = TRUE)
+    locate_evaluation(tmp_file, local = env2)
     ```
-    
-    By default, the global environment is used, but also a local environment can be used. It is also possible to defince a specific environment by passing an environmen-object to `source`.
-    
-    [When would this be useful? usecases?]
-    [should a better example, than 2,3,4 be used?]
 
+    `source()` allows us to specify an evaluation environment. By default, the global environment is used. Using a local environment is possible, by setting `local = FALSE`. We may even provide a specific environment by passing an environment object.
 
 1.  __<span style="color:red">Q</span>__: Predict the results of the following lines of code:
 
     ```{r, eval = FALSE}
-    eval(quote(eval(quote(eval(quote(2 + 2))))))        # -> 4
-    eval(eval(quote(eval(quote(eval(quote(2 + 2)))))))  # -> 4
+    eval(quote(eval(quote(eval(quote(2 + 2))))))
+    eval(eval(quote(eval(quote(eval(quote(2 + 2)))))))
     quote(eval(quote(eval(quote(eval(quote(2 + 2))))))) 
-        # eval(quote(eval(quote(eval(quote(2 + 2))))))
     ```
 
+    __<span style="color:green">A</span>__: You can see the output of the code above here:
 
-    __<span style="color:green">A</span>__: An outside `quote()` always wins...
+    ```{r, echo = FALSE}
+    eval(quote(eval(quote(eval(quote(2 + 2))))))
+    eval(eval(quote(eval(quote(eval(quote(2 + 2)))))))
+    quote(eval(quote(eval(quote(eval(quote(2 + 2)))))))
+    ```
+
+    Generally what happens, is that `2 + 2` is first quoted as an expression and than evaluated to `4`. When we nest calls to `quote()` and `eval()` more calls will be added to the AST, but the pattern of quoting and evaluating stays the same.
+
+    ```{r}
+    # pattern: evaluate a quoted expression
+    eval(quote(
+      eval(quote(
+        eval(quote(
+          2 + 2))
+      ))
+    ))
+    
+    lobstr::ast(eval(quote(eval(quote(eval(quote(2 + 2)))))))
+    ```
+
+    <!-- # TODO@taz, @hen: (optional) Maybe explain a little better, in which order this call is evaluated, left to right or so?  -->
+
+    When we wrap this expression in another `eval()` the `4` will be evaluated once more, but the result doesn't change. When we quote it, we no evaluation takes place and we capture the expression instead. We could say: "An outside `quote()` always wins."
 
 1.  __<span style="color:red">Q</span>__: Write an equivalent to `get()` using `sym()` and `eval_bare()`. Write an
     equivalent to `assign()` using `sym()`, `expr()`, and `eval_bare()`.
