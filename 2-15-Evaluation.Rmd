@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 1.  __<span style="color:red">Q</span>__: Carefully read the documentation for `source()`. What environment does it use by default? What if you supply `local = TRUE`? How do you provide a custom argument?
     
-    __<span style="color:green">A</span>__:
+    __<span style="color:green">A</span>__: `source()` allows us to specify an evaluation environment. By default, the global environment is used. Using a local environment is possible, by setting `local = FALSE`. We may even provide a specific environment by passing an environment object.
     
     ```{r}
     # create temporary, sourcable R script
@@ -41,8 +41,6 @@ knitr::opts_chunk$set(
     locate_evaluation(tmp_file, local = env2)
     ```
 
-    `source()` allows us to specify an evaluation environment. By default, the global environment is used. Using a local environment is possible, by setting `local = FALSE`. We may even provide a specific environment by passing an environment object.
-
 1.  __<span style="color:red">Q</span>__: Predict the results of the following lines of code:
 
     ```{r, eval = FALSE}
@@ -51,7 +49,7 @@ knitr::opts_chunk$set(
     quote(eval(quote(eval(quote(eval(quote(2 + 2))))))) 
     ```
 
-    __<span style="color:green">A</span>__: You can see the output of the code above here:
+    __<span style="color:orange">A</span>__: You can see the output of the code above here:
 
     ```{r, echo = FALSE}
     eval(quote(eval(quote(eval(quote(2 + 2))))))
@@ -73,7 +71,7 @@ knitr::opts_chunk$set(
     lobstr::ast(eval(quote(eval(quote(eval(quote(2 + 2)))))))
     ```
 
-    <!-- # TODO@taz, @hen: (optional) Maybe explain a little better, in which order this call is evaluated, left to right or so?  -->
+    TODO (optional) Maybe explain a little better, in which order this call is evaluated, left to right or so?
 
     When we wrap this expression in another `eval()` the `4` will be evaluated once more, but the result doesn't change. When we quote it, we no evaluation takes place and we capture the expression instead. We could say: "An outside `quote()` always wins."
 
