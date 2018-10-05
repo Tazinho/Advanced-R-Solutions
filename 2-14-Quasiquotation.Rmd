@@ -128,12 +128,20 @@ knitr::opts_chunk$set(
     })
     ```
 
-    __<span style="color:green">A</span>__: We get the expression `{x + y}`. Whitespaces and comments are lost, because R`s parsing ignores them. However, you can get the source information from the attributes of the expression:
+    __<span style="color:green">A</span>__: When we look at the captured expression, we see that the extra whitespaces and comments are lost. R ignores them when parsing an expression. They do do not need to be represented in the AST, because they do not affect the evaluation of the expression.
     
     ```{r}
-    attributes(expr({
+    library(rlang)
+    captured_expression <- expr({
       x +              y # comment  
-    }))
+    })
+    
+    captured_expression
+    ```
+    However, it is possible to retrieve the original input through the attributes of the captured expression:
+    
+     ```{r}
+    attributes(captured_expression)
     ```
 
 1.  __<span style="color:red">Q</span>__: The documentation for `substitute()` says:
