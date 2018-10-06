@@ -5,7 +5,146 @@ knitr::opts_chunk$set(
   cache = TRUE
 )
 ```
+
 # Function factories
+
+## Prerequisites
+
+```{r}
+library(rlang)
+```
+
+## Factory fundamentals
+
+1. __<span style="color:red">Q</span>__: Base R contains two function factories, `approxfun()` and `ecdf()`. 
+    Read their documentation and experiment to figure out what the functions do and what they return.
+
+   __<span style="color:green">A</span>__:
+
+2. __<span style="color:red">Q</span>__: Create a function `pick()` that takes an index, `i`, as an argument and 
+    returns a function with an argument `x` that subsets `x` with `i`.
+
+    ```{r, eval = FALSE}
+    pick(1)(x)
+    # should be equivalent to
+    x[[1]]
+    
+    lapply(mtcars, pick(5))
+    # should be equivalent to
+    lapply(mtcars, function(x) x[[5]])
+    ```
+
+   __<span style="color:green">A</span>__:
+
+3. __<span style="color:red">Q</span>__: Create a function that creates functions that compute the i^th^ [central moment](http://en.wikipedia.org/wiki/Central_moment) of a numeric vector. You can test it by running the following code:
+
+    ```{r, eval = FALSE}
+    m1 <- moment(1)
+    m2 <- moment(2)
+
+    x <- runif(100)
+    stopifnot(all.equal(m1(x), 0))
+    stopifnot(all.equal(m2(x), var(x) * 99 / 100))
+    ```
+
+   __<span style="color:green">A</span>__:
+
+4. __<span style="color:red">Q</span>__: What happens if you don't use a closure? Make predictions, then verify with the code below.
+
+    ```{r}
+    i <- 0
+    new_counter2 <- function() {
+      i <<- i + 1
+      i
+    }
+    ```
+
+   __<span style="color:green">A</span>__:
+
+5. __<span style="color:red">Q</span>__: What happens if you use `<-` instead of `<<-`? Make predictions, then verify with the code below.
+
+    ```{r}
+    new_counter3 <- function() {
+      i <- 0
+      function() {
+        i <- i + 1
+        i
+      }
+    }
+    ```
+
+   __<span style="color:green">A</span>__:
+
+## Graphical factories
+
+1. __<span style="color:red">Q</span>__: Compare and contrast `ggplot2::label_bquote()` with `scales::number_format()`.
+
+   __<span style="color:green">A</span>__:
+
+## Statistical factories
+
+1. __<span style="color:red">Q</span>__: In `boot_model()`, why don't I need to force the evaluation of `df` or `model`?
+
+   __<span style="color:green">A</span>__:
+    
+2. __<span style="color:red">Q</span>__: Why might you formulate the Box-Cox transformation like this?
+
+    ```{r}
+    boxcox3 <- function(x) {
+      function(lambda) {
+        if (lambda == 0) {
+          log(x)
+        } else {
+          (x ^ lambda - 1) / lambda
+        }
+      }  
+    }
+    ```
+
+   __<span style="color:green">A</span>__:
+
+3. __<span style="color:red">Q</span>__: Why don't you need to worry that `boot_permute()` stores a copy of the data inside the function that it generates?
+
+   __<span style="color:green">A</span>__:
+
+4. __<span style="color:red">Q</span>__: How much time does `ll_poisson2()` save compared to `ll_poisson1()`?
+    Use `bench::mark()` to see how much faster the optimisation occurs.
+    How does changing the length of `x` change the results?
+
+   __<span style="color:green">A</span>__:
+
+## Function factories + functionals
+
+1. __<span style="color:red">Q</span>__: Which of the following commands is equivalent to `with(x, f(z))`?
+
+   (a) `x$f(x$z)`.
+   (b) `f(x$z)`.
+   (c) `x$f(z)`.
+   (d) `f(z)`.
+   (e) It depends.
+
+   __<span style="color:green">A</span>__:
+
+2. __<span style="color:red">Q</span>__: Compare and contrast the effects of `env_bind()` vs. `attach()` for the following code.
+   
+    ```{r}
+    funs <- list(
+      mean = function(x) mean(x, na.rm = TRUE),
+      sum = function(x) sum(x, na.rm = TRUE)
+    )
+    
+    attach(funs)
+    mean <- function(x) stop("Hi!")
+    detach(funs)
+    
+    env_bind(globalenv(), !!!funs)
+    mean <- function(x) stop("Hi!") 
+    env_unbind(globalenv(), names(funs))
+    ```
+
+   __<span style="color:green">A</span>__:
+
+## Old exercises
 
 ## Closures
 
