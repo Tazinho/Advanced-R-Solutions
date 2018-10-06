@@ -1,9 +1,8 @@
 # Functions
 
-## Function basics
+## Function fundamentals
 
-1. __<span style="color:red">Q</span>__: Given a function, like `"mean"`, `match.fun()` lets you find a function. 
-   Given a function, can you find its name? Why doesn't that make sense in R?  
+1. __<span style="color:red">Q</span>__: Given a function, like `"mean"`, `match.fun()` lets you find a function. Given a function, can you find its name? Why doesn't that make sense in R?  
 
    __<span style="color:green">A</span>__: If you know `body()`, `formals()` and `environment()` it can be possible to find the function. However, this won't be possible for primitive functions, since they return `NULL` for those three properties. Also annonymous functions won't be found, because they are not bound to a name. On the other hand it could be that different names in an environment contain binding to one (or more functions) with the same `body()`, `formals()` and `environment()` which means that the solution wouldn't be unique. More general: In R a (function) name has an object, but an object (i.e. a function) doesn't have a name (just a binding sometimes).
 
@@ -22,47 +21,40 @@
    
    In contrast the second syntax ensures via parenthesis that the anonymous function doesn't contain a non valid function. It's obvious to see that the latter brackets are used to call the anonymous function.
    
-3. __<span style="color:red">Q</span>__: A good rule of thumb is that an anonymous function should fit on one line 
-   and shouldn't need to use `{}`. Review your code. Where could you have 
-   used an anonymous function instead of a named function? Where should you 
-   have used a named function instead of an anonymous function?  
+3. __<span style="color:red">Q</span>__: A good rule of thumb is that an anonymous function should fit on one line and shouldn't need to use `{}`. Review your code. Where could you have used an anonymous function instead of a named function? Where should you have used a named function instead of an anonymous function?  
     
-    __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: 
    
-4.  __<span style="color:red">Q</span>__: What function allows you to tell if an object is a function? What function
-    allows you to tell if a function is a primitive function?
-    
-    __<span style="color:green">A</span>__: You can test objects with `is.function` and `is.primitive`.
+4. __<span style="color:red">Q</span>__: What function allows you to tell if an object is a function? What function allows you to tell if a function is a primitive function?
+       
+   __<span style="color:green">A</span>__: You can test objects with `is.function` and `is.primitive`.
 
-5.  __<span style="color:red">Q</span>__: This code makes a list of all functions in the base package. 
+5. __<span style="color:red">Q</span>__: This code makes a list of all functions in the base package. 
     
     ```{r}
     objs <- mget(ls("package:base"), inherits = TRUE)
     funs <- Filter(is.function, objs)
     ```
     
-    Use it to answer the following questions:
+   Use it to answer the following questions:
     
-    a. Which base function has the most arguments?
+   a. Which base function has the most arguments?
     
-    a. How many base functions have no arguments? What's special about those
-       functions?
-       
-    a. How could you adapt the code to find all primitive functions?  
+   a. How many base functions have no arguments? What's special about those functions?
+   
+   a. How could you adapt the code to find all primitive functions?  
     
-    __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: 
     
-    a.  First we create a named vector that returns the number of arguments per function and then we subset it with the index of it's maximum entry:
+   a.  First we create a named vector that returns the number of arguments per function and then we subset it with the index of it's maximum entry:
         
     ```{r}
     f_arg_length <- sapply(funs, function(x) length(formals(x)))
     f_arg_length[which.max(f_arg_length)]
     ```
     
-    b. We check the number of functions with `formals()` returning `0` or `NULL`.
-    Then we will see, that all of these functions have `formals` equal to `NULL`,
-    which means, that they should be primitive functions.
-    
+   b. We check the number of functions with `formals()` returning `0` or `NULL`. Then we will see, that all of these functions have `formals` equal to `NULL`, which means, that they should be primitive functions.
+   
     ```{r}
     sum(sapply(funs, function(x) is.null(formals(x)) | length(formals(x)) == 0))
     sum(sapply(funs, function(x) !is.null(formals(x)) & length(formals(x)) == 0))
@@ -70,8 +62,8 @@
     sum(sapply(funs, function(x) is.null(formals(x)) & is.primitive(x)))
     ```
     
-    Hence not all functions with `formals` equal to `NULL` are primitive functions, there must be non primitive functions with this property too.  
-    c. Change the predicate in `Filter` to `is.primitive`:
+   Hence not all functions with `formals` equal to `NULL` are primitive functions, there must be non primitive functions with this property too.  
+   c. Change the predicate in `Filter` to `is.primitive`:
     
     ```{r, eval = FALSE}
     funs <- Filter(is.primitive, objs)
@@ -79,13 +71,13 @@
     
 6. __<span style="color:red">Q</span>__: What are the three important components of a function?  
     
-    __<span style="color:green">A</span>__: `body()`, `formals()` and `environment()`.
+   __<span style="color:green">A</span>__: `body()`, `formals()` and `environment()`.
     
-    > There is one exception to the rule that functions have three components. Primitive functions, like `sum()`, call C code directly with `.Primitive()` and contain no R code. Therefore their `formals()`, `body()`, and `environment()` are all `NULL`.
+   > There is one exception to the rule that functions have three components. Primitive functions, like `sum()`, call C code directly with `.Primitive()` and contain no R code. Therefore their `formals()`, `body()`, and `environment()` are all `NULL`.
 
 7. __<span style="color:red">Q</span>__: When does printing a function not show what environment it was created in?  
 
-    __<span style="color:green">A</span>__: When it was created in the global environment.
+   __<span style="color:green">A</span>__: When it was created in the global environment.
 
 ## Lexical Scoping
 
@@ -96,20 +88,19 @@
     c(c = c)
     ```  
     
-    __<span style="color:green">A</span>__: A named vector c, which first field has the value 10 and the name "c". The first "c" is the `c()` function, the second is the name of the first entry and the third is the value of the first entry.
+   __<span style="color:green">A</span>__: A named vector c, which first field has the value 10 and the name "c". The first "c" is the `c()` function, the second is the name of the first entry and the third is the value of the first entry.
        
 2. __<span style="color:red">Q</span>__: What are the four principles that govern how R looks for values?  
     
-    __<span style="color:green">A</span>__:   As stated in the book:
+   __<span style="color:green">A</span>__:   As stated in the book:
     
-    > There are four basic principles behind R's implementation of lexical scoping:
-    * name masking
-    * functions vs. variables
-    * a fresh start
-    * dynamic lookup
+   > There are four basic principles behind R's implementation of lexical scoping:
+   * name masking
+   * functions vs. variables
+   * a fresh start
+   * dynamic lookup
 
-3. __<span style="color:red">Q</span>__: What does the following function return? Make a prediction before 
-   running the code yourself.
+3. __<span style="color:red">Q</span>__: What does the following function return? Make a prediction before running the code yourself.
 
     ```{r, eval = FALSE}
     f <- function(x) {
@@ -123,12 +114,12 @@
     }
     f(10)
     ```
-      
-      __<span style="color:green">A</span>__: 202
+        
+   __<span style="color:green">A</span>__: 202
       
 ## Lazy evaluation
 
-1.  __<span style="color:red">Q</span>__: What important property of `&&` make `x_ok()` work?
+1. __<span style="color:red">Q</span>__: What important property of `&&` make `x_ok()` work?
 
     ```{r}
     x_ok <- function(x) {
@@ -140,8 +131,8 @@
     x_ok(1:3)
     ```
 
-    What is different with this code? Why is this behaviour undesirable here?
-    
+   What is different with this code? Why is this behaviour undesirable here?
+       
     ```{r}
     x_ok <- function(x) {
       !is.null(x) & length(x) == 1 & x > 0
@@ -152,38 +143,38 @@
     x_ok(1:3)
     ```
     
-    __<span style="color:green">A</span>__: The intended usage of `x_ok` is to check if an argument provided to a function is not `NULL`, has length `1` and is greater than `0`. To work with this function, we only want to know if this is `TRUE`, `FALSE` or NA (unknown). Therefore the first version behaves as desired as we can see in the first and the third example.
+   __<span style="color:green">A</span>__: The intended usage of `x_ok` is to check if an argument provided to a function is not `NULL`, has length `1` and is greater than `0`. To work with this function, we only want to know if this is `TRUE`, `FALSE` or NA (unknown). Therefore the first version behaves as desired as we can see in the first and the third example.
     
-    The property of `&&` that makes `x_ok()` work is lazy evaluation.
+   The property of `&&` that makes `x_ok()` work is lazy evaluation.
     
-    `&&` checks from left to right, if **the first element** of every side (argument) evaluates to `TRUE`, `FALSE` or sth. else (another valid value, which gets coerced to logical). In case of `FALSE`, it stops and returns `FALSE`. If none is `FALSE` but at least one is not `TRUE` (after checking all sides), `NA` is returned. This makes sense, since if sth. is neither true nor false, it's logical value is unknown, corresponding to `NA`.
+   `&&` checks from left to right, if **the first element** of every side (argument) evaluates to `TRUE`, `FALSE` or sth. else (another valid value, which gets coerced to logical). In case of `FALSE`, it stops and returns `FALSE`. If none is `FALSE` but at least one is not `TRUE` (after checking all sides), `NA` is returned. This makes sense, since if sth. is neither true nor false, it's logical value is unknown, corresponding to `NA`.
     
-    Apart from the undesired elementwise evaluation of the `&` operator (at least in this case) `&` almost works the same as `&&`. From ``?`&` ``:
+   Apart from the undesired elementwise evaluation of the `&` operator (at least in this case) `&` almost works the same as `&&`. From ``?`&` ``:
     
-    > ... The shorter form performs elementwise comparisons in much the same way as arithmetic operators. Evaluation proceeds only until the result is determined.
+   > ... The shorter form performs elementwise comparisons in much the same way as arithmetic operators. Evaluation proceeds only until the result is determined.
     
-    However, when combining the results, it takes the lengths of it's arguments into account. Therefore `FALSE & logical(0)` returns `logical(0)`, in contrast `FALSE && logical(0)`, which returns `FALSE`.
+   However, when combining the results, it takes the lengths of it's arguments into account. Therefore `FALSE & logical(0)` returns `logical(0)`, in contrast `FALSE && logical(0)`, which returns `FALSE`.
     
-    Returning to the first example, we can see now that this is what leads to the (in this case) undesired behaviour, where neither `TRUE`, `FALSE` nor `NA` gets returend:
+   Returning to the first example, we can see now that this is what leads to the (in this case) undesired behaviour, where neither `TRUE`, `FALSE` nor `NA` gets returend:
   
     ```{r}
     FALSE && NULL > 0
     FALSE &  NULL > 0
     ```
 
-2.  __<span style="color:red">Q</span>__: The definition of `force()` is simple:
+2. __<span style="color:red">Q</span>__: The definition of `force()` is simple:
 
     ```{r}
     force
     ```
     
-    Why is it better to `force(x)` instead of just `x`?
+   Why is it better to `force(x)` instead of just `x`?
     
-    __<span style="color:green">A</span>__: To be clear: `force(x)` is just syntactic sugar for `x`. However, as stated in the first edition of the textbook:
+   __<span style="color:green">A</span>__: To be clear: `force(x)` is just syntactic sugar for `x`. However, as stated in the first edition of the textbook:
     
-    > using this function clearly indicates that you’re forcing evaluation, not that you’ve accidentally typed `x`.
+   > using this function clearly indicates that you’re forcing evaluation, not that you’ve accidentally typed `x`.
     
-3.  __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
+3. __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
 
     ```{r, eval = FALSE}
     f2 <- function(x = z) {
@@ -193,82 +184,55 @@
     f2()
     ```  
     
-    __<span style="color:green">A</span>__: 100, lazy evaluation.
+   __<span style="color:green">A</span>__: 100, lazy evaluation.
     
-4.  __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
+4. __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
   
     ```{r, eval = FALSE}    
+    y <- 10
     f1 <- function(x = {y <- 1; 2}, y = 0) {
-      x + y
+      c(x, y)
     }
     f1()
+    y
     ```  
     
-    __<span style="color:green">A</span>__: It returns 3 and illustrates lazy evaluation. As you can see, y becomes 1, but only when `x` is evaluated (before `y`) inside the function (otherwise it is 0):
+   __<span style="color:orange">A</span>__: TODO: The original question (see old exercises at the bottom of this chapter) has been modified by Hadley in a subtile way. The answer has to be modified accordingly. From my understanding the new answer needs to address the issue: why is `y` in the end ten and not two as one would guess by the old answer.
     
-    ```{r}    
-    f2 <- function(x = {y <- 1; 2}, y = 0) {
-      y
-    }
-    f2()
-    ```  
-    
-    Note that funny things can happen if we switch the evaluation order (even within one line)
-    
-    ```{r}    
-    f3 <- function(x = {y <- 1; 2}, y = 0) {
-      y + x
-    }
-    f3()
-    ```
-
-    or we evaluate `y` once before and once after the evaluation of `x`
-    
-    ```{r}    
-    f4 <- function(x = {y <- 1; 2}, y = 0) {
-      y_before_x <- y
-      x
-      y_after_x <- y
-      c(y_before_x, y_after_x)
-    }
-    f4()
-    ```
-
-5.  __<span style="color:red">Q</span>__: In `hist()`, the default value of `xlim` is `range(breaks)`, the default 
-    value for `breaks` is `"Sturges"`, and
+5. __<span style="color:red">Q</span>__: In `hist()`, the default value of `xlim` is `range(breaks)`, the default value for `breaks` is `"Sturges"`, and
 
     ```{r}
     range("Sturges")
     ```
     
-    Explain how `hist()` works to get a correct `xlim` value.
+   Explain how `hist()` works to get a correct `xlim` value.
     
-    __<span style="color:green">A</span>__: Before the `hist()` function creates the final plot where `xlim` is provided and finally evaluated, the `hist()` function internally updates and checks the value of `breaks` several times to ensure that it is finally a numeric vector with at least two elements.
+   __<span style="color:green">A</span>__: Before the `hist()` function creates the final plot where `xlim` is provided and finally evaluated, the `hist()` function internally updates and checks the value of `breaks` several times to ensure that it is finally a numeric vector with at least two elements.
     
-    The detailed behaviour is very specific to the input. According to `?hist` this must be one of:
-    * a vector giving the breakpoints between histogram cells,
-    * a function to compute the vector of breakpoints,
-    * a single number giving the number of cells for the histogram,
-    * a character string naming an algorithm to compute the number of cells (see ‘Details’),
-    * a function to compute the number of cells.
+   The detailed behaviour is very specific to the input. According to `?hist` this must be one of:
+   * a vector giving the breakpoints between histogram cells,
+   * a function to compute the vector of breakpoints,
+   * a single number giving the number of cells for the histogram,
+   * a character string naming an algorithm to compute the number of cells (see ‘Details’),
+   * a function to compute the number of cells.
     
-    Further:
+   Further:
     
-    > In the last three cases the number is a suggestion only; as the breakpoints will be set to pretty values, the number is limited to 1e6 (with a warning if it was larger). If breaks is a function, the x vector is supplied to it as the only argument (and the number of breaks is only limited by the amount of available memory).
+   > In the last three cases the number is a suggestion only; as the breakpoints will be set to pretty values, the number is limited to 1e6 (with a warning if it was larger). If breaks is a function, the x vector is supplied to it as the only argument (and the number of breaks is only limited by the amount of available memory).
     
-    In case of `breaks = "Sturges"` this means that `breaks` is:
-    * checked that it is provided (a corresponding flag is set; otherwise it is set to `nclass` regarding that is provided)
-    * checked that its length is greater than 1 (a corresponding flag is set)
-    * converted to lower case and matched to "sturges"
-    * set to an integer value via `sturges = nclass.Sturges(x)` inside a `switch()` statement
-    * checked that it is now numeric, finite and at least 1
-    * set to 1000000 if it is greater than 1000000
-    * turned into a numeric vector of length (possibly) greater one via `pretty(range(x), n = breaks, min.n = 1)`
-    * checked that its length is now greater than 1 and not `NA`
-    * checked that the differences between the breaks are strictly positive
-    * during and after this process more variables are calculated and checks are made and finally `plot()` gets called, where `xlim` gets evaluated.
+   In case of `breaks = "Sturges"` this means that `breaks` is:
+   * checked that it is provided (a corresponding flag is set; otherwise it is set to `nclass` regarding that is provided)
+   * checked that its length is greater than 1 (a corresponding flag is set)
+   * converted to lower case and matched to "sturges"
+   * set to an integer value via `sturges = nclass.Sturges(x)` inside a `switch()` statement
+   * checked that it is now numeric, finite and at least 1
+   * set to 1000000 if it is greater than 1000000
+   * turned into a numeric vector of length (possibly) greater one via `pretty(range(x), n = breaks, min.n = 1)`
+   * checked that its length is now greater than 1 and not `NA`
+   * checked that the differences between the breaks are strictly positive
+   * during and after this process more variables are calculated and checks are made and finally `plot()` gets called, where `xlim` gets evaluated.
     
-6.  __<span style="color:red">Q</span>__: Explain why this function works. Why is it confusing?
+6. __<span style="color:red">Q</span>__: Explain why this function works. Why is it confusing?
 
     ```{r}
     show_time <- function(x = stop("Error!")) {
@@ -278,26 +242,26 @@
     show_time()
     ```
     
-    __<span style="color:green">A</span>__: It works because functions are objects, that can be modified and overwritten, and because of of lazy evaluation. Before the `x` argument is evaluated, the `stop()` function is overwritten by another function which gets called in the last line where `x` is finally evaluated.
+   __<span style="color:green">A</span>__: It works because functions are objects, that can be modified and overwritten, and because of of lazy evaluation. Before the `x` argument is evaluated, the `stop()` function is overwritten by another function which gets called in the last line where `x` is finally evaluated.
     
-    It's quite confusing, since there is no relation between the default value of `x` and its actual meaning in the context of the `show_time()` function. The user won't have any chance to guess the meaning of `x` or it's default value without looking up a possibly written documentation or analyzing of the source code.
+   It's quite confusing, since there is no relation between the default value of `x` and its actual meaning in the context of the `show_time()` function. The user won't have any chance to guess the meaning of `x` or it's default value without looking up a possibly written documentation or analyzing of the source code.
 
-7.  __<span style="color:red">Q</span>__: How many arguments are required when calling `library()`?
+7. __<span style="color:red">Q</span>__: How many arguments are required when calling `library()`?
 
-    __<span style="color:green">A</span>__: Surprisingly no argument is required. When looking at `?library` we can see under usage, that library has nine arguments and two of them are without default arguments:
+   __<span style="color:green">A</span>__: Surprisingly no argument is required. When looking at `?library` we can see under usage, that library has nine arguments and two of them are without default arguments:
     
-    library(package, help, pos = 2, lib.loc = NULL,
+   library(package, help, pos = 2, lib.loc = NULL,
         character.only = FALSE, logical.return = FALSE,
         warn.conflicts = TRUE, quietly = FALSE,
         verbose = getOption("verbose"))
         
-    However, when we call `library()` without any arguments, we get a list of all available libraries under the current library path (`.libPaths()`) as also document under the details section of the help file:
+   However, when we call `library()` without any arguments, we get a list of all available libraries under the current library path (`.libPaths()`) as also document under the details section of the help file:
     
-    > If library is called with no package or help argument, it lists all available packages in the libraries specified by lib.loc, and returns the corresponding information in an object of class "libraryIQR". (The structure of this class may change in future versions.) Use .packages(all = TRUE) to obtain just the names of all available packages, and installed.packages() for even more information.
+   > If library is called with no package or help argument, it lists all available packages in the libraries specified by lib.loc, and returns the corresponding information in an object of class "libraryIQR". (The structure of this class may change in future versions.) Use .packages(all = TRUE) to obtain just the names of all available packages, and installed.packages() for even more information.
 
 ## `...` (dot-dot-dot)
 
-1.  __<span style="color:red">Q</span>__: Explain the following results:
+1. __<span style="color:red">Q</span>__: Explain the following results:
     
     ```{r}
     sum(1, 2, 3)
@@ -307,64 +271,61 @@
     mean(1, 2, 3, na.omit = TRUE)
     ```
     
-    __<span style="color:green">A</span>__: The arguments of `sum()` are `...` and `na.rm`. For `...` `sum()` expects "numeric or complex or logical vectors" as documented in `?sum`. So any input not explicitly supplied named with `na.rm` is treated as part of the `...` argument and used for summation.
+   __<span style="color:green">A</span>__: The arguments of `sum()` are `...` and `na.rm`. For `...` `sum()` expects "numeric or complex or logical vectors" as documented in `?sum`. So any input not explicitly supplied named with `na.rm` is treated as part of the `...` argument and used for summation.
     
-    In contrast `mean()` expects as first argument `x` typically a vector, as second argument `trim` a fraction of observations to be trimmed from each end of `x` and again `na.rm`. As both: `trim = 2` and `na.rm = 3` have not effect on the calculation of the mean of `1`, we get `1` as the result.
+   In contrast `mean()` expects as first argument `x` typically a vector, as second argument `trim` a fraction of observations to be trimmed from each end of `x` and again `na.rm`. As both: `trim = 2` and `na.rm = 3` have not effect on the calculation of the mean of `1`, we get `1` as the result.
     
-    In the next call, `na.omit` is supplied via the `...` argument to `sum()`, which treats it as logical vector and builds its sum with the other arguments.
+   In the next call, `na.omit` is supplied via the `...` argument to `sum()`, which treats it as logical vector and builds its sum with the other arguments.
     
-    Finally in the last call to `mean` `na.omit = TRUE` is neither needed as part of the default method nor is it used for the mean calculation, since `mean()` calculates it's value only from its `x` argument.
+   Finally in the last call to `mean` `na.omit = TRUE` is neither needed as part of the default method nor is it used for the mean calculation, since `mean()` calculates it's value only from its `x` argument.
 
-2.  __<span style="color:red">Q</span>__: In the following call, explain how to find the documentation for the
-    named arguments in the following function call:
-    
+2. __<span style="color:red">Q</span>__: In the following call, explain how to find the documentation for the named arguments in the following function call:
+       
     ```{r, fig.asp = 1}
     plot(1:10, col = "red", pch = 20, xlab = "x", col.lab = "blue")
     ```
     
-    __<span style="color:green">A</span>__: First we type `?plot` in the console and scan the usage section:
+   __<span style="color:green">A</span>__: First we type `?plot` in the console and scan the usage section:
     
     ```
     plot(x, y, ...)
     ```
     
-    Obviously we have to look under the `...` bullet in the arguments section.
+   Obviously we have to look under the `...` bullet in the arguments section.
     
-    There we can find a bullet for `xlab` (check), and follow the recommendation to visit `?par` for further arguments. 
+   There we can find a bullet for `xlab` (check), and follow the recommendation to visit `?par` for further arguments. 
     
-    From there we type "col" into the search bar, which leads us to a recommentation to search further under `Color Specification` (check). Again using the search we find a bullet for the `pch` argument. From there we get also the recommendation to look under `?points` for more specific settings (check). Finally we use the search functionality to find `col.lab` also as a bullet inside `?par`.
+   From there we type "col" into the search bar, which leads us to a recommentation to search further under `Color Specification` (check). Again using the search we find a bullet for the `pch` argument. From there we get also the recommendation to look under `?points` for more specific settings (check). Finally we use the search functionality to find `col.lab` also as a bullet inside `?par`.
     
-3.  __<span style="color:red">Q</span>__: Why does `plot(1:10, col = "red")` only colour the points, not the axes 
+3. __<span style="color:red">Q</span>__: Why does `plot(1:10, col = "red")` only colour the points, not the axes 
     or labels? Read the source code of `plot.default()` to find out.
     
-    __<span style="color:green">A</span>__: It is easiest to start by adding `browser()` to the first line of `plot.default()` and interactively run `plot(1:10, col = "red")`. In this way we can see how the plot is build during the last lines and especially find out where the axis are added. This leads us to the function call:
+   __<span style="color:green">A</span>__: It is easiest to start by adding `browser()` to the first line of `plot.default()` and interactively run `plot(1:10, col = "red")`. In this way we can see how the plot is build during the last lines and especially find out where the axis are added. This leads us to the function call:
 
     ```{r, eval = FALSE}
     localTitle(main = main, sub = sub, xlab = xlab, ylab = ylab, ...)
     ```
     
-    The `localTitle()` function was defined in the first lines of `plot.default()` as:
+   The `localTitle()` function was defined in the first lines of `plot.default()` as:
 
     ```{r, eval = FALSE}
     localTitle <- function(..., col, bg, pch, cex, lty, lwd) title(...)
     ```
     
-    So the call to `localTitle()` clearly gets the `col` parameter as part of `...` argument. To find out if it is used we try following the source code of `title()`, which leads us to a line of C code. Instead of following further, can we stay in R and look at `?title`, which brings some clarity on the fact that the `title()` function specifies four parts of the plot: Main (title of the plot), sub (sub-title of the plot) and both axis labels. Therefore it would introduce ambiguity inside `title()` to use `col` directly. Instead on has the option to supply `col` via the `...` argument as `col.labs` or as part of `xlab` (similar for `ylab`) in the form `xlab = list(c("index"), col = "red")`.
+   So the call to `localTitle()` clearly gets the `col` parameter as part of `...` argument. To find out if it is used we try following the source code of `title()`, which leads us to a line of C code. Instead of following further, can we stay in R and look at `?title`, which brings some clarity on the fact that the `title()` function specifies four parts of the plot: Main (title of the plot), sub (sub-title of the plot) and both axis labels. Therefore it would introduce ambiguity inside `title()` to use `col` directly. Instead on has the option to supply `col` via the `...` argument as `col.labs` or as part of `xlab` (similar for `ylab`) in the form `xlab = list(c("index"), col = "red")`.
 
 ## Exiting a function
 
 1. __<span style="color:red">Q</span>__: What does `load()` return? Why don’t you normally see these values?
 
-    __<span style="color:green">A</span>__: `load()` reloads datasets written with the function `save()`. It returns a character vector of the names of objects created, invisibly. To see the names of the objects, one can set the `verbose` argument to `TRUE`, which triggers a regarding `if` statement in the function`s body. However, to print the value of the names it is also feasible to use brackets around the `load()` call to autoprint the returned value.
-
+   __<span style="color:green">A</span>__: `load()` reloads datasets written with the function `save()`. It returns a character vector of the names of objects created, invisibly. To see the names of the objects, one can set the `verbose` argument to `TRUE`, which triggers a regarding `if` statement in the function's body. However, to print the value of the names it is also feasible to use brackets around the `load()` call to autoprint the returned value.
+   
 2. __<span style="color:red">Q</span>__: What does `write.table()` return? What would be more useful?
 
-    __<span style="color:green">A</span>__: It invisibly returns `NULL`. It would be more useful to invisibly return the (data frame) object to be written as for example the **readr** package does. In this way it would be possible to save intermediate results from a sequence of processing steps directly, i.e. within a magrittr pipeline.
+   __<span style="color:green">A</span>__: It invisibly returns `NULL`. It would be more useful to invisibly return the (data frame) object to be written as for example the **readr** package does. In this way it would be possible to save intermediate results from a sequence of processing steps directly, i.e. within a magrittr pipeline.
     
-3.  __<span style="color:red">Q</span>__: How does the `chdir` parameter of `source()` compare to `in_dir()`? Why 
-    might you prefer one approach to the other?
-    The `in_dir()` approach was given in the book as
-    
+3. __<span style="color:red">Q</span>__: How does the `chdir` parameter of `source()` compare to `in_dir()`? Why might you prefer one approach to the other? The `in_dir()` approach was given in the book as
+       
     ```{r, eval = FALSE}
     in_dir <- function(dir, code) {
       old <- setwd(dir)
@@ -374,14 +335,13 @@
       }
     ```
     
-    __<span style="color:green">A</span>__: `in_dir()` takes a path to a working directory as an argument. At the beginning of the function the working directory is changed to this specification and with a call to `on.exit` it is guranteed, that when the function finishes the working directory also equals to this specification.
+   __<span style="color:green">A</span>__: `in_dir()` takes a path to a working directory as an argument. At the beginning of the function the working directory is changed to this specification and with a call to `on.exit` it is guranteed, that when the function finishes the working directory also equals to this specification.
     
-    In `source()` you need the `chdir` argument to specify, if the working directory should be changed during the evaluation to the `file` argument, if this is a pathname. The difference in `source()` is, that the actual working directory as output of `getwd()` is saved to set it in `on.exit` before changing the directory to the pathname (given to the `file` argument) for the rest of the execution of the `source()` function.
+   In `source()` you need the `chdir` argument to specify, if the working directory should be changed during the evaluation to the `file` argument, if this is a pathname. The difference in `source()` is, that the actual working directory as output of `getwd()` is saved to set it in `on.exit` before changing the directory to the pathname (given to the `file` argument) for the rest of the execution of the `source()` function.
 
-4.  __<span style="color:red">Q</span>__: Write a function that opens a graphics device, runs the supplied code, and 
-    closes the graphics device (always, regardless of whether or not the plotting code worked).  
-    
-    __<span style="color:green">A</span>__: 
+4. __<span style="color:red">Q</span>__: Write a function that opens a graphics device, runs the supplied code, and closes the graphics device (always, regardless of whether or not the plotting code worked).  
+   
+   __<span style="color:green">A</span>__: 
     
     ```{r, eval = FALSE}
     plot_pdf <- function(code){
@@ -391,7 +351,7 @@
       }
     ```
 
-5.  __<span style="color:red">Q</span>__: We can use `on.exit()` to implement a simple version of `capture.output()`.
+5. __<span style="color:red">Q</span>__: We can use `on.exit()` to implement a simple version of `capture.output()`.
 
     ```{r}
     capture.output2 <- function(code) {
@@ -407,15 +367,15 @@
     capture.output2(cat("a", "b", "c", sep = "\n"))
     ```
     
-    Compare `capture.output()` to `capture.output2()`. How do the functions differ? What features have I removed to make the key ideas easier to see? How have I rewritten the key ideas to be easier to understand?
+   Compare `capture.output()` to `capture.output2()`. How do the functions differ? What features have I removed to make the key ideas easier to see? How have I rewritten the key ideas to be easier to understand?
     
-    __<span style="color:green">A</span>__: Using `body(capture.output)`, we can see the source code for the original `capture.output()` function. `capture.output()` is a good clip longer (39 lines vs. 7 lines). The reason for this is that `capture.output2()` is more modular, since `capture.output()` writes out entire methods like `readLines()` instead of invoking them. This makes `capture.output2` easier to understand if you understand the underlying methods.
+   __<span style="color:green">A</span>__: Using `body(capture.output)`, we can see the source code for the original `capture.output()` function. `capture.output()` is a good clip longer (39 lines vs. 7 lines). The reason for this is that `capture.output2()` is more modular, since `capture.output()` writes out entire methods like `readLines()` instead of invoking them. This makes `capture.output2` easier to understand if you understand the underlying methods.
     
-    However, `capture.output2()` does remove potentially important functionality, as `capture.output()` appears to handle important exceptions not handled in `capture.output2()`, and `capture.output()` offers the ability to chose between overwriting or appending to a file.
+   However, `capture.output2()` does remove potentially important functionality, as `capture.output()` appears to handle important exceptions not handled in `capture.output2()`, and `capture.output()` offers the ability to chose between overwriting or appending to a file.
 
 ## Function forms
 
-1.  __<span style="color:red">Q</span>__: Rewrite the following code snippets into prefix form:
+1. __<span style="color:red">Q</span>__: Rewrite the following code snippets into prefix form:
 
     ```{r, eval = FALSE}
     1 + 2 + 3
@@ -425,7 +385,7 @@
     if (length(x) <= 5) x[[5]] else x[[n]]
     ```
     
-    __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: 
     
     ```{r, eval = FALSE}
     `+`(`+`(1, 2), 3)
@@ -435,7 +395,7 @@
     `if`(`<=`(length(x), 5), `[[`(x, 5), `[[`(x, n))
     ```
 
-2.  __<span style="color:red">Q</span>__: Clarify the following list of odd function calls:
+2. __<span style="color:red">Q</span>__: Clarify the following list of odd function calls:
 
     ```{r, eval = FALSE}
     x <- sample(replace = TRUE, 20, x = c(1:10, NA))
@@ -446,14 +406,14 @@
     # -> cor(x = x, y = y, use = "pairwise.complete.obs", method = "pearson")
     ```  
     
-3.  __<span style="color:red">Q</span>__: Explain why the following code fails:
+3. __<span style="color:red">Q</span>__: Explain why the following code fails:
 
     ```{r, eval = FALSE}
     modify(get("x"), 1) <- 10
     #> Error: target of assignment expands to non-language object
     ```
     
-    __<span style="color:green">A</span>__: First let define `x` and recall the definition of `modify()` from the textbook:
+   __<span style="color:green">A</span>__: First let define `x` and recall the definition of `modify()` from the textbook:
     
     ```{r}
     x <- 1:3
@@ -464,30 +424,30 @@
     }
     ```
     
-    As described in the textbook R turns the code behind the scenes into
+   As described in the textbook R turns the code behind the scenes into
     
     ```{r, eval = FALSE}
     get("x") <- `modify<-`(get("x"), 1, 10)
     #> Error in get("x") <- `modify<-`(get("x"), 1, 10) : target of assignment expands to non-language object
     ```
     
-    which can not work, because `get()` has no equivalent replacement function. To confirm this claim, we can reproduce the error via an easier example
+   which can not work, because `get()` has no equivalent replacement function. To confirm this claim, we can reproduce the error via an easier example
     
     ```{r, eval = FALSE}
     get("x") <- 2
     #> Error in get("x") <- 2 : target of assignment expands to non-language object
     ```
     
-    and modify the example to use a function with an available replacement function:
+   and modify the example to use a function with an available replacement function:
     
     ```{r}
     modify(names(x), 1) <- 10
     names(x)
     ```
     
-4.  __<span style="color:red">Q</span>__: Create a replacement function that modifies a random location in a vector.
+4. __<span style="color:red">Q</span>__: Create a replacement function that modifies a random location in a vector.
     
-    __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: 
 
     ```{r, eval = FALSE}
     `random<-` <- function(x, value){
@@ -496,8 +456,7 @@
       }
     ```
 
-5.  __<span style="color:red">Q</span>__: Write your own version of `+` that will paste its inputs together if they are character vectors but behaves as usual otherwise. In other words,
-   make this code work:
+5. __<span style="color:red">Q</span>__: Write your own version of `+` that will paste its inputs together if they are character vectors but behaves as usual otherwise. In other words, make this code work:
    
     ```{r, eval = FALSE}
     1 + 2
@@ -507,7 +466,7 @@
     #> [1] "ab"
     ```
 
-    __<span style="color:green">A</span>__: We can simply override the `+` operator. In this case we need to take a bit of care to not use the `+` operator itself inside of the function definition, since otherwise we would end in an infinite recursion (a special case of an infinite loop). We also add `b = 0L` as a default value keep the behaviour of `+` as a unary operator, i.e. to keep `+ 1` working and not throwing an error:
+   __<span style="color:green">A</span>__: We can simply override the `+` operator. In this case we need to take a bit of care to not use the `+` operator itself inside of the function definition, since otherwise we would end in an infinite recursion (a special case of an infinite loop). We also add `b = 0L` as a default value keep the behaviour of `+` as a unary operator, i.e. to keep `+ 1` working and not throwing an error:
     
     ```{r}
     `+` <- function(a, b = 0L){
@@ -526,24 +485,25 @@
     rm(`+`)
     ```
 
-6. __<span style="color:red">Q</span>__: Create a list of all the replacement functions found in the base package. 
+6. __<span style="color:red">Q</span>__: Create a list of all the replacement functions found in the base package.
    Which ones are primitive functions? (Hint use `apropros()`)
    
-    __<span style="color:green">A</span>__: We can find replacementfunctions by searching for functions that end on "<-":
+   __<span style="color:green">A</span>__: We can find replacementfunctions by searching for functions that end on "<-":
+   
     ```{r, eval = FALSE}
     repls <- funs[grepl("<-$", names(funs))]
     Filter(is.primitive, repls)
     ```
 
-7. __<span style="color:red">Q</span>__: What are valid names for user-created infix functions?  
+7. __<span style="color:orange">Q</span>__: What are valid names for user-created infix functions?  
   
-    __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: TODO: Insert source, when quoting.
     
-    > All user-created infix functions must start and end with `%` ... they can contain any sequence of characters (except “%”, of course).
+   > All user-created infix functions must start and end with `%` ... they can contain any sequence of characters (except “%”, of course).
 
 8. __<span style="color:red">Q</span>__: Create an infix `xor()` operator.
     
-    __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: 
 
     ```{r}
     `%xor_%` <- function(a, b){
@@ -555,7 +515,7 @@
    `setdiff()`. You might call them `%n%`, `%u%`, and `%/%` to match 
    conventions from mathematics.
    
-    __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: 
    
     ```{r}
     `%union_%` <- function(a, b){
@@ -567,7 +527,47 @@
       }
 
     `%setdiff_%` <- function(a, b){
-      a[! a %in% b]
+      a[!a %in% b]
       }
     ```
-   
+      
+## Old exercises
+
+1. __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
+  
+    ```{r, eval = FALSE}    
+    f1 <- function(x = {y <- 1; 2}, y = 0) {
+      x + y
+    }
+    f1()
+    ```  
+    
+   __<span style="color:green">A</span>__: It returns 3 and illustrates lazy evaluation. As you can see, y becomes 1, but only when `x` is evaluated (before `y`) inside the function (otherwise it is 0):
+    
+    ```{r}    
+    f2 <- function(x = {y <- 1; 2}, y = 0) {
+      y
+    }
+    f2()
+    ```  
+    
+   Note that funny things can happen if we switch the evaluation order (even within one line)
+    
+    ```{r}    
+    f3 <- function(x = {y <- 1; 2}, y = 0) {
+      y + x
+    }
+    f3()
+    ```
+
+   or we evaluate `y` once before and once after the evaluation of `x`
+    
+    ```{r}    
+    f4 <- function(x = {y <- 1; 2}, y = 0) {
+      y_before_x <- y
+      x
+      y_after_x <- y
+      c(y_before_x, y_after_x)
+    }
+    f4()
+    ```
