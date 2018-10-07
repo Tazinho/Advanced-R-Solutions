@@ -1,3 +1,13 @@
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
+
+Sys.setenv(LANGUAGE = "en")
+library("methods")
+```
 # Optimising code
 
 ## Memory profiling with lineprof
@@ -578,7 +588,7 @@ provides us with enough information and guides our attention on solutions in the
     
     __<span style="color:green">A</span>__: We compare regarding different sizes for square matrices:
     
-    ```{r long calculation}
+    ```{r long calculation, eval=FALSE}
     library(microbenchmark)
     dimensions <- c(1e0, 1e1, 1e2, 1e3, 0.5e4, 1e4)
     matrices <- lapply(dimensions,
@@ -628,7 +638,7 @@ provides us with enough information and guides our attention on solutions in the
     
     A benchmark of both alternatives for different vector lengths indicates, that the `crossprod()` variant is about 2.5 times faster than `sum()`:
     
-    ```{r}
+    ```{r, eval=FALSE}
     dimensions <- c(1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 0.5e7, 1e7)
     xvector <- lapply(dimensions, rnorm)
     weights <- lapply(dimensions, rnorm)
