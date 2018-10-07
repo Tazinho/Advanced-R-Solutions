@@ -1,22 +1,12 @@
-```{r include=FALSE, cache=FALSE}
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE
-)
-
-Sys.setenv(LANGUAGE = "en")
-library("methods")
-```
 # Translating R Code
 
 ### HTML
 
-1.  __<span style="color:red">Q</span>__: The escaping rules for `<script>` and `<style>` tags are different: you don't want to escape angle brackets or ampersands, but you do want to escape `</script>` or `</style>`. Adapt the code above to follow these rules.
+1. __<span style="color:red">Q</span>__: The escaping rules for `<script>` and `<style>` tags are different: you don't want to escape angle brackets or ampersands, but you do want to escape `</script>` or `</style>`. Adapt the code above to follow these rules.
 
-    TODO: Check why escaping of script/style tags would be necessary and change answer accordingly: https://github.com/hadley/adv-r/issues/1190
+   TODO: Check why escaping of script/style tags would be necessary and change answer accordingly: https://github.com/hadley/adv-r/issues/1190
 
-    Required Code from Advanced R:
+   Required Code from Advanced R:
 
     ```{r required code from advr, include=TRUE}
     library(rlang)
@@ -72,15 +62,15 @@ library("methods")
     }
     ```
     
-    __<span style="color:green">A</span>__: Sourcecode wrapped in `<script>` or `<style>` tags is different from the other HTML-tags: the `<script>` tag inserts (mainly) JavaScript into the HTML document. Here the angle brackets and ampersands should not be escaped so the code remains intact. Because JavaScript may contain multiple nested `<script>` tags, we need to escape the inner tags as `<\/script>`.
+   __<span style="color:green">A</span>__: Sourcecode wrapped in `<script>` or `<style>` tags is different from the other HTML-tags: the `<script>` tag inserts (mainly) JavaScript into the HTML document. Here the angle brackets and ampersands should not be escaped so the code remains intact. Because JavaScript may contain multiple nested `<script>` tags, we need to escape the inner tags as `<\/script>`.
     
-    [check, what is meant with "want to escape `</script>` or `</style>`"]{.todo}
+   [check, what is meant with "want to escape `</script>` or `</style>`"]{.todo}
     
-    `style` tags encapsulate css-styling guidelines and the escaping follows the same rules as for the JavaScript above.
+   `style` tags encapsulate css-styling guidelines and the escaping follows the same rules as for the JavaScript above.
     
-    Our `tag` function factory needs two serve two competing requirements for escaping: For most of the tag functions the content (brackets and ampersands) needs to be escaped. In script and style tags the content should NOT be escaped, but closing `script`- and `style`-tags need to be escaped.
+   Our `tag` function factory needs two serve two competing requirements for escaping: For most of the tag functions the content (brackets and ampersands) needs to be escaped. In script and style tags the content should NOT be escaped, but closing `script`- and `style`-tags need to be escaped.
     
-    To distinguish between these options, we extend `escape.character()` to include an argument (`escape_choice`) to choose the escape-style, that we want.
+   To distinguish between these options, we extend `escape.character()` to include an argument (`escape_choice`) to choose the escape-style, that we want.
     
     ```{r}
     # add argument `escape_choice` to escape-function
@@ -109,7 +99,7 @@ library("methods")
     escape <- function(x, ...) UseMethod("escape")
     ```
     
-    When we create the tag functions we can then specify the escape style we want:
+   When we create the tag functions we can then specify the escape style we want:
     
     ```{r}
     # create tag with specified escape-style
@@ -137,7 +127,7 @@ library("methods")
     }
     ```
     
-    Let's test our new `tag()` function:
+   Let's test our new `tag()` function:
     
     ```{r}
     p <- tag("p")
@@ -153,11 +143,7 @@ library("methods")
     script("These signs will not be escaped: &, <, >, ", "but these ones will: </script> or </style>")
 ```
 
-1.  __<span style="color:red">Q</span>__: The use of `...` for all functions has some big downsides. There's no
-    input validation and there will be little information in the
-    documentation or autocomplete about how they are used in the function. 
-    Create a new function that, when given a named list of tags and their   
-    attribute names (like below), creates functions which address this problem.
+2. __<span style="color:red">Q</span>__: The use of `...` for all functions has some big downsides. There's no input validation and there will be little information in the documentation or autocomplete about how they are used in the function. Create a new function that, when given a named list of tags and their attribute names (like below), creates functions which address this problem.
 
     ```{r, eval = FALSE}
     list(
@@ -166,21 +152,21 @@ library("methods")
     )
     ```
 
-    All tags should get `class` and `id` attributes.
+   All tags should get `class` and `id` attributes.
     
-    __<span style="color:orange">A</span>__: The use of `...` for all functions seems too general. It is known which attributes each tag function may have, so we can organize them in a named list of tags and attribute names.
+   __<span style="color:orange">A</span>__: The use of `...` for all functions seems too general. It is known which attributes each tag function may have, so we can organize them in a named list of tags and attribute names.
     
-    We now need to create tag functions where these attributes are prespecified as arguments. This will enable *autocompletion* and *input validation*. (Documentation would require the functions to be bundeled as a package which we won't do here.)
+   We now need to create tag functions where these attributes are prespecified as arguments. This will enable *autocompletion* and *input validation*. (Documentation would require the functions to be bundeled as a package which we won't do here.)
     
-    Let's start by programmatically creating one tag function now and worry about the iteration problem later.
+   Let's start by programmatically creating one tag function now and worry about the iteration problem later.
     
     ```{r}
     tag_info <- list(a = c("href", "src"))
     ```
     
-    The function factory needs to be changed: We need to parse the information provided by the list (tag name and arguments) and unquote-splice the provided arguments into the args part of `rlang::new_function()`. This will provide the autocompletion. In this step we also add the global attributes class and id. 
+   The function factory needs to be changed: We need to parse the information provided by the list (tag name and arguments) and unquote-splice the provided arguments into the args part of `rlang::new_function()`. This will provide the autocompletion. In this step we also add the global attributes class and id. 
     
-    The values of the provided named attributes need to be collected, when the function is called. We use a little "environment-hack" to accomplish this. 
+   The values of the provided named attributes need to be collected, when the function is called. We use a little "environment-hack" to accomplish this. 
     
     ```{r}
     tag <- function(tag_i,
@@ -229,7 +215,7 @@ library("methods")
     }
     ```
     
-    We also rewrite `validate_dots`. We check for any unexpected named arguments, which will serve as input validation. The list of unnamed arguments will be escaped as before.
+   We also rewrite `validate_dots`. We check for any unexpected named arguments, which will serve as input validation. The list of unnamed arguments will be escaped as before.
     
     ```{r}
     validate_dots <- function(...) {
@@ -243,7 +229,7 @@ library("methods")
     }
     ```
 
-    A few comments regarding the implementation details: The `...` had to be placed in front of the other arguments - otherwise positional matching would assign unnamed values to prespecified values and and unnamed content wouldn't be recognized properly. It was also a challenges to properly collect the prespecified arguments. These are prespecified but setting them at runtime is optional, so they had to be collected in a lazy fashion. Our hack via `caller_env()` isn't pretty and could certainly be improved upon - but it works, as we can see here:
+   A few comments regarding the implementation details: The `...` had to be placed in front of the other arguments - otherwise positional matching would assign unnamed values to prespecified values and and unnamed content wouldn't be recognized properly. It was also a challenges to properly collect the prespecified arguments. These are prespecified but setting them at runtime is optional, so they had to be collected in a lazy fashion. Our hack via `caller_env()` isn't pretty and could certainly be improved upon - but it works, as we can see here:
     
     ```{r, error=TRUE}
     # create a single tag function
@@ -263,7 +249,7 @@ library("methods")
     a(href = "http://somelink.com", "take a look at this", width = "200")
     ```
     
-    To create many tag functions we can iterate over a list with inputs.
+   To create many tag functions we can iterate over a list with inputs.
     
     ```{r}
     tag_inputs <- list(
@@ -283,10 +269,10 @@ library("methods")
       map(~ tag)  # potentially use imap to operate on index as well
     ```
 
-1.  __<span style="color:red">Q</span>__: Currently the HTML doesn't look terribly pretty, and it's hard to see the
+3. __<span style="color:red">Q</span>__: Currently the HTML doesn't look terribly pretty, and it's hard to see the
    structure. How could you adapt `tag()` to do indenting and formatting?
    
-    __<span style="color:green">A</span>__: First let us define all needed functions from the textbook:
+   __<span style="color:green">A</span>__: First let us define all needed functions from the textbook:
     
     ```{r required code from book, include=FALSE}
     tag <- function(tag) {
@@ -355,7 +341,7 @@ library("methods")
     }
     ```
 
-    Now, let's look at the example from above:
+   Now, let's look at the example from above:
 
     ```{r}
     with_html(
@@ -367,7 +353,7 @@ library("methods")
     )
     ```
 
-    The formatting comes down to just one long line of code. This output will be more difficult to work with, to inspect what the code does and if it's correct. What kind of formatting would we prefer instead? The [Google HTML Styleguide](https://google.github.io/styleguide/htmlcssguide.html#HTML_Formatting_Rules) suggests *indentation* by 2 spaces and *new lines* for every block, list, or table element. There are other recommendations, but we will keep things simple and will be satisfied with the following output.
+   The formatting comes down to just one long line of code. This output will be more difficult to work with, to inspect what the code does and if it's correct. What kind of formatting would we prefer instead? The [Google HTML Styleguide](https://google.github.io/styleguide/htmlcssguide.html#HTML_Formatting_Rules) suggests *indentation* by 2 spaces and *new lines* for every block, list, or table element. There are other recommendations, but we will keep things simple and will be satisfied with the following output.
 
     ```{html, eval=FALSE}
     <body>
@@ -377,7 +363,7 @@ library("methods")
     </body>
     ```
     
-    First we adjust the `print.advr_html` method. We replace the `strwrap` function, because this will wrap HTML-code into one long line regardless of its input. We use `cat` instead, because it prints linebreaks (`"\n"`) nicely.
+   First we adjust the `print.advr_html` method. We replace the `strwrap` function, because this will wrap HTML-code into one long line regardless of its input. We use `cat` instead, because it prints linebreaks (`"\n"`) nicely.
     
     ```{r}
     html <- function(x) structure(x, class = "advr_html")
@@ -390,7 +376,7 @@ library("methods")
     }
     ```
     
-    In our desired output we can see, that the content of the `body`-function requires another formatting than the other tag-functions. We will therefore create a new `format_code`-function, that allows for optional indentation and linbreaks. For this `strwarp` provides two helpful arguments: each element will start with a linebreak (`prefix = "\n"`) and will be indentend propely (`indent = 2`).
+   In our desired output we can see, that the content of the `body`-function requires another formatting than the other tag-functions. We will therefore create a new `format_code`-function, that allows for optional indentation and linbreaks. For this `strwarp` provides two helpful arguments: each element will start with a linebreak (`prefix = "\n"`) and will be indentend propely (`indent = 2`).
     
     ```{r}
     format_code <- function(children, indent = FALSE){
@@ -403,7 +389,7 @@ library("methods")
     }
     ```
     
-    We adjust the body function to include the `format_code()`-helper. (This could also be approached programatically in the tag function factory.)
+   We adjust the body function to include the `format_code()`-helper. (This could also be approached programatically in the tag function factory.)
     
     ```{r}
     html_tags$body <- function(...){
@@ -424,7 +410,7 @@ library("methods")
     }
     ```
     
-    The resulting output is much more satisfying.
+   The resulting output is much more satisfying.
     
     ```{r}
     with_html(
@@ -436,10 +422,8 @@ library("methods")
     )
     ```
 
-1.  __<span style="color:red">Q</span>__: Reason about the following code that calls `with_html()` referening objects
-    from the environment. Will it work or fail? Why? Run the code to 
-    verify your predictions.
-    
+4. __<span style="color:red">Q</span>__: Reason about the following code that calls `with_html()` referening objects from the environment. Will it work or fail? Why? Run the code to verify your predictions.
+       
     ```{r, eval = FALSE}
     greeting <- "Hello!"
     with_html(p(greeting))
@@ -448,9 +432,9 @@ library("methods")
     with_html(p(address))
     ```
     
-    __<span style="color:green">A</span>__: When we created the various HTML tag functions, `address()` was one of them. This HTML tag may be used to provide contact information on an HTML page. All our tag functions are not present in the global environment, but rather elements of the list `html_tags`.
+   __<span style="color:green">A</span>__: When we created the various HTML tag functions, `address()` was one of them. This HTML tag may be used to provide contact information on an HTML page. All our tag functions are not present in the global environment, but rather elements of the list `html_tags`.
     
-    The DSL code wrapped in `with_html()` is evaluated in its own environment and in the "context" of `html_tags`. The tag functions are available, because we provided a list of them as a data mask. As `r ?as_data_mask` indicates: "Objects in the mask have precedence over objects in the environment."
+   The DSL code wrapped in `with_html()` is evaluated in its own environment and in the "context" of `html_tags`. The tag functions are available, because we provided a list of them as a data mask. As `r ?as_data_mask` indicates: "Objects in the mask have precedence over objects in the environment."
     
     ```{r, error=TRUE}
     greeting <- "Hello!"
@@ -460,7 +444,7 @@ library("methods")
     with_html(p(address))
     ```
     
-    The error message then tells us, what the problem is: `p(address)` operates on `address()`, the function not the character, and we haven't implemented an `escape.function()` method. 
+   The error message then tells us, what the problem is: `p(address)` operates on `address()`, the function not the character, and we haven't implemented an `escape.function()` method. 
     
     ```{r}
     # checking our list of tag functions
@@ -472,17 +456,12 @@ library("methods")
     with_html(p(address))
     ```
     
-    
 ## LaTeX
 
-1.  __<span style="color:red">Q</span>__: Add escaping. The special symbols that should be escaped by adding a backslash
-    in front of them are `\`, `$`, and `%`. Just as with HTML, you'll need to 
-    make sure you don't end up double-escaping. So you'll need to create a small 
-    S3 class and then use that in function operators. That will also allow you 
-    to embed arbitrary LaTeX if needed.
+1. __<span style="color:red">Q</span>__: Add escaping. The special symbols that should be escaped by adding a backslash in front of them are `\`, `$`, and `%`. Just as with HTML, you'll need to make sure you don't end up double-escaping. So you'll need to create a small S3 class and then use that in function operators. That will also allow you to embed arbitrary LaTeX if needed.
     
-    __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: 
 
-1.  __<span style="color:red">Q</span>__: Complete the DSL to support all the functions that `plotmath` supports.
+2. __<span style="color:red">Q</span>__: Complete the DSL to support all the functions that `plotmath` supports.
 
-    __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: 

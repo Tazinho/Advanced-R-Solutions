@@ -1,22 +1,8 @@
-```{r include=FALSE, cache=FALSE}
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE
-)
-```
-```{r include=FALSE, cache=FALSE}
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE
-)
-```
 # Quasiquotation
 
 ## Motivation
 
-1.  __<span style="color:red">Q</span>__: For each function in the following base R code, identify which arguments are quoted and which are evaluated.
+1. __<span style="color:red">Q</span>__: For each function in the following base R code, identify which arguments are quoted and which are evaluated.
 
     ```{r, eval = FALSE}
     library(MASS)
@@ -29,7 +15,7 @@ knitr::opts_chunk$set(
     rm(mtcars2)
     ```
     
-    __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: 
     
     ```{r, eval = FALSE}
     library(MASS)  # MASS -> quoted
@@ -46,10 +32,10 @@ knitr::opts_chunk$set(
     rm(mtcars2)  # mtcars2 -> quoted
     ```
     
-    Some of the arguments (`mtcars` or `mtcars2`) are objects, which can be found in the global environment. When you type them into the console, the object will be returned. Others such as `cyl`, `sum(vs)` or `am` will need to be evaluated within a certain environment. That's why they are quoted.
+   Some of the arguments (`mtcars` or `mtcars2`) are objects, which can be found in the global environment. When you type them into the console, the object will be returned. Others such as `cyl`, `sum(vs)` or `am` will need to be evaluated within a certain environment. That's why they are quoted.
 
 
-1.  __<span style="color:red">Q</span>__: For each function in the following tidyverse code, identify which arguments are quoted and which are evaluated.
+2. __<span style="color:red">Q</span>__: For each function in the following tidyverse code, identify which arguments are quoted and which are evaluated.
 
     ```{r, eval = FALSE}
     library(dplyr)
@@ -62,7 +48,7 @@ knitr::opts_chunk$set(
     ggplot(by_cyl, aes(cyl, mean)) + geom_point()
     ```
 
-    __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__:
     
     ```{r, eval = FALSE}
     library(dplyr)    # dplyr -> quoted
@@ -78,14 +64,14 @@ knitr::opts_chunk$set(
       geom_point() 
     ```
     
-    The column names in piped dplyr-statements need to be quoted, so they can be found in the specified dataframe. The names of new variables as defined on the LHS of the `summarise`-expression are also quoted, while the function calls on the RHS will be evaluated.
+   The column names in piped dplyr-statements need to be quoted, so they can be found in the specified dataframe. The names of new variables as defined on the LHS of the `summarise`-expression are also quoted, while the function calls on the RHS will be evaluated.
     
 ## Quotation
 
-1.  __<span style="color:red">Q</span>__: What happens if you try and use `enexpr()` with an expression?
+1. __<span style="color:red">Q</span>__: What happens if you try and use `enexpr()` with an expression?
     What happens if you try and use `enexpr()` with a missing argument?
     
-    __<span style="color:green">A</span>__: In the first case we'll get an error:
+   __<span style="color:green">A</span>__: In the first case we'll get an error:
     
     ```{r, error = TRUE}
     library(rlang)
@@ -94,7 +80,7 @@ knitr::opts_chunk$set(
     on_expr(x + y)
     ```
     
-    In the second case a missing argument is returned:
+   In the second case a missing argument is returned:
     
     ```{r}
     on_missing <- function(x) {enexpr(x)}
@@ -102,9 +88,8 @@ knitr::opts_chunk$set(
     is_missing(on_missing())
     ```
 
-1.  __<span style="color:red">Q</span>__: Compare and contrast the following two functions. Can you predict the
-    ouput before running them?
-
+2. __<span style="color:red">Q</span>__: Compare and contrast the following two functions. Can you predict the ouput before running them?
+   
     ```{r, result = FALSE}
     f1 <- function(x, y) {
       exprs(x = x, y = y)
@@ -116,11 +101,11 @@ knitr::opts_chunk$set(
     f2(a + b, c + d)
     ```
     
-    __<span style="color:green">A</span>__: Both functions are able to capture multiple arguments and will return a named list of expressions. `f1()` will return the arguments defined within the body of `f1()`, because `exprs()` captures the expressions as specified by the developer during the definition of `f1`. `f2()` will return the arguments supplied to `f2()` as specified by the user when the function is called.
+   __<span style="color:green">A</span>__: Both functions are able to capture multiple arguments and will return a named list of expressions. `f1()` will return the arguments defined within the body of `f1()`, because `exprs()` captures the expressions as specified by the developer during the definition of `f1`. `f2()` will return the arguments supplied to `f2()` as specified by the user when the function is called.
     
-1.  __<span style="color:red">Q</span>__: How are `exprs(a)` and `exprs(a = )` different? Think about both the input and the output.
+3. __<span style="color:red">Q</span>__: How are `exprs(a)` and `exprs(a = )` different? Think about both the input and the output.
     
-    __<span style="color:green">A</span>__: In `exprs(a)` the input `a` is interpreted as a symbol for an unnamed argument. Consequently the output shows an unnamed list with the first element containing the symbol `a`. In `exprs(a = )` the first argument is named `a`, but then no value is provided. This leads to the output of a named list with the first element named `a`, which contains the missing argument.
+   __<span style="color:green">A</span>__: In `exprs(a)` the input `a` is interpreted as a symbol for an unnamed argument. Consequently the output shows an unnamed list with the first element containing the symbol `a`. In `exprs(a = )` the first argument is named `a`, but then no value is provided. This leads to the output of a named list with the first element named `a`, which contains the missing argument.
     
     ```{r}
     out1 <- exprs(a)
@@ -130,7 +115,7 @@ knitr::opts_chunk$set(
     is_missing(out2$a)
     ```
 
-1.  __<span style="color:red">Q</span>__: What does the following command return? What information is lost? Why?
+4. __<span style="color:red">Q</span>__: What does the following command return? What information is lost? Why?
 
     ```{r, eval = FALSE}
     expr({
@@ -138,7 +123,7 @@ knitr::opts_chunk$set(
     })
     ```
 
-    __<span style="color:green">A</span>__: When we look at the captured expression, we see that the extra whitespaces and comments are lost. R ignores them when parsing an expression. They do do not need to be represented in the AST, because they do not affect the evaluation of the expression.
+   __<span style="color:green">A</span>__: When we look at the captured expression, we see that the extra whitespaces and comments are lost. R ignores them when parsing an expression. They do do not need to be represented in the AST, because they do not affect the evaluation of the expression.
     
     ```{r}
     library(rlang)
@@ -148,33 +133,27 @@ knitr::opts_chunk$set(
     
     captured_expression
     ```
-    However, it is possible to retrieve the original input through the attributes of the captured expression:
+   
+   However, it is possible to retrieve the original input through the attributes of the captured expression:
     
-     ```{r}
+    ```{r}
     attributes(captured_expression)
     ```
 
-1.  __<span style="color:red">Q</span>__: The documentation for `substitute()` says:
+5. __<span style="color:red">Q</span>__: The documentation for `substitute()` says:
 
-    > Substitution takes place by examining each component of the parse tree 
-    > as follows: If it is not a bound symbol in env, it is unchanged. If it
-    > is a promise object, i.e., a formal argument to a function or explicitly 
-    created using delayedAssign(), the expression slot of the promise replaces 
-    > the symbol. If it is an ordinary variable, its value is substituted, 
-    > unless env is .GlobalEnv in which case the symbol is left unchanged.
+   > Substitution takes place by examining each component of the parse tree 
+   > as follows: If it is not a bound symbol in env, it is unchanged. If it
+   > is a promise object, i.e., a formal argument to a function or explicitly 
+   created using delayedAssign(), the expression slot of the promise replaces 
+   > the symbol. If it is an ordinary variable, its value is substituted, 
+   > unless env is .GlobalEnv in which case the symbol is left unchanged.
     
-    Create four examples that illustrate each of the different cases.
-
-1.  __<span style="color:red">Q</span>__: Why does `as.Date.default()` use `substitute()` and `deparse()`?
-    Why does `pairwise.t.test()` use them? Read the source code.
-
-1.  __<span style="color:red">Q</span>__: `pairwise.t.test()` assumes that `deparse()` always returns a length one 
-    character vector. Can you construct an input that violates this expectation? 
-    What happens?
+   Create four examples that illustrate each of the different cases.
 
 ## Unquotation
 
-1.  __<span style="color:red">Q</span>__: Given the following components:
+1. __<span style="color:red">Q</span>__: Given the following components:
 
     ```{r}
     xy <- expr(x + y)
@@ -183,7 +162,7 @@ knitr::opts_chunk$set(
     abc <- exprs(a, b, c)
     ```
     
-    Use quasiquotation to construct the following calls:
+   Use quasiquotation to construct the following calls:
     
     ```{r, eval = FALSE}
     (x + y) / (y + z)
@@ -196,7 +175,7 @@ knitr::opts_chunk$set(
     foo(a = x + y, b = y + z)
     ```
     
-    __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: 
     
     ```{r}
     #1  (x + y) / (y + z)
@@ -217,10 +196,9 @@ knitr::opts_chunk$set(
     expr(foo(a = xy, b = yz))
     ```
 
-1.  __<span style="color:red">Q</span>__: Explain why both `!0 + !0` and `!1 + !1` return `FALSE` while
-    `!0 + !1` returns `TRUE`.
+2. __<span style="color:red">Q</span>__: Explain why both `!0 + !0` and `!1 + !1` return `FALSE` while `!0 + !1` returns `TRUE`.
     
-    __<span style="color:green">A</span>__: To answer this question we look at the AST of the first example:
+   __<span style="color:green">A</span>__: To answer this question we look at the AST of the first example:
     
     ```{r}
     library(lobstr)
@@ -228,28 +206,24 @@ knitr::opts_chunk$set(
     ast(!0 + !0)
     ```
     
-    As the coercion rules are the same in all examples, we can use the precedence order (right to left) to explain all three examples:
+   As the coercion rules are the same in all examples, we can use the precedence order (right to left) to explain all three examples:
     
-    * `!0 + !0`:  
-      So the second zero gets coerced to `FALSE` and `!FALSE` becomes `TRUE`.  
-      `0 + TRUE` gets coerced to 1.  
-      `!1` becomes `!TRUE` which is `FALSE`  
-    * `!1 + !1`:  
-      So `!1` is `FALSE`.  
-      `1 + FALSE` is `1`.  
-      `!1` is `!TRUE` so `FALSE`.  
-    * `!0 + !1`:  
-      `!1` is `FALSE`.  
-      `0 + FALSE` is `0`.  
-      `!0` is `TRUE`.  
+   * `!0 + !0`:  
+     So the second zero gets coerced to `FALSE` and `!FALSE` becomes `TRUE`.  
+     `0 + TRUE` gets coerced to 1.  
+     `!1` becomes `!TRUE` which is `FALSE`  
+   * `!1 + !1`:  
+     So `!1` is `FALSE`.  
+     `1 + FALSE` is `1`.  
+     `!1` is `!TRUE` so `FALSE`.  
+   * `!0 + !1`:  
+     `!1` is `FALSE`.  
+     `0 + FALSE` is `0`.  
+     `!0` is `TRUE`.  
 
-1.  __<span style="color:red">Q</span>__: Base functions `match.fun()`, `page()`, and `ls()` all try to
-    automatically determine whether you want standard or non-standard
-    evaluation. Each uses a different approach. Figure out the essence
-    of each approach by reading the source code, then compare and contrast
-    the techniques.
+3. __<span style="color:red">Q</span>__: Base functions `match.fun()`, `page()`, and `ls()` all try to automatically determine whether you want standard or non-standard evaluation. Each uses a different approach. Figure out the essence of each approach by reading the source code, then compare and contrast the techniques.
 
-1.  __<span style="color:red">Q</span>__: The following two calls print the same, but are actually different:
+4. __<span style="color:red">Q</span>__: The following two calls print the same, but are actually different:
 
     ```{r}
     (a <- expr(mean(1:10)))
@@ -257,16 +231,16 @@ knitr::opts_chunk$set(
     identical(a, b)
     ```
 
-    What's the difference? Which one is more natural?
+   What's the difference? Which one is more natural?
     
-    __<span style="color:green">A</span>__: `call` evalulates its `...` arguments. So in the first call `1:10` will be evaluated to an integer (1, 2, 3, ..., 10) and in the second call `quote()` compensates the effect of the evaluation, so that `b`'s second element will be the expression `1:10` (which is again a call):
-    
+   __<span style="color:green">A</span>__: `call` evalulates its `...` arguments. So in the first call `1:10` will be evaluated to an integer (1, 2, 3, ..., 10) and in the second call `quote()` compensates the effect of the evaluation, so that `b`'s second element will be the expression `1:10` (which is again a call):
+     
     ```{r, eval = TRUE}
     as.list(a)
     as.list(b)
     ```
     
-    We can create an example, where we can see the consequences directly:
+   We can create an example, where we can see the consequences directly:
     
     ```{r, eval = TRUE}
     arg <- seq(10)
@@ -278,15 +252,14 @@ knitr::opts_chunk$set(
     eval(call2)
     ```
     
-    I would prefer the second version, since it behaves more like lazy evaluation. It's better to have call args depends on the calling environment rather than the enclosing environment,that's more similar to normal function behavior.
+   I would prefer the second version, since it behaves more like lazy evaluation. It's better to have call args depends on the calling environment rather than the enclosing environment,that's more similar to normal function behavior.
 
 ## Case studies {#quasi-case-studies}
     
-1.  __<span style="color:red">Q</span>__: Implement `arrange_desc()`, a variant of `dplyr::arrange()` that sorts
-    in descending order by default.
-    
-    __<span style="color:green">A</span>__: We just have to catch the `...` from `arrange()` as an expression and modify the expression to be wrapped inside `desc()`. Afterwards we evaluate this new code within a regular `arrange()` call:
-    
+1. __<span style="color:red">Q</span>__: Implement `arrange_desc()`, a variant of `dplyr::arrange()` that sorts in descending order by default.
+   
+   __<span style="color:green">A</span>__: We just have to catch the `...` from `arrange()` as an expression and modify the expression to be wrapped inside `desc()`. Afterwards we evaluate this new code within a regular `arrange()` call:
+       
     ```{r}
     library(dplyr)
     library(purrr)
@@ -299,7 +272,7 @@ knitr::opts_chunk$set(
     }
     ```
     
-    Let's try it out
+   Let's try it out
     
     ```{r}
     d <- data.frame(abc = letters[1:6],
@@ -313,10 +286,9 @@ knitr::opts_chunk$set(
     d %>% arrange_desc(id2, id1)
     ```
   
-1.  __<span style="color:red">Q</span>__: Implement `filter_or()`, a variant of `dplyr::filter()` that combines 
-    multiple arguments using `|` instead of `&`.
-    
-    __<span style="color:green">A</span>__: This time we just need to collapse the `...` arguments with `|`. Therefore we can use `purrr::reduce()` and afterwards we just need to evaluate the new code within a regular filter call:
+2. __<span style="color:red">Q</span>__: Implement `filter_or()`, a variant of `dplyr::filter()` that combines multiple arguments using `|` instead of `&`.
+       
+   __<span style="color:green">A</span>__: This time we just need to collapse the `...` arguments with `|`. Therefore we can use `purrr::reduce()` and afterwards we just need to evaluate the new code within a regular filter call:
     
     ```{r}
     filter_or <- function(.data, ...){
@@ -332,11 +304,9 @@ knitr::opts_chunk$set(
     filter_or(d, x < 3, y < 3)
     ```
 
-1.  __<span style="color:red">Q</span>__:Implement `partition_rows()` which, like `partition_cols()`, returns two
-    data frames, one containing the selected rows, and the other containing
-    the rows that weren't selected.
-    
-    __<span style="color:green">A</span>__: We just have to decide if we focus on integer subsetting via `dplyr::slice()` or logical subsetting via `dplyr::filter()`. The rest is straightforward. Since the implementations of both subsetting styles are completely equivalent we just choose one without any particular reason:
+3. __<span style="color:red">Q</span>__:Implement `partition_rows()` which, like `partition_cols()`, returns two data frames, one containing the selected rows, and the other containing the rows that weren't selected.
+   
+   __<span style="color:green">A</span>__: We just have to decide if we focus on integer subsetting via `dplyr::slice()` or logical subsetting via `dplyr::filter()`. The rest is straightforward. Since the implementations of both subsetting styles are completely equivalent we just choose one without any particular reason:
     
     ```{r}
     partition_rows <- function(.data, ...){
@@ -353,13 +323,10 @@ knitr::opts_chunk$set(
     partition_rows(d, x <= 3)
     ```
 
-1.  __<span style="color:red">Q</span>__:Add error handling to `slice()`. Give clear error messages if either
-    `along` or `index` have invalid values (i.e. not numeric, not length 1,
-    too small, or too big).
-
-1.  __<span style="color:red">Q</span>__:Re-implement the Box-Cox transform defined below using unquoting and
-    `new_function()`:
-
+4. __<span style="color:red">Q</span>__:Add error handling to `slice()`. Give clear error messages if either `along` or `index` have invalid values (i.e. not numeric, not length 1, too small, or too big).
+   
+5. __<span style="color:red">Q</span>__:Re-implement the Box-Cox transform defined below using unquoting and `new_function()`:
+   
     ```{r}
     bc <- function(lambda) {
       if (lambda == 0) {
@@ -370,13 +337,13 @@ knitr::opts_chunk$set(
     }
     ```
     
-    __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__:
     
     ```{r}
     bc2 <- function(lambda){
       lambda <- enexpr(lambda)
       
-      if(!!lambda == 0) {
+      if (!!lambda == 0) {
         new_function(exprs(x = ), expr(log(x)))
         } else {
           new_function(exprs(x = ), expr((x^(!!lambda) - 1) / !!lambda))
@@ -387,17 +354,16 @@ knitr::opts_chunk$set(
     bc2(2)
     bc2(2)(2)
     ```
-
-1.  __<span style="color:red">Q</span>__:Re-implement the simple `compose()` defined below using quasiquotation and 
-    `new_function()`:
-    
+   
+6. __<span style="color:red">Q</span>__:Re-implement the simple `compose()` defined below using quasiquotation and `new_function()`:
+     
     ```{r}
     compose <- function(f, g) {
       function(...) f(g(...))
     }
     ```
     
-    __<span style="color:green">A</span>__: The implementation is straight forward. However, it can become tough to handle all bracktes correct at the first try:
+   __<span style="color:green">A</span>__: The implementation is straight forward. However, it can become tough to handle all bracktes correct at the first try:
     
     ```{r}
     compose2 <- function(f, g){
@@ -415,11 +381,9 @@ knitr::opts_chunk$set(
 
 ## Dot-dot-dot (`...`)
 
-1.  __<span style="color:red">Q</span>__: Carefully read the source code for `interaction()`, `expand.grid()`, and 
-    `par()`.  Compare and constract the techniques they use for switching 
-    between dots and list behaviour.
+1. __<span style="color:red">Q</span>__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`.  Compare and constract the techniques they use for switching between dots and list behaviour.
 
-1.  __<span style="color:red">Q</span>__: Explain the problem with this defintion of `set_attr()`
+2. __<span style="color:red">Q</span>__: Explain the problem with this defintion of `set_attr()`
     
     ```{r, error = TRUE}
     set_attr <- function(x, ...) {
@@ -430,9 +394,9 @@ knitr::opts_chunk$set(
     set_attr(1:10, x = 10)
     ```
     
-    In this example we first learn that attributes must be named, as correctly given out by the error message. However, this behaviour mainly occures, because the first argument of `set_attr()` is named `x` as in the function call below. So the other argument in the `set_attr()` function call (`1:10`) is the only one, which is supplied as (unnamed) usage of the ellipsis. Therefore `set_attr()` tries to assign `1:10` as attribute to `x = 10` and the error occures.
-
-The function becomes probably clearer and less error-prone when we name the first argument `.x` again. In this case `1:10` will get the (named) attribute `x = 10` assigned:
+   __<span style="color:green">A</span>__: In this example we first learn that attributes must be named, as correctly given out by the error message. However, this behaviour mainly occures, because the first argument of `set_attr()` is named `x` as in the function call below. So the other argument in the `set_attr()` function call (`1:10`) is the only one, which is supplied as (unnamed) usage of the ellipsis. Therefore `set_attr()` tries to assign `1:10` as attribute to `x = 10` and the error occures.
+   
+   The function becomes probably clearer and less error-prone when we name the first argument `.x` again. In this case `1:10` will get the (named) attribute `x = 10` assigned:
 
     ```{r}
     set_attr <- function(.x, ...) {
