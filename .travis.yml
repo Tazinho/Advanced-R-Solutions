@@ -1,0 +1,22 @@
+language: R
+sudo: false
+cache:
+  packages: true
+  directories:
+  - _bookdown_files
+  - $HOME/.npm
+
+pandoc_version: 2.1.1
+
+before_install:
+- mkdir ~/.R
+- cp Makevars ~/.R
+- npm install netlify-cli -g
+
+script:
+- Rscript -e 'bookdown::render_book("index.Rmd")'
+
+deploy:
+  provider: script
+  script: netlify deploy -t $NETLIFY_PUBLISH_KEY
+  skip_cleanup: true
