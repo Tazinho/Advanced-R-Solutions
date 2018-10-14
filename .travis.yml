@@ -14,6 +14,7 @@ before_install:
 - npm install netlify-cli -g
 
 install:
+  - travis_wait 60 mvn install
   - R -e "0" --args --bootstrap-packrat
   - R -e "packrat::restore(restart = FALSE)"
 
