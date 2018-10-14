@@ -1,29 +1,28 @@
 ---
 title: "Advanced R Solutions"
 author: "Malte Grosser, Henning Bumann, Peter Hurford & Robert Krzyzanowski"
+github-repo: Tazinho/Advanced-R-Solutions
 date: "`r Sys.Date()`"
-knit: "bookdown::render_book"
+description: "Solutions to the exercises in Hadley Wickham's book Advanced R."
+cover-image: images/advrs_cover3.png
+documentclass: book
 site: bookdown::bookdown_site
+knit: "bookdown::render_book"
+before_chapter_script: ["before_chapter_script_1.R"]
 output:
   bookdown::gitbook:
     includes:
     config:
       toc:
-          collapse: section
-          scroll_highlight: yes
-          before: null
-          after: null
+        collapse: section
+        scroll_highlight: yes
+        before: null
+        after: null
       edit: https://github.com/Tazinho/Advanced-R-Solutions/edit/master/%s
-documentclass: book
 bibliography: [packages.bib]
 biblio-style: apalike
 link-citations: yes
-github-repo: Tazinho/Advanced-R-Solutions
-before_chapter_script: ["before_chapter_script_1.R"]
-description: "Solutions to the exercises in Hadley Wickham's book Advanced R."
-cover-image: images/advrs_cover3.png
 ---
-
 
 # Prerequisites {-}
 
@@ -35,16 +34,16 @@ knitr::opts_chunk$set(collapse = TRUE)
 knitr::include_graphics('images/advrs_cover3.png', dpi = NA)
 ```
 
-This book aims to contribute solutions to Hadley Wickham's book [Advanced R](https://adv-r.hadley.nz/). We hope to finish the answers to all the exercises till the end of 2018. The code of the book can be found on [github](https://github.com/Tazinho/Advanced-R-Solutions.git). 
+This book aims to contribute solutions to Hadley Wickham's book [Advanced R](https://adv-r.hadley.nz/). We hope to finish the answers to all the exercises till the end of 2018. The code of the book can be found on [Github](https://github.com/Tazinho/Advanced-R-Solutions.git). 
 
-The date of the exercise versions in Hadley’s book (2nd edition) is June 29th 2018.
+The date of the exercise versions in Hadley’s book (2nd edition) is October 6th 2018.
 
-```{r, echo = FALSE, warning = FALSE}
-suppressPackageStartupMessages(library(dplyr))
-suppressPackageStartupMessages(library(tidyr))
-suppressPackageStartupMessages(library(ggplot2))
-suppressPackageStartupMessages(library(forcats))
-suppressPackageStartupMessages(library(methods))
+```{r, echo = FALSE, warning = FALSE, message=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(forcats)
+library(methods)
 
 df_new <- tibble::tribble(~ `1 Names and values`, ~ `2 Vectors`, ~ `3 Subsetting`, ~ `4 Functions`, ~ `5 Environments`, ~ `6 Conditions`, ~ `7 Functionals`, ~ `8 Function factories`,  ~ `9 Function operators`,  ~ `10 S3`, ~`11 S4`, ~`12 R6`, ~`13 Expressions`, ~`14 Quasiquotation`, ~`15 Evaluation`, ~`16 Translating R code`, ~ `17 Performance`, ~ `18 Optimising code`, ~ `19 High performance functions with Rcpp`,
                        "x",  "-",  "x",   "x",  "x",  "x",  "-",  "-",  "-",   "o",    "x",  "-",  "x",     "x",   "x",  "x",  "-",  "-",  "x",
@@ -91,7 +90,8 @@ df_new <- df_new %>% filter(!is.na(solved))
 
 quote_solutions <- mean(df_new$solved == "x")
 
-df_new <- df_new %>% separate(chapter, "nr", sep = " ", remove = FALSE) %>% 
+df_new <- df_new %>%
+  separate(chapter, "nr", sep = " ", remove = FALSE) %>% 
   mutate(nr = as.integer(nr), 
          chapter = factor(chapter),
          chapter = fct_reorder(chapter, nr, .desc = TRUE),
@@ -99,8 +99,7 @@ df_new <- df_new %>% separate(chapter, "nr", sep = " ", remove = FALSE) %>%
          id = 1:n())
 df_new <- as_data_frame(df_new)
 
-solved_exercises <-
-  ggplot(df_new, aes(x = chapter, fill = solved, group = -id)) +
+solved_exercises <- ggplot(df_new, aes(x = chapter, fill = solved, group = -id)) +
   scale_y_continuous(expand = c(0, 0)) +
   scale_fill_manual(values = c("#F99992", "orange", "#00BFC4")) +
   geom_bar(colour = "white") +
@@ -122,16 +121,11 @@ solved_exercises <-
   panel.background = element_blank()
   ) +
   ggtitle(paste0("Solved exercises (", round(100 * quote_solutions, 2), "%)"))
+
   solved_exercises
 ```
 
 The date of the exercise versions in Hadley's book (1st edition) is January 25th 2017.
-
-```{r eval=FALSE, echo = FALSE}
-devtools::install_github("rstudio/bookdown")
-date()
-```
-
 
 ```{r, echo = FALSE, warning=FALSE}
 df <- tibble::tribble(~`1 Data structures`, ~`2 Subsetting`, ~`3 Functions`, ~`4 OO field guide`, ~`5 Environments`, ~`6 Exceptions and debugging`, ~`7 Functional programming`, ~`8 Functionals`, ~`9 Function operators`, ~`10 Non standard evaluation`, ~`11 Expressions`, ~`12 Domain specific languages`, ~`13 Performance`, ~`14 Profiling`, ~`15 Memory`, ~`16 Rcpp`,
@@ -184,7 +178,8 @@ df <- df %>% filter(!is.na(solved))
 
 quote_solutions <- mean(df$solved)
   
-df <- df %>% separate(chapter, "nr", sep = " ", remove = FALSE) %>% 
+df <- df %>% 
+  separate(chapter, "nr", sep = " ", remove = FALSE) %>% 
   mutate(nr = as.integer(nr), 
          chapter = factor(chapter),
          chapter = fct_reorder(chapter, nr, .desc = TRUE),
@@ -192,8 +187,7 @@ df <- df %>% separate(chapter, "nr", sep = " ", remove = FALSE) %>%
          id = 1:n())
 df <- as_data_frame(df)
 
-solved_exercises <- 
-  ggplot(df, aes(x = chapter, fill = solved, group = -id)) +
+solved_exercises <- ggplot(df, aes(x = chapter, fill = solved, group = -id)) +
   scale_y_continuous(expand = c(0,0)) +
   geom_bar(colour = "white") + 
   theme(legend.position="none",
@@ -210,21 +204,21 @@ solved_exercises <-
         panel.border = element_blank(),
         panel.background = element_blank()) +
   ggtitle(paste0("Solved exercises (", round(100 * quote_solutions), "%)"))
+
 solved_exercises
 ```
 
 
 ```{r include=FALSE}
 # automatically create a bib database for R packages
-knitr::write_bib(c(
-  .packages(), 'bookdown', 'knitr', 'rmarkdown'
-), 'packages.bib')
+knitr::write_bib(c(.packages(), 'bookdown', 'knitr', 'rmarkdown'),
+                 'packages.bib')
 ```
 
-## Acknowledgements
+## Acknowledgements {-}
 
 We would like to thank everyone who contrihubted to our project via fixing typos, grammer or revising whole exercises. Thank you: `@caijun`, `@3zhang`, `@lotgon` 
 
-## License
+## License {-}
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work by Malte Grosser, Henning Bumann, Peter Hurford & Robert Krzyzanowski is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>
