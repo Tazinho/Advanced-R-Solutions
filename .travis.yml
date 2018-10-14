@@ -13,12 +13,12 @@ before_install:
 - cp Makevars ~/.R
 - npm install netlify-cli -g
 
-install: travis_wait 60 mvn install
+install: 
   - R -e "0" --args --bootstrap-packrat
   - R -e "packrat::restore(restart = FALSE)"
 
 script:
-- Rscript -e 'bookdown::render_book("index.Rmd")'
+- travis_wait 30 Rscript -e 'bookdown::render_book("index.Rmd")'
 
 pandoc_version: 2.1.1
 
