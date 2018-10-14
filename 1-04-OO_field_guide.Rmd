@@ -45,7 +45,7 @@ library(methods)
 4.  __<span style="color:red">Q</span>__: Which base generic has the greatest number of defined methods?  
 __<span style="color:green">A</span>__: 
     
-    ```{r, warning = FALSE, cache = FALSE}
+    ```{r, warning = FALSE}
     library("methods")
     objs <- mget(ls("package:base"), inherits = TRUE)
     funs <- Filter(is.function, objs)
@@ -62,7 +62,7 @@ __<span style="color:green">A</span>__:
     figure out what's going on. Write down the rules in the simplest form
     possible.
 
-    ```{r, eval = TRUE}
+    ```{r}
     y <- 1
     g <- function(x) { 
       y <- 2
@@ -95,7 +95,7 @@ __<span style="color:green">A</span>__:
     and `g` is different in the example below. What function helps 
     distinguish between the behaviour of `f` and `g`?
 
-    ```{r, eval = TRUE}
+    ```{r}
     f <- function() 1
     g <- function() 2
     class(g) <- "function"
