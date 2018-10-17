@@ -122,10 +122,11 @@ solved_exercises <- ggplot(df_new, aes(x = chapter, fill = solved, group = -id))
   ) +
   ggtitle(paste0("Solved exercises (", round(100 * quote_solutions, 2), "%)"))
 
-  solved_exercises
+  solved_exercises +
+    ggtitle("Exercise Status - Advanced R (2nd Edition)")
 ```
 
-The date of the exercise versions in Hadley's book (1st edition) is January 25th 2017.
+
 
 ```{r, echo = FALSE, warning=FALSE}
 df <- tibble::tribble(~`1 Data structures`, ~`2 Subsetting`, ~`3 Functions`, ~`4 OO field guide`, ~`5 Environments`, ~`6 Exceptions and debugging`, ~`7 Functional programming`, ~`8 Functionals`, ~`9 Function operators`, ~`10 Non standard evaluation`, ~`11 Expressions`, ~`12 Domain specific languages`, ~`13 Performance`, ~`14 Profiling`, ~`15 Memory`, ~`16 Rcpp`,
@@ -205,9 +206,11 @@ solved_exercises <- ggplot(df, aes(x = chapter, fill = solved, group = -id)) +
         panel.background = element_blank()) +
   ggtitle(paste0("Solved exercises (", round(100 * quote_solutions), "%)"))
 
-solved_exercises
+solved_exercises +
+    ggtitle("Exercise Status - Advanced R (1st Edition)")
 ```
 
+The formulation of these exercises in this book corresponds to Advanced R (1st edition) from January 25th 2017.
 
 ```{r include=FALSE}
 # automatically create a bib database for R packages
