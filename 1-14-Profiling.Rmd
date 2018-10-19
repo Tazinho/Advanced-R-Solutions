@@ -1,3 +1,13 @@
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
+
+Sys.setenv(LANGUAGE = "en")
+library("methods")
+```
 # Profiling
 
 ## Has somebody already solved the problem?
@@ -413,7 +423,7 @@ provides us with enough information and guides our attention on solutions in the
     ```
     
     In our final benchmark, we also include compiled verions of all our attempts:
-    ```{r, eval = FALSE}
+    ```{r}
     cor_df_c <- compiler::cmpfun(cor_df)
     cor_df2_c <- compiler::cmpfun(cor_df2)
     cor_df3_c <- compiler::cmpfun(cor_df3)
@@ -469,7 +479,7 @@ provides us with enough information and guides our attention on solutions in the
     
     To trust our final result we include a last check for similar return values:
     
-    ```{r, eval = FALSE}
+    ```{r}
     set.seed(1)
     cor_df()
     #> [1] -0.001441277
@@ -549,7 +559,7 @@ provides us with enough information and guides our attention on solutions in the
     
     __<span style="color:green">A</span>__: We compare regarding different sizes for square matrices:
     
-    ```{r long calculation}
+    ```{r long calculation, eval = FALSE}
     library(microbenchmark)
     dimensions <- c(1e0, 1e1, 1e2, 1e3, 0.5e4, 1e4)
     matrices <- lapply(dimensions,
@@ -604,12 +614,12 @@ provides us with enough information and guides our attention on solutions in the
     xvector <- lapply(dimensions, rnorm)
     weights <- lapply(dimensions, rnorm)
     
-    bench_sum <- Map(function(x, y) fivenum(microbenchmark(sum(x * y))$time),
+    bench_sum <- Map(function(x, y) fivenum(microbenchmark::microbenchmark(sum(x * y))$time),
                      xvector, weights)
     bench_sum <- data.frame(time = unlist(bench_sum),
                             call = "sum",
                             stringsAsFactors = FALSE)
-    bench_cp <- Map(function(x, y) fivenum(microbenchmark(crossprod(x, y)[1])$time),
+    bench_cp <- Map(function(x, y) fivenum(microbenchmark::microbenchmark(crossprod(x, y)[1])$time),
                     xvector, weights)
     bench_cp <- data.frame(time = unlist(bench_cp),
                            call = "crossproduct",
@@ -622,6 +632,7 @@ provides us with enough information and guides our attention on solutions in the
     df$aggr_size <- rep(c(1, 2, 3, 2, 1), times = length(dimensions))
     df$group <- paste(as.character(df$call), as.character(df$aggr), sep = " ")
     
+    library(ggplot2)
     ggplot(df, aes(x = dimension, y = time, colour = call, group = group)) +
       geom_point() + 
       geom_line(aes(linetype = factor(aggr_size, levels = c("3", "2", "1"))),
