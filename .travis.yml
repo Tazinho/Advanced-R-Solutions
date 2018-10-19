@@ -1,0 +1,34 @@
+language: R
+sudo: false
+
+cache:
+  packages: true
+  directories:
+    - $TRAVIS_BUILD_DIR/_bookdown_files
+    - $TRAVIS_BUILD_DIR/packrat/lib
+    - $HOME/.npm
+
+before_install:
+  - mkdir ~/.R
+  - cp Makevars ~/.R
+  - npm install netlify-cli -g
+
+install: 
+  - R -e "0" --args --bootstrap-packrat
+  - R -e "packrat::restore(restart = FALSE)"
+
+script:
+  - Rscript -e 'bookdown::render_book("index.Rmd")'
+  - Rscript -e 'file.copy("_redirects", bookdown:::output_dirname(NULL))'
+
+pandoc_version: 2.1.1
+
+deploy:
+  provider: script
+  script: netlify deploy --dir="_book/" --prod
+  skip_cleanup: true
+
+notifications:
+  email:
+    - $EMAIL_TAZ
+    - $EMAIL_HB
