@@ -2,7 +2,7 @@
 
 # Names and values
 
-```{r}
+```{r, include=FALSE}
 library(lobstr)
 ```
 
@@ -17,7 +17,18 @@ library(lobstr)
     d <- 1:10
     ```
     
-   __<span style="color:green">A</span>__: `a`, `b`, `c` point to the same object (same address in memory) with the value `1:10`. So this object gets three name bindings. `d` points to another object with the same value.
+   __<span style="color:green">A</span>__: `a`, `b`, `c` point to the same object (with the same address in memory). This object has the value `1:10`. `d` points to a different object with the same value.
+
+    ```{r}
+    list_of_names <- list(a, b, c, d)
+    obj_addrs(list_of_names)
+    ```
+
+<!-- ```{r} -->
+<!-- # alternative code: -->
+<!-- list(a = a, b = b, c = c, d = d) %>% -->
+<!--   map_chr(obj_addr) -->
+<!-- ``` -->
 
 2. __<span style="color:red">Q</span>__: The following code accesses the mean function in multiple different ways. Do they all point to the same underlying function object? Verify with `lobstr::obj_addr()`.
     
@@ -29,63 +40,55 @@ library(lobstr)
     match.fun("mean")
     ```
     
-   __<span style="color:green">A</span>__: Yes, they point to the same object. To confirm that, we look at the address of the underlying function object. Since `lobstr::obj_addr()` currently returns an error, we use `pryr::address()` to inspect the addresses:
+   __<span style="color:green">A</span>__: Yes, they point to the same object. We confirm this by looking at the address of the underlying function object.
        
     ```{r}
-    pryr::address(mean)
+    mean_functions <- list(mean,
+                           base::mean,
+                           get("mean"),
+                           evalq(mean),
+                           match.fun("mean"))
     
-    x1 <- mean
-    pryr::address(x1)
-    
-    x2 <- base::mean
-    pryr::address(x2)
-    
-    x3 <- get("mean")
-    pryr::address(x3)
-    
-    x4 <- evalq(mean)
-    pryr::address(x4)
-    
-    x5 <- match.fun("mean")
-    pryr::address(x5)
+    unique(obj_addr(mean_functions))
     ```
     
 3. __<span style="color:red">Q</span>__: By default, base R data import functions, like `read.csv()`, will automatically convert non-syntactic names to syntactic names. Why might this be problematic? What option allows you to suppress this behaviour?
     
-   __<span style="color:green">A</span>__: This might be especially problematic in non-interactive R usage, when R reads and writes data and the output is expected to contain the same names as used in the data source. One can suppress the name conversion via setting the `check.names` argument to `FALSE`.
+   __<span style="color:green">A</span>__: When automatic and implicit (name) conversion occurrs, the prediction of a scripts output will be more difficult. For example when R is used non-interactively and some data is read, transformed and written, than the output may not contain the same names as the original data source. This could introduce problems in downstream analysis. To avoid automatic name conversion set `check.names=FALSE`.
     
 4. __<span style="color:red">Q</span>__: What rules does `make.names()` use to convert non-syntactic names into syntactic names?
     
-   __<span style="color:green">A</span>__: A valid name starts with a letter or a dot (which must not be followed by a number). It also consists only of letters, numbers, dots and underscores (`"_"` are allowed since R version 1.9.0). There are three main strategies applied to construct syntactically valid names (see also `?make.names`):
-    
-   * prepend an `X`: This strategy is applied d to names which don't start with a letter or start with a dot followed by a number:
+   __<span style="color:green">A</span>__: A valid name starts with a letter or a dot (which must not be followed by a number). It also consists of letters, numbers, dots and underscores only (`"_"` are allowed since R version 1.9.0).
+   
+   There are three main mechanisms to ensure syntactically valid names (see `?make.names`):
+   - The variable name will be prepended by an `X` when names do not start with a letter or start with a dot followed by a number:
     
     ```{r}
     make.names("")
     make.names(".1")
     ```
     
-   * (additionally) non valid characters are replaced by a dot:
+   - (additionally) non-valid characters are replaced by a dot:
     
     ```{r}
-    make.names("@")  # prepending + . replacement 
-    make.names("  ")  # prepending + .. replacement
+    make.names("@")          # prepending + . replacement 
+    make.names("  ")         # prepending + .. replacement
     make.names("non-valid")  # . replacement
     ```
     
-   * reserved R keywords (see `?reserved`) get a dot appended:
+   - reserved R keywords (see `?reserved`) are appended by a dot:
     
     ```{r}
     make.names("if")
     ```
     
-   Also mentioned in the help file:
+   Interestingly, these some of these transformations may also depend on the current locale (see `?make.names`):
 
    > The definition of a letter depends on the current locale, but only ASCII digits are considered to be digits.
 
 5. __<span style="color:red">Q</span>__: I slightly simplified the rules that govern syntactic names. Why is `.123e1` not a syntactic name? Read `?make.names` for the full details.
     
-   __<span style="color:green">A</span>__: It is not syntactically valid as it starts with one dot which is followed by a number.
+   __<span style="color:green">A</span>__: `.123e1` is not a syntact name, because it starts with one dot which is followed by a number.
 
 ## Copy-on-modify
 
