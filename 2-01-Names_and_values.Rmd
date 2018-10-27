@@ -241,68 +241,60 @@ library(lobstr)
 
 1. __<span style="color:red">Q</span>__: Wrap the two methods for subtracting medians into two functions, then use the bench package to carefully compare their speeds. How does performance change as the number of columns increase?
     
-   __<span style="color:green">orange</span>__: 
-    
-   TODO: Use the bench package instead of the microbenchmark package
-    
-   We can write one function that handles data frames and lists:
-    
+   __<span style="color:green">A</span>__: 
+
+   First, let's define a function to create some random data and a function to subtract the median from each column.
+
     ```{r}
-    subtract_medians <- function(x, med){
+    create_random_df <- function(nrow, ncol) {
+      random_matrix <- matrix(runif(nrow * ncol), nrow = nrow)
+      as.data.frame(random_matrix)
+    }
+    
+    subtract_medians <- function(x, medians){
       for (i in seq_along(medians)) {
         x[[i]] <- x[[i]] - medians[[i]]
       }
       x
     }
     ```
-    
-   The grid we choose is relatively dense to highlight the progress in the plot below:
-    
+
+   We can then profile the performance, by benchmarking `subtact_medians()` on data.frame- and list-input for a specified number columns.
+
     ```{r}
-    n_grid <- c(seq(from = 1   , to = 9   , by = 1),
-                seq(from = 10  , to = 90  , by = 10),
-                seq(from = 100 , to = 900 , by = 100),
-                seq(from = 1000, to = 5000, by = 1000), 
-                10000L)
+    compare_speed <- function(ncol){
+      df_input   <- create_random_df(nrow = 1e4, ncol = ncol)
+      list_input <- as.list(df_input)
+      medians <- vapply(df_input, median, numeric(1))
+      
+      bench::mark(List         = subtract_medians(list_input, medians),
+                  `Data Frame` = subtract_medians(df_input,   medians),
+                  check = FALSE)
+    }
     ```
 
-   Let's do our benchmark:
-    
-    ```{r}
-    benchmarks <- vector(mode = "list", length = length(n_grid))
-    
-    for (n in seq_along(n_grid)) {
-      
-      x <- data.frame(matrix(runif(n_grid[n] * 1e3), ncol = n_grid[n]))
-      xl <- as.list(x)
-      
-      medians <- vapply(x, median, numeric(1))
-      
-      benchmarks[[n]] <- microbenchmark::microbenchmark(
-        subtract_medians(x , median),
-        subtract_medians(xl, median),
-        times = 2L, unit = "ms"
-      )
-    }
-    
-    benchmarks <- dplyr::bind_rows(lapply(benchmarks, function(x) summary(x)))
-    benchmarks[["n"]] <- rep(n_grid, each = 2)
+   Then bench package allows us to run benchmark accros a grid of parameters easily. We will use it to slowly increase the number of columns of the random data.
+
+    ```{r, warning=FALSE, message=FALSE}
+    results <- bench::press(
+      ncol = c(1, 10, 100, 500, 1000, 2000, 5000),
+      compare_speed(ncol)
+    )
     ```
-    
-   And plot the results:
-    
+
+   This shows, that the execution times for mean subtraction on data.frames increase exponentially when the number of columns of the input data increases. For linst-input the execution time increases linearly.
+
+<!-- #TODO (optional) @taz: explain, why the computation time increases exponentially. (This has to do with the copying of the list, but I'm not sure, why this happens exponentially. I would think, that x get's copied proportional to the number of colums....) -->
+
+
     ```{r}
-    plot(median ~ n, data = benchmarks, col = expr,
-         ylab = "median", xlab = "n")
-    ```
-    
-   Overall the performance difference rises more than linear in the range from 1 to 10000 columns:
-    
-    ```{r}
-    plot(n_grid,
-         abs(diff(benchmarks[["median"]])[c(TRUE, FALSE)]),
-         xlab = "n",
-         ylab = "difference between list and data frame performance in ms")
+    library(ggplot2)
+    results %>% 
+      ggplot(aes(ncol, median, col = expression)) +
+      geom_point() +
+      labs(x = "Number of Columns", y = "Computation Time",
+           color = "Input Data Structure",
+           title = "Benchmark: Median Subtraction")
     ```
 
 2. __<span style="color:red">Q</span>__: What happens if you attempt to use `tracemem()` on an environment?
