@@ -1,9 +1,20 @@
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
+
+Sys.setenv(LANGUAGE = "en")
+library("methods")
+```
 # (PART) Foundations {-} 
 
 # Names and values
 
 ```{r, include=FALSE}
 library(lobstr)
+library(magrittr)
 ```
 
 ## Binding basics
@@ -96,8 +107,7 @@ library(lobstr)
 
    __<span style="color:green">A</span>__: Without a binding `1:10` will not stay in memory (there will be no reference) and it makes no sense to track an object for copies which doesn't exist. Also when we assign `1:10` to a name, it will be clear, that `1:10` will only be the value of the object created and there is no "general" object `1:10`, which one would wan't to track.
 
-2. __<span style="color:red">Q</span>__: Explain why `tracemem()` shows two copies when you run this code. 
-   Hint: carefully look at the difference between this code and the code show earlier in the section.
+2. __<span style="color:red">Q</span>__: Explain why `tracemem()` shows two copies when you run this code. Hint: carefully look at the difference between this code and the code show earlier in the section.
      
     ```{r, results = FALSE}
     x <- c(1L, 2L, 3L)
@@ -106,28 +116,34 @@ library(lobstr)
     x[[3]] <- 4
     ```
     
-   __<span style="color:green">A</span>__: Initially `x` is an integer vector. Within the replacement call, we assign a double to the third element of `x`. So besides the new value of the third element also a type conversion (coercion) is triggered affecting whole vector:
-    
-    ```{r}
+   __<span style="color:green">A</span>__: Initially `x` is an integer vector. In the replacement call a double is assigned to the third element of `x`. Because of R's coercion rules also a type conversion takes place, which affects the whole vector.
+
+    ```{r, eval=FALSE}
     # two copies
     x <- 1:3
     tracemem(x)
+    #> <0x66a4a70>
     
     x[[3]] <- 4
-    
+    #> tracemem[0x55eec7b3af38 -> 0x55eec774cc18]: 
+    #> tracemem[0x55eec774cc18 -> 0x55eeca6ed5a8]: 
+    ```
+
+    ```{r, eval=FALSE}
     # the same as 
     x <- 1:3
     tracemem(x)
+    #> <0x55eec6940ae0>
     
-    x <- 4L
-    x <- as.double(x)
-    
-    # one copy
-    x <- 1:3
-    
-    tracemem(x)
     x[[3]] <- 4L
+    #> tracemem[0x55eec7021e10 -> 0x55eecb99e788]: 
+    x <- as.double(x)
+    #> tracemem[0x55eecb99e788 -> 0x55eec93d9c18]:
     ```
+
+   <!-- code-chunks above were hard-coded to fix knitr output. -->
+
+   By assigning an integer instead of a double one copy may be avoided.
 
 3. __<span style="color:red">Q</span>__: Sketch out the relationship between the following objects:
 
@@ -137,7 +153,18 @@ library(lobstr)
     c <- list(b, a, 1:10)
     ```
     
-   __<span style="color:green">A</span>__: `a` contains a reference to an address with the value `1:10`. `b` contains a list of the same reference as `a` (twice). `c` contains a list of `b`, `a` (both containing the same reference three times) and a reference pointing to a different address containing the same value (`1:10`).
+   __<span style="color:green">A</span>__: `a` contains a reference to an address with the value `1:10`. `b` contains a list of two references to the same address as `a`. `c` contains a list of `b`, `a` (containing the same reference three times) and a reference pointing to a different address containing the same value (`1:10`).
+
+    ```{r, eval = FALSE}
+    ref(c)
+    #> █ [1:0x55eec93cbdd8] <list>    # c
+    #> ├─█ [2:0x55eecb8246e8] <list>  # b
+    #> │ ├─[3:0x55eec7df4e98] <int>   # a
+    #> │ └─[3:0x55eec7df4e98]         # a
+    #> ├─[3:0x55eec7df4e98]           # a
+    #> └─[4:0x55eec7aa6968] <int>     # 1:10
+    ```
+
 
 4. __<span style="color:red">Q</span>__: What happens when you run this code:
 
@@ -148,10 +175,44 @@ library(lobstr)
     
    Draw a picture.
 
+   __<span style="color:green">A</span>__: The initial reference tree of `x` shows, that the name `x` binds to a list object. This object contains a reference to the integer vector `1:10`.
+
+    ```{r, eval=FALSE}
+    x <- list(1:10)
+    ref(x)
+    #> █ [1:0x55853b74ff40] <list> 
+    #> └─[2:0x534t3abffad8] <int> 
+    ```
+
+    ```{r, echo = FALSE}
+    knitr::include_graphics("images/copy_on_modify_fig1.png")
+    ```
+
+   When `x` is assigned to an element of itself copy-on-modify takes place and the list is copied to a new address in memory.
+
+    ```{r, eval=FALSE}
+    tracemem(x)
+    x[[2]] <- x
+    #> tracemem[0x55853b74ff40 -> 0x5d553bacdcd8]:
+    ```
+
+   The list object previously bound to `x` is now referenced in the newly created list object. It is no longer bound to a name. The integer vector is referenced twice.
+
+    ```{r, eval=FALSE}
+    ref(x)
+    #> █ [1:0x5d553bacdcd8] <list> 
+    #> ├─[2:0x534t3abffad8] <int> 
+    #> └─█ [3:0x55853b74ff40] <list> 
+    #>   └─[2:0x534t3abffad8] 
+    ```
+
+    ```{r, echo = FALSE}
+    knitr::include_graphics("images/copy_on_modify_fig2.png")
+    ```
+
 ## Object size
 
-1. __<span style="color:red">Q</span>__: In the following example, why are `object.size(y)` and `obj_size(y)`
-   so radically different? Consult the documentation of `object.size()`.
+1. __<span style="color:red">Q</span>__: In the following example, why are `object.size(y)` and `obj_size(y)` so radically different? Consult the documentation of `object.size()`.
 
     ```{r}
     y <- rep(list(runif(1e4)), 100)
@@ -173,32 +234,32 @@ library(lobstr)
 3. __<span style="color:red">Q</span>__: Predict the output of the following code:
 
     ```{r, eval = FALSE}
-    # x <- 1:1e6
-    # obj_size(x)
-    # 
-    # y <- list(x, x)
-    # obj_size(y)
-    # obj_size(x, y)
-    # 
-    # y[[1]][[1]] <- 10
-    # obj_size(y)
-    # obj_size(x, y)
-    # 
-    # y[[2]][[1]] <- 10
-    # obj_size(y)
-    # obj_size(x, y)
+    x <- 1:1e6
+    obj_size(x)
+    
+    y <- list(x, x)
+    obj_size(y)
+    obj_size(x, y)
+    
+    y[[1]][[1]] <- 10
+    obj_size(y)
+    obj_size(x, y)
+    
+    y[[2]][[1]] <- 10
+    obj_size(y)
+    obj_size(x, y)
     ```
     
-   __<span style="color:green">A</span>__: Since `lobstr::obj_size()` currently throws an error, we use `unclass(pryr::obj_size())` instead. 
-    
-   To predict the size of `x`, we first find out via `object_size(integer(0))` that an integer takes 40 B. For every element of the integer vector additionally 4 B are needed and R allocates memory in chunks of 2, so 8 B at a time. This can be verified for example via `sapply(1:100, function(x) pryr::object_size(integer(x)))`. Overall our prediction will result in 40 B + 1000000 * 4 B = 4000040 B:
+   __<span style="color:green">A</span>__: Since `lobstr::obj_size()` currently throws returns very different values, we will use `unclass(pryr::obj_size())` for now.
+   
+   To predict the size of `x`, we first find out via `obj_size(integer(0))` that an integer takes 48 B. For every element of the integer vector additionally 4 B are needed and R allocates memory in chunks of 2, so 8 B at a time. This can be verified for example via `sapply(1:100, function(x) obj_size(integer(x)))`. Overall our prediction will result in 40 B + 1000000 * 4 B = 4000040 B:
     
     ```{r}
     x <- 1:1e6
     unclass(pryr::object_size(x))
     ```
     
-   To predict the size of `y <- list(x, x)` we make usage of the fact that both list elements point to the same memory and hence are the same reference which means neither one needs additional memory. A list takes 40 B in memory and 8 B for each element (we can verify this in the same way as for integers). Overall our prediction will result in x (4000040 B) + list of length 2 (40 B + 16 B):
+   To predict the size of `y <- list(x, x)` consider that both list elements point to the same memory address. They share the same reference, which means that no additional memory is needed. A list takes 40 B in memory and 8 B for each element. Overall our prediction will result in x (4000040 B) + list of length 2 (40 B + 16 B):
     
     ```{r}
     y <- list(x, x)
@@ -231,7 +292,7 @@ library(lobstr)
     unclass(pryr::object_size(y))
     ```
     
-   Now `x` and `y` don't share any values anymore (from Rs perspective) and their memory adds up:
+   Now `x` and `y` don't share any values anymore (from R's perspective) and their memory adds up:
     
     ```{r}
     unclass(pryr::object_size(x, y))
@@ -241,9 +302,7 @@ library(lobstr)
 
 1. __<span style="color:red">Q</span>__: Wrap the two methods for subtracting medians into two functions, then use the bench package to carefully compare their speeds. How does performance change as the number of columns increase?
     
-   __<span style="color:green">A</span>__: 
-
-   First, let's define a function to create some random data and a function to subtract the median from each column.
+   __<span style="color:green">A</span>__: First, let's define a function to create some random data and a function to subtract the median from each column.
 
     ```{r}
     create_random_df <- function(nrow, ncol) {
@@ -259,7 +318,7 @@ library(lobstr)
     }
     ```
 
-   We can then profile the performance, by benchmarking `subtact_medians()` on data.frame- and list-input for a specified number columns.
+   We can then profile the performance, by benchmarking `subtact_medians()` on data frame- and list-input for a specified number columns. For list input the result has still to be coerced into a data frame, so that the output of both functions will be identical.
 
     ```{r}
     compare_speed <- function(ncol){
@@ -267,9 +326,9 @@ library(lobstr)
       list_input <- as.list(df_input)
       medians <- vapply(df_input, median, numeric(1))
       
-      bench::mark(List         = subtract_medians(list_input, medians),
-                  `Data Frame` = subtract_medians(df_input,   medians),
-                  check = FALSE)
+      bench::mark(`Data Frame` = subtract_medians(df_input,   medians),
+                  List         = subtract_medians(list_input, medians) %>% 
+                                   as.data.frame())
     }
     ```
 
@@ -277,23 +336,32 @@ library(lobstr)
 
     ```{r, warning=FALSE, message=FALSE}
     results <- bench::press(
-      ncol = c(1, 10, 100, 500, 1000, 2000),
+      ncol = c(1, 5, 10, 50, 100, 200, 400, 600, 800, 1000, 1500),
       compare_speed(ncol)
     )
     ```
 
-   This shows, that the execution times for mean subtraction on data.frames increase exponentially when the number of columns of the input data increases. For linst-input the execution time increases linearly.
-
-<!-- #TODO (optional) @taz: explain, why the computation time increases exponentially. (This has to do with the copying of the list, but I'm not sure, why this happens exponentially. I would think, that x get's copied proportional to the number of colums....) -->
-
+   The execution times for mean subtraction on data frames increase exponentially with the number of columns of the input data. This because, the data frame will be copied more often and the copy will also be bigger. For list-input the execution time increases linearly.
+   
+   For list input with less than ~ 800 columns, the cost of the additional data structure conversion will be relatively big. For very wide data frame input the overhead from the additional copies slows down the computation considerably. Apparently the choice of the faster function depends on the size of the data also.
 
     ```{r}
     library(ggplot2)
     ggplot(results, aes(ncol, median, col = expression)) +
-      geom_point() +
-      labs(x = "Number of Columns", y = "Computation Time",
+      geom_point(size = 2) +
+      geom_smooth() +
+      labs(x = "Number of Columns of Input Data", y = "Computation Time",
            color = "Input Data Structure",
            title = "Benchmark: Median Subtraction")
     ```
 
 2. __<span style="color:red">Q</span>__: What happens if you attempt to use `tracemem()` on an environment?
+
+__<span style="color:green">A</span>__: `tracemem()` cannot be used to mark and trace environments.
+
+    ```{r, error=TRUE}
+    x <- new.env()
+    tracemem(x)
+    ```
+
+   The error occurs because "it is not useful to trace NULL, environments, promises, weak references, or external pointer objects, as these are not duplicated" (see `?tracemem`). Environments are always modified in place.
