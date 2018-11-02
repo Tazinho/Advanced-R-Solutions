@@ -54,12 +54,12 @@ df_new <- tibble::tribble(~ `1 Names and values`, ~ `2 Vectors`, ~ `3 Subsetting
                        "x",  "-",  "x",   "x",  "o",  "x",  "-",  "-",  "-",   "x",    "x",   NA,  "x",     "x",   "-",  "-",  "-",  "x",  "-",
                        "x",  "o",  "x",   "x",  "x",  "x",  "-",  "-",   NA,   "x",    "x",   NA,  "x",     "-",   "x",   NA,  "-",  "x",  "x",
                        "x",  "x",  "x",   "x",  "-",  "x",  "-",  "-",   NA,   "x",     NA,   NA,  "x",     "x",   "-",   NA,  "-",  "x",  "x",
-                       "-",  "x",  "x",   "x",  "o",  "-",  "-",  "-",   NA,   "-",     NA,   NA,  "-",     "x",   "-",   NA,  "-",  "x",  "x",
+                       "x",  "x",  "x",   "x",  "o",  "-",  "-",  "-",   NA,   "-",     NA,   NA,  "-",     "x",   "-",   NA,  "-",  "x",  "x",
                        "x",  "-",  "x",   "x",  "x",  "-",  "-",  "-",   NA,   "-",     NA,   NA,  "x",     "-",   "-",   NA,  "-",  "-",  "-",
                        "-",  "x",  "x",   "x",  "-",  "-",  "-",  "-",   NA,   "x",     NA,   NA,  "x",     "x",   "-",   NA,  "-",  "x",   NA,
                        "x",  "x",   NA,   "x",  "x",  "-",  "-",  "-",   NA,   "x",     NA,   NA,  "x",     "x",   "-",   NA,   NA,  "x",   NA,
-                       "o",  "-",   NA,   "x",   NA,  "-",  "-",   NA,   NA,   "-",     NA,   NA,  "x",     "x",   "-",   NA,   NA,  "-",   NA,
-                       "-",  "x",   NA,   "o",   NA,  "-",  "-",   NA,   NA,   "x",     NA,   NA,  "x",     "x",   "-",   NA,   NA,  "x",   NA,
+                       "x",  "-",   NA,   "x",   NA,  "-",  "-",   NA,   NA,   "-",     NA,   NA,  "x",     "x",   "-",   NA,   NA,  "-",   NA,
+                       "x",  "x",   NA,   "o",   NA,  "-",  "-",   NA,   NA,   "x",     NA,   NA,  "x",     "x",   "-",   NA,   NA,  "x",   NA,
                         NA,  "-",   NA,   "x",   NA,   NA,  "-",   NA,   NA,   "-",     NA,   NA,  "x",     "-",   "-",   NA,   NA,  "x",   NA,
                         NA,  "x",   NA,   "x",   NA,   NA,  "-",   NA,   NA,   "x",     NA,   NA,  "x",     "x",   "-",   NA,   NA,  "x",   NA,
                         NA,  "-",   NA,   "x",   NA,   NA,  "-",   NA,   NA,   "o",     NA,   NA,  "x",     "x",   "-",   NA,   NA,  "x",   NA,
@@ -120,10 +120,9 @@ solved_exercises <- ggplot(df_new, aes(x = chapter, fill = solved, group = -id))
   panel.border = element_blank(),
   panel.background = element_blank()
   ) +
-  ggtitle(paste0("Solved exercises (", round(100 * quote_solutions, 2), "%)"))
+  ggtitle(paste0("Solved Exercises: ", round(100 * quote_solutions, 1), "% (2nd Edition)"))
 
-  solved_exercises +
-    ggtitle("Exercise Status - Advanced R (2nd Edition)")
+  solved_exercises
 ```
 
 
@@ -204,10 +203,9 @@ solved_exercises <- ggplot(df, aes(x = chapter, fill = solved, group = -id)) +
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
         panel.background = element_blank()) +
-  ggtitle(paste0("Solved exercises (", round(100 * quote_solutions), "%)"))
+  ggtitle(paste0("Solved Exercises: ", round(100 * quote_solutions, 1), "% (1st Edition)"))
 
-solved_exercises +
-    ggtitle("Exercise Status - Advanced R (1st Edition)")
+solved_exercises
 ```
 
 The formulation of these exercises in this book corresponds to Advanced R (1st edition) from January 25th 2017.
