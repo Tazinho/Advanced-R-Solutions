@@ -5,6 +5,8 @@
 1. __<span style="color:red">Q</span>__: Given a function, like `"mean"`, `match.fun()` lets you find a function. Given a function, can you find its name? Why doesn't that make sense in R?  
 
    __<span style="color:green">A</span>__: If you know `body()`, `formals()` and `environment()` it can be possible to find the function. However, this won't be possible for primitive functions, since they return `NULL` for those three properties. Also annonymous functions won't be found, because they are not bound to a name. On the other hand it could be that different names in an environment contain binding to one (or more functions) with the same `body()`, `formals()` and `environment()` which means that the solution wouldn't be unique. More general: In R a (function) name has an object, but an object (i.e. a function) doesn't have a name (just a binding sometimes).
+   
+   Also: You "can only find the parents of an environment, not its children, so this is necessarily only going to be a partial search" (Hadley Wickham).
 
 2. __<span style="color:red">Q</span>__: It’s possible (although typically not useful) to call an anonymous function. Which of the two approaches below is correct? Why?
    
@@ -23,8 +25,8 @@
    
 3. __<span style="color:red">Q</span>__: A good rule of thumb is that an anonymous function should fit on one line and shouldn't need to use `{}`. Review your code. Where could you have used an anonymous function instead of a named function? Where should you have used a named function instead of an anonymous function?  
     
-   __<span style="color:green">A</span>__: 
-   
+   __<span style="color:green">A</span>__: :) - please take a look a your recent projects. You can also make a mental note to assign names to your functions, whenever they start to span multiple lines.
+
 4. __<span style="color:red">Q</span>__: What function allows you to tell if an object is a function? What function allows you to tell if a function is a primitive function?
        
    __<span style="color:green">A</span>__: You can test objects with `is.function` and `is.primitive`.
@@ -188,7 +190,7 @@
     
 4. __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
   
-    ```{r, eval = FALSE}    
+```{r include=FALSE}
     y <- 10
     f1 <- function(x = {y <- 1; 2}, y = 0) {
       c(x, y)
@@ -197,8 +199,24 @@
     y
     ```  
     
-   __<span style="color:orange">A</span>__: TODO: The original question (see old exercises at the bottom of this chapter) has been modified by Hadley in a subtile way. The answer has to be modified accordingly. From my understanding the new answer needs to address the issue: why is `y` in the end ten and not two as one would guess by the old answer.
-    
+   __<span style="color:orange">A</span>__: The output of `f1()` shows, that the default argument for `y` is not accessed. Instead the value assigned to `y` in the expression set as the default argument for `x` is used. Also, calling `f1` doesn't change value of `y` in the global environment.
+
+    ```{r}
+    f1()
+    y
+    ```
+
+   The principle here is "value caching of function arguments": R caches these arguments when their value is accessed for the first time. Here `x` is called before `y` (because of `c(x, y)`). When the default expression given to `x` is evaluated, a value for `y` is also created (and cached). Therefore the default argument for `y` will no longer be evaluated.
+
+   If we change the functions body to `c(y, x)`, the default value given for `y` will be used.
+
+    ```{r}
+    f2 <- function(x = {y <- 1; 2}, y = 0) {
+      c(y, x)
+    }
+    f2()
+    ```
+
 5. __<span style="color:red">Q</span>__: In `hist()`, the default value of `xlim` is `range(breaks)`, the default value for `breaks` is `"Sturges"`, and
 
     ```{r}
@@ -495,11 +513,9 @@
     Filter(is.primitive, repls)
     ```
 
-7. __<span style="color:orange">Q</span>__: What are valid names for user-created infix functions?  
+7. __<span style="color:red">Q</span>__: What are valid names for user-created infix functions?  
   
-   __<span style="color:green">A</span>__: TODO: Insert source, when quoting.
-    
-   > All user-created infix functions must start and end with `%` ... they can contain any sequence of characters (except “%”, of course).
+   __<span style="color:green">A</span>__: As the section on "Function Forms" in Advanced R tells us, the "names of infix functions are more flexible than regular R functions: they can contain any sequence of characters except “%”."
 
 8. __<span style="color:red">Q</span>__: Create an infix `xor()` operator.
     
@@ -535,7 +551,7 @@
 
 1. __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
   
-    ```{r, eval = FALSE}    
+    ```{r include=FALSE, echo=TRUE}
     f1 <- function(x = {y <- 1; 2}, y = 0) {
       x + y
     }
