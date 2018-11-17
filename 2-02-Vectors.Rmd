@@ -3,7 +3,25 @@
 ## Atomic vectors
 
 1. __<span style="color:red">Q</span>__: How do you create scalars of type raw and complex? (See `?raw` and `?complex`)
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: Length 1 raw and complex vectors can be created via `raw()` and `complex()`, i.e.:
+  
+  ```{r}
+  raw(1)
+  complex(1)
+  ```
+  
+  For raw vectors it's easiest to coerce numeric or character scalars to raw:
+  
+  ```{r}
+  as.raw(42)
+  charToRaw("A")
+  ```
+  
+  For complex numbers real and imaninary parts can be provided directly, i.e.:
+  
+  ```{r}
+  complex(length.out = 1, real = 1, imaginary = 1)
+  ```
 
 2. __<span style="color:red">Q</span>__: Test your knowledge of vector coercion rules by predicting the output of
    the following uses of `c()`: 
