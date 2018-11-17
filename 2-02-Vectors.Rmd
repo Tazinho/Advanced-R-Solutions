@@ -3,7 +3,6 @@
 ## Atomic vectors
 
 1. __<span style="color:red">Q</span>__: How do you create scalars of type raw and complex? (See `?raw` and `?complex`)
-
    __<span style="color:green">A</span>__: Length 1 raw and complex vectors can be created via `raw()` and `complex()`, i.e.:
   
   ```{r}
@@ -49,7 +48,14 @@ to characters which would be undesirable. Making `NA` a logical means that invol
 in a dataset (which happens often) will not result in coercion.
 
 5. __<span style="color:red">Q</span>__: Precisely what do is.atomic(), is.numeric(), and is.vector() test for?
+   
    __<span style="color:green">A</span>__: 
+   
+   __is.atomic__: Tests if `typeof()` is one of `"logical"`, `"integer"`, `"double"`, `"complex"`, `"character"`, `"raw"` or `"NULL"`.
+   
+   __is.numeric__: Tests if `typeof()` is integer or double and class is not one of `"factor"`, `"Date"`, `"POSIXt"` or `"difftime"`.
+   
+   __is.vector__: Tests if and object has no attributes, except for names and if its `mode()` is atomic (`"logical"`, `"integer"`, `"double"`, `"complex"`, `"character"`, `"raw"`), `"list"` or `"expression"`.
 
 ## Attributes
 
