@@ -134,42 +134,11 @@ in a dataset (which happens often) will not result in coercion.
 
 5. __<span style="color:red">Q</span>__: What sort of object does `table()` return? What is its type? What attributes does it have? How does the dimensionality change as you tabulate more variables?
     
-  __<span style="color:green">A</span>__: 
-   
+  __<span style="color:green">A</span>__: `table()` returns a crosstabulation of its input. The result is an S3 table object, which is an array (implicit class) of integers (type) under the hood. Attributes are dim (dimension of the underlying array) and dimnames (one for each input column). The dimensionality equals to the number of unique values (accordingly factor levels) of the input arguments, i.e.:
+  
     ```{r}
-    x <- NULL
-    # For NULL
-    table(x) %>% sloop::otype()
-    # Table kreiert ein S3-Object
-    table(x) %>% class()
-    # der Klasse table
-    table(x) %>% typeof()
-    # basierend auf dem type integer
-    table(x) %>% attributes()
-    # mit den attributen
-    # - dim
-    # - dimnames (x)
-    # - class 
-
-    x <- c("a", "b", "c")
-    # For NULL
-    table(x) %>% sloop::otype()
-    # Table kreiert ein S3-Object
-    table(x) %>% class()
-    # der Klasse table
-    table(x) %>% typeof()
-    # basierend auf dem type integer
-    table(x) %>% attributes()
-    # mit den attributen
-    # - dim
-    # - dimnames (x)
-    # - class 
- 
-    table(iris$Species) %>% unclass
-    # Returns an array
-    rm(x)
-
-    # Need to read about table and unclass and tablate
+    table(iris) %>% dim()
+    sapply(iris, function(x) length(unique(levels(as.factor(x)))))
     ```
     
 6. __<span style="color:red">Q</span>__: What happens to a factor when you modify its levels? 
