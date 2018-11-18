@@ -93,14 +93,14 @@ in a dataset (which happens often) will not result in coercion.
     
    `dim()` will return `NULL` when appleid to a 1d vector.
    
-   One might want to use `NROW()` or `NCOL()` to handle atomic vectors, lists and NULL values (1 column, 0 rows) analog do a 1-column matrix / data frame. In these cases the alternatives `nrow()` and `ncol()` would return `NULL` (consistently to the behaviour of `dim()`). When subsetting data frames (interactively) this might be convenient as it is not affected by and hence more robust regarding the "`drop = TRUE`" idiom:
+   One might want to use `NROW()` or `NCOL()` to handle atomic vectors, lists and NULL values (1 column, 0 rows) analog do a 1-column matrix / data frame. In these cases the alternatives `nrow()` and `ncol()` would return `NULL` (consistently to the behaviour of `dim()`). When subsetting data frames (interactively) this might be convenient as it is not affected by and hence more robust regarding the `drop = TRUE`-idiom:
 
-```{r}
-NROW(iris[, 1, drop = TRUE])
-nrow(iris[, 1, drop = TRUE])
-NCOL(iris[, 1, drop = TRUE])
-ncol(iris[, 1, drop = TRUE])
-```    
+    ```{r}
+    NROW(iris[, 1, drop = TRUE])
+    nrow(iris[, 1, drop = TRUE])
+    NCOL(iris[, 1, drop = TRUE])
+    ncol(iris[, 1, drop = TRUE])
+    ```    
 3. __<span style="color:red">Q</span>__: How would you describe the following three objects? What makes them different to `1:5`?
 
     ```{r}
