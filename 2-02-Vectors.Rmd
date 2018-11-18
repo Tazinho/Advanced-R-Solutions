@@ -75,6 +75,18 @@ in a dataset (which happens often) will not result in coercion.
    ```
    
    However, the implemention also means that `setNames()` only effects the names attribute and not any ohter more specific naming-attributes like the dimnames attribute for matrices and arrays.
+   
+   `unname()` is implemented in the following way:
+   
+   ```{r}
+   uname
+   ```
+   
+   It always removes names and dimnames attributes when they are set, except for data frames. Note that the documentation is currently not correct (R 3.5.1). `force == TRUE` doesn't remove the dimnames (names and row names) as the underlying `dimnames<-.data.frame` doesn't handle `NULL` and will always catch it within its first error condition:
+   
+   ```{r}
+   `dimnames<-.data.frame`
+   ```
     
 2. __<span style="color:red">Q</span>__: What does dim() return when applied to a 1d vector? When might you use NROW() or NCOL()?
     
