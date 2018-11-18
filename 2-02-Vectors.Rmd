@@ -61,7 +61,18 @@ in a dataset (which happens often) will not result in coercion.
 ## Attributes
 
 1. __<span style="color:red">Q</span>__: How is setNames() implemented? How is unname() implemented? Read the source code.
-   __<span style="color:green">A</span>__:
+   
+   __<span style="color:green">A</span>__: `setNames` is implemented as:
+   
+   ```{r}
+   setNames
+   ```
+   
+   As the data comes first `setNames()` also works well with the magrittr-pipe operator. When no first argument is given, the result is a named vector:
+   
+   ```{r}
+   setNames( , c("a", "b", "c"))
+   ```
     
 2. __<span style="color:red">Q</span>__: What does dim() return when applied to a 1d vector? When might you use NROW() or NCOL()?
     
