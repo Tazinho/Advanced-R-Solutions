@@ -167,8 +167,28 @@ in a dataset (which happens often) will not result in coercion.
 ## Lists
 
 1. __<span style="color:red">Q</span>__: List all the ways that a list differs from an atomic vector.
+
    __<span style="color:green">A</span>__: 
+   
+   * Atomic vectors are homogeneous (all contents must be of the same type). Lists are heterogeneous (all contents can be of different types). 
+   
+   * Atomic vectors point to one value, while lists contain references which point to one value each:
+
+    ```{r}
+    lobstr::ref(1:3)
+    lobstr::ref(list(1:3,2,3))
+    ```
     
+    * Subsetting with out of bound values and `NA`s leads to `NA`'s for atomics and `NULL` values for lists:
+
+    ```{r}
+    (1:3)[4]
+    list(1:3)[4]
+
+    (1:3)[NA]
+    list(1:3)[NA]
+    ```
+   
 2. __<span style="color:red">Q</span>__: Why do you need to use `unlist()` to convert a list to an 
    atomic vector? Why doesn't `as.vector()` work?  
    __<span style="color:green">A</span>__: To get rid of (flatten) the nested structure. `as.vector()` doesn't work, because a list is already a vector.
