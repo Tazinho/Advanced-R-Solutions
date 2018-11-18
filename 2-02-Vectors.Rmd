@@ -81,7 +81,7 @@ in a dataset (which happens often) will not result in coercion.
    unname
    ```
    
-   It always removes names and dimnames attributes when they are set, except for data frames. Note that the documentation is currently not correct (R 3.5.1). `force == TRUE` doesn't remove the dimnames (names and row names) as the underlying `dimnames<-.data.frame` doesn't handle `NULL` and will always catch it within its first error condition:
+   It always removes names and dimnames attributes when they are set, except for data frames. Note that the documentation is currently not correct (R 3.5.1). `force == TRUE` doesn't remove the dimnames (names and row names) as `NULL` is always catched within the first condition of the underlying `dimnames<-.data.frame`:
    
    ```{r}
    `dimnames<-.data.frame`
