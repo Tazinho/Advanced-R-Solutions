@@ -68,11 +68,13 @@ in a dataset (which happens often) will not result in coercion.
    setNames
    ```
    
-   As the data comes first `setNames()` also works well with the magrittr-pipe operator. When no first argument is given, the result is a named vector:
+   As the data comes first `setNames()` also well with the magrittr-pipe operator. When no first argument is given, the result is a named vector:
    
    ```{r}
    setNames( , c("a", "b", "c"))
    ```
+   
+   However, the implemention also means that `setNames()` only effects the names attribute and not any ohter more specific naming-attributes like the dimnames attribute for matrices and arrays.
     
 2. __<span style="color:red">Q</span>__: What does dim() return when applied to a 1d vector? When might you use NROW() or NCOL()?
     
