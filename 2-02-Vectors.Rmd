@@ -90,22 +90,18 @@ in a dataset (which happens often) will not result in coercion.
     
 2. __<span style="color:red">Q</span>__: What does dim() return when applied to a 1d vector? When might you use NROW() or NCOL()?
     
-   (TODO: The following answer originally answers the question:
-   When might you use `NROW()` or `NCOL()`? Therefore, the answer has to change according to the new question (maybe one of the old exercises at the bottom of this chapter contains info that can be merged))
+   __<span style="color:green">A</span>__: From `?nrow`:
     
-   __<span style="color:orange">A</span>__: From `?nrow`:
-    
-   > nrow and ncol return the number of rows or columns present in x. NCOL and NROW do the same treating a vector as 1-column matrix.
-    
-   This behaviour might be useful, to guarantee a numeric result even in cases one is not sure if the result is an atomic or a data frame, i. e. when subsetting of a data frame without `drop = TRUE` is involved:
-    
-    ```{r}
-    nrow(iris[ , "Sepal.Width"])
-    ncol(iris[ , "Sepal.Width"])
-    NROW(iris[ , "Sepal.Width"])
-    NCOL(iris[ , "Sepal.Width"])
-    ```
-    
+   `dim()` will return `NULL` when appleid to a 1d vector.
+   
+   One might want to use `NROW()` or `NCOL()` to handle atomic vectors, lists and NULL values (1 column, 0 rows) analog do a 1-column matrix / data frame. In these cases the alternatives `nrow()` and `ncol()` would return `NULL` (consistently to the behaviour of `dim()`). When subsetting data frames (interactively) this might be convenient as it is not affected by and hence more robust regarding the "`drop = TRUE`" idiom:
+
+```{r}
+NROW(iris[, 1, drop = TRUE])
+nrow(iris[, 1, drop = TRUE])
+NCOL(iris[, 1, drop = TRUE])
+ncol(iris[, 1, drop = TRUE])
+```    
 3. __<span style="color:red">Q</span>__: How would you describe the following three objects? What makes them different to `1:5`?
 
     ```{r}
