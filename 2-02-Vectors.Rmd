@@ -229,15 +229,17 @@ c(now_ct, date)
 
 2. __<span style="color:red">Q</span>__: What happens if you attempt to set rownames that are not unique?
 
-__<span style="color:orange">A</span>__
-An error is thrown. Besides that I need to inspect the following functions for further details...
+    __<span style="color:orange">A</span>__
+    An error is thrown. Besides that I need to inspect the following functions for further details...
 
-```{r}
-`row.names<-.data.frame`
-`.rowNamesDF<-`
-```
+    ```{r}
+    `row.names<-.data.frame`
+    `.rowNamesDF<-`
+    ```
 
 3. __<span style="color:red">Q</span>__: If `df` is a data frame, what can you say about `t(df)`, and `t(t(df))`? Perform some experiments, making sure to try different column types.
+
+    __<span style="color:green">A</span>__ Both will return matrices with dimensions regaring the typical transposition rules. As `t()` uses `as.matrix.data.frame()` for preprocessingg infront of applying `t.default()` and elements of matrices need to be of the same type, all elements get coerced in the usual order (logical << integer << double << character), while factors, dates and datetimes are treated as characters during coercion.
 
 4. __<span style="color:red">Q</span>__: What does `as.matrix()` do when applied to a data frame with 
    columns of different types? How does it differ from `data.matrix()`?
