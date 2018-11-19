@@ -195,6 +195,19 @@ in a dataset (which happens often) will not result in coercion.
 
 3. __<span style="color:red">Q</span>__: Compare and contrast `c()` and `unlist()` when combining a date and date-time into a single vector.
 
+__<span style="color:orange">A</span>__: 
+
+```{r}
+now_ct <- as.POSIXct("2018-08-01 22:00", tz = "UTC")
+date <- as.Date("1970-02-01")
+
+c(date, now_ct)
+c(now_ct, date)
+
+# For unlist see:
+#https://stackoverflow.com/questions/15659783/why-does-unlist-kill-dates-in-r
+```
+
 ## Data frames and tibbles
 
 1. __<span style="color:red">Q</span>__: Can you have a data frame with 0 rows? What about 0 columns?  
