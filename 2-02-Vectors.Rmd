@@ -236,7 +236,7 @@ c(now_ct, date, now_lt) # date_time_ct method
 2. __<span style="color:red">Q</span>__: What happens if you attempt to set rownames that are not unique?
 
     __<span style="color:green">A</span>__
-    It depends on how you attempt this. If you use the `row.names<-` replacement function, no further arguments are provided and the underlying `row.names<-.data.frame` method will throw an error (and an additional warning):
+    It depends on the object and how you attempt this. For matrices it will work without any problems. For data frames and using the `row.names<-` replacement function, no further arguments can be set and the underlying `row.names<-.data.frame` method will throw an error (and an additional warning):
    
     ```{r, error = TRUE, warning = TRUE}
     row.names(mtcars) <- rep(1, nrow(mtcars))
