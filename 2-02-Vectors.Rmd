@@ -242,7 +242,7 @@ c(now_ct, date, now_lt) # date_time_ct method
     row.names(mtcars) <- rep(1, nrow(mtcars))
     ```
     
-    However, by calling the underlying `.rowNamesDF<-` you can set the `make.names` argument to `NA`, which sets `seq_len(nrow(x))` as (integer) row names or to `TRUE`, which triggers a call of `make.names(value, unique = TRUE)` for constructing valid (character) row names.
+    However, by calling the underlying `.rowNamesDF<-` directly you can set the `make.names` argument to `NA`, which sets `seq_len(nrow(x))` as (integer) row names or to `TRUE`, which triggers a call of `make.names(value, unique = TRUE)` for constructing valid (character) row names.
 
 3. __<span style="color:red">Q</span>__: If `df` is a data frame, what can you say about `t(df)`, and `t(t(df))`? Perform some experiments, making sure to try different column types.
 
