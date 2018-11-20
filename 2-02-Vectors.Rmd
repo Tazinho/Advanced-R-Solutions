@@ -198,13 +198,19 @@ in a dataset (which happens often) will not result in coercion.
 __<span style="color:orange">A</span>__: 
 
 ```{r}
-now_ct <- as.POSIXct("2018-08-01 22:00", tz = "UTC")
 date <- as.Date("1970-02-01")
+now_ct <- as.POSIXct("2018-08-01 22:00", tz = "UTC")
+now_lt <- as.POSIXlt(now_ct)
 
-c(date, now_ct)
-c(now_ct, date)
+c(date, date) # date method
+c(now_ct, now_ct) # date_time_ct method
+c(now_lt, now_lt) # date_time_lt method
 
-# perform the same with POSIXlt (there should be NAs introduced by coercion)
+c(date, now_ct) # date method
+c(now_ct, date) # date_time_ct method
+
+c(date, now_ct, now_lt) # date method
+c(now_ct, date, now_lt) # date_time_ct method
 
 # For unlist see:
 #https://stackoverflow.com/questions/15659783/why-does-unlist-kill-dates-in-r
