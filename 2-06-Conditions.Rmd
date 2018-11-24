@@ -4,14 +4,12 @@
 
 1. __<span style="color:red">Q</span>__: Write a wrapper around `file.remove()` that throws an error if the file to be deleted does not exist.
 
-   __<span style="color:green">A</span>__: We have several options here, but for simplicity we use a combination of `options()` and `on.exit()`:
+   __<span style="color:green">A</span>__: We have several options here. I.e. we could use a combination of `options(warn)`, `on.exit()` and `try()`. However, we prefer the obvious solution for its clearness and simplicity:
     
     ```{r, error = TRUE}
     file_remove_strict <- function(...) {
-      old_warn <- getOption("warn")
-      on.exit(options("warn" = old_warn))
-      options("warn" = 2L)
-      try(file.remove(...))
+      if(!file.exists(...)) stop("Can't delete `...` as the file doesn't exist.", call. = FALSE)
+      file.remove(...)
     }
     
     # Test
