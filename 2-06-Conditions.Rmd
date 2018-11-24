@@ -8,7 +8,9 @@
     
     ```{r, error = TRUE}
     file_remove_strict <- function(...) {
-      if(!file.exists(...)) stop("Can't delete `...` as the file doesn't exist.", call. = FALSE)
+      if(!file.exists(...)) {
+        stop("Can't delete ", `...`, " as the file doesn't exist.", call. = FALSE)
+      }
       file.remove(...)
     }
     
