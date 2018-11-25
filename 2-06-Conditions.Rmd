@@ -159,14 +159,14 @@
 
 1. __<span style="color:red">Q</span>__: Inside a package, it’s occassionally useful to check that a package is installed before using it. Write a function that checks if a package is installed (with `requireNamespace("pkg", quietly = FALSE))` and if not, throws a custom condition that includes the package name in the metadata.
 
-   __<span style="color:green">A</span>__: It's quite tedious to build up this behaviour on top of `requireNamespace()`. However, if it's arguments are supplied correctly, `requiredNamespace()`'s return-behaviour can be summarised in the following way:
+   __<span style="color:green">A</span>__: It's quite tedious to build up this behaviour on top of `requireNamespace()`. However, if all arguments are supplied correctly, `requiredNamespace()`'s return behaviour can be summarised in the following way:
    
-   - when the namespace was already loaded: `TRUE`
+   - when the namespace was already loaded `TRUE` is returned
    - when the namespace was not already loaded: 
      - a message is thrown:
-     - depending on success or failure `TRUE` or `FALSE` is returned.
+     - depending on further success or failure `TRUE` or `FALSE` is returned.
 
-   Therefore we adjust this behaviour mainly regarding the failure case, where we return the error condition:
+   Therefore, we adjust the behaviour mainly regarding the failure case, where we return the error condition:
    
     ```{r}
     library(rlang)
