@@ -159,6 +159,50 @@
 
 1. __<span style="color:red">Q</span>__: Inside a package, it’s occassionally useful to check that a package is installed before using it. Write a function that checks if a package is installed (with `requireNamespace("pkg", quietly = FALSE))` and if not, throws a custom condition that includes the package name in the metadata.
 
+   __<span style="color:green">A</span>__: It's quite tedious to build up this behaviour on top of `requireNamespace()`. However, if it's arguments are supplied correctly, `requiredNamespace()`'s return-behaviour can be summarised in the following way:
+   
+   - when the namespace was already loaded: `TRUE`
+   - when the namespace was not already loaded: 
+     - a message is thrown:
+     - depending on success or failure `TRUE` or `FALSE` is returned.
+
+   Therefore we adjust this behaviour only in the failure case, where we return the error condition and document the implementation with the code:
+   
+    ```{r}
+    library(rlang)
+
+    requireNamespace2 <- function(package)  {
+      if (!is.character(package) | !length(package) == 1L) {
+        abort("error_bad_argument",
+              message = "`package` must be a length-1 character vector.")
+      }
+  
+      withCallingHandlers(
+        message = function(cnd)  {
+          if (!requireNamespace(package, quietly = TRUE)) {
+            abort(
+              "error_pkg_not_found",
+              message = paste0("`package` ", package, " not found."),
+              package = package
+            )}
+        },
+        requireNamespace(package, quietly = FALSE)
+      )
+  
+      invisible(TRUE)
+      }
+      ```
+      
+      Now we can test our new function for all cases:
+      
+      ```{r, message = TRUE, error = TRUE}
+      (requireNamespace2("base"))    # should be loaded already
+      (requireNamespace2("lobstr"))  # should return a message first
+      (requireNamespace2("lobstr")) 
+      catch_cnd(requireNamespace2("pkg"))  # this should reutrn an error
+      catch_cnd(requireNamespace2("pkg"))$package  # containing the pkg name 
+      ```
+
 2. __<span style="color:red">Q</span>__: Inside a package you often need to stop with an error when something is not right. Other packages that depend on your package might be tempted to check these errors in their unit tests. How could you help these packages to avoid relying on the error message which is part of the user interface rather than the API and might change without notice?
 
 ## Applications
