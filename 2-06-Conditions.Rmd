@@ -166,27 +166,32 @@
      - a message is thrown:
      - depending on success or failure `TRUE` or `FALSE` is returned.
 
-   Therefore we adjust this behaviour only in the failure case, where we return the error condition and document the implementation with the code:
+   Therefore we adjust this behaviour mainly regarding the failure case, where we return the error condition:
    
     ```{r}
     library(rlang)
 
     requireNamespace2 <- function(package)  {
+      # First let us include a basic check for the input:
       if (!is.character(package) | !length(package) == 1L) {
         abort("error_bad_argument",
               message = "`package` must be a length-1 character vector.")
       }
-  
-      withCallingHandlers(
+      
+      withCallingHandlers(        
+        requireNamespace(package, quietly = FALSE),
+        # Because the original error messages are hard to differentiate in a robust way,
+        # we catch all messages first:
         message = function(cnd)  {
+          # In case of failure, we throw the error. 
+          # Otherwise the original message will be returned
           if (!requireNamespace(package, quietly = TRUE)) {
             abort(
               "error_pkg_not_found",
               message = paste0("`package` ", package, " not found."),
               package = package
             )}
-        },
-        requireNamespace(package, quietly = FALSE)
+        }
       )
   
       invisible(TRUE)
