@@ -153,16 +153,16 @@ library(magrittr)
     c <- list(b, a, 1:10)
     ```
     
-   __<span style="color:green">A</span>__: `a` contains a reference to an address with the value `1:10`. `b` contains a list of two references to the same address as `a`. `c` contains a list of `b`, `a` (containing the same reference three times) and a reference pointing to a different address containing the same value (`1:10`).
+   __<span style="color:green">A</span>__: `a` contains a reference to an address with the value `1:10`. `b` contains a list of two references to the same address as `a`. `c` contains a list of `b` (containing two references to `a`), `a` (containing the same reference again) and a reference pointing to a different address containing the same value (`1:10`).
 
     ```{r, eval = FALSE}
     ref(c)
     #> █ [1:0x55eec93cbdd8] <list>    # c
-    #> ├─█ [2:0x55eecb8246e8] <list>  # b
-    #> │ ├─[3:0x55eec7df4e98] <int>   # a
-    #> │ └─[3:0x55eec7df4e98]         # a
-    #> ├─[3:0x55eec7df4e98]           # a
-    #> └─[4:0x55eec7aa6968] <int>     # 1:10
+    #> ├─█ [2:0x55eecb8246e8] <list>  # - b
+    #> │ ├─[3:0x55eec7df4e98] <int>   # -- a
+    #> │ └─[3:0x55eec7df4e98]         # -- a
+    #> ├─[3:0x55eec7df4e98]           # - a
+    #> └─[4:0x55eec7aa6968] <int>     # - 1:10
     ```
 
 
