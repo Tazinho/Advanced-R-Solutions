@@ -238,8 +238,10 @@ library(magrittr)
     base_env_names <- c("package:stats", "package:graphics", "package:grDevices",
                         "package:utils", "package:datasets", "package:methods"  ,
                         "Autoloads"    , "package:base")
-    
-    base_env_list <- sapply(base_env_names, function(x) mget(ls(x, all = TRUE), as.environment(x)))
+                        
+    base_env_list <- sapply(base_env_names, 
+                        function(x) mget(ls(x, all = TRUE), as.environment(x)))
+                        
     sum(lengths(base_env_list))
     
     sapply(base_env_list, lobstr::obj_size)
