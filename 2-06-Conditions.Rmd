@@ -292,6 +292,8 @@
    
    > Time limits are checked whenever a user interrupt could occur. This will happen frequently in R code and during Sys.sleep, but only at points in compiled C and Fortran code identified by the code author.
    
-   A minimal example pointed out in the former source would be `system.time(try(Sys.sleep(3)))` which will be hard to trigger under a certain time. 
+   A minimal example pointed out in the former source would be `system.time(try(Sys.sleep(3)))` which will be hard to trigger under a certain time. The behaviour of `Sys.sleep()` is also documented under in the "Details" section of `Sys.sleep()`:
    
-   However, in the exercise it seems to be more the question why it is hard to get i from `99` to `0` and the answer might be, that interruptions are insecure since it might be hards to anticipate which part of the programm is running and instead of triggering a specific interruption-handler it's easy to interrupt the process as a whole.
+   > Using this function allows R to temporarily be given very low priority and hence not to interfere with more important foreground tasks. A typical use is to allow a process launched from R to set itself up and read its input files before R execution is resumed. The intention is that this function suspends execution of R expressions but wakes the process up often enough to respond to GUI events, typically every half second. It can be interrupted (e.g. by Ctrl-C or Esc at the R console). There is no guarantee that the process will sleep for the whole of the specified interval (sleep might be interrupted), and it may well take slightly longer in real time to resume execution. 
+   
+   However, in the exercise it seems to be more the question why it is hard to get i from `99` to `0` and the answer might be, that interruptions are insecure since it might be hard to anticipate which part of the programm is running and instead of triggering a specific interruption-handler it's easy to interrupt the process as a whole. The specific behaviour of `Sys.sleep()` as mentioned above makes it even harder to guess which part of a program is currently executed.
