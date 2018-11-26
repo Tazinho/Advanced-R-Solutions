@@ -234,18 +234,18 @@ library(magrittr)
     
     Via the following calculations we can see that this holds for about `r base_env_names <- c("package:stats", "package:graphics", "package:grDevices", "package:utils", "package:datasets", "package:methods", "Autoloads", "package:base"); base_env_list <- sapply(base_env_names, function(x) mget(ls(x, all = TRUE), as.environment(x))); sum(lengths(base_env_list))` objects which are usually loaded by default and use about `r round(sum(sapply(base_env_list, lobstr::obj_size)) / 1024^2, 2)` MB:
   
-  ```{r}
-  base_env_names <- c("package:stats", "package:graphics", "package:grDevices",
-                      "package:utils", "package:datasets", "package:methods"  ,
-                      "Autoloads"    , "package:base")
+    ```{r}
+    base_env_names <- c("package:stats", "package:graphics", "package:grDevices",
+                        "package:utils", "package:datasets", "package:methods"  ,
+                        "Autoloads"    , "package:base")
+    
+    base_env_list <- sapply(base_env_names, function(x) mget(ls(x, all = TRUE), as.environment(x)))
+    sum(lengths(base_env_list))
+    
+    sapply(base_env_list, lobstr::obj_size)
+    round(sum(sapply(base_env_list, lobstr::obj_size)) / 1024^2, 2)
+    ```
   
-  base_env_list <- sapply(base_env_names, function(x) mget(ls(x, all = TRUE), as.environment(x)))
-  sum(lengths(base_env_list))
-  
-  sapply(base_env_list, lobstr::obj_size)
-  round(sum(sapply(base_env_list, lobstr::obj_size)) / 1024^2, 2)
-  ```
-
 3. __<span style="color:red">Q</span>__: Predict the output of the following code:
 
     ```{r, eval = FALSE}
