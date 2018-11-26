@@ -285,3 +285,13 @@
       message("No more bottles of beer on the wall, no more bottles of beer.")
     }
     ```
+    
+   __<span style="color:orange">A</span>__: Basically there seems to be an issue that interrupts are not handled in a general way, but seem to depend on the R interface and the implementation of the R code which is interrupted. Not sure if I understand this correct, but there needs to be a way from the frontend to supply the r code with the info that an interrupt has happened and the r code itself needs to check for this information regularly.
+   
+   This issue is tracked also here https://github.com/HenrikBengtsson/Wishlist-for-R/issues/47 and more official documentation is for example under `?setTimeLimit`:
+   
+   > Time limits are checked whenever a user interrupt could occur. This will happen frequently in R code and during Sys.sleep, but only at points in compiled C and Fortran code identified by the code author.
+   
+   A minimal example pointed out in the former source would be `system.time(try(Sys.sleep(3)))` which will be hard to trigger under a certain time. 
+   
+   However, in the exercise it seems to be more the question why it is hard to get i from `99` to `0` and the answer might be, that interruptions are insecure since it might be hards to anticipate which part of the programm is running and instead of triggering a specific interruption-handler it's easy to interrupt the process as a whole.
