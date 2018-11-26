@@ -116,7 +116,7 @@ library(magrittr)
     x[[3]] <- 4
     ```
     
-   __<span style="color:green">A</span>__: Initially `x` is an integer vector. In the replacement call a double is assigned to the third element of `x`. Because of R's coercion rules also a type conversion takes place, which affects the whole vector.
+   __<span style="color:green">A</span>__: Initially `x` is an integer vector. In the replacement call a double is assigned to the third element of `x`. Because of R's coercion rules, a type conversion takes place, which affects the whole vector.
 
     ```{r, eval=FALSE}
     # two copies
@@ -128,7 +128,9 @@ library(magrittr)
     #> tracemem[0x55eec7b3af38 -> 0x55eec774cc18]: 
     #> tracemem[0x55eec774cc18 -> 0x55eeca6ed5a8]: 
     ```
-
+    
+   By assigning an integer instead of a double one copy may be avoided:
+    
     ```{r, eval=FALSE}
     # the same as 
     x <- 1:3
@@ -142,8 +144,6 @@ library(magrittr)
     ```
 
    <!-- code-chunks above were hard-coded to fix knitr output. -->
-
-   By assigning an integer instead of a double one copy may be avoided.
 
 3. __<span style="color:red">Q</span>__: Sketch out the relationship between the following objects:
 
