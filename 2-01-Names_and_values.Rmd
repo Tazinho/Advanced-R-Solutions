@@ -267,7 +267,8 @@ library(magrittr)
     obj_size(x, y)
     ```
     
-   __<span style="color:green">A</span>__: Since `lobstr::obj_size()` currently throws returns very different values, we will use `unclass(pryr::obj_size())` for now.
+   __<span style="color:orange">A</span>__: TODO: lobstr and pryr return very different results (600 byites vs 4MB in the first example) before we rewrite this answer it needs to be cleared, why these differences occur.
+   Since `lobstr::obj_size()` currently returns very different values, we will use `unclass(pryr::obj_size())` for now.
    
    To predict the size of `x`, we first find out via `obj_size(integer(0))` that an integer takes 48 B. For every element of the integer vector additionally 4 B are needed and R allocates memory in chunks of 2, so 8 B at a time. This can be verified for example via `sapply(1:100, function(x) obj_size(integer(x)))`. Overall our prediction will result in 40 B + 1000000 * 4 B = 4000040 B:
     
