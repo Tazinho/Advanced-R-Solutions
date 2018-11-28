@@ -337,7 +337,7 @@ library(magrittr)
     }
     ```
 
-   We can then profile the performance, by benchmarking `subtact_medians()` on data frame- and list-input for a specified number columns. For list input the result has still to be coerced into a data frame, so that the output of both functions will be identical.
+   We can then profile the performance, by benchmarking `subtact_medians()` on data frame- and list-input for a specified number of columns. The functions should both input and output a data frame, so one is going to do a bit more work.
 
     ```{r}
     compare_speed <- function(ncol){
@@ -346,12 +346,11 @@ library(magrittr)
       medians <- vapply(df_input, median, numeric(1))
       
       bench::mark(`Data Frame` = subtract_medians(df_input,   medians),
-                  List         = subtract_medians(list_input, medians) %>% 
-                                   as.data.frame())
+                  List         = as.data.frame(subtract_medians(as.list(df_input), medians)))
     }
     ```
 
-   Then bench package allows us to run benchmark across a grid of parameters easily. We will use it to slowly increase the number of columns of the random data.
+   Then bench package allows us to run our benchmark across a grid of parameters easily. We will use it to slowly increase the number of columns of the random data.
 
     ```{r, warning=FALSE, message=FALSE}
     results <- bench::press(
@@ -360,7 +359,7 @@ library(magrittr)
     )
     ```
 
-   The execution times for mean subtraction on data frames increase exponentially with the number of columns of the input data. This because, the data frame will be copied more often and the copy will also be bigger. For list-input the execution time increases linearly.
+   The execution times for mean subtraction on data frames increase exponentially with the number of columns of the input data. This is because, the data frame will be copied more often and the copy will also be bigger. For list-input the execution time increases linearly.
    
    For list input with less than ~ 800 columns, the cost of the additional data structure conversion will be relatively big. For very wide data frame input the overhead from the additional copies slows down the computation considerably. Apparently the choice of the faster function depends on the size of the data also.
 
