@@ -354,20 +354,14 @@ library(lobstr)
     }
     ```
 
-   Then bench package allows us to run our benchmark across a grid of parameters easily. We will use it to slowly increase the number of columns of the random data.
+   Then bench package allows us to run our benchmark across a grid of parameters easily. We will use it to slowly increase the number of columns containing random data.
 
     ```{r, warning=FALSE, message=FALSE}
     results <- bench::press(
-      ncol = c(1, 5, 10, 50, 100, 200, 400, 600, 800, 1000, 1500),
+      ncol = c(1, 5, 10, 50, 100, 200, 400, 600, 800, 1000, 1500, 2500),
       compare_speed(ncol)
     )
-    ```
-
-   The execution times for mean subtraction on data frames increase exponentially with the number of columns of the input data. This is because, the data frame will be copied more often and the copy will also be bigger. For list-input the execution time increases linearly.
-   
-   For list input with less than ~ 800 columns, the cost of the additional data structure conversion will be relatively big. For very wide data frame input the overhead from the additional copies slows down the computation considerably. Apparently the choice of the faster function depends on the size of the data also.
-
-    ```{r}
+    
     library(ggplot2)
     ggplot(results, aes(ncol, median, col = expression)) +
       geom_point(size = 2) +
@@ -375,6 +369,33 @@ library(lobstr)
       labs(x = "Number of Columns of Input Data", y = "Computation Time",
            color = "Input Data Structure",
            title = "Benchmark: Median Subtraction")
+    ```
+
+   The execution times for median subtraction on data frames columns increase exponentially with the number of columns in the input data. This is because, the data frame will be copied more often and the copy will also be bigger. For subtraction on list elements the execution time increases only linearly.
+   
+   For list input with less than ~ 800 columns, the cost of the additional data structure conversion (mainly caused by `as.data.frame()`, see below) is relatively big. For very wide data frame input the overhead from the additional copies slows down the computation considerably. Apparently the choice of the faster function depends on the size of the data also.
+
+    ```{r, warning = FALSE, error = FALSE}
+    compare_speed2 <- function(ncol){
+      df_input   <- create_random_df(nrow = 1e4, ncol = ncol)
+      list_input    <- as.list(df_input)
+  
+      bench::mark(`as.data.frame()` = as.data.frame(list_input),
+                  `as.list()`       = as.list(df_input),
+                  check = FALSE)
+    }
+
+    results2 <- bench::press(
+      ncol = c(1, 5, 10, 50, 100, 200, 400, 600, 800, 1000, 1500, 2500),
+      compare_speed2(ncol)
+    )
+
+    ggplot(results2, aes(ncol, median, col = expression)) +
+      geom_point(size = 2) +
+      geom_smooth() +
+      labs(x = "Number of Columns of Input Data", y = "Computation Time",
+           color = "Input Data Structure",
+           title = "Benchmark: as.list() vs. as.data.frame()")
     ```
 
 2. __<span style="color:red">Q</span>__: What happens if you attempt to use `tracemem()` on an environment?
