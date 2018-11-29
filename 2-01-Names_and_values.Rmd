@@ -375,10 +375,10 @@ library(lobstr)
    
    For list input with less than ~ 800 columns, the cost of the additional data structure conversion (mainly caused by `as.data.frame()`, see below) is relatively big. For very wide data frame input the overhead from the additional copies slows down the computation considerably. Apparently the choice of the faster function depends on the size of the data also.
 
-    ```{r, warning = FALSE, error = FALSE}
-    compare_speed2 <- function(ncol){
+    ```{r, warning = FALSE, message = FALSE}
+    compare_speed2 <- function(ncol) {
       df_input   <- create_random_df(nrow = 1e4, ncol = ncol)
-      list_input    <- as.list(df_input)
+      list_input <- as.list(df_input)
   
       bench::mark(`as.data.frame()` = as.data.frame(list_input),
                   `as.list()`       = as.list(df_input),
@@ -394,7 +394,7 @@ library(lobstr)
       geom_point(size = 2) +
       geom_smooth() +
       labs(x = "Number of Columns of Input Data", y = "Computation Time",
-           color = "Input Data Structure",
+           color = "Conversion fuction",
            title = "Benchmark: as.list() vs. as.data.frame()")
     ```
 
