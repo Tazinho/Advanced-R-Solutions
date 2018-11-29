@@ -373,7 +373,7 @@ library(lobstr)
 
    The execution times for median subtraction on data frames columns increase exponentially with the number of columns in the input data. This is because, the data frame will be copied more often and the copy will also be bigger. For subtraction on list elements the execution time increases only linearly.
    
-   For list input with less than ~ 800 columns, the cost of the additional data structure conversion (mainly caused by `as.data.frame()`, see below) is relatively big. For very wide data frame input the overhead from the additional copies slows down the computation considerably. Apparently the choice of the faster function depends on the size of the data also.
+   For list input with less than ~ 800 columns, the cost of the additional data structure conversion (mainly caused by `as.data.frame()`, see below) is relatively big. For very wide data frames the overhead of the additional copies slows down the computation considerably. Apparently the choice of the faster function depends on the size of the data also.
 
     ```{r, warning = FALSE, message = FALSE}
     compare_speed2 <- function(ncol) {
