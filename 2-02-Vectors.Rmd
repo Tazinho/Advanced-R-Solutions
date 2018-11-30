@@ -206,20 +206,48 @@ in a dataset (which happens often) will not result in coercion.
 
 __<span style="color:orange">A</span>__: 
 
-```{r}
+```{r}# These classes can occur
 date <- as.Date("1970-02-01")
-now_ct <- as.POSIXct("2018-08-01 22:00", tz = "UTC")
-now_lt <- as.POSIXlt(now_ct)
+date_time_ct <- as.POSIXct("1970-02-01 22:00", tz = "UTC")
+date_time_lt <- as.POSIXlt(date_time_ct)
 
-c(date, date) # date method
-c(now_ct, now_ct) # date_time_ct method
-c(now_lt, now_lt) # date_time_lt method
+# We can print them alone
+date
+date_time_ct
+date_time_lt
 
-c(date, now_ct) # date method
-c(now_ct, date) # date_time_ct method
+# But they behave different when wrapped in `c()`.
+c(date)
+c(date_time_ct) # the time zone gets stripped (printed in current timezone)
+c(date_time_lt) # the time zone gets converted to the current one. See ?DateTimeClasses
 
-c(date, now_ct, now_lt) # date method
-c(now_ct, date, now_lt) # date_time_ct method
+# However further combining with itself doesn't seem to change anything else.
+c(date, date, date)
+c(date_time_ct, date_time_ct, date_time_ct)
+c(date_time_lt, date_time_lt, date_time_lt)
+
+# First lets combine date and date_time_ct only
+c(date        , date_time_ct, date_time_ct) # the date_time gets strange 
+unclass(c(date        , date_time_ct, date_time_ct))
+# it is first converted into the difference in seconds (2757600) and then this is converted into date. Therefore the conversion will be 1970-01-01 + 2757600 days.
+c(date_time_ct, date        , date_time_ct) # the date behaves strange
+c(date_time_ct, date_time_ct, date        ) # again the date behaves strange
+# -> Method dispatch seems to happen on the first argument. To work around this, we can call the methods directly:
+c.Date(date_time_ct, date        , date_time_ct)
+c.POSIXct(date_time_ct, date        , date_time_ct)
+
+# Now lets combine date and date_time_ct only
+c(date        , date_time_lt, date_time_lt) # strange behaviour
+c(date_time_lt, date        , date_time_lt) # normal behaviour
+c(date_time_lt, date_time_lt, date        ) # normal behaviour
+
+# Now lets combine all three
+c(date        , date_time_lt, date_time_ct) 
+c(date        , date_time_ct, date_time_lt)  
+c(date_time_ct, date_time_lt, date        ) 
+c(date_time_ct, date        , date_time_lt)  
+c(date_time_lt, date_time_ct, date        ) 
+c(date_time_lt, date        , date_time_ct)  
 
 # For unlist see:
 #https://stackoverflow.com/questions/15659783/why-does-unlist-kill-dates-in-r
