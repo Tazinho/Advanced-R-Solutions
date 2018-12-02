@@ -200,59 +200,48 @@ in a dataset (which happens often) will not result in coercion.
    
 2. __<span style="color:red">Q</span>__: Why do you need to use `unlist()` to convert a list to an 
    atomic vector? Why doesn't `as.vector()` work?  
-   __<span style="color:green">A</span>__: To get rid of (flatten) the nested structure. `as.vector()` doesn't work, because a list is already a vector.
+   __<span style="color:green">A</span>__: To get rid of (flatten) the nested structure `as.vector()` doesn't work, because a list is already a vector.
 
 3. __<span style="color:red">Q</span>__: Compare and contrast `c()` and `unlist()` when combining a date and date-time into a single vector.
 
 __<span style="color:orange">A</span>__: 
 
 ```{r}
-# These classes can occur
-date <- as.Date("1970-02-01")
-date_time_ct <- as.POSIXct("1970-02-01 22:00", tz = "UTC")
-date_time_lt <- as.POSIXlt(date_time_ct)
+# 3 different classes
+date    <- as.Date("1970-06-01")
+dttm_ct <- as.POSIXct("1970-06-01 22:00", tz = "UTC")
+dttm_lt <- as.POSIXlt(dttm_ct)
 
-# We can print them alone
-date
-date_time_ct
-date_time_lt
-
-# But they behave different when wrapped in `c()`.
-c(date)
-c(date_time_ct) # the time zone gets stripped (printed in current timezone)
-c(date_time_lt) # the time zone gets converted to the current one. See ?DateTimeClasses
-
-# However further combining with itself doesn't seem to change anything else.
-c(date, date, date)
-c(date_time_ct, date_time_ct, date_time_ct)
-c(date_time_lt, date_time_lt, date_time_lt)
-
-# First lets combine date and date_time_ct only
-c(date        , date_time_ct, date_time_ct) # the date_time gets strange 
-unclass(c(date        , date_time_ct, date_time_ct))
-# it is first converted into the difference in seconds (2757600) and then this is converted into date. Therefore the conversion will be 1970-01-01 + 2757600 days.
-c(date_time_ct, date        , date_time_ct) # the date behaves strange
-c(date_time_ct, date_time_ct, date        ) # again the date behaves strange
-# -> Method dispatch seems to happen on the first argument. To work around this, we can call the methods directly:
-c.Date(date_time_ct, date        , date_time_ct)
-c.POSIXct(date_time_ct, date        , date_time_ct)
-
-# Now lets combine date and date_time_ct only
-c(date        , date_time_lt, date_time_lt) # strange behaviour
-c(date_time_lt, date        , date_time_lt) # normal behaviour
-c(date_time_lt, date_time_lt, date        ) # normal behaviour
-
-# Now lets combine all three
-c(date        , date_time_lt, date_time_ct) 
-c(date        , date_time_ct, date_time_lt)  
-c(date_time_ct, date_time_lt, date        ) 
-c(date_time_ct, date        , date_time_lt)  
-c(date_time_lt, date_time_ct, date        ) 
-c(date_time_lt, date        , date_time_ct)  
-
-# For unlist we might first apply `unlist()` to all these examples and then extract our main discoveries.
-# Later it could also make sense to just focus on POSIXlt objects for unlist as these are build up on lists.
+# combining date and date-time
+c(date, dttm_ct)  # strange!
 ```
+
+it is first converted into the difference in seconds (2757600) and then this is converted into date. Therefore the conversion will be 1970-01-01 + 2757600 days. -> Method dispatch happens on the first argument. To see explicitly what is happening, we can call the methods directly:
+
+```{r}
+# reason:
+unclass(c(date, dttm_ct))
+c.Date(dttm_ct,    date)  # distorts dttm_ct
+c.POSIXct(dttm_ct, date)  # distorts date
+c.POSIXlt(dttm_lt, date)  # o.k.
+```
+
+Later it could also make sense to just focus on POSIXlt objects for unlist as these are build up on lists.
+
+```{r}
+c(date,    dttm_ct)
+unlist(c(date,    dttm_ct)) # no difference
+
+# attributes are stripped
+unlist(list(date, dttm_ct))
+unlist(list(date, dttm_lt))
+```
+
+- Date vectors are internally integers so the problem really is that attributes are stripped. 
+- In essence, as long as it's a vector, unlist does nothing (no drop of attributes as well). And if it's a list, then attributes can't be preserved.
+
+
+`c()` coerces types and errors may occur because of inappropriate method dispatch. `unlist()` strips attributes
 
 ## Data frames and tibbles
 
