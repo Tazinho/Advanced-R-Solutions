@@ -80,7 +80,7 @@ library(lobstr)
     make.names("if")
     ```
     
-   Interestingly, some of these transformations are influence by the current locale (from `r ?make.names`):
+   Interestingly, some of these transformations are influenced by the current locale (from `?make.names`):
 
    > The definition of a letter depends on the current locale, but only ASCII digits are considered to be digits.
 
@@ -330,12 +330,11 @@ library(lobstr)
     }
     ```
 
-   We can then profile the performance, by benchmarking `subtact_medians()` on data frame- and list-input for a specified number of columns. The functions should both return a data frame, so the list input will have to be transformed after the computation.
+   We can then profile the performance, by benchmarking `subtact_medians()` on data frame- and list-input for a specified number of columns. The functions should both input and output a data frame, so one is going to do a bit more work.
 
     ```{r}
     compare_speed <- function(ncol){
       df_input   <- create_random_df(nrow = 1e4, ncol = ncol)
-      list_input <- as.list(df_input)
       medians <- vapply(df_input, median, numeric(1))
       
       bench::mark(`Data Frame` = subtract_medians(df_input,   medians),
