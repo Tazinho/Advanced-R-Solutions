@@ -229,12 +229,6 @@ in a dataset (which happens often) will not result in coercion.
     c(as.Date(dttm_ct, tz = "UTC"), date)
     ```
    
-<!-- ```{r} -->
-<!-- # interestingly combining date and POSIXlt is working -->
-<!-- dttm_lt <- as.POSIXlt(dttm_ct) -->
-<!-- c.POSIXlt(date, dttm_lt)  # o.k. -->
-<!-- ``` -->
-   
    Let's look at `unlist()`, which operates on list input.
 
     ```{r}    
@@ -242,14 +236,19 @@ in a dataset (which happens often) will not result in coercion.
     unlist(list(date, dttm_ct))  
     ```
    
+   We see again, that internally dates(-times) are doubles. Unfortunately this is all we are left with, when unlist strips the attributes of the list. (This wouldn't happen for vector input, but then we would have to combine the different classes into one vector, which is tricky as seen above.)
+   
+   To summarise: `c()` coerces types and errors may occur because of inappropriate method dispatch. `unlist()` strips attributes.
+   
+<!-- ```{r} -->
+<!-- # interestingly combining date and POSIXlt is working -->
+<!-- dttm_lt <- as.POSIXlt(dttm_ct) -->
+<!-- c.POSIXlt(date, dttm_lt)  # o.k. -->
+<!-- ``` -->
 <!-- ```{r} -->
 <!-- c(date,    dttm_ct) -->
 <!-- unlist(c(date,    dttm_ct)) # no difference -->
 <!-- ``` -->
-   
-   We see again, that internally dates(-times) are doubles. Unfortunately this is all we are left with, when unlist strips the attributes of the list. (This wouldn't happen for vector input, but then we would have to combine the different classes into one vector, which is tricky as seen above.)
-   
-   To summarise: `c()` coerces types and errors may occur because of inappropriate method dispatch. `unlist()` strips attributes.
 
 ## Data frames and tibbles
 
