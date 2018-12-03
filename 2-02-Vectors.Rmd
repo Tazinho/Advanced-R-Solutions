@@ -204,44 +204,55 @@ in a dataset (which happens often) will not result in coercion.
 
 3. __<span style="color:red">Q</span>__: Compare and contrast `c()` and `unlist()` when combining a date and date-time into a single vector.
 
-__<span style="color:orange">A</span>__: 
+__<span style="color:green">A</span>__: 
+
+Date and Date-time objects are build upon doubles. Dates are represented as days, while date-time-objects (POSIXct) represent seconds (counted in regard to the reference date 1970-01-01, also known as "The Epoch").
 
 ```{r}
-# 3 different classes
-date    <- as.Date("1970-06-01")
-dttm_ct <- as.POSIXct("1970-06-01 22:00", tz = "UTC")
-dttm_lt <- as.POSIXlt(dttm_ct)
+# define date(-time) objects
+date    <- as.Date("1970-01-02")
+dttm_ct <- as.POSIXct("1970-01-01 01:00", tz = "UTC")
 
-# combining date and date-time
-c(date, dttm_ct)  # strange!
+# method-dispatch leads to suprising output whe combining date and date-time
+c(date, dttm_ct)  # equal to c.Date(date, dttm_ct) 
+c(dttm_ct, date)  # equal to c.POSIXct(date, dttm_ct)
 ```
 
-it is first converted into the difference in seconds (2757600) and then this is converted into date. Therefore the conversion will be 1970-01-01 + 2757600 days. -> Method dispatch happens on the first argument. To see explicitly what is happening, we can call the methods directly:
+The generic function dispatches based on the class of its first argument. When `c.Date()` is executed, `dttm_ct` is converted to a date, but the 3600 seconds are mistaken for 3600 days! (And when `c.POSIXct` is called on `date`, the 1 day counts as 1 second only.)
 
 ```{r}
-# reason:
-unclass(c(date, dttm_ct))
-c.Date(dttm_ct,    date)  # distorts dttm_ct
-c.POSIXct(dttm_ct, date)  # distorts date
-c.POSIXlt(dttm_lt, date)  # o.k.
+unclass(c(date, dttm_ct))  # internal representation
+date + 3599
 ```
 
-Later it could also make sense to just focus on POSIXlt objects for unlist as these are build up on lists.
+Some of these problems may be avoided by explicit conversion of the classes:
 
 ```{r}
-c(date,    dttm_ct)
-unlist(c(date,    dttm_ct)) # no difference
+c(as.Date(dttm_ct, tz = "UTC"), date)
+```
 
+<!-- ```{r} -->
+<!-- # interestingly combining date and POSIXlt is working -->
+<!-- dttm_lt <- as.POSIXlt(dttm_ct) -->
+<!-- c.POSIXlt(date, dttm_lt)  # o.k. -->
+<!-- ``` -->
+
+Let's look at `unlist()`, which operates on list input.
+
+```{r}
 # attributes are stripped
-unlist(list(date, dttm_ct))
+unlist(list(date, dttm_ct))  
 unlist(list(date, dttm_lt))
 ```
 
-- Date vectors are internally integers so the problem really is that attributes are stripped. 
-- In essence, as long as it's a vector, unlist does nothing (no drop of attributes as well). And if it's a list, then attributes can't be preserved.
+<!-- ```{r} -->
+<!-- c(date,    dttm_ct) -->
+<!-- unlist(c(date,    dttm_ct)) # no difference -->
+<!-- ``` -->
 
+We see again, that internally dates(-times) are doubles. Unfortunately this all we are left with, when unlist strips the attributes of the list. (This wouldn't happen for vector input, but then we would have to combine the different classes into one vector, which is tricky as seen above.)
 
-`c()` coerces types and errors may occur because of inappropriate method dispatch. `unlist()` strips attributes
+To summarise: `c()` coerces types and errors may occur because of inappropriate method dispatch. `unlist()` strips attributes.
 
 ## Data frames and tibbles
 
