@@ -75,7 +75,7 @@ in a dataset (which happens often) will not affect coercion.
    unname
    ```
    
-   It always removes names and dimnames attributes when they are set, except for data frames. Note that the documentation is currently not correct (R 3.5.1). `force == TRUE` doesn't remove the dimnames (names and row names) as `NULL` is always catched within the first condition of the underlying `dimnames<-.data.frame`:
+   If set, `unname()` removes the names and dimnames attributes from its input object. Note that the dimnames attribute (names and row names) for data frames won't be affected for data frames, even if the documentation currently (R 3.5.1) mentions this in the case `force == TRUE` is supplied. Instead the line `dimnames(obj) <- NULL` setting `NULL` as the replacement value in the underlying `dimnames<-.data.frame` function, raises the first error condition in the underlying source code:
    
    ```{r}
    `dimnames<-.data.frame`
