@@ -4,21 +4,21 @@
 
 1. __<span style="color:red">Q</span>__: How do you create scalars of type raw and complex? (See `?raw` and `?complex`)
 
-   __<span style="color:green">A</span>__: Length 1 raw and complex vectors can be created via `raw()` and `complex()`, i.e.:
+   __<span style="color:green">A</span>__: In R scalars are represented as vectors of length one. For raw and complex types these can be created via `raw()` and `complex()`, i.e.:
   
     ```{r}
     raw(1)
     complex(1)
     ```
   
-    For raw vectors it's easiest to coerce numeric or character scalars to raw:
+   For raw vectors it's easy to coerce numeric or character scalars to raw.
   
     ```{r}
     as.raw(42)
     charToRaw("A")
     ```
   
-    For complex numbers real and imaninary parts can be provided directly, i.e.:
+   For complex numbers real and imaginary parts can be provided directly.
   
     ```{r}
     complex(length.out = 1, real = 1, imaginary = 1)
@@ -35,7 +35,7 @@
 
 3. __<span style="color:red">Q</span>__: Why is `1 == "1"` true? Why is `-1 < FALSE` true? Why is `"one" < 2` false?  
 
-   __<span style="color:green">A</span>__: These operators are all functions which coerce their arguments (in these cases) to character, double and character. To enlighten the latter case: "one" comes after "2" in ASCII.
+   __<span style="color:green">A</span>__: These comparisons are carried out by operator-functions, which coerce their arguments to a common type. In the examples above these cases will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` becomes `"2"` (in ASCII numerals preceed letter).
 
 4. __<span style="color:red">Q</span>__: Why is the default missing value, `NA`, a logical vector? What's special
 about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)  
