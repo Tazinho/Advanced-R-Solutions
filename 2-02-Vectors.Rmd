@@ -247,13 +247,10 @@ in a dataset (which happens often) will not affect coercion.
 ## Data frames and tibbles
 
 1. __<span style="color:red">Q</span>__: Can you have a data frame with 0 rows? What about 0 columns?  
-   __<span style="color:green">A</span>__: Yes, you can create them easily. Also both dimensions can be 0:
 
-    ```{r}
-    # here we use the recycling rules for logical subsetting, but you could
-    # also subset with 0, a negative index or a zero length atomic (i.e.
-    # logical(0), character(0), integer(0), double(0))
-    
+   __<span style="color:green">A</span>__: Yes, you can create one easily and in many ways. Also both dimensions can be 0. The fastest way is to subset the regarding dimension with one of `0`, `NULL` or a valid 0-length atomic (`logical(0)`, `character(0)`, `integer(0)`, `double(0)`). Also a negative integer sequence would work. Here we use the recycling rules for logical subsetting:
+
+    ```{r}.
     iris[FALSE,]
     
     iris[ , FALSE] # or iris[FALSE]
