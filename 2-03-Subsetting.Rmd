@@ -28,9 +28,9 @@
     x[upper.tri(x)]
     ```  
     
-   __<span style="color:green">A</span>__: `upper.tri()` has really intuitive source code. It coerces it's input to a matrix and returns a logical matrix. Hence describing it's behaviour for the use of subsetting is based on everything that applies to subsetting with logical matrices.
+   __<span style="color:green">A</span>__: `upper.tri()` has really intuitive source code. It coerces its input to a matrix and returns a logical matrix. Hence describing its behaviour for the use of subsetting is based on everything that applies to subsetting with logical matrices.
 
-1. __<span style="color:red">Q</span>__: Why does `mtcars[1:20]` return an error? How does it differ from the similar `mtcars[1:20, ]`?  
+4. __<span style="color:red">Q</span>__: Why does `mtcars[1:20]` return an error? How does it differ from the similar `mtcars[1:20, ]`?  
    
    __<span style="color:green">A</span>__: In the first case `mtcar` is subsetted with a vector and the statement should return a data.frame of the first 20 columns in `mtcars`. Since `mtcars` only has 11 columns, the index is out of bounds, which explains the error. The biggest difference of `mtcars[1:20, ]` to the former case, is that now `mtcars` is subsetted with two vectors. In this case you will get returned the first 20 rows and all columns (like subsetting a matrix). 
 
@@ -194,7 +194,7 @@
     
    Many more packages, which we are currently not aware of might provide similar functionality.
    
-1. __<span style="color:red">Q</span>__: Given a linear model, e.g., `mod <- lm(mpg ~ wt, data = mtcars)`, extract the residual degrees of freedom. Extract the R squared from the model summary (`summary(mod)`).  
+2. __<span style="color:red">Q</span>__: Given a linear model, e.g., `mod <- lm(mpg ~ wt, data = mtcars)`, extract the residual degrees of freedom. Extract the R squared from the model summary (`summary(mod)`).  
    
    __<span style="color:green">A</span>__: Since `mod` is of type list we can expect several possibilities:
     
