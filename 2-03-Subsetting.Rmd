@@ -220,8 +220,11 @@
    __<span style="color:green">A</span>__: Combine `` `[` `` with the `sample()` function:
     
     ```{r,eval = FALSE}
-    iris[sample(ncol(iris))] # permute rows
-    iris[sample(nrow(iris)), sample(ncol(iris)), drop = FALSE] # permute both at the same time
+    # Permute rows
+    iris[sample(ncol(iris))]
+    
+    # Permute rows and columns in one step
+    iris[sample(nrow(iris)), sample(ncol(iris)), drop = FALSE]
     ```
 
 2. __<span style="color:red">Q</span>__: How would you select a random sample of `m` rows from a data frame? What if the sample had to be contiguous (i.e., with an initial row, a final row, and every row in between)?  
@@ -240,7 +243,7 @@
     
 3. __<span style="color:red">Q</span>__: How could you put the columns in a data frame in alphabetical order?  
    
-   __<span style="color:green">A</span>__: We can sort the names and subset by name:
+   __<span style="color:green">A</span>__: We can sort the column names first and then use the result to subset the data frame for all columns:
 
     ```{r, eval = FALSE}
     iris[sort(names(iris))]
