@@ -265,14 +265,13 @@ in a dataset (which happens often) will not affect coercion.
 
 2. __<span style="color:red">Q</span>__: What happens if you attempt to set rownames that are not unique?
 
-    __<span style="color:green">A</span>__
-    It depends on the object and how you attempt this. For matrices it will work without any problems. For data frames and using the `row.names<-` replacement function, no further arguments can be set and the underlying `row.names<-.data.frame` method will throw an error (and an additional warning):
-   
+    __<span style="color:green">A</span>__ For matrices this will work without any problems. For data frames it is not possible and what happens depends on the approach. When using the `row.names<-` replacement function, no further arguments can be set and the underlying `.rowNamesDF<-` will throw an error (and an additional warning):
+    
     ```{r, error = TRUE, warning = TRUE}
     row.names(mtcars) <- rep(1, nrow(mtcars))
     ```
     
-    However, by calling the underlying `.rowNamesDF<-` directly you can set the `make.names` argument to `NA`, which sets `seq_len(nrow(x))` as (integer) row names or to `TRUE`, which triggers a call of `make.names(value, unique = TRUE)` for constructing valid (character) row names.
+    However, by calling `.rowNamesDF<-` directly one can set the `make.names` argument to `NA` or `TRUE`. When set to `NA`, a non unique row name will trigger the new row names to become `seq_len(nrow(x))`. When `make.names = TRUE`, row names will automatically converted into unique ones via `make.names(value, unique = TRUE)`. The same behaviour is caused, when a matrix with non unique row names is converted into a data frame.
 
 3. __<span style="color:red">Q</span>__: If `df` is a data frame, what can you say about `t(df)`, and `t(t(df))`? Perform some experiments, making sure to try different column types.
 
