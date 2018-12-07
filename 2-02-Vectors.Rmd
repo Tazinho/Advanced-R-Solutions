@@ -200,25 +200,29 @@ in a dataset (which happens often) will not affect coercion.
 3. __<span style="color:red">Q</span>__: Compare and contrast `c()` and `unlist()` when combining a date and date-time into a single vector.
 
    __<span style="color:green">A</span>__: Date and date-time objects are build upon doubles. Dates are represented as days, while date-time-objects (POSIXct) represent seconds (counted in regard to the reference date 1970-01-01, also known as "The Epoch").
+   
+   Let's define date and date-time objects:
 
     ```{r}
-    # define date(-time) objects
     date    <- as.Date("1970-01-02")
     dttm_ct <- as.POSIXct("1970-01-01 01:00", tz = "UTC")
+    ```
+    
+   When combining these objects method-dispatch leads to suprising output:
 
-    # method-dispatch leads to suprising output when combining date and date-time
+    ```{r}
     c(date, dttm_ct)  # equal to c.Date(date, dttm_ct) 
     c(dttm_ct, date)  # equal to c.POSIXct(date, dttm_ct)
     ```
 
-   The generic function dispatches based on the class of its first argument. When `c.Date()` is executed, `dttm_ct` is converted to a date, but the 3600 seconds are mistaken for 3600 days! (And when `c.POSIXct()` is called on `date`, one day counts as one second only.)
+   The generic function dispatches based on the class of its first argument. When `c.Date()` is executed, `dttm_ct` is converted to a date, but the 3600 seconds are mistaken for 3600 days! When `c.POSIXct()` is called on `date`, one day counts as one second only, as illustrated by the following line:
 
     ```{r}
     unclass(c(date, dttm_ct))  # internal representation
     date + 3599
     ```
 
-   Some of these problems may be avoided by explicit conversion of the classes:
+   Some of these problems may be avoided via explicit conversion of the classes:
 
     ```{r}
     c(as.Date(dttm_ct, tz = "UTC"), date)
@@ -231,7 +235,7 @@ in a dataset (which happens often) will not affect coercion.
     unlist(list(date, dttm_ct))  
     ```
 
-   We see again, that internally dates(-times) are doubles. Unfortunately this is all we are left with, when unlist strips the attributes of the list. (This wouldn't happen for vector input, but then we would have to combine the different classes into one vector, which is tricky as seen above.)
+   We see that internally dates(-times) are doubles. Unfortunately this is all we are left with, when unlist strips the attributes of the list. (This wouldn't happen for vector input, but then we would have to combine the different classes into one vector, which is tricky as seen above.)
 
    To summarise: `c()` coerces types and errors may occur because of inappropriate method dispatch. `unlist()` strips attributes.
    
