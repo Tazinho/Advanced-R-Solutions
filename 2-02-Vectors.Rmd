@@ -271,7 +271,7 @@ in a dataset (which happens often) will not affect coercion.
     row.names(mtcars) <- rep(1, nrow(mtcars))
     ```
     
-    However, by calling `.rowNamesDF<-` directly one can set the `make.names` argument to `NA` or `TRUE`. When set to `NA`, a non unique row name will trigger the new row names to become `seq_len(nrow(x))`. When `make.names = TRUE`, row names will automatically converted into unique ones via `make.names(value, unique = TRUE)`. The same behaviour is caused, when a matrix with non unique row names is converted into a data frame.
+    However, by calling `.rowNamesDF<-` directly one can set the `make.names` argument to `NA` or `TRUE`. When set to `NA`, any non unique row name will trigger the new row names to become `seq_len(nrow(x))`. When `make.names = TRUE`, row names will automatically converted into unique ones via `make.names(value, unique = TRUE)`. The same behaviour is caused, when a matrix with non unique row names is converted into a data frame.
 
 3. __<span style="color:red">Q</span>__: If `df` is a data frame, what can you say about `t(df)`, and `t(t(df))`? Perform some experiments, making sure to try different column types.
 
