@@ -37,11 +37,9 @@
 
    __<span style="color:green">A</span>__: These comparisons are carried out by operator-functions, which coerce their arguments to a common type. In the examples above these cases will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` becomes `"2"` (in ASCII numerals preceed letter).
 
-4. __<span style="color:red">Q</span>__: Why is the default missing value, `NA`, a logical vector? What's special
-about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)  
+4. __<span style="color:red">Q</span>__: Why is the default missing value, `NA`, a logical vector? What's special about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)  
    
-   __<span style="color:green">A</span>__: It is a practical thought. When you combine `NA`s in `c()` with other atomic types they will be coerced like `TRUE` and `FALSE` to integer `(NA_integer_)`, double `(NA_real_)`, complex `(NA_complex_)` and character `(NA_character_)`. Recall that in R there is a hierarchy of recursion that goes logical >> integer >> double >> character.  If `NA` was a character and provided as part of a set of other values, all of these would be coerced into character as well. Making `NA` a logical means that involving an `NA`
-in a dataset (which happens often) will not affect coercion.
+   __<span style="color:green">A</span>__: It is a practical thought. When you combine `NA`s in `c()` with other atomic types they will be coerced like `TRUE` and `FALSE` to integer `(NA_integer_)`, double `(NA_real_)`, complex `(NA_complex_)` and character `(NA_character_)`. Recall that in R there is a hierarchy of recursion that goes logical >> integer >> double >> character.  If `NA` was a character and provided as part of a set of other values, all of these would be coerced into character as well. Making `NA` a logical means that involving an `NA` in a dataset (which happens often) will not affect coercion.
 
 5. __<span style="color:red">Q</span>__: Precisely what do is.atomic(), is.numeric(), and is.vector() test for?
    
