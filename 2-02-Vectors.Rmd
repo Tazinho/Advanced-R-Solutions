@@ -85,7 +85,7 @@
     
    > `dim()` will return `NULL` when applied to a 1d vector.
    
-   One might want to use `NROW()` or `NCOL()` to handle atomic vectors, lists and NULL values (1 column, 0 rows) analog do a 1-column matrix / data frame. In these cases the alternatives `nrow()` and `ncol()` would return `NULL` (consistently to the behaviour of `dim()`). When subsetting data frames (interactively) this might be convenient as it is not affected by and hence more robust regarding the `drop = TRUE`-idiom:
+   One might want to use `NROW()` or `NCOL()` to handle atomic vectors, lists and NULL values (1 column, 0 rows) analog to a 1-column matrix / data frame. In these cases the alternatives `nrow()` and `ncol()` return `NULL` (consistently to the behaviour of `dim()`). When subsetting data frames (interactively) this might be convenient as it is not affected by and hence more robust regarding the default `drop = TRUE`(-idiom):
 
     ```{r}
     NROW(iris[, 1, drop = TRUE])
@@ -183,39 +183,44 @@
     * Subsetting with out of bound values and `NA`s leads to `NA`s for atomics and `NULL` values for lists:
 
       ```{r}
-      (1:3)[4]
-      as.list(1:3)[4]
+      (1:2)[3]
+      as.list(1:2)[3]
 
-      (1:3)[NA]
-      as.list(1:3)[NA]
+      (1:2)[NA]
+      as.list(1:2)[NA]
       ```
    
 2. __<span style="color:red">Q</span>__: Why do you need to use `unlist()` to convert a list to an 
    atomic vector? Why doesn't `as.vector()` work?  
+   
    __<span style="color:green">A</span>__: To get rid of (flatten) the nested structure `as.vector()` doesn't work, because a list is already a vector.
 
 3. __<span style="color:red">Q</span>__: Compare and contrast `c()` and `unlist()` when combining a date and date-time into a single vector.
 
    __<span style="color:green">A</span>__: Date and date-time objects are build upon doubles. Dates are represented as days, while date-time-objects (POSIXct) represent seconds (counted in regard to the reference date 1970-01-01, also known as "The Epoch").
+   
+   Let's define date and date-time objects:
 
     ```{r}
-    # define date(-time) objects
     date    <- as.Date("1970-01-02")
     dttm_ct <- as.POSIXct("1970-01-01 01:00", tz = "UTC")
+    ```
+    
+   When combining these objects method-dispatch leads to suprising output:
 
-    # method-dispatch leads to suprising output whe combining date and date-time
+    ```{r}
     c(date, dttm_ct)  # equal to c.Date(date, dttm_ct) 
     c(dttm_ct, date)  # equal to c.POSIXct(date, dttm_ct)
     ```
 
-   The generic function dispatches based on the class of its first argument. When `c.Date()` is executed, `dttm_ct` is converted to a date, but the 3600 seconds are mistaken for 3600 days! (And when `c.POSIXct()` is called on `date`, one day counts as one second only.)
+   The generic function dispatches based on the class of its first argument. When `c.Date()` is executed, `dttm_ct` is converted to a date, but the 3600 seconds are mistaken for 3600 days! When `c.POSIXct()` is called on `date`, one day counts as one second only, as illustrated by the following line:
 
     ```{r}
     unclass(c(date, dttm_ct))  # internal representation
     date + 3599
     ```
 
-   Some of these problems may be avoided by explicit conversion of the classes:
+   Some of these problems may be avoided via explicit conversion of the classes:
 
     ```{r}
     c(as.Date(dttm_ct, tz = "UTC"), date)
@@ -228,7 +233,7 @@
     unlist(list(date, dttm_ct))  
     ```
 
-   We see again, that internally dates(-times) are doubles. Unfortunately this is all we are left with, when unlist strips the attributes of the list. (This wouldn't happen for vector input, but then we would have to combine the different classes into one vector, which is tricky as seen above.)
+   We see that internally dates(-times) are doubles. Unfortunately this is all we are left with, when unlist strips the attributes of the list. (This wouldn't happen for vector input, but then we would have to combine the different classes into one vector, which is tricky as seen above.)
 
    To summarise: `c()` coerces types and errors may occur because of inappropriate method dispatch. `unlist()` strips attributes.
    
@@ -245,13 +250,10 @@
 ## Data frames and tibbles
 
 1. __<span style="color:red">Q</span>__: Can you have a data frame with 0 rows? What about 0 columns?  
-   __<span style="color:green">A</span>__: Yes, you can create them easily. Also both dimensions can be 0:
 
-    ```{r}
-    # here we use the recycling rules for logical subsetting, but you could
-    # also subset with 0, a negative index or a zero length atomic (i.e.
-    # logical(0), character(0), integer(0), double(0))
-    
+   __<span style="color:green">A</span>__: Yes, you can create one easily and in many ways. Also both dimensions can be 0. The fastest way is to subset the regarding dimension with one of `0`, `NULL` or a valid 0-length atomic (`logical(0)`, `character(0)`, `integer(0)`, `double(0)`). Also a negative integer sequence would work. Here we use the recycling rules for logical subsetting:
+
+    ```{r}.
     iris[FALSE,]
     
     iris[ , FALSE] # or iris[FALSE]
@@ -261,14 +263,13 @@
 
 2. __<span style="color:red">Q</span>__: What happens if you attempt to set rownames that are not unique?
 
-    __<span style="color:green">A</span>__
-    It depends on the object and how you attempt this. For matrices it will work without any problems. For data frames and using the `row.names<-` replacement function, no further arguments can be set and the underlying `row.names<-.data.frame` method will throw an error (and an additional warning):
-   
+    __<span style="color:green">A</span>__ For matrices this will work without any problems. For data frames it is not possible and what happens depends on the approach. When using the `row.names<-` replacement function, no further arguments can be set and the underlying `.rowNamesDF<-` will throw an error (and an additional warning):
+    
     ```{r, error = TRUE, warning = TRUE}
     row.names(mtcars) <- rep(1, nrow(mtcars))
     ```
     
-    However, by calling the underlying `.rowNamesDF<-` directly you can set the `make.names` argument to `NA`, which sets `seq_len(nrow(x))` as (integer) row names or to `TRUE`, which triggers a call of `make.names(value, unique = TRUE)` for constructing valid (character) row names.
+    However, by calling `.rowNamesDF<-` directly one can set the `make.names` argument to `NA` or `TRUE`. When set to `NA`, any non unique row name will trigger the new row names to become `seq_len(nrow(x))`. When `make.names = TRUE`, row names will automatically converted into unique ones via `make.names(value, unique = TRUE)`. The same behaviour is caused, when a matrix with non unique row names is converted into a data frame.
 
 3. __<span style="color:red">Q</span>__: If `df` is a data frame, what can you say about `t(df)`, and `t(t(df))`? Perform some experiments, making sure to try different column types.
 
@@ -332,5 +333,5 @@ don't have to be of the same type.
 
 5. __<span style="color:red">Q</span>__: What makes `is.vector()` and `is.numeric()` fundamentally different to
    `is.list()` and `is.character()`?  
-   __<span style="color:green">A</span>__: The first two tests don't check for a specific type.
+   __<span style="color:green">A</span>__: The first two tests don't check for a specific type.  
    
