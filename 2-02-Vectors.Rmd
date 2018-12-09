@@ -24,8 +24,7 @@
     complex(length.out = 1, real = 1, imaginary = 1)
     ```
 
-2. __<span style="color:red">Q</span>__: Test your knowledge of vector coercion rules by predicting the output of
-   the following uses of `c()`: 
+2. __<span style="color:red">Q</span>__: Test your knowledge of vector coercion rules by predicting the output of the following uses of `c()`: 
 
     ```{r, eval=FALSE}
     c(1, FALSE)      # will be coerced to numeric   -> 1 0
@@ -41,13 +40,14 @@
    
    __<span style="color:green">A</span>__: It is a practical thought. When you combine `NA`s in `c()` with other atomic types they will be coerced like `TRUE` and `FALSE` to integer `(NA_integer_)`, double `(NA_real_)`, complex `(NA_complex_)` and character `(NA_character_)`. Recall that in R there is a hierarchy of recursion that goes logical >> integer >> double >> character.  If `NA` was a character and provided as part of a set of other values, all of these would be coerced into character as well. Making `NA` a logical means that involving an `NA` in a dataset (which happens often) will not affect coercion.
 
-5. __<span style="color:red">Q</span>__: Precisely what do is.atomic(), is.numeric(), and is.vector() test for?
+5. __<span style="color:red">Q</span>__: Precisely what do `is.atomic()`, `is.numeric()`, and `is.vector()` test for?
    
-   __<span style="color:green">A</span>__: __`is.atomic()`__ tests if `typeof()` is one of `"logical"`, `"integer"`, `"double"`, `"complex"`, `"character"`, `"raw"` or `"NULL"`.
+   __<span style="color:green">A</span>__: The documentation informs, that:
+   - **`is.atomic()`** tests if an object has one of these types: `"logical"`, `"integer"`, `"double"`, `"complex"`, `"character"`, `"raw"` or `"NULL"` (!).
+   - **`is.numeric()`** tests if an object has integer or double type and is not of `"factor"`, `"Date"`, `"POSIXt"` or `"difftime"` class.
+   - **`is.vector()`** tests if an object has no attributes, except of names and if its `mode()` is atomic (`"logical"`, `"integer"`, `"double"`, `"complex"`, `"character"`, `"raw"`), `"list"` or `"expression"`.
    
-   __`is.numeric()`__ tests if `typeof()` is integer or double and class is not one of `"factor"`, `"Date"`, `"POSIXt"` or `"difftime"`.
-   
-   __`is.vector()`__ tests if an object has no attributes, except of names and if its `mode()` is atomic (`"logical"`, `"integer"`, `"double"`, `"complex"`, `"character"`, `"raw"`), `"list"` or `"expression"`.
+   <!-- @henning: talk a little more about the reasons behind these choices. -->
 
 ## Attributes
 
@@ -55,29 +55,31 @@
    
    __<span style="color:green">A</span>__: `setNames()` is implemented as:
    
-   ```{r}
-   setNames
-   ```
+    ```{r}
+    setNames
+    ```
    
    As the data comes first `setNames()` also works well with the magrittr-pipe operator. When no first argument is given, the result is a named vector:
    
-   ```{r}
+    ```{r}
    setNames( , c("a", "b", "c"))
-   ```
+    ```
    
    However, the implemention also means that `setNames()` only affects the names attribute and not any other more specific naming-attributes like the dimnames attribute for matrices and arrays.
    
    `unname()` is implemented in the following way:
    
-   ```{r}
-   unname
-   ```
+    ```{r}
+    unname
+    ```
    
    If set, `unname()` removes the names and dimnames attributes from its input object. Note that the dimnames attribute (names and row names) won't be affected for data frames, even if the documentation currently (R 3.5.1) mentions this in the case where `force == TRUE` is supplied. Instead the line `dimnames(obj) <- NULL` setting `NULL` as the replacement value in the underlying `dimnames<-.data.frame` function, raises the first error condition in the underlying source code:
    
-   ```{r}
-   `dimnames<-.data.frame`
-   ```
+    ```{r}
+    `dimnames<-.data.frame`
+    ```
+
+   <!-- @henning: phew, this seems more complicated, than I would have hoped for. -->
     
 2. __<span style="color:red">Q</span>__: What does `dim()` return when applied to a 1d vector? When might you use `NROW()` or `NCOL()`?
     
@@ -92,13 +94,14 @@
     nrow(iris[, 1, drop = TRUE])
     NCOL(iris[, 1, drop = TRUE])
     ncol(iris[, 1, drop = TRUE])
-    ```    
+    ```
+
 3. __<span style="color:red">Q</span>__: How would you describe the following three objects? What makes them different to `1:5`?
 
     ```{r}
-    x1 <- array(1:5, c(1, 1, 5)) # 1 row, 1 column, 5 in third dimension
-    x2 <- array(1:5, c(1, 5, 1)) # 1 row, 5 columns, 1 in third dimension
-    x3 <- array(1:5, c(5, 1, 1)) # 5 rows, 1 column, 1 in third dimension
+    x1 <- array(1:5, c(1, 1, 5))  # 1 row,  1 column,  5 in third dimension
+    x2 <- array(1:5, c(1, 5, 1))  # 1 row,  5 columns, 1 in third dimension
+    x3 <- array(1:5, c(5, 1, 1))  # 5 rows, 1 column,  1 in third dimension
     ```
     
    __<span style="color:green">A</span>__: They are of class array and so they have a `dim` attribute.
@@ -117,25 +120,24 @@
     
    > Contrary to other attributes, the comment is not printed (by print or print.default).
     
-    
    Also from the help of attributes `(?attributes)`:  
     
    > Note that some attributes (namely class, comment, dim, dimnames, names, row.names and tsp) are treated specially and have restrictions on the values which can be set.
    
    Apart of that, we can get it easily when we are more specific, i.e.:
    
-   ```{r}
-   bla <- structure(1:5, comment = "my attribute")
-   
-   attributes(bla)
-   attr(bla, "comment")
-   ```
+    ```{r}
+    bla <- structure(1:5, comment = "my attribute")
     
-## S3 atomic vectors
+    attributes(bla)
+    attr(bla, "comment")
+    ```
 
+
+## S3 atomic vectors
 1. __<span style="color:red">Q</span>__: What sort of object does `table()` return? What is its type? What attributes does it have? How does the dimensionality change as you tabulate more variables?
     
-    __<span style="color:green">A</span>__: `table()` returns a crosstabulation of its input. The result is an S3 table object, which is an array (implicit class) of integers (type) under the hood. Attributes are dim (dimension of the underlying array) and dimnames (one for each input column). The dimensionality equals to the number of unique values (accordingly factor levels) of the input arguments, i.e.:
+   __<span style="color:green">A</span>__: `table()` returns a crosstabulation of its input. The result is an S3 table object, which is an array (implicit class) of integers (type) under the hood. Attributes are dim (dimension of the underlying array) and dimnames (one for each input column). The dimensionality equals to the number of unique values (accordingly factor levels) of the input arguments, i.e.:
   
     ```{r}
     dim(table(iris))
@@ -155,7 +157,6 @@
     f1
     ```
     
-
 3. __<span style="color:red">Q</span>__: What does this code do? How do `f2` and `f3` differ from `f1`?
 
     ```{r, results = "none"}
@@ -165,33 +166,32 @@
     
    __<span style="color:green">A</span>__: Unlike `f1` `f2` and `f3` change only one thing. They change the order of the factor or its levels, but not both at the same time.
 
-## Lists
 
+## Lists
 1. __<span style="color:red">Q</span>__: List all the ways that a list differs from an atomic vector.
 
    __<span style="color:green">A</span>__: 
    
-   * Atomic vectors are homogeneous (all contents must be of the same type). Lists are heterogeneous (all contents can be of different types). 
+   - Atomic vectors are homogeneous (all contents must be of the same type). Lists are heterogeneous (all contents can be of different types). 
    
-   * Atomic vectors point to one value, while lists contain references which point to one value each:
+   - Atomic vectors point to one value, while lists contain references which point to one value each:
 
-      ```{r}
-      lobstr::ref(1:3)
-      lobstr::ref(list(1:3,2,3))
-      ```
+    ```{r}
+    lobstr::ref(1:3)
+    lobstr::ref(list(1:3,2,3))
+    ```
     
-    * Subsetting with out of bound values and `NA`s leads to `NA`s for atomics and `NULL` values for lists:
-
-      ```{r}
-      (1:2)[3]
-      as.list(1:2)[3]
-
-      (1:2)[NA]
-      as.list(1:2)[NA]
-      ```
+   - Subsetting with out of bound values and `NA`s leads to `NA`s for atomics and `NULL` values for lists:
+    
+    ```{r}
+    (1:2)[3]
+    as.list(1:2)[3]
+    
+    (1:2)[NA]
+    as.list(1:2)[NA]
+    ```
    
-2. __<span style="color:red">Q</span>__: Why do you need to use `unlist()` to convert a list to an 
-   atomic vector? Why doesn't `as.vector()` work?  
+2. __<span style="color:red">Q</span>__: Why do you need to use `unlist()` to convert a list to an atomic vector? Why doesn't `as.vector()` work?  
    
    __<span style="color:green">A</span>__: To get rid of (flatten) the nested structure `as.vector()` doesn't work, because a list is already a vector.
 
@@ -247,13 +247,13 @@
 <!-- unlist(c(date,    dttm_ct)) # no difference -->
 <!-- ``` -->
 
-## Data frames and tibbles
 
+## Data frames and tibbles
 1. __<span style="color:red">Q</span>__: Can you have a data frame with 0 rows? What about 0 columns?  
 
    __<span style="color:green">A</span>__: Yes, you can create one easily and in many ways. Also both dimensions can be 0. The fastest way is to subset the regarding dimension with one of `0`, `NULL` or a valid 0-length atomic (`logical(0)`, `character(0)`, `integer(0)`, `double(0)`). Also a negative integer sequence would work. Here we use the recycling rules for logical subsetting:
 
-    ```{r}.
+    ```{r}
     iris[FALSE,]
     
     iris[ , FALSE] # or iris[FALSE]
@@ -263,17 +263,17 @@
 
 2. __<span style="color:red">Q</span>__: What happens if you attempt to set rownames that are not unique?
 
-    __<span style="color:green">A</span>__ For matrices this will work without any problems. For data frames it is not possible and what happens depends on the approach. When using the `row.names<-` replacement function, no further arguments can be set and the underlying `.rowNamesDF<-` will throw an error (and an additional warning):
+   __<span style="color:green">A</span>__ For matrices this will work without any problems. For data frames it is not possible and what happens depends on the approach. When using the `row.names<-` replacement function, no further arguments can be set and the underlying `.rowNamesDF<-` will throw an error (and an additional warning):
     
     ```{r, error = TRUE, warning = TRUE}
     row.names(mtcars) <- rep(1, nrow(mtcars))
     ```
     
-    However, by calling `.rowNamesDF<-` directly one can set the `make.names` argument to `NA` or `TRUE`. When set to `NA`, any non unique row name will trigger the new row names to become `seq_len(nrow(x))`. When `make.names = TRUE`, row names will automatically converted into unique ones via `make.names(value, unique = TRUE)`. The same behaviour is caused, when a matrix with non unique row names is converted into a data frame.
+   However, by calling `.rowNamesDF<-` directly one can set the `make.names` argument to `NA` or `TRUE`. When set to `NA`, any non unique row name will trigger the new row names to become `seq_len(nrow(x))`. When `make.names = TRUE`, row names will automatically converted into unique ones via `make.names(value, unique = TRUE)`. The same behaviour is caused, when a matrix with non unique row names is converted into a data frame.
 
 3. __<span style="color:red">Q</span>__: If `df` is a data frame, what can you say about `t(df)`, and `t(t(df))`? Perform some experiments, making sure to try different column types.
 
-    __<span style="color:green">A</span>__ Both will return matrices with dimensions regaring the typical transposition rules. As `t()` uses `as.matrix.data.frame()` for the preprocessing infront of applying `t.default()` and elements of matrices need to be of the same type, all elements get coerced in the usual order (logical << integer << double << character), while factors, dates and datetimes are treated as characters during coercion.
+   __<span style="color:green">A</span>__ Both will return matrices with dimensions regaring the typical transposition rules. As `t()` uses `as.matrix.data.frame()` for the preprocessing infront of applying `t.default()` and elements of matrices need to be of the same type, all elements get coerced in the usual order (logical << integer << double << character), while factors, dates and datetimes are treated as characters during coercion.
 
 4. __<span style="color:red">Q</span>__: What does `as.matrix()` do when applied to a data frame with 
    columns of different types? How does it differ from `data.matrix()`?
@@ -334,4 +334,3 @@ don't have to be of the same type.
 5. __<span style="color:red">Q</span>__: What makes `is.vector()` and `is.numeric()` fundamentally different to
    `is.list()` and `is.character()`?  
    __<span style="color:green">A</span>__: The first two tests don't check for a specific type.  
-   
