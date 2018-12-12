@@ -57,7 +57,7 @@ df_new <- tibble::tribble(~ `1 Names and values`, ~ `2 Vectors`, ~ `3 Subsetting
                        "x",  "x",  "x",   "x",  "x",  "x",  "-",  "-",  "-",   "x",    "x",   NA,  "x",     "x",   "x",  "x",  "x",  "x",  "x",
                        "x",  "x",  "x",   "x",  "o",  "x",  "-",  "-",  "-",   "x",    "x",   NA,  "x",     "x",   "-",  "x",  "-",  "x",  "x",
                        "x",  "x",  "x",   "x",  "-",  "x",  "-",  "-",  "-",   "x",    "x",   NA,  "x",     "x",   "-",  "-",  "x",  "o",  "x",
-                       "x",  "x",  "x",   "x",  "o",  "x",  "-",  "-",  "NA",   "x",    "x",   NA,  "x",     "x",   "-",  "-",  "-",  "x",  "-",
+                       "x",  "x",  "x",   "x",  "o",  "x",  "-",  "-",   NA,   "x",    "x",   NA,  "x",     "x",   "-",  "-",  "-",  "x",  "-",
                        "x",  "x",  "x",   "x",  "x",  "x",  "-",  "-",   NA,   "x",    "x",   NA,  "x",     "-",   "x",   NA,  "-",  "x",  "x",
                        "x",  "x",  "x",   "x",  "-",  "x",  "-",  "-",   NA,   "x",     NA,   NA,  "x",     "x",   "-",   NA,  "-",  "x",  "x",
                        "x",  "x",  "x",   "x",  "o",  "x",  "-",  "-",   NA,   "-",     NA,   NA,  "-",     "x",   "-",   NA,  "-",  "x",  "x",
@@ -72,8 +72,8 @@ df_new <- tibble::tribble(~ `1 Names and values`, ~ `2 Vectors`, ~ `3 Subsetting
                         NA,  "x",   NA,   "x",   NA,   NA,  "-",   NA,   NA,   "o",     NA,   NA,  "x",     "-",   "-",   NA,   NA,   NA,   NA,
                         NA,  "x",   NA,   "x",   NA,   NA,  "-",   NA,   NA,   "-",     NA,   NA,  "x",     "x",   "-",   NA,   NA,   NA,   NA,
                         NA,   NA,   NA,   "x",   NA,   NA,  "-",   NA,   NA,   "x",     NA,   NA,  "-",      NA,   "-",   NA,   NA,   NA,   NA,
-                        NA,   NA,   NA,   "x",   NA,   NA,  "NA",   NA,   NA,   "o",     NA,   NA,  "-",      NA,   "-",   NA,   NA,   NA,   NA,
-                        NA,   NA,   NA,   "x",   NA,   NA,  "NA",   NA,   NA,   "-",     NA,   NA,  "x",      NA,   "-",   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "x",   NA,   NA,   NA,   NA,   NA,   "o",     NA,   NA,  "-",      NA,   "-",   NA,   NA,   NA,   NA,
+                        NA,   NA,   NA,   "x",   NA,   NA,   NA,   NA,   NA,   "-",     NA,   NA,  "x",      NA,   "-",   NA,   NA,   NA,   NA,
                         NA,   NA,   NA,   "x",   NA,   NA,   NA,   NA,   NA,   "x",     NA,   NA,  "x",      NA,   "-",   NA,   NA,   NA,   NA,
                         NA,   NA,   NA,   "x",   NA,   NA,   NA,   NA,   NA,   "x",     NA,   NA,  "x",      NA,    NA,   NA,   NA,   NA,   NA,
                         NA,   NA,   NA,   "x",   NA,   NA,   NA,   NA,   NA,    NA,     NA,   NA,  "x",      NA,    NA,   NA,   NA,   NA,   NA,
@@ -128,8 +128,8 @@ solved_exercises <- ggplot(df_new, aes(x = chapter, fill = solved, group = -id))
   ) +
   ggtitle(paste0("Solved Exercises: ", round(100 * quote_solutions, 1), "% (2nd Edition)"),
           subtitle = paste0("Solved: ", sum(df_new$solved == "x", na.rm = TRUE),
-                            " Started: ", sum(df_new$solved == "o", na.rm = TRUE),
-                            " Untouched: ", sum(!is.na(df_new$solved))
+                            "; Started: ", sum(df_new$solved == "o", na.rm = TRUE),
+                            "; Open: ", sum(!is.na(df_new$solved))
                             )
                            )
 
