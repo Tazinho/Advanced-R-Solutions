@@ -129,7 +129,7 @@ solved_exercises <- ggplot(df_new, aes(x = chapter, fill = solved, group = -id))
   ggtitle(paste0("Solved Exercises: ", round(100 * quote_solutions, 1), "% (2nd Edition)"),
     subtitle = paste0("Solved: ", sum(df_new$solved == "x"),
       "; Started: ", sum(df_new$solved == "o"),
-      "; Open: ", sum(df_new$solved == "-")
+      "; Open: ", length(df_new$solved) - sum(df_new$solved == "x") - sum(df_new$solved == "o")
     )
   )
 
