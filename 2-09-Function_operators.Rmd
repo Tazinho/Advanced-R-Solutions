@@ -6,37 +6,35 @@
     What does it do? When might you use it?    
    
    __<span style="color:green">A</span>__:
+   
+2. __<span style="color:red">Q</span>__: Read the source code for `possibly()`. How does it work?
+   
+   __<span style="color:green">A</span>__:
+
+3. __<span style="color:red">Q</span>__: Read the source code for `safely()`. How does it work?
+   
+   __<span style="color:green">A</span>__:
     
 ## Case study: creating your own FOs
 
-1. __<span style="color:red">Q</span>__: Compare and contrast the for loop and `walk2()` approaches to downloading many urls. Which makes it easier to see the core objects and functions? Which requires more background knowledge? What are the advantages and disadvantages in factoring out components of the problem into independent functions?
-
-    ```{r, eval = FALSE}
-    for (i in seq_along(urls)) {
-      Sys.sleep(0.1)
-      if (i %% 10 == 0) cat(".")
-      download.file(urls[[i]], paths[[i]])
-    }
-    
-    walk2(
-      urls, path, 
-      download.file %>% dot_every(10) %>% delay_by(0.1), 
-      quiet = TRUE
-    )
-    ```
-    
+1.  __<span style="color:red">Q</span>__: Weigh the pros and cons of `download.file %>% dot_every(10) %>% delay_by(0.1)` vs `download.file %>% delay_by(0.1) %>% dot_every(10)`.
+   
    __<span style="color:green">A</span>__:
    
-2. __<span style="color:red">Q</span>__: Create a FO that reports whenever a file is created or deleted in the working directory, using `dir()` and `setdiff()`. What other global function effects might you want to track?
-
+2.  __<span style="color:red">Q</span>__: Should you memoise `file.download()`? Why/why not?
+   
    __<span style="color:green">A</span>__:
    
-3. __<span style="color:red">Q</span>__: Write a FO that logs a timestamp and message to a file every time a function is run.
-    
+3.  __<span style="color:red">Q</span>__: Create a FO that reports whenever a file is created or deleted in the working directory, using `dir()` and `setdiff()`. What other global function effects might you want to track?
+   
    __<span style="color:green">A</span>__:
    
-4. __<span style="color:red">Q</span>__: Modify `delay_by()` so that instead of delaying by a fixed amount of time, it ensures that a certain amount of time has elapsed since the function was last called. That is, if you called `g <- delay_by(1, f); g(); Sys.sleep(2); g()` there shouldn't be an extra delay.   
-    
+4.  __<span style="color:red">Q</span>__: Write a FO that logs a timestamp and message to a file every time a function is run.
+   
+   __<span style="color:green">A</span>__:
+   
+5.  __<span style="color:red">Q</span>__: Modify `delay_by()` so that instead of delaying by a fixed amount of time, it ensures that a certain amount of time has elapsed since the function was last called. That is, if you called `g <- delay_by(1, f); g(); Sys.sleep(2); g()` there shouldn't be an extra delay.
+   
    __<span style="color:green">A</span>__:
    
 ## Old exercises
