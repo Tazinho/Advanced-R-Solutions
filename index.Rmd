@@ -126,7 +126,12 @@ solved_exercises <- ggplot(df_new, aes(x = chapter, fill = solved, group = -id))
   panel.border = element_blank(),
   panel.background = element_blank()
   ) +
-  ggtitle(paste0("Solved Exercises: ", round(100 * quote_solutions, 1), "% (2nd Edition)"))
+  ggtitle(paste0("Solved Exercises: ", round(100 * quote_solutions, 1), "% (2nd Edition)"),
+          subtitle = paste0("Solved: ", sum(df_new$solved == "x", na.rm = TRUE),
+                            " Started: ", sum(df_new$solved == "o", na.rm = TRUE),
+                            " Untouched: ", sum(!is.na(df_new$solved))
+                            )
+                           )
 
   solved_exercises
 ```
