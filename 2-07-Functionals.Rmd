@@ -40,7 +40,15 @@ library(purrr)
     trials <- map(1:100, ~ t.test(rpois(10, 10), rpois(7, 10)))
     ```
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: We can easily extract the p-values, i. e. via `pluck()` and pipe them directly into `ggplot()` for the visualisation. For normal distributed data we would expect a uniform distribution of the p-values. Let's see what happens for poisson data:
+   
+    ```{r}
+    map_dbl(trials, pluck, "p.value") %>% 
+      as.data.frame() %>% 
+      set_names("p_value") %>% 
+      ggplot(aes(x = p_value, fill = p_value < 0.05)) + 
+      geom_dotplot(binwidth = .025) 
+    ```
 
 5. __<span style="color:red">Q</span>__: The following code uses a map nested inside another map to apply a function to every element of a nested list. Why does it fail, and what do you need to do to make it work?
 
