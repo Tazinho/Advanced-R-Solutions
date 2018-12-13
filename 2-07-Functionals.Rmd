@@ -270,6 +270,10 @@ library(purrr)
       (x - rng[1]) / (rng[2] - rng[1])
     }
     ```
+    
+   __<span style="color:green">A</span>__: Since this function needs numeric input and non-numeric input should porobably be left as ist, it's easiest to use an "if-variant" of purrr's map-family of functions. As we would also prefert to get a data frame returned, if we supply one, we decide for `modify_if()`:
+
+modify_if(iris, is.numeric, scale01)
 
 ## Base functionals
 
