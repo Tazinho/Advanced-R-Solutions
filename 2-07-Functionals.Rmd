@@ -97,7 +97,13 @@ library(purrr)
     bootstraps <- map(1:10, ~ bootstrap(mtcars))
     ```
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: Let's do one tast at a time. Fist, we'll fit the models. Then we calculate the summaries and finally we extract the $R^2$ values:
+   
+    ```{r}
+    map(bootstraps, ~ lm(mpg ~ disp, data = .x)) %>% 
+      map(summary) %>% 
+      map_dbl(pluck, "r.squared")
+    ```
 
 ## Map variants
 
