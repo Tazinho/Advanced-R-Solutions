@@ -260,61 +260,61 @@ library(lobstr)
     obj_size(x, y)
     ```
     
-   __<span style="color:orange">A</span>__: To predict the object sizes let's first find out how much memory an empty integer occupies and how much the memory size grows with the length of the vector.
+   __<span style="color:green">A</span>__: To predict the object sizes let's first find out how much memory an empty integer occupies and how much the memory size grows with the length of the vector.
    
     ```{r}
-    # Memory needed for a 0-length double
+    # Memory needed for a 0-length integer
     obj_size(integer(0))
     
     # Additional memory per element
     diff(sapply(0:64, function(x) obj_size(integer(x))))
     ```
     
-   From the first line of the code chunk above we know that R needs 48 Byte for an empty integer. From the second line we can see that R adds on average 4 Byte per additional element. To explain the small irregularities a bit more in depth, we quote Hadley's explanation from the first edition of Advanced R:
+   From the first line of the code chunk above we know that R needs 48 bytes (abbreviated in calculations as B) for an empty integer. From the second line we can see that R adds 4 bytes per additional element. To explain the small irregularities a bit more in depth, we quote Hadley's explanation from the first edition of Advanced R:
    
    > ... why does the memory size grow irregularly? To understand why, you need to know a little bit about how R requests memory from the operating system. Requesting memory (with malloc()) is a relatively expensive operation. Having to request memory every time a small vector is created would slow R down considerably. Instead, R asks for a big block of memory and then manages that block itself. This block is called the small vector pool and is used for vectors less than 128 bytes long. For efficiency and simplicity, it only allocates vectors that are 8, 16, 32, 48, 64, or 128 bytes long. ... Beyond 128 bytes, it no longer makes sense for R to manage vectors. After all, allocating big chunks of memory is something that operating systems are very good at. Beyond 128 bytes, R will ask for memory in multiples of 8 bytes. This ensures good alignment.
    
-   Now the first part is straight forward as we just need to calculate 48 Byte + 1000000 * 4 Byte = 4000048 ~ 4 MB for our prediction.
+   Now, the first part is straight forward, as we just need to calculate 48 B + 1000000 * 4 B = 4000048 B ~ 4 MB for our prediction.
    
     ```{r}
     x <- sample(1e6)
     obj_size(x)
     ```
    
-   To predict the size of `y <- list(x, x)` consider that both list elements of `y` point to the same memory address. Therefore no additional memory is needed besides apart from the memory of the list itself. As an empty list takes also 48 Byte in memory and 8 Byte for each additional element our overall prediction for `y` will be 4000048 Byte + 64 Byte = 4000112:
+   To predict the size of `y <- list(x, x)` consider that both list elements of `y` point to the same memory address. Therefore, no additional memory - apart from the memory of the list itself - is needed. As an empty list takes 48 Byte in memory (check via `obj_size(list())`) and 8 Byte for each additional element, our overall prediction for `y` is 4000048 B + 64 B = 4000112 B:
    
     ```{r}
     y <- list(x, x)
     obj_size(y)
     ```
    
-   Our prediction for `obj_size(x, y)` will end up in the same result. Since `x` and `y` are names with bindings to objects that point to the same reference, no additional memory is needed and our prediction is the maximum memory of both objects (y; 4000112 Bytes):
+   Our prediction for `obj_size(x, y)` will end up in the same result, since `y` contains references to the memory address of `x`. Therefore, our prediction is the maximum memory of both objects (y; 4000112 Bytes):
    
     ```{r}
     obj_size(x, y)
     ```
     
-   The next part gets a bit more tricky, as `y` is modified and several things happen. Since the first element of `y` gets a new value assigned, the element becomes a completely new object with a different address in memory. Hence 10 is of type double a silent coercion from integer to double gets triggerd. As an empty double needs 48 Bytes and 8 Bytes per additional element, overall 8000040 Bytes are now needed for `y`'s first element. As `y`'s elements share no memory anymore, the overall prediction can be calculated as the sum of it's elements: first element of `y` (8000048 B) + second element of `y` (x; 4000048 B) + list of length 2 (48 B + 16 B) = 12000160 B ~ 12 MB:
+   In the next part `y` gets modified and several things happen. When the first element of `y` gets a new value assigned, the element becomes a completely new object. Therefore, it also gets a new address in memory (different to the address of `x`). As 10 is of type double, a silent coercion from integer to double gets triggerd. The calculation for the object size of a double can be figured out in the same way as for integers before. Again, 48 bytes are needed for the empty double and 8 bytes are added per element. Overall 8000040 bytes are now needed for `y`'s first element. As `y`'s elements share no memory anymore, our memory prediction becomes the sum of `y`'s element's object sizes: first element of `y` (8000048 B) + second element of `y` (x; 4000048 B) + list of length 2 (48 B + 16 B) = 12000160 B ~ 12 MB:
    
     ```{r}
     y[[1]][[1]] <- 10
     obj_size(y)
     ```
     
-   As `x` is still an element of `y`, R's memory usage for both of them remains the object size of `y`: 
+   As `x` is still the second element of `y`, R's memory usage for `x` and `y` together remains the object size of `y` (12000160 B): 
    
     ```{r}
     obj_size(x, y)
     ```
     
-   As in the following line also the second element of `y` is modified in the same way as its first element before, it will now also take 8000048 Byte. However, as both elements have different memory addresses, `y`'s object size is now 2 * 8000048 B + 64 B = 16000160 B:
+   By modifying the second element of `y` in the same way as `y`'s  first element before, the second element will also take 8000048 bytes. As both elements will continue pointing to different memory addresses, `y`'s object size is now 2 * 8000048 B + 64 B = 16000160 B:
    
     ```{r}
     y[[2]][[1]] <- 10
     obj_size(y)
     ```
-    
-     As `x` and `y` share no elements anymore, their memory usage in R adds up to 20000208 Bytes:
+   
+   As also `x` and `y` share no references anymore, their memory usage in R adds up to 20000208 bytes:
      
     ```{r}
     obj_size(x, y)
