@@ -244,7 +244,23 @@ library(purrr)
 
 5. __<span style="color:red">Q</span>__: Implement `arg_max()`. It should take a function and a vector of inputs, and return the elements of the input where the function returns the highest value. For example, `arg_max(-10:5, function(x) x ^ 2)` should return -10. `arg_max(-5:5, function(x) x ^ 2)` should return `c(-5, 5)`. Also implement the matching `arg_min()` function.
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: `arg_max()`:
+    
+    ```{r, eval = TRUE}
+    arg_max <- function(x, f){
+      x[f(x) == max(f(x))]
+    }
+    
+    arg_max(-10:5, function(x) x ^ 2)
+    ```
+    
+    `arg_min()`:
+    
+    ```{r, eval = FALSE}
+    arg_min <- function(x, f){
+      x[f(x) == min(f(x))]
+    }
+    ```
 
 6. __<span style="color:red">Q</span>__: The function below scales a vector so it falls in the range [0, 1]. How would you apply it to every column of a data frame? How would you apply it to every numeric column in a data frame?
 
