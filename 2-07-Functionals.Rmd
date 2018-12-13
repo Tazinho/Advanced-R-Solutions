@@ -62,8 +62,12 @@ library(purrr)
     map(x, map, .f = triple)
     ```
     
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: If fails, because `triple()` is supplied as the `.f` argument to the outer `map()`. Therefore, the inner `map()` is treated as an argument of `triple()`, which causes the error. Instead, `triple` must be the `.f` argument of the inner `map()`. Therefore, we add braces and turn the inner `map()` part into a formula (adding the `~`) and supply the `.x` argument to it as well. 
    
+    ```{r}
+    map(x, ~ map(.x, .f = triple))
+    ```
+    
 6. __<span style="color:red">Q</span>__: Use `map()` to fit linear models to the `mtcars` using the formulas stored in this list:
 
     ```{r}
