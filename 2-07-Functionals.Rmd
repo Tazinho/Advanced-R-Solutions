@@ -109,7 +109,7 @@ library(purrr)
 
 1. __<span style="color:red">Q</span>__: Explain the results of `modify(mtcars, 1)`.
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: This is due to the consistency within purrr. `modify()` is based on `map()`, so intenally `map(mtacrs, 1)` gets called, where the `.f` argument is an atomic and therefore gets converted into an extractor function, which matches the first row of `mtcars`. As `modify()` always returns the same structure as its input we get this row 32 times (internally this is achieved via the oneliner `.x[] <- map(.x, .f, ...)`). 
 
 2. __<span style="color:red">Q</span>__: Rewrite the following code to use `iwalk()` instead of `walk2()`. What are the advantages and disadvantages?
     
