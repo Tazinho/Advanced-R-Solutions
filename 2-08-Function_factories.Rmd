@@ -56,7 +56,20 @@ library(rlang)
     stopifnot(all.equal(m2(x), var(x) * 99 / 100))
     ```
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: For a discrete formulation look under [http://www.r-tutor.com/elementary-statistics/numerical-measures/moment](http://www.r-tutor.com/elementary-statistics/numerical-measures/moment).
+    
+    ```{r}
+    moment <- function(i){
+      function(x) sum((x - mean(x)) ^ i) / length(x)
+    }
+    
+    m1 <- moment(1)
+    m2 <- moment(2)
+
+    x <- runif(100)
+    stopifnot(all.equal(m1(x), 0))
+    stopifnot(all.equal(m2(x), var(x) * 99 / 100))
+    ```
 
 4. __<span style="color:red">Q</span>__: What happens if you don't use a closure? Make predictions, then verify with the code below.
 
@@ -201,7 +214,7 @@ __<span style="color:green">A</span>__: "ecdf" means empirical density function.
     ```{r, eval = FALSE}
     moment <- function(i){
       function(x) sum((x - mean(x)) ^ i) / length(x)
-      }
+    }
     ```
 
 6.  __<span style="color:red">Q</span>__: Create a function `pick()` that takes an index, `i`, as an argument and 
