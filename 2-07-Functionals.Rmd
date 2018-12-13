@@ -178,7 +178,18 @@ library(purrr)
 
 2. __<span style="color:red">Q</span>__: What's the relationship between `which()` and `Position()`? What's the relationship between `where()` and `Filter()`?
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: `which()` returns all indices of true entries from a logical vector. `Position()` returns just the first (default) or the last integer index of all true entries that occur by applying a predicate function on a vector. So the default relation is `Position(f, x) <=> min(which(f(x)))`.
+    
+   `where()`, defined in the book as:
+    
+    ```{r, eval = FALSE}
+    where <- function(f, x) {
+      vapply(x, f, logical(1))
+    } 
+    ```
+    
+   is useful to return a logical vector from a condition asked on elements of a list or a data frame. `Filter(f, x)` returns all elements of a list or a data frame, where the supplied predicate function returns `TRUE`. So the relation is
+`Filter(f, x) <=> x[where(f, x)]`.
 
 3. __<span style="color:red">Q</span>__: `simple_reduce()` has a problem when `x` is length 0 or length 1. Describe the source of the problem and how you might go about fixing it.
     
