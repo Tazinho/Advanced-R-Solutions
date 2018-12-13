@@ -26,11 +26,11 @@ library(purrr)
        
    a) Compute the number of levels for every factor in a data frame.
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: This exercises should be straight forward. Note that `purrr::keep` is introduced in the [predicate functionals](https://adv-r.hadley.nz/functionals.html#predicate-functionals) section of the chapter.
    
     ```{r}
     map_dbl(mtcars, sd)
-    map_if(iris, is.numeric, sd) %>% str()
+    map_dbl(keep(iris, is.numeric), sd)
     map_int(iris, ~ length(levels(.x)))
     ```
 
