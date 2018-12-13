@@ -42,7 +42,9 @@ library(purrr)
 
    __<span style="color:green">A</span>__: We can easily extract the p-values, i. e. via `pluck()` and pipe them directly into `ggplot()` for the visualisation. For normal distributed data we would expect a uniform distribution of the p-values. Let's see what happens for poisson data:
    
-    ```{r}
+    ```{r, message = FALSE}
+    library(ggplot2)
+    
     map_dbl(trials, pluck, "p.value") %>% 
       as.data.frame() %>% 
       set_names("p_value") %>% 
