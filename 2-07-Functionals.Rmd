@@ -156,8 +156,19 @@ library(purrr)
 
 4. __<span style="color:red">Q</span>__: What does `write.csv()` return? i.e. what happens if you use it with `map2()` instead of `walk2()`?
 
-   __<span style="color:green">A</span>__: 
-
+   __<span style="color:green">A</span>__: It returns `NULL`. So in the example above, where we itareate over a list, a named list of `NULL`s would be returned:
+   
+    ```{r}
+    temp <- tempfile()
+    dir.create(temp)
+    
+    cyls <- split(mtcars, mtcars$cyl)
+    paths <- file.path(temp, paste0("cyl-", names(cyls), ".csv"))
+    
+    map2(cyls, paths, write.csv)
+    dir(temp)
+    ```
+    
 ## Predicate Functionals
 
 1. __<span style="color:red">Q</span>__: Why isn't `is.na()` a predicate function? What base R function is closest
