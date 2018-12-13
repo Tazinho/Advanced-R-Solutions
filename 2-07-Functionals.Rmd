@@ -119,7 +119,16 @@ library(purrr)
     walk2(cyls, paths, write.csv)
     ```
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: The main advantage is that it's easy to create everything within one function call and it's therefore not necessary to create intermediate objects, which aren't used any further. However, the disadvantage is that this style can become hard to read when single function are very long:
+   
+    ```{r}
+    cyls <- split(mtcars, mtcars$cyl)
+    temp <- tempfile()
+    dir.create(temp)
+    
+    iwalk(cyls, ~ write.csv(.x, file.path(temp, paste0("cyl-", .y, ".csv"))))
+    dir(temp)
+    ```
 
 3. __<span style="color:red">Q</span>__: Explain how the following code transforms a data frame using functions stored in a list.
 
