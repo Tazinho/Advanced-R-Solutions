@@ -21,8 +21,7 @@ library(rlang)
 
    __<span style="color:orange">A</span>__: TODO: the answers are partly provided in the "old exercises" subsection below.
 
-2. __<span style="color:red">Q</span>__: Create a function `pick()` that takes an index, `i`, as an argument and 
-    returns a function with an argument `x` that subsets `x` with `i`.
+2. __<span style="color:red">Q</span>__: Create a function `pick()` that takes an index, `i`, as an argument and returns a function with an argument `x` that subsets `x` with `i`.
 
     ```{r, eval = FALSE}
     pick(1)(x)
@@ -36,16 +35,16 @@ library(rlang)
 
    __<span style="color:green">A</span>__:
    
-   ```{r}
-   pick <- function(i) {
-     force(x)
+    ```{r}
+    pick <- function(i) {
+      force(x)
+    
+      function(x) x[[i]]
+    }
    
-     function(x) x[[i]]
-   }
-   
-   identical(x[[1]], pick(1)(x))
-   identical(lapply(mtcars, pick(5)), lapply(mtcars, function(x) x[[5]]))
-   ```
+    identical(x[[1]], pick(1)(x))
+    identical(lapply(mtcars, pick(5)), lapply(mtcars, function(x) x[[5]]))
+    ```
 
 3. __<span style="color:red">Q</span>__: Create a function that creates functions that compute the i^th^ [central moment](http://en.wikipedia.org/wiki/Central_moment) of a numeric vector. You can test it by running the following code:
 
