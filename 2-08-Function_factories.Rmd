@@ -38,6 +38,8 @@ library(rlang)
    
    ```{r}
    pick <- function(i) {
+     force(x)
+   
      function(x) x[[i]]
    }
    
@@ -60,6 +62,8 @@ library(rlang)
     
     ```{r}
     moment <- function(i){
+      force(i)
+    
       function(x) sum((x - mean(x)) ^ i) / length(x)
     }
     
