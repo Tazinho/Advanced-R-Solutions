@@ -148,7 +148,11 @@ library(purrr)
     mtcars[vars] <- map(vars, ~ trans[[.x]](mtcars[[.x]]))
     ```
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: In the `map2()` approach the `vars` are first used to subset the `.y` argument. Then, `map2()` iterates over the similarly named variables and transformations, to build up and apply the transformations as anonymous functions. On the left hand side only the similarly named variables of `mtcars` are getting replaced. 
+   
+   The `map()` variant does basically the same. However, it uses the `vars` object to directly iterate over similarly named elements of `trans` and `mtcars`.
+   
+   Besides the iteration pattern, the approaches differ in the namings and the supplied argument types in the `.f` argument. While the `.f` in the `map2()` variant is named appropriately, the creation of the anonymous function might be a bit verbose. A more technical but compact way to write the `.f` argument would be the usage of a formula as in `mtcars[vars] <- map2(trans, mtcars[vars], ~ .x(.y))`. Of course, this leads to more technial names, as also in the `map()` variant, because of the default `.x`-named variables in purrr. However, in the `map()` approach the formula in the `.f` argument together with the shortage of the `.x` variable name and the brackets clearly indicate the application of functions to specific elements of `mtcars`. Together with the replacement form on the left hand side it becomes easy to inspect what the line is doing. Therefore, especially the iteration pattern on the left hand sidy comes in handy, as it clearly highlights the important matching of `trans` and `mtcars` element names.
 
 4. __<span style="color:red">Q</span>__: What does `write.csv()` return? i.e. what happens if you use it with `map2()` instead of `walk2()`?
 
