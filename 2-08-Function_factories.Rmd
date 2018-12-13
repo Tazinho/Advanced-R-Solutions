@@ -35,6 +35,15 @@ library(rlang)
     ```
 
    __<span style="color:green">A</span>__:
+   
+   ```{r}
+   pick <- function(i) {
+     function(x) x[[i]]
+   }
+   
+   identical(x[[1]], pick(1)(x))
+   identical(lapply(mtcars, pick(5)), lapply(mtcars, function(x) x[[5]]))
+   ```
 
 3. __<span style="color:red">Q</span>__: Create a function that creates functions that compute the i^th^ [central moment](http://en.wikipedia.org/wiki/Central_moment) of a numeric vector. You can test it by running the following code:
 
