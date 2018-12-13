@@ -19,7 +19,7 @@ library(rlang)
 1. __<span style="color:red">Q</span>__: Base R contains two function factories, `approxfun()` and `ecdf()`. 
     Read their documentation and experiment to figure out what the functions do and what they return.
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:orange">A</span>__: TODO: the answers are partly provided in the "old exercises" subsection below.
 
 2. __<span style="color:red">Q</span>__: Create a function `pick()` that takes an index, `i`, as an argument and 
     returns a function with an argument `x` that subsets `x` with `i`.
@@ -85,7 +85,20 @@ library(rlang)
     }
     ```
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: Our new counters aren't too reliable anymore, as they can be overwritten or deleted quite easily:
+   
+    ```{r, error = TRUE}
+    new_counter2()
+    new_counter2()
+    
+    # Overwriting
+    i <- 0
+    new_counter2()
+    
+    # Deletion
+    rm(i)
+    new_counter2()
+    ```
 
 5. __<span style="color:red">Q</span>__: What happens if you use `<-` instead of `<<-`? Make predictions, then verify with the code below.
 
@@ -99,7 +112,16 @@ library(rlang)
     }
     ```
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: The counter will always return 1.
+   
+   ```{r}
+   new_counter_3 <- new_counter3()
+   
+   new_counter_3()
+   new_counter_3()
+   ```
+   
+    This happens as the counter always starts in a fresh execution environment, enclosed by the same enclosing environment, where `i` (in this case) remains 0.
 
 ## Graphical factories
 
