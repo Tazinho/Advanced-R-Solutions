@@ -79,7 +79,11 @@ library(purrr)
     )
     ```
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: As `mtars` is a constant part in this context, it's easiest to iterate over the `formulas`:
+   
+    ```{r}
+    map(formulas, ~ lm(.x, data = mtcars))
+    ```
 
 7. __<span style="color:red">Q</span>__: Fit the model `mpg ~ disp` to each of the bootstrap replicates of `mtcars` in the list below, then extract the $R^2$ of the model fit (Hint: you can compute the $R^2$ with `summary()`)
 
