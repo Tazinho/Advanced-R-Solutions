@@ -284,40 +284,40 @@ library(lobstr)
    To predict the size of `y <- list(x, x)` we must pay attention that both list elements of `y` contain references to the same memory address. Therefore, no additional memory apart from the first element - and the memory of the list itself - is needed. The extra memory for a list of length 2 is 64 bytes (48 byte for an empty list and 8 byte for each element; check for example `obj_size(vector("list", 2))`). This gives us a prediction of 8000048 B + 64 B = 8000112 B:
    
     ```{r}
-    y <- list(x, x)
+    y <- list(x, x) 
     obj_size(y)
     ```
    
    As `y` contains references to `x` already, no extra memory is needed for `x`. So our prediction `obj_size(x, y)` will be again 8000112 Bytes:
    
     ```{r}
-    obj_size(x, y)
+    obj_size(x, y) 
     ```
     
    In the next part the first element of `y` gets modified. As the second element of `y` and `x` point to the same memory address as the first element of `y`, R creates a copy of the first element under a new memory address before it applies the modifications. The newly created first element will still be a double of the same length as before. Therefore, it also needs 8000040 bytes. However, as `y`'s elements don't share any references anymore, our memory prediction adds up to the sum of `y`'s element's object sizes and the length-2 list size: 8000048 B + 8000048 B + 64 B = 16000160 B ~ 16 MB.
    
     ```{r}
     y[[1]][[1]] <- 10
-    obj_size(y)
+    obj_size(y) 
     ```
     
    As the second element of `y` still points to the same address as `x` does, R's memory usage for `x` and `y` together remains to `y`'s object size (16000160 B):
    
     ```{r}
-    obj_size(x, y)
+    obj_size(x, y) 
     ```
     
    By modifying the second element of `y`, this element now also points to a new memory address. Again the size of the element remains the same. Therefore `y`'s object size remains 16000160 byte:
    
     ```{r}
     y[[2]][[1]] <- 10
-    obj_size(y)
+    obj_size(y) 
     ```
    
    However, as `y` now doesn't share any references with `x` anymore, their memory usage in R now adds up to 24000208 bytes:
      
     ```{r}
-    obj_size(x, y)
+    obj_size(x, y) 
     ```
 
 ## Modify-in-place
