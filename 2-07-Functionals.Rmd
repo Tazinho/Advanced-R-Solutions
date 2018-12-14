@@ -176,22 +176,7 @@ library(purrr)
 
    __<span style="color:green">A</span>__: `is.na` is not a predicate function, as a predicate function only returns TRUE or FALSE. is.na(NULL) returns logical(0) instead, which excludes it from being a predicate function. The closest in base that we are aware of is anyNA(), if applied elementwise.
 
-2. __<span style="color:red">Q</span>__: What's the relationship between `which()` and `Position()`? What's the relationship between `where()` and `Filter()`?
-
-   __<span style="color:green">A</span>__: `which()` returns all indices of true entries from a logical vector. `Position()` returns just the first (default) or the last integer index of all true entries that occur by applying a predicate function on a vector. So the default relation is `Position(f, x) <=> min(which(f(x)))`.
-    
-   `where()`, defined in the book as:
-    
-    ```{r, eval = FALSE}
-    where <- function(f, x) {
-      vapply(x, f, logical(1))
-    } 
-    ```
-    
-   is useful to return a logical vector from a condition asked on elements of a list or a data frame. `Filter(f, x)` returns all elements of a list or a data frame, where the supplied predicate function returns `TRUE`. So the relation is
-`Filter(f, x) <=> x[where(f, x)]`.
-
-3. __<span style="color:red">Q</span>__: `simple_reduce()` has a problem when `x` is length 0 or length 1. Describe the source of the problem and how you might go about fixing it.
+2. __<span style="color:red">Q</span>__: `simple_reduce()` has a problem when `x` is length 0 or length 1. Describe the source of the problem and how you might go about fixing it.
     
     ```{r}
     simple_reduce <- function(x, f) {
@@ -205,7 +190,7 @@ library(purrr)
    
    __<span style="color:green">A</span>__: 
 
-4. __<span style="color:red">Q</span>__: Implement the `span()` function from Haskell: given a list `x` and a predicate function `f`, `span()` returns the location of the longest sequential run of elements where the predicate is true. (Hint: you might find `rle()` helpful.)
+3. __<span style="color:red">Q</span>__: Implement the `span()` function from Haskell: given a list `x` and a predicate function `f`, `span(x, f)` returns the location of the longest sequential run of elements where the predicate is true. (Hint: you might find `rle()` helpful.)
 
    __<span style="color:green">A</span>__: Our `span_r()` function returns the first index of the longest sequential run of elements where the predicate is true. In case of more than one longest sequenital, more than one index is returned.
     
@@ -242,7 +227,7 @@ library(purrr)
     }
     ```
 
-5. __<span style="color:red">Q</span>__: Implement `arg_max()`. It should take a function and a vector of inputs, and return the elements of the input where the function returns the highest value. For example, `arg_max(-10:5, function(x) x ^ 2)` should return -10. `arg_max(-5:5, function(x) x ^ 2)` should return `c(-5, 5)`. Also implement the matching `arg_min()` function.
+4. __<span style="color:red">Q</span>__: Implement `arg_max()`. It should take a function and a vector of inputs, and return the elements of the input where the function returns the highest value. For example, `arg_max(-10:5, function(x) x ^ 2)` should return -10. `arg_max(-5:5, function(x) x ^ 2)` should return `c(-5, 5)`. Also implement the matching `arg_min()` function.
 
    __<span style="color:green">A</span>__: `arg_max()`:
     
@@ -262,7 +247,7 @@ library(purrr)
     }
     ```
 
-6. __<span style="color:red">Q</span>__: The function below scales a vector so it falls in the range [0, 1]. How would you apply it to every column of a data frame? How would you apply it to every numeric column in a data frame?
+5. __<span style="color:red">Q</span>__: The function below scales a vector so it falls in the range [0, 1]. How would you apply it to every column of a data frame? How would you apply it to every numeric column in a data frame?
 
     ```{r}
     scale01 <- function(x) {
