@@ -4,8 +4,8 @@
 ## Prerequisites {-}
 
    We use the development version of lobstr to answer questions regarding the internal representation of R objects.
-
-    ```{r, include=TRUE}
+    
+    ```{r}
     # devtools::install_github("r-lib/lobstr")
     library(lobstr)
     ```
@@ -281,7 +281,7 @@
     obj_size(x)
     ```
    
-  In `y <- list(x, x)` both list elements of `y` contain references to the same memory address, so no additional memory is required for the second list element. The list itsself requires 64 bytes, 48 byte for an empty list and 8 byte for each element (`obj_size(vector("list", 2))`). This let's us predict 8000048 B + 64 B = 8000112 B:
+   In `y <- list(x, x)` both list elements of `y` contain references to the same memory address, so no additional memory is required for the second list element. The list itsself requires 64 bytes, 48 byte for an empty list and 8 byte for each element (`obj_size(vector("list", 2))`). This let's us predict 8000048 B + 64 B = 8000112 B:
    
     ```{r}
     y <- list(x, x) 
