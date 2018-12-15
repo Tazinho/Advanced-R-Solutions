@@ -34,7 +34,7 @@
 
 3. __<span style="color:red">Q</span>__: Why is `1 == "1"` true? Why is `-1 < FALSE` true? Why is `"one" < 2` false?  
 
-   __<span style="color:green">A</span>__: These comparisons are carried out by operator-functions, which coerce their arguments to a common type. In the examples above these cases will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` turns into `"2"` (and numerals preceed letters in ASCII).
+   __<span style="color:green">A</span>__: These comparisons are carried out by operator-functions, which coerce their arguments to a common type. In the examples above these cases will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` turns into `"2"` (and numerals precede letters in ASCII).
 
 4. __<span style="color:red">Q</span>__: Why is the default missing value, `NA`, a logical vector? What's special about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)  
    
@@ -79,7 +79,7 @@
     
    > `dim()` will return `NULL` when applied to a 1d vector.
    
-   One may want to use `NROW()` or `NCOL()` to handle atomic vectors, lists and NULL values similar to one column matrices or data frames. For these objects `nrow()` and `ncol()` return `NULL`. This may occurr in interactive data analysis, while subsetting data frames. 
+   One may want to use `NROW()` or `NCOL()` to handle atomic vectors, lists and NULL values similar to one column matrices or data frames. For these objects `nrow()` and `ncol()` return `NULL`. This may occur in interactive data analysis, while subsetting data frames. 
 
     ```{r}
     NROW(iris[, 1])  # default drop = TRUE results in vector
@@ -127,11 +127,11 @@
 ## S3 atomic vectors
 1. __<span style="color:red">Q</span>__: What sort of object does `table()` return? What is its type? What attributes does it have? How does the dimensionality change as you tabulate more variables?
     
-   __<span style="color:green">A</span>__: `table()` returns a cross tabulation of its input. The result is an S3 table object, which is an array (implicit class) of integers (type) under the hood. Attributes are dim (dimension of the underlying array) and dimnames (one for each input column). The dimensionality equals to the number of unique values (accordingly factor levels) of the input arguments, i.e.:
-  
+   __<span style="color:green">A</span>__: `table()` returns a contingency table of its input variables, which has the class `"table"`. Internally it´s represented as an array (implicit class) of integers (type) with the attributes `dim` (dimension of the underlying array) and `dimnames` (one name for each input column). The dimensions correspond to the number of unique values in each input variable.
+
     ```{r}
     dim(table(iris))
-    sapply(iris, function(x) length(unique(levels(as.factor(x)))))
+    sapply(iris, function(x) length(unique(x)))
     ```
     
 2. __<span style="color:red">Q</span>__: What happens to a factor when you modify its levels? 
@@ -141,7 +141,7 @@
     levels(f1) <- rev(levels(f1))
     ```
     
-   __<span style="color:green">A</span>__: Both, the entries of the factor and also its levels are being reversed:
+   __<span style="color:green">A</span>__: Both the elements of the factor and as well as its levels are being reversed:
     
     ```{r}
     f1
@@ -150,40 +150,41 @@
 3. __<span style="color:red">Q</span>__: What does this code do? How do `f2` and `f3` differ from `f1`?
 
     ```{r, results = "none"}
-    f2 <- rev(factor(letters)) # changes only the entries of the factor
-    f3 <- factor(letters, levels = rev(letters)) # changes only the levels of the factor
+    f2 <- rev(factor(letters))  # reverses element order (only)
+    f3 <- factor(letters, levels = rev(letters))  # reverses factor level order (only)
     ```
     
-   __<span style="color:green">A</span>__: Unlike `f1` `f2` and `f3` change only one thing. They change the order of the factor or its levels, but not both at the same time.
+   __<span style="color:green">A</span>__: For `f2` and `f3` either the order of the factor elements *or* its levels are being reversed. For `f1` both transformations are occurring.
 
 
 ## Lists
 1. __<span style="color:red">Q</span>__: List all the ways that a list differs from an atomic vector.
 
-   __<span style="color:green">A</span>__: 
-   
-   - Atomic vectors are homogeneous (all contents must be of the same type). Lists are heterogeneous (all contents can be of different types). 
-   
-   - Atomic vectors point to one value, while lists contain references which point to one value each:
+   __<span style="color:green">A</span>__: To summarise:
+   - Atomic vectors are always homogeneous (all elements must be of the same type). Lists may be heterogeneous (the elements can be of different types). 
+   - Atomic vectors point to only one address in memory, while lists contain a separate references for each element
 
     ```{r}
-    lobstr::ref(1:3)
-    lobstr::ref(list(1:3,2,3))
+    lobstr::ref(1:2)
+    lobstr::ref(list(1:2, 2))
     ```
     
-   - Subsetting with out of bound values and `NA`s leads to `NA`s for atomics and `NULL` values for lists:
-    
+   - Subsetting with out of bound values or `NA`s leads to `NA`s for atomics and `NULL` values for lists
+
     ```{r}
     (1:2)[3]
-    as.list(1:2)[3]
-    
     (1:2)[NA]
+    
+    as.list(1:2)[3]
     as.list(1:2)[NA]
     ```
    
 2. __<span style="color:red">Q</span>__: Why do you need to use `unlist()` to convert a list to an atomic vector? Why doesn't `as.vector()` work?  
    
-   __<span style="color:green">A</span>__: To get rid of (flatten) the nested structure `as.vector()` doesn't work, because a list is already a vector.
+   __<span style="color:green">A</span>__: A list is also a vector, though not an atomic one!
+   
+   <!-- old: -->
+   <!-- To strip (flatten) the nested structure `as.vector()` doesn't work, because a list is already a vector. -->
 
 3. __<span style="color:red">Q</span>__: Compare and contrast `c()` and `unlist()` when combining a date and date-time into a single vector.
 
@@ -241,15 +242,17 @@
 ## Data frames and tibbles
 1. __<span style="color:red">Q</span>__: Can you have a data frame with 0 rows? What about 0 columns?  
 
-   __<span style="color:green">A</span>__: Yes, you can create one easily and in many ways. Also both dimensions can be 0. The fastest way is to subset the regarding dimension with one of `0`, `NULL` or a valid 0-length atomic (`logical(0)`, `character(0)`, `integer(0)`, `double(0)`). Also a negative integer sequence would work. Here we use the recycling rules for logical subsetting:
+   __<span style="color:green">A</span>__: Yes, you can create these data frames easily and in many ways. Even both dimensions can be 0. E.g. you might subset the respective dimension with either `0`, `NULL` or a valid 0-length atomic (`logical(0)`, `character(0)`, `integer(0)`, `double(0)`). Negative integer sequences would also work. The following example uses the recycling rules for logical subsetting:
 
     ```{r}
     iris[FALSE,]
     
-    iris[ , FALSE] # or iris[FALSE]
+    iris[ , FALSE]  # or iris[FALSE]
     
-    iris[FALSE, FALSE] # or just data.frame()
+    iris[FALSE, FALSE]   # or just data.frame()
     ```
+
+<!-- @malte: recheck this for clarity and correctness. -->
 
 2. __<span style="color:red">Q</span>__: What happens if you attempt to set rownames that are not unique?
 
@@ -263,7 +266,7 @@
 
 3. __<span style="color:red">Q</span>__: If `df` is a data frame, what can you say about `t(df)`, and `t(t(df))`? Perform some experiments, making sure to try different column types.
 
-   __<span style="color:green">A</span>__ Both will return matrices with dimensions regarding the typical transposition rules. As `t()` uses `as.matrix.data.frame()` for the preprocessing in front of applying `t.default()` and elements of matrices need to be of the same type, all elements get coerced in the usual order (logical << integer << double << character), while factors, dates and datetimes are treated as characters during coercion.
+   __<span style="color:green">A</span>__ Both will return matrices with dimensions regarding the typical transposition rules. As `t()` uses `as.matrix.data.frame()` for the preprocessing in front of applying `t.default()` and elements of matrices need to be of the same type, all elements will be coerced in the usual order (logical << integer << double << character). Factors, dates and datetimes are treated as characters during coercion.
 
 4. __<span style="color:red">Q</span>__: What does `as.matrix()` do when applied to a data frame with columns of different types? How does it differ from `data.matrix()`?
     
@@ -271,7 +274,7 @@
     
    > The method for data frames will return a character matrix if there is only atomic columns and any non-(numeric/logical/complex) column, applying as.vector to factors and format to other non-character columns. Otherwise the usual coercion hierarchy (logical < integer < double < complex) will be used, e.g., all-logical data frames will be coerced to a logical matrix, mixed logical-integer will give a integer matrix, etc.
     
-   Let´s tranform a dummy data frame into a character matrix. Note that `format()` is applied to the characters, which may complicate conversion back to the previous type. (For example `TRUE` is transformed to `" TRUE"` (starting with a space))
+   Let´s transform a dummy data frame into a character matrix. Note that `format()` is applied to the characters, which may complicate conversion back to the previous type. (For example `TRUE` is transformed to `" TRUE"` (starting with a space))
 
     ```{r}
     df_coltypes <- data.frame(a = c("a", "b"),
