@@ -3,12 +3,12 @@
 # Names and values
 ## Prerequisites {-}
 
-We use the development version of lobstr to answer questions regarding the internal representation of R objects.
+   We use the development version of lobstr to answer questions regarding the internal representation of R objects.
 
-```{r, include=TRUE}
-# devtools::install_github("r-lib/lobstr")
-library(lobstr)
-```
+    ```{r, include=TRUE}
+    # devtools::install_github("r-lib/lobstr")
+    library(lobstr)
+    ```
 
 ## Binding basics
 
@@ -263,58 +263,58 @@ library(lobstr)
    __<span style="color:green">A</span>__: To predict the object size of `x` let's first find out how much memory an empty double occupies and how the size grows with the length of the vector.
    
     ```{r}
-    # Memory needed for a 0-length double
+    # memory needed for a 0-length double
     obj_size(double(0))
     
-    # Additional memory per element
+    # additional memory per element
     diff(sapply(0:32, function(x) obj_size(double(x))))
     ```
     
-   From the first result of the code chunk above we know that R needs 48 bytes (abbreviated in calculations as B) for an empty double. From the second result we can see that R adds 8 bytes per additional element. Don't get confused by the fact that are sometimes (for small vectors) preallocates more than 8 bytes per additional element. This is mainly a practical consideration for better performance. To explain this a bit more in depth, we quote Hadley's explanation from the first edition of Advanced R:
+   We see that R requires 48 bytes for a double of length 0. Generally each additional element in a vector requires 8 additional bytes of memory. But for some small vectors R preallocates a little more memory than needed, which improves performance. Here is Hadley´s explanation from the first edition of Advanced R:
    
    > ... why does the memory size grow irregularly? To understand why, you need to know a little bit about how R requests memory from the operating system. Requesting memory (with malloc()) is a relatively expensive operation. Having to request memory every time a small vector is created would slow R down considerably. Instead, R asks for a big block of memory and then manages that block itself. This block is called the small vector pool and is used for vectors less than 128 bytes long. For efficiency and simplicity, it only allocates vectors that are 8, 16, 32, 48, 64, or 128 bytes long. ... Beyond 128 bytes, it no longer makes sense for R to manage vectors. After all, allocating big chunks of memory is something that operating systems are very good at. Beyond 128 bytes, R will ask for memory in multiples of 8 bytes. This ensures good alignment.
    
-   However, for our prediction of `obj_size(x)` we just need to calculate 48 B + 1000000 * 8 B = 8000048 B ~ 8 MB.
+   However, to estimate `obj_size(x)` we just calculate _48 B + 1000000 * 8 B = 8000048 B_ (about 8 MB), which proves correct:
    
     ```{r}
     x <- runif(1e6)
     obj_size(x)
     ```
    
-   To predict the size of `y <- list(x, x)` we must pay attention that both list elements of `y` contain references to the same memory address. Therefore, no additional memory apart from the first element - and the memory of the list itself - is needed. The extra memory for a list of length 2 is 64 bytes (48 byte for an empty list and 8 byte for each element; check for example `obj_size(vector("list", 2))`). This gives us a prediction of 8000048 B + 64 B = 8000112 B:
+  In `y <- list(x, x)` both list elements of `y` contain references to the same memory address, so no additional memory is required for the second list element. The list itsself requires 64 bytes, 48 byte for an empty list and 8 byte for each element (`obj_size(vector("list", 2))`). This let's us predict 8000048 B + 64 B = 8000112 B:
    
     ```{r}
     y <- list(x, x) 
     obj_size(y)
     ```
    
-   As `y` contains references to `x` already, no extra memory is needed for `x`. So our prediction `obj_size(x, y)` will be again 8000112 Bytes:
+   The list `y` already contains references to `x`, so no extra memory is needed for `x` and the amount of required memory stays the same.
    
     ```{r}
     obj_size(x, y) 
     ```
     
-   In the next part the first element of `y` gets modified. As the second element of `y` and `x` point to the same memory address as the first element of `y`, R creates a copy of the first element under a new memory address before it applies the modifications. The newly created first element will still be a double of the same length as before. Therefore, it also needs 8000040 bytes. However, as `y`'s elements don't share any references anymore, our memory prediction adds up to the sum of `y`'s element's object sizes and the length-2 list size: 8000048 B + 8000048 B + 64 B = 16000160 B ~ 16 MB.
-   
+   When we modify the first element of `y[[1]]` copy-on-modiy occurs and the object will have the same size (8000040 bytes) and a new address in memory. So `y`'s elements don't share references anymore. Because of this their object sizes adds up to the sum of of the two different vectors and the length-2 list: 8000048 B + 8000048 B + 64 B = 16000160 B (16 MB).
+
     ```{r}
     y[[1]][[1]] <- 10
     obj_size(y) 
     ```
     
-   As the second element of `y` still points to the same address as `x` does, R's memory usage for `x` and `y` together remains to `y`'s object size (16000160 B):
+   The second element of `y` still references same address as `x` and therefore the amount of memory used for both `x` and `y` doens´t increase:
    
     ```{r}
     obj_size(x, y) 
     ```
     
-   By modifying the second element of `y`, this element now also points to a new memory address. Again the size of the element remains the same. Therefore `y`'s object size remains 16000160 byte:
+   When we modify the second element of `y`, this element will also point to a new memory address. This doesn´t affect the memory size of the list:
    
     ```{r}
     y[[2]][[1]] <- 10
     obj_size(y) 
     ```
    
-   However, as `y` now doesn't share any references with `x` anymore, their memory usage in R now adds up to 24000208 bytes:
+   However, as `y` doesn't share references with `x` anymore, the memory usage of the objects now adds up:
      
     ```{r}
     obj_size(x, y) 
