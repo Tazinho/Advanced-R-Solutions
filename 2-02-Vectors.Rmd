@@ -11,14 +11,14 @@
     complex(1)
     ```
   
-   For raw vectors it's easy to coerce numeric or character scalars to raw.
+   Raw vectors can easily be created from numeric or character values.
   
     ```{r}
     as.raw(42)
     charToRaw("A")
     ```
   
-   For complex numbers real and imaginary parts can be provided directly.
+   For complex numbers real and imaginary parts may be provided directly.
   
     ```{r}
     complex(length.out = 1, real = 1, imaginary = 1)
@@ -34,20 +34,18 @@
 
 3. __<span style="color:red">Q</span>__: Why is `1 == "1"` true? Why is `-1 < FALSE` true? Why is `"one" < 2` false?  
 
-   __<span style="color:green">A</span>__: These comparisons are carried out by operator-functions, which coerce their arguments to a common type. In the examples above these cases will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` becomes `"2"` (in ASCII numerals preceed letter).
+   __<span style="color:green">A</span>__: These comparisons are carried out by operator-functions, which coerce their arguments to a common type. In the examples above these cases will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` turns into `"2"` (and numerals preceed letters in ASCII).
 
 4. __<span style="color:red">Q</span>__: Why is the default missing value, `NA`, a logical vector? What's special about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)  
    
-   __<span style="color:green">A</span>__: It is a practical thought. When you combine `NA`s in `c()` with other atomic types they will be coerced like `TRUE` and `FALSE` to integer `(NA_integer_)`, double `(NA_real_)`, complex `(NA_complex_)` and character `(NA_character_)`. Recall that in R there is a hierarchy of recursion that goes logical >> integer >> double >> character.  If `NA` was a character and provided as part of a set of other values, all of these would be coerced into character as well. Making `NA` a logical means that involving an `NA` in a dataset (which happens often) will not affect coercion.
+   __<span style="color:green">A</span>__: The presence of missing values shouldn´t affect the type of an object. Recall that there is a type-hierarchy for coercion from character >> double >> integer >> logical. When combining `NA`s  with other atomic types, the `NA`s will be coerced to integer (`NA_integer_`), double (`NA_real_`) or character (`NA_character_`) and not the other way round.  If `NA` was a character and added to a set of other values all of these would be coerced to character as well.
 
 5. __<span style="color:red">Q</span>__: Precisely what do `is.atomic()`, `is.numeric()`, and `is.vector()` test for?
    
-   __<span style="color:green">A</span>__: The documentation informs, that:
+   __<span style="color:green">A</span>__: The documentation states that:
    - **`is.atomic()`** tests if an object has one of these types: `"logical"`, `"integer"`, `"double"`, `"complex"`, `"character"`, `"raw"` or `"NULL"` (!).
    - **`is.numeric()`** tests if an object has integer or double type and is not of `"factor"`, `"Date"`, `"POSIXt"` or `"difftime"` class.
    - **`is.vector()`** tests if an object has no attributes, except of names and if its `mode()` is atomic (`"logical"`, `"integer"`, `"double"`, `"complex"`, `"character"`, `"raw"`), `"list"` or `"expression"`.
-   
-   <!-- @henning: talk a little more about the reasons behind these choices. -->
 
 ## Attributes
 
@@ -59,13 +57,13 @@
     setNames
     ```
    
-   As the data comes first `setNames()` also works well with the magrittr-pipe operator. When no first argument is given, the result is a named vector:
+   Because the data argument comes first `setNames()` also works well with the magrittr-pipe operator. When no first argument is given, the result is a named vector:
    
     ```{r}
    setNames( , c("a", "b", "c"))
     ```
    
-   However, the implemention also means that `setNames()` only affects the names attribute and not any other more specific naming-attributes like the dimnames attribute for matrices and arrays.
+   `setNames()` only affects the names-attribute and ignores other more specific name-related attributes such as dimnames (for matrices and arrays).
    
    `unname()` is implemented in the following way:
    
@@ -73,27 +71,21 @@
     unname
     ```
    
-   If set, `unname()` removes the names and dimnames attributes from its input object. Note that the dimnames attribute (names and row names) won't be affected for data frames, even if the documentation currently (R 3.5.1) mentions this in the case where `force == TRUE` is supplied. Instead the line `dimnames(obj) <- NULL` setting `NULL` as the replacement value in the underlying `dimnames<-.data.frame` function, raises the first error condition in the underlying source code:
+   `unname()` removes existing names- and dimnames-attributes. Note that by default the dimnames attribute (names and row names) won't be affected for data frames.
    
-    ```{r}
-    `dimnames<-.data.frame`
-    ```
-
-   <!-- @henning: phew, this seems more complicated, than I would have hoped for. -->
-    
 2. __<span style="color:red">Q</span>__: What does `dim()` return when applied to a 1d vector? When might you use `NROW()` or `NCOL()`?
     
    __<span style="color:green">A</span>__: From `?nrow`:
     
    > `dim()` will return `NULL` when applied to a 1d vector.
    
-   One might want to use `NROW()` or `NCOL()` to handle atomic vectors, lists and NULL values (1 column, 0 rows) analog to a 1-column matrix / data frame. In these cases the alternatives `nrow()` and `ncol()` return `NULL` (consistently to the behaviour of `dim()`). When subsetting data frames (interactively) this might be convenient as it is not affected by and hence more robust regarding the default `drop = TRUE`(-idiom):
+   One may want to use `NROW()` or `NCOL()` to handle atomic vectors, lists and NULL values similar to one column matrices or data frames. For these objects `nrow()` and `ncol()` return `NULL`. This may occurr in interactive data analysis, while subsetting data frames. 
 
     ```{r}
-    NROW(iris[, 1, drop = TRUE])
-    nrow(iris[, 1, drop = TRUE])
-    NCOL(iris[, 1, drop = TRUE])
-    ncol(iris[, 1, drop = TRUE])
+    NROW(iris[, 1])  # default drop = TRUE results in vector
+    NCOL(iris[, 1])
+    nrow(iris[, 1])
+    ncol(iris[, 1])
     ```
 
 3. __<span style="color:red">Q</span>__: How would you describe the following three objects? What makes them different to `1:5`?
@@ -104,7 +96,7 @@
     x3 <- array(1:5, c(5, 1, 1))  # 5 rows, 1 column,  1 in third dimension
     ```
     
-   __<span style="color:green">A</span>__: They are of class array and so they have a `dim` attribute.
+   __<span style="color:green">A</span>__: These objects have the class array instead of vector. Their dimensions are stored in the `dim` attribute.
 
 4. __<span style="color:red">Q</span>__: An early draft used this code to illustrate `structure()`:
 
@@ -112,32 +104,30 @@
     structure(1:5, comment = "my attribute")
     ```
 
-   But when you print that object you don't see the comment attribute.
-   Why? Is the attribute missing, or is there something else special about
-   it? (Hint: try using help.) \index{attributes!comment}
+   But when you print that object you don't see the comment attribute. Why? Is the attribute missing, or is there something else special about it? (Hint: try using help.) \index{attributes!comment}
     
-   __<span style="color:green">A</span>__: From the help of comment `(?comment)`:  
+   __<span style="color:green">A</span>__: The documentation states (see `?comment`):  
     
    > Contrary to other attributes, the comment is not printed (by print or print.default).
     
-   Also from the help of attributes `(?attributes)`:  
+   Also, from `?attributes`:
     
    > Note that some attributes (namely class, comment, dim, dimnames, names, row.names and tsp) are treated specially and have restrictions on the values which can be set.
    
-   Apart of that, we can get it easily when we are more specific, i.e.:
-   
+   We can retrieve comment attributes by calling them explicitly:
+
     ```{r}
-    bla <- structure(1:5, comment = "my attribute")
+    foo <- structure(1:5, comment = "my attribute")
     
-    attributes(bla)
-    attr(bla, "comment")
+    attributes(foo)
+    attr(foo, which = "comment")
     ```
 
 
 ## S3 atomic vectors
 1. __<span style="color:red">Q</span>__: What sort of object does `table()` return? What is its type? What attributes does it have? How does the dimensionality change as you tabulate more variables?
     
-   __<span style="color:green">A</span>__: `table()` returns a crosstabulation of its input. The result is an S3 table object, which is an array (implicit class) of integers (type) under the hood. Attributes are dim (dimension of the underlying array) and dimnames (one for each input column). The dimensionality equals to the number of unique values (accordingly factor levels) of the input arguments, i.e.:
+   __<span style="color:green">A</span>__: `table()` returns a cross tabulation of its input. The result is an S3 table object, which is an array (implicit class) of integers (type) under the hood. Attributes are dim (dimension of the underlying array) and dimnames (one for each input column). The dimensionality equals to the number of unique values (accordingly factor levels) of the input arguments, i.e.:
   
     ```{r}
     dim(table(iris))
@@ -206,7 +196,7 @@
     dttm_ct <- as.POSIXct("1970-01-01 01:00", tz = "UTC")
     ```
     
-   When combining these objects method-dispatch leads to suprising output:
+   When combining these objects method-dispatch leads to surprising output:
 
     ```{r}
     c(date, dttm_ct)  # equal to c.Date(date, dttm_ct) 
@@ -273,43 +263,37 @@
 
 3. __<span style="color:red">Q</span>__: If `df` is a data frame, what can you say about `t(df)`, and `t(t(df))`? Perform some experiments, making sure to try different column types.
 
-   __<span style="color:green">A</span>__ Both will return matrices with dimensions regaring the typical transposition rules. As `t()` uses `as.matrix.data.frame()` for the preprocessing infront of applying `t.default()` and elements of matrices need to be of the same type, all elements get coerced in the usual order (logical << integer << double << character), while factors, dates and datetimes are treated as characters during coercion.
+   __<span style="color:green">A</span>__ Both will return matrices with dimensions regarding the typical transposition rules. As `t()` uses `as.matrix.data.frame()` for the preprocessing in front of applying `t.default()` and elements of matrices need to be of the same type, all elements get coerced in the usual order (logical << integer << double << character), while factors, dates and datetimes are treated as characters during coercion.
 
-4. __<span style="color:red">Q</span>__: What does `as.matrix()` do when applied to a data frame with 
-   columns of different types? How does it differ from `data.matrix()`?
+4. __<span style="color:red">Q</span>__: What does `as.matrix()` do when applied to a data frame with columns of different types? How does it differ from `data.matrix()`?
     
    __<span style="color:green">A</span>__: From `?as.matrix`:
     
    > The method for data frames will return a character matrix if there is only atomic columns and any non-(numeric/logical/complex) column, applying as.vector to factors and format to other non-character columns. Otherwise the usual coercion hierarchy (logical < integer < double < complex) will be used, e.g., all-logical data frames will be coerced to a logical matrix, mixed logical-integer will give a integer matrix, etc.
     
-   To illustrate this, we create an easy example where the data frame gets coerced to a character matrix:
+   Let´s tranform a dummy data frame into a character matrix. Note that `format()` is applied to the characters, which may complicate conversion back to the previous type. (For example `TRUE` is transformed to `" TRUE"` (starting with a space))
 
     ```{r}
-    a <- c("a", "b", "c")
-    b <- c(TRUE, FALSE, FALSE)
-    c <- c("TRUE", "FALSE", "FALSE")
-    d <- c(1L, 0L, 2L)
-    e <- c(1.5, 2, 3)
-    f <- c("one" = 1, "two" = 2, "three" = 3)
-    g <- c("first" = 1, "second" = 2, "third" = 3)
-    h <- factor(c("f1", "f2", "f3"))
+    df_coltypes <- data.frame(a = c("a", "b"),
+                              b = c(TRUE, FALSE),
+                              c = c("TRUE", "FALSE"),
+                              d = c(1L, 0L),
+                              e = c(1.5, 2),
+                              f = c("one" = 1, "two" = 2),
+                              g = factor(c("f1", "f2")),
+                              stringsAsFactors = FALSE)
     
-    df_cols <- data.frame(a, b, c, d, e, f, g, h, stringsAsFactors = FALSE)
-    
-    # Note that format is applied to the characters, which can complicate
-    # inverse conversion (back to the previous type).
-    # For example TRUE in the b variable becomes " TRUE" (starting with a space)
-    as.matrix(df_cols)
+    as.matrix(df_coltypes)
     ```
     
    From `?as.data.matrix`:
     
    > Return the matrix obtained by converting all the variables in a data frame to numeric mode and then binding them together as the columns of a matrix. Factors and ordered factors are replaced by their internal codes.
     
-   So for `data.matrix` we'll get a numerix matrix containing `NA`s for original character columns:
+   `data.matrix()` returns a numeric matrix, where characters are replace by missing values:
     
     ```{r}
-    data.matrix(df_cols)
+    data.matrix(df_coltypes)
     ```
 
 
