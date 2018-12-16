@@ -34,7 +34,7 @@
 
 3. __<span style="color:red">Q</span>__: Why is `1 == "1"` true? Why is `-1 < FALSE` true? Why is `"one" < 2` false?  
 
-   __<span style="color:green">A</span>__: These comparisons are carried out by operator-functions, which coerce their arguments to a common type. In the examples above these cases will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` turns into `"2"` (and numerals precede letters in the lexiographic order (may depend on locale)).
+   __<span style="color:green">A</span>__: These comparisons are carried out by operator-functions, which coerce their arguments to a common type. In the examples above these cases will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` turns into `"2"` (and numerals precede letters in the lexicographic order (may depend on locale)).
 
 4. __<span style="color:red">Q</span>__: Why is the default missing value, `NA`, a logical vector? What's special about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)  
    
@@ -136,7 +136,7 @@
 ## S3 atomic vectors
 1. __<span style="color:red">Q</span>__: What sort of object does `table()` return? What is its type? What attributes does it have? How does the dimensionality change as you tabulate more variables?
     
-   __<span style="color:green">A</span>__: `table()` returns a contingency table of its input variables, which has the class `"table"`. Internally it´s represented as an array (implicit class) of integers (type) with the attributes `dim` (dimension of the underlying array) and `dimnames` (one name for each input column). The dimensions correspond to the number of unique values in each input variable.
+   __<span style="color:green">A</span>__: `table()` returns a contingency table of its input variables, which has the class `"table"`. Internally it´s represented as an array (implicit class) of integers (type) with the attributes `dim` (dimension of the underlying array) and `dimnames` (one name for each input column). The dimensions correspond to the number of unique values (respectively factor levels) in each input variable.
 
     ```{r}
     dim(table(iris))
@@ -244,8 +244,12 @@
     
     iris[FALSE, FALSE]   # or just data.frame()
     ```
-
-<!-- @malte: recheck this for clarity and correctness. -->
+    
+   Empty data frames can also be created directly (without subsetting):
+   
+    ```{r}
+    data.frame()
+    ```
 
 2. __<span style="color:red">Q</span>__: What happens if you attempt to set rownames that are not unique?
 
@@ -293,8 +297,7 @@
     ```
 
 
-## Exercises from AdvR I
-
+## Old exercises
 1. __<span style="color:red">Q</span>__: What does `dim()` return when applied to a vector?  
    __<span style="color:green">A</span>__: `NULL`
 
