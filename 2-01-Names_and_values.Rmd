@@ -294,14 +294,14 @@ We use the development version of lobstr to answer questions regarding the inter
     obj_size(x, y) 
     ```
     
-   When we modify the first element of `y[[1]]` copy-on-modiy occurs and the object will have the same size (8000040 bytes) and a new address in memory. So `y`'s elements don't share references anymore. Because of this their object sizes adds up to the sum of of the two different vectors and the length-2 list: 8000048 B + 8000048 B + 64 B = 16000160 B (16 MB).
+   When we modify the first element of `y[[1]]` copy-on-modify occurs and the object will have the same size (8000040 bytes) and a new address in memory. So `y`'s elements don't share references anymore. Because of this their object sizes add up to the sum of of the two different vectors and the length-2 list: 8000048 B + 8000048 B + 64 B = 16000160 B (16 MB).
 
     ```{r}
     y[[1]][[1]] <- 10
     obj_size(y) 
     ```
     
-   The second element of `y` still references same address as `x` and therefore the amount of memory used for both `x` and `y` doens´t increase:
+   The second element of `y` still references to the same address as `x` and therefore the amount of memory used for both `x` and `y` doesn´t increase:
    
     ```{r}
     obj_size(x, y) 
