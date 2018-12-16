@@ -121,7 +121,7 @@
       
 ## Lazy evaluation
 
-1. __<span style="color:red">Q</span>__: What important property of `&&` make `x_ok()` work?
+1. __<span style="color:red">Q</span>__: What important property of `&&` makes `x_ok()` work?
 
     ```{r}
     x_ok <- function(x) {
@@ -342,7 +342,9 @@
 
    __<span style="color:green">A</span>__: It invisibly returns `NULL`. It would be more useful to invisibly return the (data frame) object to be written as for example the **readr** package does. In this way it would be possible to save intermediate results from a sequence of processing steps directly, i.e. within a magrittr pipeline.
     
-3. __<span style="color:red">Q</span>__: How does the `chdir` parameter of `source()` compare to `in_dir()`? Why might you prefer one approach to the other? The `in_dir()` approach was given in the book as
+3. __<span style="color:red">Q</span>__: How does the `chdir` parameter of `source()` compare to `in_dir()`? Why might you prefer one approach to the other?
+
+The `in_dir()` approach was given in the book as
        
     ```{r, eval = FALSE}
     in_dir <- function(dir, code) {
