@@ -27,7 +27,7 @@
     x[upper.tri(x)]
     ```  
     
-   __<span style="color:green">A</span>__: The implementation of `upper.tri()` is strainghtforwarward (take a look at the source code.) The input is transformed into a matrix of logicals. Its subsetting-behaviour will be identical to subsetting with logical matrices and therefore we don´t need to treat it in a special way.
+   __<span style="color:green">A</span>__: The implementation of `upper.tri()` is straightforwarward (take a look at the source code.) The input is transformed into a matrix of logicals. Its subsetting-behaviour will be identical to subsetting with logical matrices, where all elements that correspond to `TRUE` will be selected. We don´t need to treat this form of subsetting in a special way.
 
 4. __<span style="color:red">Q</span>__: Why does `mtcars[1:20]` return an error? How does it differ from the similar `mtcars[1:20, ]`?  
    
@@ -42,13 +42,20 @@
       if (is.matrix(x)) {
         if (nargs() > 1L) # this and the next line will be dropped
           stop("'nrow' or 'ncol' cannot be specified when 'x' is a matrix") 
+        
         if ((m <- min(dim(x))) == 0L) 
           return(vector(typeof(x), 0L))
+        
         y <- x[1 + 0L:(m - 1L) * (dim(x)[1L] + 1)]
         nms <- dimnames(x)
-        if (is.list(nms) && !any(sapply(nms, is.null)) && identical((nm <- nms[[1L]][seq_len(m)]),
-                                                                    nms[[2L]][seq_len(m)]))
+        
+        if (is.list(nms) && 
+            !any(sapply(nms, is.null)) &&
+            identical(
+              (nm <- nms[[1L]][seq_len(m)]), nms[[2L]][seq_len(m)])
+        )
           names(y) <- nm
+        
         return(y)
       }
       }
