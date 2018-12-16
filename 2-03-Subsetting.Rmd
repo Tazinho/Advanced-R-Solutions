@@ -5,12 +5,11 @@
 1. __<span style="color:red">Q</span>__: Fix each of the following common data frame subsetting errors:
 
     ```{r, eval = FALSE}
-    mtcars[mtcars$cyl = 4, ]       # = -> ==
-    mtcars[-1:4, ]                 # -1:4 -> -(1:4)
-    mtcars[mtcars$cyl <= 5]        # "," is missing
-    mtcars[mtcars$cyl == 4 | 6, ]  # 6 -> mtcars$cyl == 6
+    mtcars[mtcars$cyl = 4, ]       # use `==`              (instead of `=`)
+    mtcars[-1:4, ]                 # use `-(1:4)`          (instead of `-1:4`)
+    mtcars[mtcars$cyl <= 5]        # `,` is missing
+    mtcars[mtcars$cyl == 4 | 6, ]  # use `mtcars$cyl == 6` (instead of `6`)
     ```  
-    
 
 2. __<span style="color:red">Q</span>__: Why does the following code yield five missing values? (Hint: why is it different from `x[NA_real_]`?)  
 
@@ -19,7 +18,7 @@
     x[NA]
     ```
    
-   __<span style="color:green">A</span>__: `NA` is of class logical, so `x[NA]` becomes recycled to `x[NA, NA, NA, NA, NA]`. Since subsetting an atomic with `NA` leads to an `NA`, you will get 5 of them returned.
+   __<span style="color:green">A</span>__: `NA` has logical type and and internally `x[NA]` will be recycled to `x[NA, NA, NA, NA, NA]`. Subsetting an atomic with `NA` returns `NA` which occurs five times. That is why five missing values are returned.
     
 3. __<span style="color:red">Q</span>__: What does `upper.tri()` return? How does subsetting a matrix with it work? Do we need any additional subsetting rules to describe its behaviour?
 
@@ -28,11 +27,11 @@
     x[upper.tri(x)]
     ```  
     
-   __<span style="color:green">A</span>__: `upper.tri()` has really intuitive source code. It coerces its input to a matrix and returns a logical matrix. Hence describing its behaviour for the use of subsetting is based on everything that applies to subsetting with logical matrices.
+   __<span style="color:green">A</span>__: The implementation of `upper.tri()` is strainghtforwarward (take a look at the source code.) The input is transformed into a matrix of logicals. Its subsetting-behaviour will be identical to subsetting with logical matrices and therefore we don´t need to treat it in a special way.
 
 4. __<span style="color:red">Q</span>__: Why does `mtcars[1:20]` return an error? How does it differ from the similar `mtcars[1:20, ]`?  
    
-   __<span style="color:green">A</span>__: In the first case `mtcar` is subsetted with a vector and the statement should return a data.frame of the first 20 columns in `mtcars`. Since `mtcars` only has 11 columns, the index is out of bounds, which explains the error. The biggest difference of `mtcars[1:20, ]` to the former case, is that now `mtcars` is subsetted with two vectors. In this case you will get returned the first 20 rows and all columns (like subsetting a matrix). 
+   __<span style="color:green">A</span>__: `mtcars[1:20]` is subsetted with a vector and in general this statement would return a data frame of the first 20 columns of the dataset. But `mtcars` has only 11 columns, so the index will be out of bounds and an error is thrown. `mtcars[1:20, ]` is subsetted with two vectors and the first 20 rows of all columns will be returned.
 
 5. __<span style="color:red">Q</span>__: Implement your own function that extracts the diagonal entries from a matrix (it should behave like `diag(x)` where `x` is a matrix).
 
@@ -55,7 +54,7 @@
       }
     ```
   
-   In the next step we drop the unncessary `nrow` and `ncol` argument and the related code in the 3rd and     4th line:
+   In the next step we drop the unncessary `nrow` and `ncol` argument and the related code in the 3rd and 4th line:
 
     ```{r}
     diag_v <- function (x = 1) {
@@ -159,23 +158,20 @@
 
 6. __<span style="color:red">Q</span>__: What does `df[is.na(df)] <- 0` do? How does it work?  
    
-   __<span style="color:green">A</span>__: It replaces all `NA`s within `df` with the value `0`. `is.na(df)` returns a logical matrix which is used to subset df. Since you can combine subsetting and assignment, only the matched part of `df` (the `NA`s) is replaced with `0` entries.
+   __<span style="color:green">A</span>__: This expression replaces the `NA`s in `df` with `0`. Here `is.na(df)` returns a logical matrix and encodes the position of the missing values in `df`. Subsetting and assignment are then combined to replace only the missing values.
    
 ## Selecting a single element
 
 1. __<span style="color:red">Q</span>__: Brainstorm as many ways as possible to extract the third value from the `cyl` variable in the `mtcars` dataset.
 
-   __<span style="color:green">A</span>__: Lets first look at the usual base R options:
+   __<span style="color:green">A</span>__: Base R already provides an abundance of possibilities:
     
     ```{r}
-    mtcars$cyl[3]  
-    mtcars$cyl[[3]]
+    # using [[3]] instead of [3] would also work in these examples
+    mtcars$cyl[3]
     mtcars[ , "cyl"][3]
-    mtcars[ , "cyl"][[3]]
     mtcars[["cyl"]][3]
-    mtcars[["cyl"]][[3]]
     with(mtcars, cyl[3])
-    with(mtcars, cyl[[3]])
     
     mtcars[3, 2]
     mtcars[3, ]$cyl
@@ -183,59 +179,74 @@
     mtcars[3, ][ , "cyl"]
     mtcars[3, ][["cyl"]]
     with(mtcars[3, ], cyl)
+    
+    tail(head(mtcars, 3), 1)$cyl
+    head(tail(mtcars, 30), 1)$cyl  # not very practical ;)
+    
+    subset(mtcars, rownames(mtcars) == "Datsun 710")$cyl
     ```
     
-   Of course we could also use addon packages like the tidyverse for the subsetting of the `cyl` variable and its third element:
+   When we turn to other libraries, e.g. the tidyverse packages, even more possibilities open up. As an example:
        
     ```{r}
     library(magrittr)
-    mtcars %>% dplyr::pull(cyl) %>% purrr::pluck(3)
+
+    mtcars %>% 
+      purrr::pluck("cyl", 3)
+
+    mtcars %>% 
+      dplyr::pull(cyl) %>%
+      purrr::pluck(3)
     ```
-    
-   Many more packages, which we are currently not aware of might provide similar functionality.
-   
+
 2. __<span style="color:red">Q</span>__: Given a linear model, e.g., `mod <- lm(mpg ~ wt, data = mtcars)`, extract the residual degrees of freedom. Extract the R squared from the model summary (`summary(mod)`).  
    
-   __<span style="color:green">A</span>__: Since `mod` is of type list we can expect several possibilities:
+   __<span style="color:green">A</span>__: `mod` has the type list, which opens up several possibilities:
     
-    ```{r, eval = FALSE}
-    mod$df.residual       # preserving output
-    mod$df.r              # preserving output with partial matching
-    mod["df.residual"]    # list output (without partial matching)
-    mod[["df.residual"]]  # preserving output (without partial matching)
+    ```{r}
+    mod <- lm(mpg ~ wt, data = mtcars)
+    
+    mod$df.residual       # output preserved
+    mod$df.res            # `$` allows partial matching
+    mod["df.residual"]    # list output
+    mod[["df.residual"]]  # output preserved
     ```
     
-   The same states for `summary(mod)`, so we can use for example:
+   The same also applies to `summary(mod)`, so we could use i.e.:
     
     ```{r, eval = FALSE}
     summary(mod)$r.squared
     ```
     
-   (To get tidy output from r-models in general also the `broom` package is a good alternative).
+   (Tip: The `broom`-package provides a very useful approach to work with models in a tidy way).
     
 ## Applications
 
 1. __<span style="color:red">Q</span>__: How would you randomly permute the columns of a data frame? (This is an important technique in random forests.) Can you simultaneously permute the rows and columns in one step?  
    
-   __<span style="color:green">A</span>__: Combine `` `[` `` with the `sample()` function:
+   __<span style="color:green">A</span>__: This can be achieved by combining `` `[` `` and `sample()`:
     
     ```{r,eval = FALSE}
-    # Permute rows
+    # Permute columns
     iris[sample(ncol(iris))]
     
-    # Permute rows and columns in one step
+    # Permute columns and rows in one step
     iris[sample(nrow(iris)), sample(ncol(iris)), drop = FALSE]
     ```
 
 2. __<span style="color:red">Q</span>__: How would you select a random sample of `m` rows from a data frame? What if the sample had to be contiguous (i.e., with an initial row, a final row, and every row in between)?  
    
-   __<span style="color:green">A</span>__: For example
+   __<span style="color:green">A</span>__: Selecting `m` random rows from a data frame can be achieved through subsetting.
     
     ```{r, eval = FALSE}
-    m=10
-    iris[sample(nrow(iris), m),]
-    
-    # Blockversion
+    m = 10
+    iris[sample(nrow(iris), m), ]
+    ```
+
+   Keeping subsequent rows together as a "[blocked sample](https://mlr.mlr-org.com/articles/tutorial/resample.html#stratification-blocking-and-grouping)" requires only a little bit more work.
+
+    ```{r, eval = FALSE}
+    # Bocking
     start <- sample(nrow(iris) - m + 1, 1)
     end <- start + m - 1
     iris[start:end, , drop = FALSE]
@@ -243,9 +254,8 @@
     
 3. __<span style="color:red">Q</span>__: How could you put the columns in a data frame in alphabetical order?  
    
-   __<span style="color:green">A</span>__: We can sort the column names first and then use the result to subset the data frame for all columns:
+   __<span style="color:green">A</span>__: We first sort the column names alphabetically and use this vector to subset the data frame:
 
     ```{r, eval = FALSE}
     iris[sort(names(iris))]
     ```
-    
