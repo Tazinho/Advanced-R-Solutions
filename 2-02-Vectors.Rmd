@@ -34,7 +34,7 @@
 
 3. __<span style="color:red">Q</span>__: Why is `1 == "1"` true? Why is `-1 < FALSE` true? Why is `"one" < 2` false?  
 
-   __<span style="color:green">A</span>__: These comparisons are carried out by operator-functions, which coerce their arguments to a common type. In the examples above these cases will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` turns into `"2"` (and numerals precede letters in ASCII).
+   __<span style="color:green">A</span>__: These comparisons are carried out by operator-functions, which coerce their arguments to a common type. In the examples above these cases will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` turns into `"2"` (and numerals precede letters in the lexiographic order (may depend on locale)).
 
 4. __<span style="color:red">Q</span>__: Why is the default missing value, `NA`, a logical vector? What's special about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)  
    
@@ -53,8 +53,11 @@
    
    __<span style="color:green">A</span>__: `setNames()` is implemented as:
    
-    ```{r}
-    setNames
+    ```{r, eval = FALSE}
+    setNames <- function (object = nm, nm){
+      names(object) <- nm
+      object
+    }
     ```
    
    Because the data argument comes first `setNames()` also works well with the magrittr-pipe operator. When no first argument is given, the result is a named vector:
@@ -67,11 +70,17 @@
    
    `unname()` is implemented in the following way:
    
-    ```{r}
-    unname
+    ```{r, eval = FALSE}
+    unname <- function (obj, force = FALSE){
+      if (!is.null(names(obj))) 
+        names(obj) <- NULL
+      if (!is.null(dimnames(obj)) && (force || !is.data.frame(obj))) 
+        dimnames(obj) <- NULL
+      obj
+    }
     ```
    
-   `unname()` removes existing names- and dimnames-attributes. Note that by default the dimnames attribute (names and row names) won't be affected for data frames.
+   `unname()` removes existing names- and dimnames-attributes. By default the dimnames attribute (names and row names) won't be affected for data frames.
    
 2. __<span style="color:red">Q</span>__: What does `dim()` return when applied to a 1d vector? When might you use `NROW()` or `NCOL()`?
     
@@ -82,7 +91,7 @@
    One may want to use `NROW()` or `NCOL()` to handle atomic vectors, lists and NULL values similar to one column matrices or data frames. For these objects `nrow()` and `ncol()` return `NULL`. This may occur in interactive data analysis, while subsetting data frames. 
 
     ```{r}
-    NROW(iris[, 1])  # default drop = TRUE results in vector
+    NROW(iris[, 1])  # subsetting with drop = TRUE (default) returns vector
     NCOL(iris[, 1])
     nrow(iris[, 1])
     ncol(iris[, 1])
@@ -162,19 +171,21 @@
 
    __<span style="color:green">A</span>__: To summarise:
    - Atomic vectors are always homogeneous (all elements must be of the same type). Lists may be heterogeneous (the elements can be of different types). 
-   - Atomic vectors point to only one address in memory, while lists contain a separate references for each element
+   - Atomic vectors point to one address in memory, while lists contain a separate references for each element.
 
     ```{r}
     lobstr::ref(1:2)
     lobstr::ref(list(1:2, 2))
     ```
     
-   - Subsetting with out of bound values or `NA`s leads to `NA`s for atomics and `NULL` values for lists
+   - Subsetting with out of bound values or `NA`s leads to `NA`s for atomics and `NULL` values for lists.
 
     ```{r}
+    # Subsetting atomic vectors
     (1:2)[3]
     (1:2)[NA]
     
+    # Subsetting lists
     as.list(1:2)[3]
     as.list(1:2)[NA]
     ```
@@ -183,23 +194,16 @@
    
    __<span style="color:green">A</span>__: A list is also a vector, though not an atomic one!
    
-   <!-- old: -->
-   <!-- To strip (flatten) the nested structure `as.vector()` doesn't work, because a list is already a vector. -->
-
 3. __<span style="color:red">Q</span>__: Compare and contrast `c()` and `unlist()` when combining a date and date-time into a single vector.
 
-   __<span style="color:green">A</span>__: Date and date-time objects are build upon doubles. Dates are represented as days, while date-time-objects (POSIXct) represent seconds (counted in regard to the reference date 1970-01-01, also known as "The Epoch").
+   __<span style="color:green">A</span>__: Date and date-time objects are build upon doubles. Dates are represented as days, while date-time-objects (POSIXct) represent seconds (counted in respect to the reference date 1970-01-01, also known as "The Epoch").
    
-   Let's define date and date-time objects:
+   When combining these objects method-dispatch leads to surprising output:
 
     ```{r}
     date    <- as.Date("1970-01-02")
     dttm_ct <- as.POSIXct("1970-01-01 01:00", tz = "UTC")
-    ```
-    
-   When combining these objects method-dispatch leads to surprising output:
 
-    ```{r}
     c(date, dttm_ct)  # equal to c.Date(date, dttm_ct) 
     c(dttm_ct, date)  # equal to c.POSIXct(date, dttm_ct)
     ```
@@ -224,21 +228,10 @@
     unlist(list(date, dttm_ct))  
     ```
 
-   We see that internally dates(-times) are doubles. Unfortunately this is all we are left with, when unlist strips the attributes of the list. (This wouldn't happen for vector input, but then we would have to combine the different classes into one vector, which is tricky as seen above.)
+   We see that internally dates(-times) are stored as doubles. Unfortunately this is all we are left with, when unlist strips the attributes of the list.
 
    To summarise: `c()` coerces types and errors may occur because of inappropriate method dispatch. `unlist()` strips attributes.
    
-<!-- ```{r} -->
-<!-- # interestingly combining date and POSIXlt is working -->
-<!-- dttm_lt <- as.POSIXlt(dttm_ct) -->
-<!-- c.POSIXlt(date, dttm_lt)  # o.k. -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- c(date,    dttm_ct) -->
-<!-- unlist(c(date,    dttm_ct)) # no difference -->
-<!-- ``` -->
-
-
 ## Data frames and tibbles
 1. __<span style="color:red">Q</span>__: Can you have a data frame with 0 rows? What about 0 columns?  
 
@@ -300,7 +293,7 @@
     ```
 
 
-## Old exercises
+## Exercises from AdvR I
 
 1. __<span style="color:red">Q</span>__: What does `dim()` return when applied to a vector?  
    __<span style="color:green">A</span>__: `NULL`
