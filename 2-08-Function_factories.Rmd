@@ -133,7 +133,15 @@ library(rlang)
 
 1. __<span style="color:red">Q</span>__: In `boot_model()`, why don't I need to force the evaluation of `df` or `model`?
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: `boot_model()` returns
+   
+    ```{r}
+    function() {
+      fitted + sample(resid)
+    }
+    ```
+    
+   Neither `df` nor `model` appear in it. The relevant values, `fitted` and `resid`, are calculated (and so evaluated) in the enclosing environment within `boot_model`. 
     
 2. __<span style="color:red">Q</span>__: Why might you formulate the Box-Cox transformation like this?
 

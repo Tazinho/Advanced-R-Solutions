@@ -29,7 +29,7 @@
 
 4. __<span style="color:red">Q</span>__: What function allows you to tell if an object is a function? What function allows you to tell if a function is a primitive function?
        
-   __<span style="color:green">A</span>__: You can test objects with `is.function` and `is.primitive`.
+   __<span style="color:green">A</span>__: You can test objects with `is.function()` and `is.primitive()`.
 
 5. __<span style="color:red">Q</span>__: This code makes a list of all functions in the base package. 
     
@@ -79,7 +79,7 @@
 
 7. __<span style="color:red">Q</span>__: When does printing a function not show what environment it was created in?  
 
-   __<span style="color:green">A</span>__: When it was created in the global environment.
+   __<span style="color:green">A</span>__: When it is a primitive function or when it was created in the global environment.
 
 ## Lexical Scoping
 
@@ -121,7 +121,7 @@
       
 ## Lazy evaluation
 
-1. __<span style="color:red">Q</span>__: What important property of `&&` make `x_ok()` work?
+1. __<span style="color:red">Q</span>__: What important property of `&&` makes `x_ok()` work?
 
     ```{r}
     x_ok <- function(x) {
@@ -190,7 +190,7 @@
     
 4. __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
   
-```{r include=FALSE}
+    ```{r}
     y <- 10
     f1 <- function(x = {y <- 1; 2}, y = 0) {
       c(x, y)
@@ -342,7 +342,9 @@
 
    __<span style="color:green">A</span>__: It invisibly returns `NULL`. It would be more useful to invisibly return the (data frame) object to be written as for example the **readr** package does. In this way it would be possible to save intermediate results from a sequence of processing steps directly, i.e. within a magrittr pipeline.
     
-3. __<span style="color:red">Q</span>__: How does the `chdir` parameter of `source()` compare to `in_dir()`? Why might you prefer one approach to the other? The `in_dir()` approach was given in the book as
+3. __<span style="color:red">Q</span>__: How does the `chdir` parameter of `source()` compare to `in_dir()`? Why might you prefer one approach to the other?
+
+The `in_dir()` approach was given in the book as
        
     ```{r, eval = FALSE}
     in_dir <- function(dir, code) {
