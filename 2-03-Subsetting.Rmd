@@ -27,7 +27,7 @@
     x[upper.tri(x)]
     ```  
     
-   __<span style="color:green">A</span>__: The implementation of `upper.tri()` is straightforwarward (take a look at the source code.) The input is transformed into a matrix of logicals. Its subsetting-behaviour will be identical to subsetting with logical matrices, where all elements that correspond to `TRUE` will be selected. We don´t need to treat this form of subsetting in a special way.
+   __<span style="color:green">A</span>__: The implementation of `upper.tri()` is straightforward (take a look at the source code.) The input is transformed into a matrix of logicals. Its subsetting-behaviour will be identical to subsetting with logical matrices, where all elements that correspond to `TRUE` will be selected. We don´t need to treat this form of subsetting in a special way.
 
 4. __<span style="color:red">Q</span>__: Why does `mtcars[1:20]` return an error? How does it differ from the similar `mtcars[1:20, ]`?  
    
@@ -35,133 +35,24 @@
 
 5. __<span style="color:red">Q</span>__: Implement your own function that extracts the diagonal entries from a matrix (it should behave like `diag(x)` where `x` is a matrix).
 
-   __<span style="color:green">A</span>__: First we copy the relevant part of the source code from the `diag()` function:
+   __<span style="color:green">A</span>__: The elements in the diagonal of a matrix have the same row- and column indices. This characteristic can be used to create a suitable numeric matrix used for subsetting.
 
-    ```{r, eval = FALSE}
-    function (x = 1, nrow, ncol){
-      if (is.matrix(x)) {
-        if (nargs() > 1L) # this and the next line will be dropped
-          stop("'nrow' or 'ncol' cannot be specified when 'x' is a matrix") 
-        
-        if ((m <- min(dim(x))) == 0L) 
-          return(vector(typeof(x), 0L))
-        
-        y <- x[1 + 0L:(m - 1L) * (dim(x)[1L] + 1)]
-        nms <- dimnames(x)
-        
-        if (is.list(nms) && 
-            !any(sapply(nms, is.null)) &&
-            identical(
-              (nm <- nms[[1L]][seq_len(m)]), nms[[2L]][seq_len(m)])
-        )
-          names(y) <- nm
-        
-        return(y)
-      }
-      }
-    ```
+```{r}
+diag2 <- function(x){
+  n <- min(dim(x))
+  indices <- seq_len(n)
+  diag_matrix <- matrix(rep(indices, 2), ncol = 2)
   
-   In the next step we drop the unncessary `nrow` and `ncol` argument and the related code in the 3rd and 4th line:
+  x[diag_matrix]
+}
 
-    ```{r}
-    diag_v <- function (x = 1) {
-      if (is.matrix(x)) {
-        if ((m <- min(dim(x))) == 0L) 
-          return(vector(typeof(x), 0L))
-        y <- x[1 + 0L:(m - 1L) * (dim(x)[1L] + 1)] # subsetting with a vector
-        nms <- dimnames(x)
-        if (is.list(nms) && !any(sapply(nms, is.null)) && identical((nm <- nms[[1L]][seq_len(m)]),
-                                                                    nms[[2L]][seq_len(m)]))
-          names(y) <- nm
-        return(y)
-      }
-      }
-    ```
-    
-   If we look for the idea to capture the diagonal elements, we can see that the input matrix is subsetted with a vector, so we called this function `diag_v()`. Of course we can implement our own function `diag_m()`, where we subset with a matrix.
-    
-    ```{r}
-    diag_m <- function (x = 1) {
-      if (is.matrix(x)) {
-        if ((m <- min(dim(x))) == 0L) 
-          return(vector(typeof(x), 0L))
-        y <- x[matrix(c(1:m,1:m), m)] # subsetting with a matrix
-        nms <- dimnames(x)
-        if (is.list(nms) && !any(sapply(nms, is.null)) && identical((nm <- nms[[1L]][seq_len(m)]), 
-                                                                        nms[[2L]][seq_len(m)])) 
-          names(y) <- nm
-        return(y)
-      }
-    }
-    ```
-    
-   Now we can check if we get the same results as the original function and also compare the speed. Therefore we convert the relatively large `diamonds` dataset from the `ggplot2` package into a matrix.
-    
-    ```{r}
-    diamonds_m <- as.matrix(ggplot2::diamonds)
-    
-    stopifnot(all.equal(diag(diamonds_m),
-                        diag_v(diamonds_m),
-                        diag_m(diamonds_m))) # our functions succeed the little test
-    
-    microbenchmark::microbenchmark(
-      diag(diamonds_m),
-      diag_v(diamonds_m),
-      diag_m(diamonds_m)
-    )
-    ```
-    
-   The original function seems to be a little bit faster than the trimmed and our matrix version. Maybe this is due to compiling issues
-    
-    ```{r}
-    diag_c <- compiler::cmpfun(diag)
-    diag_v_c <- compiler::cmpfun(diag_v)
-    diag_m_c <- compiler::cmpfun(diag_m)
-    
-    # Now we can make a fair comparison of the speed:
-    
-    microbenchmark::microbenchmark(
-      diag_c(diamonds_m),
-      diag_v_c(diamonds_m),
-      diag_m_c(diamonds_m)
-    )
-    ```
-    
-   We can see that our diag_m version is only a little bit slower than the original version. However the source code of the matrix version could be a bit easier to read.
-    
-   We could also take an idea from the source code of `upper.tri()` and subset with a logical vector (but it turns out to be really slow):
-       
-    ```{r}
-    diag_lv <- function (x = 1) {
-      if (is.matrix(x)) {
-        if ((m <- min(dim(x))) == 0L) 
-          return(vector(typeof(x), 0L))
-        y <- x[row(x) == col(x)]
-        nms <- dimnames(x)
-        if (is.list(nms) && !any(sapply(nms, is.null)) && identical((nm <- nms[[1L]][seq_len(m)]), 
-                                                                nms[[2L]][seq_len(m)])) 
-          names(y) <- nm
-        return(y)
-      }
-      }
-    ```
-    
-   compile it and compare it with the other versions  
-    
-    ```{r}
-    diag_lv_c <- compiler::cmpfun(diag_lv)
-    stopifnot(all.equal(diag(diamonds_m),
-                        diag_v_c(diamonds_m),
-                        diag_m_c(diamonds_m),
-                        diag_lv_c(diamonds_m))) # our functions succeed the little test
-    
-    microbenchmark::microbenchmark(
-      diag(diamonds_m),
-      diag_v_c(diamonds_m),
-      diag_m_c(diamonds_m),
-      diag_lv_c(diamonds_m)
-    )
-    ```
+# Let's check if it works
+(x <- matrix(1:25, 5))
+
+diag(x)
+diag2(x)
+```
+
 
 6. __<span style="color:red">Q</span>__: What does `df[is.na(df)] <- 0` do? How does it work?  
    
