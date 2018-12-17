@@ -27,7 +27,7 @@
     x[upper.tri(x)]
     ```  
     
-   __<span style="color:green">A</span>__: The implementation of `upper.tri()` is straightforward (take a look at the source code.) The input is transformed into a matrix of logicals. Its subsetting-behaviour will be identical to subsetting with logical matrices, where all elements that correspond to `TRUE` will be selected. We don´t need to treat this form of subsetting in a special way.
+   __<span style="color:green">A</span>__: `upper.tri()` returns a logical matrix containing `TRUE` for all upper diagonal elements and `FALSE` otherwise. The implementation of `upper.tri()` is straightforward, but quite interesting as it uses `.row(dim(x)) <= .col(dim(x))` to create the logical matrix. Its subsetting-behaviour will be identical to subsetting with logical matrices, where all elements that correspond to `TRUE` will be selected. We don't need to treat this form of subsetting in a special way.
 
 4. __<span style="color:red">Q</span>__: Why does `mtcars[1:20]` return an error? How does it differ from the similar `mtcars[1:20, ]`?  
    
@@ -37,21 +37,21 @@
 
    __<span style="color:green">A</span>__: The elements in the diagonal of a matrix have the same row- and column indices. This characteristic can be used to create a suitable numeric matrix used for subsetting.
 
-```{r}
-diag2 <- function(x){
-  n <- min(dim(x))
-  indices <- seq_len(n)
-  diag_matrix <- matrix(rep(indices, 2), ncol = 2)
+    ```{r}
+    diag2 <- function(x){
+      n <- min(dim(x))
+      index <- seq_len(n)
+      diag_indices <- matrix(rep(indices, 2), ncol = 2)
   
-  x[diag_matrix]
-}
+      x[diag_indices]
+    }
 
-# Let's check if it works
-(x <- matrix(1:25, 5))
+    # Let's check if it works
+    (x <- matrix(1:30, 5))
 
-diag(x)
-diag2(x)
-```
+    diag(x)
+    diag2(x)
+    ```
 
 
 6. __<span style="color:red">Q</span>__: What does `df[is.na(df)] <- 0` do? How does it work?  
@@ -120,7 +120,7 @@ diag2(x)
     
 ## Applications
 
-1. __<span style="color:red">Q</span>__: How would you randomly permute the columns of a data frame? (This is an important technique in random forests.) Can you simultaneously permute the rows and columns in one step?  
+1. __<span style="color:red">Q</span>__: How would you randomly permute the columns of a data frame? (This is an important technique in random forests). Can you simultaneously permute the rows and columns in one step?  
    
    __<span style="color:green">A</span>__: This can be achieved by combining `` `[` `` and `sample()`:
     
@@ -141,10 +141,9 @@ diag2(x)
     iris[sample(nrow(iris), m), ]
     ```
 
-   Keeping subsequent rows together as a "[blocked sample](https://mlr.mlr-org.com/articles/tutorial/resample.html#stratification-blocking-and-grouping)" requires only a little bit more work.
+   Keeping subsequent rows together as a "[blocked sample](https://mlr.mlr-org.com/articles/tutorial/resample.html#stratification-blocking-and-grouping)" requires only some caution to get the start- and end-index correct.
 
     ```{r, eval = FALSE}
-    # Bocking
     start <- sample(nrow(iris) - m + 1, 1)
     end <- start + m - 1
     iris[start:end, , drop = FALSE]
