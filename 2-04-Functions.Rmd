@@ -15,13 +15,13 @@
     (function(x) 3)()
     ```
 
-   __<span style="color:green">A</span>__: The second approach is correct. Using the first syntax we can directly convince ourselves that the function doesn't get called and instead a function object is returned containing the invalid function `3()`. When we try to evalute the function in the correct way we`ll consequently get an error:
+   __<span style="color:green">A</span>__: The second approach is correct. Using the first expression we can directly convince ourselves that the function doesn't get called and instead a function object is returned containing the invalid function `3()`. When we try to evaluate the function in the correct way we`ll consequently get an error:
    
     ```{r, error = TRUE}
     (function(x) 3())()
     ```
    
-   In contrast the second syntax ensures via parenthesis that the anonymous function doesn't contain a non valid function. It's obvious to see that the latter brackets are used to call the anonymous function.
+   In contrast the second expression ensures via parenthesis that the anonymous function doesn't contain a non valid function. It's obvious to see that the latter brackets are used to call the anonymous function.
    
 3. __<span style="color:red">Q</span>__: A good rule of thumb is that an anonymous function should fit on one line and shouldn't need to use `{}`. Review your code. Where could you have used an anonymous function instead of a named function? Where should you have used a named function instead of an anonymous function?  
     
@@ -47,6 +47,8 @@
    a. How could you adapt the code to find all primitive functions?  
     
    __<span style="color:green">A</span>__: 
+   
+   <!-- this needs some introduction -->
     
    a.  First we create a named vector that returns the number of arguments per function and then we subset it with the index of it's maximum entry:
         
