@@ -4,9 +4,11 @@
 
 1. __<span style="color:red">Q</span>__: Given a function, like `"mean"`, `match.fun()` lets you find a function. Given a function, can you find its name? Why doesn't that make sense in R?  
 
-   __<span style="color:green">A</span>__: If you know `body()`, `formals()` and `environment()` it can be possible to find the function. However, this won't be possible for primitive functions, since they return `NULL` for those three properties. Also annonymous functions won't be found, because they are not bound to a name. On the other hand it could be that different names in an environment contain binding to one (or more functions) with the same `body()`, `formals()` and `environment()` which means that the solution wouldn't be unique. More general: In R a (function) name has an object, but an object (i.e. a function) doesn't have a name (just a binding sometimes).
+   __<span style="color:green">A</span>__: If you know `body()`, `formals()` and `environment()` it can be possible to find the function. However, this approach won't be work for primitive functions, because they return `NULL` for these three properties. Also annonymous functions won't be found, because they are not bound to a name. It is also possible that different names in an environment contain bindings to one (or more functions) with the same `body()`, `formals()` and `environment()` properties. This means that the search wouldn't be unique <!-- eindeutig -->.
+
+   More general: A (function) name is always bound to an object, but an object (i.e. a function) doesn't have a name (just a binding sometimes). <!-- @hb: look this up again -->
    
-   Also: You "can only find the parents of an environment, not its children, so this is necessarily only going to be a partial search" (Hadley Wickham).
+   Also: You "can only find the parents of an environment, not its children, so this is necessarily only going to be a partial search" (Hadley Wickham). This means, that some function names in child environments will not be found. <!-- check this. -->
 
 2. __<span style="color:red">Q</span>__: It’s possible (although typically not useful) to call an anonymous function. Which of the two approaches below is correct? Why?
    
@@ -15,21 +17,23 @@
     (function(x) 3)()
     ```
 
-   __<span style="color:green">A</span>__: The second approach is correct. Using the first expression we can directly convince ourselves that the function doesn't get called and instead a function object is returned containing the invalid function `3()`. When we try to evaluate the function in the correct way we`ll consequently get an error:
+   __<span style="color:green">A</span>__: The first expression returns a function object instead of calling an anonymous function. An error occurrs when we evaluate this function, because the functions body `3()` is invalid.
    
     ```{r, error = TRUE}
     (function(x) 3())()
     ```
    
-   In contrast the second expression ensures via parenthesis that the anonymous function doesn't contain a non valid function. It's obvious to see that the latter brackets are used to call the anonymous function.
+   In the second expression the parentheses separate the body of the function `3` from the function call `()`.
    
 3. __<span style="color:red">Q</span>__: A good rule of thumb is that an anonymous function should fit on one line and shouldn't need to use `{}`. Review your code. Where could you have used an anonymous function instead of a named function? Where should you have used a named function instead of an anonymous function?  
     
-   __<span style="color:green">A</span>__: :) - please take a look a your recent projects. You can also make a mental note to assign names to your functions, whenever they start to span multiple lines.
+   __<span style="color:green">A</span>__: The use of anonymous functions may lead to more consise and elegant code. But they miss a descriptive name and because of this, it may take a while to figure out what they do. That's why its really helpful to give long and complex functions a descriptive name. You may take a look at your own projects (or some other project online) to reflect your own style.
+   
+<!-- @hb: describe advantages of anonymous functions more clearly. -->
 
 4. __<span style="color:red">Q</span>__: What function allows you to tell if an object is a function? What function allows you to tell if a function is a primitive function?
        
-   __<span style="color:green">A</span>__: You can test objects with `is.function()` and `is.primitive()`.
+   __<span style="color:green">A</span>__: To find out, if an object is a function `is.function()` can be used. To specifically check, if an object is a primitive function use `is.primitive()`.
 
 5. __<span style="color:red">Q</span>__: This code makes a list of all functions in the base package. 
     
@@ -46,9 +50,7 @@
    
    a. How could you adapt the code to find all primitive functions?  
     
-   __<span style="color:green">A</span>__: 
-   
-   <!-- this needs some introduction -->
+   __<span style="color:green">A</span>__: Let's look at each subquestion seperatly:
     
    a.  First we create a named vector that returns the number of arguments per function and then we subset it with the index of it's maximum entry:
         
