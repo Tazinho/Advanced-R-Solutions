@@ -322,7 +322,16 @@ library(lobstr)
 
 ## Modify-in-place
 
-1. __<span style="color:red">Q</span>__: Wrap the two methods for subtracting medians into two functions, then use the bench package to carefully compare their speeds. How does performance change as the number of columns increase?
+1. Explain why the following code doesn't create a circular list.
+
+    ```{r}
+    x <- list()
+    x[[1]] <- x
+    ```
+    
+   __<span style="color:green">A</span>__: 
+
+2. __<span style="color:red">Q</span>__: Wrap the two methods for subtracting medians into two functions, then use the bench package to carefully compare their speeds. How does performance change as the number of columns increase?
     
    __<span style="color:green">A</span>__: First, let's define a function to create some random data and a function to subtract the median from each column.
 
@@ -377,7 +386,7 @@ library(lobstr)
    
    For list input with less than ~ 800 columns, the cost of the additional data structure conversion is relatively big. For very wide data frames the overhead of the additional copies slows down the computation considerably. Apparently the choice of the faster function depends on the size of the data also.
 
-2. __<span style="color:red">Q</span>__: What happens if you attempt to use `tracemem()` on an environment?
+3. __<span style="color:red">Q</span>__: What happens if you attempt to use `tracemem()` on an environment?
 
    __<span style="color:green">A</span>__: `tracemem()` cannot be used to mark and trace environments.
 
