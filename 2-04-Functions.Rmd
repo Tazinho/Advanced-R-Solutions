@@ -167,20 +167,8 @@
     FALSE && NULL > 0
     FALSE &  NULL > 0
     ```
-
-2. __<span style="color:red">Q</span>__: The definition of `force()` is simple:
-
-    ```{r}
-    force
-    ```
     
-   Why is it better to `force(x)` instead of just `x`?
-    
-   __<span style="color:green">A</span>__: To be clear: `force(x)` is just syntactic sugar for `x`. However, as stated in the first edition of the textbook:
-    
-   > using this function clearly indicates that you’re forcing evaluation, not that you’ve accidentally typed `x`.
-    
-3. __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
+2. __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
 
     ```{r, eval = FALSE}
     f2 <- function(x = z) {
@@ -192,7 +180,7 @@
     
    __<span style="color:green">A</span>__: 100, lazy evaluation.
     
-4. __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
+3. __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
   
     ```{r}
     y <- 10
@@ -221,7 +209,7 @@
     f2()
     ```
 
-5. __<span style="color:red">Q</span>__: In `hist()`, the default value of `xlim` is `range(breaks)`, the default value for `breaks` is `"Sturges"`, and
+4. __<span style="color:red">Q</span>__: In `hist()`, the default value of `xlim` is `range(breaks)`, the default value for `breaks` is `"Sturges"`, and
 
     ```{r}
     range("Sturges")
@@ -254,7 +242,7 @@
    * checked that the differences between the breaks are strictly positive
    * during and after this process more variables are calculated and checks are made and finally `plot()` gets called, where `xlim` gets evaluated.
     
-6. __<span style="color:red">Q</span>__: Explain why this function works. Why is it confusing?
+5. __<span style="color:red">Q</span>__: Explain why this function works. Why is it confusing?
 
     ```{r}
     show_time <- function(x = stop("Error!")) {
@@ -268,7 +256,7 @@
     
    It's quite confusing, since there is no relation between the default value of `x` and its actual meaning in the context of the `show_time()` function. The user won't have any chance to guess the meaning of `x` or it's default value without looking up a possibly written documentation or analyzing of the source code.
 
-7. __<span style="color:red">Q</span>__: How many arguments are required when calling `library()`?
+6. __<span style="color:red">Q</span>__: How many arguments are required when calling `library()`?
 
    __<span style="color:green">A</span>__: Surprisingly no argument is required. When looking at `?library` we can see under usage, that library has nine arguments and two of them are without default arguments:
     
