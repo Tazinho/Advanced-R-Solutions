@@ -16,12 +16,24 @@ library(rlang)
 
 ## Factory fundamentals
 
-1. __<span style="color:red">Q</span>__: Base R contains two function factories, `approxfun()` and `ecdf()`. 
+1. __<span style="color:red">Q</span>__: The definition of `force()` is simple:
+
+    ```{r}
+    force
+    ```
+    
+   Why is it better to `force(x)` instead of just `x`?
+    
+   __<span style="color:green">A</span>__: To be clear: `force(x)` is just syntactic sugar for `x`. However, as stated in the first edition of the textbook:
+    
+   > using this function clearly indicates that you’re forcing evaluation, not that you’ve accidentally typed `x`.
+
+2. __<span style="color:red">Q</span>__: Base R contains two function factories, `approxfun()` and `ecdf()`. 
     Read their documentation and experiment to figure out what the functions do and what they return.
 
    __<span style="color:orange">A</span>__: TODO: the answers are partly provided in the "old exercises" subsection below.
 
-2. __<span style="color:red">Q</span>__: Create a function `pick()` that takes an index, `i`, as an argument and returns a function with an argument `x` that subsets `x` with `i`.
+3. __<span style="color:red">Q</span>__: Create a function `pick()` that takes an index, `i`, as an argument and returns a function with an argument `x` that subsets `x` with `i`.
 
     ```{r, eval = FALSE}
     pick(1)(x)
@@ -47,7 +59,7 @@ library(rlang)
     identical(lapply(mtcars, pick(5)), lapply(mtcars, function(x) x[[5]]))
     ```
 
-3. __<span style="color:red">Q</span>__: Create a function that creates functions that compute the i^th^ [central moment](http://en.wikipedia.org/wiki/Central_moment) of a numeric vector. You can test it by running the following code:
+4. __<span style="color:red">Q</span>__: Create a function that creates functions that compute the i^th^ [central moment](http://en.wikipedia.org/wiki/Central_moment) of a numeric vector. You can test it by running the following code:
 
     ```{r, eval = FALSE}
     m1 <- moment(1)
@@ -75,7 +87,7 @@ library(rlang)
     stopifnot(all.equal(m2(x), var(x) * 99 / 100))
     ```
 
-4. __<span style="color:red">Q</span>__: What happens if you don't use a closure? Make predictions, then verify with the code below.
+5. __<span style="color:red">Q</span>__: What happens if you don't use a closure? Make predictions, then verify with the code below.
 
     ```{r}
     i <- 0
@@ -100,7 +112,7 @@ library(rlang)
     new_counter2()
     ```
 
-5. __<span style="color:red">Q</span>__: What happens if you use `<-` instead of `<<-`? Make predictions, then verify with the code below.
+6. __<span style="color:red">Q</span>__: What happens if you use `<-` instead of `<<-`? Make predictions, then verify with the code below.
 
     ```{r}
     new_counter3 <- function() {
