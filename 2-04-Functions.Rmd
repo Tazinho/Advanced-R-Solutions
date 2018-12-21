@@ -17,13 +17,11 @@
     (function(x) 3)()
     ```
 
-   __<span style="color:green">A</span>__: The first expression returns a function object instead of calling an anonymous function. An error occurrs when we evaluate this function, because the functions body `3()` is invalid.
+   __<span style="color:green">A</span>__: The second approach is correct. In this approach the anonymous function `function(x) 3` is surrounded by a pair of brackets and followd by `()` which calls the former `(function(x) 3)`. The extra syntax is needed as otherwise the following `()` belong to the body of the anonymous function. Therefore, the expression in the first approach returns a function with the invalid body `3()` and we get a error when we call it:
    
     ```{r, error = TRUE}
     (function(x) 3())()
     ```
-   
-   In the second expression the parentheses separate the body of the function `3` from the function call `()`.
    
 3. __<span style="color:red">Q</span>__: A good rule of thumb is that an anonymous function should fit on one line and shouldn't need to use `{}`. Review your code. Where could you have used an anonymous function instead of a named function? Where should you have used a named function instead of an anonymous function?  
     
