@@ -102,59 +102,6 @@
    Next the inner `withCallingHandlers()` would print `c`, so the outer `withCallingHandlers()` prints again `b` (3).
    Finally `c` (4) gets printed.
 
-3. __<span style="color:red">Q</span>__: Read the source code for `catch_cnd()` and explain how it works.
-
-   __<span style="color:green">A</span>__: It basically returns the default result from a wrapped `tryCatch()`, where the expression is forced and ensured that in case of no signalled condition `NULL` is returned instead of the expression's return value. This ensures that we always get the first condition in a list (containing message and call) or `NULL`.
-    
-    ```{r}
-    rlang::catch_cnd
-    ```
-
-4. __<span style="color:red">Q</span>__: How could you rewrite `show_condition()` to use a single handler?
-
-   __<span style="color:green">A</span>__: We can simply use the `condition` argument of `tryCatch` as shown in `rlang::catch_cond()` above:
-    
-    ```{r}
-    show_condition2 <- function(code) {
-      tryCatch(
-        condition = function(cnd) {
-          if (inherits(cnd, "error"))   {return("error")}
-          if (inherits(cnd, "warning")) {return("warning")}
-          if (inherits(cnd, "message")) {return("message")}
-          },
-        {
-          code
-          NULL
-          }
-      )
-    }
-
-    show_condition2(stop("!"))
-    show_condition2(10)
-    show_condition2(warning("?!"))
-    show_condition2({
-      10
-      message("?")
-      warning("?!")
-    })
-    ```
-    
-   If one could ensure that `"error"`, `"warning"` and `"message"` are always in the next position of the `"condition"` class, this would also work:
-    
-    ```{r}
-    show_condition2 <- function(code) {
-      tryCatch(
-        condition = function(cnd) {
-          class(cnd)[length(class(cnd)) - 1L]
-          },
-        {
-          code
-          NULL
-        }
-      )
-    }
-    ```
-
 ## Custom conditions
 
 1. __<span style="color:red">Q</span>__: Inside a package, it’s occassionally useful to check that a package is installed before using it. Write a function that checks if a package is installed (with `requireNamespace("pkg", quietly = FALSE))` and if not, throws a custom condition that includes the package name in the metadata.
@@ -323,5 +270,61 @@
       interrupt = function(cnd) message("outer part"))
       
       message("No more bottles of beer on the wall, no more bottles of beer.")
+    }
+    ```
+
+## Old exercises
+
+
+1. __<span style="color:red">Q</span>__: Read the source code for `catch_cnd()` and explain how it works.
+
+   __<span style="color:green">A</span>__: It basically returns the default result from a wrapped `tryCatch()`, where the expression is forced and ensured that in case of no signalled condition `NULL` is returned instead of the expression's return value. This ensures that we always get the first condition in a list (containing message and call) or `NULL`.
+    
+    ```{r}
+    rlang::catch_cnd
+    ```
+
+2. __<span style="color:red">Q</span>__: How could you rewrite `show_condition()` to use a single handler?
+
+   __<span style="color:green">A</span>__: We can simply use the `condition` argument of `tryCatch` as shown in `rlang::catch_cond()` above:
+    
+    ```{r}
+    show_condition2 <- function(code) {
+      tryCatch(
+        condition = function(cnd) {
+          if (inherits(cnd, "error"))   {return("error")}
+          if (inherits(cnd, "warning")) {return("warning")}
+          if (inherits(cnd, "message")) {return("message")}
+          },
+        {
+          code
+          NULL
+          }
+      )
+    }
+
+    show_condition2(stop("!"))
+    show_condition2(10)
+    show_condition2(warning("?!"))
+    show_condition2({
+      10
+      message("?")
+      warning("?!")
+    })
+    ```
+    
+   If one could ensure that `"error"`, `"warning"` and `"message"` are always in the next position of the `"condition"` class, this would also work:
+    
+    ```{r}
+    show_condition2 <- function(code) {
+      tryCatch(
+        condition = function(cnd) {
+          class(cnd)[length(class(cnd)) - 1L]
+          },
+        {
+          code
+          NULL
+        }
+      )
     }
     ```
