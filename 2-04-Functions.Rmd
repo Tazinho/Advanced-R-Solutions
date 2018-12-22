@@ -478,7 +478,7 @@
     #> [1] "ab"
     ```
 
-   __<span style="color:green">A</span>__: We can simply override the `+` operator. In this case we need to take a bit of care to not use the `+` operator itself inside of the function definition, since otherwise we would end in an infinite recursion (a special case of an infinite loop). We also add `b = 0L` as a default value keep the behaviour of `+` as a unary operator, i.e. to keep `+ 1` working and not throwing an error:
+   __<span style="color:green">A</span>__: We can simply override the `+` operator. In this case we need to take a bit of care to not use the `+` operator itself inside of the function definition, since otherwise we would end in an infinite recursion (a special case of an infinite loop). We also add `b = 0L` as a default value to keep the behaviour of `+` as a unary operator, i.e. to keep `+ 1` working and not throwing an error:
     
     ```{r}
     `+` <- function(a, b = 0L){
