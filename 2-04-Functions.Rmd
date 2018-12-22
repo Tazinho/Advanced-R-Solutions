@@ -332,7 +332,7 @@
    
 2. __<span style="color:red">Q</span>__: What does `write.table()` return? What would be more useful?
 
-   __<span style="color:green">A</span>__: It invisibly returns `NULL`. It would be more useful to invisibly return the (data frame) object to be written as for example the **readr** package does. In this way it would be possible to save intermediate results from a sequence of processing steps directly, i.e. within a magrittr pipeline.
+   __<span style="color:green">A</span>__: `write.table()` writes its `x` object, usually a data frame or a matrix, to disk. It invisibly returns `NULL`. It would be more useful, if `write.table()` would (invisibly) return its `x` object. This would be useful to save intermediate results and directly take on further processing steps without breaking the flow of the code (i.e. breaking it into different lines). One package which uses this pattern is the readr package which is part of the so called tidyverse.
     
 3. __<span style="color:red">Q</span>__: How does the `chdir` parameter of `source()` compare to `in_dir()`? Why might you prefer one approach to the other?
 
