@@ -69,7 +69,6 @@
         `==`(0L) %>%
         sum()
       ```
-       
      As we already know from the textbook that `formals()` returns `NULL` for primitive functions, all of them are included in our count of 0-argument functions. To check how this affects our count, let's create a table of 0-argument functions, dividing them into primitive and non-primitive functions. Therefore, we filter the function list for 0-argument functions first. Then we check each of these functions for beeing primitive or not and finally create our table:
      
       ```{r}
@@ -78,7 +77,6 @@
         sapply(is.primitive) %>% 
         table()
       ```
-      
      Indeed, most of the 0-arguments functions in base R are primitive functions.
      
    c. To adapt the code in `Filter()` to find all primitive functions, we can simply change the predicate from `is.function()` to `is.primitive()`:
