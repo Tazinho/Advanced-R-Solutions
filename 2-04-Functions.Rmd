@@ -50,28 +50,42 @@
     
    __<span style="color:green">A</span>__: Let's look at each subquestion seperatly:
     
-   a.  First we create a named vector that returns the number of arguments per function and then we subset it with the index of it's maximum entry:
+   __<span style="color:green">A</span>__: Let's look at each subquestion seperately:
+  
+   a.  To find the function with the most arguments, we pipe the list of functions into a chain of iterations. First, we create a list of each function's arguments. Then we count the arguments for each function. Finally, we subset the result with its maximum element, returning us the name of the function with the most arguments and the corresponding number of arguments:
         
     ```{r}
-    f_arg_length <- sapply(funs, function(x) length(formals(x)))
-    f_arg_length[which.max(f_arg_length)]
+    funs %>% 
+      sapply(formals) %>%
+      lengths() %>% 
+      `[`(which.max(.))
     ```
     
-   b. We check the number of functions with `formals()` returning `0` or `NULL`. Then we will see, that all of these functions have `formals` equal to `NULL`, which means, that they should be primitive functions.
+   b. To find the number of 0-argument functions, we count the number of arguments again for each function. However, this time we check each count for beeing equal to `0` and sum up the result.
    
     ```{r}
-    sum(sapply(funs, function(x) is.null(formals(x)) | length(formals(x)) == 0))
-    sum(sapply(funs, function(x) !is.null(formals(x)) & length(formals(x)) == 0))
-    sum(sapply(funs, function(x) is.null(formals(x))))
-    sum(sapply(funs, function(x) is.null(formals(x)) & is.primitive(x)))
+    funs %>% sapply(formals) %>% 
+      lengths() %>%
+      `==`(0L) %>%
+      sum()
+    ```
+
+   As we already know from the textbook that `formals()` returns `NULL` for primitive functions, all of them are included in our count of 0-argument functions. To check how this affects our count, let's create a table of 0-argument functions, dividing them into primitive and non-primitive functions. Therefore, we filter the function list for 0-argument functions first. Then we check each of these functions for beeing primitive or not and finally create our table:
+    
+    ```{r}
+    funs %>%
+      Filter(function(x) length(formals(x)) == 0, .) %>% 
+      sapply(is.primitive) %>% 
+      table()
     ```
     
-   Hence not all functions with `formals` equal to `NULL` are primitive functions, there must be non primitive functions with this property too.  
-   c. Change the predicate in `Filter` to `is.primitive`:
+   Indeed, most of the 0-arguments functions in base R are primitive functions.
+
+   c. Change the predicate in `Filter()` to `is.primitive()`:
     
     ```{r, eval = FALSE}
     funs <- Filter(is.primitive, objs)
-    ```  
+    ```
     
 6. __<span style="color:red">Q</span>__: What are the three important components of a function?  
     
