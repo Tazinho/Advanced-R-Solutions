@@ -51,7 +51,7 @@
    __<span style="color:green">A</span>__: Let's look at each subquestion seperately:
   
    a.  To find the function with the most arguments, we pipe the list of functions into a chain of iterations. First, we create a list of each function's arguments. Then we count the arguments for each function. Finally, we subset the result with its maximum element, returning us the name of the function with the most arguments and the corresponding number of arguments:
-        
+   
       ```{r}
       library(magrittr)
       
@@ -60,7 +60,7 @@
         lengths() %>% 
         `[`(which.max(.))
       ```
-    
+      
    b. To find the number of 0-argument functions, we count the number of arguments again for each function. However, this time we check each count for beeing equal to `0` and sum up the result.
    
       ```{r}
@@ -69,9 +69,9 @@
         `==`(0L) %>%
         sum()
       ```
-
-   As we already know from the textbook that `formals()` returns `NULL` for primitive functions, all of them are included in our count of 0-argument functions. To check how this affects our count, let's create a table of 0-argument functions, dividing them into primitive and non-primitive functions. Therefore, we filter the function list for 0-argument functions first. Then we check each of these functions for beeing primitive or not and finally create our table:
-    
+       
+     As we already know from the textbook that `formals()` returns `NULL` for primitive functions, all of them are included in our count of 0-argument functions. To check how this affects our count, let's create a table of 0-argument functions, dividing them into primitive and non-primitive functions. Therefore, we filter the function list for 0-argument functions first. Then we check each of these functions for beeing primitive or not and finally create our table:
+     
       ```{r}
       funs %>%
         Filter(function(x) length(formals(x)) == 0, .) %>% 
@@ -79,14 +79,14 @@
         table()
       ```
     
-   Indeed, most of the 0-arguments functions in base R are primitive functions.
-
+     Indeed, most of the 0-arguments functions in base R are primitive functions.
+     
    c. To adapt the code in `Filter()` to find all primitive functions, we can simply change the predicate from `is.function()` to `is.primitive()`:
-    
-    ```{r, eval = FALSE}
-    funs <- Filter(is.primitive, objs)
-    ```
-    
+   
+      ```{r, eval = FALSE}
+      funs <- Filter(is.primitive, objs)
+      ```
+      
 6. __<span style="color:red">Q</span>__: What are the three important components of a function?  
     
    __<span style="color:green">A</span>__: Thse components are the function's `body()`, `formals()` and `environment()`. However, as mentioned in the textbook:
