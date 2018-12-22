@@ -162,7 +162,7 @@
     
     To highlight the relevant consequences of lazy evaluation for this example, let's look at the provided test cases and compare both versions of `x_ok()` for each of them.
     
-    - **`x = NULL`:** As `is.null(x)` returns `FALSE` also `&&()` returns `FALSE`. Because of lazy evaluation the other arguments of `&&()` are not even evaluated. This makes sense as when one part of a logical AND conjunction is `FALSE`, the whole logical conjunction must be `FALSE`. In contrast the `&()` function evaluates all of its arguments. Especially as the last part of `x_ok()`, `x > 0`, evaluates to `logical(0)`, it becomes relevant how the results are combined. As `&()` combines `FALSE` and `logical()` to `logical()` the `&`-version of `x_ok()` doesn't provide a desired result in this case.
+    - **`x = NULL`:** As `is.null(x)` returns `FALSE` also `&&()` returns `FALSE`. Because of lazy evaluation the other arguments of `&&()` are not even evaluated. This makes sense as when one part of a logical AND conjunction is `FALSE`, the whole logical conjunction must be `FALSE`. In contrast the `&()` function evaluates all of its arguments. Especially as the last part of `x_ok()`, `x > 0`, evaluates to `logical(0)`, it becomes relevant how the results are combined. As `&()` combines `FALSE` and `logical(0)` to `logical(0)` the `&`-version of `x_ok()` doesn't provide a desired result in this case.
     
     - **`x = 1`:** As all statements evaluate to `TRUE`. Both versions of `x_ok()` combine these into the desired output of `TRUE`.
     
