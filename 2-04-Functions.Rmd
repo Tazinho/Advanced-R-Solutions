@@ -503,6 +503,8 @@
    __<span style="color:green">A</span>__: We can find replacementfunctions by searching for functions that end on "<-":
    
     ```{r, eval = FALSE}
+    objs <- mget(ls("package:base"), inherits = TRUE)
+    funs <- Filter(is.function, objs)
     repls <- funs[grepl("<-$", names(funs))]
     Filter(is.primitive, repls)
     ```
