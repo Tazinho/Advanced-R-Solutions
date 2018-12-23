@@ -61,24 +61,24 @@ library(lobstr)
    Three main mechanisms ensure syntactically valid names (see `?make.names`):
    - The variable name will be prepended by an `X` when names do not start with a letter or start with a dot followed by a number
     
-    ```{r}
-    make.names("")
-    make.names(".1")
-    ```
+      ```{r}
+      make.names("")
+      make.names(".1")
+      ```
     
    - (additionally) non-valid characters are replaced by a dot
     
-    ```{r}
-    make.names("@")          # prepending + . replacement 
-    make.names("  ")         # prepending + .. replacement
-    make.names("non-valid")  # . replacement
-    ```
+      ```{r}
+      make.names("@")          # prepending + . replacement 
+      make.names("  ")         # prepending + .. replacement
+      make.names("non-valid")  # . replacement
+      ```
     
    - reserved R keywords (see `?reserved`) are appended by a dot
     
-    ```{r}
-    make.names("if")
-    ```
+      ```{r}
+      make.names("if")
+      ```
     
    Interestingly, some of these transformations are influenced by the current locale (from `?make.names`):
 
