@@ -322,7 +322,7 @@
     localTitle <- function(..., col, bg, pch, cex, lty, lwd) title(...)
     ```
     
-   So the call to `localTitle()` clearly gets the `col` parameter as part of `...` argument. To find out if it is used we try following the source code of `title()`, which leads us to a line of C code. Instead of following further, can we stay in R and look at `?title`, which brings some clarity on the fact that the `title()` function specifies four parts of the plot: Main (title of the plot), sub (sub-title of the plot) and both axis labels. Therefore it would introduce ambiguity inside `title()` to use `col` directly. Instead on has the option to supply `col` via the `...` argument as `col.labs` or as part of `xlab` (similar for `ylab`) in the form `xlab = list(c("index"), col = "red")`.
+   So the call to `localTitle()` clearly gets the `col` parameter as part of `...` argument. To find out if it is used we try following the source code of `title()`, which leads us to a line of C code. Instead of following further, can we stay in R and look at `?title`, which brings some clarity on the fact that the `title()` function specifies four parts of the plot: Main (title of the plot), sub (sub-title of the plot) and both axis labels. Therefore it would introduce ambiguity inside `title()` to use `col` directly. Instead one has the option to supply `col` via the `...` argument as `col.labs` or as part of `xlab` (similar for `ylab`) in the form `xlab = list(c("index"), col = "red")`.
 
 ## Exiting a function
 
