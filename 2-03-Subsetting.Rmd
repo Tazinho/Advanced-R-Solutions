@@ -156,3 +156,72 @@
     ```{r, eval = FALSE}
     iris[sort(names(iris))]
     ```
+
+# Control flow
+
+## Choices
+
+1. __<span style="color:red">Q</span>__: What type of vector does each of the following calls to `ifelse()`
+    return?
+
+    ```{r, eval = FALSE}
+    ifelse(TRUE, 1, "no")
+    ifelse(FALSE, 1, "no")
+    ifelse(NA, 1, "no")
+    ```
+
+    Read the documentation and write down the rules in your own words.
+
+   __<span style="color:green">A</span>__:
+
+2. __<span style="color:red">Q</span>__: Why does the following code work?
+
+    ```{r}
+    x <- 1:10
+    if (length(x)) "not empty" else "empty"
+      
+    x <- numeric()
+    if (length(x)) "not empty" else "empty"
+    ```
+
+   __<span style="color:green">A</span>__:
+
+## Loops
+
+1. __<span style="color:red">Q</span>__: Why does this code succeed without errors or warnings? 
+    
+    ```{r, results = FALSE}
+    x <- numeric()
+    out <- vector("list", length(x))
+    for (i in 1:length(x)) {
+      out[i] <- x[i] ^ 2
+    }
+    out
+    ```
+
+   __<span style="color:green">A</span>__:
+
+2. __<span style="color:red">Q</span>__: What does the following code tell you about when the vector being 
+    iterated over is evaluated?
+
+    ```{r}
+    xs <- c(1, 2, 3)
+    for (x in xs) {
+      xs <- c(xs, x * 2)
+    }
+    xs
+    ```
+
+   __<span style="color:green">A</span>__:
+
+3. __<span style="color:red">Q</span>__: What does the following code tell you about whe the index is updated?
+
+    ```{r}
+    for (i in 1:3) {
+      i <- i * 2
+      print(i) 
+    }
+    ```
+
+   __<span style="color:green">A</span>__:
+    
