@@ -4,7 +4,7 @@
 
 1. __<span style="color:red">Q</span>__: Given a name, like `"mean"`, `match.fun()` lets you find a function. Given a function, can you find its name? Why doesn't that make sense in R?  
 
-   __<span style="color:green">A</span>__: If you know `body()`, `formals()` and `environment()` it can be possible to find the function. However, this approach won't be work for primitive functions, because they return `NULL` for these three properties. Also annonymous functions won't be found, because they are not bound to a name. It is also possible that different names in an environment contain bindings to one (or more functions) with the same `body()`, `formals()` and `environment()` properties. This means that the search wouldn't be unique <!-- eindeutig -->.
+   __<span style="color:orange">A</span>__: If you know `body()`, `formals()` and `environment()` it can be possible to find the function. However, this approach won't be work for primitive functions, because they return `NULL` for these three properties. Also annonymous functions won't be found, because they are not bound to a name. It is also possible that different names in an environment contain bindings to one (or more functions) with the same `body()`, `formals()` and `environment()` properties. This means that the search wouldn't be unique <!-- eindeutig -->.
 
    More general: A (function) name is always bound to an object, but an object (i.e. a function) doesn't have a name (just a binding sometimes). <!-- @hb: look this up again -->
    
