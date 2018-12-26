@@ -238,9 +238,13 @@
     show_time()
     ```
     
-   __<span style="color:green">A</span>__: It works because functions are objects, that can be modified and overwritten, and because of of lazy evaluation. Before the `x` argument is evaluated, the `stop()` function is overwritten by another function which gets called in the last line where `x` is finally evaluated.
-    
-   It's quite confusing, since there is no relation between the default value of `x` and its actual meaning in the context of the `show_time()` function. The user won't have any chance to guess the meaning of `x` or it's default value without looking up a possibly written documentation or analyzing of the source code.
+   __<span style="color:green">A</span>__: Before `show_time()` accesses `x` (default `stop("Error")`), it overwrites the `stop()` function with `function(...) Sys.time()`. As default arguments are evaluated in the function environment, `x` gets evaluated as `Sys.time()`.
+   
+   `show_time()` is confusing, since its behaviour changes when `x`'s default value is supplied directly as it gets evalutad in the calling environment in this case.
+  
+    ```{r, error = TRUE}
+    show_time(stop("Error"))
+    ```
 
 6. __<span style="color:red">Q</span>__: How many arguments are required when calling `library()`?
 
