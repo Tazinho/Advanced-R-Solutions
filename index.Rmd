@@ -95,9 +95,9 @@ df_new[] <- lapply(df_new, as.character)
 df_new <- df_new %>% mutate(exercise = 1:n())
 
 df_new <- gather_(df_new, "chapter", "solved", setdiff(names(df_new), "exercise"))
-df_new <- df_new %>% filter(!is.na(solved))
+df_new <- df_new
 
-quote_solutions <- mean(df_new$solved == "x")
+quote_solutions <- mean(df_new$solved == "x", na.rm = TRUE)
 
 df_new <- df_new %>%
   separate(chapter, "nr", sep = " ", remove = FALSE) %>% 
@@ -130,8 +130,8 @@ solved_exercises <- ggplot(df_new, aes(x = chapter, fill = solved, group = -id))
   panel.background = element_blank()
   ) +
   ggtitle(paste0("Solved Exercises: ", round(100 * quote_solutions, 1), "% (2nd Edition)"),
-    subtitle = paste0("Solved: ", sum(df_new$solved == "x"),
-      "; Open: ", length(df_new$solved) - sum(df_new$solved == "x")
+    subtitle = paste0("Solved: ", sum(df_new$solved == "x", na.rm = TRUE),
+      "; Open: ", length(df_new$solved) - sum(df_new$solved == "x", na.rm = TRUE)
     )
   )
 
