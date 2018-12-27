@@ -31,7 +31,7 @@ library(purrr)
     ```{r}
     map_dbl(mtcars, sd)
     map_dbl(keep(iris, is.numeric), sd)
-    map_int(iris, ~ length(levels(.x)))
+    map_int(keep(iris, is.factor), ~ length(levels(.x)))
     ```
 
 4. __<span style="color:red">Q</span>__: The following code simulates the performance of a t-test for non-normal data. Extract the p-value from each test, then visualise.
