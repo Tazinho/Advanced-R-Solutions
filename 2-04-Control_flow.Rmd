@@ -42,7 +42,7 @@
     out
     ```
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: The elements we are iterating over are of length 0. Our loop goes from `i = 1` to `i = 0`. As we use `[<-` and `[` for indexing, we need to be aware of its subsetting behaviour for out of bounds and zero indices. During the first iteration `x[1]` will generate an `NA` (out of bound indexing for atomics). The resulting `NA` from squaring will be coerced to a list and assigned to the the empty length-1 list `out[1]` (out of bounds indexing for lists). Further `x[0]` will return `numeric(0)`. Again squaring doesn't change the value and `numeric(0)` gets coerced to `list()` when assigned to `out[0]`. Therefore, `out` doesn't change during the last iteration. This simply works, because it is valid R code.
 
 2. __<span style="color:red">Q</span>__: What does the following code tell you about when the vector being 
     iterated over is evaluated?
