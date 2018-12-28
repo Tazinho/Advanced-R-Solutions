@@ -274,13 +274,13 @@
     mean(1, 2, 3, na.omit = TRUE)
     ```
     
-   __<span style="color:green">A</span>__: # The arguments of `sum()` are `...` and `na.rm`.
+   __<span style="color:green">A</span>__: The arguments of `sum()` are `...` and `na.rm`.
    
     ```{r}
     str(sum)
     ```
     
-   For the `...` argument sum() expects numeric, complex or logical vector input (see `?sum`). A downside of `...` is that any misspelled arguments, like `na.omit` won't raise an error (when no further input checks are implemented). Instead, `na.omit` is treated as a logical element of the `...` argument, gets further coerced to `1` and used for summation. All other arguments are of course also part of the `...`. Therefore, `sum(1, 2, 3)` returns `6` and `sum(1, 2, 3, na.omit = TRUE)` returns `7`.
+   For the `...` argument sum() expects numeric, complex or logical vector input (see `?sum`). A downside of `...` is that any misspelled arguments, like `na.omit` won't raise an error (when no further input checks are implemented). Instead, `na.omit` is treated as a logical element of the `...` argument, gets further coerced to `1` and used for summation. All other arguments are - of course - also part of the `...`. Therefore, `sum(1, 2, 3)` returns `6` and `sum(1, 2, 3, na.omit = TRUE)` returns `7`.
    
    In contrast, the generic function `mean()` expects `x`, `trim`, `na.rm` and `...` for it's default method, `mean.default()`, which handles numeric and logical vector input for it's `x` argument (see `?mean`).
    
@@ -288,7 +288,7 @@
     str(mean.default)
     ```
    
-   As `mean()` uses `...` and `na.omit` is none of `mean()`'s named arguments (and also not a candidate for partial matching), `no.omit` becomes - again - part of the `...` argument, which isn't used any further inside `mean.default()`. The other supplied objects are matched regarding their order, i.e.: `x = 1`, `trim = 2` and `na.rm = 3`. As `x` is of length 1 and not `NA`, the settings of `trim` and `na.rm` do not affect the calculation of the mean and both calls return `1`.
+   As `mean()` uses `...` and `na.omit` is none of `mean()`'s named arguments (and also not a candidate for partial matching), `no.omit` becomes - again - part of the `...` argument, which isn't used any further inside `mean.default()`. The other supplied objects are matched regarding their order, i.e.: `x = 1`, `trim = 2` and `na.rm = 3`. As `x` is of length 1 and not `NA`, the settings of `trim` and `na.rm` do not affect the calculation of the mean and both calls (`mean(1, 2, 3)` and `mean(1, 2, 3, na.omit = TRUE)`) return `1`.
 
 2. __<span style="color:red">Q</span>__: In the following call, explain how to find the documentation for the named arguments in the following function call:
        
