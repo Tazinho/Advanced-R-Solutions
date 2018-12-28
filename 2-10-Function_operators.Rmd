@@ -25,25 +25,66 @@
    
    __<span style="color:green">A</span>__:
    
-3.  __<span style="color:red">Q</span>__: Create a FO that reports whenever a file is created or deleted in the working directory, using `dir()` and `setdiff()`. What other global function effects might you want to track?
+3.  __<span style="color:red">Q</span>__: Create a function operator that reports whenever a file is created or deleted in the working directory, using `dir()` and `setdiff()`. What other global function effects might you want to track?
    
-   __<span style="color:green">A</span>__:
-   
-4.  __<span style="color:red">Q</span>__: Write a FO that logs a timestamp and message to a file every time a function is run.
-   
-   __<span style="color:green">A</span>__:
-   
-5.  __<span style="color:red">Q</span>__: Modify `delay_by()` so that instead of delaying by a fixed amount of time, it ensures that a certain amount of time has elapsed since the function was last called. That is, if you called `g <- delay_by(1, f); g(); Sys.sleep(2); g()` there shouldn't be an extra delay.
-   
-   __<span style="color:green">A</span>__:
-   
-## Old exercises
-
-## Behavioural FOs
-
-1.  __<span style="color:red">Q</span>__: Write a FO that logs a time stamp and message to a file every time a 
-    function is run.
+   __<span style="color:green">A</span>__: We start with a short version to show the idea:
     
+    ```{r, eval = FALSE}
+    track_dir <- function(f){
+      force(f)
+      function(...){
+        dir_old <- dir()
+        on.exit(if(!setequal(dir(), dir_old)){
+          message("files in your working directory were deleted or added by this function")})
+        f(...)
+      }
+    }
+    
+    # the following test will create the file "delete_me" in your working directory
+    td <- track_dir(dir.create)
+    td("delete_me")
+    ```
+    
+    Of course we can provide more information on the type of changes:
+    
+    ```{r, eval = FALSE}
+    track_dir <- function(f){
+      force(f)
+      function(...){
+        dir_old <- dir()
+        
+        on.exit(if(!setequal(dir(), dir_old)){
+          message("Files in your working directory were deleted or added by this
+                  function.")}, add = TRUE)
+        on.exit(if(length(setdiff(dir_old, dir()) != 0)){
+          message(paste0("The following files were deleted: ",
+                         paste(setdiff(dir_old, dir()), collapse = ", ")
+                         ))}, add = TRUE)
+        on.exit(if(length(setdiff(dir(), dir_old) != 0)){
+          message(paste0("The following files were added: ", 
+                         paste(setdiff(dir(), dir_old), collapse = ", ")
+                         ))}, add = TRUE)
+        
+        f(...)
+      }
+    }
+
+    # the following test will again create two files in your working directory
+    td <- track_dir(sapply)
+    td(c("delete_me", "me_too"), dir.create)
+    ```
+    
+    Other global effects that might be worth tracking include changes regarding:
+    
+    * the search path and/or introduced `conflicts()`
+    * `options()` and `par()` which modify global settings
+    * the path of the working directory
+    * environment variables
+    * the locale.
+
+   
+4.  __<span style="color:red">Q</span>__: Write a function operator that logs a timestamp and message to a file every time a function is run.
+   
     __<span style="color:green">A</span>__: Note that the example will create a file file in your current working directory:
     
     ```{r, eval = FALSE}
@@ -62,6 +103,40 @@
     mean2(1:4, message = "first time") 
     mean2(1:4, message = "second_time")
     ```
+   
+5.  __<span style="color:red">Q</span>__: Modify `delay_by()` so that instead of delaying by a fixed amount of time, it ensures that a certain amount of time has elapsed since the function was last called. That is, if you called `g <- delay_by(1, f); g(); Sys.sleep(2); g()` there shouldn't be an extra delay.
+   
+   __<span style="color:green">A</span>__: We can do this with three little tricks (and the help
+    of 42):
+    
+    ```{r, eval = FALSE}
+    delay_by_v2 <- function(delay, f) {
+      force(f)
+      # we initialise the timestamp for the last run. We set a specific default value,
+      # to ensure that the first run of the returned function will never be delayed
+      last_runtime <- Sys.time() - (delay + 42)
+      function(...) {
+        # we continually check if enough time passed with an (empty) while statement.
+        while (Sys.time() < last_runtime + delay) {}
+        # we override the start for the next waiting interval.
+        # Note that this is done on exit (after the function is evaluated)
+        on.exit(last_runtime <<- Sys.time()) 
+        return(f(...))
+      }
+    }
+    ```
+    
+    Alternatively to the empty while statement we could have used `Sys.sleep()`. I would not recommend this solution, since `?Sys.sleep` indicates that `Sys.sleep()` might have some overhead and seems not to be as exact as we need.
+
+   
+## Old exercises
+
+## Behavioural FOs
+
+1.  __<span style="color:red">Q</span>__: Write a FO that logs a time stamp and message to a file every time a 
+    function is run.
+    
+    __<span style="color:green">A</span>__: 
 
 2.  __<span style="color:red">Q</span>__: What does the following function do? What would be a good name for it?
 
@@ -89,28 +164,7 @@
     `g <- delay_by(1, f); g(); Sys.sleep(2); g()` there shouldn't be an 
     extra delay.
     
-    __<span style="color:green">A</span>__: We can do this with three little tricks (and the help
-    of 42):
-    
-    ```{r, eval = FALSE}
-    delay_by_v2 <- function(delay, f) {
-      force(f)
-      # we initialise the timestamp for the last run. We set a specific default value,
-      # to ensure that the first run of the returned function will never be delayed
-      last_runtime <- Sys.time() - (delay + 42)
-      function(...) {
-        # we continually check if enough time passed with an (empty) while statement.
-        while (Sys.time() < last_runtime + delay) {}
-        # we override the start for the next waiting interval.
-        # Note that this is done on exit (after the function is evaluated)
-        on.exit(last_runtime <<- Sys.time()) 
-        return(f(...))
-      }
-    }
-    ```
-    
-    Alternatively to the empty while statement we could have used `Sys.sleep()`. I would not recommend this solution, since `?Sys.sleep` indicates that `Sys.sleep()` might have some overhead and seems not to be as exact as we need.
-
+    __<span style="color:green">A</span>__:
 4.  __<span style="color:red">Q</span>__: Write `wait_until()` which delays execution until a specific time.
 
     __<span style="color:green">A</span>__: 
@@ -250,61 +304,7 @@
     (Hint: use `dir()` and `setdiff()`.) What other global effects of 
     functions might you want to track?
     
-    __<span style="color:green">A</span>__: We start with a short version to show the idea:
-    
-    ```{r, eval = FALSE}
-    track_dir <- function(f){
-      force(f)
-      function(...){
-        dir_old <- dir()
-        on.exit(if(!setequal(dir(), dir_old)){
-          message("files in your working directory were deleted or added by this function")})
-        f(...)
-      }
-    }
-    
-    # the following test will create the file "delete_me" in your working directory
-    td <- track_dir(dir.create)
-    td("delete_me")
-    ```
-    
-    Of course we can provide more information on the type of changes:
-    
-    ```{r, eval = FALSE}
-    track_dir <- function(f){
-      force(f)
-      function(...){
-        dir_old <- dir()
-        
-        on.exit(if(!setequal(dir(), dir_old)){
-          message("Files in your working directory were deleted or added by this
-                  function.")}, add = TRUE)
-        on.exit(if(length(setdiff(dir_old, dir()) != 0)){
-          message(paste0("The following files were deleted: ",
-                         paste(setdiff(dir_old, dir()), collapse = ", ")
-                         ))}, add = TRUE)
-        on.exit(if(length(setdiff(dir(), dir_old) != 0)){
-          message(paste0("The following files were added: ", 
-                         paste(setdiff(dir(), dir_old), collapse = ", ")
-                         ))}, add = TRUE)
-        
-        f(...)
-      }
-    }
-
-    # the following test will again create two files in your working directory
-    td <- track_dir(sapply)
-    td(c("delete_me", "me_too"), dir.create)
-    ```
-    
-    Other global effects that might be worth tracking include changes regarding:
-    
-    * the search path and/or introduced `conflicts()`
-    * `options()` and `par()` which modify global settings
-    * the path of the working directory
-    * environment variables
-    * the locale.
-
+    __<span style="color:green">A</span>__:
 ## Input FOs
 
 1.  __<span style="color:red">Q</span>__: Our previous `download()` function only downloads a single file. How can 
