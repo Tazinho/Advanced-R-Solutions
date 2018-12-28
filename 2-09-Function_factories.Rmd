@@ -177,7 +177,7 @@ library(rlang)
 
 3. __<span style="color:red">Q</span>__: Why don't you need to worry that `boot_permute()` stores a copy of the data inside the function that it generates?
 
-   __<span style="color:green">A</span>__: Anything created in a manufactured function, like those returned by `boot_compute()`, gets created in the function's execution environment. As we've learned in the environments chapter, execution environments are ephemeral: once the function has completed, the environment will be garbage collected. As long as we don't return the execution environment and assign the referencing object any further, we don't have to worry about it. Therefore, we have to be careful in case we are explicitly returning the environment or another function, which carries the execution environment further as it's enclosing enviornment.
+   __<span style="color:green">A</span>__: Anything created in a manufactured function, like those returned by `boot_compute()`, gets created in the function's execution environment. As we've learned in the environments chapter, execution environments are ephemeral: once the function has completed, the environment will be garbage collected. As long as we don't return the execution environment and assign the referencing object any further, we don't have to worry about it. Therefore, we have to be careful in case we are explicitly returning the environment or another function, which carries the execution environment as it's enclosing enviornment.
 
 4. __<span style="color:red">Q</span>__: How much time does `ll_poisson2()` save compared to `ll_poisson1()`?
     Use `bench::mark()` to see how much faster the optimisation occurs.
