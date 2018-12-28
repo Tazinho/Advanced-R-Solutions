@@ -31,7 +31,11 @@ library(rlang)
 2. __<span style="color:red">Q</span>__: Base R contains two function factories, `approxfun()` and `ecdf()`. 
     Read their documentation and experiment to figure out what the functions do and what they return.
 
-   __<span style="color:orange">A</span>__: TODO: the answers are partly provided in the "old exercises" subsection below.
+   __<span style="color:orange">A</span>__:
+   
+   - **`approxfun()`**: `approxfun()` basically takes a combination of 2-dimensional data points + some extra specifications as arguments and returns a stepwise linear or constant interpolation function (defined on the range of given x-values, by default).
+
+   - **`ecdf()`**: `ecdf()` means empirical density function. For a numeric vector, ecdf() returns the appropriate density function (of class “ecdf”, which is inheriting from class “stepfun”). You can describe it’s behaviour in 2 steps. In the first part of it’s body, the (x,y) pairs for the nodes of the density function are calculated. In the second part these pairs are given to approxfun.
 
 3. __<span style="color:red">Q</span>__: Create a function `pick()` that takes an index, `i`, as an argument and returns a function with an argument `x` that subsets `x` with `i`.
 
