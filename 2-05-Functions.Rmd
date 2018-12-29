@@ -203,31 +203,8 @@
     
    Explain how `hist()` works to get a correct `xlim` value.
     
-   __<span style="color:green">A</span>__: Before the `hist()` function creates the final plot where `xlim` is provided and finally evaluated, the `hist()` function internally updates and checks the value of `breaks` several times to ensure that it is finally a numeric vector with at least two elements.
-    
-   The detailed behaviour is very specific to the input. According to `?hist` this must be one of:
-   * a vector giving the breakpoints between histogram cells,
-   * a function to compute the vector of breakpoints,
-   * a single number giving the number of cells for the histogram,
-   * a character string naming an algorithm to compute the number of cells (see ‘Details’),
-   * a function to compute the number of cells.
-    
-   Further:
-    
-   > In the last three cases the number is a suggestion only; as the breakpoints will be set to pretty values, the number is limited to 1e6 (with a warning if it was larger). If breaks is a function, the x vector is supplied to it as the only argument (and the number of breaks is only limited by the amount of available memory).
-    
-   In case of `breaks = "Sturges"` this means that `breaks` is:
-   * checked that it is provided (a corresponding flag is set; otherwise it is set to `nclass` regarding that is provided)
-   * checked that its length is greater than 1 (a corresponding flag is set)
-   * converted to lower case and matched to "sturges"
-   * set to an integer value via `sturges = nclass.Sturges(x)` inside a `switch()` statement
-   * checked that it is now numeric, finite and at least 1
-   * set to 1000000 if it is greater than 1000000
-   * turned into a numeric vector of length (possibly) greater one via `pretty(range(x), n = breaks, min.n = 1)`
-   * checked that its length is now greater than 1 and not `NA`
-   * checked that the differences between the breaks are strictly positive
-   * during and after this process more variables are calculated and checks are made and finally `plot()` gets called, where `xlim` gets evaluated.
-    
+   __<span style="color:green">A</span>__: The `xlim` argument of `hist()` is required to terminate the range of the histogram's x-axis. In order to provide a valid axis, `xlim` must contain a numeric vector of exactly two unique values. This holds at least, when the `plot` argument is set to `TRUE`, as otherwise no x-axis is needed. Therefore, when `xlim` is left as the default (`range(breaks)`), `breaks` must evaluate to a vector of at least two unique values. As the breakpoints for any histogram with at least one cell should suffice this condition, this requirement is consistent with our expectations. `hist()` technically achieves this by overwriting the `breaks` argument internally. As the `breaks` argument is quite flexible and allows the users to provide the breakpoints directly or compute them (or the related number of cells) in several ways, the detailled behaviour is quite specific to the input. However, via several internal checks, `hist()` ensures that `breaks` evaluates to a numeric vector containing at least two unique elements, before `xlim` gets accesed and evaluated and the final result of `hist()` is ready to be plotted.
+   
 5. __<span style="color:red">Q</span>__: Explain why this function works. Why is it confusing?
 
     ```{r}
