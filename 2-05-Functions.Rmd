@@ -412,12 +412,17 @@
 
     ```{r, eval = FALSE}
     x <- sample(replace = TRUE, 20, x = c(1:10, NA))
-    # -> sample(x = c(1:10, NA), size = 20, replace = TRUE)
     y <- runif(min = 0, max = 1, 20)
-    # -> runif(n = 20, min = 0, max = 1)
     cor(m = "k", y = y, u = "p", x = x)
-    # -> cor(x = x, y = y, use = "pairwise.complete.obs", method = "pearson")
     ```  
+    
+   __<span style="color:green">A</span>__: Since none of these functions provides a `...` argument, we only need to consider, that function arguments are first machted by exactly, then via partial matching and finally by position. This leads us to:
+   
+    ```{r, eval = FALSE}
+    x <- sample(x = c(1:10, NA), size = 20, replace = TRUE)
+    y <- runif(n = 20, min = 0, max = 1)
+    cor(x = x, y = y, use = "pairwise.complete.obs", method = "pearson")
+    ```
     
 3. __<span style="color:red">Q</span>__: Explain why the following code fails:
 
