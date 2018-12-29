@@ -431,7 +431,7 @@
     #> Error: target of assignment expands to non-language object
     ```
     
-   __<span style="color:green">A</span>__: First let define `x` and recall the definition of `modify()` from the textbook:
+   __<span style="color:green">A</span>__: First, let's define `x` and recall the definition of `modify()` from the textbook:
     
     ```{r}
     x <- 1:3
@@ -442,21 +442,28 @@
     }
     ```
     
-   As described in the textbook R turns the code behind the scenes into
+   As described in the textbook, R turns the code behind the scenes literally into
     
     ```{r, eval = FALSE}
     get("x") <- `modify<-`(get("x"), 1, 10)
-    #> Error in get("x") <- `modify<-`(get("x"), 1, 10) : target of assignment expands to non-language object
     ```
     
-   which can not work, because `get()` has no equivalent replacement function. To confirm this claim, we can reproduce the error via an easier example
+   When we try to evaluate the code, R returns the same error message as above:
+   
+    ```{r, eval = FALSE}
+    get("x") <- `modify<-`(get("x"), 1, 10)
+    #> Error in get("x") <- `modify<-`(get("x"), 1, 10) : 
+         target of assignment expands to non-language object
+    ```
+    
+   The error occures during the assignment, as no corresponding replacement function, i.e. `get<-` does exists for `get()`. To confirm this claim, we can reproduce the error via an easier example
     
     ```{r, eval = FALSE}
     get("x") <- 2
     #> Error in get("x") <- 2 : target of assignment expands to non-language object
     ```
     
-   and modify the example to use a function with an available replacement function:
+   To improve the code, we can modify the example to use the `names()` function, which has a corresponding replacement function:
     
     ```{r}
     modify(names(x), 1) <- 10
