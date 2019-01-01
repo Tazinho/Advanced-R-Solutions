@@ -57,7 +57,12 @@
     catch_cnd(abort("An error"))
     ```
     
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: In contrast to `stop()` which conatines the call, `abort()` stores the whole backtrace genereated by `rlang::trace_back()`: 
+   
+    ```{r, error = TRUE}
+    str(catch_cnd(stop("An error")))
+    str(catch_cnd(abort("An error")))
+    ```
 
 2. __<span style="color:red">Q</span>__: Predict the results of evaluating the following code
 
