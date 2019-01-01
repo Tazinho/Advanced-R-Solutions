@@ -272,9 +272,7 @@
     
 3. __<span style="color:red">Q</span>__:  How would you modify the `catch_cnds()` defined if you wanted to recreate the original intermingling of warnings and messages?
 
-   __<span style="color:orange">A</span>__: (TODO: Need to resolve the 2nd issue below; maybe via the parent option from rlang's signalling functions...) The output of `catch_cnds()` should be returned in the order: messages, then errors, then warnings. Also messages inside warnings (and vice versa) should be denoted appropriately.
-   
-   To resolve the first issue, we order the output accordinly:
+   __<span style="color:green">A</span>__: The output of `catch_cnds()` should be returned in the order: messages, errors, warnings. To resolve the this we sort the output accordinly:
 
     ```{r}
     catch_cnds <- function(expr) {
@@ -335,7 +333,7 @@
     }
     ```
     
-   __<span style="color:orange">A</span>__: Basically there seems to be an issue that interrupts are not handled in a general way, but seem to depend on the R interface and the implementation of the R code which is interrupted. Not sure if I understand this correct, but there needs to be a way from the frontend to supply the r code with the info that an interrupt has happened and the r code itself needs to check for this information regularly.
+   __<span style="color:green">A</span>__: Basically there seems to be an issue that interrupts are not handled in a general way, but seem to depend on the R interface and the implementation of the R code which is interrupted. Not sure if I understand this correct, but there needs to be a way from the frontend to supply the r code with the info that an interrupt has happened and the r code itself needs to check for this information regularly.
    
    This issue is tracked i.e. here https://github.com/HenrikBengtsson/Wishlist-for-R/issues/47 and reported also here https://www.r-bloggers.com/interrupting-r-processes-in-ubuntu/ and more official documentation is for example under `?setTimeLimit`:
    
