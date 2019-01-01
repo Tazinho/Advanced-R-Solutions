@@ -272,7 +272,45 @@
     
 3. __<span style="color:red">Q</span>__:  How would you modify the `catch_cnds()` defined if you wanted to recreate the original intermingling of warnings and messages?
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:orange">A</span>__: (TODO: Need to resolve the 2nd issue below; maybe via the parent option from rlang's signalling functions...) The output of `catch_cnds()` should be returned in the order: messages, then errors, then warnings. Also messages inside warnings (and vice versa) should be denoted appropriately.
+   
+   To resolve the first issue, we order the output accordinly:
+
+    ```{r}
+    catch_cnds <- function(expr) {
+      conds <- list()
+      add_cond <- function(cnd) {
+        conds <<- append(conds, list(cnd))
+        cnd_muffle(cnd)
+      }
+  
+      tryCatch(
+        error = function(cnd) {
+          conds <<- append(conds, list(cnd))
+        },
+        withCallingHandlers(
+          message = add_cond,
+          warning = add_cond,
+          expr
+        )
+      )
+  
+      filter_cndts <- function(conds, condition) {
+        Filter(function(x) inherits(x, condition), conds)
+      }
+  
+      c(filter_cndts(conds, "message"),
+        filter_cndts(conds, "error"),
+        filter_cndts(conds, "warning"))
+    }
+    
+    # Test
+    catch_cnds({
+      inform("a")
+      warn("b")
+      inform("c")
+    })
+    ```
    
 4. __<span style="color:red">Q</span>__:  Why is catching interrupts dangerous? Run this code to find out.
 
