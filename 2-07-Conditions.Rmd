@@ -217,12 +217,13 @@
 
 1. __<span style="color:red">Q</span>__: Create `suppressConditions()` that works like `suppressMessages()` and `supressWarnings()` but supresses everything. Think carefully about how you should handle errors.
 
-   __<span style="color:orange">A</span>__: (The exercise might not be completely solved, as we would like to return also `NULL` in the test below. In other words, execution shouldn't be stopped by the error). In general we would like to catch any error, since they contain important information for debugging. So in order to suppress the error message and hide the returned error object from the console, we handle errors within a `tryCatch()` and return the error object invisible:
+   __<span style="color:green">A</span>__: In general we would like to catch errors, since they contain important information for debugging. So in order to suppress the error message and hide the returned error object from the console, we handle errors within a `tryCatch()` and return the error object invisible:
 
     ```{r}
     suppressErrors <- function(expr) {
       tryCatch(
         error = function(cnd) invisible(cnd),
+        interrupt = function(cnd) stop("Terminated by the user", call. = FALSE),
         expr
       )
     }
@@ -244,9 +245,10 @@
         warning("warning")
         message("message")
         abort("error")
-        NULL
       }
     ))
+    
+    NULL
     ```
 
 2. __<span style="color:red">Q</span>__: Compare the following two implementations of `message2error()`. What is the main advantage of `withCallingHandlers()` in this scenario? (Hint: look carefully at the traceback.)
