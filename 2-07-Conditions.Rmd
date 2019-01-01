@@ -270,7 +270,7 @@
     
    __<span style="color:green">A</span>__: Calling handlers are called in the context of the call that signalled the condition and exiting handlers are called in the context of the call to `tryCatch()`. Therefore, the `withCallingHandlers()` version is more informative as it points us to the exact call in the context of our code.
    
-    ```{r}
+    ```{r, error = TRUE}
     message2error1 <- function(code) {
       withCallingHandlers(code, message = function(e) stop("error"))
     }
