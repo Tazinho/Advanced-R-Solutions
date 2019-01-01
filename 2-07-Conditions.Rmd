@@ -372,14 +372,3 @@
       message("No more bottles of beer on the wall, no more bottles of beer.")
     }
     ```
-
-## Old exercises
-
-1. __<span style="color:red">Q</span>__: What does `options(error = recover)` do? Why might you use it?
-
-   __<span style="color:green">A</span>__: In case of `options(error = recover)` `utils::recover()` will be called (without arguments) in case of an error. This will print out a list of calls which precede the error and lets the user choose to incorporate `browser()` directly in any of the regarding environments allowing a practical mode for debugging.
-
-2. __<span style="color:red">Q</span>__: What does `options(error = quote(dump.frames(to.file = TRUE)))` do? Why might you use it?
-
-   __<span style="color:green">A</span>__: This option writes a dump of the evaluation environment where an error occurs into a file ending on `.rda`. When this option is set, R will continue to run after the first error. To stop R at the first error use `quote({dump.frames(to.file=TRUE); q()})`. These options are especially useful for debugging non-interactive R scripts afterwards ("post mortem debugging").
-
