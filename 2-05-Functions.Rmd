@@ -487,27 +487,28 @@
     rm(`+`)
     ```
 
-6. __<span style="color:red">Q</span>__: Create a list of all the replacement functions found in the base package.
-   Which ones are primitive functions? (Hint use `apropros()`)
+6. __<span style="color:red">Q</span>__: Create a list of all the replacement functions found in the base package. Which ones are primitive functions? (Hint use `apropos()`)
    
-   __<span style="color:green">A</span>__: Following the hint to use `apropros()` it becomes clear, that we have to search for functions with a specific naming pattern. As replacement functions end on `<-` by convention, we need to search for these objects via the regular expression `<-$`. However, `apropros()` makes it a little bit harder to work with environments explicitly, we use `ls()` instead and adopt a bit of the code from a previous exercise. After finding all objects in the base package which end on `<-`, we filter these to ensure they are functions. In the same manner we will further filter those which are primitive functions.
+   __<span style="color:green">A</span>__: The hint suggests to look for functions with a specific naming pattern: Replacement functions conventionally end on `<-`. We can search these objects with a regular expression (`<-$`). 
+   
+   However, instead of `apropros()`we will use `ls()` and adopt a bit of the code from a previous exercise. (This makes it easier to work with environments explicitly.) From all the objects in the base package which end on `<-`, we subset the functions. Additionally, we also filter for primitive functions.
    
     ```{r}
-    repl_objs <- mget(ls("package:base", all = TRUE, pattern = "<-$"),
+    repl_objects <- mget(ls("package:base", all.names = TRUE, pattern = "<-$"),
                       inherits = TRUE)
-    repl_funs <- Filter(is.function, repl_objs)
-    length(repl_funs)
+    repl_functions <- Filter(is.function, repl_objects)
+    length(repl_functions)
     ```
    
-   Overall base R contains `r length(repl_funs)` replacement functions. The following `r length(Filter(is.primitive, repl_funs))` of them are also primitive functions:
+   Overall base R contains `r length(repl_functions)` replacement functions. The following `r length(Filter(is.primitive, repl_functions))` of them are also primitive functions:
    
     ```{r}
-    names(Filter(is.primitive, repl_funs))
+    names(Filter(is.primitive, repl_functions))
     ```
 
 7. __<span style="color:red">Q</span>__: What are valid names for user-created infix functions?  
   
-   __<span style="color:green">A</span>__: As the section on "Function Forms" tells us:
+   __<span style="color:green">A</span>__: Let's cite **Advanced R** here (section on "Function Forms"):
    
    > ... names of infix functions are more flexible than regular R functions: they can contain any sequence of characters except “%”.
 
@@ -521,22 +522,23 @@
     }
     ```
 
-9. __<span style="color:red">Q</span>__: Create infix versions of the set functions `intersect()`, `union()`, and
-   `setdiff()`. You might call them `%n%`, `%u%`, and `%/%` to match 
-   conventions from mathematics.
+9. __<span style="color:red">Q</span>__: Create infix versions of the set functions `intersect()`, `union()`, and`setdiff()`. You might call them `%n%`, `%u%`, and `%/%` to match conventions from mathematics.
    
    __<span style="color:green">A</span>__: 
    
     ```{r}
-    `%union_%` <- function(a, b){
+    `%n%` <- function(a, b){
+      unique(a[a %in% b])
+    }
+
+    `%u%` <- function(a, b){
       unique(c(a, b))
     }
 
-    `%intersect_%` <- function(a, b){
-      unique(c(a[a %in% b], b[b %in% a]))
-    }
-
-    `%setdiff_%` <- function(a, b){
+    `%/%` <- function(a, b){
       a[!a %in% b]
     }
     ```
+
+
+
