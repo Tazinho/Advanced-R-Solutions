@@ -331,21 +331,17 @@ library(lobstr)
     x[[1]] <- x
     ```
     
-   __<span style="color:orange">A</span>__: The code doesn't create a circular list, since during the creation of the first element copy-on-modify gets triggered. Therefore, the memmory address of `x` changes and the newly created first element of `x` will contain a reference to the old address of `x`. Let us illustrate the details on the code from above:
+   __<span style="color:orange">A</span>__: In this situation Copy-on-modify prevents the creation of a circular list. Let's step through the details as follows:
    
     ```{r}
-    # We create x again, determine its address and track any copies that may occur via tracemem.
-    x <- list()
-    lobstr::obj_addr(x)
+    x <- list()      # creates initial object
+    obj_addr(x)
     
-    # Now we create the first element of x. This should trigger one copy.
-    x[[1]] <- x
+    tracemem(x)
+    x[[1]] <- x  # Copy-on-modify triggers new copy
     
-    # Therfore, the memory address and the value of the first element correspond to the initial ones of x.
-    lobstr::obj_addr(x[[1]])
-    
-    # However, x and it's memory address have clearly changed.
-    lobstr::obj_addr(x)
+    obj_addr(x)       # copied object has new memory address
+    obj_addr(x[[1]])  # list element contains old memory adress
     ```
 
 2. __<span style="color:red">Q</span>__: Wrap the two methods for subtracting medians into two functions, then use the bench package to carefully compare their speeds. How does performance change as the number of columns increase?
