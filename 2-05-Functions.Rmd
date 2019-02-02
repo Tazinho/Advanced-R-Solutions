@@ -4,10 +4,9 @@
 
 1. __<span style="color:red">Q</span>__: Given a name, like `"mean"`, `match.fun()` lets you find a function. Given a function, can you find its name? Why doesn't that make sense in R?  
 
-   __<span style="color:orange">A</span>__: If you know `body()`, `formals()` and `environment()` it can be possible to find the function. However, this approach won't be work for primitive functions, because they return `NULL` for these three properties. Also annonymous functions won't be found, because they are not bound to a name. It is also possible that different names in an environment contain bindings to one (or more functions) with the same `body()`, `formals()` and `environment()` properties. This means that the search wouldn't be unique <!-- eindeutig -->.
+   __<span style="color:orange">A</span>__: If you know `body()`, `formals()` and `environment()` it is generally possible to find the corresponding function. (The search doesn't work for primitive functions, because they return `NULL` for these three properties and they are not bound to a name.) The search may also be ambiguous, because different names in an environment may contain bindings to more than one function with the same `body()`, `formals()` and `environment()` properties.
 
-   More general: A (function) name is always bound to an object, but an object (i.e. a function) doesn't have a name (just a binding sometimes). <!-- @hb: look this up again -->
-   
+   Keep in mind: A (function) name has to be bound to an object, but an object (i.e. a function) doesn't always have a name. <!-- @hb: look this up again -->
    Also: You "can only find the parents of an environment, not its children, so this is necessarily only going to be a partial search" (Hadley Wickham). This means, that some function names in child environments will not be found. <!-- check this. -->
 
 2. __<span style="color:red">Q</span>__: It’s possible (although typically not useful) to call an anonymous function. Which of the two approaches below is correct? Why?
@@ -17,21 +16,26 @@
     (function(x) 3)()
     ```
 
-   __<span style="color:green">A</span>__: The second approach is correct. In this approach the anonymous function `function(x) 3` is surrounded by a pair of brackets and followed by `()` which calls the former `(function(x) 3)`. The extra syntax is needed as otherwise the following `()` belong to the body of the anonymous function. Therefore, the expression in the first approach returns a function with the invalid body `3()` and we get an error when we call it:
+   __<span style="color:green">A</span>__: The second approach is correct.
+   
+   The anonymous function `function(x) 3` is surrounded by a pair of parentheses before it is called by `()`. These extra parentheses seperate the function call from the anonymous functions body. Without these a function with the invalid body `3()` is returned, which throws an error when we call it:
    
     ```{r, error = TRUE}
     (function(x) 3())()
     ```
-   
+
+
 3. __<span style="color:red">Q</span>__: A good rule of thumb is that an anonymous function should fit on one line and shouldn't need to use `{}`. Review your code. Where could you have used an anonymous function instead of a named function? Where should you have used a named function instead of an anonymous function?  
     
-   __<span style="color:green">A</span>__: The use of anonymous functions may lead to more concise and elegant code in certain situations. However, they miss a descriptive name and it can take a while to figure out what they do. That's why it's really helpful to give long and complex functions a descriptive name. You may take a look at your own projects (or some other online projects) to reflect your own style.
+   __<span style="color:green">A</span>__: The use of anonymous functions allows concise and elegant code in certain situations. However, they miss a descriptive name and when re-reading the code it can take a while to figure out what they do (even it it's future you reading). That's why it's helpful to give long and complex functions a descriptive name. It may be worthwile to take a look at your own projects or other peoples code to reflect on this part of your coding style.
 
 <!-- @hb: maybe describe advantages of anonymous functions more clearly. -->
+<!-- comment: maybe write about use of anonymous functions
+for functional programing (lapply, purrr) -->
 
 4. __<span style="color:red">Q</span>__: What function allows you to tell if an object is a function? What function allows you to tell if a function is a primitive function?
        
-   __<span style="color:green">A</span>__: To find out, if an object is a function `is.function()` can be used. To specifically check, if an object is a primitive function use `is.primitive()`.
+   __<span style="color:green">A</span>__: Use `is.function()` to test, if an object is a function. You may also consider `is.primitive()` to test specifically for primitive functions.
 
 5. __<span style="color:red">Q</span>__: This code makes a list of all functions in the base package. 
     
@@ -50,7 +54,7 @@
     
    __<span style="color:green">A</span>__: Let's look at each subquestion seperately:
    
-   a. To find the function with the most arguments, we pipe the list of functions into a chain of iterations. First, we create a list of each function's arguments. Then we count the arguments for each function. Finally, we subset the result with its maximum element, returning us the name of the function with the most arguments and the corresponding number of arguments:
+   a. To find the function with the most arguments, access the arguments of each function in the list. We count each functions arguments and subset to the maximum value. This returns the name of the function with the most arguments and also the corresponding number of arguments:
    
       ```{r}
       library(magrittr)
@@ -61,15 +65,16 @@
         `[`(which.max(.))
       ```
       
-   b. To find the number of 0-argument functions, we count the number of arguments again for each function. However, this time we check each count for beeing equal to `0` and sum up the result.
+   b. To find the number functions with no argument, we compute the number of arguments for each function and check, if they are equal to `0`. The sum of this result gives us the answer we want.
    
       ```{r}
-      funs %>% sapply(formals) %>% 
+      funs %>%
+        sapply(formals) %>% 
         lengths() %>%
         `==`(0L) %>%
         sum()
       ```
-     As we already know from the textbook that `formals()` returns `NULL` for primitive functions, all of them are included in our count of 0-argument functions. To check how this affects our count, let's create a table of 0-argument functions, dividing them into primitive and non-primitive functions. Therefore, we filter the function list for 0-argument functions first. Then we check each of these functions for beeing primitive or not and finally create our table:
+        Because `formals()` returns `NULL` for primitive functions, these are included in our count of functions with no argument. We could also divide the functions into primitive and non-primitive functions. We filter the function list for functions with zero arguments first. We then test if these functions are primitive and tabulate the result:
      
       ```{r}
       funs %>%
@@ -77,9 +82,9 @@
         sapply(is.primitive) %>% 
         table()
       ```
-     Indeed, most of the 0-argument functions in base R are primitive functions.
+        Indeed, most of the functions with no argrument in base R are primitive.
      
-   c. To adapt the code in `Filter()` to find all primitive functions, we can simply change the predicate from `is.function()` to `is.primitive()`:
+   c. To find all primitive functions, we can change the predicate in `Filter()` from `is.function()` to `is.primitive()`:
    
       ```{r, eval = FALSE}
       funs <- Filter(is.primitive, objs)
@@ -93,7 +98,7 @@
 
 7. __<span style="color:red">Q</span>__: When does printing a function not show what environment it was created in?  
 
-   __<span style="color:green">A</span>__: When it is a primitive function or when it was created in the global environment.
+   __<span style="color:green">A</span>__: Only primitive functions or functions created in the global environment do not show the enivronment they were created in when they are printed.
 
 ## Lexical Scoping
 
