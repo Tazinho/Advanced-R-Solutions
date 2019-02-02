@@ -109,16 +109,16 @@ for functional programing (lapply, purrr) -->
     c(c = c)
     ```  
     
-   __<span style="color:green">A</span>__: A named vector `c`, which first element has the value `10` and the name `"c"`. The first "c" is the `c()` function, the second is the name of the first element and the third is the value of the first element.
+   __<span style="color:green">A</span>__: This code returns a named numeric vector of length one - with one element of the value `10` and the name `"c"`. The first `c` represents the `c()` function, the second `c` is interpreted as a (quoted) name and the third `c` as a value.
        
 2. __<span style="color:red">Q</span>__: What are the four principles that govern how R looks for values?  
     
-   __<span style="color:green">A</span>__: The four principles are those behind R's implementation of lexical scoping:
+   __<span style="color:green">A</span>__: R's lexical scoping rules are based on these four principles:
    
-   * name masking
-   * functions vs. variables
-   * a fresh start
-   * dynamic lookup
+   * Name masking
+   * Functions vs. variables
+   * A fresh start
+   * Dynamic lookup
 
 3. __<span style="color:red">Q</span>__: What does the following function return? Make a prediction before running the code yourself.
 
@@ -135,8 +135,9 @@ for functional programing (lapply, purrr) -->
     f(10)
     ```
         
-   __<span style="color:green">A</span>__: 202
-      
+   __<span style="color:green">A</span>__: Within this function two more functions also named `f()` are defined and called. Because the functions are each executed in their own environment R will look up and use the functions defined in these environments. The innermost `f()` is called last, though it is the first function to return a value. Because of this the order of the calculation passes "from the inside to the outside" and the function returns `202`.
+
+
 ## Lazy evaluation
 
 1. __<span style="color:red">Q</span>__: What important property of `&&` makes `x_ok()` work?
@@ -544,6 +545,3 @@ for functional programing (lapply, purrr) -->
       a[!a %in% b]
     }
     ```
-
-
-
