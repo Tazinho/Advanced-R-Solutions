@@ -126,7 +126,7 @@
       control = list(warmup = 1000)
       ))
 
-    mb_prom_median <- broom::tidy(mb_prom)[2,]$median
+    mb_prom_median <- summary(mb_prom)$median
     ```
     
    This lets us calculate, that ~`r round(420 / mb_prom_median, 4) * 100`% of the median run time are caused by the extra arguments.
