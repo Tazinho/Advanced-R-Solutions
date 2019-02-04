@@ -205,7 +205,9 @@ for functional programing (lapply, purrr) -->
     
    Explain how `hist()` works to get a correct `xlim` value.
     
-   __<span style="color:green">A</span>__: The `xlim` argument of `hist()` is required to terminate the range of the histogram's x-axis. In order to provide a valid axis, `xlim` must contain a numeric vector of exactly two unique values. This holds at least, when the `plot` argument is set to `TRUE`, as otherwise no x-axis is needed. Therefore, when `xlim` is left as the default (`range(breaks)`), `breaks` must evaluate to a vector of at least two unique values. As the breakpoints for any histogram with at least one cell should suffice this condition, this requirement is consistent with our expectations. `hist()` technically achieves this by overwriting the `breaks` argument internally. As the `breaks` argument is quite flexible and allows the users to provide the breakpoints directly or compute them (or the related number of cells) in several ways, the detailled behaviour is quite specific to the input. However, via several internal checks, `hist()` ensures that `breaks` evaluates to a numeric vector containing at least two unique elements, before `xlim` gets accesed and evaluated and the final result of `hist()` is ready to be plotted.
+   __<span style="color:green">A</span>__: The `xlim` argument of `hist()` defines the range of the histogram's x-axis. In order to provide a valid axis `xlim` must contain a numeric vector of exactly two unique values. Consequently for the default `xlim = range(breaks)`), `breaks` must evaluate to a vector with at least two unique values.
+   
+   During execution `hist()` overwrites the `breaks` argument. The `breaks` argument is quite flexible and allows the users to provide the breakpoints directly or compute them in several ways. Therefore the specific behaviour depends highly on the input. But `hist` ensures that `breaks` evaluates to a numeric vector containing at least two unique elements before `xlim` is accessed.
    
 5. __<span style="color:red">Q</span>__: Explain why this function works. Why is it confusing?
 
@@ -227,19 +229,17 @@ for functional programing (lapply, purrr) -->
 
 6. __<span style="color:red">Q</span>__: How many arguments are required when calling `library()`?
 
-   __<span style="color:green">A</span>__: `library()` doesn't require any arguments. When called without arguments `library()` (invisibly) returns a list of class libraryIQR, containing a header and footer element as well as a results matrix, with one row and three columns per installed package. These columns contain entries for the name of the package ("Package"), the path to the package ("LibPath") and the title of the package ("Title"). `library()` also got its own print method (`print.libraryIQR`) which shows the information in its own window in the regarding development environment (i.e. RGui or RStudio).
+   __<span style="color:green">A</span>__: `library()` doesn't require any arguments. When called without arguments `library()` (invisibly) returns a list of class "libraryIQR", which contains a results matrix with one row and three columns per installed package. These columns contain entries for the name of the package ("Package"), the path to the package ("LibPath") and the title of the package ("Title"). `library()` also has its own print method (`print.libraryIQR`), which displays this information conveniently in its own window.
    
-   This behaviour is also documented under the details section of the help page for `library()` (see `?library`):
+   This behaviour is also documented under the details section of the help page for `?library`:
    
    > If library is called with no package or help argument, it lists all available packages in the libraries specified by lib.loc, and returns the corresponding information in an object of class “libraryIQR”. (The structure of this class may change in future versions.) Use .packages(all = TRUE) to obtain just the names of all available packages, and installed.packages() for even more information.
    
-   However, since the `package` and `help` argument from `library()` do not show a default value, the possibility to call `library()` without arguments might be unnecessarily hard to spot for users during their first pass over the function.
+   Because the `package` and `help` argument from `library()` do not show a default value, it's easy to overlook the possibility to call `library()` without these arguments. (Instead of providing `NULL`s as default values `library()` uses `missing()` to check if these argements were provided.)
 
     ```{r}
     str(formals(library))
     ```
-    
-   Instead of providing `NULL`s as default values, `library()` terminates internally via the `missing()` function, if the regarding arguments were supplied.
 
 ## `...` (dot-dot-dot)
 
@@ -253,21 +253,21 @@ for functional programing (lapply, purrr) -->
     mean(1, 2, 3, na.omit = TRUE)
     ```
     
-   __<span style="color:green">A</span>__: The arguments of `sum()` are `...` and `na.rm`.
+   __<span style="color:green">A</span>__: Let's inspect the arguments and their order for both functions. For `sum()` these are `...` and `na.rm`:
    
     ```{r}
     str(sum)
     ```
     
-   For the `...` argument `sum()` expects numeric, complex or logical vector input (see `?sum`). A downside of `...` is that any misspelled arguments, like `na.omit` won't raise an error (when no further input checks are implemented). Instead, `na.omit` is treated as a logical element of the `...` argument, gets further coerced to `1` and used for summation. All other arguments are - of course - also part of the `...`. Therefore, `sum(1, 2, 3)` returns `6` and `sum(1, 2, 3, na.omit = TRUE)` returns `7`.
+   For the `...` argument `sum()` expects numeric, complex or logical vector input (see `?sum`). Unfortunately, when `...` is used, misspelled arguments (!) like `na.omit` won't raise an error (When no further input checks are implemented). So instead, `na.omit` is treated as a logical and becomes part of the `...` argument. It will be coerced to `1` and be part of the sum. All other arguments are left unchanged. Therefore `sum(1, 2, 3)` returns `6` and `sum(1, 2, 3, na.omit = TRUE)` returns `7`.
    
-   In contrast, the generic function `mean()` expects `x`, `trim`, `na.rm` and `...` for its default method, `mean.default()`, which handles numeric and logical vector input for its `x` argument (see `?mean`).
+   In contrast, the generic function `mean()` expects `x`, `trim`, `na.rm` and `...` for its default method.
    
     ```{r}
     str(mean.default)
     ```
    
-   As `mean()` uses `...` and `na.omit` is none of `mean()`'s named arguments (and also not a candidate for partial matching), `no.omit` becomes - again - part of the `...` argument, which isn't used any further inside `mean.default()`. The other supplied objects are matched regarding their order, i.e.: `x = 1`, `trim = 2` and `na.rm = 3`. As `x` is of length 1 and not `NA`, the settings of `trim` and `na.rm` do not affect the calculation of the mean and both calls (`mean(1, 2, 3)` and `mean(1, 2, 3, na.omit = TRUE)`) return `1`.
+  Because `na.omit` is not one of `mean()`'s named arguments (and also not a candidate for partial matching), `na.omit` again becomes part of the `...` argument. The other supplied objects are matched by their order, i.e.: `x = 1`, `trim = 2` and `na.rm = 3`. Because `x` is of length 1 and not `NA`, the settings of `trim` and `na.rm` do not affect the calculation of the mean. Both calls (`mean(1, 2, 3)` and `mean(1, 2, 3, na.omit = TRUE)`) return `1`.
 
 2. __<span style="color:red">Q</span>__: In the following call, explain how to find the documentation for the named arguments in the following function call:
        
@@ -275,22 +275,19 @@ for functional programing (lapply, purrr) -->
     plot(1:10, col = "red", pch = 20, xlab = "x", col.lab = "blue")
     ```
     
-   __<span style="color:green">A</span>__: First we type `?plot` in the console and scan the usage section:
+   __<span style="color:green">A</span>__: First we type `?plot` in the console and check the "Usage" section:
     
     ```
     plot(x, y, ...)
     ```
     
-   Obviously we have to look under the `...` bullet in the arguments section.
+   The arguments we want to learn more about are part of the `...` argument. We can find information for `xlab` and follow the recommendation to visit `?par` for the other arguments. Here we type "col" into the search bar, which leads us the section "Color Specification". We also search for the `pch` argument, which leads to the recommendation to check `?points`. Finally `col.lab` is also directly documented within `?par`.
     
-   There we can find a bullet for `xlab` (check), and follow the recommendation to visit `?par` for further arguments. 
+3. __<span style="color:red">Q</span>__: Why does `plot(1:10, col = "red")` only colour the points, not the axes or labels? Read the source code of `plot.default()` to find out.
     
-   From there we type "col" into the search bar, which leads us to a recommentation to search further under `Color Specification` (check). Again using the search we find a bullet for the `pch` argument. From there we get also the recommendation to look under `?points` for more specific settings (check). Finally we use the search functionality to find `col.lab` also as a bullet inside `?par`.
-    
-3. __<span style="color:red">Q</span>__: Why does `plot(1:10, col = "red")` only colour the points, not the axes 
-    or labels? Read the source code of `plot.default()` to find out.
-    
-   __<span style="color:green">A</span>__: It is easiest to start by adding `browser()` to the first line of `plot.default()` and interactively run `plot(1:10, col = "red")`. In this way we can see how the plot is build during the last lines and especially find out where the axis are added. This leads us to the function call:
+   __<span style="color:green">A</span>__: To learn about the internals of `plot.default()` we add `browser()` to the first line of the code and interactively run `plot(1:10, col = "red")`. This way we can see how the plot is build and learn where the axis are added.
+   
+   This leads us to the function call
 
     ```{r, eval = FALSE}
     localTitle(main = main, sub = sub, xlab = xlab, ylab = ylab, ...)
@@ -302,17 +299,17 @@ for functional programing (lapply, purrr) -->
     localTitle <- function(..., col, bg, pch, cex, lty, lwd) title(...)
     ```
     
-   So the call to `localTitle()` clearly gets the `col` parameter as part of `...` argument. To find out if it is used we try following the source code of `title()`, which leads us to a line of C code. Instead of following further, can we stay in R and look at `?title`, which brings some clarity on the fact that the `title()` function specifies four parts of the plot: Main (title of the plot), sub (sub-title of the plot) and both axis labels. Therefore it would introduce ambiguity inside `title()` to use `col` directly. Instead one has the option to supply `col` via the `...` argument as `col.labs` or as part of `xlab` (similar for `ylab`) in the form `xlab = list(c("index"), col = "red")`.
+   The call to `localTitle()` will be passed the `col` parameter as part of `...` argument. `?title` tells us that the `title()` function specifies four parts of the plot: Main (title of the plot), sub (sub-title of the plot) and both axis labels. Because of this it would introduce ambiguity inside `title()` to use `col` directly. Instead one has the option to supply `col` via the `...` argument as `col.labs` or as part of `xlab` (similar for `ylab`) in the form `xlab = list(c("index"), col = "red")`.
 
 ## Exiting a function
 
 1. __<span style="color:red">Q</span>__: What does `load()` return? Why don’t you normally see these values?
 
-   __<span style="color:green">A</span>__: `load()` reloads datasets which were previously written to disk via the `save()` function. When run succesfully, `load()` invisibly returns a character vector, containing the names of the newly loaded objects. To print these names to the console, one can set the argument `verbose` to `TRUE` or surround the call in brackets to trigger R's autoprinting mechanism.
+   __<span style="color:green">A</span>__: `load()` reloads datasets which were previously written to disk via `save()`. When run succesfully, `load()` invisibly returns a character vector, containing the names of the newly loaded objects. To print these names to the console, one can set the argument `verbose` to `TRUE` or surround the call in parentheses to trigger R's autoprinting mechanism.
    
 2. __<span style="color:red">Q</span>__: What does `write.table()` return? What would be more useful?
 
-   __<span style="color:green">A</span>__: `write.table()` writes its `x` object, usually a data frame or a matrix, to disk. It invisibly returns `NULL`. It would be more useful, if `write.table()` would (invisibly) return its `x` object. This would be useful to save intermediate results and directly take on further processing steps without breaking the flow of the code (i.e. breaking it into different lines). One package which uses this pattern is the readr package which is part of the so called tidyverse.
+   __<span style="color:green">A</span>__: `write.table()` writes an object, usually a data frame or a matrix, to disk. The function invisibly returns `NULL`. It would be more useful, if `write.table()` would (invisibly) return its `x` object. This would allow to save intermediate results and directly take on further processing steps without breaking the flow of the code (i.e. breaking it into different lines). One package which uses this pattern is the readr package, which is part of the "tidyverse"-ecosystem.
     
 3. __<span style="color:red">Q</span>__: How does the `chdir` parameter of `source()` compare to `in_dir()`? Why might you prefer one approach to the other?
 
@@ -327,13 +324,15 @@ for functional programing (lapply, purrr) -->
     }
     ```
     
-   __<span style="color:orange">A</span>__: `in_dir()` takes a path to a working directory as an argument. At the beginning of the function the working directory is changed to this specification and with a call to `on.exit` it is guranteed, that when the function finishes the working directory also equals to this specification.
+   __<span style="color:orange">A</span>__: `in_dir()` takes a path to a working directory as an argument. First the working directory is changed accordingly. `on.exit()` ensures, that the modification to the working directory are reset to the initial value, when the function exits.
     
-   In `source()` you need the `chdir` argument to specify, if the working directory should be changed during the evaluation to the `file` argument, if this is a pathname. The difference in `source()` is, that the actual working directory as output of `getwd()` is saved to set it in `on.exit` before changing the directory to the pathname (given to the `file` argument) for the rest of the execution of the `source()` function.
+   In `source()` the `chdir` argument specifies, if the working directory should be changed during the evaluation of the `file` argument (which in this case has to be a pathname). But in `source()` the current working directory is stored and passed to `on.exit()`, before the working directory is changed for the subsequent evaluation.
+   
+<!-- Why might you prefer one approach to the other? Explain what happens in `source` more clearly. -->
 
 4. __<span style="color:red">Q</span>__: Write a function that opens a graphics device, runs the supplied code, and closes the graphics device (always, regardless of whether or not the plotting code worked).  
    
-   __<span style="color:green">A</span>__: To control the graphics device we use `pdf()` and `dev.off()`. To guarantee a clean termination `on.exit()` is used.
+   __<span style="color:green">A</span>__: To control the graphics device we use `pdf()` and `dev.off()`. To ensure a clean termination `on.exit()` is used.
     
     ```{r, eval = FALSE}
     plot_pdf <- function(code){
@@ -361,9 +360,9 @@ for functional programing (lapply, purrr) -->
     
    Compare `capture.output()` to `capture.output2()`. How do the functions differ? What features have I removed to make the key ideas easier to see? How have I rewritten the key ideas to be easier to understand?
     
-   __<span style="color:green">A</span>__: Using `body(capture.output)`, we can see the source code for the original `capture.output()` function. `capture.output()` is a good clip longer (39 lines vs. 7 lines). The reason for this is that `capture.output2()` is more modular, since `capture.output()` writes out entire methods like `readLines()` instead of invoking them. This makes `capture.output2` easier to understand if you understand the underlying methods.
-    
-   However, `capture.output2()` does remove potentially important functionality, as `capture.output()` appears to handle important exceptions not handled in `capture.output2()`, and `capture.output()` offers the ability to chose between overwriting or appending to a file.
+   __<span style="color:green">A</span>__: Using `body(capture.output)` we inspect the source code of the original `capture.output()` function. `capture.output()` is a quite a bit longer (39 lines vs. 7 lines). `capture.output()` writes out entire methods, such as `readLines()`. Instead `capture.output2()` calls these methods directly. This brevity and modularity makes `capture.output2` easier to understand (given you know the underlying methods).
+
+   However `capture.output2()` does miss a couple of features: `capture.output()` appears to handle important exceptions and it also offers a choice between overwriting or appending to a file.
 
 ## Function forms
 
