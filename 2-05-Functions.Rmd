@@ -164,15 +164,13 @@ for functional programing (lapply, purrr) -->
     x_ok(1:3)
     ```
     
-    __<span style="color:green">A</span>__: The intended usage of `x_ok()` is to check if an argument provided to a function is not `NULL`, has length `1` and is greater than `0`. To work with this function, we only want to know if this is `TRUE`, `FALSE` or `NA` (unknown). Therefore, the first version behaves as desired. The property of `&&` that makes `x_ok()` work is lazy evaluation.
-    
-    To highlight the relevant consequences of lazy evaluation for this example, let's look at the provided test cases and compare both versions of `x_ok()` for each of them.
-    
-    - **`x = NULL`:** As `is.null(x)` returns `FALSE` also `&&()` returns `FALSE`. Because of lazy evaluation the other arguments of `&&()` are not even evaluated. This makes sense as when one part of a logical AND conjunction is `FALSE`, the whole logical conjunction must be `FALSE`. In contrast the `&()` function evaluates all of its arguments. Especially as the last part of `x_ok()`, `x > 0`, evaluates to `logical(0)`, it becomes relevant how the results are combined. As `&()` combines `FALSE` and `logical(0)` to `logical(0)` the `&`-version of `x_ok()` doesn't provide a desired result in this case.
-    
-    - **`x = 1`:** As all statements evaluate to `TRUE`. Both versions of `x_ok()` combine these into the desired output of `TRUE`.
-    
-    - **`x = 1:3`:** When it comes to elementwise evaluation `&&()` and `&()` differ fundamentally. While `&&()` compares only the first elements of its arguments, `&()` compares its arguments elementwise and even recycles shorter vectors, if necessary. As the `length(x) == 1` condition is `FALSE`, the `&&`-version of `x_ok()` doesn't even evaluate the last condition, `x > 0`, and returns `FALSE` immediately. In contrast, the `&`-version evaluates all of its arguments and since `x > 0` evaluates to `c(FALSE, FALSE, FALSE)`, this is also the result (due to recycling and elementwise comparison), which is - again - not as desired.
+   __<span style="color:green">A</span>__: We expect `x_ok()` to validate its input vie certain criteria: it must not be `NULL`, but have length `1` and a value greater than `0`. Meaningful outcomes for this assertion will be `TRUE`, `FALSE` or `NA`.
+   
+   The desired behaviour is reached by combining the assertions through `&&` instead of `&`. `&&` does not perform elementvise comparisons, instead it uses the first element of each value only. It also uses lazy evaluation, in the sense that evaluation "proceeds only until the result is determined" (from `?Logic`).
+   
+   For some situations (`x = 1`) both operators will lead to the same result. But this is not always the case. For `x = NULL`, the `&&`-operator will stop after the `!is.null`-statement and return the result. The following conditions won't even be evaluated! (If the other conditions are also evaluated (by the use of `&`), the outcome would change. `NULL > 0` returns `logical(0)`, which is not a helpful in this case.)
+   
+   We can also see the difference in behaviour, when we set `x = 1:3`. The `&&`-operator returns the result from `length(x) == 1`, which is `FALSE`. Using `&` as the logical operator leads to the (vectorised) `x > 0` condition being be evaluated and also returned.
 
 2. __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
 
@@ -184,7 +182,7 @@ for functional programing (lapply, purrr) -->
     f2()
     ```  
     
-   __<span style="color:green">A</span>__: The function returns `100`. This is because default arguments are evaluated in the function environment and arguments are not evaluated before they are accessed. At the time `x` is accessed `z` has already been bound to the value `100`. The illustrated principle is lazy evaluation.
+   __<span style="color:green">A</span>__: The function returns `100`. The default arguments are evaluated in the function environment. Because of *lazy evaluation* these arguments are not evaluated before they are accessed. At the time `x` is accessed `z` has already been bound to the value `100`.
     
 3. __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
   
@@ -197,9 +195,7 @@ for functional programing (lapply, purrr) -->
     y
     ```  
     
-   __<span style="color:green">A</span>__: The function returns `c(2, 1)`. This is due to name masking. When `x` gets accessed within `c()`, the promise `x = {y <- 1; 2}` gets evaluated inside `f1()`'s environment. `y` gets the value `1` assigned and the return value of `{()` (`2`) is assigned to `x`. When `y` gets accessed within `c()`, it has already the value `1` and R doesn't need to look it up any further. Therefore, the promise `y = 0` doesn't get evaluated.
-   
-   As `y` got assigned within `f1()`'s environment, the value of the global variable `y` stays untouched.
+   __<span style="color:green">A</span>__: The function returns `c(2, 1)`. This is due to *name masking*. When `x` is accessed within `c()`, the promise `x = {y <- 1; 2}` is evaluated inside `f1()`'s environment. `y` is bound to the value `1` and the return value of `{()` (`2`) is assigned to `x`. When `y` is accessed within `c()`, it has already the value `1` and R doesn't need to look it up any further. Therefore, the promise `y = 0` won't be evaluated. Also, because `y` is assigned within `f1()`'s environment, the value of the global variable `y` is left untouched.
 
 4. __<span style="color:red">Q</span>__: In `hist()`, the default value of `xlim` is `range(breaks)`, the default value for `breaks` is `"Sturges"`, and
 
@@ -221,12 +217,12 @@ for functional programing (lapply, purrr) -->
     show_time()
     ```
     
-   __<span style="color:green">A</span>__: Before `show_time()` accesses `x` (default `stop("Error")`), it overwrites the `stop()` function with `function(...) Sys.time()`. As default arguments are evaluated in the function environment, `x` gets evaluated as `Sys.time()`.
+   __<span style="color:green">A</span>__: Before `show_time()` accesses `x` (default `stop("Error")`), the `stop()` function is overwritten as `function(...) Sys.time()`. Because default arguments are evaluated in the function environment, `print(x)` will be evaluated as `print(Sys.time())`.
    
-   `show_time()` is confusing, since its behaviour changes when `x`'s default value is supplied directly as it gets evalutad in the calling environment in this case.
+   This function is confusing, because its behaviour changes when `x`'s value is supplied directly. Now the value from the calling environment will be used and the overwriting of `stop` won't affect the outcome anymore.
   
     ```{r, error = TRUE}
-    show_time(stop("Error"))
+    show_time(x = stop("Error!"))
     ```
 
 6. __<span style="color:red">Q</span>__: How many arguments are required when calling `library()`?
