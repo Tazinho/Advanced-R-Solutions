@@ -18,7 +18,7 @@
 
    __<span style="color:green">A</span>__: The second approach is correct.
    
-   The anonymous function `function(x) 3` is surrounded by a pair of parentheses before it is called by `()`. These extra parentheses seperate the function call from the anonymous functions body. Without these a function with the invalid body `3()` is returned, which throws an error when we call it:
+   The anonymous function `function(x) 3` is surrounded by a pair of parentheses before it is called by `()`. These extra parentheses separate the function call from the anonymous functions body. Without these a function with the invalid body `3()` is returned, which throws an error when we call it:
    
     ```{r, error = TRUE}
     (function(x) 3())()
@@ -27,11 +27,11 @@
 
 3. __<span style="color:red">Q</span>__: A good rule of thumb is that an anonymous function should fit on one line and shouldn't need to use `{}`. Review your code. Where could you have used an anonymous function instead of a named function? Where should you have used a named function instead of an anonymous function?  
     
-   __<span style="color:green">A</span>__: The use of anonymous functions allows concise and elegant code in certain situations. However, they miss a descriptive name and when re-reading the code it can take a while to figure out what they do (even it it's future you reading). That's why it's helpful to give long and complex functions a descriptive name. It may be worthwile to take a look at your own projects or other peoples code to reflect on this part of your coding style.
+   __<span style="color:green">A</span>__: The use of anonymous functions allows concise and elegant code in certain situations. However, they miss a descriptive name and when re-reading the code it can take a while to figure out what they do (even it it's future you reading). That's why it's helpful to give long and complex functions a descriptive name. It may be worthwhile to take a look at your own projects or other peoples code to reflect on this part of your coding style.
 
 <!-- @hb: maybe describe advantages of anonymous functions more clearly. -->
 <!-- comment: maybe write about use of anonymous functions
-for functional programing (lapply, purrr) -->
+for functional programming (lapply, purrr) -->
 
 4. __<span style="color:red">Q</span>__: What function allows you to tell if an object is a function? What function allows you to tell if a function is a primitive function?
        
@@ -52,7 +52,7 @@ for functional programing (lapply, purrr) -->
    
    a. How could you adapt the code to find all primitive functions?  
     
-   __<span style="color:green">A</span>__: Let's look at each subquestion seperately:
+   __<span style="color:green">A</span>__: Let's look at each sub-question separately:
    
    a. To find the function with the most arguments, access the arguments of each function in the list. We count each functions arguments and subset to the maximum value. This returns the name of the function with the most arguments and also the corresponding number of arguments:
    
@@ -92,13 +92,13 @@ for functional programing (lapply, purrr) -->
       
 6. __<span style="color:red">Q</span>__: What are the three important components of a function?  
     
-   __<span style="color:green">A</span>__: Thse components are the function's `body()`, `formals()` and `environment()`. However, as mentioned in the textbook:
+   __<span style="color:green">A</span>__: These components are the function's `body()`, `formals()` and `environment()`. However, as mentioned in the textbook:
     
    > There is one exception to the rule that functions have three components. Primitive functions, like `sum()`, call C code directly with `.Primitive()` and contain no R code. Therefore their `formals()`, `body()`, and `environment()` are all `NULL`.
 
 7. __<span style="color:red">Q</span>__: When does printing a function not show what environment it was created in?  
 
-   __<span style="color:green">A</span>__: Only primitive functions or functions created in the global environment do not show the enivronment they were created in when they are printed.
+   __<span style="color:green">A</span>__: Only primitive functions or functions created in the global environment do not show the environment they were created in when they are printed.
 
 ## Lexical Scoping
 
@@ -166,7 +166,7 @@ for functional programing (lapply, purrr) -->
     
    __<span style="color:green">A</span>__: We expect `x_ok()` to validate its input vie certain criteria: it must not be `NULL`, but have length `1` and a value greater than `0`. Meaningful outcomes for this assertion will be `TRUE`, `FALSE` or `NA`.
    
-   The desired behaviour is reached by combining the assertions through `&&` instead of `&`. `&&` does not perform elementvise comparisons, instead it uses the first element of each value only. It also uses lazy evaluation, in the sense that evaluation "proceeds only until the result is determined" (from `?Logic`).
+   The desired behaviour is reached by combining the assertions through `&&` instead of `&`. `&&` does not perform elementwise comparisons, instead it uses the first element of each value only. It also uses lazy evaluation, in the sense that evaluation "proceeds only until the result is determined" (from `?Logic`).
    
    For some situations (`x = 1`) both operators will lead to the same result. But this is not always the case. For `x = NULL`, the `&&`-operator will stop after the `!is.null`-statement and return the result. The following conditions won't even be evaluated! (If the other conditions are also evaluated (by the use of `&`), the outcome would change. `NULL > 0` returns `logical(0)`, which is not a helpful in this case.)
    
@@ -221,7 +221,7 @@ for functional programing (lapply, purrr) -->
     
    __<span style="color:green">A</span>__: Before `show_time()` accesses `x` (default `stop("Error")`), the `stop()` function is overwritten as `function(...) Sys.time()`. Because default arguments are evaluated in the function environment, `print(x)` will be evaluated as `print(Sys.time())`.
    
-   This function is confusing, because its behaviour changes when `x`'s value is supplied directly. Now the value from the calling environment will be used and the overwriting of `stop` won't affect the outcome anymore.
+   This function is confusing, because its behaviour changes when `x`'s value is supplied directly. Now the value from the calling environment will be used and the overwriting of `stop` won't affect the outcome any more.
   
     ```{r, error = TRUE}
     show_time(x = stop("Error!"))
@@ -235,7 +235,7 @@ for functional programing (lapply, purrr) -->
    
    > If library is called with no package or help argument, it lists all available packages in the libraries specified by lib.loc, and returns the corresponding information in an object of class “libraryIQR”. (The structure of this class may change in future versions.) Use .packages(all = TRUE) to obtain just the names of all available packages, and installed.packages() for even more information.
    
-   Because the `package` and `help` argument from `library()` do not show a default value, it's easy to overlook the possibility to call `library()` without these arguments. (Instead of providing `NULL`s as default values `library()` uses `missing()` to check if these argements were provided.)
+   Because the `package` and `help` argument from `library()` do not show a default value, it's easy to overlook the possibility to call `library()` without these arguments. (Instead of providing `NULL`s as default values `library()` uses `missing()` to check if these arguments were provided.)
 
     ```{r}
     str(formals(library))
@@ -305,7 +305,7 @@ for functional programing (lapply, purrr) -->
 
 1. __<span style="color:red">Q</span>__: What does `load()` return? Why don’t you normally see these values?
 
-   __<span style="color:green">A</span>__: `load()` reloads datasets which were previously written to disk via `save()`. When run succesfully, `load()` invisibly returns a character vector, containing the names of the newly loaded objects. To print these names to the console, one can set the argument `verbose` to `TRUE` or surround the call in parentheses to trigger R's autoprinting mechanism.
+   __<span style="color:green">A</span>__: `load()` reloads datasets which were previously written to disk via `save()`. When run successfully, `load()` invisibly returns a character vector, containing the names of the newly loaded objects. To print these names to the console, one can set the argument `verbose` to `TRUE` or surround the call in parentheses to trigger R's auto-printing mechanism.
    
 2. __<span style="color:red">Q</span>__: What does `write.table()` return? What would be more useful?
 
@@ -394,7 +394,7 @@ for functional programing (lapply, purrr) -->
     cor(m = "k", y = y, u = "p", x = x)
     ```  
     
-   __<span style="color:green">A</span>__: None of these functions provides a `...` argument. Therefore the function arguments are first machted exactly, then via partial matching and finally by position. This leads us to the following explicit function calls:
+   __<span style="color:green">A</span>__: None of these functions provides a `...` argument. Therefore the function arguments are first matched exactly, then via partial matching and finally by position. This leads us to the following explicit function calls:
    
     ```{r, eval = FALSE}
     x <- sample(x = c(1:10, NA), size = 20, replace = TRUE)
@@ -428,7 +428,7 @@ for functional programing (lapply, purrr) -->
     #>   target of assignment expands to non-language object
     ```
     
-   The error occures during the assignment, because no corresponding replacement function, i.e. `get<-` exists for `get()`. To confirm this we can reproduce the error via the following simple example.
+   The error occurs during the assignment, because no corresponding replacement function, i.e. `get<-` exists for `get()`. To confirm this we can reproduce the error via the following simple example.
     
     ```{r, eval = FALSE}
     get("x") <- 2
@@ -437,7 +437,7 @@ for functional programing (lapply, purrr) -->
     
 4. __<span style="color:red">Q</span>__: Create a replacement function that modifies a random location in a vector.
     
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: Lets define `%random%` like this:
 
     ```{r, eval = FALSE}
     `random<-` <- function(x, value){
@@ -500,7 +500,7 @@ for functional programing (lapply, purrr) -->
 
 8. __<span style="color:red">Q</span>__: Create an infix `xor()` operator.
     
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: We could create an infix `%xor_%` like this:
 
     ```{r}
     `%xor_%` <- function(a, b){
@@ -510,7 +510,7 @@ for functional programing (lapply, purrr) -->
 
 9. __<span style="color:red">Q</span>__: Create infix versions of the set functions `intersect()`, `union()`, and`setdiff()`. You might call them `%n%`, `%u%`, and `%/%` to match conventions from mathematics.
    
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: These infix operators could be defined in the following way. (`%/%` is chosen instead of `%\%`, because `\` serves as an escape character.)
    
     ```{r}
     `%n%` <- function(a, b){
