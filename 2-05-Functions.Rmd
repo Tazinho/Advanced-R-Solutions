@@ -376,7 +376,7 @@ for functional programing (lapply, purrr) -->
     if (length(x) <= 5) x[[5]] else x[[n]]
     ```
     
-   __<span style="color:green">A</span>__: In the following, we rewrite the expressions to match the exact syntax from above. Since prefix functions change the execution order in the same way as brackets do, we can omit the brackets in the second expression. Therefore, we provide the regarding alternative version as a comment.
+   __<span style="color:green">A</span>__: Let's rewrite the expressions to match the exact syntax from the code above. Because prefix functions already define the execution order, we may omit the parentheses in the second expression.
     
     ```{r, eval = FALSE}
     `+`(`+`(1, 2), 3)
@@ -394,12 +394,12 @@ for functional programing (lapply, purrr) -->
     cor(m = "k", y = y, u = "p", x = x)
     ```  
     
-   __<span style="color:green">A</span>__: Since none of these functions provides a `...` argument, we only need to consider, that function arguments are first machted exactly, then via partial matching and finally by position. This leads us to:
+   __<span style="color:green">A</span>__: None of these functions provides a `...` argument. Therefore the function arguments are first machted exactly, then via partial matching and finally by position. This leads us to the following explicit function calls:
    
     ```{r, eval = FALSE}
     x <- sample(x = c(1:10, NA), size = 20, replace = TRUE)
     y <- runif(n = 20, min = 0, max = 1)
-    cor(x = x, y = y, use = "pairwise.complete.obs", method = "pearson")
+    cor(x = x, y = y, use = "pairwise.complete.obs", method = "kendall")
     ```
     
 3. __<span style="color:red">Q</span>__: Explain why the following code fails:
@@ -420,32 +420,19 @@ for functional programing (lapply, purrr) -->
     }
     ```
     
-   As described in the textbook, R turns the code behind the scenes literally into
+   R internally transforms the code and the transformed code reproduces the error above.
     
-    ```{r, eval = FALSE}
-    get("x") <- `modify<-`(get("x"), 1, 10)
-    ```
-    
-   When we try to evaluate the code, R returns the same error message as above:
-   
     ```{r, eval = FALSE}
     get("x") <- `modify<-`(get("x"), 1, 10)
     #> Error in get("x") <- `modify<-`(get("x"), 1, 10) : 
     #>   target of assignment expands to non-language object
     ```
     
-   The error occures during the assignment, as no corresponding replacement function, i.e. `get<-` does exists for `get()`. To confirm this claim, we can reproduce the error via an easier example
+   The error occures during the assignment, because no corresponding replacement function, i.e. `get<-` exists for `get()`. To confirm this we can reproduce the error via the following simple example.
     
     ```{r, eval = FALSE}
     get("x") <- 2
     #> Error in get("x") <- 2 : target of assignment expands to non-language object
-    ```
-    
-   To improve the code, we can modify the example to use the `names()` function, which has a corresponding replacement function:
-    
-    ```{r}
-    modify(names(x), 1) <- 10
-    names(x)
     ```
     
 4. __<span style="color:red">Q</span>__: Create a replacement function that modifies a random location in a vector.
@@ -469,22 +456,20 @@ for functional programing (lapply, purrr) -->
     #> [1] "ab"
     ```
 
-   __<span style="color:green">A</span>__: We can simply override the `+` operator. In this case we need to take a bit of care to not use the `+` operator itself inside of the function definition, since otherwise we would end in an infinite recursion (a special case of an infinite loop). We also add `b = 0L` as a default value to keep the behaviour of `+` as a unary operator, i.e. to keep `+ 1` working and not throwing an error:
+   __<span style="color:green">A</span>__: To achieve this behaviour, we need to override the `+` operator. We need to take care to not use the `+` operator itself inside of the function definition, because this would lead to an undesired infinite recursion. We also add `b = 0L` as a default value to keep the behaviour of `+` as a unary operator, i.e. to keep `+ 1` working and not throwing an error
     
     ```{r}
     `+` <- function(a, b = 0L){
       if (is.character(a) && is.character(b)) {return(paste0(a, b))}
-      a -- b
+      sum(a, b)
     }
     
-    # tests
+    # test functionality
     + 1
-    
     1 + 2
-    
     "a" + "b"
     
-    # return back to the original `+` operator behaviour
+    # return back to the original `+` operator
     rm(`+`)
     ```
 
