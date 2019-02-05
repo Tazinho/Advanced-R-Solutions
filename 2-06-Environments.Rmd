@@ -4,6 +4,9 @@ editor_options:
   chunk_output_type: console
 ---
 # Environments
+    ```{r, include=FALSE}
+    library(rlang)
+    ```
 
 ## Environment basics
 
@@ -24,7 +27,7 @@ editor_options:
    __<span style="color:green">A</span>__: 
     
     ```{r}
-    e1 <- rlang::env()
+    e1 <- env()
     e1$loop <- e1
     ```
 
@@ -37,8 +40,8 @@ editor_options:
    __<span style="color:green">A</span>__: 
     
     ```{r}
-    e1 <- rlang::env()
-    e2 <- rlang::env()
+    e1 <- env()
+    e2 <- env()
     
     e1$loop   <- e2
     e2$dedoop <- e1
@@ -52,9 +55,8 @@ editor_options:
     
    __<span style="color:red">A</span>__: We want `env_poke2()` to test, if the supplied name is already present in the given environment. We only allow new names to be assigned to a value, otherwise an (informative) error is thrown.
 
-    ```{r}
-    env_poke2 <- function (env, nm, value) 
-    {
+    ```{r, error=TRUE}
+    env_poke2 <- function (env, nm, value){
       stopifnot(is_string(nm))
       current_names <- env_names(env)
       if (nm %in% current_names) {
@@ -63,7 +65,6 @@ editor_options:
       else {
         assign(nm, value, envir = env)
       }
-      
       invisible(env)
     }
     
@@ -71,8 +72,7 @@ editor_options:
     env_1 <- env(a = 1)
     env_poke2(env_1, "b", 2)
     env_names(env_1)
-    
-    env_poke2(env_1, "a", 2)
+    env_poke2(env_1, "b", 2)
     ```
 
 6. __<span style="color:red">Q</span>__: What does this function do? How does it differ from `<<-` and why might you prefer it?
@@ -101,71 +101,38 @@ editor_options:
 
 1. __<span style="color:red">Q</span>__: Modify `where()` to return all environments that contain a binding for `name`. Carefully think through what type of object the function will need to return.
    
-   __<span style="color:orange">A</span>__: We look at the source code of the original `pryr::where()`:  
-    
-    ```{r, eval = FALSE}
-    pryr::where
-    function (name, env = parent.frame()) 
-      {
-      stopifnot(is.character(name), length(name) == 1)
-      env <- to_env(env)
-      if (identical(env, emptyenv())) { # "base case"
-        stop("Can't find ", name, call. = FALSE)
-        }
-      if (exists(name, env, inherits = FALSE)) { # "success case"
-        env
-        }
-      else { # "recursive case"
-        where(name, parent.env(env)) # we will copy this line in the success case
-      }
-    }
-    ```
-    
-   Since `where()` stops searching when a match appears, we copy the recursive call in the `else` block to the block of the matching ("success") case, so that our new function `where2` will look for a binding within the complete search path. We also need to pay attention to other details. We have to take care to save the bindings in an object, while not overriding it in our recursive calls. So we create a list object for that and define a new function within `where2()` that we call `where2.internal`. `where2.internal()` will do the recursive work and whenever it finds a binding it will write it via `<<-` to the especially created list in its enclosing environment:
+   __<span style="color:green">A</span>__: The modified function will always recurse until it reaches the empty environment. Along the way, it will check each environment for a given `name`. Only if no matching object is found in any environment, an error will be thrown. Otherwise the environments containing matching objects will be written to a *list*, which will be returned once the function terminates. Please also note how the list is initialized via the default argument, when the function is called for the first time.
 
-    ```{r, eval = FALSE}
-    where2 <- function(name, env = parent.frame()){
-      # we need to collect all environments where name has a binding
-      env_list <- list()
-      
-      # since our function will be recursive and env_list would be overwritten
-      # when it is inside the recursive function, we put it on the outside of
-      # the recursive function and concatenate every binding environment
-      # that we find via the `<<-` operator on its end.
-      # In the following we start by defining the recursive function:
-      where2.internal <- function(name, env = parent.frame()) {
-        stopifnot(is.character(name), length(name) == 1)
-        env <- pryr:::to_env(env) # note that we need to call to_env via pryr:::
-        
-        # when we reach the empty environment, we return all binding environments
-        # (if we found some) if we found no bindings, we give the same error message
-        # as pryr::where does
-        if (identical(env, emptyenv())) {
-          if (length(env_list) != 0){
-            return(env_list)
-            }
+    ```{r}
+    where2 <- function(name, env = caller_env(), env_list = list()) {
+      if (identical(env, empty_env())) {
+        if (length(env_list)){
+          # Final case
+          return(env_list)
+        } else {
+          # Base case
           stop("Can't find ", name, call. = FALSE)
-          }
-        if (exists(name, env, inherits = FALSE)) {
-          # this is a case where we find a binding. the main difference to
-          # pryr::where is that we don't return immediately. Instead we save
-          # the binding environment to env_list and call where2.internal again
-          env_list <<- c(env_list, env)
-          where2.internal(name, parent.env(env))
-          } else {
-            where2.internal(name, parent.env(env))
-          }
+        }
+      } else {
+        if(env_has(env, name)){
+          # Success case
+          env_list <- c(env_list, env)
+        }
+        # Recursive case
+        where2(name, env_parent(env), env_list)
       }
-      
-      # as a last step we just call where2.internal() to start the recursion
-      where2.internal(name, env = env)
     }
-    ```   
-    
-   Note that `where2.internal()` still provides the same structure as `pryr::where` does and you can also divide it in "base case", "success case" and "recursive case".
-    
-   TODO: Second part of the question.
 
+    # Test
+    e1a <- env(empty_env(), a = 1, b = 2)
+    e1b <- env(e1a, b = 10, c = 11)
+    e1c <- env(e1b, a = 12, d = 13)
+    
+    where2("a", e1c)
+    ```
+
+- initialize via default argument   
+   
 2. __<span style="color:red">Q</span>__: Write a function called `fget()` that finds only function objects. It should have two arguments, `name` and `env`, and should obey the regular scoping rules for functions: if there's an object with a matching name that's not a function, look in the parent. For an added challenge, also add an `inherits` argument which controls whether the function recurses up the parents or only looks in one environment.
 
    __<span style="color:green">A</span>__: We can build up our function on the implementation of `get2()` in the last exercise. We only need to add a check via `is.function()`, change the name (also in the recursive call) and the error message:
