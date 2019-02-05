@@ -4,15 +4,15 @@
 
 1. __<span style="color:red">Q</span>__: List three ways in which an environment differs from a list.
 
-   __<span style="color:green">A</span>__: The most important differences are:
-   * environments have reference semantics
-   * environments have parents
-   * environments are not ordered
-   * elements of environments need to be (uniquely) named
+   __<span style="color:green">A</span>__: The most important differences between environments and lists are:
+   - environments have reference semantics
+   - environments have parents
+   - environments are not ordered
+   - elements of environments need to be (uniquely) named
 
 2. __<span style="color:red">Q</span>__: Create an environment as illustrated by this picture.
 
-    ```{r, echo = FALSE, out.width = NULL}
+    ```{r echo=FALSE, out.width = "400px"}
     knitr::include_graphics("diagrams/environments/recursive-1.png", dpi = 300)
     ```
     
@@ -25,7 +25,7 @@
 
 3. __<span style="color:red">Q</span>__: Create a pair of environments as illustrated by this picture.
 
-    ```{r, echo = FALSE, out.width = NULL}
+    ```{r, echo = FALSE, out.width = "400px"}
     knitr::include_graphics("diagrams/environments/recursive-2.png", dpi = 300)
     ```
     
@@ -239,6 +239,6 @@
     a
     ```  
     
-   __<span style="color:green">A</span>__: The function does "more or less" the same as `<<-`. Additionally to `<<-` it has an `env` argument, but this is not a big advantage, since also `assign()` provides this functionality. The main difference is that `rebind()` only does an assignment, when it finds a binding in one of the parent environments of `env`. Whereas:
-    
-   > If `<<-` doesn't find an existing variable, it will create one in the global environment. This is usually undesirable, because global variables introduce non-obvious dependencies between functions.
+   __<span style="color:green">A</span>__: The function does "more or less" the same as `<<-`. Additionally to `<<-` it has an `env` argument, but this is not a big advantage, since `assign()` also provides this functionality. The main difference is that `rebind()` only does an assignment, when it finds a binding in one of the parent environments of `env`. Whereas:
+   
+    > If `<<-` doesn't find an existing variable, it will create one in the global environment. This is usually undesirable, because global variables introduce non-obvious dependencies between functions.
