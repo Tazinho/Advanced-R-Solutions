@@ -2,8 +2,7 @@
 
 ## Choices
 
-1. __<span style="color:red">Q</span>__: What type of vector does each of the following calls to `ifelse()`
-    return?
+1. __<span style="color:red">Q</span>__: What type of vector does each of the following calls to `ifelse()` return?
 
     ```{r, eval = FALSE}
     ifelse(TRUE, 1, "no")
@@ -11,11 +10,11 @@
     ifelse(NA, 1, "no")
     ```
 
-    Read the documentation and write down the rules in your own words.
+   Read the documentation and write down the rules in your own words.
 
-   __<span style="color:green">A</span>__: The arguments of `ifelse()` are `test`, `yes` and `no`. When `yes` or `no` are shorter than `test`, they are getting recycled. When they are longer than `test`, their additional elements get ignored. `ifelse()` operates elementwise and returns the entry from `yes` (when `test` is `TRUE`), `no` (when `test` is `FALSE`) or `NA` (when `test` is `NA`). The resulting object gets coerced according to usual coercion rules and attributes (including the class) get stripped.
+   __<span style="color:green">A</span>__: The arguments of `ifelse()` are `test`, `yes` and `no`. `ifelse()` operates elementwise, so when `yes` or `no` are shorter than `test`, they will be recycled. (When they are longer than `test`, their additional elements will be ignored.)
    
-   Therefore, the expressions above return vectors of type double, character and logical.
+   The function returns the entry for `yes` (when `test` is `TRUE`), `no` (when `test` is `FALSE`) or `NA` (when `test` is `NA`). The final object is coerced according to usual coercion rules with attributes (including the class) being stripped. Therefore, the expressions above return vectors of type `double`, `character` and `logical`.
 
 2. __<span style="color:red">Q</span>__: Why does the following code work?
 
@@ -27,7 +26,7 @@
     if (length(x)) "not empty" else "empty"
     ```
 
-   __<span style="color:green">A</span>__: `if()` expects a logical condition. Objects of other types are coercecd to logical if possible. Therefore, `0` gets coerced to `FALSE` and other numeric input gets coerced to `TRUE`. Numeric input which is not logically interpretable in the sense of `if()`, like `NaN`, `NA_integer` and `NA_real`, leads to an error.
+   __<span style="color:green">A</span>__: `if()` expects a logical condition. Objects of other types are coerced to logical if possible. `0` is coerced to `FALSE` while other numeric input is coerced to `TRUE`. Numeric input which is not logically interpretable by `if()`, like `NaN`, `NA_integer` and `NA_real`, will lead to an error.
 
 ## Loops
 
@@ -42,10 +41,15 @@
     out
     ```
 
-   __<span style="color:green">A</span>__: The elements we are iterating over are of length 0. Our loop goes from `i = 1` to `i = 0`. As we use `[<-` and `[` for indexing, we need to be aware of its subsetting behaviour for out-of-bounds and zero indices. During the first iteration `x[1]` will generate an `NA` (out-of-bounds indexing for atomics). The resulting `NA` from squaring will be coerced to a list and assigned to the empty length-1 list `out[1]` (out-of-bounds indexing for lists). Further, `x[0]` will return `numeric(0)` (zero indexing for atomics). Again squaring doesn't change the value and `numeric(0)` gets coerced to `list()` when assigned to `out[0]` (the same value as `out(0)` already returns; zero indexing for lists). Therefore, `out` doesn't change during the last iteration. This simply works, because it is valid R code executing valid R operations.
+   __<span style="color:green">A</span>__: The vector we are iterating over are of length 0. Our loop goes from `i = 1` to `i = 0`. As we use `[<-` and `[` for indexing, we need to be aware of their subsetting behaviour for out-of-bounds and zero indices.
+   
+   During the first iteration `x[1]` will generate an `NA` (out-of-bounds indexing for atomics). The resulting `NA` (from squaring) will be assigned to the empty length-1 list `out[1]` (out-of-bounds indexing for lists).
+   
+   In the next iteration, `x[0]` will return `numeric(0)` (zero indexing for atomics). Again squaring doesn't change the value and `numeric(0)` is assigned to `out[0]` (zero indexing for lists). Please be aware, that `out` doesn't change during the last iteration.
+   
+   Overall the code works, because each step includes valid R operations. (Though it may have been very helpful to warn the user about the unusual inputs to this loop.)
 
-2. __<span style="color:red">Q</span>__: What does the following code tell you about when the vector being 
-    iterated over is evaluated?
+2. __<span style="color:red">Q</span>__: What does the following code tell you about when the vector being iterated over is evaluated?
 
     ```{r}
     xs <- c(1, 2, 3)
@@ -55,7 +59,7 @@
     xs
     ```
 
-   __<span style="color:green">A</span>__: `x` takes on the values of the initial `xs` (`1`, `2` and `3`). So, `xs` must be evaluated just once and before `x`.
+   __<span style="color:green">A</span>__: In this loop `x` takes on the values of the initial `xs` (`1`, `2` and `3`), which evaluated just once in the beginning of the loop.
 
 3. __<span style="color:red">Q</span>__: What does the following code tell you about when the index is updated?
 
@@ -66,4 +70,4 @@
     }
     ```
 
-   __<span style="color:green">A</span>__: The index gets updated before each iteration. Therefore, reassigning the index symbol during the loop doesn't affect the index.
+   __<span style="color:green">A</span>__: In a `for`-loop the index is updated in the beginning of each iteration. Therefore, reassigning the index symbol during one iteration doesn't affect the following iterations.
