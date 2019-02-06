@@ -24,7 +24,7 @@ editor_options:
     knitr::include_graphics("diagrams/environments/recursive-1.png", dpi = 300)
     ```
     
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: Let's create an environment, that contains itsself.
     
     ```{r}
     e1 <- env()
@@ -37,7 +37,7 @@ editor_options:
     knitr::include_graphics("diagrams/environments/recursive-2.png", dpi = 300)
     ```
     
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: These two environments contain each other:
     
     ```{r}
     e1 <- env()
@@ -93,7 +93,7 @@ editor_options:
     a
     ```  
     
-   __<span style="color:green">A</span>__: The function does "more or less" the same as `<<-`. Additionally to `<<-` it has an `env` argument, but this is not a big advantage, since `assign()` also provides this functionality. The main difference is that `rebind()` only does an assignment, when it finds a binding in one of the parent environments of `env`. Whereas:
+   __<span style="color:green">A</span>__: The function does "more or less" the same as `<<-`. `rebind()` provides an additional `env` argument (but this functionality is already coverd by `assign()`). More importantly, `rebind()` will only carry out an assignment when it finds a binding in one of the parent environments of `env`. This is different than the behaviour of `<<-` (see textbook):
    
     > If `<<-` doesn't find an existing variable, it will create one in the global environment. This is usually undesirable, because global variables introduce non-obvious dependencies between functions.
     
@@ -131,11 +131,9 @@ editor_options:
     where2("a", e1c)
     ```
 
-- initialize via default argument   
-   
 2. __<span style="color:red">Q</span>__: Write a function called `fget()` that finds only function objects. It should have two arguments, `name` and `env`, and should obey the regular scoping rules for functions: if there's an object with a matching name that's not a function, look in the parent. For an added challenge, also add an `inherits` argument which controls whether the function recurses up the parents or only looks in one environment.
 
-   __<span style="color:green">A</span>__: We can build up our function on the implementation of `get2()` in the last exercise. We only need to add a check via `is.function()`, change the name (also in the recursive call) and the error message:
+   __<span style="color:orange">A</span>__: We can build up our function on the implementation of `get2()` in the last exercise. We only need to add a check via `is.function()`, change the name (also in the recursive call) and the error message:
    
     ```{r}
     fget2 <- function(name, env = parent.frame()){
@@ -246,43 +244,48 @@ editor_options:
     knitr::include_graphics("diagrams/environments/function_environments.png", dpi = 96)
     ```
     
-3. __<span style="color:red">Q</span>__: Write an enhanced version of `str()` that provides more information about functions. Show where the function was found and what environment it was defined in.  
-   __<span style="color:green">A</span>__: Additionally we provide the function type in the sense of `pryr::ftype`. We use functions from the `pryr` package, since it provides helpers for all requested features:
-    
+3. __<span style="color:red">Q</span>__: Write an enhanced version of `str()` that provides more information about functions. Show where the function was found and what environment it was defined in.
+
+   __<span style="color:green">A</span>__: Apart from the requested features, let us also provide the function type (see `?pryr::ftype` for details). We use functions from the `pryr` package, since it provides helpers for all requested features:
+
     ```{r}
-    fstr <- function(object){
-      if (!is.function(object)) {stop("fstr works only for functions")}
+    fstr <- function(obj){
+      if (!is.function(obj)) {stop("fstr works only for functions")}
       
-      object_str <- lazyeval::expr_text(object)
+      obj_str <- lazyeval::expr_text(obj)
+
+      flist <- list(ftype = pryr::ftype(obj),
+                    where = pryr::where(obj_str),
+                    enclosing_env = pryr::enclosing_env(obj),
+                    args = pryr::fun_args(obj))
       
-      flist <- list(ftype = pryr::ftype(object),
-                 where = pryr::where(object_str),
-                 enclosing_env = pryr::enclosing_env(object),
-                 args = pryr::fun_args(object)
-                 )
-      
-      return(flist)
+      flist
     }
+    
+    # Test
+    fstr(sum)
     ```
     
-   Note that we wanted to have non standard evaluation like the original `str()` function. Since `pryr::where()` doesn't support non standard evaluation, we needed to catch the name of the supplied `object`. Therefore we used `expr_text()` from the [lazyeval](https://github.com/hadley/lazyeval) package. As a result, `fstr(object = packagename::functionname)` will result in an error in contrast to `str()`.
+   We chose to use non-standard evaluation for the input just like `str()` does. `pryr::where()` requires character input. We catch the name of the supplied `object` and use `lazyeval::expr_text()` (https://github.com/hadley/lazyeval) to create the string we need.
+   
+   <!-- would love to replace lazyeval with rlang, but somehow the usual quote/unquote-magic is failing me here. -->
 
 ## The call stack
 
 1. __<span style="color:red">Q</span>__: Write a function that lists all the variables defined in the environment in which it was called. It should return the same results as `ls()`.
    __<span style="color:green">A</span>__: We can implement this dynamic scoping behaviour, by explicitly referencing the caller environment. Pleaso note, that this approach returns also variables starting with a dot - an option we also pass to `ls()`.
 
-```{r}
-ls2 <- function(env = caller_env()) {
-  env_names(env)
-}
-
-# Test in global environment
-ls(all.names = TRUE)
-ls2()
-
-# Test in "sandbox" environment
-e1 <- env(a = 1, b = 2)
-invoke(ls, .env = e1)
-invoke(list_variables, .env = e1)
-```
+    ```{r}
+    ls2 <- function(env = caller_env()) {
+      env_names(env)
+    }
+    
+    # Test in global environment
+    ls(all.names = TRUE)
+    ls2()
+    
+    # Test in "sandbox" environment
+    e1 <- env(a = 1, b = 2)
+    invoke(ls, .env = e1)
+    invoke(list_variables, .env = e1)
+    ```
