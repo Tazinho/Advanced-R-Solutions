@@ -133,55 +133,36 @@ editor_options:
 
 2. __<span style="color:red">Q</span>__: Write a function called `fget()` that finds only function objects. It should have two arguments, `name` and `env`, and should obey the regular scoping rules for functions: if there's an object with a matching name that's not a function, look in the parent. For an added challenge, also add an `inherits` argument which controls whether the function recurses up the parents or only looks in one environment.
 
-   __<span style="color:orange">A</span>__: We can build up our function on the implementation of `get2()` in the last exercise. We only need to add a check via `is.function()`, change the name (also in the recursive call) and the error message:
+   __<span style="color:orange">A</span>__: We follow a similar approach to the previous exercise. This time we additionally check if the found object is a function and implement and argument to turn off the recursion, if desired.
    
     ```{r}
-    fget2 <- function(name, env = parent.frame()){
-      stopifnot(is.character(name), length(name) == 1)
-      env <- pryr:::to_env(env)
+    fget2 <- function(name, env = caller_env(), inherits = TRUE){
+      # browser()
       if (identical(env, emptyenv())) {
-        stop("Could not find function called ", name, call. = FALSE) # 
-        }
-      # here we add the is.function() check
-      if (exists(name, env, inherits = FALSE) && is.function(env[[name]])) {
-        return(env[[name]])
-        }
+        # Base case
+        stop("Could not find function called \"", name, "\"", call. = FALSE) 
+      }
+      else if (name %in% env_names(env) && is.function(env[[name]])) {
+        # Success case
+        return(env_name(env))
+      }
+      else if (!inherits) {
+        # Escape case ;-)
+        stop("Could not find function called \"", name, "\"",
+             "\nConsider setting `inherits = TRUE`.",
+             call. = FALSE) 
+      }
       else {
-        fget2(name, parent.env(env))
+        # Recursive Case
+        fget2(name, env_parent(env))
       }
     }
+    
+    # Test
+    fget2("filter", inherits = TRUE)
     ```
-    
-   Note that this function is almost the same as the implementation of `pryr::fget()`:
-    
-    ```{r}
-    pryr::fget
-    ```
-    
-   We add an `inherits` parameter as described in the exercise:
-    
-    ```{r}
-    fget3 <- function(name, env = parent.frame(), inherits = TRUE){
-      stopifnot(is.character(name), length(name) == 1)
-      env <- pryr:::to_env(env)
-      if (identical(env, emptyenv())) {
-        stop("Could not find function called ", name, call. = FALSE) 
-        }
-      if (exists(name, env, inherits = FALSE) && is.function(env[[name]])) {
-        return(env[[name]])
-        }
-      # after the environment, which is specified in the env parameter, is checked
-      # we stop our function in case the new inherits parameter is set to FALSE
-      if (inherits == FALSE) {
-        stop("Could not find function called ", name," within ",
-             environmentName(env),
-             call. = FALSE)
-        }
-      else {
-        fget3(name, parent.env(env))
-      }
-    }
-    ```
+
+<!-- would like to avoid `env[[name]]`, but the right rlang-function currently escapes me. -->
 
 ## Special environments
 
