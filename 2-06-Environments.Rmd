@@ -270,4 +270,19 @@ editor_options:
 ## The call stack
 
 1. __<span style="color:red">Q</span>__: Write a function that lists all the variables defined in the environment in which it was called. It should return the same results as `ls()`.
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: We can implement this dynamic scoping behaviour, by explicitly referencing the caller environment. Pleaso note, that this approach returns also variables starting with a dot - an option we also pass to `ls()`.
+
+```{r}
+ls2 <- function(env = caller_env()) {
+  env_names(env)
+}
+
+# Test in global environment
+ls(all.names = TRUE)
+ls2()
+
+# Test in "sandbox" environment
+e1 <- env(a = 1, b = 2)
+invoke(ls, .env = e1)
+invoke(list_variables, .env = e1)
+```
