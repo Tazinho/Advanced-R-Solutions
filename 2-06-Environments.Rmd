@@ -189,6 +189,40 @@ editor_options:
 
 1. __<span style="color:red">Q</span>__: How is `search_envs()` different fo `env_parents(global_env())`?
 
+   __<span style="color:green">A</span>__: `search_envs()` returns all the environments on the search path. "The search path is a chain of environments containing exported functions of attached packages" (from `?search_envs`). Every time you attach a new package, this search path will grow. The search path ends with the base-environment. The global environment is included, because functions present in the global environment will always be part of the search path.
+
+    ```{r, eval=FALSE}
+    search_envs()
+    #>  [[1]] $ <env: global>
+    #>  [[2]] $ <env: package:rlang>
+    #>  [[3]] $ <env: tools:rstudio>
+    #>  [[4]] $ <env: package:stats>
+    #>  [[5]] $ <env: package:graphics>
+    #>  [[6]] $ <env: package:grDevices>
+    #>  [[7]] $ <env: package:utils>
+    #>  [[8]] $ <env: package:datasets>
+    #>  [[9]] $ <env: package:methods>
+    #> [[10]] $ <env: Autoloads>
+    #> [[11]] $ <env: package:base>
+    ```
+
+`env_parents(global_env())` will list all the ancestors of the global environment, therefore the global environment itsself is not included. This also includes the "ultimate ancestor", the empty environment. This environment is not part of the search path, because it contains no objects would need to be found.
+
+    ```{r, eval=FALSE}
+    env_parents(global_env())
+    #>  [[1]] $ <env: package:rlang>
+    #>  [[2]] $ <env: tools:rstudio>
+    #>  [[3]] $ <env: package:stats>
+    #>  [[4]] $ <env: package:graphics>
+    #>  [[5]] $ <env: package:grDevices>
+    #>  [[6]] $ <env: package:utils>
+    #>  [[7]] $ <env: package:datasets>
+    #>  [[8]] $ <env: package:methods>
+    #>  [[9]] $ <env: Autoloads>
+    #> [[10]] $ <env: package:base>
+    #> [[11]] $ <env: empty>
+    ```
+
 2. __<span style="color:red">Q</span>__: Draw a diagram that shows the enclosing environments of this function:
     
     ```{r, eval = FALSE}
@@ -204,10 +238,12 @@ editor_options:
     f1(1)
     ```  
     
-   __<span style="color:orange">A</span>__: TODO: Adopt the diagram to Hadley's new diagram-style in the 2nd-edition chapter.
+   __<span style="color:green">A</span>__: Each function environment binds its parent environment. The function environments contain functions and the values provided in the function call.
     
+   <!-- How I hope I understood this correctly! ;) (hb) -->
+
     ```{r, echo = FALSE}
-    knitr::include_graphics("diagrams/enclosing.png", dpi = 96)
+    knitr::include_graphics("diagrams/environments/function_environments.png", dpi = 96)
     ```
     
 3. __<span style="color:red">Q</span>__: Write an enhanced version of `str()` that provides more information about functions. Show where the function was found and what environment it was defined in.  
