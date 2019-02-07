@@ -1,3 +1,13 @@
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE
+)
+
+Sys.setenv(LANGUAGE = "en")
+library("methods")
+```
 ---
 title: "Advanced R Solutions"
 author: "Malte Grosser & Henning Bumann"
@@ -49,94 +59,90 @@ We would also like to thank everybody else who contributed to this project by fi
 
 ## Current Progress {-}
 
-```{r, echo = FALSE, warning = FALSE, message=FALSE}
+```{r, echo = FALSE, warning = FALSE, message=FALSE, fig.width = 8, fig.height=10}
+library(tibble)
 library(dplyr)
+library(purrr)
 library(tidyr)
-library(ggplot2)
 library(forcats)
-library(methods)
+library(ggplot2)
 
-df_new <- tibble::tribble(~ `1 Introduction`, ~ `2 Names and values`, ~ `3 Vectors`, ~ `4 Subsetting`, ~ `5 Control flow`, ~ `6 Functions`, ~ `7 Environments`, ~ `8 Conditions`, ~ `9 Functionals`, ~ `10 Function factories`,  ~ `11 Function operators`, ~ `12 Base types`, ~ `13 S3`, ~`14 R6`, ~`15 S4`, ~ `16 Trade-offs`, ~`17 Expressions`, ~`18 Quasiquotation`, ~`19 Evaluation`, ~`20 Translating R code`, ~ `21 Performance`, ~ `22 Optimising code`, ~ `23 High performance functions with Rcpp`,
-                       NA, "x",  "x",  "x",   "x",   "o",  "x",  "x",  "-",  "x",  "-",NA,   "o",    "-",  "x",NA,  "x",     "x",   "x",  "x",  "-",  "-",  "x",
-                       NA, "x",  "x",  "x",   "x",   "x",  "x",  "x",  "x",  "x",  "-",NA,   "-",    "-",  "o",NA,  "x",     "x",   "o",  "o",  "x",  "-",  "x",
-                       NA, "x",  "x",  "x",   "x",   "x",  "x",  "x",  "x",  "x",  "-",NA,   "x",     NA,  "x",NA,  "x",     "x",   "x",  "x",  "x",  "x",  "x",
-                       NA, "x",  "x",  "x",   "x",   "x",  "x",  "x",  "x",  "x",  "-",NA,   "x",     NA,  "x",NA,  "x",     "x",   "-",  "x",  "-",  "x",  "x",
-                       NA, "x",  "x",  "x",   "x",   "x",  "x",  "x",  "x",  "x",  "-",NA,   "x",     NA,  "x",NA,  "x",     "x",   "-",  "-",  "x",  "o",  "x",
-                       NA, "x",  "x",  "x",    NA,   "x",  "x",  "x",  "x",  "x",   NA,NA,   "x",     NA,  "x",NA,  "x",     "x",   "-",  "-",  "-",  "x",  "-",
-                       NA, "x",  "x",  "x",    NA,   "x",  "x",  "x",  "x",  "-",   NA,NA,   "x",     NA,  "x",NA,  "x",     "-",   "x",   NA,  "-",  "x",  "x",
-                       NA, "x",  "x",  "x",    NA,   "x",  "o",  "x",  "x",  "x",   NA,NA,   "x",     NA,   NA,NA,  "x",     "x",   "-",   NA,  "-",  "x",  "x",
-                       NA, "x",  "x",  "x",    NA,   "x",  "x",  "x",  "x",  "-",   NA,NA,   "-",     NA,   NA,NA,  "-",     "x",   "-",   NA,  "-",  "x",  "x",
-                       NA, "x",  "x",  "x",    NA,   "x",  "x",  "x",  "x",  "x",   NA,NA,   "-",     NA,   NA,NA,  "x",     "-",   "-",   NA,  "-",  "-",  "-",
-                       NA, "x",  "x",  "x",    NA,   "x",  "x",  "x",  "x",  "-",   NA,NA,   "x",     NA,   NA,NA,  "x",     "x",   "-",   NA,  "-",  "x",   NA,
-                       NA, "x",  "x",   NA,    NA,   "x",  "x",  "x",  "x",  "x",   NA,NA,   "x",     NA,   NA,NA,  "x",     "x",   "-",   NA,   NA,  "x",   NA,
-                       NA, "o",  "x",   NA,    NA,   "x",   NA,  "x",  "x",  "-",   NA,NA,   "-",     NA,   NA,NA,  "x",     "x",   "-",   NA,   NA,  "-",   NA,
-                       NA, "x",  "x",   NA,    NA,   "x",   NA,   NA,  "x",   NA,   NA,NA,   "x",     NA,   NA,NA,  "x",     "x",   "-",   NA,   NA,  "x",   NA,
-                       NA, "x",  "x",   NA,    NA,   "x",   NA,   NA,  "x",   NA,   NA,NA,   "-",     NA,   NA,NA,  "x",     "-",   "-",   NA,   NA,  "x",   NA,
-                       NA,  NA,  "x",   NA,    NA,   "x",   NA,   NA,  "x",   NA,   NA,NA,   "x",     NA,   NA,NA,  "x",     "x",   "-",   NA,   NA,  "x",   NA,
-                       NA,  NA,  "x",   NA,    NA,   "x",   NA,   NA,  "x",   NA,   NA,NA,   "o",     NA,   NA,NA,  "x",     "x",   "-",   NA,   NA,  "x",   NA,
-                       NA,  NA,  "x",   NA,    NA,   "x",   NA,   NA,  "x",   NA,   NA,NA,   "o",     NA,   NA,NA,  "x",     "-",   "-",   NA,   NA,   NA,   NA,
-                       NA,  NA,  "x",   NA,    NA,   "x",   NA,   NA,  "-",   NA,   NA,NA,   "-",     NA,   NA,NA,  "x",     "x",   "-",   NA,   NA,   NA,   NA,
-                       NA,  NA,   NA,   NA,    NA,   "x",   NA,   NA,   NA,   NA,   NA,NA,   "x",     NA,   NA,NA,  "-",      NA,   "-",   NA,   NA,   NA,   NA,
-                       NA,  NA,   NA,   NA,    NA,   "x",   NA,   NA,   NA,   NA,   NA,NA,   "o",     NA,   NA,NA,  "-",      NA,   "-",   NA,   NA,   NA,   NA,
-                       NA,  NA,   NA,   NA,    NA,   "o",   NA,   NA,   NA,   NA,   NA,NA,   "-",     NA,   NA,NA,  "x",      NA,   "-",   NA,   NA,   NA,   NA,
-                       NA,  NA,   NA,   NA,    NA,   "x",   NA,   NA,   NA,   NA,   NA,NA,   "x",     NA,   NA,NA,  "x",      NA,   "-",   NA,   NA,   NA,   NA,
-                       NA,  NA,   NA,   NA,    NA,   "x",   NA,   NA,   NA,   NA,   NA,NA,   "x",     NA,   NA,NA,  "x",      NA,    NA,   NA,   NA,   NA,   NA,
-                       NA,  NA,   NA,   NA,    NA,   "x",   NA,   NA,   NA,   NA,   NA,NA,    NA,     NA,   NA,NA,  "x",      NA,    NA,   NA,   NA,   NA,   NA,
-                       NA,  NA,   NA,   NA,    NA,   "x",   NA,   NA,   NA,   NA,   NA,NA,    NA,     NA,   NA,NA,   NA,      NA,    NA,   NA,   NA,   NA,   NA,
-                       NA,  NA,   NA,   NA,    NA,   "o",   NA,   NA,   NA,   NA,   NA,NA,    NA,     NA,   NA,NA,   NA,      NA,    NA,   NA,   NA,   NA,   NA,
-                       NA,  NA,   NA,   NA,    NA,   "x",   NA,   NA,   NA,   NA,   NA,NA,    NA,     NA,   NA,NA,   NA,      NA,    NA,   NA,   NA,   NA,   NA,
-                       NA,  NA,   NA,   NA,    NA,   "x",   NA,   NA,   NA,   NA,   NA,NA,    NA,     NA,   NA,NA,   NA,      NA,    NA,   NA,   NA,   NA,   NA,
-                       NA,  NA,   NA,   NA,    NA,   "x",   NA,   NA,   NA,   NA,   NA,NA,    NA,     NA,   NA,NA,   NA,      NA,    NA,   NA,   NA,   NA,   NA,
-                       NA,  NA,   NA,   NA,    NA,   "x",   NA,   NA,   NA,   NA,   NA,NA,    NA,     NA,   NA,NA,   NA,      NA,    NA,   NA,   NA,   NA,   NA,
-                       NA,  NA,   NA,   NA,    NA,   "x",   NA,   NA,   NA,   NA,   NA,NA,    NA,     NA,   NA,NA,   NA,      NA,    NA,   NA,   NA,   NA,   NA,
-                       NA,  NA,   NA,   NA,    NA,   "x",   NA,   NA,   NA,   NA,   NA,NA,    NA,     NA,   NA,NA,   NA,      NA,    NA,   NA,   NA,   NA,   NA)    
-
-df_new[] <- lapply(df_new, as.character)
-
-df_new <- df_new %>% mutate(exercise = 1:n())
-
-df_new <- gather_(df_new, "chapter", "solved", setdiff(names(df_new), "exercise"))
-df_new <- df_new
-
-quote_solutions <- mean(df_new$solved == "x", na.rm = TRUE)
-
-df_new <- df_new %>%
-  separate(chapter, "nr", sep = " ", remove = FALSE) %>% 
+# import from file --------------------------------------------------------
+df_long <- read.table("progress_data.csv", stringsAsFactors = FALSE,
+                      sep = "\t", header = TRUE) %>% 
+  as_tibble() %>% 
+  modify_at("status", factor, levels = c("open", "started", "solved")) %>% 
+  arrange(chapter, subchapter, exercise) %>% 
+  tibble::rowid_to_column("id") %>% 
+  separate(chapter, "nr", sep = " ", remove = FALSE, extra = "drop") %>% 
   mutate(nr = as.integer(nr), 
          chapter = factor(chapter),
          chapter = fct_reorder(chapter, nr, .desc = TRUE),
-         solved = as.character(solved),
-         id = 1:n())
-df_new <- as_data_frame(df_new)
+         part = case_when(nr < 9 ~ "Foundations",
+                          nr < 12 ~ "FP",
+                          nr < 17 ~ "OOP",
+                          nr < 21 ~ "Metapr.",
+                          TRUE    ~ "Techn."),
+         part = factor(part, levels = c("Foundations", "FP", "OOP",
+                                        "Metapr.", "Techn."))) %>% 
+  # find most recent state for each exercise
+  group_by(chapter, subchapter, exercise) %>% 
+  filter(updated_when == max(updated_when)) %>% 
+  ungroup()
 
-solved_exercises <- ggplot(df_new, aes(x = chapter, fill = solved, group = -id)) +
-  scale_y_continuous(expand = c(0, 0)) +
-  scale_fill_manual(values = c("#F99992", "orange", "#00BFC4")) +
-  geom_bar(colour = "white") +
-  theme(
-  legend.position = "none",
-  axis.text.x = element_blank(),
-  axis.title.x = element_blank(),
-  axis.ticks.x = element_blank(),
-  axis.text.y = element_text(size = 12),
-  axis.title.y = element_blank(),
-  axis.ticks.y = element_blank()
-  ) +
+# Intermediate calculations
+percent_solved <- mean(df_long$status == "solved", na.rm = TRUE) * 100
+
+# Create Plot
+plot_progress <- df_long %>% 
+  ggplot(aes(x = chapter, fill = status, group = -id,
+             subchapter = subchapter, exercise = exercise,
+             credits = credits)) +
   coord_flip() +
-  theme(
-  axis.line = element_blank(),
-  panel.grid.major = element_blank(),
-  panel.grid.minor = element_blank(),
-  panel.border = element_blank(),
-  panel.background = element_blank()
-  ) +
-  ggtitle(paste0("Solved Exercises: ", round(100 * quote_solutions, 1), "% (2nd Edition)"),
-    subtitle = paste0("Solved: ", sum(df_new$solved == "x", na.rm = TRUE),
-      "; Open: ", sum(!is.na(df_new$solved)) - sum(df_new$solved == "x", na.rm = TRUE)
-    )
-  )
+  geom_bar(color = "white") +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom",
+        # legend.justification = c(0, 1),
+        strip.background = element_rect(fill = "#EFEFEF"),
+        strip.placement = "outside",
+        axis.text.x = element_blank(),
+        axis.text.y = element_text(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        plot.title = element_text(hjust = -2.5),
+        panel.grid = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank()) +
+  guides(color = FALSE,
+         fill = guide_legend(nrow = 1)) +
+  scale_fill_manual(values = c("#F99992", "orange", "#00BFC4")) +
+  labs(title = paste("Solved Exercises:",
+                     round(percent_solved, 1),
+                     "% (2nd Edition)"),
+       caption = paste0("(Open: ",
+                         sum(df_long$status == "open"),
+                         " | Started: ",
+                         sum(df_long$status == "started"),
+                         " | Solved: ",
+                         sum(df_long$status == "solved"),
+                        ")"),
+       fill = "Status:")
 
-  solved_exercises
+# Create static plot (including facets for parts)
+plot_progress + 
+  facet_grid(part ~ ., scales = "free",
+             space = "free", switch = "both")
+
+# Create interactive version of plot
+# plot_progress %>%
+#   plotly::ggplotly(tooltip = c("subchapter", "exercise", "credits")) %>% 
+#   plotly::layout(legend = list(orientation = "h",
+#                                xanchor = "left",
+#                                x = 0,
+#                                yanchor = "bottom",
+#                                y = -.05,
+#                                font = list(size = 25)))
 ```
 
 The date of the exercise versions in Hadley’s book (2nd edition) is October 6th 2018.
