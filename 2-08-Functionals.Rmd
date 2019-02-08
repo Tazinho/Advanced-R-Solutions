@@ -382,9 +382,8 @@ find_fixed_point <- function(f, x_start = 1, n_max = 10000, tol = 0.0001) {
         
         if(is_fixed_point){
           # Success case
-          message("Fixed point was found: ", round(x, nchar(tol)),
-                  "\n", n, " iterations needed.")
-          break()
+          message("Fixed point was found, after", n, " iterations.")
+          return(x)
         } else {
           # Recursive case
           x <- y
@@ -399,7 +398,7 @@ find_fixed_point <- function(f, x_start = 1, n_max = 10000, tol = 0.0001) {
 ```
 
     ```{r}
-# Functions with fixed points
+    # Functions with fixed points
     find_fixed_point(sin, x_start = 1)
     find_fixed_point(cos, x_start = 1)
     
