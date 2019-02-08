@@ -367,10 +367,45 @@
 
 3. __<span style="color:red">Q</span>__: Challenge: read about the [fixed point algorithm](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-12.html#%25_idx_1096). Complete the exercises using R.
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: A number x is called a fixed point of a function $f$, if it satisfies the equation $f(x) = x$. For some functions we may find a fixed point by beginning with a starting value and applying $f$ repeatedly. Here `find_fixed_point()` acts as a functional, because it takes a function as an argument.
 
-
-
+    ```{r}
+    find_fixed_point <- function(f, x_start = 1, n_max = 10000, tol = 0.0001) {
+      # Initialize
+      n <- 1
+      x <- x_start
+      
+      while (n < n_max) {
+        # Compute function and test for fixed point quality
+        y <- f(x)
+        is_fixed_point <- all.equal(x, y, tolerance = tol)  == TRUE
+        
+        if(is_fixed_point){
+          # Success case
+          message("Fixed point was found: ", round(x, nchar(tol)),
+                  "\n", n, " iterations needed.")
+          break()
+        } else {
+          # Recursive case
+          x <- y
+          n <- n + 1
+        }
+      }
+      if(!is_fixed_point){
+        # Non-converging case
+        message("No fixed point found.")
+      }
+    }
+    
+    
+    # Functions with fixed points
+    find_fixed_point(sin, x_start = 1)
+    find_fixed_point(cos, x_start = 1)
+    
+    # Functions without fixed points
+    add_one <- function(x) x + 1
+    find_fixed_point(add_one, x_start = 1)
+    ```
 
 ## Old exercises
 
