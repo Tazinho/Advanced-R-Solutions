@@ -1,30 +1,35 @@
 # Evaluation
 
+## Prerequisites
+    ```{r, message=FALSE}
+    library(rlang)
+    library(purrr)
+    ```
+
 ## Introduction
 
 1. __<span style="color:red">Q</span>__: Carefully read the documentation for `source()`. What environment does it use by default? What if you supply `local = TRUE`? How do you provide a custom argument?
     
-   __<span style="color:green">A</span>__: `source()` allows us to specify an evaluation environment. By default, the global environment is used. Using a local environment is possible, by setting `local = FALSE`. We may even provide a specific environment by passing an environment object.
+   __<span style="color:green">A</span>__: By default, `source()` uses the global environment, but another evaluation environment may also be chosen, by passing it to the `local`-argument. To use a local environment set `local = TRUE`.
     
     ```{r}
     # create temporary, sourcable R script
     tmp_file <- tempfile()
     writeLines("print(x)", tmp_file)
     
-    # prepare testing "probes"
+    # set x globally
     x <- "global environment"
+    env2 <- rlang::env(x = "specified envirionment")
     
     locate_evaluation <- function(file, local){
       x <- "local environment"
       source(file, local = local)
     }
     
-    env2 <- rlang::env(x = "specified envirionment")
-    
     # where will source() be evaluated?
-    locate_evaluation(tmp_file, local = FALSE)
-    locate_evaluation(tmp_file, local = TRUE)
+    locate_evaluation(tmp_file, local = FALSE)  # default
     locate_evaluation(tmp_file, local = env2)
+    locate_evaluation(tmp_file, local = TRUE)
     ```
 
 2. __<span style="color:red">Q</span>__: Predict the results of the following lines of code:
@@ -35,7 +40,7 @@
     quote(eval(quote(eval(quote(eval(quote(2 + 2))))))) 
     ```
 
-   __<span style="color:orange">A</span>__: You can see the output of the code above here:
+   __<span style="color:green">A</span>__: You can see the output of the code above here:
 
     ```{r, echo = FALSE}
     eval(quote(eval(quote(eval(quote(2 + 2))))))
@@ -43,7 +48,7 @@
     quote(eval(quote(eval(quote(eval(quote(2 + 2)))))))
     ```
 
-   Generally what happens, is that `2 + 2` is first quoted as an expression and than evaluated to `4`. When we nest calls to `quote()` and `eval()` more calls will be added to the AST, but the pattern of quoting and evaluating stays the same.
+   Generally, `2 + 2` is first quoted as an expression and than evaluated to `4`. When we nest calls to `quote()` and `eval()` more calls will be added to the AST, but the pattern of quoting and evaluating stays the same.
 
     ```{r}
     # pattern: evaluate a quoted expression
@@ -57,21 +62,9 @@
     lobstr::ast(eval(quote(eval(quote(eval(quote(2 + 2)))))))
     ```
 
-   TODO (optional) Maybe explain a little better, in which order this call is evaluated, left to right or so?
+   When we wrap this expression in another `eval()` the `4` will be evaluated once more, but the result doesn't change. When we quote it, no evaluation takes place and we capture the expression instead.
 
-   When we wrap this expression in another `eval()` the `4` will be evaluated once more, but the result doesn't change. When we quote it, we no evaluation takes place and we capture the expression instead. We could say: "An outside `quote()` always wins."
-
-3. __<span style="color:red">Q</span>__: Write an equivalent to `get()` using `sym()` and `eval_bare()`. Write an equivalent to `assign()` using `sym()`, `expr()`, and `eval_bare()`. (Don't worry about the multiple ways of choosing an environment that
-    `get()` and `assign()` support; assume that the user supplies it 
-    explicitly.)
-    
-    ```{r}
-    # name is a string
-    get2 <- function(name, env) {}
-    assign2 <- function(name, value, env) {}
-    ```
-    
-   __<span style="color:green">A</span>__:   
+3. __<span style="color:red">Q</span>__: Fill in the function bodies below to re-implement `get()` using `sym()` and `eval()`, and`assign()` using `sym()`, `expr()`, and `eval()`. Don't worry about the multiple ways of choosing an environment that `get()` and `assign()` support; assume that the user supplies it explicitly
 
     ```{r}
     # name is a string
@@ -79,9 +72,95 @@
     assign2 <- function(name, value, env) {}
     ```
 
+   __<span style="color:green">A</span>__: The reimplemantion of these two function using tidy evaluation is based on building an expression, which is then evaluated.
+
+    ```{r}
+    get2 <- function(name, env = caller_env()) {
+      name_sym <- sym(name)
+      eval(name_sym, env)
+    }
+    
+    x <- 1
+    get2("x")
+    ```
+
+   The implementation could be even more concise, if the user would provide an expression instead of a string:
+
+    ```{r}
+    get3 <- function(name, env = caller_env()){
+      eval(name, env)
+    }
+    
+    get3(x)
+    ```
+
+   To build the correct expression for the value assignment, we unquote using `!!`. Bang bang! :)
+
+    ```{r}
+    assign2 <- function(name, value, env = caller_env()) {
+      name_sym <- sym(name)
+      assign_expr <- expr(!!name_sym <- !!value)
+      eval(assign_expr, env)
+    }
+    
+    assign2("x", 4)
+    x
+    ```
+    
 4. __<span style="color:red">Q</span>__: Modify `source2()` so it returns the result of _every_ expression, not just the last one. Can you eliminate the for loop?
 
+   __<span style="color:orange">A</span>__: 
+
+   - keep in mind `<-` invisibly returns its value
+
+    ```{r, error=TRUE}
+    tmp_file <- tempfile()
+    writeLines("x <- 1
+            x
+            y <- 2
+            y  # another comment
+           ", tmp_file)
+    
+    source2 <- function(file, env = caller_env()){
+      readLines(file) %>% 
+        parse_exprs() %>%
+        map(eval_tidy, env = env)
+      
+      # alternatively: 
+      # for (i in seq_along(exprs)) eval(exprs[i], env)
+    }
+    
+    source2(tmp_file)
+    x
+    y
+    ```
+
 5. __<span style="color:red">Q</span>__: The code generated by `source2()` lacks source references. Read the source code for `sys.source()` and the help for `srcfilecopy()`, then modify `source2()` to preserve source references. You can test your code by sourcing a function that contains a comment. If successful, when you look at the function, you'll see the comment and not just the source code.
+
+   __<span style="color:orange">A</span>__: 
+
+    ```{r, error=TRUE}
+    tmp_file <- tempfile()
+    writeLines('x <- 1
+    test_function <- function() {
+    "source me!"  # testcomment
+    }', tmp_file)
+    
+    file <- tmp_file
+    
+    source2 <- function(file, env = caller_env()){
+      lines <- readLines(file)
+      srcfile <- srcfilecopy(file, lines)
+      
+      parse(text = lines, srcfile = srcfile, keep.source = TRUE) %>% 
+        map(eval_tidy, env = env) 
+    }
+    
+    source2(tmp_file)
+    test_function
+    ```
+
+   - the comment is still missing
 
 6. __<span style="color:red">Q</span>__: We can make `base::local()` slightly easier to understand by spreading out over multiple lines:
 
