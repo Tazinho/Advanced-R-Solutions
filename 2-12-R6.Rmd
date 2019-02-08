@@ -1,12 +1,57 @@
 # R6
 
+## Classes and methods
+
+1. __<span style="color:red">Q</span>__: Create a bank account R6 class that stores a balance and allows you to deposit and withdraw money. Create a subclass that throws an error if you attempt to go into overdraft. Create another subclass that allows you to go into overdraft, but charges you a fee.
+
+   __<span style="color:green">A</span>__:
+
+2. __<span style="color:red">Q</span>__: Create an R6 class that represents a shuffled deck of cards. You should be able to draw cards from the deck with `$draw(n)`, and return all cards to the deck and reshuffle with `$reshuffle()`. Use the following code to make a vector of cards.
+    
+    ```{r}
+    suit <- c("♠", "♥", "♦", "♣")
+    value <- c("A", 2:10, "J", "Q", "K")
+    cards <- paste0(rep(value, 4), suit)
+    ```
+
+   __<span style="color:green">A</span>__:
+
+3. __<span style="color:red">Q</span>__: Why can't you model a bank account or a deck of cards with an S3 class?
+    
+   __<span style="color:green">A</span>__:
+
+4. __<span style="color:red">Q</span>__: Create an R6 class that allows you to get and set the current timezone. You can access the current timezone with `Sys.timezone()` and set it with `Sys.setenv(TZ = "newtimezone")`. When setting the time zone, make sure the new time zone is in the list provided by `OlsonNames()`.
+
+   __<span style="color:green">A</span>__:
+
+5. __<span style="color:red">Q</span>__: Create an R6 class that manages the current working directory.It should have `$get()` and `$set()` methods.
+    
+   __<span style="color:green">A</span>__:
+
+6. __<span style="color:red">Q</span>__: Why can't you model the time zone or current working directory with an S3 class?
+    
+   __<span style="color:green">A</span>__:
+
+7. __<span style="color:red">Q</span>__: What base type are R6 objects built on top of? What attributes do they have?
+
+   __<span style="color:green">A</span>__:
+
 ## Controlling access
 
-1. __<span style="color:red">Q</span>__: How would you define a write-only field?
+1. __<span style="color:red">Q</span>__: Create a bank account class that prevents you from directly setting the account balance, but you can still withdraw from and deposit to. Throw an error if you attempt to go into overdraft.
+    
+   __<span style="color:green">A</span>__:
 
-   __<span style="color:green">A</span>__: 
+2. __<span style="color:red">Q</span>__: Create a class with a write-only `$password` field. It should have `$check_password(password)` method that returns `TRUE` or `FALSE`, but there should be no way to view the complete password.
 
-2. __<span style="color:red">Q</span>__: Can subclasses access private fields/methods from their parent? Perform an experiment to find out.
+   __<span style="color:green">A</span>__:
 
-   __<span style="color:green">A</span>__: 
-   
+3. __<span style="color:red">Q</span>__: Extend the `Rando` class with another active binding that allows you to access the previous random value. Ensure that active binding is the only way to access the value.
+
+   __<span style="color:green">A</span>__:
+
+4. __<span style="color:red">Q</span>__: Can subclasses access private fields/methods from their parent? Perform an experiment to find out.
+
+
+## Reference semantics
+1. __<span style="color:red">Q</span>__: Create a class that allows you to write a line to a specified file.  You should open a connection to the file in `$initialize()`, append a line using `cat()` in `$append_line()`, and close the connection in `$finalize()`.
