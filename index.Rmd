@@ -87,7 +87,8 @@ df_long <- read.table("progress_data.csv", stringsAsFactors = FALSE,
                                         "Metapr.", "Techn."))) %>% 
   # find most recent state for each exercise
   group_by(chapter, subchapter, exercise) %>% 
-  filter(updated_when == max(updated_when)) %>% 
+  filter(updated_when == max(updated_when),
+         status != "deleted") %>% 
   ungroup()
 
 # Intermediate calculations
