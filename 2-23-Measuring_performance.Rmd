@@ -1,5 +1,9 @@
 # Measuring performance
 
+    ```{r, include=FALSE}
+    library(magrittr)
+    ```
+
 ## Profiling
 
 1. __<span style="color:red">Q</span>__: Profile the following function with `torture = TRUE`. What is surprising? Read the source code of `rm()` to figure out what's going on.
@@ -12,7 +16,14 @@
     ```
 
    __<span style="color:green">A</span>__:
-   
+
+    ```{r, eval = FALSE, include = FALSE}
+    profvis::profvis(f(), torture = TRUE)
+    
+    f()
+    ```
+
+<!-- from `?profvis()`: `Toruture` triggers garbage collection after every torture memory allocation call. -->
 
 ## Microbenchmarking
 
@@ -24,11 +35,33 @@
     system.time(for (i in 1:n) x ^ 0.5) / n
     ```
     
-    How do the estimates from `system.time()` compare to those from
-    `bench::mark()`? Why are they different?
+  How do the estimates from `system.time()` compare to those from `bench::mark()`? Why are they different?
 
    __<span style="color:green">A</span>__:
-   
+
+```{r}
+n <- 1e6
+x <- runif(100)
+
+bench_res <- bench::mark(sqrt(x), x ^ 0.5)
+time_sqrt <- system.time(for (i in 1:n) sqrt(x)) / n
+time_powerhalf <- system.time(for (i in 1:n) x ^ 0.5) / n
+
+# compare results for sqrt(x)
+time_sqrt[["elapsed"]]
+as.numeric(bench_res$mean)[[1]]
+
+# compare results for x ^ sqrt(0.5)
+time_powerhalf[["elapsed"]]
+as.numeric(bench_res$mean)[[2]]
+```
+
+- both approaches get the order of magnitude right, but the average method is a little faster.
+- this is surprising to me, because this approach also get's the (small) overhead of the `for`-loop
+- `system.time`-approach is only able to return the average execution time, which is not optimal for the skewed distribution of execution times.
+
+<!-- Just in case, that you are not sold on bench::mark yet - remember, there is no fancy default plot for system.time. ;) -->
+
 2. __<span style="color:red">Q</span>__: Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.
 
     ```{r, eval = FALSE}
@@ -36,8 +69,24 @@
     exp(log(x) / 2)
     ```
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:orange">A</span>__: We'll use the "bench"-package to estimate the relative execution time of these expression, with the fastest expression standardized to 1.
    
+```{r, message=FALSE}
+x <- runif(100)
+y <- 1/2
+bench::mark(sqrt(x),          # (1)
+            x ^ 0.5,          # (2)
+            x ^ (1 / 2),      # (3)
+            exp(log(x) / 2),  # (4)
+            relative = TRUE) %>% 
+  dplyr::select(expression, median) %>% 
+  dplyr::arrange(median)
+```
+
+At first, the result seems surprising. The call to `exp(log(x)/2)`, with the most function calls is actually considerably faster than (2) and (3).
+
+<!-- todo: find better explanation, why `exp(log(x)/2)` is fast -->
+<!-- also: explain, why (3) is faster than (2). I suppose it has sth todo with machine numbers and precision, maybe? -->
 
 ## Old exercises
 1. __<span style="color:red">Q</span>__: Instead of using `microbenchmark()`, you could use the built-in function `system.time()`. But `system.time()` is much less precise, so you'll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.
