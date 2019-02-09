@@ -6,7 +6,7 @@
     library(purrr)
     ```
 
-## Introduction
+## Evaluation Basics
 
 1. __<span style="color:red">Q</span>__: Carefully read the documentation for `source()`. What environment does it use by default? What if you supply `local = TRUE`? How do you provide a custom argument?
     
@@ -172,7 +172,45 @@
     ```
     
   Explain how `local()` works in words. (Hint: you might want to `print(call)` to help understand what `substitute()` is doing, and read the documentation to remind yourself what environment `new.env()` will inherit from.)
-    
+
+   __<span style="color:green">A</span>__:
+
+```{r}
+local3 <- function(expr, envir = new.env()) {
+  call <- substitute(eval(quote(expr), envir))
+  print(call)
+  eval(call, envir = parent.frame())
+}
+
+foo <- local3({
+  x <- 10
+  x * 2
+})
+
+foo
+```
+
+substitute only replaces the expr with the input and the environment (for the call to eval) by the relate
+
+```{r}
+# how does substitute work?
+```
+
+- substitute opperates in function execution environment, it replaces the variables bound in this environments by their expression (expr becomes the input, and envir, becomes the environment passed to `local3` (new.env() by default))
+
+<!-- this needs a better description based on the ast, @taz -->
+
+```{r}
+# this is, what is happening afterwards
+eval(eval(quote({x <- 10; x * 2}), new.env()), parent.frame())
+
+eval(quote({x <- 10; x * 2}), new.env())  # this is evaluated locally
+
+eval(20, parent.frame())  # makes it available in the caller environment
+```
+
+
+
 ## Quosures
 
 1. __<span style="color:red">Q</span>__: Predict what evaluating each of the following quosures will return.
@@ -190,7 +228,7 @@
     q3
     ```
     
-   __<span style="color:green">A</span>__: Each quosure will be evaluated in it's own environment. Hence we get:
+   __<span style="color:green">A</span>__: Each quosure will be evaluated in it's own environment. This leads us to:
     
     ```{r}
     eval_tidy(q1)
@@ -198,11 +236,102 @@
     eval_tidy(q3)
     ```
 
-2. __<span style="color:red">Q</span>__: Write a function `enenv()` that captures the environment associated with an argument.
+2. __<span style="color:red">Q</span>__: Write an enenv() function that captures the environment associated with an argument. (Hint: this should only require two function calls.)
+
+   __<span style="color:green">A</span>__: A quosure captures both the expression and the environment. From a captured quosure, we can access the environment with the help of `get_env()`.
+
+    ```{r}
+    enenv <- function(x){
+      q <- enquo(x)
+      get_env(q) 
+    }
+    
+    # Test
+    capture_env <- function(x){
+      enenv(x)
+    }
+    
+    enenv(x)
+    capture_env(x)  # functions execution environment is captured
+    ```
+
+## Data Masks
+1. __<span style="color:red">Q</span>__: Why did I use a for loop in `transform2()` instead of `map()`? Consider `transform2(df, x = x * 2, x = x * 2)`.
+   
+   __<span style="color:green">A</span>__: 
+   
+2. __<span style="color:red">Q</span>__: Here's an alternative implementation of `subset2()`:
+
+    ```{r, results = FALSE}
+    subset3 <- function(data, rows) {
+      rows <- enquo(rows)
+      eval_tidy(expr(data[!!rows, , drop = FALSE]), data = data)
+    }
+
+    df <- data.frame(x = 1:3)
+    subset3(df, x == 1)
+    ```
+
+   Compare and contrast `subset3()` to `subset2()`. What are its advantages and disadvantages?
+
+   __<span style="color:green">A</span>__: 
+   
+3. __<span style="color:red">Q</span>__: The following function implements the basics of `dplyr::arrange()`. Annotate each line with a comment explaining what it does. Can you explain why `!!.na.last` is strictly correct, but omitting the `!!` is unlikely to cause problems?
+
+    ```{r}
+    arrange2 <- function(.df, ..., .na.last = TRUE) {
+      args <- enquos(...)
+
+      order_call <- expr(order(!!!args, na.last = !!.na.last))
+
+      ord <- eval_tidy(order_call, .df)
+      stopifnot(length(ord) == nrow(.df))
+
+      .df[ord, , drop = FALSE]
+    }
+    ```
+
+   __<span style="color:green">A</span>__: 
+   
+   
+## Using tidy evaluation
+1. __<span style="color:red">Q</span>__:  I've included an alternative implementation of `threshold_var()` below. What makes it different to the approach I used above? What makes it harder?
+
+    ```{r}
+    threshold_var <- function(df, var, val) {
+      var <- ensym(var)
+      subset2(df, `$`(.data, !!var) >= !!val)
+    }
+    ```
 
    __<span style="color:green">A</span>__: 
 
-## Tidy evaluation
+
+## Old exercises
+
+1. __<span style="color:red">Q</span>__: Run this code in your head and predict what it will print. Confirm or refute your prediction by running the code in R.
+
+    ```{r, results = FALSE}
+    f <- function(...) {
+      x <- "f"
+      g(f = x, ...)
+    }
+    g <- function(...) {
+      x <- "g"
+      h(g = x, ...)
+    }
+    h <- function(...) {
+      enquos(...)
+    }
+    x <- "top"
+    
+    out <- f(top = x)
+    out
+    purrr::map_chr(out, eval_tidy)
+    ```
+
+1. __<span style="color:red">Q</span>__: What happens if you use `expr()` instead of `enexpr()` inside of `subset2()`?
+
 
 1. __<span style="color:red">Q</span>__: Improve `subset2()` to make it more like real `base::subset()`:
     
@@ -280,7 +409,7 @@
 10. __<span style="color:red">Q</span>__: Implement a version of `within.data.frame()` that uses tidy evaluation. 
     Read the documentation and make sure that you understand what `within()` does, then read the source code.
     
-## Wrapping quoting functions
+<!-- ## Wrapping quoting functions -->
 
 1. __<span style="color:red">Q</span>__: When model building, typically the response and data are relatively constant while you rapidly experiment with different predictors. Write a small wrapper that allows you to reduce duplication in this situation.
     
@@ -293,35 +422,10 @@
     pred_mpg(~ disp * cyl)
     ```
     
-1. __<span style="color:red">Q</span>__: Another way to way to write `boot_lm()` would be to include the boostrapping expression (`data[sample(nrow(data), replace = TRUE), , drop = FALSE]`) in the data argument. Implement that approach. What are the advantages? What are the disadvantages?
+2. __<span style="color:red">Q</span>__: Another way to way to write `boot_lm()` would be to include the boostrapping expression (`data[sample(nrow(data), replace = TRUE), , drop = FALSE]`) in the data argument. Implement that approach. What are the advantages? What are the disadvantages?
 
-1. __<span style="color:red">Q</span>__: To make these functions somewhat more robust, instead of always using the `caller_env()` we could capture a quosure, and then use its environment. However, if there are multiple arguments, they might be associated with different environments. Write a function that takes a list of quosures, and returns the common environment, if they have one, or otherwise throws an error.
+3. __<span style="color:red">Q</span>__: To make these functions somewhat more robust, instead of always using the `caller_env()` we could capture a quosure, and then use its environment. However, if there are multiple arguments, they might be associated with different environments. Write a function that takes a list of quosures, and returns the common environment, if they have one, or otherwise throws an error.
 
-1. __<span style="color:red">Q</span>__: Write a function that takes a data frame and a list of formulas, fitting a linear model with each formula, generating a useful model call.
+4. __<span style="color:red">Q</span>__: Write a function that takes a data frame and a list of formulas, fitting a linear model with each formula, generating a useful model call.
 
-1. __<span style="color:red">Q</span>__: Create a formula generation function that allows you to optionally supply a transformation function (e.g. `log()`) to the response or the predictors.
-
-## Old exercises
-
-1. __<span style="color:red">Q</span>__: Run this code in your head and predict what it will print. Confirm or refute your prediction by running the code in R.
-
-    ```{r, results = FALSE}
-    f <- function(...) {
-      x <- "f"
-      g(f = x, ...)
-    }
-    g <- function(...) {
-      x <- "g"
-      h(g = x, ...)
-    }
-    h <- function(...) {
-      enquos(...)
-    }
-    x <- "top"
-    
-    out <- f(top = x)
-    out
-    purrr::map_chr(out, eval_tidy)
-    ```
-
-1. __<span style="color:red">Q</span>__: What happens if you use `expr()` instead of `enexpr()` inside of `subset2()`?
+5. __<span style="color:red">Q</span>__: Create a formula generation function that allows you to optionally supply a transformation function (e.g. `log()`) to the response or the predictors.
