@@ -2,7 +2,7 @@
 
 ## Getting started with C++
 
-1.  __<span style="color:red">Q</span>__: With the basics of C++ in hand, it's now a great time to practice by reading and writing some simple C++ functions. For each of the following functions, read the code and figure out what the corresponding base R function is. You might not understand every part of the code yet, but you should be able to figure out the basics of what the function does.
+1. __<span style="color:red">Q</span>__: With the basics of C++ in hand, it's now a great time to practice by reading and writing some simple C++ functions. For each of the following functions, read the code and figure out what the corresponding base R function is. You might not understand every part of the code yet, but you should be able to figure out the basics of what the function does.
 
     ```cpp
     double f1(NumericVector x) {
@@ -60,18 +60,19 @@
     }
     ```
 
-    __<span style="color:green">A</span>__:  The R equivalents are:  
+   __<span style="color:green">A</span>__:  The R equivalents are:  
 
-    *   f1: `mean()`  
-    *   f2: `cumsum()`  
-    *   f3: `any()`
-    *   f4: `Position()`
-    *   f5: `pmin()`
+   *   f1: `mean()`  
+   *   f2: `cumsum()`  
+   *   f3: `any()`
+   *   f4: `Position()`
+   *   f5: `pmin()`
 
+1. __<span style="color:red">Q</span>__:  To practice your function writing skills, convert the following functions into C++. For now, assume the inputs have no missing values.  
 
-1.  __<span style="color:red">Q</span>__:  To practice your function writing skills, convert the following functions into C++. For now, assume the inputs have no missing values.  
-  
-    1. `all()`
+   __<span style="color:green">A</span>__:
+   
+   1. `all()`
   
     ```cpp
     bool allC(LogicalVector x) {
@@ -84,7 +85,7 @@
     }
     ```
   
-    2. `cumprod()`, `cummin()`, `cummax()`.
+   2. `cumprod()`, `cummin()`, `cummax()`.
   
     ```cpp
     NumericVector cumprodC(NumericVector x) {
@@ -122,7 +123,7 @@
     }
     ```
 
-    3. `diff()`. Start by assuming lag 1, and then generalise for lag `n`.
+   3. `diff()`. Start by assuming lag 1, and then generalise for lag `n`.
     
     ```cpp
     NumericVector diffC(NumericVector x){
@@ -146,7 +147,7 @@
     }'
     ```
   
-    4. `range`.  
+   4. `range`.  
     
     ```cpp
     NumericVector rangeC(NumericVector x){
@@ -167,16 +168,13 @@
       return out;
     ```
   
-    5. `var`. Read about the approaches you can take on 
-     [wikipedia](http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance).
-    Whenever implementing a numerical algorithm, it's always good to check what 
-    is already known about the problem.
+   5. `var`. Read about the approaches you can take on [wikipedia](http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance). Whenever implementing a numerical algorithm, it's always good to check what is already known about the problem.
 
 ## Missing values
 
-1.  __<span style="color:red">Q</span>__:  Rewrite any of the functions from the first exercise to deal with missing values. If `na.rm` is true, ignore the missing values. If `na.rm` is false, return a missing value if the input contains any missing values. Some good functions to practice with are `min()`, `max()`, `range()`, `mean()`, and `var()`.
+1. __<span style="color:red">Q</span>__:  Rewrite any of the functions from the first exercise to deal with missing values. If `na.rm` is true, ignore the missing values. If `na.rm` is false, return a missing value if the input contains any missing values. Some good functions to practice with are `min()`, `max()`, `range()`, `mean()`, and `var()`.
 
-     __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__:
    
     ```cpp
     NumericVector minC(NumericVector x, bool narm){
@@ -320,7 +318,7 @@
 
 2. __<span style="color:red">Q</span>__: Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that these functions have slightly more complicated behaviour.  
     
-    __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__:
    
     ```cpp
     NumericVector cumsumC(NumericVector x) {
@@ -360,8 +358,10 @@
 
 To practice using the STL algorithms and data structures, implement the following using R functions in C++, using the hints provided:
 
-1. `median.default()` using `partial_sort`.
+1. __<span style="color:red">Q</span>__: `median.default()` using `partial_sort`.
 
+   __<span style="color:green">A</span>__:
+   
     ```cpp
     #include <algorithm>
     #include <Rcpp.h>
@@ -383,9 +383,13 @@ To practice using the STL algorithms and data structures, implement the followin
     }
     ```
 
-1. `%in%` using `unordered_set` and the `find()` or `count()` methods.
+2. __<span style="color:red">Q</span>__: `%in%` using `unordered_set` and the `find()` or `count()` methods.
 
-1. `unique()` using an `unordered_set` (challenge: do it in one line!).  
+   __<span style="color:green">A</span>__:
+
+3. __<span style="color:red">Q</span>__: `unique()` using an `unordered_set` (challenge: do it in one line!).  
+
+   __<span style="color:green">A</span>__:
 
     ```cpp
     // [[Rcpp::plugins(cpp11)]]
@@ -405,9 +409,11 @@ To practice using the STL algorithms and data structures, implement the followin
       
       return wrap(out);
     }
-```
+    ```
 
-1. `min()` using `std::min()`, or `max()` using `std::max()`.
+4. __<span style="color:red">Q</span>__: `min()` using `std::min()`, or `max()` using `std::max()`.
+
+   __<span style="color:green">A</span>__:
 
     ```cpp
     #include <Rcpp.h>
@@ -426,7 +432,9 @@ To practice using the STL algorithms and data structures, implement the followin
     }
     ```
 
-1. `which.min()` using `min_element`, or `which.max()` using `max_element`.  
+5. __<span style="color:red">Q</span>__: `which.min()` using `min_element`, or `which.max()` using `max_element`.  
+
+   __<span style="color:green">A</span>__:
 
     ```cpp
     #include <Rcpp.h>
@@ -443,7 +451,9 @@ To practice using the STL algorithms and data structures, implement the followin
   
       return out;
     }
-```
+    ```
 
-1. `setdiff()`, `union()`, and `intersect()` for integers using sorted ranges 
-   and `set_union`, `set_intersection` and `set_difference`.
+6. __<span style="color:red">Q</span>__: `setdiff()`, `union()`, and `intersect()` for integers using sorted ranges and `set_union`, `set_intersection` and `set_difference`.
+
+   __<span style="color:green">A</span>__:
+   

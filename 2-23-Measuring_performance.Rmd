@@ -1,7 +1,45 @@
 # Measuring performance
 
+## Profiling
+
+1. __<span style="color:red">Q</span>__: Profile the following function with `torture = TRUE`. What is surprising? Read the source code of `rm()` to figure out what's going on.
+
+    ```{r}
+    f <- function(n = 1e5) {
+      x <- rep(1, n)
+      rm(x)
+    }
+    ```
+
+   __<span style="color:green">A</span>__:
+   
+
 ## Microbenchmarking
 
+1. __<span style="color:red">Q</span>__: Instead of using `bench::mark()`, you could use the built-in function `system.time()`. But `system.time()` is much less precise, so you'll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.
+
+    ```{r, eval = FALSE}
+    n <- 1e6
+    system.time(for (i in 1:n) sqrt(x)) / n
+    system.time(for (i in 1:n) x ^ 0.5) / n
+    ```
+    
+    How do the estimates from `system.time()` compare to those from
+    `bench::mark()`? Why are they different?
+
+   __<span style="color:green">A</span>__:
+   
+2. __<span style="color:red">Q</span>__: Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.
+
+    ```{r, eval = FALSE}
+    x ^ (1 / 2)
+    exp(log(x) / 2)
+    ```
+
+   __<span style="color:green">A</span>__:
+   
+
+## Old exercises
 1. __<span style="color:red">Q</span>__: Instead of using `microbenchmark()`, you could use the built-in function `system.time()`. But `system.time()` is much less precise, so you'll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.
 
     ```{r, eval = FALSE}
@@ -98,7 +136,7 @@
     the number of evaluations needed to take 1 second. Repeat the benchmarks
     above with the eps unit. How does this change your intuition for performance?
 
-## Language performance
+<!-- ## Language performance -->
 
 1. __<span style="color:red">Q</span>__: `scan()` has the most arguments (21) of any base function. About how much time does it take to make 21 promises each time scan is called? Given a simple input (e.g., `scan(text = "1 2 3", quiet = T)`) what proportion of the total run time is due to creating those promises?
     
@@ -137,7 +175,7 @@
 
 5. __<span style="color:red">Q</span>__: Why is the cost of name lookup less for functions in the base package?
 
-## Implementations performance
+<!-- ## Implementations performance -->
 
 1. __<span style="color:red">Q</span>__: The performance characteristics of `squish_ife()`, `squish_p()`, and `squish_in_place()` vary considerably with the size of `x`. Explore the differences. Which sizes lead to the biggest and smallest differences?
 
