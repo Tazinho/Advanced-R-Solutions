@@ -1,3 +1,8 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
 # Evaluation
 
 ## Prerequisites
@@ -162,7 +167,7 @@
 
    - the comment is still missing
 
-6. __<span style="color:red">Q</span>__: We can make `base::local()` slightly easier to understand by spreading out over multiple lines:
+6. __<span style="color:red">Q</span>__: We can make `base::local()` slightly easier to understand by spreading it out over multiple lines:
 
     ```{r}
     local3 <- function(expr, envir = new.env()) {
@@ -208,7 +213,6 @@ eval(quote({x <- 10; x * 2}), new.env())  # this is evaluated locally
 
 eval(20, parent.frame())  # makes it available in the caller environment
 ```
-
 
 
 ## Quosures
@@ -258,8 +262,45 @@ eval(20, parent.frame())  # makes it available in the caller environment
 ## Data Masks
 1. __<span style="color:red">Q</span>__: Why did I use a for loop in `transform2()` instead of `map()`? Consider `transform2(df, x = x * 2, x = x * 2)`.
    
-   __<span style="color:green">A</span>__: 
-   
+   __<span style="color:green">A</span>__: Within the `for`-loop the evaluation of previous steps has already been assigned to `.data`, which makes the specification of chained transformations possible.
+
+    ```{r}
+    transform2 <- function(.data, ...) {
+      dots <- enquos(...)
+      
+      for (i in seq_along(dots)) {
+        name <- names(dots)[[i]]
+        dot <- dots[[i]]
+        
+        .data[[name]] <- eval_tidy(dot, .data)
+      }
+      
+      .data
+    }
+    
+    df <- data.frame(x = 1)
+    transform2(df, x = x * 2, x = x * 2)  # (re-)transforms x
+    transform2(df, x1 = x * 2, x2 = x1 * 2)  # stores intermediate variables
+    ```
+
+   We see, that the computation `(x * 2) * 2` has been taking place - the output of the first transformation has been used as input for the second transformation. 
+   This feature is not available, with `map()`, becaus it evaluates each element of the input seperately. This implies, that the individual transformations are independent of another and that intermediate computations are not available for the subsequent transformations.
+
+    ```{r, error=TRUE}
+    transform3 <- function(.data, ...) {
+      dots <- enquos(...)
+      
+      dots %>% 
+        map(eval_tidy, .data) %>% 
+        dplyr::bind_cols(.data, .)
+    }
+    
+    transform3(df, x = x * 2, x = x * 2)  # bind_cols() corrects duplicate names
+    transform3(df, x1 = x * 2, x2 = x1 * 2)
+    ```
+
+   The repeated retransformation of columns is very useful in interactive data analysis and can also be used within `dplyr::mutate()`. Be a little careful with reusing the same name too often though, because this spreads out related transformations across multiple statements.
+
 2. __<span style="color:red">Q</span>__: Here's an alternative implementation of `subset2()`:
 
     ```{r, results = FALSE}
@@ -274,8 +315,43 @@ eval(20, parent.frame())  # makes it available in the caller environment
 
    Compare and contrast `subset3()` to `subset2()`. What are its advantages and disadvantages?
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: Let's take a closer look at subset2() first:
    
+```{r}
+subset2 <- function(data, rows) {
+  rows <- enquo(rows)
+  rows_val <- eval_tidy(rows, data)
+  stopifnot(is.logical(rows_val))
+
+  data[rows_val, , drop = FALSE]
+}
+```
+
+We see, that there is an additional logical check, which is missing from `subset3()`. The here the logical condition `rows` is evaluated in the context of `data`, which results in a logical vector used for subsetting. Afterwards only `[` needs to be used to return the subset.
+
+```{r}
+# subset2() evaluation
+(rows_val <- eval_tidy(quo(x == 1), df))
+df[rows_val, , drop = FALSE]
+```
+
+With `subset3()` both of these steps occur in a single line. This means, that the subsetting is also evaluated in the context of the data mask.
+
+```{r}
+# subset3() evaluation
+eval_tidy(expr(df[x == 1, ,drop = FALSE]), df)
+```
+
+This is shorter, but also less readable, because the evaluation and the subsetting take place in the same expression. It may also introduce unwanted errors, if the data mask should contain an element named `data`, because the object from the data mask takes precedence over argument of the function.
+
+```{r, error=TRUE}
+df <- data.frame(x = 1:3, data = 1)
+subset2(df, x == 1)
+subset3(df, x == 1)
+```
+
+<!-- is there an advantage of `subset3()`, that I am missing? -->
+
 3. __<span style="color:red">Q</span>__: The following function implements the basics of `dplyr::arrange()`. Annotate each line with a comment explaining what it does. Can you explain why `!!.na.last` is strictly correct, but omitting the `!!` is unlikely to cause problems?
 
     ```{r}
@@ -291,21 +367,48 @@ eval(20, parent.frame())  # makes it available in the caller environment
     }
     ```
 
-   __<span style="color:green">A</span>__: 
-   
-   
+   __<span style="color:green">A</span>__: This function builds an expression, which contains the specified `order()`-call. The `!!!`-operator is used, which allows multiple arguments to be included (to break ties). Once the correct roworder is determined, numeric subsetting is used to return the rearranged data frame.
+
+    ```{r}
+    arrange2 <- function(.df, ..., .na.last = TRUE) {
+      args <- enquos(...)  # capture arguments, which determine order
+      
+      order_call <- expr(order(!!!args, na.last = !!.na.last))
+      # `!!!`: unquote-splice arguments into order()
+      # `!!.na.last`: pass option for treatment of NAs to order()
+      # return expression-object
+
+      ord <- eval_tidy(order_call, .df)    # evaluate order_call within .df
+      stopifnot(length(ord) == nrow(.df))  # ensure that no rows are dropped
+
+      .df[ord, , drop = FALSE]  # reorder rows by numeric subsetting
+    }
+    ```
+
+   By using `!!.na.last` the `.na.last`-argument is unquoted, when the `order()`-call is built. That way, the `na.last`-argeument is already correctly specified (typically `TRUE`, `FALSE` or `NA`).
+
+   Without the unquoting, the expression would read `na.last = .na.last`. The value for `.na.last` would still have to be looked up and found. Because these computations take place inside of the functions execution environment (which contains `.na.last`), this is unlikely to cause problems.
+
+    ```{r}
+    # the effect of unquoting .na.last
+    .na.last <- FALSE
+    expr(order(..., na.last = !!.na.last))
+    expr(order(..., na.last = .na.last))
+    ```
+
+   PS: Putting breakpoints (`browser()`) inside these functions was really helpful to figure out, what's going on inside of them.
+
 ## Using tidy evaluation
 1. __<span style="color:red">Q</span>__:  I've included an alternative implementation of `threshold_var()` below. What makes it different to the approach I used above? What makes it harder?
 
     ```{r}
-    threshold_var <- function(df, var, val) {
+    threshold_var2 <- function(df, var, val) {
       var <- ensym(var)
       subset2(df, `$`(.data, !!var) >= !!val)
     }
     ```
 
    __<span style="color:green">A</span>__: 
-
 
 ## Old exercises
 
