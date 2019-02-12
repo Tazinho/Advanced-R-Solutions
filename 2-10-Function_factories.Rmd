@@ -103,18 +103,13 @@ library(rlang)
     }
     ```
 
-   __<span style="color:green">A</span>__: Our new counters aren't too reliable anymore, as they can be overwritten or deleted quite easily:
+   __<span style="color:green">A</span>__: Our counts aren't reliable anymore, as they are stored within the global environment, where thy can be easily overwritten, deleted or interfere with other counters:
    
     ```{r, error = TRUE}
     new_counter2()
     new_counter2()
     
-    # Overwriting
     i <- 0
-    new_counter2()
-    
-    # Deletion
-    rm(i)
     new_counter2()
     ```
 
