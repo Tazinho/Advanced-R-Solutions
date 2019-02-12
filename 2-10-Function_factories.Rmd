@@ -10,10 +10,11 @@ knitr::opts_chunk$set(
 
 ## Prerequisites
 
-For most of this chapter we stay in base R only. Just in some exercises, we make additional usage of the **rlang** package:
+For most of this chapter we stay mainly in base R only. Just in very few exercises, we make additional usage of the **rlang** and the **ggplot2** package:
 
 ```{r}
 library(rlang)
+library(ggplot2)
 ```
 
 ## Factory fundamentals
@@ -180,10 +181,66 @@ library(rlang)
     Use `bench::mark()` to see how much faster the optimisation occurs.
     How does changing the length of `x` change the results?
 
-   __<span style="color:green">A</span>__:
-
-## Function factories + functionals
-
+   __<span style="color:green">A</span>__: Let us recall the definitions of `ll_poisson1()` and `ll_poisson2()` from the book:
+   
+    ```{r}
+    ll_poisson1 <- function(x) {
+      n <- length(x)
+    
+      function(lambda) {
+        log(lambda) * sum(x) - n * lambda - sum(lfactorial(x))
+      }
+    }
+    
+    ll_poisson2 <- function(x) {
+      n <- length(x)
+      sum_x <- sum(x)
+      c <- sum(lfactorial(x))
+      
+      function(lambda) {
+        log(lambda) * sum_x - n * lambda - c
+      }
+    }
+    ```
+    
+   Additionally, the test case from the book is
+    
+    ```{r}
+    x1 <- c(41, 30, 31, 38, 29, 24, 30, 29, 31, 38)
+    ```
+    
+   A first benchmark for this vector reveals a performance improvement of factor 2 for `ll_poisson2()` over `ll_poisson1()`
+   
+    ```{r}    
+    bench::mark(llp1 = optimise(ll_poisson1(x1), c(0, 100), maximum = TRUE),
+                llp2 = optimise(ll_poisson2(x1), c(0, 100), maximum = TRUE))
+    ```
+    
+   Regarding differing lengths of `x1`, we expect even further performance improvements of `ll_poisson2()` compared to `ll_poisson1()`, as the redundant calculations within `ll_poisson1()`, become more expensive with growing length of `x1`. The following results imply that for a length of `x1` of 100000, `ll_poisson2()` is about 25 times as fast as `ll_poisson1()`:
+   
+    ```{r}
+    results <- vector(mode = "list", length = 5L)
+    
+    for (i in 1:length(results)) {
+      x_i_length <- 10L^i
+      x_i <- rpois(x_i_length, 100L)
+      
+      results[[i]] <- bench::mark(
+      llp1 = optimise(ll_poisson1(x_i), c(0, 100), maximum = TRUE),
+      llp2 = optimise(ll_poisson2(x_i), c(0, 100), maximum = TRUE))
+    }
+    
+    library(magrittr)
+   
+    do.call(rbind, results) %>% 
+      dplyr::select(expression, `itr/sec`) %>% 
+      dplyr::mutate(x_length = 10^rep(1:5, each = 2)) %>% 
+      tidyr::spread(key = expression, value = `itr/sec`) %>% 
+      dplyr::mutate(relative_iterations_per_second = llp2 / llp1) %>% 
+      ggplot(aes(x = x_length, y = relative_iterations_per_second)) +
+      geom_point()
+    ```
+ 
 1. __<span style="color:red">Q</span>__: Which of the following commands is equivalent to `with(x, f(z))`?
 
    (a) `x$f(x$z)`.
