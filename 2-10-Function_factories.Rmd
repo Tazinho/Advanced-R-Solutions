@@ -218,7 +218,7 @@ library(ggplot2)
     
    Regarding differing lengths of `x1`, we expect even further performance improvements of `ll_poisson2()` compared to `ll_poisson1()`, as the redundant calculations within `ll_poisson1()`, become more expensive with growing length of `x1`. The following results imply that for a length of `x1` of 100000, `ll_poisson2()` is about 25 times as fast as `ll_poisson1()`:
    
-    ```{r}
+    ```{r, message = FALSE, warning = FALSE}
     results <- vector(mode = "list", length = 5L)
     
     for (i in 1:length(results)) {
