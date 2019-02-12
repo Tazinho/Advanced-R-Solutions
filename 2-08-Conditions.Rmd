@@ -423,20 +423,21 @@
     }
     ```
     
-   __<span style="color:green">A</span>__: Basically there seems to be an issue that interrupts are not handled in a general way, but seem to depend on the R interface and the implementation of the R code which is interrupted. Not sure if I understand this correct, but there needs to be a way from the frontend to supply the r code with the info that an interrupt has happened and the r code itself needs to check for this information regularly.
+   __<span style="color:green">A</span>__: When running the `bottles_of_beer()` function in your console, the output will look somehow similar to the following:
    
-   This issue is tracked i.e. here https://github.com/HenrikBengtsson/Wishlist-for-R/issues/47 and reported also here https://www.r-bloggers.com/interrupting-r-processes-in-ubuntu/ and more official documentation is for example under `?setTimeLimit`:
+   ```{r}
+   > bottles_of_beer()
+   There are 99 bottles of beer on the wall, 99 bottles of beer.
+   Take one down, pass it around, 98 bottles of beer on the wall.
+   Take one down, pass it around, 97 bottles of beer on the wall.
+   Take one down, pass it around, 96 bottles of beer on the wall.
+   Take one down, pass it around, 95 bottles of beer on the wall.
    
-   > Time limits are checked whenever a user interrupt could occur. This will happen frequently in R code and during Sys.sleep, but only at points in compiled C and Fortran code identified by the code author.
+   > 
+   ```
    
-   A minimal example pointed out in the former source would be `system.time(try(Sys.sleep(3)))` which will be hard to trigger under a certain time. The behaviour of `Sys.sleep()` is also documented under in the "Details" section of `Sys.sleep()`:
-   
-   > Using this function allows R to temporarily be given very low priority and hence not to interfere with more important foreground tasks. A typical use is to allow a process launched from R to set itself up and read its input files before R execution is resumed. The intention is that this function suspends execution of R expressions but wakes the process up often enough to respond to GUI events, typically every half second. It can be interrupted (e.g. by Ctrl-C or Esc at the R console). There is no guarantee that the process will sleep for the whole of the specified interval (sleep might be interrupted), and it may well take slightly longer in real time to resume execution. 
-   
-   However, in the exercise it seems to be more the question why it is hard to get i from `99` to `0` and the answer might be, that interruptions are insecure since it might be hard to anticipate which part of the program is running and instead of triggering a specific interruption-handler it's easy to interrupt the process as a whole. The specific behaviour of `Sys.sleep()` as mentioned above makes it even harder to guess which part of a program is currently executed.
-   
-   We can see this behaviour explicitly when we modify the code above a bit to wrap the `tryCatch()`-part into another `tryCatch()` part where we handle the regarding further interruptions and play with this code interactively in the console again:
-   
+  At this point you'll probably recognise how hard it is to get the number of bottles down from `99` to `0`. The underlying issue lies in the usage of interrups to trigger the count of beers. The interrupt to update the beer count, needs to occur in the `bottles_of_beers()` functoin's `sys.sleep()` part within the `tryCatch()` block. Only there the special behaviour of interrups is defined. In cases of interrupts during the execution of other parts of the `bottles_of_beer()` function, these will just exit the function, as interrupts typically do in R. To make this behaviour more apparent, the following definition of `bottles_of_beer()` returns an explicit message, emphasising where the interrupt occured:
+  
     ```{r, eval = FALSE}
     bottles_of_beer <- function(i = 99) {
     
@@ -461,4 +462,20 @@
       
       message("No more bottles of beer on the wall, no more bottles of beer.")
     }
-    ```
+    ```  
+  
+<!--  the  As it turns out, the underlying  underlying , which is inherent to the nature of `interruptions`, is    
+    
+   Basically there seems to be an issue that interrupts are not handled in a general way, but seem to depend on the R interface and the implementation of the R code which is interrupted. Not sure if I understand this correct, but there needs to be a way from the frontend to supply the r code with the info that an interrupt has happened and the r code itself needs to check for this information regularly.
+   
+   This issue is tracked i.e. here https://github.com/HenrikBengtsson/Wishlist-for-R/issues/47 and reported also here https://www.r-bloggers.com/interrupting-r-processes-in-ubuntu/ and more official documentation is for example under `?setTimeLimit`:
+   
+   > Time limits are checked whenever a user interrupt could occur. This will happen frequently in R code and during Sys.sleep, but only at points in compiled C and Fortran code identified by the code author.
+   
+   A minimal example pointed out in the former source would be `system.time(try(Sys.sleep(3)))` which will be hard to trigger under a certain time. The behaviour of `Sys.sleep()` is also documented under in the "Details" section of `Sys.sleep()`:
+   
+   > Using this function allows R to temporarily be given very low priority and hence not to interfere with more important foreground tasks. A typical use is to allow a process launched from R to set itself up and read its input files before R execution is resumed. The intention is that this function suspends execution of R expressions but wakes the process up often enough to respond to GUI events, typically every half second. It can be interrupted (e.g. by Ctrl-C or Esc at the R console). There is no guarantee that the process will sleep for the whole of the specified interval (sleep might be interrupted), and it may well take slightly longer in real time to resume execution. 
+   
+   However, in the exercise it seems to be more the question why it is hard to get i from `99` to `0` and the answer might be, that interruptions are insecure since it might be hard to anticipate which part of the program is running and instead of triggering a specific interruption-handler it's easy to interrupt the process as a whole. The specific behaviour of `Sys.sleep()` as mentioned above makes it even harder to guess which part of a program is currently executed.
+   
+   We can see this behaviour explicitly when we modify the code above a bit to wrap the `tryCatch()`-part into another `tryCatch()` part where we handle the regarding further interruptions and play with this code interactively in the console again: -->
