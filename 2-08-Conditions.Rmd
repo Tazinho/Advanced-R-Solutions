@@ -423,20 +423,20 @@
     }
     ```
     
-   __<span style="color:green">A</span>__: When running the `bottles_of_beer()` function in your console, the output will look somehow similar to the following:
+   __<span style="color:green">A</span>__: When running the `bottles_of_beer()` function in your console, the output should look somehow similar to the following:
    
-   ```{r}
-   > bottles_of_beer()
-   There are 99 bottles of beer on the wall, 99 bottles of beer.
-   Take one down, pass it around, 98 bottles of beer on the wall.
-   Take one down, pass it around, 97 bottles of beer on the wall.
-   Take one down, pass it around, 96 bottles of beer on the wall.
-   Take one down, pass it around, 95 bottles of beer on the wall.
+    ```{r, eval = FALSE}
+    > bottles_of_beer()
+    There are 99 bottles of beer on the wall, 99 bottles of beer.
+    Take one down, pass it around, 98 bottles of beer on the wall.
+    Take one down, pass it around, 97 bottles of beer on the wall.
+    Take one down, pass it around, 96 bottles of beer on the wall.
+    Take one down, pass it around, 95 bottles of beer on the wall.
+    
+    > 
+    ```
    
-   > 
-   ```
-   
-  At this point you'll probably recognise how hard it is to get the number of bottles down from `99` to `0`. The underlying issue lies in the usage of interrups to trigger the count of beers. The interrupt to update the beer count, needs to occur in the `bottles_of_beers()` functoin's `sys.sleep()` part within the `tryCatch()` block. Only there the special behaviour of interrups is defined. In cases of interrupts during the execution of other parts of the `bottles_of_beer()` function, these will just exit the function, as interrupts typically do in R. To make this behaviour more apparent, the following definition of `bottles_of_beer()` returns an explicit message, emphasising where the interrupt occured:
+   At this point you'll probably recognise how hard it is to get the number of bottles down from `99` to `0`. The underlying issue lies in the usage of interrupts to trigger the count of beers. Interrupts to update the beer count, need to occur within the `bottles_of_beers()` function's `sys.sleep()` part in the `tryCatch()` block. Only there the intended special behaviour of interrupts triggers the update of the beer count. In cases of interrupts during the execution of other parts of the `bottles_of_beer()` function, these will just exit the function, as interrupts typically do in R. To make this behaviour more apparent, the following definition of `bottles_of_beer()` returns an explicit message, emphasising where the interrupt occured:
   
     ```{r, eval = FALSE}
     bottles_of_beer <- function(i = 99) {
