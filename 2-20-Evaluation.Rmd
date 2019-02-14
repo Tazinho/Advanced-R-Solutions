@@ -176,41 +176,41 @@ library(purrr)
 
    __<span style="color:green">A</span>__:
 
-```{r}
-local3 <- function(expr, envir = new.env()) {
-  call <- substitute(eval(quote(expr), envir))
-  print(call)
-  eval(call, envir = parent.frame())
-}
+    ```{r}
+    local3 <- function(expr, envir = new.env()) {
+      call <- substitute(eval(quote(expr), envir))
+      print(call)
+      eval(call, envir = parent.frame())
+    }
+    
+    foo <- local3({
+      x <- 10
+      x * 2
+    })
+    
+    foo
+    ```
 
-foo <- local3({
-  x <- 10
-  x * 2
-})
+   substitute only replaces the expr with the input and the environment (for the call to eval) by the relate
 
-foo
-```
+    ```{r}
+    # how does substitute work?
+    ```
 
-substitute only replaces the expr with the input and the environment (for the call to eval) by the relate
+   - substitute opperates in function execution environment, it replaces the variables bound in this environments by their expression (expr becomes the input, and envir, becomes the environment passed to `local3` (new.env() by default))
 
-```{r}
-# how does substitute work?
-```
+   <!-- this needs a better description based on the AST, @Malte -->
 
-- substitute opperates in function execution environment, it replaces the variables bound in this environments by their expression (expr becomes the input, and envir, becomes the environment passed to `local3` (new.env() by default))
-
-<!-- this needs a better description based on the ast, @taz -->
-
-```{r}
-# this is, what is happening afterwards
-eval(eval(quote({x <- 10; x * 2}), new.env()), parent.frame())
-
-eval(quote({x <- 10; x * 2}), new.env())  # this is evaluated locally
-
-eval(20, parent.frame())  # makes it available in the caller environment
-```
-
-
+    ```{r}
+    # this is, what is happening afterwards
+    eval(eval(quote({x <- 10; x * 2}), new.env()), parent.frame())
+    
+    eval(quote({x <- 10; x * 2}), new.env())  # this is evaluated locally
+    
+    eval(20, parent.frame())  # makes it available in the caller environment
+    ```
+  
+    
 ## Quosures
 
 1. __<span style="color:red">Q</span>__: Predict what evaluating each of the following quosures will return.
@@ -313,38 +313,38 @@ eval(20, parent.frame())  # makes it available in the caller environment
 
    __<span style="color:green">A</span>__: Let's take a closer look at subset2() first:
    
-```{r}
-subset2 <- function(data, rows) {
-  rows <- enquo(rows)
-  rows_val <- eval_tidy(rows, data)
-  stopifnot(is.logical(rows_val))
+    ```{r}
+    subset2 <- function(data, rows) {
+      rows <- enquo(rows)
+      rows_val <- eval_tidy(rows, data)
+      stopifnot(is.logical(rows_val))
+      
+      data[rows_val, , drop = FALSE]
+    }
+    ```
 
-  data[rows_val, , drop = FALSE]
-}
-```
+   We see, that there is an additional logical check, which is missing from `subset3()`. The here the logical condition `rows` is evaluated in the context of `data`, which results in a logical vector used for subsetting. Afterwards only `[` needs to be used to return the subset.
 
-We see, that there is an additional logical check, which is missing from `subset3()`. The here the logical condition `rows` is evaluated in the context of `data`, which results in a logical vector used for subsetting. Afterwards only `[` needs to be used to return the subset.
+    ```{r}
+    # subset2() evaluation
+    (rows_val <- eval_tidy(quo(x == 1), df))
+    df[rows_val, , drop = FALSE]
+    ```
 
-```{r}
-# subset2() evaluation
-(rows_val <- eval_tidy(quo(x == 1), df))
-df[rows_val, , drop = FALSE]
-```
+   With `subset3()` both of these steps occur in a single line. This means, that the subsetting is also evaluated in the context of the data mask.
 
-With `subset3()` both of these steps occur in a single line. This means, that the subsetting is also evaluated in the context of the data mask.
+    ```{r}
+    # subset3() evaluation
+    eval_tidy(expr(df[x == 1, ,drop = FALSE]), df)
+    ```
 
-```{r}
-# subset3() evaluation
-eval_tidy(expr(df[x == 1, ,drop = FALSE]), df)
-```
+   This is shorter, but also less readable, because the evaluation and the subsetting take place in the same expression. It may also introduce unwanted errors, if the data mask should contain an element named `data`, because the object from the data mask takes precedence over argument of the function.
 
-This is shorter, but also less readable, because the evaluation and the subsetting take place in the same expression. It may also introduce unwanted errors, if the data mask should contain an element named `data`, because the object from the data mask takes precedence over argument of the function.
-
-```{r, error=TRUE}
-df <- data.frame(x = 1:3, data = 1)
-subset2(df, x == 1)
-subset3(df, x == 1)
-```
+    ```{r, error=TRUE}
+    df <- data.frame(x = 1:3, data = 1)
+    subset2(df, x == 1)
+    subset3(df, x == 1)
+    ```
 
 <!-- is there an advantage of `subset3()`, that I am missing? -->
 
