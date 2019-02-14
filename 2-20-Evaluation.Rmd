@@ -1,15 +1,11 @@
----
-output: html_document
-editor_options: 
-  chunk_output_type: console
----
 # Evaluation
 
 ## Prerequisites
-    ```{r, message=FALSE}
-    library(rlang)
-    library(purrr)
-    ```
+
+```{r, message=FALSE}
+library(rlang)
+library(purrr)
+```
 
 ## Evaluation Basics
 
@@ -404,11 +400,125 @@ subset3(df, x == 1)
     ```{r}
     threshold_var2 <- function(df, var, val) {
       var <- ensym(var)
+
       subset2(df, `$`(.data, !!var) >= !!val)
     }
     ```
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:orange">A</span>__: Lets compare this approach to the original implementation:
+
+    ```{r}
+    threshold_var <- function(df, var, val) {
+      var <- as_string(ensym(var))
+      subset2(df, .data[[var]] >= !!val)
+    }
+    ```
+
+   We can see, that the symbol in no longer coerced to a string in `threshold_var2()`. Therefore `$` instead of `[[` is used for subsetting. Initially we suspected partial matching to work with `$`, but this seems to avoided, when the expression is tidily evaluated.
+
+   The prefix call to `$()` is less common than infix-subsetting using `[[`, but ultimately both functions seem to behave the same.
+
+    ```{r}
+    df <- data.frame(x = 1:10)
+    threshold_var(df, x, 8)
+    threshold_var2(df, x, 8)
+    ```
+
+<!-- I am probably missing sth here. What makes the second approach **harder**? -->
+
+## Base evaluation
+
+1. __<span style="color:red">Q</span>__: Why does this function fail?
+
+    ```{r, error = TRUE}
+    lm3a <- function(formula, data) {
+      formula <- enexpr(formula)
+      
+      lm_call <- expr(lm(!!formula, data = data))
+      eval(lm_call, caller_env())
+    }
+    lm3a(mpg ~ disp, mtcars)$call
+    ```
+
+   __<span style="color:green">A</span>__: In this function, `lm_call` is evaluated in the caller environment, which happens to be the global environment. In this environment, the name `data` is bound to `utils::data`. To fix the error, we can either set the evaluation environment to the functions execution environment or unquote the data argument when building the call to `lm()`.
+    
+    ```{r, error = TRUE}
+    # change evaluation environment
+    lm3b <- function(formula, data) {
+      formula <- enexpr(formula)
+      
+      lm_call <- expr(lm(!!formula, data = data))
+      eval(lm_call, current_env())
+    }
+    
+    lm3b(mpg ~ disp, mtcars)$call
+    lm3b(mpg ~ disp, data)$call  #reproduces original error
+```
+
+   When we want to unquote an argument within a function, we first need to capture the user-input (by `enenxpr()`).
+
+    ```{r, error = TRUE}
+    # unquoting data-argument
+    lm3c <- function(formula, data) {
+      formula <- enexpr(formula)
+      data_quo <- enexpr(data)
+
+      lm_call <- expr(lm(!!formula, data = !!data_quo))
+      eval(lm_call, caller_env())
+    }
+    lm3c(mpg ~ disp, mtcars)$call
+    ```
+
+2. __<span style="color:red">Q</span>__: When model building, typically the response and data are relatively constant while you rapidly experiment with different predictors. Write a small wrapper that allows you to reduce duplication in the code below.
+
+    ```{r, eval = FALSE}
+    lm(mpg ~ disp, data = mtcars)
+    lm(mpg ~ I(1 / disp), data = mtcars)
+    lm(mpg ~ disp * cyl, data = mtcars)
+    ```
+
+   __<span style="color:green">A</span>__: In the wrapping function below, the response and the data were defined as default argument to the function. It would also be acceptable to "hardcode" them into the `lm()`-expression instead, but this way provides a little more flexibility.
+
+    ```{r}
+    lm_wrap <- function(pred, resp = mpg, data = mtcars){
+      # unquoting using base tools
+      lm(substitute(resp ~ pred, environment()), data = data)
+    }
+    
+    lm_wrap(disp)$coef
+    lm_wrap(I(1 / disp))$coef
+    lm_wrap(disp * cyl)$coef
+    ```
+
+   In practice, small wrappers like this can help keeping your scripts well organized and make it easy to see, what is being changed.
+
+3. __<span style="color:red">Q</span>__: Another way to way to write `resample_lm()` would be to include the resample expression `(data[sample(nrow(data), replace = TRUE), , drop = FALSE])` in the data argument. Implement that approach. What are the advantages? What are the disadvantages?
+
+   __<span style="color:green">A</span>__: We can take advantage of the lazy evaluation of function arguments, by moving the resampling step into the argument definition. The uses passes the data to the function, but only a permutation of this data (`rsampled_data`) will be used.
+
+    ```{r}
+    resample_lm0 <- function(
+      formula, data,
+      resample_data = data[sample(nrow(data), replace = TRUE), , drop = FALSE],
+      env = current_env()
+    ) {
+      formula <- enexpr(formula)
+      
+      lm_call <- expr(lm(!!formula, data = resample_data))
+      expr_print(lm_call)
+      eval(lm_call, env)
+    }
+    
+    df <- data.frame(x = 1:10, y = 5 + 3 * (1:10) + round(rnorm(10), 2))
+    (resamp_lm1 <- resample_lm0(y ~ x, data = df))
+    resamp_lm1$call
+    ```
+
+   With this approach the evaluation needs to take place within the functions environments, because the resampled dataset (defined as a default argument) will only be available in the function environment.
+
+   Overall, putting an essential part of the preprocessing outside of the functions body is not common practice in R. Compared to the unquoting-implementation (`resample_lm1()`), this approach captures the model-call in a more meaningful way.
+
+<!-- would be nice to list a few more advantages and disadvantages -->
 
 ## Old exercises
 
