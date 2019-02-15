@@ -119,7 +119,8 @@ library(purrr)
    __<span style="color:green">A</span>__: The data (`mtars`) is constant for all these models and we iterate over the `formulas` provided. Because the formula is the first argument of a `lm()`-call, it doesn't need to be specified explicitly.
    
     ```{r}
-    map(formulas, lm, data = mtcars)
+    map(formulas, lm, data = mtcars) %>% 
+      map(coef)  # shortens output
     ```
 
 7. __<span style="color:red">Q</span>__: Fit the model `mpg ~ disp` to each of the bootstrap replicates of `mtcars` in the list below, then extract the $R^2$ of the model fit (Hint: you can compute the $R^2$ with `summary()`)
@@ -196,8 +197,9 @@ library(purrr)
    __<span style="color:green">A</span>__: `write.csv()` returns `NULL`. In the example above we iterated over a list of data frames and file names a named list of `NULL`s would be returned.
    
     ```{r}
-    # cyls <- split(mtcars, mtcars$cyl)
-    # paths <- file.path(temp, paste0("cyl-", names(cyls), ".csv"))
+    cyls <- split(mtcars, mtcars$cyl)
+    paths <- file.path(temp_dir, paste0("cyl-", names(cyls), ".csv"))
+    
     map2(cyls, paths, write.csv)
     ```
     
@@ -327,7 +329,7 @@ library(purrr)
 
 ## Base functionals
 
-1.  __<span style="color:red">Q</span>__: How does `apply()` arrange the output? Read the documentation and perform some experiments.
+1. __<span style="color:red">Q</span>__: How does `apply()` arrange the output? Read the documentation and perform some experiments.
     
    __<span style="color:green">A</span>__: `apply()` arranges its output columns (or list elements) according to the order of the margin. The rows are ordered by the other dimensions, starting with the "last" dimension of the input object. What this means should become clear by looking at the three and four dimensional cases of the following example:
    
