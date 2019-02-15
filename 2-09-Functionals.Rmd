@@ -3,20 +3,20 @@
 # Functionals
 
 ## Prerequisites
-
-    ```{r, message=FALSE}
-    library(purrr)
-    ```
+   
+```{r, message=FALSE}
+library(purrr)
+```
 
 ## My first functional: `map()`
 
 1. __<span style="color:red">Q</span>__: Use `as_mapper()` to explore how purrr generates anonymous functions for the integer, character, and list helpers. What helper allows you to extract attributes? Read the documentation to find out.
    
-   __<span style="color:green">A</span>__: `map()` offers multiple ways (functions, formulas, extractor functions) to specify its function argument (`.f`). Initially the various inputs need to be transformed to a valid function, which is then applied. This is where `as_mapper()` comes is. (It is called every time `map()` is used.)
+   __<span style="color:green">A</span>__: `map()` offers multiple ways (functions, formulas and extractor functions) to specify the function argument (`.f`). Initially, the various inputs have to be transformed into a valid function, which is then applied. The creation of this valid function is the job of `as_mapper()` and it is called every time `map()` is used.
 
-   Given character, numeric or list input, `as_mapper()` will create an extractor function. Characters select by name, numeric input selects by positions and a list allows a mix of these two types. This can be very useful when working with nested data.
+   Given character, numeric or list input `as_mapper()` will create an extractor function. Characters select by name, while numeric input selects by positions and a list allows a mix of these two approaches. This extractor interface can be very useful, when working with nested data.
 
-   The extractor function is implemented as a call to `purrr::pluck()`, which accepts a list of accessors.
+   The extractor function is implemented as a call to `purrr::pluck()`, which accepts a list of accessors (accessors "access" some part of your data object).
 
     ```{r}
     as_mapper(c(1, 2))
@@ -24,9 +24,9 @@
     as_mapper(list(1, "b"))
     ```
 
-   Besides a mix of positions and names it is also passible to pass along an accessor function. This is basically an anonymous function, that gets information about some aspect of the input data and you are free to define your own acessor functions. 
+   Besides mixing positions and names, it is also passible to pass along an accessor function. This is basically an anonymous function, that gets information about some aspect of the input data. You are free to define your own acessor functions. 
 
-   If you need to access certain attributes, the helper `attr_getter(y)` is already predefined and creates the appropiate accessor function.
+   If you need to access certain attributes, the helper `attr_getter(y)` is already predefined and will create the appropiate accessor function for you.
 
     ```{r}
     # define custom accessor function
@@ -40,8 +40,15 @@
 
 2. __<span style="color:red">Q</span>__: `map(1:3, ~ runif(2))` is a useful pattern for generating random numbers, but `map(1:3, runif(2))` is not. Why not? Can you explain why it returns the result that it does?
 
-   __<span style="color:green">A</span>__: The first pattern is useful, as `map()`'s `.f` argument, `~ runif(2)`, is supplied as a formula. Internally `map()` applies `as_mapper()` on its `.f` argument which converts `~ runif(2)` into an anonymous function. Therefore, `runif(2)` gets called three times (one time during each iteration), leading to three different pairs of random numbers. In contrast, in the second pattern the `.f` argument, `runif(2)`, is supplied as an atomic vector. Therefore, `as_mapper()` creates an extractor function based on `pluck()` and the return value from `runif(2)` for indexing. This leads to three `NULL`s (`pluck()`'s `.default` return), since no values corresponding to the index are found during the iterations.
+   __<span style="color:green">A</span>__: The first pattern creates random numbers, because `~ runif(2)` successfully uses the formula interface. Internally `map()` applies `as_mapper()` to this formular, which converts `~ runif(2)` into an anonymous function. Afterwards `runif(2)` is applied three times (one time during each iteration), leading to three different pairs of random numbers.
    
+   In the second pattern `runif(2)` is supplied as an atomic vector. Consequently `as_mapper()` creates an extractor function based on the return values from `runif(2)` (via `pluck()`). This leads to three `NULL`s (`pluck()`'s `.default` return), because no values corresponding to the index can be found.
+   
+    ```{r}
+    map(1:3, ~ runif(2))  # uses formular interface
+    map(1:3, runif(2))  # uses extractor interface
+    ```
+
 3. __<span style="color:red">Q</span>__: Use the appropriate `map()` function to:
     
    a) Compute the standard deviation of every column in a numeric data frame.
@@ -50,7 +57,7 @@
        
    a) Compute the number of levels for every factor in a data frame.
 
-   __<span style="color:green">A</span>__: This exercises should be straight forward. Note that `purrr::keep` is introduced in the [predicate functionals](https://adv-r.hadley.nz/functionals.html#predicate-functionals) section of the chapter.
+   __<span style="color:green">A</span>__: To solve this exercise we take advantage of calling the type stable variants of `map()`, which give us more concise output. We also use `purrr::keep()` to initially select the matching columns of the data frames. (`keep()` is introduced in the [predicate functionals](https://adv-r.hadley.nz/functionals.html#predicate-functionals) section of the "Functionals"-chapter).
    
     ```{r}
     map_dbl(mtcars, sd)
@@ -64,17 +71,19 @@
     trials <- map(1:100, ~ t.test(rpois(10, 10), rpois(7, 10)))
     ```
 
-   __<span style="color:green">A</span>__: We can easily extract the p-values, i. e. via `pluck()` and pipe them directly into `ggplot()` for the visualisation. For normal distributed data we would expect a uniform distribution of the p-values. Let's see what happens for poisson data:
+   __<span style="color:green">A</span>__: `pluck()` allows us to elegantly extract the p-values.  We can then pass a data frame directly to `ggplot()` for the visualisation. For randomly generated data, we can expect a uniform distribution of the p-values.
    
     ```{r, message = FALSE}
     library(ggplot2)
     
-    map_dbl(trials, pluck, "p.value") %>% 
-      as.data.frame() %>% 
-      set_names("p_value") %>% 
+    map_dbl(trials, "p.value") %>% 
+      tibble::tibble(`p_value` = .) %>% 
       ggplot(aes(x = p_value, fill = p_value < 0.05)) + 
-      geom_dotplot(binwidth = .025) 
+      geom_dotplot(binwidth = .025) +
+      ggtitle("Distribution of p-values for random poisson data.")
     ```
+
+<!-- I would like to use `map_dfr` in the example above, but the required names for dplyr::bind_cols are missing...-->
 
 5. __<span style="color:red">Q</span>__: The following code uses a map nested inside another map to apply a function to every element of a nested list. Why does it fail, and what do you need to do to make it work?
 
@@ -88,10 +97,12 @@
     map(x, map, .f = triple)
     ```
     
-   __<span style="color:green">A</span>__: If fails, because `triple()` is supplied as the `.f` argument to the outer `map()`. Therefore, the inner `map()` is treated as an argument of `triple()`, which causes the error. Instead, `triple` must be the `.f` argument of the inner `map()`. Therefore, we add braces and turn the inner `map()` part into a formula (adding the `~`) and supply the `.x` argument to it as well. 
+   __<span style="color:green">A</span>__: This function call fails, because `triple()` is specified as the `.f` argument and consequently belongs to the outer `map()`. The unnamed argument `map` is treated as an argument of `triple()`, which causes the error.
+   
+   If we switch the naming of the argument, the nested transformations work as expected:
    
     ```{r}
-    map(x, ~ map(.x, .f = triple))
+    map(x, .f = map, triple)
     ```
     
 6. __<span style="color:red">Q</span>__: Use `map()` to fit linear models to the `mtcars` using the formulas stored in this list:
@@ -105,10 +116,10 @@
     )
     ```
 
-   __<span style="color:green">A</span>__: As `mtars` is a constant part in this context, it's easiest to iterate over the `formulas`:
+   __<span style="color:green">A</span>__: The data (`mtars`) is constant for all these models and we iterate over the `formulas` provided. Because the formula is the first argument of a `lm()`-call, it doesn't need to be specified explicitly.
    
     ```{r}
-    map(formulas, ~ lm(.x, data = mtcars))
+    map(formulas, lm, data = mtcars)
     ```
 
 7. __<span style="color:red">Q</span>__: Fit the model `mpg ~ disp` to each of the bootstrap replicates of `mtcars` in the list below, then extract the $R^2$ of the model fit (Hint: you can compute the $R^2$ with `summary()`)
@@ -121,12 +132,13 @@
     bootstraps <- map(1:10, ~ bootstrap(mtcars))
     ```
 
-   __<span style="color:green">A</span>__: Let's do one tast at a time. Fist, we'll fit the models. Then we calculate the summaries and finally we extract the $R^2$ values:
+   __<span style="color:green">A</span>__: To accomplish this task, we take advantage of the "list in, list out"-functionality of `map()`. This allows us to chain multiple transformation together. We start by fitting the models. We then calculate the summaries and extract the $R^2$ values. For the last call we use `map_dbl`, which provides convenient output.
    
     ```{r}
-    map(bootstraps, ~ lm(mpg ~ disp, data = .x)) %>% 
+    bootstraps %>% 
+      map(~ lm(mpg ~ disp, data = .x)) %>% 
       map(summary) %>% 
-      map_dbl(pluck, "r.squared")
+      map_dbl("r.squared")
     ```
 
 ## Map variants
