@@ -3,20 +3,20 @@
 # Functionals
 
 ## Prerequisites
-
-    ```{r, message=FALSE}
-    library(purrr)
-    ```
+   
+```{r, message=FALSE}
+library(purrr)
+```
 
 ## My first functional: `map()`
 
 1. __<span style="color:red">Q</span>__: Use `as_mapper()` to explore how purrr generates anonymous functions for the integer, character, and list helpers. What helper allows you to extract attributes? Read the documentation to find out.
    
-   __<span style="color:green">A</span>__: `map()` offers multiple ways (functions, formulas, extractor functions) to specify its function argument (`.f`). Initially the various inputs need to be transformed to a valid function, which is then applied. This is where `as_mapper()` comes is. (It is called every time `map()` is used.)
+   __<span style="color:green">A</span>__: `map()` offers multiple ways (functions, formulas and extractor functions) to specify the function argument (`.f`). Initially, the various inputs have to be transformed into a valid function, which is then applied. The creation of this valid function is the job of `as_mapper()` and it is called every time `map()` is used.
 
-   Given character, numeric or list input, `as_mapper()` will create an extractor function. Characters select by name, numeric input selects by positions and a list allows a mix of these two types. This can be very useful when working with nested data.
+   Given character, numeric or list input `as_mapper()` will create an extractor function. Characters select by name, while numeric input selects by positions and a list allows a mix of these two approaches. This extractor interface can be very useful, when working with nested data.
 
-   The extractor function is implemented as a call to `purrr::pluck()`, which accepts a list of accessors.
+   The extractor function is implemented as a call to `purrr::pluck()`, which accepts a list of accessors (accessors "access" some part of your data object).
 
     ```{r}
     as_mapper(c(1, 2))
@@ -24,9 +24,9 @@
     as_mapper(list(1, "b"))
     ```
 
-   Besides a mix of positions and names it is also passible to pass along an accessor function. This is basically an anonymous function, that gets information about some aspect of the input data and you are free to define your own acessor functions. 
+   Besides mixing positions and names, it is also possible to pass along an accessor function. This is basically an anonymous function, that gets information about some aspect of the input data. You are free to define your own accessor functions. 
 
-   If you need to access certain attributes, the helper `attr_getter(y)` is already predefined and creates the appropiate accessor function.
+   If you need to access certain attributes, the helper `attr_getter(y)` is already predefined and will create the appropriate accessor function for you.
 
     ```{r}
     # define custom accessor function
@@ -40,8 +40,15 @@
 
 2. __<span style="color:red">Q</span>__: `map(1:3, ~ runif(2))` is a useful pattern for generating random numbers, but `map(1:3, runif(2))` is not. Why not? Can you explain why it returns the result that it does?
 
-   __<span style="color:green">A</span>__: The first pattern is useful, as `map()`'s `.f` argument, `~ runif(2)`, is supplied as a formula. Internally `map()` applies `as_mapper()` on its `.f` argument which converts `~ runif(2)` into an anonymous function. Therefore, `runif(2)` gets called three times (one time during each iteration), leading to three different pairs of random numbers. In contrast, in the second pattern the `.f` argument, `runif(2)`, is supplied as an atomic vector. Therefore, `as_mapper()` creates an extractor function based on `pluck()` and the return value from `runif(2)` for indexing. This leads to three `NULL`s (`pluck()`'s `.default` return), since no values corresponding to the index are found during the iterations.
+   __<span style="color:green">A</span>__: The first pattern creates random numbers, because `~ runif(2)` successfully uses the formula interface. Internally `map()` applies `as_mapper()` to this formula, which converts `~ runif(2)` into an anonymous function. Afterwards `runif(2)` is applied three times (one time during each iteration), leading to three different pairs of random numbers.
    
+   In the second pattern `runif(2)` is supplied as an atomic vector. Consequently `as_mapper()` creates an extractor function based on the return values from `runif(2)` (via `pluck()`). This leads to three `NULL`s (`pluck()`'s `.default` return), because no values corresponding to the index can be found.
+   
+    ```{r}
+    map(1:3, ~ runif(2))  # uses formular interface
+    map(1:3, runif(2))  # uses extractor interface
+    ```
+
 3. __<span style="color:red">Q</span>__: Use the appropriate `map()` function to:
     
    a) Compute the standard deviation of every column in a numeric data frame.
@@ -50,7 +57,7 @@
        
    a) Compute the number of levels for every factor in a data frame.
 
-   __<span style="color:green">A</span>__: This exercises should be straight forward. Note that `purrr::keep` is introduced in the [predicate functionals](https://adv-r.hadley.nz/functionals.html#predicate-functionals) section of the chapter.
+   __<span style="color:green">A</span>__: To solve this exercise we take advantage of calling the type stable variants of `map()`, which give us more concise output. We also use `purrr::keep()` to initially select the matching columns of the data frames. (`keep()` is introduced in the [predicate functionals](https://adv-r.hadley.nz/functionals.html#predicate-functionals) section of the "Functionals"-chapter).
    
     ```{r}
     map_dbl(mtcars, sd)
@@ -64,17 +71,19 @@
     trials <- map(1:100, ~ t.test(rpois(10, 10), rpois(7, 10)))
     ```
 
-   __<span style="color:green">A</span>__: We can easily extract the p-values, i. e. via `pluck()` and pipe them directly into `ggplot()` for the visualisation. For normal distributed data we would expect a uniform distribution of the p-values. Let's see what happens for poisson data:
+   __<span style="color:green">A</span>__: `pluck()` allows us to elegantly extract the p-values.  We can then pass a data frame directly to `ggplot()` for the visualisation. For randomly generated data, we can expect a uniform distribution of the p-values.
    
     ```{r, message = FALSE}
     library(ggplot2)
     
-    map_dbl(trials, pluck, "p.value") %>% 
-      as.data.frame() %>% 
-      set_names("p_value") %>% 
+    map_dbl(trials, "p.value") %>% 
+      tibble::tibble(`p_value` = .) %>% 
       ggplot(aes(x = p_value, fill = p_value < 0.05)) + 
-      geom_dotplot(binwidth = .025) 
+      geom_dotplot(binwidth = .025) +
+      ggtitle("Distribution of p-values for random poisson data.")
     ```
+
+<!-- I would like to use `map_dfr` in the example above, but the required names for dplyr::bind_cols are missing...-->
 
 5. __<span style="color:red">Q</span>__: The following code uses a map nested inside another map to apply a function to every element of a nested list. Why does it fail, and what do you need to do to make it work?
 
@@ -88,10 +97,12 @@
     map(x, map, .f = triple)
     ```
     
-   __<span style="color:green">A</span>__: If fails, because `triple()` is supplied as the `.f` argument to the outer `map()`. Therefore, the inner `map()` is treated as an argument of `triple()`, which causes the error. Instead, `triple` must be the `.f` argument of the inner `map()`. Therefore, we add braces and turn the inner `map()` part into a formula (adding the `~`) and supply the `.x` argument to it as well. 
+   __<span style="color:green">A</span>__: This function call fails, because `triple()` is specified as the `.f` argument and consequently belongs to the outer `map()`. The unnamed argument `map` is treated as an argument of `triple()`, which causes the error.
+   
+   If we switch the naming of the argument, the nested transformations work as expected:
    
     ```{r}
-    map(x, ~ map(.x, .f = triple))
+    map(x, .f = map, triple)
     ```
     
 6. __<span style="color:red">Q</span>__: Use `map()` to fit linear models to the `mtcars` using the formulas stored in this list:
@@ -105,10 +116,10 @@
     )
     ```
 
-   __<span style="color:green">A</span>__: As `mtars` is a constant part in this context, it's easiest to iterate over the `formulas`:
+   __<span style="color:green">A</span>__: The data (`mtars`) is constant for all these models and we iterate over the `formulas` provided. Because the formula is the first argument of a `lm()`-call, it doesn't need to be specified explicitly.
    
     ```{r}
-    map(formulas, ~ lm(.x, data = mtcars))
+    map(formulas, lm, data = mtcars)
     ```
 
 7. __<span style="color:red">Q</span>__: Fit the model `mpg ~ disp` to each of the bootstrap replicates of `mtcars` in the list below, then extract the $R^2$ of the model fit (Hint: you can compute the $R^2$ with `summary()`)
@@ -121,19 +132,20 @@
     bootstraps <- map(1:10, ~ bootstrap(mtcars))
     ```
 
-   __<span style="color:green">A</span>__: Let's do one tast at a time. Fist, we'll fit the models. Then we calculate the summaries and finally we extract the $R^2$ values:
+   __<span style="color:green">A</span>__: To accomplish this task, we take advantage of the "list in, list out"-functionality of `map()`. This allows us to chain multiple transformation together. We start by fitting the models. We then calculate the summaries and extract the $R^2$ values. For the last call we use `map_dbl`, which provides convenient output.
    
     ```{r}
-    map(bootstraps, ~ lm(mpg ~ disp, data = .x)) %>% 
+    bootstraps %>% 
+      map(~ lm(mpg ~ disp, data = .x)) %>% 
       map(summary) %>% 
-      map_dbl(pluck, "r.squared")
+      map_dbl("r.squared")
     ```
 
 ## Map variants
 
 1. __<span style="color:red">Q</span>__: Explain the results of `modify(mtcars, 1)`.
 
-   __<span style="color:green">A</span>__: This is due to the consistency within purrr. `modify()` is based on `map()`, so intenally `map(mtacrs, 1)` gets called, where the `.f` argument is an atomic and therefore gets converted into an extractor function, which matches the first row of `mtcars`. As `modify()` always returns the same structure as its input we get this row 32 times (internally this is achieved via the oneliner `.x[] <- map(.x, .f, ...)`). 
+   __<span style="color:green">A</span>__: `modify()` is based on `map()`, and in this case, the extractor interface will be used. It extracts the first element of each column in `mtcars`. `modify()` always returns the same structure as its input:  in this case it forces the first row to be recycled 32 times. (Internally `modify()` uses `.x[] <- map(.x, .f, ...)` for assignment.) 
 
 2. __<span style="color:red">Q</span>__: Rewrite the following code to use `iwalk()` instead of `walk2()`. What are the advantages and disadvantages?
     
@@ -143,15 +155,16 @@
     walk2(cyls, paths, write.csv)
     ```
 
-   __<span style="color:green">A</span>__: The main advantage is that it's easy to create everything within one function call and it's therefore not necessary to create intermediate objects, which aren't used any further. However, the disadvantage is that this style can become hard to read when single function are very long:
+   __<span style="color:green">A</span>__: With `iwalk()` it is possible combine the name creation and file saving with one function call. It is not necessary to create intermediate objects, which won't be used any further. Unfortunately, the function turns out quite long and it may be difficult to understand it immediately.
    
     ```{r}
-    cyls <- split(mtcars, mtcars$cyl)
-    temp <- tempfile()
-    dir.create(temp)
+    temp_dir <- tempfile()
+    dir.create(temp_dir)
     
-    iwalk(cyls, ~ write.csv(.x, file.path(temp, paste0("cyl-", .y, ".csv"))))
-    dir(temp)
+    split(mtcars, mtcars$cyl) %>% 
+      iwalk(~ write.csv(.x, file.path(temp_dir, paste0("cyl-", .y, ".csv"))))
+    
+    list.files(temp_dir)
     ```
 
 3. __<span style="color:red">Q</span>__: Explain how the following code transforms a data frame using functions stored in a list.
@@ -166,39 +179,35 @@
     mtcars[vars] <- map2(trans, mtcars[vars], function(f, var) f(var))
     ```
     
-   Compare and constrast the `map2()` approach to this `map()` approach:
+   Compare and contrast the `map2()` approach to this `map()` approach:
     
     ```{r, eval = FALSE}
     mtcars[vars] <- map(vars, ~ trans[[.x]](mtcars[[.x]]))
     ```
 
-   __<span style="color:green">A</span>__: In the `map2()` approach the `vars` are first used to subset the `.y` argument. Then, `map2()` iterates over the similarly named variables and transformations, to build up and apply the transformations as anonymous functions. On the left hand side only the similarly named variables of `mtcars` are getting replaced. 
+   __<span style="color:green">A</span>__: In the `map2()` approach `vars` is first used to subset the `.y` argument. Then, `map2()` iterates over the similarly named variables and transformations, to build up and apply the transformations as anonymous functions. On the left hand side only the similarly named variables of `mtcars` is being replaced. 
    
    The `map()` variant does basically the same. However, it uses the `vars` object to directly iterate over similarly named elements of `trans` and `mtcars`.
    
-   Besides the iteration pattern, the approaches differ in the namings and the supplied argument types in the `.f` argument. While the `.f` in the `map2()` variant is named appropriately, the creation of the anonymous function might be a bit verbose. A more technical but compact way to write the `.f` argument would be the usage of a formula as in `mtcars[vars] <- map2(trans, mtcars[vars], ~ .x(.y))`. Of course, this leads to more technial names, as also in the `map()` variant, because of the default `.x`-named variables in purrr. However, in the `map()` approach the formula in the `.f` argument together with the shortage of the `.x` variable name and the brackets clearly indicate the application of functions to specific elements of `mtcars`. Together with the replacement form on the left hand side it becomes easy to inspect what the line is doing. Therefore, especially the iteration pattern on the left hand sidy comes in handy, as it clearly highlights the important matching of `trans` and `mtcars` element names.
+   Besides the iteration pattern, the approaches differ in the namings and the supplied argument types in the `.f` argument. While the `.f` in the `map2()` variant is named appropriately, the creation of the anonymous function might be a bit verbose. A more technical but compact way to write the `.f` argument would be the usage of a formula as in `mtcars[vars] <- map2(trans, mtcars[vars], ~ .x(.y))`. Of course, this leads to more technical names, as also in the `map()` variant, because of the default `.x`-named variables in purrr. However, in the `map()` approach the formula in the `.f` argument together with the shortage of the `.x` variable name and the brackets clearly indicate the application of functions to specific elements of `mtcars`. Together with the replacement form on the left hand side it becomes easy to inspect what the line is doing. Therefore, especially the iteration pattern on the left hand side comes in handy, as it clearly highlights the important matching of `trans` and `mtcars` element names.
 
 4. __<span style="color:red">Q</span>__: What does `write.csv()` return? i.e. what happens if you use it with `map2()` instead of `walk2()`?
 
-   __<span style="color:green">A</span>__: It returns `NULL`. So in the example above, where we itareate over a list, a named list of `NULL`s would be returned:
+   __<span style="color:green">A</span>__: `write.csv()` returns `NULL`. In the example above we iterated over a list of data frames and file names a named list of `NULL`s would be returned.
    
     ```{r}
-    temp <- tempfile()
-    dir.create(temp)
-    
-    cyls <- split(mtcars, mtcars$cyl)
-    paths <- file.path(temp, paste0("cyl-", names(cyls), ".csv"))
-    
+    # cyls <- split(mtcars, mtcars$cyl)
+    # paths <- file.path(temp, paste0("cyl-", names(cyls), ".csv"))
     map2(cyls, paths, write.csv)
-    dir(temp)
     ```
     
 ## Predicate Functionals
 
-1. __<span style="color:red">Q</span>__: Why isn't `is.na()` a predicate function? What base R function is closest
-    to being a predicate version of `is.na()`?
+1. __<span style="color:red">Q</span>__: Why isn't `is.na()` a predicate function? What base R function is closest to being a predicate version of `is.na()`?
 
-   __<span style="color:green">A</span>__: `is.na` is not a predicate function, as a predicate function only returns TRUE or FALSE. is.na(NULL) returns logical(0) instead, which excludes it from being a predicate function. The closest in base that we are aware of is anyNA(), if applied elementwise.
+   __<span style="color:green">A</span>__: `is.na` is not a predicate function, because a predicate function may only return `TRUE` or `FALSE`. This is not strictly the case for `is.na` (e.g. `is.na(NULL)` returns `logical(0)`). It may be, that `anyNA()`, if applied elementwise, may be closest to a predicate-`is.na()` in base R.
+
+<!-- @hadley: is this correct? -->
 
 2. __<span style="color:red">Q</span>__: `simple_reduce()` has a problem when `x` is length 0 or length 1. Describe the source of the problem and how you might go about fixing it.
     
@@ -212,7 +221,7 @@
     }
     ```
    
-   __<span style="color:green">A</span>__: The loop inside `simple_reduce()` always starts with the index 2. Therefore, subsetting length-0 and length-1 vectors via `[[` will lead to the error _subscript out of bounds_. To avoid this, we let `simple_reduce()` return before running the for-loop and supply it with a default argument for 0-length vectors.
+   __<span style="color:green">A</span>__: The loop inside `simple_reduce()` always starts with the index 2. Therefore, subsetting length-0 and length-1 vectors via `[[` will lead to the error *subscript out of bounds*. To avoid this, we allow `simple_reduce()` to `return()` before the for-loop is started and include default argument for 0-length vectors.
    
     ```{r}
     simple_reduce <- function(x, f, default) {
@@ -227,7 +236,7 @@
     }
     ```
     
-   Our new new `simple_reduce()` works now as expected:
+   Our new new `simple_reduce()` now works as intended:
    
     ```{r, error = TRUE}
     simple_reduce(integer(0), `+`)
@@ -238,7 +247,7 @@
 
 3. __<span style="color:red">Q</span>__: Implement the `span()` function from Haskell: given a list `x` and a predicate function `f`, `span(x, f)` returns the location of the longest sequential run of elements where the predicate is true. (Hint: you might find `rle()` helpful.)
 
-   __<span style="color:green">A</span>__: Our `span_r()` function returns the first index of the longest sequential run of elements where the predicate is true. In case of more than one longest sequenital, more than one index is returned.
+   __<span style="color:green">A</span>__: Our `span_r()` function returns the first index of the longest sequential run of elements where the predicate is true. In case of more than one longest sequential, more than one index is returned.
     
     ```{r, eval = FALSE}
     span_r <- function(l, pred){
@@ -275,22 +284,30 @@
 
 4. __<span style="color:red">Q</span>__: Implement `arg_max()`. It should take a function and a vector of inputs, and return the elements of the input where the function returns the highest value. For example, `arg_max(-10:5, function(x) x ^ 2)` should return -10. `arg_max(-5:5, function(x) x ^ 2)` should return `c(-5, 5)`. Also implement the matching `arg_min()` function.
 
-   __<span style="color:green">A</span>__: `arg_max()`:
-    
-    ```{r, eval = TRUE}
+   __<span style="color:green">A</span>__: Both functions take a vector of inputs and a function as an argument. The functions output are then used to subset the input accordingly.
+ 
+    ```{r}
     arg_max <- function(x, f){
       x[f(x) == max(f(x))]
     }
     
-    arg_max(-10:5, function(x) x ^ 2)
-    ```
-    
-    `arg_min()`:
-    
-    ```{r, eval = FALSE}
     arg_min <- function(x, f){
       x[f(x) == min(f(x))]
     }
+
+    arg_max(-10:5, function(x) x ^ 2)
+    arg_min(-10:5, function(x) x ^ 2)
+    ```
+
+   Both functions are actually quite similar, so it would have also been possible to pass an option (`max` or `min`) to an argument.
+
+    ```{r}
+    arg_ <- function(g, x, f){
+      x[f(x) == g(f(x))]
+    }
+    
+    arg_(max, -10:5, function(x) x ^ 2)
+    arg_(min, -10:5, function(x) x ^ 2)
     ```
 
 5. __<span style="color:red">Q</span>__: The function below scales a vector so it falls in the range [0, 1]. How would you apply it to every column of a data frame? How would you apply it to every numeric column in a data frame?
@@ -302,7 +319,7 @@
     }
     ```
     
-   __<span style="color:green">A</span>__: Since this function needs numeric input and non-numeric input should porobably be left as ist, it's easiest to use an "if-variant" of purrr's map-family of functions. As we would also prefert to get a data frame returned, if we supply one, we decide for `modify_if()`:
+   __<span style="color:green">A</span>__: To apply a function to every function of a data frame, we can use `purrr::modify`, which also conveniently returns a data frame. To limit the application to numeric columns, the scoped versions `modify_if()` can be used.
 
     ```{r, eval = FALSE}
     modify_if(iris, is.numeric, scale01)
@@ -312,23 +329,27 @@
 
 1.  __<span style="color:red">Q</span>__: How does `apply()` arrange the output? Read the documentation and perform some experiments.
     
-    __<span style="color:green">A</span>__: `apply()` arranges its output columns (or list elements) according to the order of the margin. The rows are ordered by the other dimensions, starting with the "last" dimension of the input object. What this means should become clear by looking at the three and four dimensional cases of the following example:
+   __<span style="color:green">A</span>__: `apply()` arranges its output columns (or list elements) according to the order of the margin. The rows are ordered by the other dimensions, starting with the "last" dimension of the input object. What this means should become clear by looking at the three and four dimensional cases of the following example:
+   
+   <!-- @Malte: Could you clarify this a bit more for the reader? What is the "other" dimension? Maybe add some explanation between each code chunk.-->
 
     ```{r, eval = FALSE}
     # for two dimensional cases everything is sorted by the other dimension
     arr2 <- array(1:9, dim = c(3, 3), dimnames = list(paste0("row", 1:3),
-                                                  paste0("col", 1:3)))
+                                                      paste0("col", 1:3)))
     arr2
     apply(arr2, 1, head, 1) # Margin is row
     apply(arr2, 1, head, 9) # sorts by col
     
     apply(arr2, 2, head, 1) # Margin is col
     apply(arr2, 2, head, 9) # sorts by row
-    
+    ```
+
+    ```{r, eval = FALSE}
     # 3 dimensional
-    arr3 <- array(1:27, dim = c(3,3,3), dimnames = list(paste0("row", 1:3),
-                                                    paste0("col", 1:3),
-                                                    paste0("time", 1:3)))
+    arr3 <- array(1:27, dim = c(3, 3, 3), dimnames = list(paste0("row", 1:3),
+                                                          paste0("col", 1:3),
+                                                          paste0("time", 1:3)))
     arr3
     apply(arr3, 1, head, 1) # Margin is row
     apply(arr3, 1, head, 27) # sorts by time and col
@@ -338,12 +359,15 @@
     
     apply(arr3, 3, head, 1) # Margin is time
     apply(arr3, 3, head, 27) # sorts by col and row
-    
+    ```
+
+    ```{r, eval = FALSE}
     # 4 dimensional
-    arr4 <- array(1:81, dim = c(3,3,3,3), dimnames = list(paste0("row", 1:3),
-                                                      paste0("col", 1:3),
-                                                      paste0("time", 1:3),
-                                                      paste0("var", 1:3)))
+    arr4 <- array(1:81, dim = c(3 ,3, 3, 3),
+                  dimnames = list(paste0("row", 1:3),
+                                  paste0("col", 1:3),
+                                  paste0("time", 1:3),
+                                  paste0("var", 1:3)))
     arr4
     
     apply(arr4, 1, head, 1) # Margin is row
@@ -361,16 +385,16 @@
 
 2. __<span style="color:red">Q</span>__: What do `eapply()` and `rapply()` do? Does purrr have equivalents?
 
-   __<span style="color:green">A</span>__: `eapply()` is a variant of `lapply()`. The main difference is that it iterates over the (named) elements of an environment. In purrr is no equivalent for `eapply()` as purrr does mainly provide functions that operate on vectors and functions but not on environments. 
+   __<span style="color:green">A</span>__: `eapply()` is a variant of `lapply()`, which iterates over the (named) elements of an environment. In purrr there is no equivalent for `eapply()` as purrr mainly provides functions that operate on vectors and functions, but not on environments. 
    
-   `rapply()` applies a function to all elements of a list in a recursive manner. It allows to limit the application of the function to specified classes (default `classes = ANY`) and one may specify how elements of other classes should remain: i.e. as their identity (`how = replace`) or another value (`deflt = NULL`). Again purrr doesn't provide an equivalent to this function.
+   `rapply()` applies a function to all elements of a list recursively. This function makes it possible to limit the application of the function to specified classes (default `classes = ANY`). One may also specify how elements of other classes should remain: i.e. as their identity (`how = replace`) or another value (`deflt = NULL`). Again purrr doesn't provide an equivalent to this function.
 
 3. __<span style="color:red">Q</span>__: Challenge: read about the [fixed point algorithm](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-12.html#%25_idx_1096). Complete the exercises using R.
 
-   __<span style="color:green">A</span>__: A number x is called a fixed point of a function $f$, if it satisfies the equation $f(x) = x$. For some functions we may find a fixed point by beginning with a starting value and applying $f$ repeatedly. Here `find_fixed_point()` acts as a functional, because it takes a function as an argument.
+   __<span style="color:green">A</span>__: A number $x$ is called a fixed point of a function $f$, if it satisfies the equation $f(x) = x$. For some functions we may find a fixed point by beginning with a starting value and applying $f$ repeatedly. Here `find_fixed_point()` acts as a functional, because it takes a function as an argument.
 
     ```{r}
-find_fixed_point <- function(f, x_start = 1, n_max = 10000, tol = 0.0001) {
+    find_fixed_point <- function(f, x_start = 1, n_max = 10000, tol = 0.0001) {
       # Initialize
       n <- 1
       x <- x_start
@@ -382,7 +406,7 @@ find_fixed_point <- function(f, x_start = 1, n_max = 10000, tol = 0.0001) {
         
         if(is_fixed_point){
           # Success case
-          message("Fixed point was found, after", n, " iterations.")
+          message("Fixed point was found, after ", n, " iterations.")
           return(x)
         } else {
           # Recursive case
@@ -395,7 +419,7 @@ find_fixed_point <- function(f, x_start = 1, n_max = 10000, tol = 0.0001) {
         message("No fixed point found.")
       }
     }
-```
+    ```
 
     ```{r}
     # Functions with fixed points
@@ -635,7 +659,7 @@ in `lapply()`'s third argument (`...`).
     lmapply(testlist, mean, numeric(1))
     ```
 
-7.  __<span style="color:red">Q</span>__: Implement `mcsapply()`, a multicore version of `sapply()`. Can you
+7.  __<span style="color:red">Q</span>__: Implement `mcsapply()`, a multi-core version of `sapply()`. Can you
     implement `mcvapply()`, a parallel version of `vapply()`? Why or why not?
 
 ## Manipulating matrices and data frames
