@@ -1,3 +1,8 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
 # Function factories
 
 ## Prerequisites
@@ -118,7 +123,7 @@ library(ggplot2)
     }
     ```
 
-   __<span style="color:green">A</span>__: Without the superassignment `<<-`, the counter will always return 1. The counter always starts in a new execution environment within the same enclosing environment, which contains an unchanged value for `i` (in this case it remains 0).
+   __<span style="color:green">A</span>__: Without the super assignment `<<-`, the counter will always return 1. The counter always starts in a new execution environment within the same enclosing environment, which contains an unchanged value for `i` (in this case it remains 0).
    
     ```{r}
     new_counter_3 <- new_counter3()
@@ -146,7 +151,7 @@ library(ggplot2)
     }
     ```
     
-   Neither `df` nor `model` appear in it. The relevant values, `fitted` and `resid`, are calculated (and so evaluated) in the enclosing environment within `boot_model`. 
+   In this function neither `df` nor `model` are used. The relevant values, `fitted` and `resid`, are calculated (and therefore evaluated) in the enclosing environment of `boot_model`. 
     
 2. __<span style="color:red">Q</span>__: Why might you formulate the Box-Cox transformation like this?
 
@@ -162,17 +167,29 @@ library(ggplot2)
     }
     ```
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:orange">A</span>__: `boxcox3` returns a function where `x` is fixed (though it is not forced, so it may manipulated later). This allows us to apply and test different transformations for different inputs and give them a descriptive name.
+
+    ```{r}
+    # initial example (should be improved)
+    boxcox_airpassengers <- boxcox3(AirPassengers)
+    
+    par(mfrow=c(2, 2))
+    purrr::map(c(0.1, 0.3, 0.5, 0.8), boxcox_airpassengers) %>% 
+      purrr::walk(plot)
+    dev.off()
+    ```
+
+<!-- this doesn't make much sense, one could also use map2 here and mutate into ggplot or so -->
 
 3. __<span style="color:red">Q</span>__: Why don't you need to worry that `boot_permute()` stores a copy of the data inside the function that it generates?
 
-   __<span style="color:green">A</span>__: Anything created in a manufactured function, like those returned by `boot_compute()`, gets created in the function's execution environment. As we've learned in the environments chapter, execution environments are ephemeral: once the function has completed, the environment will be garbage collected. As long as we don't return the execution environment and assign the referencing object any further, we don't have to worry about it. Therefore, we have to be careful in case we are explicitly returning the environment or another function, which carries the execution environment as its enclosing enviornment.
+   __<span style="color:green">A</span>__: The objects created in a manufactured function, like those returned by `boot_compute()`, are created in the function's execution environment. Execution environments are ephemeral: once the function is executed, the environment will be garbage collected. As long as we don't return the execution environment and assign the referencing object, we won't run into problems.
 
-4. __<span style="color:red">Q</span>__: How much time does `ll_poisson2()` save compared to `ll_poisson1()`?
-    Use `bench::mark()` to see how much faster the optimisation occurs.
-    How does changing the length of `x` change the results?
+<!-- this could be improved a little more -->
 
-   __<span style="color:green">A</span>__: Let us recall the definitions of `ll_poisson1()` and `ll_poisson2()` from the book:
+4. __<span style="color:red">Q</span>__: How much time does `ll_poisson2()` save compared to `ll_poisson1()`? Use `bench::mark()` to see how much faster the optimisation occurs. How does changing the length of `x` change the results?
+
+   __<span style="color:green">A</span>__: Let us recall the definitions of `ll_poisson1()` and `ll_poisson2()` and the test data `x1`:
    
     ```{r}
     ll_poisson1 <- function(x) {
@@ -192,44 +209,47 @@ library(ggplot2)
         log(lambda) * sum_x - n * lambda - c
       }
     }
-    ```
     
-   Additionally, the test case from the book is
-    
-    ```{r}
+    # provided test data
     x1 <- c(41, 30, 31, 38, 29, 24, 30, 29, 31, 38)
     ```
     
-   A first benchmark for this vector reveals a performance improvement of factor 2 for `ll_poisson2()` over `ll_poisson1()`
+   A benchmark with this data reveals a performance improvement of factor 2 for `ll_poisson2()` over `ll_poisson1()`
    
     ```{r}    
     bench::mark(llp1 = optimise(ll_poisson1(x1), c(0, 100), maximum = TRUE),
                 llp2 = optimise(ll_poisson2(x1), c(0, 100), maximum = TRUE))
     ```
     
-   Regarding differing lengths of `x1`, we expect even further performance improvements of `ll_poisson2()` compared to `ll_poisson1()`, as the redundant calculations within `ll_poisson1()`, become more expensive with growing length of `x1`. The following results imply that for a length of `x1` of 100000, `ll_poisson2()` is about 25 times as fast as `ll_poisson1()`:
+   Regarding differing lengths of `x1`, we expect even further performance improvements of `ll_poisson2()` compared to `ll_poisson1()`, as the redundant calculations within `ll_poisson1()`, become more expensive with growing length of `x1`. The following results imply that for a length of `x1` of 100000, `ll_poisson2()` is about 20+ times as fast as `ll_poisson1()`:
    
     ```{r, message = FALSE, warning = FALSE}
-    results <- vector(mode = "list", length = 5L)
+    library(purrr)
+    library(dplyr)
     
-    for (i in 1:length(results)) {
-      x_i_length <- 10L^i
+    bench_poisson <- function(i){
+      x_i_length <- 10L ^ i
       x_i <- rpois(x_i_length, 100L)
       
-      results[[i]] <- bench::mark(
-      llp1 = optimise(ll_poisson1(x_i), c(0, 100), maximum = TRUE),
-      llp2 = optimise(ll_poisson2(x_i), c(0, 100), maximum = TRUE))
+      rel_advantage <- bench::mark(llp1 = optimise(ll_poisson1(x_i), c(0, 100), maximum = TRUE),
+                  llp2 = optimise(ll_poisson2(x_i), c(0, 100), maximum = TRUE),
+                  relative = TRUE)$median %>% 
+        max()
+      
+      rel_advantage
     }
     
-    library(magrittr)
-   
-    do.call(rbind, results) %>% 
-      dplyr::select(expression, `itr/sec`) %>% 
-      dplyr::mutate(x_length = 10^rep(1:5, each = 2)) %>% 
-      tidyr::spread(key = expression, value = `itr/sec`) %>% 
-      dplyr::mutate(relative_iterations_per_second = llp2 / llp1) %>% 
-      ggplot(aes(x = x_length, y = relative_iterations_per_second)) +
-      geom_point()
+    bench_df <- map_dbl(1:5, bench_poisson) %>% 
+      tibble(i = 1:5,
+             rel_advantage = .,
+             x_length = 10 ^ i)
+    
+    bench_df %>% 
+      ggplot(aes(x_length, rel_advantage)) +
+      geom_point() +
+      geom_line() +
+      ggtitle("Rel. Speed of ll_poisson2() increases with vector length") +
+      scale_x_log10()
     ```
  
 1. __<span style="color:red">Q</span>__: Which of the following commands is equivalent to `with(x, f(z))`?
@@ -240,7 +260,7 @@ library(ggplot2)
    (d) `f(z)`.
    (e) It depends.
 
-   __<span style="color:green">A</span>__: e: It dependes. Typically b (`f(x$z)`) is equivalent. However, if `x` is the current environment, also d (`f(z)`) is equivalent.
+   __<span style="color:green">A</span>__: e: It depends ;-). Typically (b) (`f(x$z)`) is equivalent. However, if `x` is bound in the current environment, also d (`f(z)`) is equivalent.
 
 2. __<span style="color:red">Q</span>__: Compare and contrast the effects of `env_bind()` vs. `attach()` for the following code.
    
