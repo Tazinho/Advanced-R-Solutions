@@ -1,16 +1,8 @@
-```{r include=FALSE, cache=FALSE}
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE
-)
-```
-
 # Function factories
 
 ## Prerequisites
 
-For most of this chapter we stay in base R only. Just in very few exercises, we make additional usage of the **rlang** and the **ggplot2** package:
+For most of this chapter base R is sufficient. Just a few exercises require **rlang** and **ggplot2** packages.
 
 ```{r}
 library(rlang)
@@ -27,17 +19,17 @@ library(ggplot2)
     
    Why is it better to `force(x)` instead of just `x`?
     
-   __<span style="color:green">A</span>__: To be clear: `force(x)` is just syntactic sugar for `x`. However, as stated in the first edition of the textbook:
+   __<span style="color:green">A</span>__: As you can see `force(x)` is just syntactic sugar for `x`. From the textbook:
     
    > using this function clearly indicates that you’re forcing evaluation, not that you’ve accidentally typed `x`.
 
 2. __<span style="color:red">Q</span>__: Base R contains two function factories, `approxfun()` and `ecdf()`. Read their documentation and experiment to figure out what the functions do and what they return.
 
-   __<span style="color:green">A</span>__: Let's start with `approxfun()` as it is needed within `ecdf()` to generate empirical density functions:
+   __<span style="color:green">A</span>__: Let's begin with `approxfun()` as it is used within `ecdf()` also:
    
-   - `approxfun()` basically takes a 2-dimensional combination of data points (`x` and `y` arguements) and returns a stepwise linear (`method = "linear"`) or constant (`method = constant`) interpolation function, which can handle new `x` values. Further arguments allow to control how the function should behave. I.e. `yleft`, `yright` and `rule` specify how the newly created function should map new values which are outside of `range(x)`. Further, `f` controls the degree of right-left-continuity via a numeric value from `0` to `1` and `ties` expects a function name like min, mean etc. which defines how non-unique x-y-combinations should be handled when interpolating the data points.
+   - `approxfun()` takes a 2-dimensional combination of data points (`x` and `y`) as input and returns a *stepwise interpolation function*, which transforms new `x` values. Additional arguments control how the created function should behave. (The interpolation `method` may be linear or constant. `yleft`, `yright` and `rule` specify how the newly created function should map new values which are outside of `range(x)`. `f` controls the degree of right-left-continuity via a numeric value from `0` to `1` and `ties` expects a function name like min, mean etc. which defines how non-unique x-y-combinations should be handled when interpolating the data points.)
 
-   - `ecdf()` stands for empirical density function. For a numeric vector, `ecdf()` returns the appropriate density function (of class “ecdf”, which is inheriting from class “stepfun”). One might describe its inner workings in 2 steps. In the first one, the (x,y) pairs for the nodes of the density function are calculated. In the second one these pairs are given to `approxfun()`, which then creates the final function.
+   - `ecdf()` is an acronym for empirical cumulative distribution function. For a numeric vector, `ecdf()` returns the appropriate distribution function (of class “ecdf”, which is inheriting from class “stepfun”). Initially the (x, y) pairs for the nodes of the density function are calculated. Afterwards these pairs are passed to `approxfun()`, which then returns the desired function.
 
 3. __<span style="color:red">Q</span>__: Create a function `pick()` that takes an index, `i`, as an argument and returns a function with an argument `x` that subsets `x` with `i`.
 
@@ -51,18 +43,19 @@ library(ggplot2)
     lapply(mtcars, function(x) x[[5]])
     ```
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: In this exercise `pick(i)` is acts as a function factory, which returns the required subsetting function.
    
     ```{r}
     pick <- function(i) {
       force(i)
-    
+      
       function(x) x[[i]]
     }
     
     x <- 1:3
     identical(x[[1]], pick(1)(x))
-    identical(lapply(mtcars, pick(5)), lapply(mtcars, function(x) x[[5]]))
+    identical(lapply(mtcars, function(x) x[[5]]),
+              lapply(mtcars, pick(5)))
     ```
 
 4. __<span style="color:red">Q</span>__: Create a function that creates functions that compute the i^th^ [central moment](http://en.wikipedia.org/wiki/Central_moment) of a numeric vector. You can test it by running the following code:
@@ -76,7 +69,7 @@ library(ggplot2)
     stopifnot(all.equal(m2(x), var(x) * 99 / 100))
     ```
 
-   __<span style="color:green">A</span>__: For a discrete formulation look under [http://www.r-tutor.com/elementary-statistics/numerical-measures/moment](http://www.r-tutor.com/elementary-statistics/numerical-measures/moment).
+   __<span style="color:green">A</span>__: The first moment is closely related to the mean and describes the average deviation from the mean, which is 0 (within numerical margin of error). The second moment describes the variance of the input data. If we want compare it to `var`, we need to undo [Bessel's correction}(https://en.wikipedia.org/wiki/Bessel%27s_correction) correction by multiplying with $\frac{N-1}{N}$.
     
     ```{r}
     moment <- function(i){
@@ -89,8 +82,8 @@ library(ggplot2)
     m2 <- moment(2)
 
     x <- runif(100)
-    stopifnot(all.equal(m1(x), 0))
-    stopifnot(all.equal(m2(x), var(x) * 99 / 100))
+    all.equal(m1(x), 0)  # removed stopifnot() for clarity
+    all.equal(m2(x), var(x) * 99 / 100)
     ```
 
 5. __<span style="color:red">Q</span>__: What happens if you don't use a closure? Make predictions, then verify with the code below.
@@ -103,7 +96,7 @@ library(ggplot2)
     }
     ```
 
-   __<span style="color:green">A</span>__: Our counts aren't reliable anymore, as they are stored within the global environment, where thy can be easily overwritten, deleted or interfere with other counters:
+   __<span style="color:green">A</span>__: Without the captured and encapsulated environment of a closure the counts will be stored in the global environment. Here they can be overwritten or deleted as well as interfere with other counters.
    
     ```{r, error = TRUE}
     new_counter2()
@@ -125,16 +118,15 @@ library(ggplot2)
     }
     ```
 
-   __<span style="color:green">A</span>__: The counter will always return 1.
+   __<span style="color:green">A</span>__: Without the superassignment `<<-`, the counter will always return 1. The counter always starts in a new execution environment within the same enclosing environment, which contains an unchanged value for `i` (in this case it remains 0).
    
-   ```{r}
-   new_counter_3 <- new_counter3()
+    ```{r}
+    new_counter_3 <- new_counter3()
+    
+    new_counter_3()
+    new_counter_3()
+    ```
    
-   new_counter_3()
-   new_counter_3()
-   ```
-   
-    This happens as the counter always starts in a fresh execution environment, enclosed by the same enclosing environment, where `i` (in this case) remains 0.
 
 ## Graphical factories
 
