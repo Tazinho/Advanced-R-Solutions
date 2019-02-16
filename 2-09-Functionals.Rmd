@@ -1,3 +1,8 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
 # (PART) Functional programming {-} 
 
 # Functionals
@@ -158,7 +163,7 @@ library(purrr)
 
    __<span style="color:green">A</span>__: With `iwalk()` it is possible combine the name creation and file saving with one function call. It is not necessary to create intermediate objects, which won't be used any further. Unfortunately, the function turns out quite long and it may be difficult to understand it immediately.
    
-    ```{r}
+    ```{r, eval = FALSE}
     temp_dir <- tempfile()
     dir.create(temp_dir)
     
@@ -166,6 +171,7 @@ library(purrr)
       iwalk(~ write.csv(.x, file.path(temp_dir, paste0("cyl-", .y, ".csv"))))
     
     list.files(temp_dir)
+    #> [1] "cyl-4.csv" "cyl-6.csv" "cyl-8.csv"
     ```
 
 3. __<span style="color:red">Q</span>__: Explain how the following code transforms a data frame using functions stored in a list.
@@ -196,11 +202,19 @@ library(purrr)
 
    __<span style="color:green">A</span>__: `write.csv()` returns `NULL`. In the example above we iterated over a list of data frames and file names a named list of `NULL`s would be returned.
    
-    ```{r}
+    ```{r, eval=FALSE}
     cyls <- split(mtcars, mtcars$cyl)
     paths <- file.path(temp_dir, paste0("cyl-", names(cyls), ".csv"))
     
     map2(cyls, paths, write.csv)
+    #> $`4`
+    #> NULL
+    #> 
+    #> $`6`
+    #> NULL
+    #> 
+    #> $`8`
+    #> NULL
     ```
     
 ## Predicate Functionals
