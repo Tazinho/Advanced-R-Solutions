@@ -263,41 +263,39 @@ library(purrr)
 
 3. __<span style="color:red">Q</span>__: Implement the `span()` function from Haskell: given a list `x` and a predicate function `f`, `span(x, f)` returns the location of the longest sequential run of elements where the predicate is true. (Hint: you might find `rle()` helpful.)
 
-   __<span style="color:green">A</span>__: Our `span_r()` function returns the first index of the longest sequential run of elements where the predicate is true. In case of more than one longest sequential, more than one index is returned.
-    
-    ```{r, eval = FALSE}
-    span_r <- function(l, pred){
-      # We test if l is a list
-      stopifnot(is.list(l))
-    
-      # we preallocate a logical vector and save the result
-      # of the predicate function applied to each element of the list
-      test <- vector("logical", length(l))
-      for (i in seq_along(l)){
-        test[i] <- (pred(l[[i]]))
-      }
-      # we return NA, if the output of pred is always FALSE
-      if(!any(test)) return(NA_integer_)
+   __<span style="color:green">A</span>__: Our `span_r()` function returns the list indices of the (first occuring) longest sequential run of elements where the predicate is true. In case the predicate is not true for any list element, `NA_integer` gets returned.
+   
+    ```{r}
+    span_r <- function(x, f) {
+      index_lgl <- map_lgl(x, ~ f(.x))
+      index_lgl <- unname(index_lgl)
       
-      # Otherwise we look at the length encoding of TRUE and FALSE values.
-      rle_test <- rle(test)
-      # Since it might happen, that more than one maximum series of TRUE's appears,
-      # we have to implement some logic, which might be easier, if we save the rle 
-      # output in a data.frmame
-      rle_test <- data.frame(lengths = rle_test[["lengths"]],
-                              values = rle_test[["values"]],
-                              cumsum = cumsum(rle_test[["lengths"]]))
-      rle_test[["first_index"]] <- rle_test[["cumsum"]] - rle_test[["lengths"]] + 1
-      # In the last line we calculated the first index in the original list for every encoding
-      # In the next line we calculate a column, which gives the maximum 
-      # encoding length among all encodings with the value TRUE
-      rle_test[["max"]] <-  max(rle_test[rle_test[, "values"] == TRUE, ][,"lengths"])
-      # Now we just have to subset for maximum length among all TRUE values and return the
-      # according "first index":
-      rle_test[rle_test$lengths == rle_test$max & rle_test$values == TRUE, ]$first_index
+      # The interesting part of rle is in $lengths and $values
+      sequences <- rle(index_lgl) 
+  
+      # In case of no true $values, we return NA_integer
+      if (!any(sequences$values)) {return(NA_integer_)}
+      
+      # For further calculations we need to find the $length index of the (first
+      # appearing) longest sequence of trues
+      index_seq <- which.max(
+        sequences$lengths == max(sequences$lengths[sequences$values]) &
+        sequences$values)
+  
+      # This allows us to calculate the start and end index of the longest sequence
+      index_start <- sum(sequences$lengths[seq_len(index_seq - 1)]) + 1L
+      index_end   <- sum(sequences$lengths[seq_len(index_seq)])
+  
+      # Now, it's straight forward to return the regarding sequence
+      index_start:index_end
     }
+    
+    # Tests
+    span_r(iris, is.numeric)
+    span_r(iris, is.factor)
+    span_r(iris, is.character)
     ```
-
+    
 4. __<span style="color:red">Q</span>__: Implement `arg_max()`. It should take a function and a vector of inputs, and return the elements of the input where the function returns the highest value. For example, `arg_max(-10:5, function(x) x ^ 2)` should return -10. `arg_max(-5:5, function(x) x ^ 2)` should return `c(-5, 5)`. Also implement the matching `arg_min()` function.
 
    __<span style="color:green">A</span>__: Both functions take a vector of inputs and a function as an argument. The functions output are then used to subset the input accordingly.
