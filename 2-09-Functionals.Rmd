@@ -343,59 +343,22 @@ library(purrr)
 
 1. __<span style="color:red">Q</span>__: How does `apply()` arrange the output? Read the documentation and perform some experiments.
     
-   __<span style="color:green">A</span>__: `apply()` arranges its output columns (or list elements) according to the order of the margin. The rows are ordered by the other dimensions, starting with the "last" dimension of the input object. What this means should become clear by looking at the three and four dimensional cases of the following example:
+   __<span style="color:green">A</span>__: Basically `apply()` applies a function over the margins of an array. In the two dimensional case, the margins are just the rows and columns of a matrix. Let's make this concrete.
    
-   <!-- @Malte: Could you clarify this a bit more for the reader? What is the "other" dimension? Maybe add some explanation between each code chunk.-->
-
-    ```{r, eval = FALSE}
-    # for two dimensional cases everything is sorted by the other dimension
-    arr2 <- array(1:9, dim = c(3, 3), dimnames = list(paste0("row", 1:3),
-                                                      paste0("col", 1:3)))
+    ```{r}
+    arr2 <- array(1:9, dim = c(3, 3),
+                  dimnames = list(row = paste0("row", 1:3),
+                                  col = paste0("col", 1:3)))
     arr2
-    apply(arr2, 1, head, 1) # Margin is row
-    apply(arr2, 1, head, 9) # sorts by col
-    
-    apply(arr2, 2, head, 1) # Margin is col
-    apply(arr2, 2, head, 9) # sorts by row
     ```
-
-    ```{r, eval = FALSE}
-    # 3 dimensional
-    arr3 <- array(1:27, dim = c(3, 3, 3), dimnames = list(paste0("row", 1:3),
-                                                          paste0("col", 1:3),
-                                                          paste0("time", 1:3)))
-    arr3
-    apply(arr3, 1, head, 1) # Margin is row
-    apply(arr3, 1, head, 27) # sorts by time and col
     
-    apply(arr3, 2, head, 1) # Margin is col
-    apply(arr3, 2, head, 27) # sorts by time and row
+   When we apply the `head()` function over a margin of `arr2`, i.e. the rows, the results are contained in the columns of the output:
     
-    apply(arr3, 3, head, 1) # Margin is time
-    apply(arr3, 3, head, 27) # sorts by col and row
+    ```{r}
+    apply(X = arr2, MARGIN = "row", FUN = head, 2)
     ```
-
-    ```{r, eval = FALSE}
-    # 4 dimensional
-    arr4 <- array(1:81, dim = c(3 ,3, 3, 3),
-                  dimnames = list(paste0("row", 1:3),
-                                  paste0("col", 1:3),
-                                  paste0("time", 1:3),
-                                  paste0("var", 1:3)))
-    arr4
     
-    apply(arr4, 1, head, 1) # Margin is row
-    apply(arr4, 1, head, 81) # sorts by var, time, col
-    
-    apply(arr4, 2, head, 1) # Margin is col
-    apply(arr4, 2, head, 81) # sorts by var, time, row
-    
-    apply(arr4, 3, head, 1) # Margin is time
-    apply(arr4, 3, head, 81) # sorts by var, col, row
-    
-    apply(arr4, 4, head, 1) # Margin is var
-    apply(arr4, 4, head, 81) # sorts by time, col, row
-    ```
+   Obviously the rows are orderd by the other input's margin (the original columns). For higher dimensional arrays this could become quite ambiguous. However, with a bit of experimantation, one can find out that `apply()` arranges the order of the of it's output directly in the order of the other array dimensions.
 
 2. __<span style="color:red">Q</span>__: What do `eapply()` and `rapply()` do? Does purrr have equivalents?
 
