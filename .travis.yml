@@ -5,7 +5,7 @@ cache:
   packages: true
   directories:
     - $TRAVIS_BUILD_DIR/_bookdown_files
-    - $TRAVIS_BUILD_DIR/packrat/lib
+#     - $TRAVIS_BUILD_DIR/packrat/lib
     - $HOME/.npm
 
 before_install:
@@ -14,9 +14,9 @@ before_install:
   - nvm install stable
   - npm install netlify-cli -g
 
-install: 
-  - R -e "0" --args --bootstrap-packrat
-  - R -e "packrat::restore(restart = FALSE)"
+# install: 
+#   - R -e "0" --args --bootstrap-packrat
+#   - R -e "packrat::restore(restart = FALSE)"
 
 script:
   - Rscript -e 'bookdown::render_book("index.Rmd")'
