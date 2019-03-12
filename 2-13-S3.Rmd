@@ -85,43 +85,145 @@ source("before_chapter.R")
 ## Classes
 
 1. __<span style="color:red">Q</span>__: Write a constructor for `data.frame` objects. What base type is a data frame built on? What attributes does it use? What are the restrictions placed on the individual elements? What about the names?
+
+   __<span style="color:green">A</span>__: Data frames are built on (named) lists with the additional requirement that all elements must have the same length. Their only attribute is "row.names". These must be unique, have the same length as each list element and also must be of integer or character type.
+   
+   There are no additional restrictions to column names apart to those of lists, so one could use special characters and surround the names with backticks (which is not recommended).
+   
+   A very good constructor implementing these criteria used to part of the sloop package. It is no longer part of the package, but the source can still be found online (https://github.com/r-lib/sloop/blob/be7ce8a6be660536df4bdd3a31fa54f0d627f2d6/R/data.frame.R#L11).
     
-   __<span style="color:green">A</span>__: Data frames are built on (named) lists and their only attribute is row.names. Row names must be unique and have the same length as observations within the data. They must be of type integer or character. Also all elements must have the same length. Technically there are no restrictions to column names apart to those of lists, so one could surround special names via backticks at creation (of course this is not recommended). A very good constructor regarding these criteria is already implemented within the sloop package.
+    ```{r, error=TRUE}
+    # copied from older version of the sloop package
+    new_data.frame <- function(x, row.names = NULL) {
+      stopifnot(is.list(x))
+      
+      n <- if (length(x) == 0) 0 else length(x[[1]])
+      lengths <- vapply(x, length, integer(1))
+      stopifnot(all(lengths == n))
+      
+      if (is.null(row.names)) {
+        row.names <- .set_row_names(n)
+      } else {
+        stopifnot(
+          is.character(row.names) || 
+            is.numeric(row.names)
+          )
+        stopifnot(
+          length(row.names) == n || 
+            length(row.names) == 2
+          )
+      }
+      
+      structure(
+        x,
+        class = "data.frame",
+        row.names = row.names
+      )
+    }
     
-    ```{r, comment = "", eval = FALSE}
-    sloop::new_data.frame
-    ```
+    # Test
+    x <- list(a = 1, b = 2)
+    new_data.frame(x, row.names = "l1")
+    new_data.frame(x, row.names = 1)
+```
     
 2. __<span style="color:red">Q</span>__: Enhance our `factor()` helper to have better behaviour when one or more `values` is not found in `levels`. What does `base::factor()` do in this situation?
     
-   __<span style="color:green">A</span>__: `base::factor()` converts these values (silently) into `NA`'s. To improve our `factor()` helper, we write a more informative error message.
+   __<span style="color:green">A</span>__: `base::factor()` converts these values (silently) into `NA`'s. To improve our `factor()` helper we choose to return an informative error message instead.
     
     ```{r, eval = FALSE}
     factor <- function(x, levels = unique(x)) {
-      ind <- match(x, levels)
+      new_levels <- match(x, levels)
       
-      # error when values occur, which are not in the levels
-      if(any(is.na(ind))){
-        stop("The following values do not occur in the levels: ",
-             paste(setdiff(x,levels), collapse = ", "), ".", 
+      # return error if unseen levels are passed
+      if(any(is.na(new_levels))){
+        stop("The following values do not occur ",
+             "in the levels of x: ",
+             paste(setdiff(x, levels), collapse = ", ")
+             ".", 
              call. = FALSE)
         }
       
-      validate_factor(new_factor(ind, levels))
+      validate_factor(new_factor(new_levels, levels))
     }
     ```
 
 3. __<span style="color:red">Q</span>__: Carefully read the source code of `factor()`. What does it do that our constructor does not?
-    
-   __<span style="color:green">A</span>__: It allows more general values as `x` input and converts them to character or replaces them by `character(0)` (in case of `NULL`). It also ensures that the levels are unique. This is done by setting the levels via the `base::levels<-` function, which fails when one tries to supply duplicated level values.
-    
+
+   __<span style="color:green">A</span>__: The original implementation allows a more flexible specification of input for `x`. The input is coerced to character or replaced by `character(0)` (in case of `NULL`). It also ensured that the factor levels are unique. This is achieved by setting the levels via `base::levels<-`, which fails when duplicate values are supplied.
+
 4. __<span style="color:red">Q</span>__: Factors have an optional “contrasts” attribute. Read the help for `C()`, briefly describe it’s purpose. Rewrite our `new_factor()` constructor to include this attribute.
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: When factor variables (representing nominal or ordinal information) are used in statistical models, they are typically encoded as dummy variables and by default each level is compared with the first factor level. But many other encodings ("contrasts") are possible: https://en.wikipedia.org/wiki/Contrast_(statistics)
+
+   Within R's formula interface you can wrap a factor in `C` and specify the contrast of your choice. Alternativly you can set the "contrast" attribute of you factor variable, which accepts matrix input. (see `?contr.helmert` or similar for details)
+
+
+    ```{r}
+    # updated factor constructor
+    new_factor <- function(
+      x = integer(),
+      levels = character(),
+      contrast = NULL
+    ) {
+      stopifnot(is.integer(x))
+      stopifnot(is.character(levels))
+      stopifnot(is.matrix(contrast) | is.null(contrast))
+      
+      structure(
+        x,
+        levels = levels,
+        class = "factor",
+        contrast = contrast
+      )
+    }
+    ```
 
 5. __<span style="color:red">Q</span>__: Read the documentation for `utils::as.roman()`. How would you write a constructor? Does it need a validator? What would a helper look like?
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: This function transforms numeric input into roman numbers (how cool is this!). This class is built on the "integer" type, which results in the following constructor.
+
+    ```{r}
+    new_roman <- function(x = integer()){
+      stopifnot(is.integer(x))
+      structure(x, class = "roman")
+    }
+    ```
+
+   The documentation tells us, that only values between 1 and 3899 are uniquely represented, which we then include in our validation function.
+
+    ```{r}
+    validate_roman <- function(x) {
+      values <- unclass(x)
+      
+      if(any(values < 1 | values > 3899)) {
+        stop(
+          "Roman numbers are only defined between ",
+          "1 and 3899.",
+          call. = FALSE
+        )
+      }
+      
+      x
+    }
+```
+
+   <!-- Anyone have an idea, why 3899 is the upper limit for roman numbers in R? -->
+
+   For convenience, we allow the user to also pass real values to a helper function.
+
+    ```{r, error=TRUE}
+    roman <- function(x = integer()) {
+      x <- as.integer(x)
+      
+      validate_roman(new_roman(x))
+    }
+    
+    # Test
+    roman(c(1, 753, 2019))
+    roman(0)
+    ```
+
 
 ## Generics and methods
 
