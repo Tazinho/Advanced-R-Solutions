@@ -6,25 +6,46 @@ source("before_chapter.R")
 
 ## Basics
 
-1. __<span style="color:red">Q</span>__: Describe the difference between t.test() and t.data.frame()? When is each function called?
+1. __<span style="color:red">Q</span>__: Describe the difference between `t.test()` and `t.data.frame()`? When is each function called?
 
-   __<span style="color:green">A</span>__:
-
+   __<span style="color:green">A</span>__: Because of S3's `generic.class()` naming scheme, both functions may initially look similar, while they are in fact unrelated.
+   
+   - `t.test()` calls a *generic* function and will perform a t-test. 
+   - The *method* `t.data.frame()` is called by the generic `t()` to transpose data frame input.
 
 2. __<span style="color:red">Q</span>__: Make a list of commonly used base R functions that contain `.` in their name but are not S3 methods.
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: In the recent years "snake_case"-style has become increasingly common when naming functions (and variables) in R. But many functions in base R will continue to be "point.separated", which is why some inconsitency in your R code most likely cannot be avoided.
+   
+    ```{r, eval=FALSE}
+    # some base R functions with point.separated names
+    install.packages()
+    read.csv()
+    
+    list.files()
+    download.file()
+    
+    data.frame()
+    as.character()
+    Sys.Date()
+    
+    all.equal()
+    
+    do.call()
+    on.exit()
+    ```
+   
+   For some of these functions "tidyverse"-replacements may exist such as `readr::read_csv()` or `rlang::as_character()`, which you could use at the cost of an extra dependency.
+
+<!-- possibly mention https://journal.r-project.org/archive/2012/RJ-2012-018/RJ-2012-018.pdf (The State of Naming Conventions in R)    -->
 
 3. __<span style="color:red">Q</span>__: What does the `as.data.frame.data.frame()` method do? Why is it confusing? How could you avoid this confusion in your own code?
 
-   __<span style="color:green">A</span>__: The name is confusing, because it is not clear, from the name, if it is a normal function, a generic or a method. Even if we know, that it is a method, the name doesn't tell us, which part is the name of the generic and which part is the class name.  
-We can easily avoid this confusion, by forgoing to use period separated class and function names.
+   __<span style="color:green">A</span>__: The function `as.data.frame.data.frame()` implements the data frame *method* for the `as.data.frame()` *generic*, which coerces objects to data frames.
 
-   To reveal the solution: `as.data.frame.data.frame()` is the data frame method of the `as.data.frame()` generic. Methods of this generic generally coerce objects to data frames.  
-    This specific method strips all class attributes preceding the "data.frame" class.  
-    If row names are supplied, this method will check their length and then set these as new "row.names" attribute.
+   The name is confusing, because it does not clearly communicate the type of the function, which could be a regular function, a generic or a method. Even if we assume a method, the amount of `.`'s makes it difficult to seperate the generic- and the class-part of the name.  
 
-   Also: snakecase!! :-D
+   We could avoid this confusion by applying a different naming convention (e.g. "snake_case") for our class and function names.
 
 4. __<span style="color:red">Q</span>__: Describe the difference in behaviour in these two calls.
 
@@ -36,11 +57,12 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     mean(unclass(some_days))
     ```
     
-   __<span style="color:green">A</span>__: Since `mean()` is a generic and `some_days` is an object of class Date, the first call results in `mean.Date(some_days)`.  
+   __<span style="color:green">A</span>__: `mean()` is a generic function, which will select the appropriate method based on the class of the input. `some_days` has the class "Date" and `mean.Date(some_days)` will be used.
     
-   In the second call `unclass()` removes the class attribute from `some_days`, which means that `unclass(some_days)` is not an OO object and the call results in `mean.default(unclass(some_days))`, which calculates the mean of the underlying double.  
+   After `unclass()` has removed the class attribute the default method is chosen by the methed dispatch. (`mean.default(unclass(some_days))`) calculates the mean of the underlying double.  
     
-   When you look into the source code of `mean.Date()` (one line), you will see that the difference in the resulting objects is only the class attribute.
+   <!-- When you look into the source code of `mean.Date()` (one line), you will see that the difference in the resulting objects is only the class attribute. -->
+   <!-- I agree, that inspecting `mean.Date` is interesting, though I am not entirely sure, how the dots work here and how the origin of the date is passed to `.Date`. It looks to me, as if the result of `mean.default(unclass(x))` is then backtransformend into a Date... If we can describe this consicely, we can use it otherwise I think we can safely skip it. (HB, 2019-03-12) -->
 
 5. __<span style="color:red">Q</span>__: What does the following code return? What base type is it built on? What attributes does it use?
     
@@ -49,7 +71,7 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     x
     ```
     
-   __<span style="color:green">A</span>__: It returns the Empirical Cumulative Distribution Function of `rpois(100, 10)`. It is built on the base type "closure" and it saves the expression, which was used to create it, in its `call` attribute.
+   __<span style="color:green">A</span>__: This code returns an object of the class "ecdf" and contains an empirical cumulative distribution function of its input. The object is built on the base type "closure" and the expression, which was used to create it (`rpois(100, 10)`) is stored in in the `call` attribute.
 
 6. __<span style="color:red">Q</span>__: What does the following code return? What base type is it built on? What attributes does it use?
     
@@ -57,8 +79,8 @@ We can easily avoid this confusion, by forgoing to use period separated class an
     x <- table(rpois(100, 5))
     x
     ```
-    
-   __<span style="color:green">A</span>__: 
+
+   __<span style="color:green">A</span>__: This code returns a "table" object, which is build upon the base type "integer". The attribute "dimnames" are used to name the elements of the integer vector.
 
 ## Classes
 
