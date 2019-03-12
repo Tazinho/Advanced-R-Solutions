@@ -4,6 +4,11 @@ source("before_chapter.R")
 
 # S3
 
+```{r}
+library(sloop)
+```
+
+
 ## Basics
 
 1. __<span style="color:red">Q</span>__: Describe the difference between `t.test()` and `t.data.frame()`? When is each function called?
@@ -237,19 +242,28 @@ source("before_chapter.R")
     
     ```{r}
     t.test
+    
+    # or simply call
+    sloop::ftype(t.test)
     ```  
     
-   There are also other (programmatic) possibilities to check this like `pryr::ftype()`, which checks via its internal `pryr:::is_s3_generic`, which uses `codetools::findGlobals()` that `t.test()` contains a call to `UseMethod()`.
+   `sloop::ftype()` confirms via a call to  `sloop:::is_s3_generic` (which then uses `codetools::findGlobals()`) that `t.test()` contains a call to `UseMethod()`.
     
-   Interestingly, while digging a bit around in the pryr package, one can also find some dependencies to the tools package, where a list of functions exists, which tells you about some functions that look like methods, but are not.
+   Interestingly R also provides helpers, which lists functions that look like methods, but in fact are not:
     
     ```{r}
     tools::nonS3methods("stats")
     ```
     
-   However, if we create an object with class `test`, `t()`, will dispatch to `t.test()`. This simply happens, because `UseMethod()` just looks for functions named `paste0("generic", ".", c(class(x), "default"))`. So `t.test()` is erroneously treated like a method of `t()`. Since `t.test()` is a generic itself and doesn't find a method called `t.test.test()`, it dispatches to `t.test.default()`. Just to proof the latter quickly, we specify a method `t.test.test()` and see what happens:
+   When we create an object with class `test`, `t()`, will dispatch to `t.test()`. This happens, because `UseMethod()` simply searches for functions named `paste0("generic", ".", c(class(x), "default"))`.
+   
+   Consequently `t.test()` is erroneously treated as a method of `t()`. Because `t.test()` is a generic itself and doesn't find a method called `t.test.test()`, it dispatches to `t.test.default()`.
+   
+   By defining `t.test.test()`, we demonstrate, that this is really what is happening internally.
+
+    ```{r, error=TRUE}
+    t(x)
     
-    ```{r}
     t.test.test <- function(x) t.default(x)
     t(x)
     ```
@@ -265,20 +279,25 @@ source("before_chapter.R")
 
 4. __<span style="color:red">Q</span>__: Which base generic has the greatest number of defined methods?
     
-   __<span style="color:green">A</span>__: `print()` has clearly the most
-    
+   __<span style="color:green">A</span>__: The generic `print()` clearly has the most defined methods.
+
     ```{r}
     library(methods)
     objs <- mget(ls("package:base"), inherits = TRUE)
     funs <- Filter(is.function, objs)
-    generics <- Filter(function(x) ("generic" %in% pryr::ftype(x)), funs)
+    generics <- Filter(
+      function(x) "generic" %in% sloop::ftype(x),
+      funs
+    )
     
-    sort(
-      lengths(sapply(names(generics), function(x) methods(x), USE.NAMES = TRUE)),
-      decreasing = TRUE
-      )[1:3]
+    methods_per_generic <- sapply(
+      names(generics), function(x) methods(x),
+      USE.NAMES = TRUE
+    )
+    
+    tail(sort(lengths(methods_per_generic)), 3)
     ```
-
+    
 5. __<span style="color:red">Q</span>__: Carefully read the documentation for `UseMethod()` and explain why the following code returns the results that it does. What two usual rules of function evaluation does `UseMethod()` violate?
     
     ```{r}
@@ -294,14 +313,17 @@ source("before_chapter.R")
     g(x)
     ```
     
-   __<span style="color:green">A</span>__: R looks for the `x` argument in `g()`'s calling environment (the global environment), where `x` is defined as 1. Then `g()` dispatches to `g.default()`. The `x` argument is given to `g.default()`. `y` is not defined inside it, so `g.default()` takes `y`'s value from the environment where `UseMethod()` created the call. There `y` is defined as 10.  
+   __<span style="color:green">A</span>__: R looks for the `x` argument in `g()`'s calling environment (the global environment), in which `x` is bound to 1.
+
+   `g()` then dispatches to `g.default()`. The `x` argument is passed to `g.default()`. As `y` is not defined with `g.default`'s function environment, `y`'s value will be taken from the environment where `UseMethod()` created the call. There `y` is defined as 10.  
     
    `UseMethod()` behaves special in many ways, two of them are:
     
-   * it never "returns" (any statement after `UseMethod` won't be evaluated)
+   * it never "returns" an object (any statement after `UseMethod` won't be evaluated)
    * the argument matching can become a bit tricky (generic and methods should have the same order of arguments or you must name them)
     
     ```{r}
+    # generics and methods should have the same argument order
     g <- function(x, y) {UseMethod("g")}
     g.default <- function(y, x) c(x = x, y = y)
     
@@ -312,6 +334,7 @@ source("before_chapter.R")
 6. __<span style="color:red">Q</span>__: What are the arguments to `[`? Why is this a hard question to answer?
 
    __<span style="color:green">A</span>__: 
+
     
 ## Object styles
 
