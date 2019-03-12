@@ -6,12 +6,12 @@ source("before_chapter.R")
 
 ## Prerequisites
 
-For most of this chapter base R is sufficient. Just a few exercises require **rlang** and **ggplot2** packages.
+   For most of this chapter base R is sufficient. Just a few exercises require **rlang** and **ggplot2** packages.
 
-```{r}
-library(rlang)
-library(ggplot2)
-```
+    ```{r}
+    library(rlang)
+    library(ggplot2)
+    ```
 
 ## Factory fundamentals
 
@@ -23,9 +23,9 @@ library(ggplot2)
     
    Why is it better to `force(x)` instead of just `x`?
     
-   __<span style="color:green">A</span>__: As you can see `force(x)` is just syntactic sugar for `x`. From the textbook:
+   __<span style="color:green">A</span>__: As you can see `force(x)` is just syntactic sugar for `x`. We prefer this explicit form, because
     
-   > using this function clearly indicates that you’re forcing evaluation, not that you’ve accidentally typed `x`.
+   > using this function clearly indicates that you’re forcing evaluation, not that you’ve accidentally typed `x`. (Quote from the textbook)
 
 2. __<span style="color:red">Q</span>__: Base R contains two function factories, `approxfun()` and `ecdf()`. Read their documentation and experiment to figure out what the functions do and what they return.
 
@@ -142,16 +142,23 @@ library(ggplot2)
 
 1. __<span style="color:red">Q</span>__: In `boot_model()`, why don't I need to force the evaluation of `df` or `model`?
 
-   __<span style="color:green">A</span>__: `boot_model()` returns
+   __<span style="color:green">A</span>__: `boot_model()` ultimately returns a function.
    
     ```{r}
-    function() {
-      fitted + sample(resid)
-    }
+    boot_model <- function(df, formula) {
+      mod <- lm(formula, data = df)
+      fitted <- unname(fitted(mod))
+      resid <- unname(resid(mod))
+      rm(mod)
+      
+      function() {
+        fitted + sample(resid)
+      }
+    } 
     ```
     
-   In this function neither `df` nor `model` are used. The relevant values, `fitted` and `resid`, are calculated (and therefore evaluated) in the enclosing environment of `boot_model`. 
-    
+   In this function neither `df` nor `model` are used. The relevant values, `fitted` and `resid`, have been calculated (and therefore evaluated) in the enclosing environment of `boot_model`. 
+
 2. __<span style="color:red">Q</span>__: Why might you formulate the Box-Cox transformation like this?
 
     ```{r}
