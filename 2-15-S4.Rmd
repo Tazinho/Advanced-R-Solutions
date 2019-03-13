@@ -12,14 +12,13 @@ source("before_chapter.R")
 
 2. __<span style="color:red">Q</span>__: What other ways can you find help for a method? Read `?"?"` and summarise the details.
     
-   __<span style="color:green">A</span>__: We can get
+   __<span style="color:green">A</span>__: We can find
     
-   * general documentation of the generic via `?genericName`
-   * general documentation of the methods from a generic via `methods?genericName`
-   * documentation of a specific method via `ClassName?methodName`
+   * general documentation for a generic via `?genericName`
+   * general documentation for the methods of a generic via `methods?genericName`
+   * documentation for a specific method via `ClassName?methodName`
     
-   Regarding the latter, we can also get help on a specific method via adding a `?` in front of a function call, like `?show(hadley)`.
-
+   We can also get help for a specific method by adding `?` in front of a function call, e.g. `?show(hadley)`.
 
 ## Classes
 1. __<span style="color:red">Q</span>__: Extend the Person class with fields to match `utils::person()`. Think about what slots you will need, what class each slot should have, and what you’ll need to check in your validity method.
@@ -29,33 +28,40 @@ source("before_chapter.R")
 2. __<span style="color:red">Q</span>__: What happens if you define a new S4 class that doesn’t have any slots?  (Hint: read about virtual classes in `?setClass`.)
     
    __<span style="color:green">A</span>__: It depends on the other arguments.
+   
    If we supply a class that doesn't exist, we'll get an error
     
     ```{r, error = TRUE}
-    setClass("Programmer", slots = c(skill = "ANY"), contains = "Human")
+    setClass("Programmer",
+             slots = c(skill = "ANY"),
+             contains = "Human")
     ```
     
-   However, we can get around that, if we register the class before
-    
+   To can get around that, we register the new class before we define the new class.
+   
     ```{r}
     setOldClass("Human")
-    .Programmer <- setClass("Programmer", slots = c(Skill = "ANY"), contains = "Human")
+    .Programmer <- setClass("Programmer",
+                            slots = c(Skill = "ANY"),
+                            contains = "Human")
     ```
     
-   Supplying neither `slots`, nor `contains` results in a contructor for virtual classes 
+   Supplying neither `slots` nor `contains` results in a contructor for virtual classes 
     
     ```{r}
     .VirtualProgrammer <- setClass("VirtualProgrammer")
-    # The same as contains = "VIRTUAL" (here you could also supply slots)
-    .VirtualProgrammer <- setClass("VirtualProgrammer", contains = "VIRTUAL")
+    # equal to contains = "VIRTUAL" (here you could also supply slots)
+    .VirtualProgrammer <- setClass("VirtualProgrammer",
+                                   contains = "VIRTUAL")
     ```
     
    Just leaving out `contains`, but supplying slots results in a constructor without superclass
     
     ```{r}
-    .DataScientist <- setClass("RProgrammer", slots = c(stats = "ANY",
-                                                        math = "ANY",
-                                                        programming = "ANY"))
+    .DataScientist <- setClass("RProgrammer",
+                               slots = c(stats = "ANY",
+                                         math = "ANY",
+                                         programming = "ANY"))
     ```
 
 3. __<span style="color:red">Q</span>__: Imagine you were going to reimplement factors, dates, and data frames in S4. Sketch out the `setClass()` calls that you would use to define the classes. Think about appropriate `slots` and `prototype`.
@@ -70,7 +76,7 @@ source("before_chapter.R")
 
 2. __<span style="color:red">Q</span>__: In the defintion of the generic, why is it necessary to repeat the name of the generic twice?
 
-   __<span style="color:green">A</span>__: The first time it is needed as name of the generic and the second time it is needed to explicitly incorporate method dispacth via `standardGeneric()` within the generic's body (`def` parameter). This is similar to `UseMethod()` within S3.
+   __<span style="color:green">A</span>__: The name is needed as the name of the generic as well as to explicitly incorporate method dispatch via `standardGeneric()` within the generic's body (`def` parameter). This is similar to `UseMethod()` in S3.
 
 3. __<span style="color:red">Q</span>__: Why does the `show()` method defined in Section 15.4.3 use i`s(object)[[1]]`? (Hint: try printing the employee subclass.)
 
@@ -80,13 +86,10 @@ source("before_chapter.R")
 
    __<span style="color:green">A</span>__: It depends. Lets first create the object `hadley` of class "Person":
     
-    ```{r, eval = TRUE}
+    ```{r}
     .Person <- setClass("Person", 
-                        slots = c(
-                          name = "character", 
-                          age = "numeric"
-                        )
-                      )
+                        slots = c(name = "character", 
+                                  age = "numeric"))
     
     hadley <- .Person(name = "Hadley")
     hadley
@@ -94,13 +97,13 @@ source("before_chapter.R")
     
    Now let us see, which arguments can be supplied to the `show()` generic
     
-    ```{r, eval = TRUE}
+    ```{r}
     formals("show")
     ```
     
    Usually we would use this argument when defining a new method
     
-    ```{r, eval = TRUE}
+    ```{r}
     setMethod("show", "Person", 
               function(object){
                 cat(object@name, "creates hard exercises")
@@ -108,8 +111,7 @@ source("before_chapter.R")
     hadley
     ```
     
-   When we supply another name, for example `x` instead of `object`, as a first element of our method, this becomes matched to the correct `object` argument and we get a warning.
-   However, our method will work
+   When we supply another name as a first element of our method (e.g. `x` instead of `object`), this will be matched to the correct `object` argument and we recieve a warning. Our method will work, though
     
     ```{r, eval = TRUE}
     setMethod("show", "Person", 
@@ -128,7 +130,7 @@ source("before_chapter.R")
               })
     ```
     
-   However, if we do this with arguments added to the correctly written `object` argument, we will get the informative error message, that we could in general add other argument names for generics, which can take the `...` argument
+   If we do this with arguments added to the correctly written `object` argument, we will get the informative error message, that we could add other argument names for generics, which can take the `...` argument
     
     ```{r, eval = TRUE, error = TRUE}
     setMethod("show", "Person", 
@@ -148,7 +150,7 @@ source("before_chapter.R")
 
 3. __<span style="color:red">Q</span>__: Take the last example which shows multiple dispatch over two classes that use multiple inheritance. What happens if you define a method for all terminal classes? Why does method dispatch not save us much work here?
 
-   __<span style="color:green">A</span>__: We will introduce ambiguity, since one class has distance 2 to all terminal nodes and the other 4 have distance 1 to two terminal nodes each. To resolve this ambiguity we have to define 5 more methods, one per class combination.
+   __<span style="color:green">A</span>__: We will introduce ambiguity, since one class has distance 2 to all terminal nodes and the other four have distance 1 to two terminal nodes each. To resolve this ambiguity we have to define five more methods, one per class combination.
 
 
 ## S4 and S3
