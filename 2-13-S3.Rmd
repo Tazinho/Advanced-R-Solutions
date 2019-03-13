@@ -418,35 +418,48 @@ library(sloop)
 
 1. __<span style="color:red">Q</span>__: How does `[.Date` support subclasses? How does it fail to support subclasses?
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:orange">A</span>__: 
+   
+    ```{r, eval=FALSE}
+    # inspect function
+    `[.Date`
+    
+    # see how it's used
+    x <- Sys.Date()
+    s3_dispatch(x[1])
+    
+    # attempt to find out, what oldclass does
+    oldClass()
+    ```
+
+   Maybe one would have to create a subclass to `Date` and see what `s3_dispatch` returns, when it is called on this subclass. I suspect, the delegation to the internal `[` to be related to the issue here.
 
 2. __<span style="color:red">Q</span>__: R has two classes for representing date time data, `POSIXct` and `POSIXlt`, which both inherit from `POSIXt`. Which generics have different behaviours for the two classes? Which generics share the same behaviour?
     
-   __<span style="color:green">A</span>__: To answer this question, we have to get the regarding generics
+   __<span style="color:green">A</span>__: To answer this question, we have to get the respective generics
     
     ```{r}
-    # generics of POSIXt
-    generics_t <- attr(methods(class = "POSIXt"), "info")[["generic"]]
-    # Generics of POSIXct
-    generics_ct <- attr(methods(class = "POSIXct"), "info")[["generic"]]
-    # generics of POSIXlt
-    generics_lt <- attr(methods(class = "POSIXlt"), "info")[["generic"]]
+    # define helper
+    get_generics <- function(x) {
+      attr(methods(class = x), "info")[["generic"]]
+    }
+    
+    # get generics
+    generics_t  <- get_generics("POSIXt")
+    generics_ct <- get_generics("POSIXct")
+    generics_lt <- get_generics("POSIXlt")
     ```
     
-   Those generics that have a method for POSIXt are potentially sharing the same behaviour (`generics_t`). However, those generics that have a specific method for one of the sublcases have to be subtractet:
+   The generics in `generics_t` with method for the superclass POSIXt potentially share the same behaviour for both subclasses. However, if a generic has a specific method for one of the subclass, it has to be subtractet:
     
     ```{r}
-    generics_same <- setdiff(generics_t, union(generics_ct, generics_lt))
-    generics_same
+    # find subclass-specific methods
+    union(generics_ct, generics_lt)
+    
+    # find shared (inherited) methods
+    setdiff(generics_t, union(generics_ct, generics_lt))
     ```
     
-   The rest is different
-    
-    ```{r}
-    generics_different <- union(generics_ct, generics_lt)
-    generics_different
-    ```
-
 3. __<span style="color:red">Q</span>__: What do you expect this code to return? What does it actually return? Why?
 
     ```{r, eval = FALSE}
@@ -458,19 +471,18 @@ library(sloop)
       NextMethod()
     }
     
-    generic2(sloop::new_s3_scalar(class = c("b", "a2")))
+    generic2(structure(list(), class = c("b", "a2")))
     ```
     
-   __<span style="color:orange">A</span>__: TODO: Question text changed from "Explain what is happening in the following code."...So check, if the answer needs to be updated accordingly. Also set eval to true in the code chunk and check why new_s3_scalar is not found (maybe wrong sloop version?).
-    
-   * We supply an object of classes `b` and `a2` to `generic2()`, so R will look for a method`generic2.b()`
-   * `generic2.b()` changes the class to `a1` and then calls `NextMethod()`
-   * One could think, that R calls now`generic2.a1()`. But in fact, as mentioned
-    in the textbook, `NextMethod()` 
+   __<span style="color:green">A</span>__: When we execute the code above, this is what is happening:
+  
+   * we pass an object of classes `b` and `a2` to `generic2()`, which promts R to look for a method`generic2.b()`
+   * the method `generic2.b()` then changes the class to `a1` and calls `NextMethod()`
+   * One would think that this will lead R to call `generic2.a1()`, but in fact, as mentioned in the textbook, `NextMethod()` 
     
         > doesn’t actually work with the class attribute of the object, but instead uses a special global variable (.Class) to keep track of which method to call next.
 
-   * We can easily verify (for example via `print()`) that `.Class` is still `c("b", "a2")` and so `generic2.a2()` gets called.
+   This is why `generic2.a2()` is called instead.
 
 ## Dispatch details
 
