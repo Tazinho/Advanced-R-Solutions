@@ -4,9 +4,23 @@ source("before_chapter.R")
 
 # S4
 
-## Classes
+## Basics
 
-1. __<span style="color:red">Q</span>__: What happens if you define a new S4 class that doesn't "contain" an existing class?  (Hint: read about virtual classes in `?setClass`.)
+1. __<span style="color:red">Q</span>__: `lubridate::period()` returns an S4 class. What slots does it have? What class is each slot? What accessors does it provide?
+    
+   __<span style="color:green">A</span>__: 
+
+2. __<span style="color:red">Q</span>__: What other ways can you find help for a method? Read `?"?"` and summarise the details.
+    
+   __<span style="color:green">A</span>__: 
+
+
+## Classes
+1. __<span style="color:red">Q</span>__: Extend the Person class with fields to match `utils::person()`. Think about what slots you will need, what class each slot should have, and what you’ll need to check in your validity method.
+    
+   __<span style="color:green">A</span>__: 
+
+2. __<span style="color:red">Q</span>__: What happens if you define a new S4 class that doesn’t have any slots?  (Hint: read about virtual classes in `?setClass`.)
     
    __<span style="color:green">A</span>__: It depends on the other arguments.
    If we supply a class that doesn't exist, we'll get an error
@@ -38,7 +52,7 @@ source("before_chapter.R")
                                                         programming = "ANY"))
     ```
 
-2. __<span style="color:red">Q</span>__: Imagine you were going to reimplement ordered factors, dates, and data frames in S4. Sketch out the `setClass()` calls that you would use to define the classes. What should they inherit from? What slots should they use?
+3. __<span style="color:red">Q</span>__: Imagine you were going to reimplement factors, dates, and data frames in S4. Sketch out the `setClass()` calls that you would use to define the classes. Think about appropriate `slots` and `prototype`.
 
    __<span style="color:orange">A</span>__: The basic idea is to use a slot for the base type and one slot per attribute. Inheritance matters for ordered factors and dates. Special checks like equal lengths of list elements for columns of a data frame should be done within a validator.
 
