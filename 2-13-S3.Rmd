@@ -363,7 +363,7 @@ library(sloop)
 
 ## Object styles
 
-1. __<span style="color:red">Q</span>__: Categorise the objects returned by `lm()`, `factor()`, `table()`, `as.Date()`, `ecdf()`, `ordered()`, `I()` into "vector", "scalar", and "other".
+1. __<span style="color:red">Q</span>__: Categorise the objects returned by `lm()`, `factor()`, `table()`, `as.Date()`, `ecdf()`, `ordered()`, `I()` into the styles described above.
     
    __<span style="color:green">A</span>__: 
     
@@ -371,8 +371,8 @@ library(sloop)
    scalar: `lm()`  
    other: `ecdf()`, `I()`  
     
-2. __<span style="color:red">Q</span>__: What would a constructor function for `lm` objects, `new_lm()`, look like? Why is a constructor function less useful for linear models? (Think about what functions would call `new_lm()`.)
-    
+2. __<span style="color:red">Q</span>__: What would a constructor function for `lm` objects, `new_lm()`, look like? Use `?lm` and experimentation to figure out the required fields and their types.
+
    __<span style="color:orange">A</span>__: TODO: 2nd part of the question.
     
     ```{r}
@@ -406,127 +406,11 @@ library(sloop)
 
 ## Inheritance
 
-1. __<span style="color:red">Q</span>__: The `ordered` class is a subclass of `factor`, but it's implemented in a very ad hoc way in base R. Implement it in a principled way by building a constructor and providing `vec_restore()` method.
-    
-    ```{r}
-    f1 <- factor("a", c("a", "b"))
-    as.factor(f1)  
-    as.ordered(f1) # loses levels
-    ```
-
-   __<span style="color:orange">A</span>__: TODO: the olad exercise text ended on "an `as_ordered` generic". Check the answer if it needs to be updated.
-    
-   ordered is a subclass of factor, so we need to do the following
-    
-   * for factors: add a subclass argument to the constructor and helper
-   * for ordered: add a constructor
-   * write an `as_ordered()` generic with methods ordered, factor and default
-    
-   We use the **factor** constructor from the textbook and add the subclass argument
-    
-    ```{r}
-    new_factor <- function(x, levels, ..., subclass = NULL) {
-      stopifnot(is.integer(x))
-      stopifnot(is.character(levels))
-      
-      structure(
-        x,
-        levels = levels,
-        class = c(subclass, "factor")
-      )
-    }
-    ```
-    
-   We also use the validator for factors from the textbook
-    
-    ```{r}
-    validate_factor <- function(x) {
-      values <- unclass(x)
-      levels <- attr(x, "levels")
-      
-      if (!all(!is.na(values) & values > 0)) {
-        stop(
-          "All `x` values must be non-missing and greater than zero",
-          call. = FALSE
-        )
-      }
-      
-      if (length(levels) < max(values)) {
-        stop(
-          "There must at least as many `levels` as possible values in `x`",
-          call. = FALSE
-        )
-      }
-      
-      x
-    }
-    ```
-    
-   And we add the subclass argument for the helper from the textbook and the exercises
-    
-    ```{r}
-    factor <- function(x, levels = unique(x), ... , subclass = NULL) {
-      ind <- match(x, levels)
-      
-      # error when values occur, which are not in the levels
-      if(any(is.na(ind))){
-        stop("The following values do not occur in the levels: ",
-             paste(setdiff(x,levels), collapse = ", "), ".", 
-             call. = FALSE)
-        }
-      
-      validate_factor(new_factor(ind, levels, subclass = subclass))
-    }
-    ```
-    
-   A constructor for ordered is already implemented in the sloop package:
-    
-    ```{r}
-    new_ordered <- function (x, levels) {
-      stopifnot(is.integer(x))
-      stopifnot(is.character(levels))
-      structure(x, levels = levels, class = c("ordered", "factor"))
-    }
-    ```
-    
-   The implementation of the **generic** and the first two methods is straight forward
-    
-    ```{r}
-    as_ordered <- function(x, ...) {
-      UseMethod("as_ordered")
-    }
-    
-    as_ordered.ordered <- function(x, ...) x
-    as_ordered.default <- function(x, ...) {
-      stop(
-        "Don't know how to coerce object of class ", 
-        paste(class(x), collapse = "/"), " into an ordered factor", 
-        call. = FALSE
-      )
-    }
-    ```
-    
-   For the factor method of `as_ordered()` we use the factor helper, since it saves us some typing:
-    
-    ```{r}
-    as_ordered.factor <- function(x, ...) {
-      factor(x, attr(x, "levels"), subclass = "ordered")
-    }
-    ```
-    
-   Finally, our new method preserves all levels:
-    
-    ```{r}
-    as_ordered(f1)
-    ```
-    
-   For a real scenario, we might want to add an `as_factor.ordered()` method to the `as_factor()` generic from the textbook.
-
-2. __<span style="color:red">Q</span>__: How does `[.Date` support subclasses? How does it fail to support subclasses?
+1. __<span style="color:red">Q</span>__: How does `[.Date` support subclasses? How does it fail to support subclasses?
 
    __<span style="color:green">A</span>__: 
 
-3. __<span style="color:red">Q</span>__: R has two classes for representing date time data, `POSIXct` and `POSIXlt`, which both inherit from `POSIXt`. Which generics have different behaviours for the two classes? Which generics share the same behaviour?
+2. __<span style="color:red">Q</span>__: R has two classes for representing date time data, `POSIXct` and `POSIXlt`, which both inherit from `POSIXt`. Which generics have different behaviours for the two classes? Which generics share the same behaviour?
     
    __<span style="color:green">A</span>__: To answer this question, we have to get the regarding generics
     
@@ -553,7 +437,7 @@ library(sloop)
     generics_different
     ```
 
-4. __<span style="color:red">Q</span>__: What do you expect this code to return? What does it actually return? Why?
+3. __<span style="color:red">Q</span>__: What do you expect this code to return? What does it actually return? Why?
 
     ```{r, eval = FALSE}
     generic2 <- function(x) UseMethod("generic2")
@@ -763,3 +647,120 @@ library(sloop)
     # test
     new_difftime(c(NA, -3600, 86400))
     ```
+
+### Inheritance
+1. __<span style="color:red">Q</span>__: The `ordered` class is a subclass of `factor`, but it's implemented in a very ad hoc way in base R. Implement it in a principled way by building a constructor and providing `vec_restore()` method.
+    
+    ```{r}
+    f1 <- factor("a", c("a", "b"))
+    as.factor(f1)  
+    as.ordered(f1) # loses levels
+    ```
+
+   __<span style="color:orange">A</span>__: TODO: the olad exercise text ended on "an `as_ordered` generic". Check the answer if it needs to be updated.
+    
+   ordered is a subclass of factor, so we need to do the following
+    
+   * for factors: add a subclass argument to the constructor and helper
+   * for ordered: add a constructor
+   * write an `as_ordered()` generic with methods ordered, factor and default
+    
+   We use the **factor** constructor from the textbook and add the subclass argument
+    
+    ```{r}
+    new_factor <- function(x, levels, ..., subclass = NULL) {
+      stopifnot(is.integer(x))
+      stopifnot(is.character(levels))
+      
+      structure(
+        x,
+        levels = levels,
+        class = c(subclass, "factor")
+      )
+    }
+    ```
+    
+   We also use the validator for factors from the textbook
+    
+    ```{r}
+    validate_factor <- function(x) {
+      values <- unclass(x)
+      levels <- attr(x, "levels")
+      
+      if (!all(!is.na(values) & values > 0)) {
+        stop(
+          "All `x` values must be non-missing and greater than zero",
+          call. = FALSE
+        )
+      }
+      
+      if (length(levels) < max(values)) {
+        stop(
+          "There must at least as many `levels` as possible values in `x`",
+          call. = FALSE
+        )
+      }
+      
+      x
+    }
+    ```
+    
+   And we add the subclass argument for the helper from the textbook and the exercises
+    
+    ```{r}
+    factor <- function(x, levels = unique(x), ... , subclass = NULL) {
+      ind <- match(x, levels)
+      
+      # error when values occur, which are not in the levels
+      if(any(is.na(ind))){
+        stop("The following values do not occur in the levels: ",
+             paste(setdiff(x,levels), collapse = ", "), ".", 
+             call. = FALSE)
+        }
+      
+      validate_factor(new_factor(ind, levels, subclass = subclass))
+    }
+    ```
+    
+   A constructor for ordered is already implemented in the sloop package:
+    
+    ```{r}
+    new_ordered <- function (x, levels) {
+      stopifnot(is.integer(x))
+      stopifnot(is.character(levels))
+      structure(x, levels = levels, class = c("ordered", "factor"))
+    }
+    ```
+    
+   The implementation of the **generic** and the first two methods is straight forward
+    
+    ```{r}
+    as_ordered <- function(x, ...) {
+      UseMethod("as_ordered")
+    }
+    
+    as_ordered.ordered <- function(x, ...) x
+    as_ordered.default <- function(x, ...) {
+      stop(
+        "Don't know how to coerce object of class ", 
+        paste(class(x), collapse = "/"), " into an ordered factor", 
+        call. = FALSE
+      )
+    }
+    ```
+    
+   For the factor method of `as_ordered()` we use the factor helper, since it saves us some typing:
+    
+    ```{r}
+    as_ordered.factor <- function(x, ...) {
+      factor(x, attr(x, "levels"), subclass = "ordered")
+    }
+    ```
+    
+   Finally, our new method preserves all levels:
+    
+    ```{r}
+    as_ordered(f1)
+    ```
+    
+   For a real scenario, we might want to add an `as_factor.ordered()` method to the `as_factor()` generic from the textbook.
