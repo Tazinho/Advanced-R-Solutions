@@ -365,24 +365,34 @@ library(sloop)
 
 1. __<span style="color:red">Q</span>__: Categorise the objects returned by `lm()`, `factor()`, `table()`, `as.Date()`, `ecdf()`, `ordered()`, `I()` into the styles described above.
     
-   __<span style="color:green">A</span>__: 
+   __<span style="color:orange">A</span>__: These object correspond to the following object styles:
     
-   vector: `factor()`, `table()`, `as.Date()`, `ordered()`  
-   scalar: `lm()`  
-   other: `ecdf()`, `I()`  
-    
+   Vector: `factor()`, `table()`, `as.Date()`, `ordered()`  
+   Scalar: `lm()`  
+   Other: `ecdf()`, `I()`  
+   
 2. __<span style="color:red">Q</span>__: What would a constructor function for `lm` objects, `new_lm()`, look like? Use `?lm` and experimentation to figure out the required fields and their types.
 
-   __<span style="color:orange">A</span>__: TODO: 2nd part of the question.
+   __<span style="color:green">A</span>__: The constructor needs to populate the attributes of an `lm` object and check their type for correctness.
     
     ```{r}
-    new_lm <- function(coefficiets, residuals, effects, rank, fitted.values, assign,
-                       qr, df.residual, xlevels, call, terms, model) {
+    # learn about lm-attributes
+    ?lm
+    attributes(lm(cyl ~ ., data = mtcars))
+    
+    # define constructor
+    new_lm <- function(
+      coefficiets, residuals, effects, rank, fitted.values, assign,
+      qr, df.residual, xlevels, call, terms, model
+    ) {
       
-      stopifnot(is.double(coefficients), is.double(residuals), is.double(effects),
-                is.integer(rank), is.double(fitted.values), is.integer(assign),
-                is.list(qr), is.integer(df.residual), is.list(xlevels),
-                is.language(call), is.language(terms), is.list(model))
+      stopifnot(
+        is.double(coefficients), is.double(residuals), 
+        is.double(effects), is.integer(rank), is.double(fitted.values),
+        is.integer(assign), is.list(qr), is.integer(df.residual),
+        is.list(xlevels), is.language(call), is.language(terms),
+        is.list(model)
+      )
       
       structure(
         list(
@@ -398,10 +408,10 @@ library(sloop)
           call = call,
           terms = terms, 
           model = model
-          ),
+        ),
         class = "lm"
       )
-      }
+    }
     ```
 
 ## Inheritance
