@@ -20,7 +20,7 @@ library(sloop)
 
 2. __<span style="color:red">Q</span>__: Make a list of commonly used base R functions that contain `.` in their name but are not S3 methods.
 
-   __<span style="color:green">A</span>__: In the recent years "snake_case"-style has become increasingly common when naming functions (and variables) in R. But many functions in base R will continue to be "point.separated", which is why some inconsitency in your R code most likely cannot be avoided.
+   __<span style="color:green">A</span>__: In the recent years "snake_case"-style has become increasingly common when naming functions (and variables) in R. But many functions in base R will continue to be "point.separated", which is why some inconsistency in your R code most likely cannot be avoided.
    
     ```{r, eval=FALSE}
     # some base R functions with point.separated names
@@ -48,7 +48,7 @@ library(sloop)
 
    __<span style="color:green">A</span>__: The function `as.data.frame.data.frame()` implements the data frame *method* for the `as.data.frame()` *generic*, which coerces objects to data frames.
 
-   The name is confusing, because it does not clearly communicate the type of the function, which could be a regular function, a generic or a method. Even if we assume a method, the amount of `.`'s makes it difficult to seperate the generic- and the class-part of the name.  
+   The name is confusing, because it does not clearly communicate the type of the function, which could be a regular function, a generic or a method. Even if we assume a method, the amount of `.`'s makes it difficult to separate the generic- and the class-part of the name.  
 
    We could avoid this confusion by applying a different naming convention (e.g. "snake_case") for our class and function names.
 
@@ -64,10 +64,10 @@ library(sloop)
     
    __<span style="color:green">A</span>__: `mean()` is a generic function, which will select the appropriate method based on the class of the input. `some_days` has the class "Date" and `mean.Date(some_days)` will be used.
     
-   After `unclass()` has removed the class attribute the default method is chosen by the methed dispatch. (`mean.default(unclass(some_days))`) calculates the mean of the underlying double.  
+   After `unclass()` has removed the class attribute the default method is chosen by the method dispatch. (`mean.default(unclass(some_days))`) calculates the mean of the underlying double.  
     
    <!-- When you look into the source code of `mean.Date()` (one line), you will see that the difference in the resulting objects is only the class attribute. -->
-   <!-- I agree, that inspecting `mean.Date` is interesting, though I am not entirely sure, how the dots work here and how the origin of the date is passed to `.Date`. It looks to me, as if the result of `mean.default(unclass(x))` is then backtransformend into a Date... If we can describe this consicely, we can use it otherwise I think we can safely skip it. (HB, 2019-03-12) -->
+   <!-- I agree, that inspecting `mean.Date` is interesting, though I am not entirely sure, how the dots work here and how the origin of the date is passed to `.Date`. It looks to me, as if the result of `mean.default(unclass(x))` is then backtransformend into a Date... If we can describe this concisely, we can use it otherwise I think we can safely skip it. (HB, 2019-03-12) -->
 
 5. __<span style="color:red">Q</span>__: What does the following code return? What base type is it built on? What attributes does it use?
     
@@ -161,7 +161,7 @@ library(sloop)
 
    __<span style="color:green">A</span>__: When factor variables (representing nominal or ordinal information) are used in statistical models, they are typically encoded as dummy variables and by default each level is compared with the first factor level. But many other encodings ("contrasts") are possible: https://en.wikipedia.org/wiki/Contrast_(statistics)
 
-   Within R's formula interface you can wrap a factor in `C` and specify the contrast of your choice. Alternativly you can set the "contrast" attribute of you factor variable, which accepts matrix input. (see `?contr.helmert` or similar for details)
+   Within R's formula interface you can wrap a factor in `C` and specify the contrast of your choice. Alternatively you can set the "contrast" attribute of you factor variable, which accepts matrix input. (see `?contr.helmert` or similar for details)
 
     ```{r}
     # updated factor constructor
@@ -185,7 +185,7 @@ library(sloop)
 
 5. __<span style="color:red">Q</span>__: Read the documentation for `utils::as.roman()`. How would you write a constructor? Does it need a validator? What would a helper look like?
 
-   __<span style="color:green">A</span>__: This function transforms numeric input into roman numbers (how cool is this!). This class is built on the "integer" type, which results in the following constructor.
+   __<span style="color:green">A</span>__: This function transforms numeric input into Roman numbers (how cool is this!). This class is built on the "integer" type, which results in the following constructor.
 
     ```{r}
     new_roman <- function(x = integer()){
@@ -282,7 +282,7 @@ library(sloop)
 
 3. __<span style="color:red">Q</span>__: What generics does the `ecdf` class have methods for?
 
-   __<span style="color:green">A</span>__: We use the same approach as above. When this is not succesful, we repeat using the superclass. Apparently the classes `ecdf` and `stepfun` exist, even though no specific methods are currently implemented (in base R).
+   __<span style="color:green">A</span>__: We use the same approach as above. When this is not successful, we repeat using the superclass. Apparently the classes `ecdf` and `stepfun` exist, even though no specific methods are currently implemented (in base R).
 
     ```{r}
     class(ecdf(1:2))
@@ -450,7 +450,7 @@ library(sloop)
     generics_lt <- get_generics("POSIXlt")
     ```
     
-   The generics in `generics_t` with method for the superclass POSIXt potentially share the same behaviour for both subclasses. However, if a generic has a specific method for one of the subclass, it has to be subtractet:
+   The generics in `generics_t` with method for the superclass POSIXt potentially share the same behaviour for both subclasses. However, if a generic has a specific method for one of the subclass, it has to be subtracted:
     
     ```{r}
     # find subclass-specific methods
@@ -476,7 +476,7 @@ library(sloop)
     
    __<span style="color:green">A</span>__: When we execute the code above, this is what is happening:
   
-   * we pass an object of classes `b` and `a2` to `generic2()`, which promts R to look for a method`generic2.b()`
+   * we pass an object of classes `b` and `a2` to `generic2()`, which prompts R to look for a method`generic2.b()`
    * the method `generic2.b()` then changes the class to `a1` and calls `NextMethod()`
    * One would think that this will lead R to call `generic2.a1()`, but in fact, as mentioned in the textbook, `NextMethod()` 
     
