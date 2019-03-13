@@ -1057,6 +1057,78 @@ the supplied predicate function returns `TRUE`. So the relation is
     myGeneric
     ```
 
+## Expressions
+
+### Abstract syntax trees
+
+1. __<span style="color:red">Q</span>__: Use `ast()` and experimentation to figure out the three arguments to an `if()` call. What would you call them? Which arguments are required and which are optional?
+    
+   __<span style="color:green">A</span>__: You can write an `if()` statement in several ways: with or without `else`, formatted or in one line and also in prefix notation. Here are several versions focussing on the possibility of leaving out curly brackets.
+    
+    ```{r}
+    lobstr::ast(if (TRUE) {} else {})
+    lobstr::ast(if (TRUE) 1 else 2)
+    lobstr::ast(`if`(TRUE, 1, 2))
+    ```
+    
+   One possible way of naming the arguments would be: condition (1), conclusion (2), alternative (3).
+    
+   The *condition* is always required. If the *condition* is `TRUE`, also the *conclusion* is required. If the *condition* is `FALSE` and `if()` is called in combination with `else()`, then also the *alternative* is required.
+    
+2. __<span style="color:red">Q</span>__: What are the arguments to the `for()` and `while()` calls? 
+
+   __<span style="color:green">A</span>__: `for()` requires an *index* (called `var` in the docs), a *sequence* and an *expression*, for example
+    
+    ```{r}
+    `for`(i, 1:3, {print(i)})
+    ```
+    
+   `while()` requires a *condition* and an *expression*. Again, an example in prefix notation:
+    
+    ```{r}
+    set.seed(123)
+    `while`((i <- rnorm(1)) < 1, {print(i)})
+    i
+    ```
+    
+   Note that a minimal expression can consist of `{` only.
+    
+3. __<span style="color:red">Q</span>__: Two arithmetic operators can be used in both prefix and infix style.
+   What are they?
+    
+   __<span style="color:green">A</span>__: I am not sure how this is meant to be. Theoretically every arithmetic operator can be written in prefix notation via backticks. On the other hand, `+` and `-` seem to be the only ones, which can be written in infix notation without backticks.
+    
+    ```{r}
+    x <- 1
+
+    +(x)
+    -(x)
+    ```
+    
+   However, when we look more closely, the call tree is not what we would expect from a prefix function
+    
+    ```{r}
+    lobstr::ast(+(x))  
+    lobstr::ast(-(x))  
+    ```
+    
+   So maybe it is meant to look like this...
+    
+    ```{r}
+    lobstr::ast(+x)
+    lobstr::ast(-x)
+    ```
+    
+   Of course also this doesn't make too much sense, since in `?Syntax` one can read, that R clearly differentiates between unary and binary `+` and `-` operators and a unary operator is not really what we mean, when we speak about infix operators.
+    
+   However, if we don't differentiate in this way, this is probably the solution, since it's obviously also an infix function:
+    
+    ```{r}
+    lobstr::ast(x + y)
+    lobstr::ast(x - y)
+    ```
+
+
 ## Quasiquotation (new)
 
 1.  __<span style="color:red">Q</span>__: Why does `as.Date.default()` use `substitute()` and `deparse()`? Why does `pairwise.t.test()` use them? Read the source code.

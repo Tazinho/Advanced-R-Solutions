@@ -4,23 +4,59 @@ source("before_chapter.R")
 
 # Expressions
 
+```{r}
+library(lobstr)
+```
+
 ## Abstract syntax trees
 
-1. __<span style="color:red">Q</span>__: Use `ast()` and experimentation to figure out the three arguments to an `if()` call. What would you call them? Which arguments are required and which are optional?
+1. __<span style="color:red">Q</span>__: Reconstruct the code represented by the trees below:
     
-   __<span style="color:green">A</span>__: You can write an `if()` statement in several ways: with or without `else`, formatted or in one line and also in prefix notation. Here are several versions focussing on the possibility of leaving out curly brackets.
-    
-    ```{r}
-    lobstr::ast(if (TRUE) {} else {})
-    lobstr::ast(if (TRUE) 1 else 2)
-    lobstr::ast(`if`(TRUE, 1, 2))
+    ```{r, echo = FALSE}
+    ast(f(g(h())))
+
+    ast(1 + 2 + 3)
+
+    ast((x + y) * z)
     ```
     
-   One possible way of naming the arguments would be: condition (1), conclusion (2), alternative (3).
-    
-   The *condition* is always required. If the *condition* is `TRUE`, also the *conclusion* is required. If the *condition* is `FALSE` and `if()` is called in combination with `else()`, then also the *alternative* is required.
-    
-1. __<span style="color:red">Q</span>__: What does the call tree of an `if` statement with multiple `else if` conditions look like? Why?
+   __<span style="color:orange">A</span>__: The source is with you. ;)
+
+    ```{r}
+    ast(f(g(h())))
+    ast(1 + 2 + 3)
+    ast((x + y) * z)
+    ```
+
+2. __<span style="color:red">Q</span>__: Draw the following trees by hand then check your answers with `lobstr::ast()`.
+
+    ```{r, eval = FALSE}
+    f(g(h(i(1, 2, 3))))
+    f(1, g(2, h(3, i())))
+    f(g(1, 2), h(3, i(4, 5)))
+    ```
+
+   __<span style="color:green">A</span>__:
+
+3. __<span style="color:red">Q</span>__: What's happening with the ASTs below? (Hint: carefully read `?"^"`)
+
+    ```{r}
+    lobstr::ast(`x` + `y`)
+    lobstr::ast(x ** y)
+    lobstr::ast(1 -> x)
+    ```
+
+   __<span style="color:green">A</span>__:
+
+4. __<span style="color:red">Q</span>__: What is special about the AST below? (Hint: re-read Section 6.2.1)
+
+    ```{r}
+    lobstr::ast(function(x = 1, y = 2) {})
+    ```
+
+   __<span style="color:green">A</span>__:
+
+5. __<span style="color:red">Q</span>__: What does the call tree of an `if` statement with multiple `else if` conditions look like? Why?
 
    __<span style="color:green">A</span>__: The ast of nested `else if` statements might look a bit confusing because it contains multiple brackets. However, we can see that in the `else` part of the *ast* just another expression is being evaluated, which happens to be an `if` statement and so forth.
     
@@ -40,59 +76,6 @@ source("before_chapter.R")
     
     ```{r}
     lobstr::ast(`if`(FALSE, 1, `if`(FALSE, 2, `if`(TRUE, 3))))
-    ```
-
-1. __<span style="color:red">Q</span>__: What are the arguments to the `for()` and `while()` calls? 
-
-   __<span style="color:green">A</span>__: `for()` requires an *index* (called `var` in the docs), a *sequence* and an *expression*, for example
-    
-    ```{r}
-    `for`(i, 1:3, {print(i)})
-    ```
-    
-   `while()` requires a *condition* and an *expression*. Again, an example in prefix notation:
-    
-    ```{r}
-    set.seed(123)
-    `while`((i <- rnorm(1)) < 1, {print(i)})
-    i
-    ```
-    
-   Note that a minimal expression can consist of `{` only.
-    
-1. __<span style="color:red">Q</span>__: Two arithmetic operators can be used in both prefix and infix style.
-   What are they?
-    
-   __<span style="color:green">A</span>__: I am not sure how this is meant to be. Theoretically every arithmetic operator can be written in prefix notation via backticks. On the other hand, `+` and `-` seem to be the only ones, which can be written in infix notation without backticks.
-    
-    ```{r}
-    x <- 1
-
-    +(x)
-    -(x)
-    ```
-    
-   However, when we look more closely, the call tree is not what we would expect from a prefix function
-    
-    ```{r}
-    lobstr::ast(+(x))  
-    lobstr::ast(-(x))  
-    ```
-    
-   So maybe it is meant to look like this...
-    
-    ```{r}
-    lobstr::ast(+x)
-    lobstr::ast(-x)
-    ```
-    
-   Of course also this doesn't make too much sense, since in `?Syntax` one can read, that R clearly differentiates between unary and binary `+` and `-` operators and a unary operator is not really what we mean, when we speak about infix operators.
-    
-   However, if we don't differentiate in this way, this is probably the solution, since it's obviously also an infix function:
-    
-    ```{r}
-    lobstr::ast(x + y)
-    lobstr::ast(x - y)
     ```
 
 ## R's grammar
