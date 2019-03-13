@@ -270,21 +270,35 @@ library(sloop)
 
 2. __<span style="color:red">Q</span>__: What generics does the `table` class have methods for?
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: We find methods specific for the `table` class, by searching for functions that end on ".table".
+   
+    ```{r}
+    library(methods)
+    objs <- mget(ls("package:base"), inherits = TRUE)
+    funs <- Filter(is.function, objs)
+    
+    Filter(function(x) grepl(".table$", x), names(funs))
+    ```
 
 3. __<span style="color:red">Q</span>__: What generics does the `ecdf` class have methods for?
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: We use the same approach as above. When this is not succesful, we repeat using the superclass. Apparently the classes `ecdf` and `stepfun` exist, even though no specific methods are currently implemented (in base R).
 
+    ```{r}
+    class(ecdf(1:2))
+    
+    Filter(function(x) grepl(".ecdf$", x), names(funs))
+    Filter(function(x) grepl(".stepfun$", x), names(funs))
+    Filter(function(x) grepl(".function$", x), names(funs))
+    ```
+
+   <!-- I think it would be nice to reflect on, why `ecdf` has a special class, but no specific methods tailored to this class. But I'm not sure about this for now. (HB, 2018-03-13) -->
 
 4. __<span style="color:red">Q</span>__: Which base generic has the greatest number of defined methods?
     
    __<span style="color:green">A</span>__: The generic `print()` clearly has the most defined methods.
 
     ```{r}
-    library(methods)
-    objs <- mget(ls("package:base"), inherits = TRUE)
-    funs <- Filter(is.function, objs)
     generics <- Filter(
       function(x) "generic" %in% sloop::ftype(x),
       funs
@@ -333,9 +347,20 @@ library(sloop)
     
 6. __<span style="color:red">Q</span>__: What are the arguments to `[`? Why is this a hard question to answer?
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:orange">A</span>__: The subsetting operator `[` is a primitive and generic function. Even though it is recommended that generics and methods share the same arguments this does not always have to be the case.
 
+    ```{r}
+    # `[` as a generic with many methods
+    ftype(`[`)
+    methods(`[`)
     
+    # inspect arguments for two methods
+    names(formals(`[.Date`))
+    names(formals(`[.table`))
+    ```
+
+   <!-- Would be nice to reflect on the properties of ... here (HB, 2019-03-13) -->
+
 ## Object styles
 
 1. __<span style="color:red">Q</span>__: Categorise the objects returned by `lm()`, `factor()`, `table()`, `as.Date()`, `ecdf()`, `ordered()`, `I()` into "vector", "scalar", and "other".
