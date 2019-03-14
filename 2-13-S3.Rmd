@@ -23,7 +23,7 @@ library(sloop)
    __<span style="color:green">A</span>__: In the recent years "snake_case"-style has become increasingly common when naming functions (and variables) in R. But many functions in base R will continue to be "point.separated", which is why some inconsistency in your R code most likely cannot be avoided.
    
     ```{r, eval=FALSE}
-    # some base R functions with point.separated names
+    # Some base R functions with point.separated names
     install.packages()
     read.csv()
     
@@ -95,10 +95,10 @@ library(sloop)
    
    There are no additional restrictions to column names apart to those of lists, so one could use special characters and surround the names with backticks (which is not recommended).
    
-   A very good constructor implementing these criteria used to part of the sloop package. It is no longer part of the package, but the source can still be found online (https://github.com/r-lib/sloop/blob/be7ce8a6be660536df4bdd3a31fa54f0d627f2d6/R/data.frame.R#L11).
+   A very good constructor implementing these criteria used to be part of the sloop package. It is no longer part of the package, but the source can still be found online (https://github.com/r-lib/sloop/blob/be7ce8a6be660536df4bdd3a31fa54f0d627f2d6/R/data.frame.R#L11).
     
     ```{r, error=TRUE}
-    # copied from older version of the sloop package
+    # Copied from older version of the sloop package
     new_data.frame <- function(x, row.names = NULL) {
       stopifnot(is.list(x))
       
@@ -140,7 +140,7 @@ library(sloop)
     factor <- function(x, levels = unique(x)) {
       new_levels <- match(x, levels)
       
-      # return error if unseen levels are passed
+      # Return error if unseen levels are passed
       if(any(is.na(new_levels))){
         stop("The following values do not occur ",
              "in the levels of x: ",
@@ -155,7 +155,7 @@ library(sloop)
 
 3. __<span style="color:red">Q</span>__: Carefully read the source code of `factor()`. What does it do that our constructor does not?
 
-   __<span style="color:green">A</span>__: The original implementation allows a more flexible specification of input for `x`. The input is coerced to character or replaced by `character(0)` (in case of `NULL`). It also ensured that the factor levels are unique. This is achieved by setting the levels via `base::levels<-`, which fails when duplicate values are supplied.
+   __<span style="color:green">A</span>__: The original implementation allows a more flexible specification of input for `x`. The input is coerced to character or replaced by `character(0)` (in case of `NULL`). It also ensures that the factor levels are unique. This is achieved by setting the levels via `base::levels<-`, which fails when duplicate values are supplied.
 
 4. __<span style="color:red">Q</span>__: Factors have an optional “contrasts” attribute. Read the help for `C()`, briefly describe it’s purpose. Rewrite our `new_factor()` constructor to include this attribute.
 
@@ -164,7 +164,7 @@ library(sloop)
    Within R's formula interface you can wrap a factor in `C` and specify the contrast of your choice. Alternatively you can set the "contrast" attribute of you factor variable, which accepts matrix input. (see `?contr.helmert` or similar for details)
 
     ```{r}
-    # updated factor constructor
+    # Updated factor constructor
     new_factor <- function(
       x = integer(),
       levels = character(),
@@ -210,9 +210,7 @@ library(sloop)
       
       x
     }
-```
-
-   <!-- Anyone have an idea, why 3899 is the upper limit for roman numbers in R? -->
+    ```
 
    For convenience, we allow the user to also pass real values to a helper function.
 
