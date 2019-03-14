@@ -20,10 +20,13 @@ output:
         after: null
       edit: https://github.com/Tazinho/Advanced-R-Solutions/edit/master/%s
     css: adv-r.css
-bibliography: [packages.bib]
+documentclass: krantz
+bibliography: packages.bib
 biblio-style: apalike
 link-citations: yes
 ---
+
+`r if (knitr::is_latex_output()) '<!--'` 
 
 # Welcome {-}
 
@@ -142,3 +145,5 @@ plot_progress +
 knitr::write_bib(c(.packages(), 'bookdown', 'knitr', 'rmarkdown'),
                  'packages.bib')
 ```
+
+`r if (knitr::is_latex_output()) '-->'`
