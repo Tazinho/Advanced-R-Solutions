@@ -331,18 +331,15 @@ library(sloop)
 
    `g()` then dispatches to `g.default()`. The `x` argument is passed to `g.default()`. As `y` is not defined with `g.default`'s function environment, `y`'s value will be taken from the environment where `UseMethod()` created the call. There `y` is defined as 10.  
     
-   `UseMethod()` behaves special in many ways, two of them are:
-    
-   * it never "returns" an object (any statement after `UseMethod` won't be evaluated)
-   * the argument matching can become a bit tricky (generic and methods should have the same order of arguments or you must name them)
-    
+   When invoking `g.default()` explicitly, instead of using `UseMethod()`, the default argument, `x`, is evaluated in `g.default`'s calling environment, where it is `10` and further global variables like `y` are looked up via lexical scoping in the enclosing (global) environment, where `y` is `1`.
+   
     ```{r}
-    # generics and methods should have the same argument order
-    g <- function(x, y) {UseMethod("g")}
-    g.default <- function(y, x) c(x = x, y = y)
-    
-    g(10, 100)
-    g(x = 10, y = 100)
+    g <- function(x) {
+      x <- 10
+      y <- 10
+      g.default(x)
+    }
+    g(x)
     ```
     
 6. __<span style="color:red">Q</span>__: What are the arguments to `[`? Why is this a hard question to answer?
