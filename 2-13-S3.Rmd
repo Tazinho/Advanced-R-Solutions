@@ -347,19 +347,19 @@ library(sloop)
     
 6. __<span style="color:red">Q</span>__: What are the arguments to `[`? Why is this a hard question to answer?
 
-   __<span style="color:orange">A</span>__: The subsetting operator `[` is a primitive and generic function. Even though it is recommended that generics and methods share the same arguments this does not always have to be the case.
-
+   __<span style="color:orange">A</span>__: The subsetting operator `[` is a primitive and generic function as can be inspected via `ftype`. 
+   
     ```{r}
-    # `[` as a generic with many methods
     ftype(`[`)
-    methods(`[`)
-    
-    # inspect arguments for two methods
+    ```
+   
+   Therefore, `formals(`[`)` returns `NULL` and one possible way to figure out `[`'s arguments would be to inspect the underlying C source code, which can be found online via `pryr::show_c_source(.Primitive("["))`. However, regarding the differing arguments of `[`'s methods, it seems most probable, that `[`'s arguemts are `x` and `...`.
+
+    ```{r}    
     names(formals(`[.Date`))
     names(formals(`[.table`))
+    names(formals(`[.AsIs]`))
     ```
-
-   <!-- Would be nice to reflect on the properties of ... here (HB, 2019-03-13) -->
 
 ## Object styles
 
