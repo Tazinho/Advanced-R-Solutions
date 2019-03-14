@@ -15,8 +15,10 @@ library(sloop)
 
    __<span style="color:green">A</span>__: Because of S3's `generic.class()` naming scheme, both functions may initially look similar, while they are in fact unrelated.
    
-   - `t.test()` calls a *generic* function and will perform a t-test. 
-   - The *method* `t.data.frame()` is called by the generic `t()` to transpose data frame input.
+   - `t.test()` is a *generic* function that performs a t-test. 
+   - `t.data.frame()` is a *method* that gets called by the generic `t()` to transpose data frame input.
+   
+   Due to R's S3 dispatch rules, `t.test()` would also get called when `t()` is a applied to an object of class "test".
 
 2. __<span style="color:red">Q</span>__: Make a list of commonly used base R functions that contain `.` in their name but are not S3 methods.
 
@@ -159,7 +161,7 @@ library(sloop)
 
 4. __<span style="color:red">Q</span>__: Factors have an optional “contrasts” attribute. Read the help for `C()`, briefly describe it’s purpose. Rewrite our `new_factor()` constructor to include this attribute.
 
-   __<span style="color:green">A</span>__: When factor variables (representing nominal or ordinal information) are used in statistical models, they are typically encoded as dummy variables and by default each level is compared with the first factor level. But many other encodings ("contrasts") are possible: https://en.wikipedia.org/wiki/Contrast_(statistics)
+   __<span style="color:green">A</span>__: When factor variables (representing nominal or ordinal information) are used in statistical models, they are typically encoded as dummy variables and by default each level is compared with the first factor level. However, many different encodings ("contrasts") are possible: https://en.wikipedia.org/wiki/Contrast_(statistics)
 
    Within R's formula interface you can wrap a factor in `C` and specify the contrast of your choice. Alternatively you can set the "contrast" attribute of you factor variable, which accepts matrix input. (see `?contr.helmert` or similar for details)
 
@@ -247,7 +249,7 @@ library(sloop)
     
    `sloop::ftype()` confirms via a call to  `sloop:::is_s3_generic` (which then uses `codetools::findGlobals()`) that `t.test()` contains a call to `UseMethod()`.
     
-   Interestingly R also provides helpers, which lists functions that look like methods, but in fact are not:
+   Interestingly R also provides helpers, which list functions that look like methods, but in fact are not:
     
     ```{r}
     tools::nonS3methods("stats")
@@ -374,11 +376,11 @@ library(sloop)
    __<span style="color:green">A</span>__: The constructor needs to populate the attributes of an `lm` object and check their type for correctness.
     
     ```{r}
-    # learn about lm-attributes
+    # Learn about lm-attributes
     ?lm
     attributes(lm(cyl ~ ., data = mtcars))
     
-    # define constructor
+    # Define constructor
     new_lm <- function(
       coefficiets, residuals, effects, rank, fitted.values, assign,
       qr, df.residual, xlevels, call, terms, model
@@ -448,13 +450,13 @@ library(sloop)
     generics_lt <- get_generics("POSIXlt")
     ```
     
-   The generics in `generics_t` with method for the superclass POSIXt potentially share the same behaviour for both subclasses. However, if a generic has a specific method for one of the subclass, it has to be subtracted:
+   The generics in `generics_t` with a method for the superclass POSIXt potentially share the same behaviour for both subclasses. However, if a generic has a specific method for one of the subclasses, it has to be subtracted:
     
     ```{r}
-    # find subclass-specific methods
+    # These generics provide subclass-specific methods
     union(generics_ct, generics_lt)
     
-    # find shared (inherited) methods
+    # These generics share (inherited) methods for both subclasses
     setdiff(generics_t, union(generics_ct, generics_lt))
     ```
     
