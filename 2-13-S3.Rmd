@@ -71,7 +71,7 @@ library(sloop)
    <!-- When you look into the source code of `mean.Date()` (one line), you will see that the difference in the resulting objects is only the class attribute. -->
    <!-- I agree, that inspecting `mean.Date` is interesting, though I am not entirely sure, how the dots work here and how the origin of the date is passed to `.Date`. It looks to me, as if the result of `mean.default(unclass(x))` is then backtransformend into a Date... If we can describe this concisely, we can use it otherwise I think we can safely skip it. (HB, 2019-03-12) -->
 
-5. __<span style="color:red">Q</span>__: What does the following code return? What base type is it built on? What attributes does it use?
+5. __<span style="color:red">Q</span>__: What class of object does the following code return? What base type is it built on? What attributes does it use?
     
     ```{r}
     x <- ecdf(rpois(100, 10))
@@ -80,7 +80,7 @@ library(sloop)
     
    __<span style="color:green">A</span>__: This code returns an object of the class "ecdf" and contains an empirical cumulative distribution function of its input. The object is built on the base type "closure" and the expression, which was used to create it (`rpois(100, 10)`) is stored in in the `call` attribute.
 
-6. __<span style="color:red">Q</span>__: What does the following code return? What base type is it built on? What attributes does it use?
+6. __<span style="color:red">Q</span>__: What class of object does the following code return? What base type is it built on? What attributes does it use?
     
     ```{r}
     x <- table(rpois(100, 5))
@@ -134,7 +134,7 @@ library(sloop)
     new_data.frame(x, row.names = 1)
 ```
     
-2. __<span style="color:red">Q</span>__: Enhance our `factor()` helper to have better behaviour when one or more `values` is not found in `levels`. What does `base::factor()` do in this situation?
+2. __<span style="color:red">Q</span>__: Enhance my `factor()` helper to have better behaviour when one or more `values` is not found in `levels`. What does `base::factor()` do in this situation?
     
    __<span style="color:green">A</span>__: `base::factor()` converts these values (silently) into `NA`'s. To improve our `factor()` helper we choose to return an informative error message instead.
     
@@ -159,7 +159,7 @@ library(sloop)
 
    __<span style="color:green">A</span>__: The original implementation allows a more flexible specification of input for `x`. The input is coerced to character or replaced by `character(0)` (in case of `NULL`). It also ensures that the factor levels are unique. This is achieved by setting the levels via `base::levels<-`, which fails when duplicate values are supplied.
 
-4. __<span style="color:red">Q</span>__: Factors have an optional “contrasts” attribute. Read the help for `C()`, briefly describe it’s purpose. Rewrite our `new_factor()` constructor to include this attribute.
+4. __<span style="color:red">Q</span>__: Factors have an optional “contrasts” attribute. Read the help for `C()`, and briefly describe the purpose of the attribute. What type should it have? Rewrite the `new_factor()` constructor to include this attribute.
 
    __<span style="color:green">A</span>__: When factor variables (representing nominal or ordinal information) are used in statistical models, they are typically encoded as dummy variables and by default each level is compared with the first factor level. However, many different encodings ("contrasts") are possible: https://en.wikipedia.org/wiki/Contrast_(statistics)
 
@@ -185,7 +185,7 @@ library(sloop)
     }
     ```
 
-5. __<span style="color:red">Q</span>__: Read the documentation for `utils::as.roman()`. How would you write a constructor? Does it need a validator? What would a helper look like?
+5. __<span style="color:red">Q</span>__: Read the documentation for `utils::as.roman()`. How would you write a constructor for this class? Does it need a validator? What would a helper look like?
 
    __<span style="color:green">A</span>__: This function transforms numeric input into Roman numbers (how cool is this!). This class is built on the "integer" type, which results in the following constructor.
 
@@ -233,7 +233,7 @@ library(sloop)
 
 1. __<span style="color:red">Q</span>__: Read the source code for `t()` and `t.test()` and confirm that `t.test()` is an S3 generic and not an S3 method. What happens if you create an object with class `test` and call `t()` with it? Why?
     
-    ```{r}
+    ```{r, eval=FALSE}
     x <- structure(1:10, class = "test")
     t(x)
     ```
@@ -262,6 +262,7 @@ library(sloop)
    By defining `t.test.test()`, we demonstrate, that this is really what is happening internally.
 
     ```{r, error=TRUE}
+    x <- structure(1:10, class = "test")
     t(x)
     
     t.test.test <- function(x) t.default(x)
