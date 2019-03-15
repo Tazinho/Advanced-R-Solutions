@@ -81,7 +81,7 @@ library(lobstr)
 ## Expressions
 
 1. __<span style="color:red">Q</span>__: Which two of the six types of atomic vector can't appear in an expression? 
-    Why? Why can't you create an expression that contains an atomic vector of 
+    Why? Similarly, why can't you create an expression that contains an atomic vector of 
     length greater than one? 
     
    __<span style="color:green">A</span>__: It is not possible to create an expression that evaluates to an atomic of length greater than one without using a function (i.e. the `c()` function). But expressions that include a function would be calls.
@@ -181,7 +181,7 @@ library(lobstr)
     lobstr::ast(`if`(x > 1, "a", "b"))
     ```
 
-## Parsing and deparsing
+## Parsing and grammar
 
 1. __<span style="color:red">Q</span>__: R uses parentheses in two slightly different ways as illustrated by these two calls:
 
@@ -267,7 +267,7 @@ library(lobstr)
 
    __<span style="color:orange">A</span>__: One reason is that `<-` is right-associative.
 
-1. __<span style="color:red">Q</span>__: Compare the ASTs `x + y %+% z` and `x ^ y %+% z`. What have you learned about the precedence of custom infix functions?
+1. __<span style="color:red">Q</span>__: Compare the ASTs of `x + y %+% z` and `x ^ y %+% z`. What have you learned about the precedence of custom infix functions?
 
    __<span style="color:green">A</span>__: Comparison of the syntax trees:
     
@@ -313,7 +313,7 @@ library(lobstr)
 
     What does `expr_text()` do instead?
 
-1. __<span style="color:red">Q</span>__: pairwise.t.test() assumes that deparse() always returns a length one character vector. Can you construct an input that violates this expectation? What happens?
+1. __<span style="color:red">Q</span>__: `pairwise.t.test()` assumes that `deparse()` always returns a length one character vector. Can you construct an input that violates this expectation? What happens?
 
    __<span style="color:green">A</span>__: Old exercise. Need to copy solution over here...
 
