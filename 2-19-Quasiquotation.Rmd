@@ -89,8 +89,7 @@ source("common.R")
     
    __<span style="color:green">A</span>__: Both functions are able to capture multiple arguments and will return a named list of expressions. `f1()` will return the arguments defined within the body of `f1()`, because `exprs()` captures the expressions as specified by the developer during the definition of `f1`. `f2()` will return the arguments supplied to `f2()` as specified by the user when the function is called.
     
-3. __<span style="color:red">Q</span>__: What happens if you try and use `enexpr()` with an expression?
-    What happens if you try and use `enexpr()` with a missing argument?
+3. __<span style="color:red">Q</span>__: What happens if you try and use `enexpr()` with an expression (i.e. `enexpr(x + y)`)? What happens if `enexpr()` is passed a missing argument?
     
    __<span style="color:green">A</span>__: In the first case we'll get an error:
     
@@ -136,33 +135,8 @@ source("common.R")
     >   unchanged.
 
     Create examples that illustrate each of the four different cases.
-
-5. __<span style="color:red">Q</span>__: What does the following command return? What information is lost? Why?
-
-    ```{r, eval = FALSE}
-    expr({
-      x +              y # comment  
-    })
-    ```
-
-   __<span style="color:green">A</span>__: When we look at the captured expression, we see that the extra whitespaces and comments are lost. R ignores them when parsing an expression. They do do not need to be represented in the AST, because they do not affect the evaluation of the expression.
     
-    ```{r}
-    library(rlang)
-    captured_expression <- expr({
-      x +              y # comment  
-    })
-    
-    captured_expression
-    ```
-   
-   However, it is possible to retrieve the original input through the attributes of the captured expression:
-    
-    ```{r}
-    attributes(captured_expression)
-    ```
-
-## Unquotation
+## Unquoting
 
 1. __<span style="color:red">Q</span>__: Given the following components:
 
@@ -207,33 +181,6 @@ source("common.R")
     expr(foo(a = xy, b = yz))
     ```
 
-2. __<span style="color:red">Q</span>__: Explain why both `!0 + !0` and `!1 + !1` return `FALSE` while `!0 + !1` returns `TRUE`.
-    
-   __<span style="color:green">A</span>__: To answer this question we look at the AST of the first example:
-    
-    ```{r}
-    library(lobstr)
-    
-    ast(!0 + !0)
-    ```
-    
-   As the coercion rules are the same in all examples, we can use the precedence order (right to left) to explain all three examples:
-    
-   * `!0 + !0`:  
-     So the second zero gets coerced to `FALSE` and `!FALSE` becomes `TRUE`.  
-     `0 + TRUE` gets coerced to 1.  
-     `!1` becomes `!TRUE` which is `FALSE`  
-   * `!1 + !1`:  
-     So `!1` is `FALSE`.  
-     `1 + FALSE` is `1`.  
-     `!1` is `!TRUE` so `FALSE`.  
-   * `!0 + !1`:  
-     `!1` is `FALSE`.  
-     `0 + FALSE` is `0`.  
-     `!0` is `TRUE`.  
-
-3. __<span style="color:red">Q</span>__: Base functions `match.fun()`, `page()`, and `ls()` all try to automatically determine whether you want standard or non-standard evaluation. Each uses a different approach. Figure out the essence of each approach by reading the source code, then compare and contrast the techniques.
-
 4. __<span style="color:red">Q</span>__: The following two calls print the same, but are actually different:
 
     ```{r}
@@ -265,8 +212,162 @@ source("common.R")
     
    I would prefer the second version, since it behaves more like lazy evaluation. It's better to have call args depends on the calling environment rather than the enclosing environment,that's more similar to normal function behavior.
 
-## Case studies {#quasi-case-studies}
+## Dot-dot-dot (`...`)
+
+1. __<span style="color:red">Q</span>__: One way to implement `exec()` is shown below. Describe how it works. What are the
+    key ideas?
     
+    ```{r}
+    exec <- function(f, ..., .env = caller_env()) {
+      args <- list2(...)
+      do.call(f, args, envir = .env)
+    }
+    ```
+
+1. __<span style="color:red">Q</span>__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`.  Compare and constract the techniques they use for switching between dots and list behaviour.
+
+2. __<span style="color:red">Q</span>__: Explain the problem with this defintion of `set_attr()`
+    
+    ```{r, error = TRUE}
+    set_attr <- function(x, ...) {
+      attr <- rlang::list2(...)
+      attributes(x) <- attr
+      x
+    }
+    set_attr(1:10, x = 10)
+    ```
+    
+   __<span style="color:green">A</span>__: In this example we first learn that attributes must be named, as correctly given out by the error message. However, this behaviour mainly occures, because the first argument of `set_attr()` is named `x` as in the function call below. So the other argument in the `set_attr()` function call (`1:10`) is the only one, which is supplied as (unnamed) usage of the ellipsis. Therefore `set_attr()` tries to assign `1:10` as attribute to `x = 10` and the error occures.
+   
+   The function becomes probably clearer and less error-prone when we name the first argument `.x` again. In this case `1:10` will get the (named) attribute `x = 10` assigned:
+
+    ```{r}
+    set_attr <- function(.x, ...) {
+      attr <- rlang::list2(...)
+      
+      attributes(.x) <- attr
+      .x
+    }
+    
+    set_attr(1:10, x = 10)
+    ```
+
+## Case studies {#expr-case-studies}
+    
+1. __<span style="color:red">Q</span>__: In the linear-model example, we could replace the `expr()` in `reduce(summands, ~ expr(!!.x + !!.y))` with `call2()`: `reduce(summands, call2, "+")`. Compare and contrast the two approaches. Which do you think is easier to read?
+    
+5. __<span style="color:red">Q</span>__:Re-implement the Box-Cox transform defined below using unquoting and `new_function()`:
+   
+    ```{r}
+    bc <- function(lambda) {
+      if (lambda == 0) {
+        function(x) log(x)
+      } else {
+        function(x) (x ^ lambda - 1) / lambda
+      }
+    }
+    ```
+    
+   __<span style="color:green">A</span>__:
+    
+    ```{r}
+    bc2 <- function(lambda){
+      lambda <- enexpr(lambda)
+      
+      if (!!lambda == 0) {
+        new_function(exprs(x = ), expr(log(x)))
+        } else {
+          new_function(exprs(x = ), expr((x^(!!lambda) - 1) / !!lambda))
+        }
+      }
+    
+    bc2(0)
+    bc2(2)
+    bc2(2)(2)
+    ```
+   
+6. __<span style="color:red">Q</span>__:Re-implement the simple `compose()` defined below using quasiquotation and `new_function()`:
+     
+    ```{r}
+    compose <- function(f, g) {
+      function(...) f(g(...))
+    }
+    ```
+    
+   __<span style="color:green">A</span>__: The implementation is straight forward. However, it can become tough to handle all bracktes correct at the first try:
+    
+    ```{r}
+    compose2 <- function(f, g){
+      f <- enexpr(f)
+      g <- enexpr(g)
+      
+      new_function(exprs(... = ), expr((!!f)((!!g)(...))))
+    }
+    
+    compose(sin, cos)
+    compose(sin, cos)(pi)
+    compose2(sin, cos)
+    compose2(sin, cos)(pi)
+    ```
+
+## Old exercises Unquoting
+
+1. __<span style="color:red">Q</span>__: What does the following command return? What information is lost? Why?
+
+    ```{r, eval = FALSE}
+    expr({
+      x +              y # comment  
+    })
+    ```
+
+   __<span style="color:green">A</span>__: When we look at the captured expression, we see that the extra whitespaces and comments are lost. R ignores them when parsing an expression. They do do not need to be represented in the AST, because they do not affect the evaluation of the expression.
+    
+    ```{r}
+    library(rlang)
+    captured_expression <- expr({
+      x +              y # comment  
+    })
+    
+    captured_expression
+    ```
+   
+   However, it is possible to retrieve the original input through the attributes of the captured expression:
+    
+    ```{r}
+    attributes(captured_expression)
+    ```
+
+## Unquoting
+
+2. __<span style="color:red">Q</span>__: Explain why both `!0 + !0` and `!1 + !1` return `FALSE` while `!0 + !1` returns `TRUE`.
+    
+   __<span style="color:green">A</span>__: To answer this question we look at the AST of the first example:
+    
+    ```{r}
+    library(lobstr)
+    
+    ast(!0 + !0)
+    ```
+    
+   As the coercion rules are the same in all examples, we can use the precedence order (right to left) to explain all three examples:
+    
+   * `!0 + !0`:  
+     So the second zero gets coerced to `FALSE` and `!FALSE` becomes `TRUE`.  
+     `0 + TRUE` gets coerced to 1.  
+     `!1` becomes `!TRUE` which is `FALSE`  
+   * `!1 + !1`:  
+     So `!1` is `FALSE`.  
+     `1 + FALSE` is `1`.  
+     `!1` is `!TRUE` so `FALSE`.  
+   * `!0 + !1`:  
+     `!1` is `FALSE`.  
+     `0 + FALSE` is `0`.  
+     `!0` is `TRUE`.  
+
+3. __<span style="color:red">Q</span>__: Base functions `match.fun()`, `page()`, and `ls()` all try to automatically determine whether you want standard or non-standard evaluation. Each uses a different approach. Figure out the essence of each approach by reading the source code, then compare and contrast the techniques.
+
+## Case studies {#quasi-case-studies}
+
 1. __<span style="color:red">Q</span>__: Implement `arrange_desc()`, a variant of `dplyr::arrange()` that sorts in descending order by default.
    
    __<span style="color:green">A</span>__: We just have to catch the `...` from `arrange()` as an expression and modify the expression to be wrapped inside `desc()`. Afterwards we evaluate this new code within a regular `arrange()` call:
@@ -335,87 +436,3 @@ source("common.R")
     ```
 
 4. __<span style="color:red">Q</span>__:Add error handling to `slice()`. Give clear error messages if either `along` or `index` have invalid values (i.e. not numeric, not length 1, too small, or too big).
-   
-5. __<span style="color:red">Q</span>__:Re-implement the Box-Cox transform defined below using unquoting and `new_function()`:
-   
-    ```{r}
-    bc <- function(lambda) {
-      if (lambda == 0) {
-        function(x) log(x)
-      } else {
-        function(x) (x ^ lambda - 1) / lambda
-      }
-    }
-    ```
-    
-   __<span style="color:green">A</span>__:
-    
-    ```{r}
-    bc2 <- function(lambda){
-      lambda <- enexpr(lambda)
-      
-      if (!!lambda == 0) {
-        new_function(exprs(x = ), expr(log(x)))
-        } else {
-          new_function(exprs(x = ), expr((x^(!!lambda) - 1) / !!lambda))
-        }
-      }
-    
-    bc2(0)
-    bc2(2)
-    bc2(2)(2)
-    ```
-   
-6. __<span style="color:red">Q</span>__:Re-implement the simple `compose()` defined below using quasiquotation and `new_function()`:
-     
-    ```{r}
-    compose <- function(f, g) {
-      function(...) f(g(...))
-    }
-    ```
-    
-   __<span style="color:green">A</span>__: The implementation is straight forward. However, it can become tough to handle all bracktes correct at the first try:
-    
-    ```{r}
-    compose2 <- function(f, g){
-      f <- enexpr(f)
-      g <- enexpr(g)
-      
-      new_function(exprs(... = ), expr((!!f)((!!g)(...))))
-    }
-    
-    compose(sin, cos)
-    compose(sin, cos)(pi)
-    compose2(sin, cos)
-    compose2(sin, cos)(pi)
-    ```
-
-## Dot-dot-dot (`...`)
-
-1. __<span style="color:red">Q</span>__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`.  Compare and constract the techniques they use for switching between dots and list behaviour.
-
-2. __<span style="color:red">Q</span>__: Explain the problem with this defintion of `set_attr()`
-    
-    ```{r, error = TRUE}
-    set_attr <- function(x, ...) {
-      attr <- rlang::list2(...)
-      attributes(x) <- attr
-      x
-    }
-    set_attr(1:10, x = 10)
-    ```
-    
-   __<span style="color:green">A</span>__: In this example we first learn that attributes must be named, as correctly given out by the error message. However, this behaviour mainly occures, because the first argument of `set_attr()` is named `x` as in the function call below. So the other argument in the `set_attr()` function call (`1:10`) is the only one, which is supplied as (unnamed) usage of the ellipsis. Therefore `set_attr()` tries to assign `1:10` as attribute to `x = 10` and the error occures.
-   
-   The function becomes probably clearer and less error-prone when we name the first argument `.x` again. In this case `1:10` will get the (named) attribute `x = 10` assigned:
-
-    ```{r}
-    set_attr <- function(.x, ...) {
-      attr <- rlang::list2(...)
-      
-      attributes(.x) <- attr
-      .x
-    }
-    
-    set_attr(1:10, x = 10)
-    ```
