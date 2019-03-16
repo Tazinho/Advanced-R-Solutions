@@ -4,11 +4,98 @@ source("common.R")
 
 # R6
 
+## Prerequisites
+
+```{r}
+library(R6)
+```
+
 ## Classes and methods
 
 1. __<span style="color:red">Q</span>__: Create a bank account R6 class that stores a balance and allows you to deposit and withdraw money. Create a subclass that throws an error if you attempt to go into overdraft. Create another subclass that allows you to go into overdraft, but charges you a fee.
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: Let's start with a very basic bank account, similar to the `Accumulator` class in the text book.
+
+    ```{r}
+    BankAccount <- R6Class("BankAccount",
+                           list(
+                             balance = 0,
+                             deposit = function(dep = 0) {
+                               self$balance = self$balance + dep
+                               invisible(self)
+                             },
+                             withdraw = function(draw) {
+                               self$balance = self$balance - draw
+                               invisible(self)
+                             }
+                           ))
+
+    # Test
+    my_account <- BankAccount$new()
+    my_account$balance
+
+    my_account$
+      deposit(5)$
+      withdraw(2)$
+      deposit(7)$
+      balance
+    ```
+
+   Now, lets make it more strict and add errors, that prevent a negative balance.
+
+    ```{r}
+    BankAccountStrict <- R6Class("BankAccount",
+                                 inherit = BankAccount,
+                                 public = list(
+                                   withdraw = function(draw = 0) {
+                                     if (self$balance - draw < 0) {
+                                       stop("Your `withdraw` must be smaller ",
+                                            "than your `balance`.", call. = FALSE)
+                                     }
+                                     super$withdraw(draw = draw)
+                                   }
+                                 ))
+    
+    # Test
+    my_strict_account <- BankAccountStrict$new()
+    my_strict_account$balance
+    
+    my_strict_account$
+      deposit(5)$
+      withdraw(2)$
+      deposit(7)$
+      withdraw(11)
+
+    my_strict_account$balance
+    ```
+
+   Finally, we creat a class that charges a constant fee for each withdraw which leaves the account with a negative balance.
+
+    ```{r}
+    BankAccountCharging <- R6Class("BankAccount",
+                                   inherit = BankAccount,
+                                   public = list(
+                                     withdraw = function(draw = 0) {
+                                       if (self$balance - draw < 0) {
+                                         draw = draw + 1
+                                       }
+                                       super$withdraw(draw = draw)
+                                     }
+                                   ))
+    
+    # Test
+    my_charging_account <- BankAccountCharging$new()
+    my_charging_account$balance
+    
+    my_charging_account$
+      deposit(5)$
+      withdraw(2)$
+      deposit(7)$
+      withdraw(11)$
+      withdraw(1)
+    
+    my_charging_account$balance
+    ```
 
 2. __<span style="color:red">Q</span>__: Create an R6 class that represents a shuffled deck of cards. You should be able to draw cards from the deck with `$draw(n)`, and return all cards to the deck and reshuffle with `$reshuffle()`. Use the following code to make a vector of cards.
     
@@ -18,7 +105,39 @@ source("common.R")
     cards <- paste0(rep(value, 4), suit)
     ```
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: To keep the class flexible, we use `cards` as the default for a similar named field, which can be specified at initialisation.
+
+    ```{r}
+    ShuffledDeck <- R6Class("ShuffledDeck",
+                            public = list(
+                              cards = {
+                                suit <- c("♠", "♥", "♦", "♣")
+                                value <- c("A", 2:10, "J", "Q", "K")
+                                paste0(rep(value, 4), suit)
+                              },
+                              deck = NULL,
+                              initialize = function(deck = cards) {
+                                self$cards = deck
+                                self$deck = sample(deck)
+                              },
+                              reshuffle = function(deck = self$cards) {
+                                self$deck = sample(deck)
+                                invisible(self)
+                              },
+                              draw = function(n){
+                                output <- self$deck[seq_len(n)]
+                                self$deck <- self$deck[-seq_len(n)]
+                                output
+                              }
+                            ))
+
+    # Test
+    my_deck <- ShuffledDeck$new()
+    my_deck$draw(20)
+    my_deck$deck
+    my_deck$reshuffle()
+    my_deck$deck
+    ```
 
 3. __<span style="color:red">Q</span>__: Why can't you model a bank account or a deck of cards with an S3 class?
     
@@ -27,14 +146,42 @@ source("common.R")
 4. __<span style="color:red">Q</span>__: Create an R6 class that allows you to get and set the current timezone. You can access the current timezone with `Sys.timezone()` and set it with `Sys.setenv(TZ = "newtimezone")`. When setting the time zone, make sure the new time zone is in the list provided by `OlsonNames()`.
 
    __<span style="color:green">A</span>__:
+   
+    ```{r}
+    TimeSetter <- R6Class("TimeSetter",
+                          public = list(
+                            get_timezone = Sys.timezone,
+                            set_timezone = function(TZ, tzdir = NULL) {
+                              stopifnot(TZ %in% as.character(OlsonNames(tzdir = tzdir)))
+                              Sys.setenv(TZ = TZ)
+                            }
+                          )
+    )
+                      
+    # Test
+    time_setter <- TimeSetter$new()
+    
+    (old_tz <- time_setter$get_timezone())
+    time_setter$set_timezone("Antarctica/South_Pole")
+    time_setter$get_timezone()
+    time_setter$set_timezone(old_tz)
+    ```
 
 5. __<span style="color:red">Q</span>__: Create an R6 class that manages the current working directory.It should have `$get()` and `$set()` methods.
     
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: This `WDManager` class is quite minimal, but should be easy to extend:
+
+    ```{r}
+    WDManager <- R6Class("WDManager", 
+                         list(
+                           get = getwd,
+                           set = setwd
+                         ))
+    ```
 
 6. __<span style="color:red">Q</span>__: Why can't you model the time zone or current working directory with an S3 class?
     
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: R6 objects are built on top of environments and have a `class` attribute, which is a character vector containing the class name and the string `"R6"`.
 
 7. __<span style="color:red">Q</span>__: What base type are R6 objects built on top of? What attributes do they have?
 
@@ -45,6 +192,36 @@ source("common.R")
 1. __<span style="color:red">Q</span>__: Create a bank account class that prevents you from directly setting the account balance, but you can still withdraw from and deposit to. Throw an error if you attempt to go into overdraft.
     
    __<span style="color:green">A</span>__:
+   
+    ```{r}
+    BankAccountStrict2 <- R6Class(
+      "BankAccountStrict2",
+      list(
+        deposit = function(dep = 0) {
+          private$balance = private$balance + dep
+          invisible(self)
+        },
+        withdraw = function(draw = 0) {
+          if (private$balance - draw < 0) {
+            stop("Your `withdraw` must be smaller ",
+                 "than your `balance`.",
+                 call. = FALSE)
+          }
+          private$balance = private$balance - draw
+          invisible(self)
+        }
+      ),
+      private = list(balance = 0)
+    )
+
+    # Test
+    my_account_strict_2 <- BankAccountStrict2$new()
+    my_account_strict_2$balance
+
+    my_account_strict_2$deposit(5)
+    my_account_strict_2$withdraw(5)
+    my_account_strict_2$withdraw(1)
+    ```
 
 2. __<span style="color:red">Q</span>__: Create a class with a write-only `$password` field. It should have `$check_password(password)` method that returns `TRUE` or `FALSE`, but there should be no way to view the complete password.
 
