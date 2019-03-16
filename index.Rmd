@@ -49,8 +49,8 @@ library(forcats)
 library(ggplot2)
 
 # import from file --------------------------------------------------------
-df_long <- read.table("progress_data.csv", stringsAsFactors = FALSE,
-                      sep = "\t", header = TRUE) %>% 
+df_long <- read.csv2("progress_data.csv", stringsAsFactors = FALSE, 
+                      header = TRUE) %>% 
   as_tibble() %>% 
   modify_at("status", factor, levels = c("open", "started", "solved")) %>% 
   arrange(chapter, subchapter, exercise) %>% 
