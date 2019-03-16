@@ -299,11 +299,11 @@ source("common.R")
     with_html(p(address))
     ```
     
-   __<span style="color:orange">A</span>__: (TODO: In the exercise the definition of `p` changed into `p <- function() "p"`. This needs to be added and the exercise/answer might need to get updated) When we created the various HTML tag functions, `address()` was one of them. This HTML tag may be used to provide contact information on an HTML page. All our tag functions are not present in the global environment, but rather elements of the list `html_tags`.
+   __<span style="color:orange">A</span>__: (TODO: In the exercise the definition of `p` changed into `p <- function() "p"`. This needs to be added and the exercise/answer might need to get updated. Further `with_html` is defined in the next exercise. Therefore, a change to introduce it already here has to be made...and the chunks then need to be changed to `eval = TRUE`) When we created the various HTML tag functions, `address()` was one of them. This HTML tag may be used to provide contact information on an HTML page. All our tag functions are not present in the global environment, but rather elements of the list `html_tags`.
     
    The DSL code wrapped in `with_html()` is evaluated in its own environment and in the "context" of `html_tags`. The tag functions are available, because we provided a list of them as a data mask. As `r ?as_data_mask` indicates: "Objects in the mask have precedence over objects in the environment."
     
-    ```{r, error=TRUE}
+    ```{r, error=TRUE, eval = FALSE}
     greeting <- "Hello!"
     with_html(p(greeting))
     
@@ -313,7 +313,7 @@ source("common.R")
     
    The error message then tells us, what the problem is: `p(address)` operates on `address()`, the function not the character, and we haven't implemented an `escape.function()` method. 
     
-    ```{r}
+    ```{r, eval = FALSE}
     # checking our list of tag functions
     c("greeting", "address") %in% names(html_tags)
     
