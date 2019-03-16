@@ -4,21 +4,67 @@ source("common.R")
 
 # Function operators
 
+```{r}
+library(purrr)
+```
+
+
 ## Existing FOs
 
-1. __<span style="color:red">Q</span>__: Base R provides a function operator in the form of `Vectorize()`. 
-    What does it do? When might you use it?    
+1. __<span style="color:red">Q</span>__: Base R provides a function operator in the form of `Vectorize()`. What does it do? When might you use it?    
    
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: In R a lot of the common operations are "vectorized". This often means, that a computation is applied to the whole object (say an atomic vector) by default and because these operations are often implemented in a compiled language such as C they are also very fast.
    
+   Despilte what the Functions name and the documentation (`?Vectorize`) tell us, this function operator is not able to speed up the provided function. It rather changes the input format of the arguments, so that it can be iterated over. Because of this it works best for scalar functions.
+
+   In essence, `Vectorize` is mostly a wrapper for `mapply`. Let's take a look at an example from the documentation:
+
+    ```{r}
+    vrep <- Vectorize(rep.int)
+    vrep
+    
+    # application
+    vrep(1:2, 3:4)
+    vrep(times = 1:2, x = 3:4)  # naming arguments still works
+```
+
+   `Vectorize()` provides a convenient and concise notation to iterate over multipe arguments. If you combine it with parallelization, it may also speed up your code consitently. If you already use the tidyverse, you may also consider the following type stable alternative:
+
+    ```{r}
+    map2(1:2, 3:4, rep.int)
+```
+
 2. __<span style="color:red">Q</span>__: Read the source code for `possibly()`. How does it work?
    
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: When we look at the source code, that `possibly()` is mostly a wrapper around `tryCatch()`:
+
+    ```{r}
+    possibly
+    ```
+   
+The function accepts a function (`.f`) as input and passing it through `as_mapper()` enables purrr's convenient as function interface. Afterwords the evaluation of the provided value for the "default return value" (in case of an error) (`otherwise`) is forced.
+
+Now a function wrapping `tryCatch()` is created and returned by the function operator. This function will evaluate the provided function and return the its output. In case of an error, the value of `otherwise` will be returned instead.
+
+(The desired behaviour following an user-interrupt is also specified as stopping and printing an informative error message. There is an option to opt-out of a quiet/silent mode, which will print any occurring error message to the console.)
+
 
 3. __<span style="color:red">Q</span>__: Read the source code for `safely()`. How does it work?
    
-   __<span style="color:green">A</span>__:
-    
+   __<span style="color:green">A</span>__: `safely()` returns a function created by `capture_error()`, which we have to inspect in order to understand what this function operator does:
+
+    ```{r}
+    safely
+    ```
+
+    ```{r}
+    purrr:::capture_error
+    ```
+
+   Here `tryCatch()` evaluates the `code`, which is passed to it, within a list with the two elements "results" and "error". If the code evaluates without an error, the returned value be assigned to the "results" element of this list.
+
+   In cas of an error, the list will have the same structure, but "results" will be `otherwise` (`NULL` by default) and the "error" element will contain the error message. Take a look at the textbook or the documentation of `safely()` to see how you can take advantage of this behaviour, for example when fitting many models with R.
+
 ## Case study: creating your own FOs
 
 1.  __<span style="color:red">Q</span>__: Weigh the pros and cons of `download.file %>% dot_every(10) %>% delay_by(0.1)` vs `download.file %>% delay_by(0.1) %>% dot_every(10)`.
