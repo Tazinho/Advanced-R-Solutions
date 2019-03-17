@@ -141,7 +141,33 @@ library(R6)
 
 3. __<span style="color:red">Q</span>__: Why can't you model a bank account or a deck of cards with an S3 class?
     
-   __<span style="color:green">A</span>__:
+   __<span style="color:orange">A</span>__: (TODO: Check the requirements to how the class should look like). It is not clear why this should not be possible. Of course this would look different than R6, but one could still build up an S3 class based on i.e. a list or environment. Here an S3 version of a bank account and one method:
+   
+    ```{r}
+    # On top of a list
+    ba1 <- list(balance = 0)
+    class(ba1) <- "bank_account"
+    
+    withdraw <- function(ba, draw) {
+      UseMethod("withdraw")
+    }
+    
+    withdraw.bank_account <- function(ba, draw) {
+      ba$balance <- ba$balance - draw
+      ba
+    }
+
+    ba1 <- withdraw.bank_account(ba1, 5)
+    ba1
+    
+    # On top of an environment
+    ba2 <- new.env()
+    ba2$balance <- 0
+    
+    class(ba2) <- "bank_account"
+    withdraw(ba2, 5)
+    ba2$balance
+    ```
 
 4. __<span style="color:red">Q</span>__: Create an R6 class that allows you to get and set the current timezone. You can access the current timezone with `Sys.timezone()` and set it with `Sys.setenv(TZ = "newtimezone")`. When setting the time zone, make sure the new time zone is in the list provided by `OlsonNames()`.
 
