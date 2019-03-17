@@ -311,6 +311,33 @@ library(R6)
 
 4. __<span style="color:red">Q</span>__: Can subclasses access private fields/methods from their parent? Perform an experiment to find out.
 
+   __<span style="color:green">A</span>__: Our experiment shows that only methods can be accessed by the subclass
+
+    ```{r}
+    A <- R6Class(
+      classname = "A",
+      private = list(
+        foo = "foo",
+        bar = function() {
+          "bar"
+        }
+      )
+    )
+
+    B <- R6Class(
+      classname = "B",
+      inherit = A,
+      public = list(
+        foobar = function() {
+          print(super$foo)
+          print(super$bar())
+        }
+      )
+    )
+
+    x <- B$new()
+    x$foobar()
+    ```
 
 ## Reference semantics
 1. __<span style="color:red">Q</span>__: Create a class that allows you to write a line to a specified file.  You should open a connection to the file in `$initialize()`, append a line using `cat()` in `$append_line()`, and close the connection in `$finalize()`.
