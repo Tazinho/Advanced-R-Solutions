@@ -252,6 +252,30 @@ library(R6)
 2. __<span style="color:red">Q</span>__: Create a class with a write-only `$password` field. It should have `$check_password(password)` method that returns `TRUE` or `FALSE`, but there should be no way to view the complete password.
 
    __<span style="color:green">A</span>__:
+   
+    ```{r}
+    PWClass <- R6Class(
+      "PWClass",
+      list(
+        print = function(...) {
+          cat("PWClass: \n")
+          invisible(self)
+        },
+        set_password = function(password) {
+          private$password <- password
+        },
+        check_password = function(password) {
+          !is.null(private$password)
+        }
+      ),
+      private = list(password = NULL)
+    )
+
+    my_pw <- PWClass$new()
+    my_pw$set_password(123)
+    my_pw
+    my_pw$check_password()
+    ```
 
 3. __<span style="color:red">Q</span>__: Extend the `Rando` class with another active binding that allows you to access the previous random value. Ensure that active binding is the only way to access the value.
 
