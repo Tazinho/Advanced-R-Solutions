@@ -281,6 +281,28 @@ library(R6)
 3. __<span style="color:red">Q</span>__: Extend the `Rando` class with another active binding that allows you to access the previous random value. Ensure that active binding is the only way to access the value.
 
    __<span style="color:green">A</span>__:
+   
+    ```{r}
+    Rando <- R6::R6Class(
+      "Rando",
+      private = list(last_random = NULL),
+      active = list(
+        random = function(value) {
+          if (missing(value)) {
+            private$last_random <- runif(1)
+            private$last_random
+          } else {
+            stop("Can't set `$random`", call. = FALSE)
+          }
+        },
+        previous_random = function(value) {
+          if (missing(value)) {
+            private$last_random
+          }
+        }
+      )
+    )
+    ```
 
 4. __<span style="color:red">Q</span>__: Can subclasses access private fields/methods from their parent? Perform an experiment to find out.
 
