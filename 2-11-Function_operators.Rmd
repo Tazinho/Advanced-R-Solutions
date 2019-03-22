@@ -26,13 +26,13 @@ library(purrr)
     # application
     vrep(1:2, 3:4)
     vrep(times = 1:2, x = 3:4)  # naming arguments still works
-```
+    ```
 
    `Vectorize()` provides a convenient and concise notation to iterate over multipe arguments. If you combine it with parallelization, it may also speed up your code consitently. If you already use the tidyverse, you may also consider the following type stable alternative:
 
     ```{r}
     map2(1:2, 3:4, rep.int)
-```
+    ```
 
 2. __<span style="color:red">Q</span>__: Read the source code for `possibly()`. How does it work?
    
@@ -41,13 +41,12 @@ library(purrr)
     ```{r}
     possibly
     ```
+    
+   The function accepts a function (`.f`) as input and passing it through `as_mapper()` enables purrr's convenient as function interface. Afterwords the evaluation of the provided value for the "default return value" (in case of an error) (`otherwise`) is forced.
    
-The function accepts a function (`.f`) as input and passing it through `as_mapper()` enables purrr's convenient as function interface. Afterwords the evaluation of the provided value for the "default return value" (in case of an error) (`otherwise`) is forced.
-
-Now a function wrapping `tryCatch()` is created and returned by the function operator. This function will evaluate the provided function and return the its output. In case of an error, the value of `otherwise` will be returned instead.
-
-(The desired behaviour following an user-interrupt is also specified as stopping and printing an informative error message. There is an option to opt-out of a quiet/silent mode, which will print any occurring error message to the console.)
-
+   Now a function wrapping `tryCatch()` is created and returned by the function operator. This function will evaluate the provided function and return the its output. In case of an error, the value of `otherwise` will be returned instead.
+   
+   (The desired behaviour following an user-interrupt is also specified as stopping and printing an informative error message. There is an option to opt-out of a quiet/silent mode, which will print any occurring error message to the console.)
 
 3. __<span style="color:red">Q</span>__: Read the source code for `safely()`. How does it work?
    
@@ -67,15 +66,15 @@ Now a function wrapping `tryCatch()` is created and returned by the function ope
 
 ## Case study: creating your own FOs
 
-1.  __<span style="color:red">Q</span>__: Weigh the pros and cons of `download.file %>% dot_every(10) %>% delay_by(0.1)` vs `download.file %>% delay_by(0.1) %>% dot_every(10)`.
+1. __<span style="color:red">Q</span>__: Weigh the pros and cons of `download.file %>% dot_every(10) %>% delay_by(0.1)` vs `download.file %>% delay_by(0.1) %>% dot_every(10)`.
    
    __<span style="color:green">A</span>__:
    
-2.  __<span style="color:red">Q</span>__: Should you memoise `file.download()`? Why/why not?
+2. __<span style="color:red">Q</span>__: Should you memoise `file.download()`? Why/why not?
    
    __<span style="color:green">A</span>__: In general it makes sense to memoise `file.download()` in scenarios where objects are downloaded repeatedly and downloads might take a little longer. However, the downside when caching results in memory is that the regarding amount of memory will not be available for further tasks during the R session. Therefore, it doesn't make sense to memoise `file.download()` when it is needed to download very large files, lots of different files or time is not an issue. As the meaning of these terms varies regarding differing situations, it always depends on the use case and one has to weigh up these trade offs carefully.
    
-3.  __<span style="color:red">Q</span>__: Create a function operator that reports whenever a file is created or deleted in the working directory, using `dir()` and `setdiff()`. What other global function effects might you want to track?
+3. __<span style="color:red">Q</span>__: Create a function operator that reports whenever a file is created or deleted in the working directory, using `dir()` and `setdiff()`. What other global function effects might you want to track?
    
    __<span style="color:green">A</span>__: We start with a short version to show the idea:
     
@@ -124,18 +123,18 @@ Now a function wrapping `tryCatch()` is created and returned by the function ope
     td(c("delete_me", "me_too"), dir.create)
     ```
     
-    Other global effects that might be worth tracking include changes regarding:
+   Other global effects that might be worth tracking include changes regarding:
     
-    * the search path and/or introduced `conflicts()`
-    * `options()` and `par()` which modify global settings
-    * the path of the working directory
-    * environment variables
-    * the locale.
+   * the search path and/or introduced `conflicts()`
+   * `options()` and `par()` which modify global settings
+   * the path of the working directory
+   * environment variables
+   * the locale.
 
    
-4.  __<span style="color:red">Q</span>__: Write a function operator that logs a timestamp and message to a file every time a function is run.
+4. __<span style="color:red">Q</span>__: Write a function operator that logs a timestamp and message to a file every time a function is run.
    
-    __<span style="color:green">A</span>__: Note that the example will create a file file in your current working directory:
+   __<span style="color:green">A</span>__: Note that the example will create a file file in your current working directory:
     
     ```{r, eval = FALSE}
     logger <- function(f, filename){
@@ -154,7 +153,7 @@ Now a function wrapping `tryCatch()` is created and returned by the function ope
     mean2(1:4, message = "second_time")
     ```
    
-5.  __<span style="color:red">Q</span>__: Modify `delay_by()` so that instead of delaying by a fixed amount of time, it ensures that a certain amount of time has elapsed since the function was last called. That is, if you called `g <- delay_by(1, f); g(); Sys.sleep(2); g()` there shouldn't be an extra delay.
+5. __<span style="color:red">Q</span>__: Modify `delay_by()` so that instead of delaying by a fixed amount of time, it ensures that a certain amount of time has elapsed since the function was last called. That is, if you called `g <- delay_by(1, f); g(); Sys.sleep(2); g()` there shouldn't be an extra delay.
    
    __<span style="color:green">A</span>__: We can do this with three little tricks (and the help
     of 42):
@@ -176,17 +175,11 @@ Now a function wrapping `tryCatch()` is created and returned by the function ope
     }
     ```
     
-    Alternatively to the empty while statement we could have used `Sys.sleep()`. I would not recommend this solution, since `?Sys.sleep` indicates that `Sys.sleep()` might have some overhead and seems not to be as exact as we need.
-
+   Alternatively to the empty while statement we could have used `Sys.sleep()`. I would not recommend this solution, since `?Sys.sleep` indicates that `Sys.sleep()` might have some overhead and seems not to be as exact as we need.
    
 ## Old exercises
 
 ## Behavioural FOs
-
-1.  __<span style="color:red">Q</span>__: Write a FO that logs a time stamp and message to a file every time a 
-    function is run.
-    
-    __<span style="color:green">A</span>__: 
 
 2.  __<span style="color:red">Q</span>__: What does the following function do? What would be a good name for it?
 
