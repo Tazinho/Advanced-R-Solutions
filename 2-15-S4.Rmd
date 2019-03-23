@@ -4,11 +4,34 @@ source("common.R")
 
 # S4
 
+## Prerequisites
+
+We load the methods package for anything specifically related to S4 and the lubridate package for the 1st exercise.
+
+```{r}
+library(methods)
+librars(lubridate)
+```
+
 ## Basics
 
 1. __<span style="color:red">Q</span>__: `lubridate::period()` returns an S4 class. What slots does it have? What class is each slot? What accessors does it provide?
     
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: Objects of the S4 `Period` class have the six slots `.Data`, `year`, `month`, `day`, `hour` and `minute`, which are each of type double. Except for `.Data` all fields have similar named accessors. `.Data` can be accessed via `methods::gedDataPart()`. For a short example, see the following code:
+   
+    ```{r}
+    bla <- period(c(3, 1, 2, 13, 1), 
+              c("second", "minute", "hour", "day", "week"))
+    
+    str(bla)
+    
+    year(bla)
+    month(bla)
+    day(bla)
+    hour(bla)
+    minute(bla)
+    getDataPart(bla)
+    ```
 
 2. __<span style="color:red">Q</span>__: What other ways can you find help for a method? Read `?"?"` and summarise the details.
     
