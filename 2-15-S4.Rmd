@@ -255,4 +255,9 @@ library(lubridate)
 
 2. __<span style="color:red">Q</span>__: Define a `length` method for the `Person` class.
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: We can define this method as an S3 method and register it afterwards:
+   
+    ```{r}
+    length.Person <- function(x) "a"
+    setMethod("length", "Person", length.Person)
+    ```
