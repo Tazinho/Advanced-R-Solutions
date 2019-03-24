@@ -46,7 +46,69 @@ library(lubridate)
 ## Classes
 1. __<span style="color:red">Q</span>__: Extend the Person class with fields to match `utils::person()`. Think about what slots you will need, what class each slot should have, and what you’ll need to check in your validity method.
     
-   __<span style="color:yellow">A</span>__: From `?utils::person` we can find out that the following slots are needed `given`, `family`, `role`, `email`, `comment`. All these slots must be of type character. The entries in the `role` slot must match one of the following abbreviations "aut", "com", "cph", "cre", "ctb", "ctr", "dtc", "fnd", "rev", "ths", "trl".
+   __<span style="color:yellow">A</span>__: From `?utils::person` we can find out that the following slots are needed `given`, `family`, `role`, `email`, `comment`. All these slots must be of type character. The entries in the `role` slot must match one of the following abbreviations "aut", "com", "cph", "cre", "ctb", "ctr", "dtc", "fnd", "rev", "ths", "trl". Therefore, we include these slots in our new definition of the `Person` class. As `role` might be of different length than the other slots, we include the constraint that these slots must be of length one to the validator.
+   
+    ```{r}
+    setClass("Person", 
+         slots = c(
+           name = "character", 
+           age = "numeric",
+           given = "character",
+           family = "character",
+           role = "character",
+           email = "character",
+           comment = "character"
+         ),
+         prototype = list(
+           name = NA_character_,
+           age = NA_real_,
+           given = NA_character_,
+           family = NA_character_,
+           role = NA_character_,
+           email = NA_character_,
+           comment = NA_character_
+         )
+    )
+    
+    Person <- function(name, age = NA, 
+                   given = NA_character_,
+                   family = NA_character_,
+                   role = NA_character_,
+                   email = NA_character_,
+                   comment = NA_character_) {
+      age <- as.double(age)
+      
+      new("Person", name = name, age = age, 
+      given = given, family = family, 
+      role = role, email = email,
+      comment = comment)
+    }
+
+    Person(name = c("Malte", "Henning"), role = c("aut", "com"))
+
+    setValidity("Person", function(object) {
+      if (length(object@name)    != 1 |
+          length(object@age)     != 1 |
+          length(object@given)   != 1 |
+          length(object@family)  != 1 |
+          length(object@email)   != 1 |
+          length(object@comment) != 1) {
+        "@name, @age, @given, @family, @email, @comment must be of length 1"
+      } 
+  
+      if (!all(object@role %in% c(NA_character_, 
+            "aut", "com", "cph", "cre", "ctb",
+            "ctr", "dtc", "fnd", "rev", "ths", "trl"))) {
+        paste("@role (s) must be one of", 
+              paste (c(NA_character_, 
+                                     "aut", "com", "cph", "cre", "ctb",
+                                     "ctr", "dtc", "fnd", "rev", "ths", "trl"),
+                     collapse = ", "), ".")
+      }
+  
+      TRUE
+    })
+    ```
 
 2. __<span style="color:red">Q</span>__: What happens if you define a new S4 class that doesn’t have any slots?  (Hint: read about virtual classes in `?setClass`.)
     
