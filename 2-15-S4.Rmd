@@ -155,7 +155,19 @@ library(lubridate)
 
 1. __<span style="color:red">Q</span>__: Add `age()` accessors for the `Person` class.
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: Similar as shown for `name()` in the chapter, we define an `age()` generic, with a method for the `Person` class and a replacement function `age<-()`:
+   
+    ```{r}
+    setGeneric("age", function(x) standardGeneric("age"))
+    setMethod("age", "Person", function(x) x@age)
+    
+    setGeneric("age<-", function(x, value) standardGeneric("age<-"))
+    setMethod("age<-", "Person", function(x, value) {
+      x@age <- value
+      validObject(x)
+      x
+    })
+    ```
 
 2. __<span style="color:red">Q</span>__: In the definition of the generic, why is it necessary to repeat the name of the generic twice?
 
