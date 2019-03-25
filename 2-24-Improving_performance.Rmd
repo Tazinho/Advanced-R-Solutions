@@ -188,7 +188,35 @@ provides us with enough information and guides our attention on solutions in the
 
 5. __<span style="color:red">Q</span>__: Can you make a faster version of `table()` for the case of an input of two integer vectors with no missing values? Can you use it to speed up your chi-square test?
     
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: When analysing the source code of `table`, we can omit everything unnecessary and extract the main building blocks:
+   
+    ```{r}
+    table2 <- function(a, b){
+      u_a <- unique(a)
+      u_b <- unique(b)
+        
+      dims <- c(length(u_a), length(u_b))
+      pd <- prod(dims)
+      dn <- list(a = as.character(sort(u_a)), 
+             b = as.character(sort(u_b)))
+      
+      bin <- (as.integer(as.factor(a))-1) + length(u_a) * (as.integer(as.factor(b)) - 1) + 1
+      
+      y <- array(tabulate(bin, pd), dim = dims, dimnames = dn)
+      class(y) <- "table"
+      
+      y
+    }
+    
+    a <- sample(100, 10000, TRUE)
+    b <- sample(100, 10000, TRUE)
+    
+    bench::mark(table(a, b),
+                table2(a, b),
+                relative = TRUE)
+    ```
+   
+   Unfortunately, the performance gain is very small.
 
 ## Vectorise
 
