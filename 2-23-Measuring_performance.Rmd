@@ -73,11 +73,11 @@ source("common.R")
     exp(log(x) / 2)
     ```
 
-   __<span style="color:orange">A</span>__: (TODO: Explain why the order behaves like this.) We'll use the "bench"-package to estimate the relative execution time of these expression, with the fastest expression standardized to 1.
+   __<span style="color:green">A</span>__: We'll use the "bench"-package to estimate the relative execution time of these expression, with the fastest expression standardized to 1.
    
     ```{r, message=FALSE}
     x <- runif(100)
-    y <- 1/2
+    
     bench::mark(sqrt(x),          # (1)
                 x ^ 0.5,          # (2)
                 x ^ (1 / 2),      # (3)
@@ -87,10 +87,7 @@ source("common.R")
       dplyr::arrange(median)
     ```
 
-   At first, the result seems surprising. The call to `exp(log(x)/2)`, with the most function calls is actually considerably faster than (2) and (3).
-
-<!-- todo: find better explanation, why `exp(log(x)/2)` is fast -->
-<!-- also: explain, why (3) is faster than (2). I suppose it has sth todo with machine numbers and precision, maybe? -->
+   As supposed, `exp(log(x)/2)` needs the longest time to calculate the square root of `x`.
 
 ## Old exercises
 1. __<span style="color:red">Q</span>__: Instead of using `microbenchmark()`, you could use the built-in function `system.time()`. But `system.time()` is much less precise, so you'll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.
