@@ -52,7 +52,11 @@ library(lobstr)
     lobstr::ast(1 -> x)
     ```
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: As the AST starts function calls always with the name of the function, the call in the first expression is translated into its prefix form. In the second case, `**` is translated by R's parser into `^`. In the last AST, the expression is flipped when R parses it:
+   
+    ```{r}
+    str(expr(a -> b))
+    ```
 
 4. __<span style="color:red">Q</span>__: What is special about the AST below? (Hint: re-read Section 6.2.1)
 
