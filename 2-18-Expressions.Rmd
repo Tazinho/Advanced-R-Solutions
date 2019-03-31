@@ -132,6 +132,8 @@ library(lobstr)
     call2(median, expr(x), na.rm = TRUE)
     call2(expr(median), expr(x), na.rm = TRUE)
     ```
+    
+   __<span style="color:green">A</span>__: The call objects differ in their first two elements, which are sometimes evaluated before the call is constructed. In the first one, both `median()` and `x` are evaluated. Therefore, we can see in the constructed call that `median` is a generic and the `x` argument is `1:10`. In the following calls we remain with differing combinations. Once, only `x` and once only only `median()` gets evaluated. In the final call both aren't evaluated.
 
 1. __<span style="color:red">Q</span>__: `rlang::call_standardise()` doesn't work so well for the following calls.
     Why? What makes `mean()` special?
