@@ -53,7 +53,6 @@ df_long <- read.csv2("progress_data.csv", stringsAsFactors = FALSE,
                       header = TRUE) %>% 
   as_tibble() %>% 
   modify_at("status", factor, levels = c("open", "started", "solved")) %>% 
-  arrange(chapter, subchapter, exercise) %>% 
   tibble::rowid_to_column("id") %>% 
   separate(chapter, "nr", sep = " ", remove = FALSE, extra = "drop") %>% 
   mutate(nr = as.integer(nr), 
@@ -65,12 +64,7 @@ df_long <- read.csv2("progress_data.csv", stringsAsFactors = FALSE,
                           nr < 22 ~ "Metapr.",
                           TRUE    ~ "Techn."),
          part = factor(part, levels = c("Foundations", "FP", "OOP",
-                                        "Metapr.", "Techn."))) %>% 
-  # find most recent state for each exercise
-  group_by(chapter, subchapter, exercise) %>% 
-  filter(updated_when == max(updated_when),
-         status != "deleted") %>% 
-  ungroup()
+                                        "Metapr.", "Techn.")))
 
 # Intermediate calculations
 percent_solved <- mean(df_long$status == "solved", na.rm = TRUE) * 100
