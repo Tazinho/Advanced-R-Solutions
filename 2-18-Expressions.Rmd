@@ -348,7 +348,12 @@ library(lobstr)
 
 1. __<span style="color:red">Q</span>__: `pairwise.t.test()` assumes that `deparse()` always returns a length one character vector. Can you construct an input that violates this expectation? What happens?
 
-   __<span style="color:green">A</span>__: Old exercise. Need to copy solution over here...
+   __<span style="color:green">A</span>__: We can pass an expression to one of `pairwise.t.test()`’s data input arguments, which exceeds the default cutoff width in `deparse()`. The expression will be split into a character vector of length greater 1. The deparsed data inputs are directly pasted (read the source code!) with “and” as separator and the result is just used to be displayed in the output. Just the data.name output will change (it will include more than one “and”).
+   
+    ```{r}
+    d=1
+    pairwise.t.test(2, d+d+d+d+d+d+d+d+d+d+d+d+d+d+d+d+d)
+    ```
 
 ## Walking the AST with recursive functions {#ast-funs}
 
