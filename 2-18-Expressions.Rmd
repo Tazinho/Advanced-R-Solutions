@@ -335,7 +335,16 @@ library(lobstr)
     deparse(expr)
     ```
 
-    What does `expr_text()` do instead?
+   What does `expr_text()` do instead?
+    
+   __<span style="color:green">A</span>__: `expr_text()` pastes the results from `deparse(expr)` together with a linebreak `\n` as separator. 
+   
+    ```{r}
+    expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + 
+      m + n + o + p + q + r + s + t + u + v + w + x + y + z))
+    deparse(expr)
+    expr_text(expr)
+    ```
 
 1. __<span style="color:red">Q</span>__: `pairwise.t.test()` assumes that `deparse()` always returns a length one character vector. Can you construct an input that violates this expectation? What happens?
 
