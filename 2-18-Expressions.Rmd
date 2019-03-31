@@ -182,10 +182,10 @@ library(lobstr)
    
 1. __<span style="color:red">Q</span>__: Construct the expression `if(x > 1) "a" else "b"` using multiple calls to `call2()`. How does the structure code reflect the structure of the AST?
 
-   __<span style="color:orange">A</span>__: _TODO:_ Exercise got reformulated to use `call2()` instead of `lang()`. Similar to the prefix version we get
+   __<span style="color:green">A</span>__: Similar to the prefix version we get
     
     ```{r}
-    rlang::lang("if", rlang::expr(x > 1), "a", "b")
+    call2("if", expr(x > 1), "a", "b")
     ```
     
    When we reed the AST from left to right, we get the same structure:
