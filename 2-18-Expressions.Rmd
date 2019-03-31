@@ -146,7 +146,7 @@ library(lobstr)
     call_standardise(quote(mean(x = 1:10, , TRUE)))
     ```
     
-   __<span style="color:green">A</span>__: The reason for this unexpected behaviour lies in the fact that `mean()` uses S3 dispatch (i.e., `UseMethod`) and therefore does not store its formals on `mean()`, but rather on `mean.default()`. `rlang::call_standardise()` can do much better when the S3 dispatch is explicit.
+   __<span style="color:green">A</span>__: The reason for this unexpected behaviour lies in the fact that `mean()` uses the `...` argument and therefore can not standardise the regarding arguments. Since `mean()` uses S3 dispatch (i.e., `UseMethod`) and the underlying `mean.default()` method specifies some more arguments, `rlang::call_standardise()` can do much better when the S3 dispatch is explicit.
     
     ```{r}
     call_standardise(quote(mean.default(1:10, na.rm = TRUE)))
