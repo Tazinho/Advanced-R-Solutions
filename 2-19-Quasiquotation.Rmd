@@ -128,6 +128,8 @@ source("common.R")
 
 5. __<span style="color:red">Q</span>__: What are other differences between `exprs()` and `alist()`? Read the documentation for the named arguments of `exprs()` to find out.
 
+   __<span style="color:green">A</span>__: `exprs()` provides the additional arguments `.named` (`= FALSE`), `.ignore_empty` (`c("trailing", "none", "all")`) and `.unquote_names` (`TRUE`). `.named` allows to ensure taht all dots are named. `ignore_empty` allows to specify how empty arguments should be handled for dots (`"trailing"`) or all arguments (`"none"` and `"all"`). Further via `.unquote_names` one can specify if `:=` should be treated like `=`. `:=` can be useful as it supports unquoting (`!!`) on the left-hand-side.
+
 6. __<span style="color:red">Q</span>__: The documentation for `substitute()` says:
 
     > Substitution takes place by examining each component of the parse tree 
