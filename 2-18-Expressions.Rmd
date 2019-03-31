@@ -307,7 +307,11 @@ library(lobstr)
 1. __<span style="color:red">Q</span>__: What happens if you call `parse_expr()` with a string that generates
     multiple expressions? e.g. `parse_expr("x + 1; y + 1")`
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: `parse_expr()` notices that more than one expression would be generated and throws an error.
+   
+    ```{r}
+    parse_expr("x + 1; y + 1")
+    ```
 
 1. __<span style="color:red">Q</span>__: What happens if you attempt to parse an invalid expression? e.g. `"a +"` or `"f())"`.
 
