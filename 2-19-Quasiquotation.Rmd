@@ -225,12 +225,14 @@ source("common.R")
 1. __<span style="color:red">Q</span>__: One way to implement `exec()` is shown below. Describe how it works. What are the
     key ideas?
     
-    ```{r}
+    ```{r, eval = FALSE}
     exec <- function(f, ..., .env = caller_env()) {
       args <- list2(...)
       do.call(f, args, envir = .env)
     }
     ```
+    
+   __<span style="color:green">A</span>__: `exec()` takes a function together with its arguments and an environment as input. The idea is to construct a call from the function and its arguments and evaluate it in the supplied environment. As the `...` argument is handled via `list2()`, `exec` supports tidy dots (quasiquotation), which means that one may unquote arguments via `!!!` and names on the LHS of `:=` via `!!`.
 
 1. __<span style="color:red">Q</span>__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`.  Compare and constract the techniques they use for switching between dots and list behaviour.
 
