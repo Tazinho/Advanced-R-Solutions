@@ -120,6 +120,8 @@ library(lobstr)
 1. __<span style="color:red">Q</span>__: What happens when you subset a call object to remove the first element?
     e.g. `expr(read.csv("foo.csv", header = TRUE))[-1]`. Why?
     
+    __<span style="color:green">A</span>__: When the first element of a call object is removed, the second element moves to the first position, which is in general taken as the function to call. Therefore, we remain with the call `"food.csv"(header = TRUE)`
+    
 1. __<span style="color:red">Q</span>__: Describe the differences between the following call objects.
 
     ```{r, results = FALSE}
