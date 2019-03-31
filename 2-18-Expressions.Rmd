@@ -253,7 +253,13 @@ library(lobstr)
 
 1. __<span style="color:red">Q</span>__: Does `-2^2` yield 4 or -4? Why?
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: It yields `-4`, because `^` has higher operator precedence than `-`, which we can verify by looking at the AST:
+   
+    ```{r}
+    -2^2
+    
+    lobstr::ast(-2^2)
+    ```
 
 1. __<span style="color:red">Q</span>__: What does `!1 + !1` return? Why?
 
