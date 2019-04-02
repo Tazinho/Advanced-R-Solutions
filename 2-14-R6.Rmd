@@ -6,6 +6,8 @@ source("common.R")
 
 ## Prerequisites
 
+To solve the exercises in this chapter we need to create R6 objects with the similar named package.
+
 ```{r}
 library(R6)
 ```
@@ -17,18 +19,17 @@ library(R6)
    __<span style="color:green">A</span>__: Let's start with a very basic bank account, similar to the `Accumulator` class in the text book.
 
     ```{r}
-    BankAccount <- R6Class("BankAccount",
-                           list(
-                             balance = 0,
-                             deposit = function(dep = 0) {
-                               self$balance = self$balance + dep
-                               invisible(self)
-                             },
-                             withdraw = function(draw) {
-                               self$balance = self$balance - draw
-                               invisible(self)
-                             }
-                           ))
+    BankAccount <- R6Class("BankAccount", list(
+      balance = 0,
+      deposit = function(dep = 0) {
+        self$balance = self$balance + dep
+        invisible(self)
+      },
+      withdraw = function(draw) {
+        self$balance = self$balance - draw
+        invisible(self)
+      }
+    ))
 
     # Test
     my_account <- BankAccount$new()
@@ -45,16 +46,16 @@ library(R6)
 
     ```{r, error = TRUE}
     BankAccountStrict <- R6Class("BankAccount",
-                                 inherit = BankAccount,
-                                 public = list(
-                                   withdraw = function(draw = 0) {
-                                     if (self$balance - draw < 0) {
-                                       stop("Your `withdraw` must be smaller ",
-                                            "than your `balance`.", call. = FALSE)
-                                     }
-                                     super$withdraw(draw = draw)
-                                   }
-                                 ))
+      inherit = BankAccount,
+      public = list(
+        withdraw = function(draw = 0) {
+          if (self$balance - draw < 0) {
+            stop("Your `withdraw` must be smaller ",
+                 "than your `balance`.", call. = FALSE)
+          }
+          super$withdraw(draw = draw)
+        }
+    ))
     
     # Test
     my_strict_account <- BankAccountStrict$new()
@@ -73,15 +74,15 @@ library(R6)
 
     ```{r}
     BankAccountCharging <- R6Class("BankAccount",
-                                   inherit = BankAccount,
-                                   public = list(
-                                     withdraw = function(draw = 0) {
-                                       if (self$balance - draw < 0) {
-                                         draw = draw + 1
-                                       }
-                                       super$withdraw(draw = draw)
-                                     }
-                                   ))
+      inherit = BankAccount,
+      public = list(
+        withdraw = function(draw = 0) {
+          if (self$balance - draw < 0) {
+            draw = draw + 1
+          }
+          super$withdraw(draw = draw)
+        }
+    ))
     
     # Test
     my_charging_account <- BankAccountCharging$new()
@@ -108,28 +109,27 @@ library(R6)
    __<span style="color:green">A</span>__: To keep the class flexible, we use `cards` as the default for a similar named field, which can be specified at initialisation.
 
     ```{r}
-    ShuffledDeck <- R6Class("ShuffledDeck",
-                            public = list(
-                              cards = {
-                                suit <- c("♠", "♥", "♦", "♣")
-                                value <- c("A", 2:10, "J", "Q", "K")
-                                paste0(rep(value, 4), suit)
-                              },
-                              deck = NULL,
-                              initialize = function(deck = cards) {
-                                self$cards = deck
-                                self$deck = sample(deck)
-                              },
-                              reshuffle = function(deck = self$cards) {
-                                self$deck = sample(deck)
-                                invisible(self)
-                              },
-                              draw = function(n){
-                                output <- self$deck[seq_len(n)]
-                                self$deck <- self$deck[-seq_len(n)]
-                                output
-                              }
-                            ))
+    ShuffledDeck <- R6Class("ShuffledDeck", public = list(
+      cards = {
+        suit <- c("♠", "♥", "♦", "♣")
+        value <- c("A", 2:10, "J", "Q", "K")
+        paste0(rep(value, 4), suit)
+      },
+      deck = NULL,
+      initialize = function(deck = cards) {
+        self$cards = deck
+        self$deck = sample(deck)
+      },
+      reshuffle = function(deck = self$cards) {
+        self$deck = sample(deck)
+        invisible(self)
+      },
+      draw = function(n){
+        output <- self$deck[seq_len(n)]
+        self$deck <- self$deck[-seq_len(n)]
+        output
+      }
+    ))
 
     # Test
     my_deck <- ShuffledDeck$new()
@@ -174,14 +174,12 @@ library(R6)
    __<span style="color:green">A</span>__:
    
     ```{r}
-    TimeSetter <- R6Class("TimeSetter",
-                          public = list(
-                            get_timezone = Sys.timezone,
-                            set_timezone = function(TZ, tzdir = NULL) {
-                              stopifnot(TZ %in% as.character(OlsonNames(tzdir = tzdir)))
-                              Sys.setenv(TZ = TZ)
-                            }
-                          )
+    TimeSetter <- R6Class("TimeSetter", public = list(
+      get_timezone = Sys.timezone,
+      set_timezone = function(TZ, tzdir = NULL) {
+        stopifnot(TZ %in% as.character(OlsonNames(tzdir = tzdir)))
+        Sys.setenv(TZ = TZ)
+      })
     )
                       
     # Test
@@ -198,11 +196,10 @@ library(R6)
    __<span style="color:green">A</span>__: This `WDManager` class is quite minimal, but should be easy to extend:
 
     ```{r}
-    WDManager <- R6Class("WDManager", 
-                         list(
-                           get = getwd,
-                           set = setwd
-                         ))
+    WDManager <- R6Class("WDManager", list(
+      get = getwd,
+      set = setwd
+    ))
     ```
 
 6. __<span style="color:red">Q</span>__: Why can't you model the time zone or current working directory with an S3 class?
