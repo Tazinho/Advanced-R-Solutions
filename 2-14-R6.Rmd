@@ -178,7 +178,7 @@ library(R6)
 
 4. __<span style="color:red">Q</span>__: Create an R6 class that allows you to get and set the current timezone. You can access the current timezone with `Sys.timezone()` and set it with `Sys.setenv(TZ = "newtimezone")`. When setting the time zone, make sure the new time zone is in the list provided by `OlsonNames()`.
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: To create an R6 class that allows us to get and set the timezone, we provide the regarding functions as public methods to the R6 class.
    
     ```{r}
     TimeSetter <- R6Class("TimeSetter", public = list(
@@ -188,8 +188,11 @@ library(R6)
         Sys.setenv(TZ = TZ)
       })
     )
+    ```
+    
+   Now let us create one instance of this class and test, if we can can set and get the timezone as we prefer.
                       
-    # Test
+    ```{r}
     time_setter <- TimeSetter$new()
     
     (old_tz <- time_setter$get_timezone())
