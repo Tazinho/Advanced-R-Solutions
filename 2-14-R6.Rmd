@@ -30,21 +30,23 @@ library(R6)
         invisible(self)
       }
     ))
-
-    # Test
+    ```
+    
+   To test this class we create one instance and leave it with a negative balance
+   
+    ```{r}
     my_account <- BankAccount$new()
     my_account$balance
 
     my_account$
       deposit(5)$
-      withdraw(2)$
-      deposit(7)$
+      withdraw(15)$
       balance
     ```
 
-   Now, lets make a more strict bank account and add errors, that prevent a negative balance.
+   Now, we create the first subclass that prevents us from going into overdraft and throws an error in case we attempt to withdraw more than our current balance.
 
-    ```{r, error = TRUE}
+    ```{r}
     BankAccountStrict <- R6Class("BankAccount",
       inherit = BankAccount,
       public = list(
@@ -56,21 +58,22 @@ library(R6)
           super$withdraw(draw = draw)
         }
     ))
+    ```
     
-    # Test
+   This time our test should throw an error
+   
+    ```{r, error = TRUE}
     my_strict_account <- BankAccountStrict$new()
     my_strict_account$balance
     
     my_strict_account$
       deposit(5)$
-      withdraw(2)$
-      deposit(7)$
-      withdraw(11)
+      withdraw(15)
 
     my_strict_account$balance
     ```
 
-   Finally, we creat a class that charges a constant fee for each withdraw which leaves the account with a negative balance.
+   Finally, we creat a class that charges a constant fee (of 1) for each withdraw which leaves the account with a negative balance.
 
     ```{r}
     BankAccountCharging <- R6Class("BankAccount",
@@ -83,18 +86,19 @@ library(R6)
           super$withdraw(draw = draw)
         }
     ))
+    ```
     
-    # Test
+   And provide a regarding test, which should result in -12, since we pay the fee two twice:
+    
+    ```{r}
     my_charging_account <- BankAccountCharging$new()
     my_charging_account$balance
     
     my_charging_account$
       deposit(5)$
-      withdraw(2)$
-      deposit(7)$
-      withdraw(11)$
-      withdraw(1)
-    
+      withdraw(15)$
+      withdraw(0)
+      
     my_charging_account$balance
     ```
 
