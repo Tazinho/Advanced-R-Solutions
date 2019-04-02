@@ -73,7 +73,7 @@ library(R6)
     my_strict_account$balance
     ```
 
-   Finally, we creat a class that charges a constant fee (of 1) for each withdraw which leaves the account with a negative balance.
+   Finally, we create a class that charges a constant fee (of 1) for each withdraw which leaves the account with a negative balance.
 
     ```{r}
     BankAccountCharging <- R6Class("BankAccount",
@@ -110,7 +110,7 @@ library(R6)
     cards <- paste0(rep(value, 4), suit)
     ```
 
-   __<span style="color:green">A</span>__: To keep the class flexible, we use `cards` as the default for a similar named field, which can be specified at initialisation.
+   __<span style="color:green">A</span>__: To keep the class flexible, we allow to specify any `deck` of cards at initialisation with the `cards` deck from the exercise text as the default value.
 
     ```{r}
     ShuffledDeck <- R6Class("ShuffledDeck", public = list(
@@ -120,7 +120,7 @@ library(R6)
         paste0(rep(value, 4), suit)
       },
       deck = NULL,
-      initialize = function(deck = cards) {
+      initialize = function(deck = self$cards) {
         self$cards = deck
         self$deck = sample(deck)
       },
@@ -134,13 +134,16 @@ library(R6)
         output
       }
     ))
+    ```
+    
+   To test this class we initialise one instance, draw 20 cards and reshuffle the deck. 
 
-    # Test
+    ```{r}
     my_deck <- ShuffledDeck$new()
     my_deck$draw(20)
-    my_deck$deck
-    my_deck$reshuffle()
-    my_deck$deck
+    my_deck$
+      reshuffle()$
+      deck
     ```
 
 3. __<span style="color:red">Q</span>__: Why can't you model a bank account or a deck of cards with an S3 class?
