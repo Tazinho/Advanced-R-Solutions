@@ -261,7 +261,7 @@ library(R6)
 
 2. __<span style="color:red">Q</span>__: Create a class with a write-only `$password` field. It should have `$check_password(password)` method that returns `TRUE` or `FALSE`, but there should be no way to view the complete password.
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: To protect the password from changes and direct access, the password will be a private field. Further, our `PWClass` will get it's own print method, which hides the password.
    
     ```{r}
     PWClass <- R6Class(
@@ -280,7 +280,11 @@ library(R6)
       ),
       private = list(password = NULL)
     )
+    ```
+    
+   Let's create one instance of our new class and confirm that the password is neither accessible nor visible.
 
+    ```{r, error = TRUE}
     my_pw <- PWClass$new()
     my_pw$set_password(123)
     my_pw$password
