@@ -224,7 +224,7 @@ library(R6)
 
 1. __<span style="color:red">Q</span>__: Create a bank account class that prevents you from directly setting the account balance, but you can still withdraw from and deposit to. Throw an error if you attempt to go into overdraft.
     
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: To fulfill this requirement, we make balance a private field. The use has to use the `deposit()` and `withdraw()` methods which will still have access to the balance field. 
    
     ```{r, error = TRUE}
     BankAccountStrict2 <- R6Class(
@@ -246,14 +246,17 @@ library(R6)
       ),
       private = list(balance = 0)
     )
+    ```
+    
+   To test our new class, we create an instance and try to go into overdraft.
 
-    # Test
+    ```{r, error = TRUE}
     my_account_strict_2 <- BankAccountStrict2$new()
-    my_account_strict_2$balance
 
     my_account_strict_2$deposit(5)
-    my_account_strict_2$withdraw(5)
-    my_account_strict_2$withdraw(1)
+    my_account_strict_2$withdraw(10)
+    
+    my_account_strict_2$balance
     ```
 
 2. __<span style="color:red">Q</span>__: Create a class with a write-only `$password` field. It should have `$check_password(password)` method that returns `TRUE` or `FALSE`, but there should be no way to view the complete password.
