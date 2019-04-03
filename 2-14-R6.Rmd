@@ -327,7 +327,7 @@ library(R6)
 
 4. __<span style="color:red">Q</span>__: Can subclasses access private fields/methods from their parent? Perform an experiment to find out.
 
-   __<span style="color:green">A</span>__: Our experiment shows that only methods can be accessed by the subclass
+   __<span style="color:green">A</span>__: To find out if private fields/classes can be accessed from subclasses, we first create a class `A` with a private field `foo` and a privte method `bar`. Afterwards, an instance of a subclass `B` and call the `foobar()` methods, which tries to access the `foo` field and the `bar()` method from its superclass `A`.
 
     ```{r}
     A <- R6Class(
@@ -354,6 +354,8 @@ library(R6)
     x <- B$new()
     x$foobar()
     ```
+    
+   We conclude, that subclasses can access private fields from their superclasses, but not private methods.
 
 ## Reference semantics
 1. __<span style="color:red">Q</span>__: Create a class that allows you to write a line to a specified file.  You should open a connection to the file in `$initialize()`, append a line using `cat()` in `$append_line()`, and close the connection in `$finalize()`.
