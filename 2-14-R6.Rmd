@@ -360,7 +360,7 @@ library(R6)
 ## Reference semantics
 1. __<span style="color:red">Q</span>__: Create a class that allows you to write a line to a specified file. You should open a connection to the file in `$initialize()`, append a line using `cat()` in `$append_line()`, and close the connection in `$finalize()`.
 
-   __<span style="color:green">A</span>__: (TODO: create a temporary file below and prove that this is working... also explain what `open = "a"` does (found it on https://stackoverflow.com/questions/17710469/why-wont-cat-append-to-a-file-connection) and explain that `cat` usually appends for files but not with connections (except `open = "a"`...). Afterwards set eval to TRUE in the code chunk.)
+   __<span style="color:green">A</span>__: Our `FileWriter` class will create a connection to a file at initialization. Therefore, we open a connection to a user specified file during the initialisation. Note that we need to set `open = "a"` in `file()` to open connection for appeding text. Otherwise `cat` would only work when applied to files, but not with connctions as explicitly asked for in the exercise. Further, we add the `append_line()` method and a `close()` statement as finalizer.
 
     ```{r, eval = TRUE, error = TRUE}
     FileWriter <- R6::R6Class(
@@ -378,15 +378,10 @@ library(R6)
         }
       )
     )
-                          
-    my_fw <- FileWriter$new("test.txt")
-    my_fw$append_line()
-    rm(my_fw)
-    my_fw$con
     ```
     
-    Additional test
-    
+   Let's see, if new instances of our class work as expected.
+                          
     ```{r}
     tmp_file <- tempfile(pattern = "test", tmpdir = tempdir(), fileext = ".txt")
     my_fw <- FileWriter$new(tmp_file)
