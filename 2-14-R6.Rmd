@@ -358,11 +358,11 @@ library(R6)
    We conclude, that subclasses can access private fields from their superclasses, but not private methods.
 
 ## Reference semantics
-1. __<span style="color:red">Q</span>__: Create a class that allows you to write a line to a specified file.  You should open a connection to the file in `$initialize()`, append a line using `cat()` in `$append_line()`, and close the connection in `$finalize()`.
+1. __<span style="color:red">Q</span>__: Create a class that allows you to write a line to a specified file. You should open a connection to the file in `$initialize()`, append a line using `cat()` in `$append_line()`, and close the connection in `$finalize()`.
 
    __<span style="color:green">A</span>__: (TODO: create a temporary file below and prove that this is working... also explain what `open = "a"` does (found it on https://stackoverflow.com/questions/17710469/why-wont-cat-append-to-a-file-connection) and explain that `cat` usually appends for files but not with connections (except `open = "a"`...). Afterwards set eval to TRUE in the code chunk.)
 
-    ```{r, eval = FALSE}
+    ```{r, eval = TRUE, error = TRUE}
     FileWriter <- R6::R6Class(
       "FileWriter",
       list(
@@ -385,3 +385,14 @@ library(R6)
     my_fw$con
     ```
     
+    Additional test
+    
+    ```{r}
+    tmp_file <- tempfile(pattern = "test", tmpdir = tempdir(), fileext = ".txt")
+    my_fw <- FileWriter$new(tmp_file)
+    
+    readLines(tmp_file)
+    my_fw$append_line()
+    my_fw$append_line()
+    readLines(tmp_file)
+    ```
