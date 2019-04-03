@@ -17,20 +17,23 @@ library(lubridate)
 
 1. __<span style="color:red">Q</span>__: `lubridate::period()` returns an S4 class. What slots does it have? What class is each slot? What accessors does it provide?
     
-   __<span style="color:green">A</span>__: Objects of the S4 `Period` class have the six slots `.Data`, `year`, `month`, `day`, `hour` and `minute`, which are each of type double. Except for `.Data` all fields have similar named accessors. `.Data` can be accessed via `methods::gedDataPart()`. For a short example, see the following code:
+   __<span style="color:green">A</span>__: Objects of the S4 `Period` class have the six slots `.Data`, `year`, `month`, `day`, `hour` and `minute`, which are each of type double. Except for `.Data` all fields have similar named accessors. `.Data` can be accessed via `methods::gedDataPart()`. As a short example, we create a period of 1 second, 2 minutes, 3 hours, 4 days and 1 week.
    
     ```{r}
-    bla <- period(c(3, 1, 2, 13, 1), 
+    example12345 <- period(c(1, 2, 3, 4, 5), 
               c("second", "minute", "hour", "day", "week"))
+    ```
     
-    str(bla)
+   This should add up to a period of 39 days, 3 hours, 2 minutes and 1 second.
+   
+    ```{r}
+    example12345
+    ```
     
-    year(bla)
-    month(bla)
-    day(bla)
-    hour(bla)
-    minute(bla)
-    getDataPart(bla)
+   When we inspect our `example12345`, we can see the fields and conclude that the seconds are stored in the `.Data` field.
+   
+    ```{r}
+    str(example12345)
     ```
 
 2. __<span style="color:red">Q</span>__: What other ways can you find help for a method? Read `?"?"` and summarise the details.
