@@ -292,7 +292,7 @@ library(R6)
 
 3. __<span style="color:red">Q</span>__: Extend the `Rando` class with another active binding that allows you to access the previous random value. Ensure that active binding is the only way to access the value.
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: To access the previous random value from an instance, we add a private `last_random` field to our class, and we modify the `random()` method to write to this field whenever it is called. To access the `last_random` field we provide a `prvious_random` method.
    
     ```{r}
     Rando <- R6::R6Class(
@@ -314,7 +314,11 @@ library(R6)
         }
       )
     )
+    ```
     
+   Now, we initiate a new `Rando` object and see, if it behaves as expected.
+    
+    ```
     x <- Rando$new()
     x$random
     x$random
