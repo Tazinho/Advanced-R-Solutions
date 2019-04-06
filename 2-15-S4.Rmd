@@ -50,9 +50,10 @@ library(lubridate)
 
 1. __<span style="color:red">Q</span>__: Extend the Person class with fields to match `utils::person()`. Think about what slots you will need, what class each slot should have, and what you’ll need to check in your validity method.
     
-   __<span style="color:green">A</span>__: From `?utils::person` we can find out that the following slots are needed `given`, `family`, `role`, `email`, `comment`. All these slots must be of type character. The entries in the `role` slot must match one of the following abbreviations "aut", "com", "cph", "cre", "ctb", "ctr", "dtc", "fnd", "rev", "ths", "trl". Therefore, we include these slots in our new definition of the `Person` class. As `role` might be of different length than the other slots, we include the constraint that these slots must be of length one to the validator.
+   __<span style="color:green">A</span>__: The Person class from the textbook contains the slots `name` and `age`. The person class from the utils package contains the slots `given`, `family`, `role`, `email` and `comment`. All these slots must be of type character. Further, the entries in the `role` slot must match one of the following abbreviations "aut", "com", "cph", "cre", "ctb", "ctr", "dtc", "fnd", "rev", "ths", "trl". Therefore, we include all these slots in our new definition of the `Person` class. As `role` might be of different length than the other slots, we include the constraint that all slots must be of length one to the validator.
    
     ```{r}
+    # Definition of the Person class
     setClass("Person", 
          slots = c(
            name = "character", 
@@ -74,6 +75,7 @@ library(lubridate)
          )
     )
     
+    # Helper to create instances of the Person class
     Person <- function(name, age = NA, 
                    given = NA_character_,
                    family = NA_character_,
@@ -88,6 +90,7 @@ library(lubridate)
       comment = comment)
     }
 
+    # Validator to ensure that each slot is of length one
     setValidity("Person", function(object) {
       if (length(object@name)    != 1 |
           length(object@age)     != 1 |
