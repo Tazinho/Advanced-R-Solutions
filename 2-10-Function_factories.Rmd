@@ -269,7 +269,18 @@ source("common.R")
    (d) `f(z)`.
    (e) It depends.
 
-   __<span style="color:green">A</span>__: e: It depends ;-). Typically (b) (`f(x$z)`) is equivalent. However, if `x` is bound in the current environment, also d (`f(z)`) is equivalent.
+   __<span style="color:green">A</span>__: (e) "It depends" is the correct answer. Usually `with()` is used with a data frame, so you'd usually expect (b), but if `x` is a list, it could be any of the options.
+
+    ```{r}   
+    f <- mean
+    z <- 1
+    x <- list(f = mean, z = 1)
+
+    identical(with(x, f(z)), x$f(x$z))
+    identical(with(x, f(z)), f(x$z))
+    identical(with(x, f(z)), x$f(z))
+    identical(with(x, f(z)), f(z))
+    ```
 
 2. __<span style="color:red">Q</span>__: Compare and contrast the effects of `env_bind()` vs. `attach()` for the following code.
    

@@ -1,20 +1,13 @@
-\mainmatter
-
 ```{r, include=FALSE}
 source("common.R")
 ```
-
-# Introduction
-
-# (PART) Foundations {-} 
 
 # Names and values
 ## Prerequisites {-}
 
 We use the development version of lobstr to answer questions regarding the internal representation of R objects.
 
-```{r}
-# devtools::install_github("r-lib/lobstr")
+```{r setup}
 library(lobstr) 
 ```
 
@@ -59,8 +52,10 @@ library(lobstr)
     ```
     
 3. __<span style="color:red">Q</span>__: By default, base R data import functions, like `read.csv()`, will automatically convert non-syntactic names to syntactic names. Why might this be problematic? What option allows you to suppress this behaviour?
-    
+
    __<span style="color:green">A</span>__: When automatic and implicit (name) conversion occurs, the prediction of a scripts output will be more difficult. For example when R is used non-interactively and some data is read, transformed and written, then the output may not contain the same names as the original data source. This behaviour may introduce problems in downstream analysis. To avoid automatic name conversion set `check.names=FALSE`.
+   
+   <!-- I think the key point is that column names are often data, and the make.names() transformation is non-invertible, so the default behaviour corrupts data -->
     
 4. __<span style="color:red">Q</span>__: What rules does `make.names()` use to convert non-syntactic names into syntactic names?
     
@@ -82,7 +77,7 @@ library(lobstr)
       make.names("non-valid")  # . replacement
       ```
     
-   - reserved R keywords (see `?reserved`) are appended by a dot
+   - reserved R keywords (see `?reserved`) are suffixed by a dot
     
       ```{r}
       make.names("if")
@@ -94,7 +89,7 @@ library(lobstr)
 
 5. __<span style="color:red">Q</span>__: I slightly simplified the rules that govern syntactic names. Why is `.123e1` not a syntactic name? Read `?make.names` for the full details.
     
-   __<span style="color:green">A</span>__: `.123e1` is not a syntactic name, because it starts with one dot which is followed by a number.
+   __<span style="color:green">A</span>__: `.123e1` is not a syntactic name, because it starts with one dot which is followed by a number. This makes it a double, `1.23`.
 
 ## Copy-on-modify
 
@@ -104,7 +99,7 @@ library(lobstr)
    When `1:10` is called an object with an address in memory is created, but it is not bound to a name. Therefore the object cannot be called or manipulated from R. As no copies will be made, it is not useful to track the object for copying.
    
     ```{r}
-    obj_addr(1:10)  # the object exists, but no copy will be made
+    obj_addr(1:10)  # the object exists, but has no name
     ```
    
 2. __<span style="color:red">Q</span>__: Explain why `tracemem()` shows two copies when you run this code. Hint: carefully look at the difference between this code and the code show earlier in the section.
@@ -116,7 +111,7 @@ library(lobstr)
     x[[3]] <- 4
     ```
     
-   __<span style="color:green">A</span>__: Initially the vector `x` has integer type. The replacement call assigns a double to the third element of `x`, which triggers copy-on-modify. Because of R's coercion rules, a type conversion occurs, which affects the vector as a whole and leads to an additional copy.
+   __<span style="color:green">A</span>__: Initially the vector `x` has integer type. The replacement call assigns a double to the third element of `x`, which triggers copy-on-modify.
 
     ```{r, eval=FALSE}
     # two copies
@@ -126,10 +121,11 @@ library(lobstr)
     
     x[[3]] <- 4
     #> tracemem[0x55eec7b3af38 -> 0x55eec774cc18]: 
-    #> tracemem[0x55eec774cc18 -> 0x55eeca6ed5a8]: 
     ```
     
-   By assigning an integer instead of a double one copy (the one related to coercion) may be avoided:
+    <!-- I only see one copy when I run this in the console. Are you sure you didn't run inside RStudio?  -->
+    
+   We can avoid the copy by sub-assigning an integer instead of a double:
     
     ```{r, eval=FALSE}
     # the same as 
@@ -139,8 +135,6 @@ library(lobstr)
     
     x[[3]] <- 4L
     #> tracemem[0x55eec7021e10 -> 0x55eecb99e788]: 
-    x <- as.double(x)
-    #> tracemem[0x55eecb99e788 -> 0x55eec93d9c18]:
     ```
 
    <!-- code-chunks above were hard-coded to fix knitr output. -->
@@ -154,6 +148,8 @@ library(lobstr)
     ```
     
    __<span style="color:green">A</span>__: `a` contains a reference to an address with the value `1:10`. `b` contains a list of two references to the same address as `a`. `c` contains a list of `b` (containing two references to `a`), `a` (containing the same reference again) and a reference pointing to a different address containing the same value (`1:10`).
+   
+   <!-- could you insert an actual drawing here? -->
 
     ```{r, eval = FALSE}
     ref(c)
@@ -165,13 +161,14 @@ library(lobstr)
     #> └─[4:0x55eec7aa6968] <int>     # - 1:10
     ```
 
-
 4. __<span style="color:red">Q</span>__: What happens when you run this code:
 
     ```{r}
     x <- list(1:10)
     x[[2]] <- x
     ```
+    
+    <!-- I think I actually meant to say `x[[2]] <- x[[1]]` to make the problem slightly less complicated -->
     
    Draw a picture.
 
@@ -207,9 +204,11 @@ library(lobstr)
     ```
 
     ```{r, echo = FALSE}
-    Sys.sleep(0.1)
     knitr::include_graphics("images/copy_on_modify_fig2.png")
     ```
+    
+    <!-- The image size doesn't look right -->    
+    <!-- The arrow pointing to 0x558 is pointing upwards instead of leftwards -->
 
 ## Object size
 
@@ -231,29 +230,42 @@ library(lobstr)
     # obj_size(x)
     #> 16,928 B
     ```
-    __<span style="color:green">A</span>__: It is somewhat misleading, because all three functions are built-in to R as part of the base and stats packages and hence always loaded. 
+    __<span style="color:green">A</span>__: It is somewhat misleading, because all three functions are built-in to R as part of the base and stats packages and hence always available. 
     
-   From the following calculations we can see that this applies to about `r base_env_names <- c("package:stats", "package:graphics", "package:grDevices", "package:utils", "package:datasets", "package:methods", "Autoloads", "package:base"); base_env_list <- sapply(base_env_names, function(x) mget(ls(x, all = TRUE), as.environment(x))); sum(lengths(base_env_list))` objects which are usually loaded by default and take up about `r round(sum(sapply(base_env_list, lobstr::obj_size)) / 1024^2, 2)` MB of memory.
+   From the following calculations we can see that this applies to about 2400 objects usually loaded by default.
+   
+   <!-- I couldn't get the forward reference here to work. I think you'd be better off rewriting the code block to be more self-explanatory -->
+  
+   <!-- Can you please the tidyverse style guide? -->
   
     ```{r}
-    base_env_names <- c("package:stats", "package:graphics", "package:grDevices",
-                        "package:utils", "package:datasets", "package:methods"  ,
-                        "Autoloads"    , "package:base")
+    base_pkgs <- c(
+      "package:stats", "package:graphics", "package:grDevices",
+      "package:utils", "package:datasets", "package:methods",
+      "package:base"
+    )
+    base_envs <- lapply(base_pkgs, as.environment)
+    names(base_envs) <- base_pkgs
+    base_objs <- lapply(base_envs, function(x) mget(ls(x), x))
+
+    sum(lengths(base_objs))
     
-    base_env_list <- sapply(base_env_names, 
-                            function(x) mget(ls(x, all = TRUE), as.environment(x)))
+    # Show sizes in MB
+    base_sizes <- vapply(base_objs, obj_size, double(1)) / 1024^2
     
-    sum(lengths(base_env_list))
+    base_sizes
+    sum(base_sizes)
     
-    sapply(base_env_list, lobstr::obj_size)
-    round(sum(sapply(base_env_list, lobstr::obj_size)) / 1024^2, 2)
+    # Check if we've over-counted
+    as.numeric(obj_size(!!!base_objs)) / 1024^2
     ```
-  
+
 3. __<span style="color:red">Q</span>__: Predict the output of the following code:
 
     ```{r, eval = FALSE}
     x <- runif(1e6)
     obj_size(x)
+    #> 8,000,048 B
     
     y <- list(x, x)
     obj_size(y)
@@ -268,28 +280,33 @@ library(lobstr)
     obj_size(x, y)
     ```
     
-   __<span style="color:green">A</span>__: To predict the object size of `x` let's first find out how much memory an empty double occupies and how the size grows with the length of the vector.
-   
-    ```{r}
-    # memory needed for a 0-length double
-    obj_size(double(0))
+    <!-- I think I accidentally made this too hard too - the important thing is the size of y, not of x -->
     
-    # additional memory per element
-    diff(sapply(0:32, function(x) obj_size(double(x))))
-    ```
-    
-   We see that R requires 48 bytes for a double of length 0. Generally each additional element in a vector requires 8 additional bytes of memory. But for some small vectors R preallocates a little more memory than needed, which improves performance. Here is Hadley´s explanation from the first edition of Advanced R:
-   
-   > ... why does the memory size grow irregularly? To understand why, you need to know a little bit about how R requests memory from the operating system. Requesting memory (with malloc()) is a relatively expensive operation. Having to request memory every time a small vector is created would slow R down considerably. Instead, R asks for a big block of memory and then manages that block itself. This block is called the small vector pool and is used for vectors less than 128 bytes long. For efficiency and simplicity, it only allocates vectors that are 8, 16, 32, 48, 64, or 128 bytes long. ... Beyond 128 bytes, it no longer makes sense for R to manage vectors. After all, allocating big chunks of memory is something that operating systems are very good at. Beyond 128 bytes, R will ask for memory in multiples of 8 bytes. This ensures good alignment.
-   
-   However, to estimate `obj_size(x)` we just calculate _48 B + 1000000 * 8 B = 8000048 B_ (about 8 MB), which proves correct:
-   
+   __<span style="color:green">A</span>__: In R (on most platforms) a length-0
+  vector has 48 bytes of overhead:
+
     ```{r}
-    x <- runif(1e6)
-    obj_size(x)
+    obj_size(list())
+    obj_size(double())
+    obj_size(character())
     ```
    
-   In `y <- list(x, x)` both list elements of `y` contain references to the same memory address, so no additional memory is required for the second list element. The list itsself requires 64 bytes, 48 byte for an empty list and 8 byte for each element (`obj_size(vector("list", 2))`). This let's us predict 8000048 B + 64 B = 8000112 B:
+   A single double takes up an additional 8 bytes of memory:
+   
+    ```{r}
+    obj_size(double(1))
+    obj_size(double(2))
+    ```
+   
+   So 1 million double should take up 8,000,048 bytes: 
+
+    ```{r}
+    obj_size(double(1e6))
+    ```
+    
+    (If you look carefully at the amount of memory occupied by short vectors, you'll notice that the pattern is actually more complicated. This is to do with how R allocates memory, and is not that important. If you want to know the full details, they're discussed in the 1st edition of Advanced R: http://adv-r.had.co.nz/memory.html#object-size)
+
+   In `y <- list(x, x)` both list elements of `y` contain references to the same memory address, so no additional memory is required for the second list element. The list itself requires 64 bytes, 48 byte for an empty list and 8 byte for each element (`obj_size(vector("list", 2))`). This let's us predict 8000048 B + 64 B = 8000112 B:
    
     ```{r}
     y <- list(x, x) 
@@ -300,6 +317,7 @@ library(lobstr)
    
     ```{r}
     obj_size(x, y) 
+    ref(x, y)
     ```
     
    When we modify the first element of `y[[1]]` copy-on-modify occurs and the object will have the same size (8000040 bytes) and a new address in memory. So `y`'s elements don't share references anymore. Because of this their object sizes add up to the sum of of the two different vectors and the length-2 list: 8000048 B + 8000048 B + 64 B = 16000160 B (16 MB).
@@ -309,22 +327,24 @@ library(lobstr)
     obj_size(y) 
     ```
     
-   The second element of `y` still references to the same address as `x` and therefore the amount of memory used for both `x` and `y` doesn´t increase:
+   The second element of `y` still references to the same address as `x`, so the combined size of `x` and `y` is the same as `y`:
    
     ```{r}
     obj_size(x, y) 
+    ref(x, y)
     ```
     
-   When we modify the second element of `y`, this element will also point to a new memory address. This doesn´t affect the memory size of the list:
+   When we modify the second element of `y`, this element will also point to a new memory address. This doesn´t affect the size of the list:
    
     ```{r}
     y[[2]][[1]] <- 10
     obj_size(y) 
     ```
    
-   However, as `y` doesn't share references with `x` anymore, the memory usage of the objects now adds up:
-     
+   However, as `y` doesn't share references with `x` anymore, the memory usage of the combined objects increases:
+   
     ```{r}
+    ref(x, y)
     obj_size(x, y) 
     ```
 
@@ -338,6 +358,8 @@ library(lobstr)
     ```
     
    __<span style="color:orange">A</span>__: In this situation Copy-on-modify prevents the creation of a circular list. Let's step through the details as follows:
+   
+   <!-- can't use tracemem with knitr -->
    
     ```{r}
     x <- list()      # creates initial object
@@ -366,8 +388,16 @@ library(lobstr)
       }
       x
     }
+    
+    subtract_medians_l <- function(x, medians){
+      x <- as.list(x)
+      x <- subtract_medians(x, medians)
+      as.data.frame(x)
+    }
     ```
 
+    <!-- Need to update text and code to use subtract_medians_2 -->
+  
    We can then profile the performance, by benchmarking `subtact_medians()` on data frame- and list-input for a specified number of columns. The functions should both input and output a data frame, so one is going to do a bit more work.
 
     ```{r}
@@ -401,9 +431,9 @@ library(lobstr)
     knitr::include_graphics("images/median_benchmark.png")
     ```
 
-   The execution times for median subtraction on data frames columns increase exponentially with the number of columns in the input data. This is because, the data frame will be copied more often and the copy will also be bigger. For subtraction on list elements the execution time increases only linearly.
+   When working directly with the data frame, the execution time grows quadratically with the number of columns in the input data. This is because (e.g.) the first column must be copied `n` times, the second column `n-1` times, and so on. When working with a list, the execution time increases only linearly.
    
-   For list input with less than ~ 800 columns, the cost of the additional data structure conversion is relatively big. For very wide data frames the overhead of the additional copies slows down the computation considerably. Apparently the choice of the faster function depends on the size of the data also.
+   Obviously in the long run, linear growth creates shorter run-times, but there is some cost to this strategy - we have to convert between data structures with `as.list()` and `as.data.frame()`. This means that the improved approach doesn't pay off until we get to a data frame that's ~800 columns wide.
 
 3. __<span style="color:red">Q</span>__: What happens if you attempt to use `tracemem()` on an environment?
 
