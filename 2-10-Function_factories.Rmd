@@ -269,20 +269,16 @@ source("common.R")
    (d) `f(z)`.
    (e) It depends.
 
-   __<span style="color:green">A</span>__: (e) "It depends" is the correct answer. Usually `with()` is used with a data frame, so you'd usually expect (b), but if it's a list, it could be any of the options.
+   __<span style="color:green">A</span>__: (e) "It depends" is the correct answer. Usually `with()` is used with a data frame, so you'd usually expect (b), but if `x` is a list, it could be any of the options.
 
     ```{r}   
     f <- mean
     z <- 1
     x <- list(f = mean, z = 1)
 
-    # (a)
     identical(with(x, f(z)), x$f(x$z))
-    # (b)
     identical(with(x, f(z)), f(x$z))
-    # (c)
     identical(with(x, f(z)), x$f(z))
-    # (d)
     identical(with(x, f(z)), f(z))
     ```
 
