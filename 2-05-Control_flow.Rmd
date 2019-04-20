@@ -16,9 +16,15 @@ source("common.R")
 
    Read the documentation and write down the rules in your own words.
 
-   __<span style="color:green">A</span>__: The arguments of `ifelse()` are `test`, `yes` and `no`. `ifelse()` operates elementwise, so when `yes` or `no` are shorter than `test`, they will be recycled. (When they are longer than `test`, their additional elements will be ignored.)
+   __<span style="color:green">A</span>__: The arguments of `ifelse()` are `test`, `yes` and `no`. `ifelse()` is vectorised, so when `yes` or `no` are shorter than `test`, they will be recycled. (When they are longer than `test`, their additional elements will be ignored.)
    
-   The function returns the entry for `yes` (when `test` is `TRUE`), `no` (when `test` is `FALSE`) or `NA` (when `test` is `NA`). The final object is coerced according to usual coercion rules with attributes (including the class) being stripped. Therefore, the expressions above return vectors of type `double`, `character` and `logical`.
+   The documentation says:
+   
+   > A vector of the same length and attributes (including dimensions and "class") as test and data values from the values of yes or no. The mode of the answer will be coerced from logical to accommodate first any values taken from yes and then any values taken from no.
+
+   This surprising because it uses the type of `test` ... 
+   
+   The function returns the entry for `yes` when `test` is `TRUE`, `no` when `test` is `FALSE` or `NA` when `test` is `NA`. Therefore, the expressions above return vectors of type `double`, `character` and `logical`.
 
 2. __<span style="color:red">Q</span>__: Why does the following code work?
 
@@ -30,7 +36,7 @@ source("common.R")
     if (length(x)) "not empty" else "empty"
     ```
 
-   __<span style="color:green">A</span>__: `if()` expects a logical condition. Objects of other types are coerced to logical if possible. `0` is coerced to `FALSE` while other numeric input is coerced to `TRUE`. Numeric input which is not logically interpretable by `if()`, like `NaN`, `NA_integer` and `NA_real`, will lead to an error.
+   __<span style="color:green">A</span>__: `if()` expects a logical condition, but also accepts a numeric vector where `0` is treated as `FALSE` and all other numbers are treated as `TRUE`. Numeric missing values (including `NaN`) lead to an error in the same way that a logical missing, `NA`, does.
 
 ## Loops
 
@@ -45,11 +51,11 @@ source("common.R")
     out
     ```
 
-   __<span style="color:green">A</span>__: The vector we are iterating over are of length 0. Our loop goes from `i = 1` to `i = 0`. As we use `[<-` and `[` for indexing, we need to be aware of their subsetting behaviour for out-of-bounds and zero indices.
+   __<span style="color:green">A</span>__: The vector we are iterating over are of length 0. Our loop goes from `i = 1` to `i = 0` because `:` counts down, as well as up. As we use `[<-` and `[` for indexing, we need to be aware of their subsetting behaviour for out-of-bounds and zero indices.
    
    During the first iteration `x[1]` will generate an `NA` (out-of-bounds indexing for atomics). The resulting `NA` (from squaring) will be assigned to the empty length-1 list `out[1]` (out-of-bounds indexing for lists).
    
-   In the next iteration, `x[0]` will return `numeric(0)` (zero indexing for atomics). Again squaring doesn't change the value and `numeric(0)` is assigned to `out[0]` (zero indexing for lists). Please be aware, that `out` doesn't change during the last iteration.
+   In the next iteration, `x[0]` will return `numeric(0)` (zero indexing for atomics). Again squaring doesn't change the value and `numeric(0)` is assigned to `out[0]` (zero indexing for lists). Assigning a 0-length vector to a 0-length subset works, but doesn't change anything.
    
    Overall the code works, because each step includes valid R operations. (Though it may have been very helpful to warn the user about the unusual inputs to this loop.)
 
@@ -63,7 +69,7 @@ source("common.R")
     xs
     ```
 
-   __<span style="color:green">A</span>__: In this loop `x` takes on the values of the initial `xs` (`1`, `2` and `3`), which evaluated just once in the beginning of the loop.
+   __<span style="color:green">A</span>__: In this loop `x` takes on the values of the initial `xs` (`1`, `2` and `3`), indicating that it is evaluated just once in the beginning of the loop, not after each iteration.
 
 3. __<span style="color:red">Q</span>__: What does the following code tell you about when the index is updated?
 
