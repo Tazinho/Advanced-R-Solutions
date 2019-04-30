@@ -8,11 +8,17 @@ source("common.R")
 
 1. __<span style="color:red">Q</span>__: Given a name, like `"mean"`, `match.fun()` lets you find a function. Given a function, can you find its name? Why doesn't that make sense in R?  
 
-   __<span style="color:orange">A</span>__: If you know `body()`, `formals()` and `environment()` it is generally possible to find the corresponding function. (The search doesn't work for primitive functions, because they return `NULL` for these three properties and they are not bound to a name.) The search may also be ambiguous, because different names in an environment may contain bindings to more than one function with the same `body()`, `formals()` and `environment()` properties.
-
-   Keep in mind: A (function) name has to be bound to an object, but an object (i.e. a function) doesn't always have a name. <!-- @hb: look this up again -->
-   Also: You "can only find the parents of an environment, not its children, so this is necessarily only going to be a partial search" (Hadley Wickham). This means, that some function names in child environments will not be found. <!-- check this. -->
-
+   __<span style="color:orange">A</span>__: A name can only point to a single object, but an object can be pointed to by 0, 1, or many names. What are names of the functions in the following block?
+   
+    ```{r}
+    function(x) sd(x) / mean(x)
+    
+    f1 <- function(x) (x - min(x)) / (max(x) - min(x))
+    f2 <- f1
+    f3 <- f1
+    ```
+   
+  
 2. __<span style="color:red">Q</span>__: It’s possible (although typically not useful) to call an anonymous function. Which of the two approaches below is correct? Why?
    
     ```{r}
@@ -22,10 +28,12 @@ source("common.R")
 
    __<span style="color:green">A</span>__: The second approach is correct.
    
-   The anonymous function `function(x) 3` is surrounded by a pair of parentheses before it is called by `()`. These extra parentheses separate the function call from the anonymous functions body. Without these a function with the invalid body `3()` is returned, which throws an error when we call it:
+   The anonymous function `function(x) 3` is surrounded by a pair of parentheses before it is called by `()`. These extra parentheses separate the function call from the anonymous functions body. Without these a function with the invalid body `3()` is returned, which throws an error when we call it. This is easier to see if we name the  function:
    
     ```{r, error = TRUE}
-    (function(x) 3())()
+    f <- function(x) 3()
+    f
+    f()
     ```
 
 
@@ -58,40 +66,47 @@ for functional programming (lapply, purrr) -->
     
    __<span style="color:green">A</span>__: Let's look at each sub-question separately:
    
-   a. To find the function with the most arguments, access the arguments of each function in the list. We count each functions arguments and subset to the maximum value. This returns the name of the function with the most arguments and also the corresponding number of arguments:
+   a. To find the function with the most arguments, we first compute the length of `formals()`
    
       ```{r}
-      library(magrittr)
+      library(purrr)
       
-      funs %>% 
-        sapply(formals) %>%
-        lengths() %>% 
-        `[`(which.max(.))
+      n_args <- funs %>% 
+        map(formals) %>%
+        map_int(length)
       ```
-      
-   b. To find the number functions with no argument, we compute the number of arguments for each function and check, if they are equal to `0`. The sum of this result gives us the answer we want.
+   
+    Then use `table()` to see the distribution, and `[` to find the largest:
    
       ```{r}
-      funs %>%
-        sapply(formals) %>% 
-        lengths() %>%
-        `==`(0L) %>%
-        sum()
+      table(n_args)
+      names(n_args)[n_args == 22]
       ```
-        Because `formals()` returns `NULL` for primitive functions, these are included in our count of functions with no argument. We could also divide the functions into primitive and non-primitive functions. We filter the function list for functions with zero arguments first. We then test if these functions are primitive and tabulate the result:
-     
+      
+   b. We can also use `n_args` to find the number functions with no arguments:
+   
       ```{r}
-      funs %>%
-        Filter(function(x) length(formals(x)) == 0, .) %>% 
-        sapply(is.primitive) %>% 
-        table()
+      sum(n_args == 0)
       ```
-        Indeed, most of the functions with no argrument in base R are primitive.
-     
+      
+      However, this over counts because `formals()` returns `NULL` for primitive functions, and `length(NULL)` is 0. To fix that we can first remove the primitive functions
+      
+      ```{r}
+      n_args2 <- funs %>% 
+        discard(is.primitive) %>% 
+        map(formals) %>%
+        map_int(length)
+
+      sum(n_args2 == 0)
+      ```
+      
+      Indeed, most of functions with no arguments are actually primitive functions.
+
    c. To find all primitive functions, we can change the predicate in `Filter()` from `is.function()` to `is.primitive()`:
    
       ```{r, eval = FALSE}
       funs <- Filter(is.primitive, objs)
+      length(funs)
       ```
       
 6. __<span style="color:red">Q</span>__: What are the three important components of a function?  
@@ -102,7 +117,7 @@ for functional programming (lapply, purrr) -->
 
 7. __<span style="color:red">Q</span>__: When does printing a function not show what environment it was created in?  
 
-   __<span style="color:green">A</span>__: Only primitive functions or functions created in the global environment do not show the environment they were created in when they are printed.
+   __<span style="color:green">A</span>__: Primitive functions and functions created in the global environment do not print their environment.
 
 ## Lexical Scoping
 
@@ -119,6 +134,7 @@ for functional programming (lapply, purrr) -->
     
    __<span style="color:green">A</span>__: R's lexical scoping rules are based on these four principles:
    
+   <!-- Link to adv-r sections? -->
    * Name masking
    * Functions vs. variables
    * A fresh start
@@ -139,7 +155,7 @@ for functional programming (lapply, purrr) -->
     f(10)
     ```
         
-   __<span style="color:green">A</span>__: Within this function two more functions also named `f()` are defined and called. Because the functions are each executed in their own environment R will look up and use the functions defined in these environments. The innermost `f()` is called last, though it is the first function to return a value. Because of this the order of the calculation passes "from the inside to the outside" and the function returns `202`.
+   __<span style="color:green">A</span>__: Within this function two more functions also named `f()` are defined and called. Because the functions are each executed in their own environment R will look up and use the functions defined in these environments. The innermost `f()` is called last, though it is the first function to return a value. Because of this the order of the calculation passes "from the inside to the outside" and the function returns `((10 ^ 2) + 1) * 2`, i.e. 202.
 
 
 ## Lazy evaluation
@@ -168,7 +184,10 @@ for functional programming (lapply, purrr) -->
     x_ok(1:3)
     ```
     
-   __<span style="color:green">A</span>__: We expect `x_ok()` to validate its input vie certain criteria: it must not be `NULL`, but have length `1` and a value greater than `0`. Meaningful outcomes for this assertion will be `TRUE`, `FALSE` or `NA`.
+   __<span style="color:green">A</span>__: 
+   <!-- HW: The explanation needs to start with shortcircuiting - the RHS of && is ever evaluated is the LHS is NULL. The same is not true for & -->
+   
+   We expect `x_ok()` to validate its input vie certain criteria: it must not be `NULL`, but have length `1` and a value greater than `0`. Meaningful outcomes for this assertion will be `TRUE`, `FALSE` or `NA`.
    
    The desired behaviour is reached by combining the assertions through `&&` instead of `&`. `&&` does not perform elementwise comparisons, instead it uses the first element of each value only. It also uses lazy evaluation, in the sense that evaluation "proceeds only until the result is determined" (from `?Logic`).
    
@@ -211,7 +230,7 @@ for functional programming (lapply, purrr) -->
     
    __<span style="color:green">A</span>__: The `xlim` argument of `hist()` defines the range of the histogram's x-axis. In order to provide a valid axis `xlim` must contain a numeric vector of exactly two unique values. Consequently for the default `xlim = range(breaks)`), `breaks` must evaluate to a vector with at least two unique values.
    
-   During execution `hist()` overwrites the `breaks` argument. The `breaks` argument is quite flexible and allows the users to provide the breakpoints directly or compute them in several ways. Therefore the specific behaviour depends highly on the input. But `hist` ensures that `breaks` evaluates to a numeric vector containing at least two unique elements before `xlim` is accessed.
+   During execution `hist()` overwrites the `breaks` argument. The `breaks` argument is quite flexible and allows the users to provide the breakpoints directly or compute them in several ways. Therefore the specific behaviour depends highly on the input. But `hist` ensures that `breaks` evaluates to a numeric vector containing at least two unique elements before `xlim` is computed.
    
 5. __<span style="color:red">Q</span>__: Explain why this function works. Why is it confusing?
 
@@ -223,7 +242,7 @@ for functional programming (lapply, purrr) -->
     show_time()
     ```
     
-   __<span style="color:green">A</span>__: Before `show_time()` accesses `x` (default `stop("Error")`), the `stop()` function is overwritten as `function(...) Sys.time()`. Because default arguments are evaluated in the function environment, `print(x)` will be evaluated as `print(Sys.time())`.
+   __<span style="color:green">A</span>__: Before `show_time()` accesses `x` (default `stop("Error")`), the `stop()` function is masked by `function(...) Sys.time()`. Because default arguments are evaluated in the function environment, `print(x)` will be evaluated as `print(Sys.time())`.
    
    This function is confusing, because its behaviour changes when `x`'s value is supplied directly. Now the value from the calling environment will be used and the overwriting of `stop` won't affect the outcome any more.
   
@@ -309,11 +328,11 @@ for functional programming (lapply, purrr) -->
 
 1. __<span style="color:red">Q</span>__: What does `load()` return? Why don’t you normally see these values?
 
-   __<span style="color:green">A</span>__: `load()` reloads datasets which were previously written to disk via `save()`. When run successfully, `load()` invisibly returns a character vector, containing the names of the newly loaded objects. To print these names to the console, one can set the argument `verbose` to `TRUE` or surround the call in parentheses to trigger R's auto-printing mechanism.
+   __<span style="color:green">A</span>__: `load()` loads objects saved to disk in `.Rdata` files by `save()`. When run successfully, `load()` invisibly returns a character vector containing the names of the newly loaded objects. To print these names to the console, one can set the argument `verbose` to `TRUE` or surround the call in parentheses to trigger R's auto-printing mechanism.
    
 2. __<span style="color:red">Q</span>__: What does `write.table()` return? What would be more useful?
 
-   __<span style="color:green">A</span>__: `write.table()` writes an object, usually a data frame or a matrix, to disk. The function invisibly returns `NULL`. It would be more useful, if `write.table()` would (invisibly) return its `x` object. This would allow to save intermediate results and directly take on further processing steps without breaking the flow of the code (i.e. breaking it into different lines). One package which uses this pattern is the readr package, which is part of the "tidyverse"-ecosystem.
+   __<span style="color:green">A</span>__: `write.table()` writes an object, usually a data frame or a matrix, to disk. The function invisibly returns `NULL`. It would be more useful if `write.table()` would (invisibly) return the input data, `x`. This would allow to save intermediate results and directly take on further processing steps without breaking the flow of the code (i.e. breaking it into different lines). One package which uses this pattern is the readr package, which is part of the "tidyverse"-ecosystem.
     
 3. __<span style="color:red">Q</span>__: How does the `chdir` parameter of `source()` compare to `in_dir()`? Why might you prefer one approach to the other?
 
@@ -328,22 +347,24 @@ for functional programming (lapply, purrr) -->
     }
     ```
     
-   __<span style="color:orange">A</span>__: `in_dir()` takes a path to a working directory as an argument. First the working directory is changed accordingly. `on.exit()` ensures, that the modification to the working directory are reset to the initial value, when the function exits.
-    
-   In `source()` the `chdir` argument specifies, if the working directory should be changed during the evaluation of the `file` argument (which in this case has to be a pathname). But in `source()` the current working directory is stored and passed to `on.exit()`, before the working directory is changed for the subsequent evaluation.
+   __<span style="color:orange">A</span>__: 
    
-<!-- Why might you prefer one approach to the other? Explain what happens in `source` more clearly. -->
+   `in_dir()` takes a path to a working directory as an argument. First the working directory is changed accordingly. `on.exit()` ensures that the modification to the working directory are reset to the initial value when the function exits.
+    
+   In `source()` the `chdir` argument specifies if the working directory should be changed during the evaluation of the `file` argument (which in this case has to be a pathname). 
+   
+   <!-- HW: I think I'm more intersted in supplying a path vs. a logical value here -->
 
 4. __<span style="color:red">Q</span>__: Write a function that opens a graphics device, runs the supplied code, and closes the graphics device (always, regardless of whether or not the plotting code worked).  
    
    __<span style="color:green">A</span>__: To control the graphics device we use `pdf()` and `dev.off()`. To ensure a clean termination `on.exit()` is used.
     
     ```{r, eval = FALSE}
-    plot_pdf <- function(code){
+    plot_pdf <- function(code) {
       pdf("test.pdf")
-      on.exit(dev.off())
+      on.exit(dev.off(), add = TRUE)
       code
-      }
+    }
     ```
 
 5. __<span style="color:red">Q</span>__: We can use `on.exit()` to implement a simple version of `capture.output()`.
@@ -364,7 +385,9 @@ for functional programming (lapply, purrr) -->
     
    Compare `capture.output()` to `capture.output2()`. How do the functions differ? What features have I removed to make the key ideas easier to see? How have I rewritten the key ideas to be easier to understand?
     
-   __<span style="color:green">A</span>__: Using `body(capture.output)` we inspect the source code of the original `capture.output()` function. `capture.output()` is a quite a bit longer (39 lines vs. 7 lines). `capture.output()` writes out entire methods, such as `readLines()`. Instead `capture.output2()` calls these methods directly. This brevity and modularity makes `capture.output2` easier to understand (given you know the underlying methods).
+   __<span style="color:green">A</span>__: Using `body(capture.output)` we inspect the source code of the original `capture.output()` function. `capture.output()` is a quite a bit longer (39 lines vs. 7 lines). `capture.output()` writes out entire methods, such as `readLines()` <!-- HW: what does this mean? -->. Instead `capture.output2()` calls these methods directly. This brevity and modularity makes `capture.output2` easier to understand (given you know the underlying methods).
+   
+   <!-- HW: main difference is that capture.output() uses substitute() + eval -->
 
    However `capture.output2()` does miss a couple of features: `capture.output()` appears to handle important exceptions and it also offers a choice between overwriting or appending to a file.
 
@@ -385,7 +408,8 @@ for functional programming (lapply, purrr) -->
     ```{r, eval = FALSE}
     `+`(`+`(1, 2), 3)
     
-    `+`(1, `(`(`+`(2, 3)))  # `+`(1, `+`(2, 3))
+    `+`(1, `(`(`+`(2, 3)))
+    `+`(1, `+`(2, 3))
     
     `if`(`<=`(length(x), 5), `[[`(x, 5), `[[`(x, n))
     ```
@@ -401,9 +425,9 @@ for functional programming (lapply, purrr) -->
    __<span style="color:green">A</span>__: None of these functions provides a `...` argument. Therefore the function arguments are first matched exactly, then via partial matching and finally by position. This leads us to the following explicit function calls:
    
     ```{r, eval = FALSE}
-    x <- sample(x = c(1:10, NA), size = 20, replace = TRUE)
-    y <- runif(n = 20, min = 0, max = 1)
-    cor(x = x, y = y, use = "pairwise.complete.obs", method = "kendall")
+    x <- sample(c(1:10, NA), size = 20, replace = TRUE)
+    y <- runif(20, min = 0, max = 1)
+    cor(x, y, use = "pairwise.complete.obs", method = "kendall")
     ```
     
 3. __<span style="color:red">Q</span>__: Explain why the following code fails:
@@ -444,10 +468,11 @@ for functional programming (lapply, purrr) -->
    __<span style="color:green">A</span>__: Lets define `%random%` like this:
 
     ```{r, eval = FALSE}
-    `random<-` <- function(x, value){
-      x[sample(length(x), 1)] <- value
+    `random<-` <- function(x, value) {
+      idx <- sample(length(x), 1)
+      x[idx] <- value
       x
-      }
+    }
     ```
 
 5. __<span style="color:red">Q</span>__: Write your own version of `+` that will paste its inputs together if they are character vectors but behaves as usual otherwise. In other words, make this code work:
@@ -464,8 +489,11 @@ for functional programming (lapply, purrr) -->
     
     ```{r}
     `+` <- function(a, b = 0L){
-      if (is.character(a) && is.character(b)) {return(paste0(a, b))}
-      sum(a, b)
+      if (is.character(a) && is.character(b)) {
+        paste0(a, b)
+      } else {
+        base::`+`(a, b)  
+      }
     }
     
     # test functionality
@@ -481,15 +509,20 @@ for functional programming (lapply, purrr) -->
    
    __<span style="color:green">A</span>__: The hint suggests to look for functions with a specific naming pattern: Replacement functions conventionally end on `<-`. We can search these objects with a regular expression (`<-$`). 
    
-   However, instead of `apropros()`we will use `ls()` and adopt a bit of the code from a previous exercise. (This makes it easier to work with environments explicitly.) From all the objects in the base package which end on `<-`, we subset the functions. Additionally, we also filter for primitive functions.
+    ```{r}
+    apropos("<-$")
+    ```
+
+   However, instead of `apropros()` we will use `ls()` and adopt a bit of the code from a previous exercise. (This makes it easier to work with environments explicitly.) We first find all the objects in the base package which end on `<-`, then filter to only look at functions:
    
     ```{r}
-    repl_objects <- mget(ls("package:base", all.names = TRUE, pattern = "<-$"),
-                      inherits = TRUE)
+    repl_nms <- ls(baseenv(), all.names = TRUE, pattern = "<-$")
+    repl_objects <- mget(repl_nms, baseenv())
     repl_functions <- Filter(is.function, repl_objects)
     length(repl_functions)
     ```
    
+   Additionally, we also filter for primitive functions.
    Overall base R contains `r length(repl_functions)` replacement functions. The following `r length(Filter(is.primitive, repl_functions))` of them are also primitive functions:
    
     ```{r}
@@ -498,18 +531,21 @@ for functional programming (lapply, purrr) -->
 
 7. __<span style="color:red">Q</span>__: What are valid names for user-created infix functions?  
   
-   __<span style="color:green">A</span>__: Let's cite **Advanced R** here (section on "Function Forms"):
+   __<span style="color:green">A</span>__: Let's cite **Advanced R** here (section on "Function Forms"): 
+   <!-- HW: link to section -->
    
    > ... names of infix functions are more flexible than regular R functions: they can contain any sequence of characters except “%”.
 
 8. __<span style="color:red">Q</span>__: Create an infix `xor()` operator.
     
-   __<span style="color:green">A</span>__: We could create an infix `%xor_%` like this:
+   __<span style="color:green">A</span>__: We could create an infix `%xor%` like this:
 
     ```{r}
-    `%xor_%` <- function(a, b){
-      (a | b) & !(a & b)
+    `%xor%` <- function(a, b) {
+      xor(a, b)
     }
+    TRUE %xor% TRUE
+    FALSE %xor% TRUE
     ```
 
 9. __<span style="color:red">Q</span>__: Create infix versions of the set functions `intersect()`, `union()`, and`setdiff()`. You might call them `%n%`, `%u%`, and `%/%` to match conventions from mathematics.
@@ -517,15 +553,22 @@ for functional programming (lapply, purrr) -->
    __<span style="color:green">A</span>__: These infix operators could be defined in the following way. (`%/%` is chosen instead of `%\%`, because `\` serves as an escape character.)
    
     ```{r}
-    `%n%` <- function(a, b){
-      unique(a[a %in% b])
+    `%n%` <- function(a, b) {
+      intersect(a, b)
     }
 
-    `%u%` <- function(a, b){
-      unique(c(a, b))
+    `%u%` <- function(a, b) {
+      union(a, b)
     }
 
-    `%/%` <- function(a, b){
-      a[!a %in% b]
+    `%/%` <- function(a, b) {
+      setdiff(a, b)
     }
+    
+    x <- c("a", "b", "d")
+    y <- c("a", "c", "d")
+    
+    x %u% y
+    x %n% y
+    x %/% y
     ```
