@@ -13,26 +13,23 @@ library(purrr)
 
 1. __<span style="color:red">Q</span>__: Base R provides a function operator in the form of `Vectorize()`. What does it do? When might you use it?    
    
-   __<span style="color:green">A</span>__: In R a lot of the common operations are "vectorized". This often means, that a computation is applied to the whole object (say an atomic vector) by default and because these operations are often implemented in a compiled language such as C they are also very fast.
+   __<span style="color:green">A</span>__: In R a lot of functions are "vectorised". This means, that a computation is iteratively applied to each element of a "vectorised argument". Further - in the context of R - the term vectorised implies that these operations are implemented in a compiled language such as C or Fortran as these languages provide faster evaluation of for loops than R does.
    
-   Despilte what the Functions name and the documentation (`?Vectorize`) tell us, this function operator is not able to speed up the provided function. It rather changes the input format of the arguments, so that it can be iterated over. Because of this it works best for scalar functions.
+   Despite what the function's name and its documentation (`?Vectorize`) tell us, `Vectorize()` is not able to speed up the provided function. It rather changes the input format of the supplied arguments (`vectorize.args`), so that they are iterated over. Because of this `Vectorize()` works best for scalar functions.
 
-   In essence, `Vectorize` is mostly a wrapper for `mapply`. Let's take a look at an example from the documentation:
+   In essence, `Vectorize()` is mostly a wrapper for `mapply()`. Let's take a look at an example from the documentation:
 
     ```{r}
     vrep <- Vectorize(rep.int)
     vrep
     
-    # application
+    # Application
     vrep(1:2, 3:4)
-    vrep(times = 1:2, x = 3:4)  # naming arguments still works
+    # Naming arguments still works
+    vrep(times = 1:2, x = 3:4)  
     ```
 
-   `Vectorize()` provides a convenient and concise notation to iterate over multipe arguments. If you combine it with parallelization, it may also speed up your code consitently. If you already use the tidyverse, you may also consider the following type stable alternative:
-
-    ```{r}
-    map2(1:2, 3:4, rep.int)
-    ```
+   `Vectorize()` provides a convenient and concise notation to iterate over multiple arguments. If you combine it with parallelization, it may also speed up your code consistently. If you want your vectorised function to be type stable you might want to set `SIMPLIFY = FALSE` inside of `Vectorize()`.
 
 2. __<span style="color:red">Q</span>__: Read the source code for `possibly()`. How does it work?
    
