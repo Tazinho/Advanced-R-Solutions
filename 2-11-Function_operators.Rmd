@@ -34,17 +34,15 @@ library(purrr)
 
 2. __<span style="color:red">Q</span>__: Read the source code for `possibly()`. How does it work?
    
-   __<span style="color:green">A</span>__: When we look at the source code, that `possibly()` is mostly a wrapper around `tryCatch()`:
-
+   __<span style="color:green">A</span>__: `possibly()` is a function operator that modifies functions to return a specified default value in case of an error (`otherwise`) and to suppress any error messages (`quiet = TRUE`).
+   
+   While reading the source code, we notice that `possibly()` internally uses `purrr::as_mapper()`. This enables users to supply not only functions, but also formulas or atomics via the same syntax as known from other functions in the purrr package. Besides this, the new default value (`otherwise`) gets evaluated once to make it (almost) immutable from now on.
+   
+   The main functionality of `possibly()` is provided by `base::tryCatch()`. In this part the supplied function (`.f`) gets wrapped and the error and interrupt handling are specified.
+   
     ```{r}
     possibly
     ```
-    
-   The function accepts a function (`.f`) as input and passing it through `as_mapper()` enables purrr's convenient as function interface. Afterwords the evaluation of the provided value for the "default return value" (in case of an error) (`otherwise`) is forced.
-   
-   Now a function wrapping `tryCatch()` is created and returned by the function operator. This function will evaluate the provided function and return the its output. In case of an error, the value of `otherwise` will be returned instead.
-   
-   (The desired behaviour following an user-interrupt is also specified as stopping and printing an informative error message. There is an option to opt-out of a quiet/silent mode, which will print any occurring error message to the console.)
 
 3. __<span style="color:red">Q</span>__: Read the source code for `safely()`. How does it work?
    
