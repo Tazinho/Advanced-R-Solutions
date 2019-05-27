@@ -21,8 +21,8 @@ library(R6)
     ```{r}
     BankAccount <- R6Class("BankAccount", list(
       balance = 0,
-      deposit = function(depo = 0) {
-        self$balance = self$balance + depo
+      deposit = function(dep = 0) {
+        self$balance = self$balance + dep
         invisible(self)
       },
       withdraw = function(draw) {
@@ -73,7 +73,7 @@ library(R6)
     my_strict_account$balance
     ```
 
-   Finally, we create a class that charges a constant fee (of 1) for each withdrawal which leaves the account with a negative balance.
+   Finally, we create a class that charges a constant fee of 1 for each withdrawal which leaves the account with a negative balance.
 
     ```{r}
     BankAccountCharging <- R6Class("BankAccount",
@@ -110,7 +110,7 @@ library(R6)
     cards <- paste0(rep(value, 4), suit)
     ```
 
-   __<span style="color:green">A</span>__: We choose to keep the class very flexible and allow the specification of any `deck` of cards at initialisation. The `cards` deck from the exercise text will serve as the default value.
+   __<span style="color:green">A</span>__: We choose to keep the class flexible and allow the specification of any `deck` of cards at initialisation. The `cards` deck from the exercise text will serve as the default value.
 
     ```{r}
     ShuffledDeck <- R6Class("ShuffledDeck", public = list(
@@ -148,7 +148,7 @@ library(R6)
 
 3. __<span style="color:red">Q</span>__: Why can't you model a bank account or a deck of cards with an S3 class?
     
-   __<span style="color:orange">A</span>__: It is not entirely clear why this should not be possible. Of course this would look different than R6, but one could still build up an S3 class based on i.e. a list or environment. Here an S3 version of a bank account and one method:
+   __<span style="color:orange">A</span>__: It is not entirely clear why this should not be possible. Of course this would look different than R6, but one could still build up an S3 class based on i.e. a list or an environment. Here an S3 version of a bank account and one method:
    
    <!-- (TODO: Check the requirements to how the class should look like). -->
    
@@ -294,7 +294,7 @@ library(R6)
 
 3. __<span style="color:red">Q</span>__: Extend the `Rando` class with another active binding that allows you to access the previous random value. Ensure that active binding is the only way to access the value.
 
-   __<span style="color:green">A</span>__: To access the previous random value from an instance, we add a private `last_random` field to our class, and we modify the `random()` method to write to this field, whenever it is called. To access the `last_random` field we provide a `prvious_random` method.
+   __<span style="color:green">A</span>__: To access the previous random value from an instance, we add a private `last_random` field to our class, and we modify the `random()` method to write to this field, whenever it is called. To access the `last_random` field we provide a `previous_random` method.
    
     ```{r}
     Rando <- R6::R6Class(
@@ -329,7 +329,7 @@ library(R6)
 
 4. __<span style="color:red">Q</span>__: Can subclasses access private fields/methods from their parent? Perform an experiment to find out.
 
-   __<span style="color:green">A</span>__: To find out if private fields/classes can be accessed from subclasses, we first create a class `A` with a private field `foo` and a private method `bar`. Afterwards, an instance of a subclass `B`  is created and calls the `foobar()` methods, which tries to access the `foo` field and the `bar()` method from its superclass `A`.
+   __<span style="color:green">A</span>__: To find out if private fields/classes can be accessed from subclasses, we first create a class `A` with a private field `foo` and a private method `bar()`. Afterwards, an instance of a subclass `B`  is created and calls the `foobar()` methods, which tries to access the `foo` field and the `bar()` method from its superclass `A`.
 
     ```{r}
     A <- R6Class(
@@ -382,7 +382,7 @@ library(R6)
     )
     ```
     
-   Let's see, if new instances of our class works as expected.
+   Let's see, if new instances of our class work as expected.
                           
     ```{r}
     tmp_file <- tempfile(pattern = "test", tmpdir = tempdir(), fileext = ".txt")
