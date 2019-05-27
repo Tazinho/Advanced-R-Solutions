@@ -153,20 +153,42 @@ library(purrr)
     of 42):
     
     ```{r, eval = FALSE}
-    delay_by_v2 <- function(delay, f) {
+    delay_by_v2 <- function(f, amount) {
       force(f)
-      # we initialise the timestamp for the last run. We set a specific default value,
-      # to ensure that the first run of the returned function will never be delayed
-      last_runtime <- Sys.time() - (delay + 42)
+      force(amount)
+      
+      # First, we initialise the timestamp for the last run: 
+      # Here, we set a specific default value, to ensure that
+      # the first run of the new function will never be delayed.
+      
+      last_runtime <- Sys.time() - (amount + 42)
+      
       function(...) {
-        # we continually check if enough time passed with an (empty) while statement.
-        while (Sys.time() < last_runtime + delay) {}
-        # we override the start for the next waiting interval.
-        # Note that this is done on exit (after the function is evaluated)
+        # Inside the new function we continually check via an empty
+        # while statement, if enough time has passed.
+        
+        while (Sys.time() < last_runtime + amount) {}
+        
+        # Finally, set the timestamp to start the next waiting period
+        # to begin after the function is evaluated.
+        
         on.exit(last_runtime <<- Sys.time()) 
+        
         return(f(...))
       }
     }
     ```
     
    Alternatively to the empty while statement we could have used `Sys.sleep()`. I would not recommend this solution, since `?Sys.sleep` indicates that `Sys.sleep()` might have some overhead and seems not to be as exact as we need.
+
+<<- MGO: Not sure, if this exercise really intends to track the time of the call or the finished evaluation of the new function. 
+The current solution assumes the first case. However, regarding the latter case I would introduce two timers that jump one (timer) up, whenever the new function gets evaluated. I.e. use sth. like
+
+```
+last_call <- Sys.time() - amount
+this_call <- Sys.time()
+
+last_call <<- this_call
+this_call <-  Sys.time()
+```
+-->
