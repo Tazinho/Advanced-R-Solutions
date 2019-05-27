@@ -99,11 +99,11 @@ library(purrr)
         on.exit(if(!setequal(dir(), dir_old)){
           message("Files in your working directory were deleted or added by this
                   function.")}, add = TRUE)
-        on.exit(if(length(setdiff(dir_old, dir()) != 0)){
+        on.exit(if(length(setdiff(dir_old, dir()))){
           message(paste0("The following files were deleted: ",
                          paste(setdiff(dir_old, dir()), collapse = ", ")
                          ))}, add = TRUE)
-        on.exit(if(length(setdiff(dir(), dir_old) != 0)){
+        on.exit(if(length(setdiff(dir(), dir_old))){
           message(paste0("The following files were added: ", 
                          paste(setdiff(dir(), dir_old), collapse = ", ")
                          ))}, add = TRUE)
@@ -117,14 +117,14 @@ library(purrr)
     td(c("delete_me", "me_too"), dir.create)
     ```
     
+   To create a more serious version of `track_dir()` one might provide optionality to set the `full.names` and `recursive` arguments of `dir()` to `TRUE`. This would enable to also track the creation/deletion of hidden files and files in folders contained in the working directory.
+   
    Other global effects that might be worth tracking include changes regarding:
     
-   * the search path and/or introduced `conflicts()`
+   * the search path and possibly introduced `conflicts()`
    * `options()` and `par()` which modify global settings
    * the path of the working directory
    * environment variables
-   * the locale.
-
    
 4. __<span style="color:red">Q</span>__: Write a function operator that logs a timestamp and message to a file every time a function is run.
    
