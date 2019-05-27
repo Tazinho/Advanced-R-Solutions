@@ -16,7 +16,7 @@ library(rlang)
    - environments have reference semantics (i.e. they don't copy-on-modify).
    - environments have parents
    - the contents of an environment are not ordered
-   - the contents of an environment must have unique named
+   - the contents of an environment must have unique names
 
 2. __<span style="color:red">Q</span>__: Create an environment as illustrated by this picture.
 
@@ -96,7 +96,7 @@ library(rlang)
 
 1. __<span style="color:red">Q</span>__: Modify `where()` to return all environments that contain a binding for `name`. Carefully think through what type of object the function will need to return.
    
-   __<span style="color:green">A</span>__: The modified function will always recurse until it reaches the empty environment. Along the way, it will check each environment for a given `name`. Now it will return a list of environments where the binding was found; if no binding was found, the list will be empty. Please also note how the list is initialized via the default argument, when the function is called for the first time. This is a bit confusing, which is why it's common to wrap a recurisve function inside another, more useful friendly, function.
+   __<span style="color:green">A</span>__: The modified function will always recurse until it reaches the empty environment. Along the way, it will check each environment for a given `name`. Now it will return a list of environments where the binding was found; if no binding was found, the list will be empty. Please also note how the list is initialized via the default argument, when the function is called for the first time. This is a bit confusing, which is why it's common to wrap a recurisve function inside another, more user friendly, function.
 
     ```{r}
     where2 <- function(name, env = caller_env(), results = list()) {
@@ -122,7 +122,7 @@ library(rlang)
 
 2. __<span style="color:red">Q</span>__: Write a function called `fget()` that finds only function objects. It should have two arguments, `name` and `env`, and should obey the regular scoping rules for functions: if there's an object with a matching name that's not a function, look in the parent. For an added challenge, also add an `inherits` argument which controls whether the function recurses up the parents or only looks in one environment.
 
-   __<span style="color:orange">A</span>__: We follow a similar approach to the previous exercise. This time we additionally check if the found object is a function and implement and argument to turn off the recursion, if desired.
+   __<span style="color:green">A</span>__: We follow a similar approach to the previous exercise. This time we additionally check if the found object is a function and implement and argument to turn off the recursion, if desired.
    
     ```{r}
     fget <- function(name, env = caller_env(), inherits = TRUE) {
@@ -248,15 +248,14 @@ library(rlang)
     fstr("mean")
     ```
     
-    Once you have learned about tidyeval, you could rewrite `fstr()` to use 
-    `enquo()` so that you'd call it like more like `str()`, i.e. `fstr(sum)`.
+   Once you have learned about tidyeval, you could rewrite `fstr()` to use `enquo()` so that you'd call it like more like `str()`, i.e. `fstr(sum)`.
     
 ## The call stack
 
 1. __<span style="color:red">Q</span>__: Write a function that lists all the variables defined in the environment in which it was called. It should return the same results as `ls()`.
 
   <!-- HW: I really don't understand what the point of this question is -->
-
+   
    __<span style="color:green">A</span>__: We can implement this dynamic scoping behaviour, by explicitly referencing the caller environment. Please note, that this approach returns also variables starting with a dot, an option that `ls()` usually requires.
 
     ```{r}
