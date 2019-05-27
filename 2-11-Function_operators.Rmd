@@ -46,7 +46,7 @@ library(purrr)
 
 3. __<span style="color:red">Q</span>__: Read the source code for `safely()`. How does it work?
    
-   __<span style="color:green">A</span>__: `safely()` modifies functions to return a list, containing the elements "result" and "error". It works in a similar fashion as `possibly()` and besides using `as_mapper()` `safely()` also provides the `otherwise` and `quiet` argument. However, in order to provide both, the result and the error, in a consistent way, the `tryCatch()` part of the implementation returns a list with the same structure in both cases. In the case of successful evaluation "error" equals to `NULL` and in case of an error "result" equals to `otherwise`, which is `NULL` by default.
+   __<span style="color:green">A</span>__: `safely()` modifies functions to return a list, containing the elements "result" and "error". It works in a similar fashion as `possibly()` and besides using `as_mapper()`, `safely()` also provides the `otherwise` and `quiet` argument. However, in order to provide the result and the error in a consistent way, the `tryCatch()` part of the implementation returns a list with the same structure in both cases. In the case of successful evaluation "error" equals to `NULL` and in case of an error "result" equals to `otherwise`, which is `NULL` by default.
    
    As the `tryCatch()` part is hidden in the internal `purrr:::capture_output()` function, we provide it here in addition to `safely()`:
    
