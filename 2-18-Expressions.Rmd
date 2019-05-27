@@ -121,12 +121,12 @@ library(lobstr)
     ```
     <!-- HB: don't fully understand the first line of code in the above code-chunk -->    
 
-1. __<span style="color:red">Q</span>__: What happens when you subset a call object to remove the first element?
+2. __<span style="color:red">Q</span>__: What happens when you subset a call object to remove the first element?
     e.g. `expr(read.csv("foo.csv", header = TRUE))[-1]`. Why?
     
     __<span style="color:green">A</span>__: When the first element of a call object is removed, the second element moves to the first position, which is in general taken as the function to call. Therefore, we remain with the call `"food.csv"(header = TRUE)`
     
-1. __<span style="color:red">Q</span>__: Describe the differences between the following call objects.
+3. __<span style="color:red">Q</span>__: Describe the differences between the following call objects.
 
     ```{r, results = FALSE}
     x <- 1:10
@@ -139,7 +139,7 @@ library(lobstr)
     
    __<span style="color:green">A</span>__: The call objects differ in their first two elements, which are sometimes evaluated before the call is constructed. In the first one, both `median()` and `x` are evaluated. Therefore, we can see in the constructed call that `median` is a generic and the `x` argument is `1:10`. In the following calls we remain with differing combinations. Once, only `x` and once only only `median()` gets evaluated. In the final call both aren't evaluated.
 
-1. __<span style="color:red">Q</span>__: `rlang::call_standardise()` doesn't work so well for the following calls.
+4. __<span style="color:red">Q</span>__: `rlang::call_standardise()` doesn't work so well for the following calls.
     Why? What makes `mean()` special?
 
     ```{r}
@@ -158,7 +158,7 @@ library(lobstr)
     call_standardise(quote(mean.default(x = 1:10, , TRUE)))
     ```
     
-1. __<span style="color:red">Q</span>__: Why does this code not make sense?
+5. __<span style="color:red">Q</span>__: Why does this code not make sense?
 
     ```{r, eval = FALSE}
     x <- expr(foo(x = 1))
@@ -184,7 +184,7 @@ library(lobstr)
     
    So giving the first element a name just adds useless metadata.
    
-1. __<span style="color:red">Q</span>__: Construct the expression `if(x > 1) "a" else "b"` using multiple calls to `call2()`. How does the structure code reflect the structure of the AST?
+6. __<span style="color:red">Q</span>__: Construct the expression `if(x > 1) "a" else "b"` using multiple calls to `call2()`. How does the structure code reflect the structure of the AST?
 
    __<span style="color:green">A</span>__: Similar to the prefix version we get
     
@@ -230,7 +230,7 @@ library(lobstr)
     lobstr::ast(((1 + 1)))
     ```
     
-1. __<span style="color:red">Q</span>__: `=` can also be used in two ways. Construct a simple example that shows both uses.
+2. __<span style="color:red">Q</span>__: `=` can also be used in two ways. Construct a simple example that shows both uses.
     
    __<span style="color:green">A</span>__: I was not exactly aware of a similar case with multiple syntactical meanings for the `=` symbol, but one can get there somehow. `=` is used as an operator for assignment. It is also part of the logical operators `==`, `>=`, `<=`, `!=` and is also used within functions to assign parameters or the definition of default settings.
     
@@ -255,7 +255,7 @@ library(lobstr)
     
    The second way is more explicit, but both return the same syntax tree. When wee ignore the `brackets` and compare the trees, we can finally see from the second tree, that the first `=` is just part of the syntax and the second one is for the usage of assignment.
 
-1. __<span style="color:red">Q</span>__: Does `-2^2` yield 4 or -4? Why?
+3. __<span style="color:red">Q</span>__: Does `-2^2` yield 4 or -4? Why?
 
    __<span style="color:green">A</span>__: It yields `-4`, because `^` has higher operator precedence than `-`, which we can verify by looking at the AST:
    
@@ -265,7 +265,7 @@ library(lobstr)
     lobstr::ast(-2^2)
     ```
 
-1. __<span style="color:red">Q</span>__: What does `!1 + !1` return? Why?
+4. __<span style="color:red">Q</span>__: What does `!1 + !1` return? Why?
 
    __<span style="color:green">A</span>__: The first answer is quite simple
     
@@ -287,11 +287,11 @@ library(lobstr)
     
    However, note that if `!` had a higher precedence, the result would get `FALSE + FALSE` as intermediate result, which would be evalutated (again involving coercion) to `0`.
 
-1. __<span style="color:red">Q</span>__: Why does `x1 <- x2 <- x3 <- 0` work? Describe the two reasons.
+5. __<span style="color:red">Q</span>__: Why does `x1 <- x2 <- x3 <- 0` work? Describe the two reasons.
 
    __<span style="color:orange">A</span>__: One reason is that `<-` is right-associative.
 
-1. __<span style="color:red">Q</span>__: Compare the ASTs of `x + y %+% z` and `x ^ y %+% z`. What have you learned about the precedence of custom infix functions?
+6. __<span style="color:red">Q</span>__: Compare the ASTs of `x + y %+% z` and `x ^ y %+% z`. What have you learned about the precedence of custom infix functions?
 
    __<span style="color:green">A</span>__: Comparison of the syntax trees:
     
@@ -308,7 +308,7 @@ library(lobstr)
     
    So we can conclude that custom infix functions must have a precedence between addition and exponentiation. The general precedence rules can be found for example [here](https://cran.r-project.org/doc/manuals/r-release/R-lang.html).
    
-1. __<span style="color:red">Q</span>__: What happens if you call `parse_expr()` with a string that generates
+7. __<span style="color:red">Q</span>__: What happens if you call `parse_expr()` with a string that generates
     multiple expressions? e.g. `parse_expr("x + 1; y + 1")`
 
    __<span style="color:green">A</span>__: `parse_expr()` notices that more than one expression would be generated and throws an error.
@@ -317,7 +317,7 @@ library(lobstr)
     parse_expr("x + 1; y + 1")
     ```
 
-1. __<span style="color:red">Q</span>__: What happens if you attempt to parse an invalid expression? e.g. `"a +"` or `"f())"`.
+8. __<span style="color:red">Q</span>__: What happens if you attempt to parse an invalid expression? e.g. `"a +"` or `"f())"`.
 
    __<span style="color:green">A</span>__: We get an error from the underlying `parse` function
     
@@ -329,7 +329,7 @@ library(lobstr)
     parse(text = "f())")
     ```
 
-1. __<span style="color:red">Q</span>__: `deparse()` produces vectors when the input is long. For example, the
+9. __<span style="color:red">Q</span>__: `deparse()` produces vectors when the input is long. For example, the
     following call produces a vector of length two:
 
     ```{r, eval = FALSE}
@@ -350,7 +350,7 @@ library(lobstr)
     expr_text(expr)
     ```
 
-1. __<span style="color:red">Q</span>__: `pairwise.t.test()` assumes that `deparse()` always returns a length one character vector. Can you construct an input that violates this expectation? What happens?
+10. __<span style="color:red">Q</span>__: `pairwise.t.test()` assumes that `deparse()` always returns a length one character vector. Can you construct an input that violates this expectation? What happens?
 
    __<span style="color:green">A</span>__: We can pass an expression to one of `pairwise.t.test()`’s data input arguments, which exceeds the default cutoff width in `deparse()`. The expression will be split into a character vector of length greater 1. The deparsed data inputs are directly pasted (read the source code!) with “and” as separator and the result is just used to be displayed in the output. Just the data.name output will change (it will include more than one “and”).
    
@@ -359,7 +359,7 @@ library(lobstr)
     pairwise.t.test(2, d+d+d+d+d+d+d+d+d+d+d+d+d+d+d+d+d)
     ```
 
-## Walking the AST with recursive functions {#ast-funs}
+## Walking AST with recursive functions {#ast-funs}
 
 1. __<span style="color:red">Q</span>__: `logical_abbr()` returns `TRUE` for `T(1, 2, 3)`. How could you modify `logical_abbr_rec()` so that it ignores function calls that use `T` or `F`?
 
@@ -429,7 +429,7 @@ library(lobstr)
     logical_abbr(c(T, T, T))
     ```
 
-1. __<span style="color:red">Q</span>__: `logical_abbr()` works with expressions. It currently fails when you give it a function. Why not? How could you modify `logical_abbr()` to make it work? What components of a function will you need to recurse over?
+2. __<span style="color:red">Q</span>__: `logical_abbr()` works with expressions. It currently fails when you give it a function. Why not? How could you modify `logical_abbr()` to make it work? What components of a function will you need to recurse over?
 
     ```{r, eval = FALSE}
     f <- function(x = TRUE) {
@@ -440,7 +440,7 @@ library(lobstr)
     
    __<span style="color:green">A</span>__: It currently fails, because `"closure"` is not handled within `switch_expr()` within `logical_abbr_rec()`. If we wanted to make it work, we must open a case there and write a function to inspect the formals and the body of the input function.
 
-1. __<span style="color:red">Q</span>__: Modify find assignment to also detect assignment using replacement functions, i.e. `names(x) <- y`.
+3. __<span style="color:red">Q</span>__: Modify `find_assign` to also detect assignment using replacement functions, i.e. `names(x) <- y`.
 
    __<span style="color:green">A</span>__: Let`s see what the AST of such an assignment looks like:
     
@@ -502,7 +502,7 @@ library(lobstr)
     find_assign(names(x(y)) <- y <- z)
     ```
   
-1. __<span style="color:red">Q</span>__: Write a function that extracts all calls to a specified function.
+4. __<span style="color:red">Q</span>__: Write a function that extracts all calls to a specified function.
 
    __<span style="color:green">A</span>__: We just need to delete the former added else statement and check for a call (not necessarily `<-`) within the first `if()` in `find_assign_call()`. We save a call when we found one and return it later as part of our character output. Everything else stays the same:
 
