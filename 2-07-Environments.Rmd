@@ -252,12 +252,11 @@ library(rlang)
     
 ## The call stack
 
+<!-- HW: I really don't understand what the point of this question is -->
 1. __<span style="color:red">Q</span>__: Write a function that lists all the variables defined in the environment in which it was called. It should return the same results as `ls()`.
-
-  <!-- HW: I really don't understand what the point of this question is -->
    
    __<span style="color:green">A</span>__: We can implement this dynamic scoping behaviour, by explicitly referencing the caller environment. Please note, that this approach returns also variables starting with a dot, an option that `ls()` usually requires.
-
+   
     ```{r}
     ls2 <- function(env = caller_env()) {
       env_names(env)
