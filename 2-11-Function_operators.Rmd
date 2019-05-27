@@ -185,9 +185,11 @@ library(purrr)
 The current solution assumes the first case. However, regarding the latter case I would introduce two timers that jump one (timer) up, whenever the new function gets evaluated. I.e. use sth. like
 
 ```
+# Initialisation
 last_call <- Sys.time() - amount
 this_call <- Sys.time()
 
+# During evaluation of new function
 last_call <<- this_call
 this_call <-  Sys.time()
 ```
