@@ -72,7 +72,7 @@ library(lobstr)
 
 5. __<span style="color:red">Q</span>__: What does the call tree of an `if` statement with multiple `else if` conditions look like? Why?
 
-   __<span style="color:green">A</span>__: The ast of nested `else if` statements might look a bit confusing because it contains multiple brackets. However, we can see that in the `else` part of the *ast* just another expression is being evaluated, which happens to be an `if` statement and so forth.
+   __<span style="color:green">A</span>__: The AST of nested `else if` statements might look a bit confusing because it contains multiple brackets. However, we can see that in the `else` part of the AST just another expression is being evaluated, which happens to be an `if` statement and so forth.
     
     ```{r}
     lobstr::ast(
@@ -150,7 +150,7 @@ library(lobstr)
     call_standardise(quote(mean(x = 1:10, , TRUE)))
     ```
     
-   __<span style="color:green">A</span>__: The reason for this unexpected behaviour lies in the fact that `mean()` uses the `...` argument and therefore can not standardise the regarding arguments. Since `mean()` uses S3 dispatch (i.e., `UseMethod`) and the underlying `mean.default()` method specifies some more arguments, `rlang::call_standardise()` can do much better when the S3 dispatch is explicit.
+   __<span style="color:green">A</span>__: The reason for this unexpected behaviour is that `mean()` uses the `...` argument and therefore can not standardise the regarding arguments. Since `mean()` uses S3 dispatch (i.e., `UseMethod()`) and the underlying `mean.default()` method specifies some more arguments, `rlang::call_standardise()` can do much better when the S3 dispatch is explicit.
     
     ```{r}
     call_standardise(quote(mean.default(1:10, na.rm = TRUE)))
@@ -182,7 +182,7 @@ library(lobstr)
     x
     ```
     
-   So giving the first element a name just adds useless metadata.
+   So giving the first element a name just adds unnecessary metadata.
    
 6. __<span style="color:red">Q</span>__: Construct the expression `if(x > 1) "a" else "b"` using multiple calls to `call2()`. How does the structure code reflect the structure of the AST?
 
@@ -210,21 +210,21 @@ library(lobstr)
     
    Compare and contrast the two uses by referencing the AST.
     
-   __<span style="color:green">A</span>__: The trick with these examples lies in the fact, that `(` can represent a primitive function but also be a part of R's general prefix function syntax.
+   __<span style="color:green">A</span>__: The trick with these examples lies in the fact, that `(` can be a part of R's general prefix function syntax, but also represent a primitive function.
     
-   So in the AST of the first example, we will not see the outer `(`, which belongs to `f()` and is therefore not shown in the syntax, while the inner `(` is treated as a function (symbol):
+   So in the AST of the first example, we will not see the outer `(`, since it is prefix function syntax and belongs to `f()`. In contrast, the inner `(` is a function (represented as a symbol in the AST):
     
     ```{r}
     lobstr::ast(f((1)))
     ```
     
-   In the second example, we can see that the outer `(` is treated as a function and the inner `(` belongs to its syntax:
+   In the second example, we can see that the outer `(` is a function and the inner `(` belongs to its syntax:
     
     ```{r}
     lobstr::ast(`(`(1 + 1))
     ```
     
-   For the sake of clarity, let's also create a third example, where none of the `(` is part of another functions syntax:
+   For the sake of clarity, let's also create a third example, where none of the `(` is part of another function's syntax:
     
     ```{r}
     lobstr::ast(((1 + 1)))
@@ -289,20 +289,26 @@ library(lobstr)
 
 5. __<span style="color:red">Q</span>__: Why does `x1 <- x2 <- x3 <- 0` work? Describe the two reasons.
 
-   __<span style="color:orange">A</span>__: One reason is that `<-` is right-associative.
+   __<span style="color:green">A</span>__: One reason is that `<-` is right-associative. I.e. evaluation takes place from right to left:
+   
+    ```{r}
+    x1 <- x2 <- x3 <- 0
+    ```
+    
+   The other reason it that the assignment operator has the lowest precedence of all operators in R (besides the `?`-shortcut for `help()`), see `?Syntax`.
 
 6. __<span style="color:red">Q</span>__: Compare the ASTs of `x + y %+% z` and `x ^ y %+% z`. What have you learned about the precedence of custom infix functions?
 
    __<span style="color:green">A</span>__: Comparison of the syntax trees:
     
     ```{r}
-    # for ast(x + y %+% z)
-    # y %+% z will be calculated first and the result will be added to x
+    # For ast(x + y %+% z)
+    # y %+% z will be calculated first, and the result will be added to x
     lobstr::ast(x + y %+% z)
     
-    # for ast(x ^ y %+% z) 
+    # For ast(x ^ y %+% z) 
     # x ^ y will be calculated first, and the result will be used as 
-    # first argument of %+%()
+    # First argument of %+%()
     lobstr::ast(x ^ y %+% z)
     ```
     
@@ -319,7 +325,7 @@ library(lobstr)
 
 8. __<span style="color:red">Q</span>__: What happens if you attempt to parse an invalid expression? e.g. `"a +"` or `"f())"`.
 
-   __<span style="color:green">A</span>__: We get an error from the underlying `parse` function
+   __<span style="color:green">A</span>__: We get an error from the underlying `parse()` function
     
     ```{r, error = TRUE}
     rlang::parse_expr("a +")
@@ -350,7 +356,7 @@ library(lobstr)
     expr_text(expr)
     ```
 
-10. __<span style="color:red">Q</span>__: `pairwise.t.test()` assumes that `deparse()` always returns a length one character vector. Can you construct an input that violates this expectation? What happens?
+10.__<span style="color:red">Q</span>__: `pairwise.t.test()` assumes that `deparse()` always returns a length one character vector. Can you construct an input that violates this expectation? What happens?
 
    __<span style="color:green">A</span>__: We can pass an expression to one of `pairwise.t.test()`’s data input arguments, which exceeds the default cutoff width in `deparse()`. The expression will be split into a character vector of length greater 1. The deparsed data inputs are directly pasted (read the source code!) with “and” as separator and the result is just used to be displayed in the output. Just the data.name output will change (it will include more than one “and”).
    
@@ -450,7 +456,7 @@ library(lobstr)
 
    So we need to catch the case where the first two elements are both calls. Further the first call is identical to `<-` and we must return only the second call to see which objects got new values assigned.
     
-   This is why we add the following block Within another `else` statement in `find_assign_call()`:
+   This is why we add the following block within another `else` statement in `find_assign_call()`:
     
     ```{r, eval = FALSE}
     if (is_call(x, "<-") && is_call(x[[2]])) {
