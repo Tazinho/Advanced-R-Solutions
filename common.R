@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 
 options(
   rlang_trace_top_env = rlang::current_env(),
-  rlang__backtrace_on_error = "none"
+  rlang_backtrace_on_error = "none"
 )
 
 options(
