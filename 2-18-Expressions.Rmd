@@ -98,28 +98,20 @@ library(lobstr)
     Why? Similarly, why can't you create an expression that contains an atomic vector of 
     length greater than one? 
     
-   __<span style="color:green">A</span>__: It is not possible to create an expression that evaluates to an atomic of length greater than one without using a function (i.e. the `c()` function). But expressions that include a function would be calls.
+   __<span style="color:green">A</span>__: It is not possible to create an expression that evaluates to an atomic of length greater than one without using a function (e.g. the `c()` funtion). But expressions that include a function are calls.
     
-   Let us illustrate this observation via the following example:
-    
-    ```{r}
-    is.atomic(quote(1))       # atomic
-    is.atomic(quote(c(1,1)))  # not an atomic (it would just evaluate to an atomic).
-    is.call(quote(c(1,1)))    # still a call! (so at least a valid expression).
-    ```
-    <!-- HB: a little more explanation would be nice, I think. -->
-    
-   Two of the six atomic vector types of R do not work with expressions, the first one being raws. We assume, that raws may only be constructed through using `as.raw()`, but this function would then creating another call in the AST.
-    
-   For similar reasons complex numbers also won't work:
+   Let's make this observation concrete via an example:
     
     ```{r}
-    (function(x){is.atomic(x) & length(x) == 1})(quote(1 + 1.5i))
-    
-    # however, imaginary parts of complex numbers work:
-    lobstr::ast(1i)
+    # Atomic
+    is.atomic(quote(1))       
+    # Not an atomic (would just evaluate to an atomic)
+    is.atomic(quote(c(1,1)))  
+    # But a call
+    is.call(quote(c(1,1)))    
     ```
-    <!-- HB: don't fully understand the first line of code in the above code-chunk -->    
+    
+   As there is no way to create raws and complex atomics without using a function call (this is only possible for imaginary scalars like i, 5i etc.), both of these vector types can not appear in an expression.
 
 2. __<span style="color:red">Q</span>__: What happens when you subset a call object to remove the first element?
     e.g. `expr(read.csv("foo.csv", header = TRUE))[-1]`. Why?
