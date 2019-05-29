@@ -288,13 +288,13 @@ library(lobstr)
     lobstr::ast(!1 + !1)
     ```
     
-   So, the right `!1` becomes evaluated, which results in `FALSE`, because in R every non 0 numeric, becomes coerced to `TRUE`, when a logical operator is applied on it.
+   So, the right `!1` becomes evaluated first, resulting in `FALSE`, because in R every non 0 numeric becomes coerced to `TRUE`, when a logical operator is applied on it, and `!TRUE` is `FALSE`.
     
    Next `1 + FALSE` is evaluated to `1`, since `FALSE` is coerced to `0`.
     
-   Finally `!1` is evaluated to `FALSE`, because it is the opposite of `TRUE`, which is what `1` becomes coerced to.
-    
-   However, note that if `!` had a higher precedence, the result would get `FALSE + FALSE` as intermediate result, which would be evalutated (involving coercion again) to `0`.
+   Finally `!1` is evaluated to `FALSE`.
+   
+   However, note that if `!` had a higher precedence, the intermediate result would be `FALSE + FALSE`, which would be evalutated to `0`.
 
 5. __<span style="color:red">Q</span>__: Why does `x1 <- x2 <- x3 <- 0` work? Describe the two reasons.
 
