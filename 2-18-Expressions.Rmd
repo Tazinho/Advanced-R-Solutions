@@ -98,7 +98,7 @@ library(lobstr)
     Why? Similarly, why can't you create an expression that contains an atomic vector of 
     length greater than one? 
     
-   __<span style="color:green">A</span>__: It is not possible to create an expression that evaluates to an atomic of length greater than one without using a function (e.g. the `c()` funtion). But expressions that include a function are calls.
+   __<span style="color:green">A</span>__: It is not possible to create an expression that evaluates to an atomic of length greater than one without using a function (e.g. the `c()` function). But expressions that include a function are calls.
     
    Let's make this observation concrete via an example:
     
@@ -129,7 +129,24 @@ library(lobstr)
     call2(expr(median), expr(x), na.rm = TRUE)
     ```
     
-   __<span style="color:green">A</span>__: The call objects differ in their first two elements, which are sometimes evaluated before the call is constructed. In the first one, both `median()` and `x` are evaluated. Therefore, we can see in the constructed call that `median` is a generic and the `x` argument is `1:10`. In the following calls we remain with differing combinations. Once, only `x` and once only only `median()` gets evaluated. In the final call both aren't evaluated.
+   __<span style="color:green">A</span>__: The call objects differ in their first two elements, which are in some cases evaluated before the call is constructed. In the first one, both `median()` and `x` are evaluated. Therefore, we can see in the constructed call that median is a generic and the `x` argument is 1:10. 
+   
+    ```{r}
+    call2(median, x, na.rm = TRUE)
+    ```
+    
+   In the following calls we remain with differing combinations. Once, only `x` and once only `median()` gets evaluated. 
+    
+    ```{r}
+    call2(expr(median), x, na.rm = TRUE)
+    call2(median, expr(x), na.rm = TRUE)
+    ```
+
+   In the final call neither `x` nor `median()` are evaluated.
+   
+    ```{r}
+    call2(expr(median), expr(x), na.rm = TRUE)
+    ```
 
 4. __<span style="color:red">Q</span>__: `rlang::call_standardise()` doesn't work so well for the following calls.
     Why? What makes `mean()` special?
