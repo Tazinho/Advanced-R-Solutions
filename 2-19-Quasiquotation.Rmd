@@ -143,11 +143,8 @@ library(rlang)
     > as follows: 
     > 
     > * If it is not a bound symbol in `env`, it is unchanged. 
-    > * If it is a promise object (i.e., a formal argument to a function) 
-    >   the expression slot of the promise replaces the symbol. 
-    > * If it is an ordinary variable, its value is substituted;
-    > * Unless `env` is .GlobalEnv in which case the symbol is left 
-    >   unchanged.
+    > * If it is a promise object (i.e., a formal argument to a function) the expression slot of the promise replaces the symbol. 
+    > * If it is an ordinary variable, its value is substituted, unless `env` is .GlobalEnv in which case the symbol is left unchanged.
 
     Create examples that illustrate each of the four different cases.
     
@@ -196,7 +193,7 @@ library(rlang)
     expr(foo(a = xy, b = yz))
     ```
 
-4. __<span style="color:red">Q</span>__: The following two calls print the same, but are actually different:
+2. __<span style="color:red">Q</span>__: The following two calls print the same, but are actually different:
 
     ```{r}
     (a <- expr(mean(1:10)))
@@ -241,9 +238,9 @@ library(rlang)
     
    __<span style="color:green">A</span>__: `exec()` takes a function together with its arguments and an environment as input. The idea is to construct a call from the function and its arguments and evaluate it in the supplied environment. As the `...` argument is handled via `list2()`, `exec` supports tidy dots (quasiquotation), which means that one may unquote arguments via `!!!` and names on the LHS of `:=` via `!!`.
 
-1. __<span style="color:red">Q</span>__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`.  Compare and constract the techniques they use for switching between dots and list behaviour.
+2. __<span style="color:red">Q</span>__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`.  Compare and constract the techniques they use for switching between dots and list behaviour.
 
-2. __<span style="color:red">Q</span>__: Explain the problem with this defintion of `set_attr()`
+3. __<span style="color:red">Q</span>__: Explain the problem with this defintion of `set_attr()`
     
     ```{r, error = TRUE}
     set_attr <- function(x, ...) {
@@ -273,7 +270,7 @@ library(rlang)
     
 1. __<span style="color:red">Q</span>__: In the linear-model example, we could replace the `expr()` in `reduce(summands, ~ expr(!!.x + !!.y))` with `call2()`: `reduce(summands, call2, "+")`. Compare and contrast the two approaches. Which do you think is easier to read?
     
-5. __<span style="color:red">Q</span>__:Re-implement the Box-Cox transform defined below using unquoting and `new_function()`:
+2. __<span style="color:red">Q</span>__:Re-implement the Box-Cox transform defined below using unquoting and `new_function()`:
    
     ```{r}
     bc <- function(lambda) {
@@ -303,7 +300,7 @@ library(rlang)
     bc2(2)(2)
     ```
    
-6. __<span style="color:red">Q</span>__:Re-implement the simple `compose()` defined below using quasiquotation and `new_function()`:
+3. __<span style="color:red">Q</span>__:Re-implement the simple `compose()` defined below using quasiquotation and `new_function()`:
      
     ```{r}
     compose <- function(f, g) {
