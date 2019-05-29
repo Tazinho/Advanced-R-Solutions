@@ -62,7 +62,7 @@ library(tibble)
        
    a) Compute the number of levels for every factor in a data frame.
 
-   __<span style="color:green">A</span>__: To solve this exercise we take advantage of calling the type stable variants of `map()`, which give us more concise output, and use `map_lgl()` to select the columns of the data frame (laer you'll learn about `keep()`, which simplifies this pattern a little).
+   __<span style="color:green">A</span>__: To solve this exercise we take advantage of calling the type stable variants of `map()`, which give us more concise output, and use `map_lgl()` to select the columns of the data frame (later you'll learn about `keep()`, which simplifies this pattern a little).
    
     ```{r}
     map_dbl(mtcars, sd)
@@ -80,9 +80,9 @@ library(tibble)
     trials <- map(1:100, ~ t.test(rpois(10, 10), rpois(10, 7)))
     ```
     
-    (NB: there was a typo in the book. It had `rpois(7, 10)`, not `rpoise(10, 7)`)
+    (NB: there was a typo in the book. It had `rpois(7, 10)`, not `rpoise(10, 7)`.)
 
-   __<span style="color:green">A</span>__: `pluck()` allows us to elegantly extract the p-values and store in a data frame.  
+   __<span style="color:green">A</span>__: `pluck()` allows us to elegantly extract the p-values and store them in a data frame.  
    
    There are many ways to visualise this data, but since it's relatively small, a dot plot allows us to see both the individual values and the overall distribution. 
    
@@ -182,7 +182,7 @@ library(tibble)
     iwalk(cyls, ~ write.csv(.x, .y)))
     ```
     
-    We could do this in a single pipe by taking advantage of `set_names()`:
+   We could do this in a single pipe by taking advantage of `set_names()`:
     
     ```{r, eval = FALSE}
     mtcars %>% 
@@ -215,7 +215,7 @@ library(tibble)
    
    Besides the iteration pattern, the approaches differ in the possibilities for appropriate argument naming in the `.f` argument. In the `map2()` approach we iterate over the elements of `x` and `y`. Therefore, it is possible to choose appropriate placeholders like `f` and `var`. This makes the anonymous function more expressive at the cost of making it longer. However, we think using the formula interface here makes for rather cryptic code: `mtcars[vars] <- map2(trans, mtcars[vars], ~ .x(.y))`. 
    
-   In the `map()` approach we map over the variable names. It is therefore not possible to introduce placeholders for the function and variable names. The formula syntax together with the `.x` shortcut is pretty compact. The object names and the brackets indicate clearly the application of transformaions to specific columns of `mtcars`. In this case the iteration over the variable names comes in handy, as it highlights the importance of matching between `trans` and `mtcars` element names. Together with the replacement form on the left hand side, this lines is relatively easy to inspect. To summarise, in situations where `map()` and `map2()` provide solutions for an iteration problem, several points are to consider before deciding for one or the other approach.
+   In the `map()` approach we map over the variable names. It is therefore not possible to introduce placeholders for the function and variable names. The formula syntax together with the `.x` shortcut is pretty compact. The object names and the brackets indicate clearly the application of transformations to specific columns of `mtcars`. In this case the iteration over the variable names comes in handy, as it highlights the importance of matching between `trans` and `mtcars` element names. Together with the replacement form on the left hand side, this lines is relatively easy to inspect. To summarise, in situations where `map()` and `map2()` provide solutions for an iteration problem, several points are to consider before deciding for one or the other approach.
 
 4. __<span style="color:red">Q</span>__: What does `write.csv()` return? i.e. what happens if you use it with `map2()` instead of `walk2()`?
 
@@ -263,7 +263,7 @@ library(tibble)
     seq(2, 1)
     ```
    
-   Therefore, subsetting length-0 and length-1 vectors via `[[` will lead to a *subscript out of bounds* error . To avoid this, we allow `simple_reduce()` to `return()` before the for-loop is started and include default argument for 0-length vectors.
+   Therefore, subsetting length-0 and length-1 vectors via `[[` will lead to a *subscript out of bounds* error. To avoid this, we allow `simple_reduce()` to `return()` before the for-loop is started and include default argument for 0-length vectors.
    
     ```{r}
     simple_reduce <- function(x, f, default) {
@@ -296,7 +296,7 @@ library(tibble)
       idx <- unname(map_lgl(x, ~ f(.x)))
       rle <- rle(idx) 
   
-      # check that predicate is never TRUE
+      # Check that predicate is never TRUE
       if (!any(rle$values)) {
         return(integer())
       }
@@ -365,7 +365,7 @@ library(tibble)
     arr2
     ```
     
-   When we apply the `head()` function over the first margin of `arr2` (i.e. the rows), the results are contained in the columns of the output, transposing the array compared to the original input.
+   When we apply the `head()` function over the first margin of `arr2()` (i.e. the rows), the results are contained in the columns of the output, transposing the array compared to the original input.
     
     ```{r}
     apply(arr2, 1, function(x) x[1:2])
@@ -383,7 +383,7 @@ library(tibble)
 
    __<span style="color:green">A</span>__: `eapply()` is a variant of `lapply()`, which iterates over the (named) elements of an environment. In purrr there is no equivalent for `eapply()` as purrr mainly provides functions that operate on vectors and functions, but not on environments. 
    
-   `rapply()` applies a function to all elements of a list recursively. This function makes it possible to limit the application of the function to specified classes (default `classes = ANY`). One may also specify how elements of other classes should remain: i.e. as their identity (`how = replace`) or another value (`deflt = NULL`). The closest equivalent in purrr is `modify_depth()`, which allows you to modify elements a specific depth in a nested list.
+   `rapply()` applies a function to all elements of a list recursively. This function makes it possible to limit the application of the function to specified classes (default `classes = ANY`). One may also specify how elements of other classes should remain: i.e. as their identity (`how = replace`) or another value (`deflt = NULL`). The closest equivalent in purrr is `modify_depth()`, which allows you to modify elements at a specified depth in a nested list.
 
 3. __<span style="color:red">Q</span>__: Challenge: read about the [fixed point algorithm](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-12.html#%25_idx_1096). Complete the exercises using R.
 
