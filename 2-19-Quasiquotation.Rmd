@@ -5,7 +5,7 @@ source("common.R")
 # Quasiquotation
 ## Prerequisites {-}
 
-To further compute on the language, we mainly use the rlang package in this section.
+To further compute on the language, we mainly use the rlang package in this chapter.
 
 ```{r}
 library(rlang)
@@ -26,25 +26,39 @@ library(rlang)
     rm(mtcars2)
     ```
     
-   __<span style="color:green">A</span>__: 
-    
-    ```{r, eval = FALSE}
-    library(MASS)  # MASS -> quoted
-    # library also accepts "MASS", which would be evaluated
-    
+   __<span style="color:green">A</span>__: For each argument we follow the advice from the textbook and execute it outside of the function first.
+   
+   As `MASS` raises an error when executed alone, we can clearly see that `library()` quotes it''s first argument.
+
+    ```{r, error = TRUE}
+    library(MASS) 
+    MASS          # MASS -> quoted
+    ```
+
+   The same holds for the second arguments in `subset()` and `with()`:
+
+    ```{r, error = TRUE}
     mtcars2 <- subset(mtcars, cyl == 4)  # mtcars -> evaluated
-                                         # cyl    -> quoted
+    cyl == 4                             # cyl    -> quoted
     
     with(mtcars2, sum(vs))  # mtcars2 -> evaluated
-                            # sum(vs) -> quoted
+    sum(vs)                 # sum(vs) -> quoted
+    ```
+
+   In the following code, the `$()` function clearly quotes `am`:
+
+    ```{r, error = TRUE}
     sum(mtcars2$am)  # matcars$am -> evaluated
-                     # am -> quoted (via `$`)    
-    
+    am               # am         -> quoted by $()
+    ```
+
+   The last example is a bit harder to explain. In short: 
+
+    ```{r}
     rm(mtcars2)  # mtcars2 -> quoted
     ```
-    
-   Some of the arguments (`mtcars` or `mtcars2`) are objects, which can be found in the global environment. When you type them into the console, the object will be returned. Others such as `cyl`, `sum(vs)` or `am` will need to be evaluated within a certain environment. That's why they are quoted.
-
+   
+   When we inspect the source code of `rm()`, we notice that `rm()` catches it's `...` argument internally via `match.call()` as an unevaluated call (in this case a pairlist) and afterwards converts it into a string for further evaluation.
 
 2. __<span style="color:red">Q</span>__: For each function in the following tidyverse code, identify which arguments are quoted and which are evaluated.
 
