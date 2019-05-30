@@ -28,7 +28,7 @@ library(rlang)
     
    __<span style="color:green">A</span>__: For each argument we first follow the advice from the textbook and execute the argument outside of the regarding function. Since `MASS`, `cyl`, `vs` and `am` are not objects contained in the global environment, their execution raises an "Object not found" error. Hence, we can be sure that the regarding function arguments are quoted. For the other arguments, we carefully inspect the source code (and the documentation) to check if any quoting mechanisms are applied or the arguments are evaluated.
 
-    ```{r}
+    ```{r, eval = FALSE}
     library(MASS)  # MASS -> quoted
     # library also accepts character vectors and doesn't quote
     # when character.only is set to TRUE.
@@ -44,9 +44,9 @@ library(rlang)
                      # am -> quoted by $()    
     ```
     
-   When we inspect the source code of `rm()`, we notice that `rm()` catches it's `...` argument internally via `match.call()` as an unevaluated call (in this case a pairlist) and afterwards converts it into a string for further evaluation.
+   When we inspect the source code of `rm()`, we notice that `rm()` catches its `...` argument internally via `match.call()` as an unevaluated call (in this case a pairlist) and afterwards converts it into a string for further evaluation.
 
-    ```{r}
+    ```{r, eval = FALSE}
     rm(mtcars2)  # mtcars2 -> quoted
     ```
    
