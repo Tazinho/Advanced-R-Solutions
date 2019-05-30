@@ -26,40 +26,30 @@ library(rlang)
     rm(mtcars2)
     ```
     
-   __<span style="color:green">A</span>__: For each argument we follow the advice from the textbook and execute it outside of the function first.
-   
-   As `MASS` raises an error when executed alone, we can clearly see that `library()` quotes it''s first argument.
+   __<span style="color:green">A</span>__: For each argument we first follow the advice from the textbook and execute the argument outside of the regarding function. Since `MASS`, `cyl`, `vs` and `am` are not objects contained in the global environment, their execution raises an "Object not found" error. Hence, we can be sure that the regarding function arguments are quoted. For the other arguments, we carefully inspect the source code (and the documentation) to check if any quoting mechanisms are applied or the arguments are evaluated.
 
-    ```{r, error = TRUE}
-    library(MASS) 
-    MASS          # MASS -> quoted
-    ```
-
-   The same holds for the second arguments in `subset()` and `with()`:
-
-    ```{r, error = TRUE}
-    mtcars2 <- subset(mtcars, cyl == 4)  # mtcars -> evaluated
-    cyl == 4                             # cyl    -> quoted
+    ```{r}
+    library(MASS)  # MASS -> quoted
+    # library also accepts character vectors and doesn't quote
+    # when character.only is set to TRUE.
+    # Try: library(MASS, character.only = TRUE)
     
+    mtcars2 <- subset(mtcars, cyl == 4)  # mtcars -> evaluated
+                                         # cyl    -> quoted
+                                         
     with(mtcars2, sum(vs))  # mtcars2 -> evaluated
-    sum(vs)                 # sum(vs) -> quoted
-    ```
-
-   In the following code, the `$()` function clearly quotes `am`:
-
-    ```{r, error = TRUE}
+                            # sum(vs) -> quoted
+                            
     sum(mtcars2$am)  # matcars$am -> evaluated
-    am               # am         -> quoted by $()
+                     # am -> quoted by $()    
     ```
-
-   The last example is a bit harder to explain. In short: 
+    
+   When we inspect the source code of `rm()`, we notice that `rm()` catches it's `...` argument internally via `match.call()` as an unevaluated call (in this case a pairlist) and afterwards converts it into a string for further evaluation.
 
     ```{r}
     rm(mtcars2)  # mtcars2 -> quoted
     ```
    
-   When we inspect the source code of `rm()`, we notice that `rm()` catches it's `...` argument internally via `match.call()` as an unevaluated call (in this case a pairlist) and afterwards converts it into a string for further evaluation.
-
 2. __<span style="color:red">Q</span>__: For each function in the following tidyverse code, identify which arguments are quoted and which are evaluated.
 
     ```{r, eval = FALSE}
