@@ -34,6 +34,8 @@ source("common.R")
    - `approxfun()` takes a 2-dimensional combination of data points (`x` and `y`) as input and returns a *stepwise interpolation function*, which transforms new `x` values. Additional arguments control how the created function should behave. (The interpolation `method` may be linear or constant. `yleft`, `yright` and `rule` specify how the newly created function should map new values which are outside of `range(x)`. `f` controls the degree of right-left-continuity via a numeric value from `0` to `1` and `ties` expects a function name like min, mean etc. which defines how non-unique x-y-combinations should be handled when interpolating the data points.)
 
    - `ecdf()` is an acronym for empirical cumulative distribution function. For a numeric vector, `ecdf()` returns the appropriate distribution function (of class “ecdf”, which is inheriting from class “stepfun”). Initially the (x, y) pairs for the nodes of the density function are calculated. Afterwards these pairs are passed to `approxfun()`, which then returns the desired function.
+   
+  <!-- HW: I think a couple of examples here would help -->
 
 3. __<span style="color:red">Q</span>__: Create a function `pick()` that takes an index, `i`, as an argument and returns a function with an argument `x` that subsets `x` with `i`.
 
@@ -104,10 +106,13 @@ source("common.R")
    
     ```{r, error = TRUE}
     new_counter2()
+    i
     new_counter2()
+    i
     
     i <- 0
     new_counter2()
+    i
     ```
 
 6. __<span style="color:red">Q</span>__: What happens if you use `<-` instead of `<<-`? Make predictions, then verify with the code below.
@@ -137,12 +142,14 @@ source("common.R")
 1. __<span style="color:red">Q</span>__: Compare and contrast `ggplot2::label_bquote()` with `scales::number_format()`.
 
    __<span style="color:green">A</span>__:
+   
+   <!-- HW: not sure what I was thinking here, but I'd focus more on the results than the implementation. i.e. they're both function factories designed to create nice labels; `label_bquote()` is used with facets, and adds mathematical notation; `number_format()` is used with axes/legends, and adds commas etc -->
 
 ## Statistical factories
 
 1. __<span style="color:red">Q</span>__: In `boot_model()`, why don't I need to force the evaluation of `df` or `model`?
 
-   __<span style="color:green">A</span>__: `boot_model()` ultimately returns a function.
+   __<span style="color:green">A</span>__: `boot_model()` ultimately returns a function, and whenever you return a function you need to make sure all the inputs are explicitly evaluated. Here that happens automatically because we use `df` and `formula` in `lm()`.
    
     ```{r}
     boot_model <- function(df, formula) {
@@ -156,8 +163,6 @@ source("common.R")
       }
     } 
     ```
-    
-   In this function neither `df` nor `model` are used. The relevant values, `fitted` and `resid`, have been calculated (and therefore evaluated) in the enclosing environment of `boot_model`. 
 
 2. __<span style="color:red">Q</span>__: Why might you formulate the Box-Cox transformation like this?
 
@@ -175,25 +180,36 @@ source("common.R")
 
    __<span style="color:orange">A</span>__: `boxcox3` returns a function where `x` is fixed (though it is not forced, so it may manipulated later). This allows us to apply and test different transformations for different inputs and give them a descriptive name.
 
-    ```{r}
-    library(purrr)
+    ```{r, out.width = "45%", fig.show = "hold", fig.align = "none"}
     # initial example (should be improved)
     boxcox_airpassengers <- boxcox3(AirPassengers)
     
-    par(mfrow=c(2, 2))
-    purrr::map(c(0.1, 0.3, 0.5, 0.8), boxcox_airpassengers) %>% 
-      purrr::walk(plot)
-    dev.off()
+    plot(boxcox_airpassengers(0))
+    plot(boxcox_airpassengers(1))
+    plot(boxcox_airpassengers(2))
     ```
-
-<!-- this doesn't make much sense, one could also use map2 here and mutate into ggplot or so -->
 
 3. __<span style="color:red">Q</span>__: Why don't you need to worry that `boot_permute()` stores a copy of the data inside the function that it generates?
 
-   __<span style="color:green">A</span>__: The objects created in a manufactured function, like those returned by `boot_compute()`, are created in the function's execution environment. Execution environments are ephemeral: once the function is executed, the environment will be garbage collected. As long as we don't return the execution environment and assign the referencing object, we won't run into problems.
-
-<!-- this could be improved a little more -->
-
+   __<span style="color:green">A</span>__: Because it doesn't actually store a copy; it's just a name that points to the same underlying object in memory.
+   
+    ```{r}
+    boot_permute <- function(df, var) {
+      n <- nrow(df)
+      force(var)
+      
+      function() {
+        col <- df[[var]]
+        col[sample(n, replace = TRUE)]
+      }
+    }
+    boot_mtcars1 <- boot_permute(mtcars, "mpg")
+    
+    lobstr::obj_size(mtcars)
+    lobstr::obj_size(boot_mtcars1)
+    lobstr::obj_sizes(mtcars, boot_mtcars1)
+    ```
+   
 4. __<span style="color:red">Q</span>__: How much time does `ll_poisson2()` save compared to `ll_poisson1()`? Use `bench::mark()` to see how much faster the optimisation occurs. How does changing the length of `x` change the results?
 
    __<span style="color:green">A</span>__: Let us recall the definitions of `ll_poisson1()` and `ll_poisson2()` and the test data `x1`:
@@ -224,8 +240,10 @@ source("common.R")
    A benchmark with this data reveals a performance improvement of factor 2 for `ll_poisson2()` over `ll_poisson1()`
    
     ```{r}    
-    bench::mark(llp1 = optimise(ll_poisson1(x1), c(0, 100), maximum = TRUE),
-                llp2 = optimise(ll_poisson2(x1), c(0, 100), maximum = TRUE))
+    bench::mark(
+      llp1 = optimise(ll_poisson1(x1), c(0, 100), maximum = TRUE),
+      llp2 = optimise(ll_poisson2(x1), c(0, 100), maximum = TRUE)
+    )
     ```
     
    Regarding differing lengths of `x1`, we expect even further performance improvements of `ll_poisson2()` compared to `ll_poisson1()`, as the redundant calculations within `ll_poisson1()`, become more expensive with growing length of `x1`. The following results imply that for a length of `x1` of 100000, `ll_poisson2()` is about 20+ times as fast as `ll_poisson1()`:
