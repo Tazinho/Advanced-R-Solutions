@@ -83,7 +83,7 @@ library(purrr)
       }
     }
     
-    # The following test will create the file "delete_me" in your working directory
+    # This test creates the file "delete_me" in your working directory
     td <- track_dir(dir.create)
     td("delete_me")
     ```
@@ -112,7 +112,7 @@ library(purrr)
       }
     }
 
-    # The following test will again create two files in your working directory
+    # This test will create two files in your working directory
     td <- track_dir(sapply)
     td(c("delete_me", "me_too"), dir.create)
     ```
@@ -131,9 +131,9 @@ library(purrr)
    __<span style="color:green">A</span>__: Note that the example will (again) create a file in your current working directory:
     
     ```{r, eval = FALSE}
-    logger <- function(f, filename){
+    logger <- function(f, prefix){
       force(f)
-      filename_tmp <- paste(filename, basename(tempfile()), sep = "_")
+      filename_tmp <- paste(prefix, basename(tempfile()), sep = "_")
       write(paste("created at:", Sys.time()), filename_tmp, append = TRUE)
       function(..., message = "you can add a message at each call") {
         write(paste0("used at: ", Sys.time(), ", ", message), filename_tmp, append = TRUE)
@@ -141,7 +141,7 @@ library(purrr)
       }
     }
     
-    # The following line creates a file, which name starts with "mean_log_"
+    # The following line creates a file, prefixed with "mean_log_"
     mean2 <- logger(mean, "mean_log") 
     mean2(1:4, message = "first_time") 
     mean2(1:4, message = "second_time")
