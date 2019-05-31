@@ -11,7 +11,7 @@ library(rlang)
 library(purrr)
 ```
 
-## Evaluation Basics
+## Evaluation basics
 
 1. __<span style="color:red">Q</span>__: Carefully read the documentation for `source()`. What environment does it use by default? What if you supply `local = TRUE`? How do you provide a custom environment?
     
@@ -231,7 +231,8 @@ library(purrr)
     capture_env(x)  # functions execution environment is captured
     ```
 
-## Data Masks
+## Data masks
+
 1. __<span style="color:red">Q</span>__: Why did I use a for loop in `transform2()` instead of `map()`? Consider `transform2(df, x = x * 2, x = x * 2)`.
    
    __<span style="color:green">A</span>__: Within the `for`-loop the evaluation of previous steps has already been assigned to `.data`, which makes the specification of chained transformations possible.
@@ -371,6 +372,7 @@ library(purrr)
    PS: Putting breakpoints (`browser()`) inside these functions was really helpful to figure out, what's going on inside of them.
 
 ## Using tidy evaluation
+
 1. __<span style="color:red">Q</span>__:  I've included an alternative implementation of `threshold_var()` below. What makes it different to the approach I used above? What makes it harder?
 
     ```{r}
