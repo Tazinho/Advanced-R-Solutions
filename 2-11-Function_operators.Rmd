@@ -4,7 +4,7 @@ source("common.R")
 
 # Function operators
 
-```{r}
+```{r setup}
 library(purrr)
 ```
 
@@ -13,9 +13,9 @@ library(purrr)
 
 1. __<span style="color:red">Q</span>__: Base R provides a function operator in the form of `Vectorize()`. What does it do? When might you use it?    
    
-   __<span style="color:green">A</span>__: In R a lot of functions are "vectorised". This means, that a computation is iteratively applied to each element of a "vectorised argument". Further - in the context of R - the term vectorised implies that these operations are implemented in a compiled language such as C or Fortran as these languages provide faster evaluation of for loops than R does.
+   __<span style="color:green">A</span>__: In R a lot of functions are "vectorised". Vectorised has two meanings. First, it means (broadly) that a function inputs a vector or vectors, and does something to each element. Secondly, it usually implies that these operations are implemented in a compiled language such as C or Fortran, so that the implementation is very fast.
    
-   Despite what the function's name tells us, `Vectorize()` is not able to speed up the provided function. It rather changes the input format of the supplied arguments (`vectorize.args`), so that they can be iterated over.
+   However, despite what the functions name implies, `Vectorize()` is not able to speed up the provided function. It rather changes the input format of the supplied arguments (`vectorize.args`), so that they can be iterated over.
 
    In essence, `Vectorize()` is mostly a wrapper for `mapply()`. Let's take a look at an example from the documentation:
 
@@ -30,7 +30,7 @@ library(purrr)
     vrep(times = 1:2, x = 3:4)  
     ```
 
-   `Vectorize()` provides a convenient and concise notation to iterate over multiple arguments. Because of this, `Vectorize()` works best for scalar functions. If you want your vectorised function to be type stable you might want to set `SIMPLIFY = FALSE` inside of `Vectorize()`.
+   `Vectorize()` provides a convenient and concise notation to iterate over multiple arguments, but has some major drawbacks that mean you generally shouldn't use it. See <https://www.jimhester.com/2018/04/12/vectorize/> for more details.
 
 2. __<span style="color:red">Q</span>__: Read the source code for `possibly()`. How does it work?
    
@@ -62,61 +62,62 @@ library(purrr)
 
 1. __<span style="color:red">Q</span>__: Weigh the pros and cons of `download.file %>% dot_every(10) %>% delay_by(0.1)` vs `download.file %>% delay_by(0.1) %>% dot_every(10)`.
    
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: 
+   
+   <!-- HW: do you get the dot before or after the pause. It probably doesn't make such difference here -->
    
 2. __<span style="color:red">Q</span>__: Should you memoise `file.download()`? Why/why not?
    
-   __<span style="color:green">A</span>__: Before you consider to memoise `file.download()`, you should make sure that the files you want to download under a specific URL don't change. It makes sense to memoise `file.download()` in scenarios where objects are downloaded repeatedly and might take a little longer. However, the downside of caching results in memory is that the respective amount of memory will not be available for other tasks during the R session. Therefore, it not beneficial to memoise `file.download()` when it is needed to download very large files, mostly different files or time is not an issue. As the specific meaning of these terms varies in different situations, the best choice depends on the use case and one has to weigh up these trade-offs carefully.
+   __<span style="color:green">A</span>__: Memoising `file.download()` will only work if the files are immutable; i.e. if the file at a given url is always same. There's no point memoising unless this is true. Even if this is true, however, memoise has to store the results in memory, and large files will potentially take up a lot of memory.
+   
+   This implies that it's probably not beneficial to memoise `file.download()` in most cases. The only exception is if you are downloading small files many times, and the file at a given url is guaranteed not to change.
    
 3. __<span style="color:red">Q</span>__: Create a function operator that reports whenever a file is created or deleted in the working directory, using `dir()` and `setdiff()`. What other global function effects might you want to track?
    
-   __<span style="color:green">A</span>__: We start with a short version to show the idea:
-    
-    ```{r, eval = FALSE}
-    track_dir <- function(f){
-      force(f)
-      function(...){
-        dir_old <- dir()
-        on.exit(if(!setequal(dir(), dir_old)){
-          message("files in your working directory were deleted or added by this function")})
-        f(...)
+   __<span style="color:green">A</span>__: We first start with a function that simply reports the difference between two vectors of files:
+   
+    ```{r}
+    dir_compare <- function(old, new) {
+      if (setequal(old, new)) {
+        return()
       }
+    
+      added <- setdiff(new, old)
+      removed <- setdiff(old, new)
+      
+      changes <- c(
+        if (length(added) > 0) paste0(" * '", added, "' was added"),
+        if (length(removed ) > 0) paste0(" * '", removed , "' was removed")
+      )
+      message(paste(changes, collapse = "\n"))
     }
     
-    # This test creates the file "delete_me" in your working directory
-    td <- track_dir(dir.create)
-    td("delete_me")
+    dir_compare(c("x", "y"), c("x", "y"))
+    dir_compare(c("x", "y"), c("x", "a"))
     ```
+   
+    Then we wrap it up in a function operator
     
-   Of course we can provide more information on the type of changes:
-    
-    ```{r, eval = FALSE}
-    track_dir <- function(f){
+    ```{r}
+track_dir <- function(f) {
       force(f)
-      function(...){
+      function(...) {
         dir_old <- dir()
-        
-        on.exit(if(!setequal(dir(), dir_old)){
-          message("Files in your working directory were deleted
-                   or added by this function.")}, add = TRUE)
-        on.exit(if(length(setdiff(dir_old, dir()))){
-          message(paste0("The following files were deleted: ",
-                         paste(setdiff(dir_old, dir()),
-                               collapse = ", ")
-                         ))}, add = TRUE)
-        on.exit(if(length(setdiff(dir(), dir_old))){
-          message(paste0("The following files were added: ", 
-                         paste(setdiff(dir(), dir_old),
-                               collapse = ", ")
-                         ))}, add = TRUE)
+        on.exit(dir_compare(dir_old, dir()), add = TRUE)
         
         f(...)
       }
     }
+    ```
+  
+    And try it out by creating wrappers around `file.create()` and `file.remove()`:
 
-    # This test will create two files in your working directory
-    td <- track_dir(sapply)
-    td(c("delete_me", "me_too"), dir.create)
+    ```{r}
+    file_create <- track_dir(file.create)
+    file_remove <- track_dir(file.remove)
+    
+    file_create("delete_me")
+    file_remove("delete_me")
     ```
     
    To create a more serious version of `track_dir()` one might provide optionality to set the `full.names` and `recursive` arguments of `dir()` to `TRUE`. This would enable to also track the creation/deletion of hidden files and files in folders contained in the working directory.
@@ -130,25 +131,35 @@ library(purrr)
    
 4. __<span style="color:red">Q</span>__: Write a function operator that logs a timestamp and message to a file every time a function is run.
    
-   __<span style="color:green">A</span>__: Note that the example will (again) create a file in your current working directory:
+   __<span style="color:green">A</span>__: 
     
-    ```{r, eval = FALSE}
-    logger <- function(f, prefix){
+    ```{r}
+    append_line <- function(path, ...) { 
+      cat(..., "\n", sep = "", file = path, append = TRUE)
+    }
+    
+    logger <- function(f, log_path) {
       force(f)
-      filename_tmp <- paste(prefix, basename(tempfile()), sep = "_")
-      write(paste("created at:", Sys.time()),
-            filename_tmp, append = TRUE)
-      function(..., message = "you can add a message at each call") {
-        write(paste0("used at: ", Sys.time(), ", ", message),
-              filename_tmp, append = TRUE)
+      force(log_path)
+      
+      append_line(log_path, "created at: ", as.character(Sys.time()))
+      function(...) {
+        append_line(log_path, "called at: ", as.character(Sys.time()))
         f(...)
       }
     }
+    ```
+
+
+    ```{r}
+    log_path <- tempfile()
+    mean2 <- logger(mean, log_path)
+    Sys.sleep(5)
+    mean2(1:4) 
+    Sys.sleep(1)
+    mean2(1:4)
     
-    # The following line creates a file, prefixed with "mean_log_"
-    mean2 <- logger(mean, "mean_log") 
-    mean2(1:4, message = "first_time") 
-    mean2(1:4, message = "second_time")
+    readLines(log_path)
     ```
    
 5. __<span style="color:red">Q</span>__: Modify `delay_by()` so that instead of delaying by a fixed amount of time, it ensures that a certain amount of time has elapsed since the function was last called. That is, if you called `g <- delay_by(1, f); g(); Sys.sleep(2); g()` there shouldn't be an extra delay.
@@ -156,46 +167,28 @@ library(purrr)
    __<span style="color:green">A</span>__: We can do this with three little tricks (and the help of 42):
     
     ```{r, eval = FALSE}
-    delay_by_v2 <- function(f, amount) {
+    delay_atleast <- function(f, amount) {
       force(f)
       force(amount)
       
-      # First, we initialise the timestamp for the last run: 
-      # Here, we set a specific default value, to ensure that
-      # the first run of the new function will never be delayed.
-      
-      last_runtime <- Sys.time() - (amount + 42)
+      # Store the last time the function was run
+      last_time <- NULL
       
       function(...) {
-      
-        # Inside the new function we continually check via an empty
-        # while statement, if enough time has passed.
+        if (!is.null(last_runtime)) {
+          wait <- (last_time - Sys.time()) + amount
+          if (wait > 0) {
+            Sys.sleep(wait)
+          }
+        }
+
+        # Update the time after the function has finished
+        on.exit(last_time <<- Sys.time()) 
         
-        while (Sys.time() < last_runtime + amount) {}
-        
-        # Finally, set the timestamp to start the next waiting period
-        # to begin after the function is evaluated.
-        
-        on.exit(last_runtime <<- Sys.time()) 
-        
-        return(f(...))
+        f(...)
       }
     }
     ```
     
-   Alternatively to the empty while statement we could have used `Sys.sleep()`. I would not recommend this solution, since `?Sys.sleep` indicates that `Sys.sleep()` might have some overhead and seems not to be as exact as we need.
-
-<!-- MGO: Not sure, if this exercise really intends to track the time of the call or the finished evaluation of the new function. 
-The current solution assumes the first case. However, regarding the latter case I would introduce two timers that jump one (timer) up, whenever the new function gets evaluated. I.e. use sth. like
-
-```
-# Initialisation
-last_call <- Sys.time() - amount
-this_call <- Sys.time()
-
-# During evaluation of new function
-last_call <<- this_call
-this_call <-  Sys.time()
-```
-
--->
+    <!-- HW: Sys.sleep() is right the solution here. But can you check that I got the algebra correct? -->
+    
