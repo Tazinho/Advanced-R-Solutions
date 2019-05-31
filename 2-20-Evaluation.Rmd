@@ -15,14 +15,14 @@ library(purrr)
 
 1. __<span style="color:red">Q</span>__: Carefully read the documentation for `source()`. What environment does it use by default? What if you supply `local = TRUE`? How do you provide a custom environment?
     
-   __<span style="color:green">A</span>__: By default, `source()` uses the global environment, but another evaluation environment may also be chosen, by passing it to the `local`-argument. To use a local environment set `local = TRUE`.
+   __<span style="color:green">A</span>__: By default, `source()` uses the global environment, but another evaluation environment may also be chosen, by passing it to the `local` argument. To use a local environment set `local = TRUE`.
     
     ```{r}
-    # create temporary, sourcable R script
+    # Create temporary, sourcable R script
     tmp_file <- tempfile()
     writeLines("print(x)", tmp_file)
     
-    # set x globally
+    # Set x globally
     x <- "global environment"
     env2 <- rlang::env(x = "specified envirionment")
     
@@ -31,7 +31,7 @@ library(purrr)
       source(file, local = local)
     }
     
-    # where will source() be evaluated?
+    # Where will source() be evaluated?
     locate_evaluation(tmp_file, local = FALSE)  # default
     locate_evaluation(tmp_file, local = env2)
     locate_evaluation(tmp_file, local = TRUE)
