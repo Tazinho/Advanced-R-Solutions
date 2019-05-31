@@ -97,15 +97,17 @@ library(purrr)
         dir_old <- dir()
         
         on.exit(if(!setequal(dir(), dir_old)){
-          message("Files in your working directory were deleted or added by this
-                  function.")}, add = TRUE)
+          message("Files in your working directory were deleted
+                   or added by this function.")}, add = TRUE)
         on.exit(if(length(setdiff(dir_old, dir()))){
           message(paste0("The following files were deleted: ",
-                         paste(setdiff(dir_old, dir()), collapse = ", ")
+                         paste(setdiff(dir_old, dir()),
+                               collapse = ", ")
                          ))}, add = TRUE)
         on.exit(if(length(setdiff(dir(), dir_old))){
           message(paste0("The following files were added: ", 
-                         paste(setdiff(dir(), dir_old), collapse = ", ")
+                         paste(setdiff(dir(), dir_old),
+                               collapse = ", ")
                          ))}, add = TRUE)
         
         f(...)
@@ -134,9 +136,11 @@ library(purrr)
     logger <- function(f, prefix){
       force(f)
       filename_tmp <- paste(prefix, basename(tempfile()), sep = "_")
-      write(paste("created at:", Sys.time()), filename_tmp, append = TRUE)
+      write(paste("created at:", Sys.time()),
+            filename_tmp, append = TRUE)
       function(..., message = "you can add a message at each call") {
-        write(paste0("used at: ", Sys.time(), ", ", message), filename_tmp, append = TRUE)
+        write(paste0("used at: ", Sys.time(), ", ", message),
+              filename_tmp, append = TRUE)
         f(...)
       }
     }
