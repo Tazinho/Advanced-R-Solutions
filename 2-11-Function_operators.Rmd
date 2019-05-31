@@ -15,7 +15,7 @@ library(purrr)
    
    __<span style="color:green">A</span>__: In R a lot of functions are "vectorised". This means, that a computation is iteratively applied to each element of a "vectorised argument". Further - in the context of R - the term vectorised implies that these operations are implemented in a compiled language such as C or Fortran as these languages provide faster evaluation of for loops than R does.
    
-   Despite what the function's name tells us, `Vectorize()` is not able to speed up the provided function. It rather changes the input format of the supplied arguments (`vectorize.args`), so that they are iterated over.
+   Despite what the function's name tells us, `Vectorize()` is not able to speed up the provided function. It rather changes the input format of the supplied arguments (`vectorize.args`), so that they can be iterated over.
 
    In essence, `Vectorize()` is mostly a wrapper for `mapply()`. Let's take a look at an example from the documentation:
 
@@ -66,7 +66,7 @@ library(purrr)
    
 2. __<span style="color:red">Q</span>__: Should you memoise `file.download()`? Why/why not?
    
-   __<span style="color:green">A</span>__: Before you consider to memoise `file.download()`, always ensure that the files you want to download under a specific URL don't change. It makes sense to memoise `file.download()` in scenarios where objects are downloaded repeatedly and might take a little longer. However, the downside of caching results in memory is that the regarding amount of memory will not be available for other tasks during the R session. Therefore, it doesn't make sense to memoise `file.download()` when it is needed to download very large files, mostly different files or time is not an issue. As the meaning of these terms varies regarding differing situations, it always depends on the use case and one has to weigh up these trade offs carefully.
+   __<span style="color:green">A</span>__: Before you consider to memoise `file.download()`, you should make sure that the files you want to download under a specific URL don't change. It makes sense to memoise `file.download()` in scenarios where objects are downloaded repeatedly and might take a little longer. However, the downside of caching results in memory is that the respective amount of memory will not be available for other tasks during the R session. Therefore, it not beneficial to memoise `file.download()` when it is needed to download very large files, mostly different files or time is not an issue. As the specific meaning of these terms varies in different situations, the best choice depends on the use case and one has to weigh up these trade-offs carefully.
    
 3. __<span style="color:red">Q</span>__: Create a function operator that reports whenever a file is created or deleted in the working directory, using `dir()` and `setdiff()`. What other global function effects might you want to track?
    
@@ -88,7 +88,7 @@ library(purrr)
     td("delete_me")
     ```
     
-    Of course we can provide more information on the type of changes:
+   Of course we can provide more information on the type of changes:
     
     ```{r, eval = FALSE}
     track_dir <- function(f){
@@ -149,8 +149,7 @@ library(purrr)
    
 5. __<span style="color:red">Q</span>__: Modify `delay_by()` so that instead of delaying by a fixed amount of time, it ensures that a certain amount of time has elapsed since the function was last called. That is, if you called `g <- delay_by(1, f); g(); Sys.sleep(2); g()` there shouldn't be an extra delay.
    
-   __<span style="color:green">A</span>__: We can do this with three little tricks (and the help
-    of 42):
+   __<span style="color:green">A</span>__: We can do this with three little tricks (and the help of 42):
     
     ```{r, eval = FALSE}
     delay_by_v2 <- function(f, amount) {
