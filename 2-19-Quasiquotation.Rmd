@@ -155,6 +155,8 @@ library(rlang)
 
     Create examples that illustrate each of the four different cases.
     
+   __<span style="color:green">A</span>__: 
+    
 ## Unquoting
 
 1. __<span style="color:red">Q</span>__: Given the following components:
@@ -243,9 +245,11 @@ library(rlang)
     }
     ```
     
-   __<span style="color:green">A</span>__: `exec()` takes a function together with its arguments and an environment as input. The idea is to construct a call from the function and its arguments and evaluate it in the supplied environment. As the `...` argument is handled via `list2()`, `exec` supports tidy dots (quasiquotation), which means that one may unquote arguments via `!!!` and names on the LHS of `:=` via `!!`.
+   __<span style="color:green">A</span>__: `exec()` takes a function together with its arguments and an environment as input. The idea is to construct a call from the function and its arguments and evaluate it in the supplied environment. As the `...` argument is handled via `list2()`, `exec()` supports tidy dots (quasiquotation), which means that one may unquote arguments via `!!!` and names on the LHS of `:=` via `!!`.
 
 2. __<span style="color:red">Q</span>__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`.  Compare and constract the techniques they use for switching between dots and list behaviour.
+
+   __<span style="color:green">A</span>__: 
 
 3. __<span style="color:red">Q</span>__: Explain the problem with this defintion of `set_attr()`
     
@@ -276,7 +280,9 @@ library(rlang)
 ## Case studies {#expr-case-studies}
     
 1. __<span style="color:red">Q</span>__: In the linear-model example, we could replace the `expr()` in `reduce(summands, ~ expr(!!.x + !!.y))` with `call2()`: `reduce(summands, call2, "+")`. Compare and contrast the two approaches. Which do you think is easier to read?
-    
+
+   __<span style="color:green">A</span>__: 
+
 2. __<span style="color:red">Q</span>__:Re-implement the Box-Cox transform defined below using unquoting and `new_function()`:
    
     ```{r}
