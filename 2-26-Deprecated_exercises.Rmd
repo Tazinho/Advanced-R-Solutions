@@ -1763,3 +1763,132 @@ does it work?
     ```{r}
     rlang::expr_label(expr)
     ```
+
+## Quasiquotation
+
+### Old exercises Unquoting
+
+1. __[Q]{.Q}__: What does the following command return? What information is lost? Why?
+
+    ```{r, eval = FALSE}
+    expr({
+      x +              y # comment  
+    })
+    ```
+
+   __[A]{.solved}__: When we look at the captured expression, we see that the extra whitespaces and comments are lost. R ignores them when parsing an expression. They do do not need to be represented in the AST, because they do not affect the evaluation of the expression.
+    
+    ```{r}
+    library(rlang)
+    captured_expression <- expr({
+      x +              y # comment  
+    })
+    
+    captured_expression
+    ```
+   
+   However, it is possible to retrieve the original input through the attributes of the captured expression:
+    
+    ```{r}
+    attributes(captured_expression)
+    ```
+
+### Unquoting
+
+2. __[Q]{.Q}__: Explain why both `!0 + !0` and `!1 + !1` return `FALSE` while `!0 + !1` returns `TRUE`.
+    
+   __[A]{.solved}__: To answer this question we look at the AST of the first example:
+    
+    ```{r}
+    library(lobstr)
+    
+    ast(!0 + !0)
+    ```
+    
+   As the coercion rules are the same in all examples, we can use the precedence order (right to left) to explain all three examples:
+    
+   * `!0 + !0`:  
+     So the second zero gets coerced to `FALSE` and `!FALSE` becomes `TRUE`.  
+     `0 + TRUE` gets coerced to 1.  
+     `!1` becomes `!TRUE` which is `FALSE`  
+   * `!1 + !1`:  
+     So `!1` is `FALSE`.  
+     `1 + FALSE` is `1`.  
+     `!1` is `!TRUE` so `FALSE`.  
+   * `!0 + !1`:  
+     `!1` is `FALSE`.  
+     `0 + FALSE` is `0`.  
+     `!0` is `TRUE`.  
+
+3. __[Q]{.Q}__: Base functions `match.fun()`, `page()`, and `ls()` all try to automatically determine whether you want standard or non-standard evaluation. Each uses a different approach. Figure out the essence of each approach by reading the source code, then compare and contrast the techniques.
+
+### Case studies {#quasi-case-studies}
+
+1. __[Q]{.Q}__: Implement `arrange_desc()`, a variant of `dplyr::arrange()` that sorts in descending order by default.
+   
+   __[A]{.solved}__: We just have to catch the `...` from `arrange()` as an expression and modify the expression to be wrapped inside `desc()`. Afterwards we evaluate this new code within a regular `arrange()` call:
+       
+    ```{r}
+    library(dplyr)
+    library(purrr)
+    
+    arrange_desc <- function(.data, ...){
+      increasing <- enexprs(...)
+      decreasing <- map(increasing, ~ expr(desc(!!.x)))
+      
+      arrange(.data, !!!decreasing)
+    }
+    ```
+    
+   Let's try it out
+    
+    ```{r}
+    d <- data.frame(abc = letters[1:6],
+                    id1 = 1:6,
+                    id2 = rep(1:2, 3))
+      
+      # old behaviour
+    d %>% arrange(id2, id1)
+    
+    # new descending behaviour
+    d %>% arrange_desc(id2, id1)
+    ```
+  
+2. __[Q]{.Q}__: Implement `filter_or()`, a variant of `dplyr::filter()` that combines multiple arguments using `|` instead of `&`.
+       
+   __[A]{.solved}__: This time we just need to collapse the `...` arguments with `|`. Therefore we can use `purrr::reduce()` and afterwards we just need to evaluate the new code within a regular filter call:
+    
+    ```{r}
+    filter_or <- function(.data, ...){
+      normal <- enexprs(...)
+      
+      normal_or <- reduce(normal, function(x, y) expr(!!x | !!y))
+      
+      filter(.data, !!!normal_or)
+    }
+    
+    # and test it
+    d <- data.frame(x = 1:6, y = 6:1)
+    filter_or(d, x < 3, y < 3)
+    ```
+
+3. __[Q]{.Q}__:Implement `partition_rows()` which, like `partition_cols()`, returns two data frames, one containing the selected rows, and the other containing the rows that weren't selected.
+   
+   __[A]{.solved}__: We just have to decide if we focus on integer subsetting via `dplyr::slice()` or logical subsetting via `dplyr::filter()`. The rest is straightforward. Since the implementations of both subsetting styles are completely equivalent we just choose one without any particular reason:
+    
+    ```{r}
+    partition_rows <- function(.data, ...){
+      included <- enexprs(...)
+      excluded <- map(included, ~ expr(!(!!.x)))
+      
+      list(
+        incl = filter(.data, !!!included),
+        excl = filter(.data, !!!excluded)
+      )
+    }
+    
+    d <- data.frame(x = 1:6, y = 6:1)
+    partition_rows(d, x <= 3)
+    ```
+
+4. __[Q]{.Q}__:Add error handling to `slice()`. Give clear error messages if either `along` or `index` have invalid values (i.e. not numeric, not length 1, too small, or too big).
