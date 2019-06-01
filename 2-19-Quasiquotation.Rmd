@@ -63,23 +63,43 @@ library(rlang)
     ggplot(by_cyl, aes(cyl, mean)) + geom_point()
     ```
 
-   __<span style="color:green">A</span>__:
+   __<span style="color:green">A</span>__: From the last exercise we already know that `library()` calls its first argument.
     
     ```{r, eval = FALSE}
     library(dplyr)    # dplyr -> quoted
     library(ggplot2)  # ggplot2 -> quoted
+    ```
     
+     In similar manner, it becomes obvious that `cyl` is quoted by `group_by()`.
+    
+    ```{r, eval = FALSE}
     by_cyl <- mtcars %>%  # mtcars -> evaluated
       group_by(cyl) %>%   # cyl -> quoted
-      summarise(mean = mean(mpg))  # mean, mean() and mpg -> quoted
+      summarise(mean = mean(mpg))  # mean = mean(mpg) -> quoted
+    ```
+   
+   To find out what happens in `summarise()`, we need to inspect its source code. While following the S3-dispatch of `summarise()`, it turns out that the `...` argument gets quoted in the underlying `summarise.tbl_df()` method.
     
+    ```{r}
+    dplyr::summarise
+    
+    dplyr:::summarise.tbl_df
+    ```
+    
+   In the following ggplot2 code it should be already obvious that `cyl` and `mean` are quoted.
+    
+    ```{r, eval = FALSE}
     ggplot(by_cyl,  # by_cyl -> evaluated
            aes(cyl, mean)) +  # aes() -> evaluated
                               # cyl, mean -> quoted (via aes)
       geom_point() 
     ```
     
-   The column names in piped dplyr-statements need to be quoted, so they can be found in the specified dataframe. The names of new variables as defined on the LHS of the `summarise`-expression are also quoted, while the function calls on the RHS will be evaluated.
+   We can unveil this also explicitly by inspecting `aes()`'s source code.
+   
+    ```{r}
+    ggplot2::aes
+    ```
     
 ## Quoting
 
