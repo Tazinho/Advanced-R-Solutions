@@ -185,7 +185,32 @@ library(rlang)
 
     Create examples that illustrate each of the above cases.
     
-   __<span style="color:green">A</span>__: 
+   __<span style="color:green">A</span>__: Let's create a new environment `a` containing no objects. In this case `substitute()` will just return its first argument (`expr`):
+   
+    ```{r}
+    a <- base::new.env()
+    substitute(x, a)
+    ```
+    
+   Now, let's create a function containing one argument, which gets directly returned after substitution. This function just returns the provided expression:
+   
+    ```{r}
+    bla <- function(x) {substitute(x)}
+
+    bla(x + y * sin(0))
+    ```
+    
+   In case `substitute()` can find (parts of) the expression in `env`, it will litterally substitute. However, unless `env` is `.GlobalEnv`
+   
+    ```{r}
+    a$x <- 7
+    
+    substitute(x, a)
+    substitute(x + y, a)
+    
+    x <- 7
+    substitute(x, .GlobalEnv)
+    ```
     
 ## Unquoting
 
