@@ -299,12 +299,12 @@ library(rlang)
 
 2. __[Q]{.Q}__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`. Compare and contrast the techniques they use for switching between dots and list behaviour.
 
-   __<span style="color:yellow">A</span>__: All three functions capture the dots via `args <- list(...)` and return early in case of `length(args) == 0`. 
+   __[A]{.solved}__:  All three functions capture the dots via `args <- list(...)`. `interaction()` and `expand.grid()` return early in case of `length(args) == 0`. 
    
-   As `interaction()` computes factors regarding combinations of `args` elements, `interaction()` iterates over `args` and doesn't differentiate further between list and dots behaviour. Only the case `length(args) == 1 & is.list(args[[1]])` gets treated via `args <- args[[1]]`. Consequently lists deeper than 1 level raise errors in other 
+   As `interaction()` computes factors regarding combinations of `args` elements, `interaction()` iterates over `args` and doesn't differentiate further between list and dots behaviour. Only the case `length(args) == 1 && is.list(args[[1]])` gets treated via `args <- args[[1]]`. Consequently lists deeper than 1 level raise errors in other parts of the code.
    
     ```{r, error = TRUE}
-    # These are the same
+    # These work and return the same
     identical(
       interaction(     a = c("a", "b", "c", "d"), b = c("e", "f")),
       interaction(list(a = c("a", "b", "c", "d"), b = c("e", "f")))
@@ -314,7 +314,9 @@ library(rlang)
     interaction(list(list(a = c("a", "b", "c", "d"), b = c("e", "f"))))
     ```
     
+   `expand.grid()` switches in exactly the same way as `interaction()`. I.e. it also assigns `args <- args[[1]]` in case of `length(args) == 1 && is.list(args[[1]])` is `TRUE`.
    
+   `par()` preprocesses `args` the most in order to ensure that it becomes a list (or `NULL`). First, in case no dots were supplied (`length(list(...)) == 0`) `par()` creates a list from an internal character vector (partly depending on `par()`'s `no.readonly` argument). Furter, in case all elements of `args` are character vectors (`all(unlist(lapply(args, is.character)))`) `args` is turned into a list via `as.list(unlist(args))`. When `args` is of length one with its first element being a list or `NULL` `args` becomes `args <- args[1]`.
 
 3. __[Q]{.Q}__: Explain the problem with this defintion of `set_attr()`
     
