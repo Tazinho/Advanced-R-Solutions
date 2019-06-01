@@ -10,34 +10,34 @@ library(rlang)
 
 ## Environment basics
 
-1. [Q]{.Q}: List three ways in which an environment differs from a list.
+1. __[Q]{.Q}__: List three ways in which an environment differs from a list.
 
-   [A]{.solved}: The most important differences between environments and lists are:
+   __[A]{.solved}__: The most important differences between environments and lists are:
    - environments have reference semantics (i.e. they don't copy-on-modify).
    - environments have parents
    - the contents of an environment are not ordered
    - the contents of an environment must have unique names
 
-2. [Q]{.Q}: Create an environment as illustrated by this picture.
+2. __[Q]{.Q}__: Create an environment as illustrated by this picture.
 
     ```{r echo=FALSE, out.width = NULL}
     knitr::include_graphics("diagrams/environments/recursive-1.png", dpi = 300)
     ```
     
-   [A]{.solved}: Let's create an environment, that contains itself.
+   __[A]{.solved}__: Let's create an environment, that contains itself.
     
     ```{r}
     e1 <- env()
     e1$loop <- e1
     ```
 
-3. [Q]{.Q}: Create a pair of environments as illustrated by this picture.
+3. __[Q]{.Q}__: Create a pair of environments as illustrated by this picture.
 
     ```{r, echo = FALSE, out.width = NULL}
     knitr::include_graphics("diagrams/environments/recursive-2.png", dpi = 300)
     ```
     
-   [A]{.solved}: These two environments contain each other:
+   __[A]{.solved}__: These two environments contain each other:
     
     ```{r}
     e1 <- env()
@@ -47,13 +47,13 @@ library(rlang)
     e2$dedoop <- e1
     ```
 
-4. [Q]{.Q}: Explain why `e[[1]]` and `e[c("a", "b")]` don't make sense when `e` is an environment.
+4. __[Q]{.Q}__: Explain why `e[[1]]` and `e[c("a", "b")]` don't make sense when `e` is an environment.
 
-   [A]{.solved}: The first option doesn't make sense, because elements of an environment are not ordered. The second option would return two objects at the same time. What data structure would they be contained inside?
+   __[A]{.solved}__: The first option doesn't make sense, because elements of an environment are not ordered. The second option would return two objects at the same time. What data structure would they be contained inside?
 
-5. [Q]{.Q}: Create a version of `env_poke()` that will only bind new names, never re-bind old names. Some programming languages only do this, and are known as [single assignment languages](http://en.wikipedia.org/wiki/Assignment_(computer_science)#Single_assignment).
+5. __[Q]{.Q}__: Create a version of `env_poke()` that will only bind new names, never re-bind old names. Some programming languages only do this, and are known as [single assignment languages](http://en.wikipedia.org/wiki/Assignment_(computer_science)#Single_assignment).
     
-   [A]{.solved}: We want `env_poke2()` to test, if the supplied name is already present in the given environment. We only allow new names to be assigned to a value, otherwise an (informative) error is thrown.
+   __[A]{.solved}__: We want `env_poke2()` to test, if the supplied name is already present in the given environment. We only allow new names to be assigned to a value, otherwise an (informative) error is thrown.
 
     ```{r, error=TRUE}
     env_poke2 <- function(env, name, value) {
@@ -72,7 +72,7 @@ library(rlang)
     env_poke2(env_1, "b", 2)
     ```
 
-6. [Q]{.Q}: What does this function do? How does it differ from `<<-` and why might you prefer it?
+6. __[Q]{.Q}__: What does this function do? How does it differ from `<<-` and why might you prefer it?
    
     ```{r, error = TRUE}
     rebind <- function(name, value, env = caller_env()) {
@@ -90,13 +90,13 @@ library(rlang)
     a
     ```  
     
-   [A]{.solved}: The primary differnce between `rebind()` and `<<-` is that `rebind()` will only carry out an assignment when it finds an existing binding; unlike `<<-` it will never create a new one in the global environment. This is usually undesirable, because global variables introduce non-obvious dependencies between functions.
+   __[A]{.solved}__: The primary differnce between `rebind()` and `<<-` is that `rebind()` will only carry out an assignment when it finds an existing binding; unlike `<<-` it will never create a new one in the global environment. This is usually undesirable, because global variables introduce non-obvious dependencies between functions.
     
 ## Recursing over environments
 
-1. [Q]{.Q}: Modify `where()` to return all environments that contain a binding for `name`. Carefully think through what type of object the function will need to return.
+1. __[Q]{.Q}__: Modify `where()` to return all environments that contain a binding for `name`. Carefully think through what type of object the function will need to return.
    
-   [A]{.solved}: The modified function will always recurse until it reaches the empty environment. Along the way, it will check each environment for a given `name`. Now it will return a list of environments where the binding was found; if no binding was found, the list will be empty. Please also note how the list is initialized via the default argument, when the function is called for the first time. This is a bit confusing, which is why it's common to wrap a recurisve function inside another, more user friendly, function.
+   __[A]{.solved}__: The modified function will always recurse until it reaches the empty environment. Along the way, it will check each environment for a given `name`. Now it will return a list of environments where the binding was found; if no binding was found, the list will be empty. Please also note how the list is initialized via the default argument, when the function is called for the first time. This is a bit confusing, which is why it's common to wrap a recurisve function inside another, more user friendly, function.
 
     ```{r}
     where2 <- function(name, env = caller_env(), results = list()) {
@@ -120,9 +120,9 @@ library(rlang)
     where2("a", e1c)
     ```
 
-2. [Q]{.Q}: Write a function called `fget()` that finds only function objects. It should have two arguments, `name` and `env`, and should obey the regular scoping rules for functions: if there's an object with a matching name that's not a function, look in the parent. For an added challenge, also add an `inherits` argument which controls whether the function recurses up the parents or only looks in one environment.
+2. __[Q]{.Q}__: Write a function called `fget()` that finds only function objects. It should have two arguments, `name` and `env`, and should obey the regular scoping rules for functions: if there's an object with a matching name that's not a function, look in the parent. For an added challenge, also add an `inherits` argument which controls whether the function recurses up the parents or only looks in one environment.
 
-   [A]{.solved}: We follow a similar approach to the previous exercise. This time we additionally check if the found object is a function and implement and argument to turn off the recursion, if desired.
+   __[A]{.solved}__: We follow a similar approach to the previous exercise. This time we additionally check if the found object is a function and implement and argument to turn off the recursion, if desired.
    
     ```{r}
     fget <- function(name, env = caller_env(), inherits = TRUE) {
@@ -150,9 +150,9 @@ library(rlang)
 
 ## Special environments
 
-1. [Q]{.Q}: How is `search_envs()` different fo `env_parents(global_env())`?
+1. __[Q]{.Q}__: How is `search_envs()` different fo `env_parents(global_env())`?
 
-   [A]{.solved}: `search_envs()` returns all the environments on the search path. "The search path is a chain of environments containing exported functions of attached packages" (from `?search_envs`). Every time you attach a new package, this search path will grow. The search path ends with the base-environment. The global environment is included, because functions present in the global environment will always be part of the search path.
+   __[A]{.solved}__: `search_envs()` returns all the environments on the search path. "The search path is a chain of environments containing exported functions of attached packages" (from `?search_envs`). Every time you attach a new package, this search path will grow. The search path ends with the base-environment. The global environment is included, because functions present in the global environment will always be part of the search path.
 
     ```{r, eval=FALSE}
     search_envs()
@@ -186,7 +186,7 @@ library(rlang)
     #> [[11]] $ <env: empty>
     ```
 
-2. [Q]{.Q}: Draw a diagram that shows the enclosing environments of this function:
+2. __[Q]{.Q}__: Draw a diagram that shows the enclosing environments of this function:
     
     ```{r, eval = FALSE}
     f1 <- function(x1) {
@@ -201,7 +201,7 @@ library(rlang)
     f1(1)
     ```  
     
-   [A]{.solved}: Each function environment binds its parent environment. The function environments contain functions and the values provided in the function call.
+   __[A]{.solved}__: Each function environment binds its parent environment. The function environments contain functions and the values provided in the function call.
     
    <!-- HW: Looks good! -->
 
@@ -209,9 +209,9 @@ library(rlang)
     knitr::include_graphics("diagrams/environments/function_environments.png", dpi = 96)
     ```
     
-3. [Q]{.Q}: Write an enhanced version of `str()` that provides more information about functions. Show where the function was found and what environment it was defined in.
+3. __[Q]{.Q}__: Write an enhanced version of `str()` that provides more information about functions. Show where the function was found and what environment it was defined in.
 
-   [A]{.solved}: To solve this problem, we need to write a function that takes the name of a function and looks for that function returning both the function and the environment that it was found in.
+   __[A]{.solved}__: To solve this problem, we need to write a function that takes the name of a function and looks for that function returning both the function and the environment that it was found in.
 
     ```{r}
     fget2 <- function(name, env = caller_env()) {
@@ -253,9 +253,9 @@ library(rlang)
 ## The call stack
 
 <!-- HW: I really don't understand what the point of this question is -->
-1. [Q]{.Q}: Write a function that lists all the variables defined in the environment in which it was called. It should return the same results as `ls()`.
+1. __[Q]{.Q}__: Write a function that lists all the variables defined in the environment in which it was called. It should return the same results as `ls()`.
    
-   [A]{.solved}: We can implement this dynamic scoping behaviour, by explicitly referencing the caller environment. Please note, that this approach returns also variables starting with a dot, an option that `ls()` usually requires.
+   __[A]{.solved}__: We can implement this dynamic scoping behaviour, by explicitly referencing the caller environment. Please note, that this approach returns also variables starting with a dot, an option that `ls()` usually requires.
    
     ```{r}
     ls2 <- function(env = caller_env()) {

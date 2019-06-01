@@ -15,7 +15,7 @@ source("common.R")
 
 ## Factory fundamentals
 
-1. [Q]{.Q}: The definition of `force()` is simple:
+1. __[Q]{.Q}__: The definition of `force()` is simple:
 
     ```{r}
     force
@@ -23,13 +23,13 @@ source("common.R")
     
    Why is it better to `force(x)` instead of just `x`?
     
-   [A]{.solved}: As you can see `force(x)` is just syntactic sugar for `x`. We prefer this explicit form, because
+   __[A]{.solved}__: As you can see `force(x)` is just syntactic sugar for `x`. We prefer this explicit form, because
     
    > using this function clearly indicates that you’re forcing evaluation, not that you’ve accidentally typed `x`. (Quote from the textbook)
 
-2. [Q]{.Q}: Base R contains two function factories, `approxfun()` and `ecdf()`. Read their documentation and experiment to figure out what the functions do and what they return.
+2. __[Q]{.Q}__: Base R contains two function factories, `approxfun()` and `ecdf()`. Read their documentation and experiment to figure out what the functions do and what they return.
 
-   [A]{.solved}: Let's begin with `approxfun()` as it is used within `ecdf()` also:
+   __[A]{.solved}__: Let's begin with `approxfun()` as it is used within `ecdf()` also:
    
    - `approxfun()` takes a 2-dimensional combination of data points (`x` and `y`) as input and returns a *stepwise interpolation function*, which transforms new `x` values. Additional arguments control how the created function should behave. (The interpolation `method` may be linear or constant. `yleft`, `yright` and `rule` specify how the newly created function should map new values which are outside of `range(x)`. `f` controls the degree of right-left-continuity via a numeric value from `0` to `1` and `ties` expects a function name like min, mean etc. which defines how non-unique x-y-combinations should be handled when interpolating the data points.)
 
@@ -37,7 +37,7 @@ source("common.R")
    
   <!-- HW: I think a couple of examples here would help -->
 
-3. [Q]{.Q}: Create a function `pick()` that takes an index, `i`, as an argument and returns a function with an argument `x` that subsets `x` with `i`.
+3. __[Q]{.Q}__: Create a function `pick()` that takes an index, `i`, as an argument and returns a function with an argument `x` that subsets `x` with `i`.
 
     ```{r, eval = FALSE}
     pick(1)(x)
@@ -49,7 +49,7 @@ source("common.R")
     lapply(mtcars, function(x) x[[5]])
     ```
 
-   [A]{.solved}: In this exercise `pick(i)` acts as a function factory, which returns the required subsetting function.
+   __[A]{.solved}__: In this exercise `pick(i)` acts as a function factory, which returns the required subsetting function.
    
     ```{r}
     pick <- function(i) {
@@ -64,7 +64,7 @@ source("common.R")
               lapply(mtcars, pick(5)))
     ```
 
-4. [Q]{.Q}: Create a function that creates functions that compute the i^th^ [central moment](http://en.wikipedia.org/wiki/Central_moment) of a numeric vector. You can test it by running the following code:
+4. __[Q]{.Q}__: Create a function that creates functions that compute the i^th^ [central moment](http://en.wikipedia.org/wiki/Central_moment) of a numeric vector. You can test it by running the following code:
 
     ```{r, eval = FALSE}
     m1 <- moment(1)
@@ -75,7 +75,7 @@ source("common.R")
     stopifnot(all.equal(m2(x), var(x) * 99 / 100))
     ```
 
-   [A]{.solved}: The first moment is closely related to the mean and describes the average deviation from the mean, which is 0 (within numerical margin of error). The second moment describes the variance of the input data. If we want compare it to `var`, we need to undo [Bessel's correction}(https://en.wikipedia.org/wiki/Bessel%27s_correction) correction by multiplying with $\frac{N-1}{N}$.
+   __[A]{.solved}__: The first moment is closely related to the mean and describes the average deviation from the mean, which is 0 (within numerical margin of error). The second moment describes the variance of the input data. If we want compare it to `var`, we need to undo [Bessel's correction}(https://en.wikipedia.org/wiki/Bessel%27s_correction) correction by multiplying with $\frac{N-1}{N}$.
     
     ```{r}
     moment <- function(i){
@@ -92,7 +92,7 @@ source("common.R")
     all.equal(m2(x), var(x) * 99 / 100)
     ```
 
-5. [Q]{.Q}: What happens if you don't use a closure? Make predictions, then verify with the code below.
+5. __[Q]{.Q}__: What happens if you don't use a closure? Make predictions, then verify with the code below.
 
     ```{r}
     i <- 0
@@ -102,7 +102,7 @@ source("common.R")
     }
     ```
 
-   [A]{.solved}: Without the captured and encapsulated environment of a closure the counts will be stored in the global environment. Here they can be overwritten or deleted as well as interfere with other counters.
+   __[A]{.solved}__: Without the captured and encapsulated environment of a closure the counts will be stored in the global environment. Here they can be overwritten or deleted as well as interfere with other counters.
    
     ```{r, error = TRUE}
     new_counter2()
@@ -115,7 +115,7 @@ source("common.R")
     i
     ```
 
-6. [Q]{.Q}: What happens if you use `<-` instead of `<<-`? Make predictions, then verify with the code below.
+6. __[Q]{.Q}__: What happens if you use `<-` instead of `<<-`? Make predictions, then verify with the code below.
 
     ```{r}
     new_counter3 <- function() {
@@ -127,7 +127,7 @@ source("common.R")
     }
     ```
 
-   [A]{.solved}: Without the super assignment `<<-`, the counter will always return 1. The counter always starts in a new execution environment within the same enclosing environment, which contains an unchanged value for `i` (in this case it remains 0).
+   __[A]{.solved}__: Without the super assignment `<<-`, the counter will always return 1. The counter always starts in a new execution environment within the same enclosing environment, which contains an unchanged value for `i` (in this case it remains 0).
    
     ```{r}
     new_counter_3 <- new_counter3()
@@ -139,17 +139,17 @@ source("common.R")
 
 ## Graphical factories
 
-1. [Q]{.Q}: Compare and contrast `ggplot2::label_bquote()` with `scales::number_format()`.
+1. __[Q]{.Q}__: Compare and contrast `ggplot2::label_bquote()` with `scales::number_format()`.
 
-   [A]{.solved}:
+   __[A]{.solved}__:
    
    <!-- HW: not sure what I was thinking here, but I'd focus more on the results than the implementation. i.e. they're both function factories designed to create nice labels; `label_bquote()` is used with facets, and adds mathematical notation; `number_format()` is used with axes/legends, and adds commas etc -->
 
 ## Statistical factories
 
-1. [Q]{.Q}: In `boot_model()`, why don't I need to force the evaluation of `df` or `model`?
+1. __[Q]{.Q}__: In `boot_model()`, why don't I need to force the evaluation of `df` or `model`?
 
-   [A]{.solved}: `boot_model()` ultimately returns a function, and whenever you return a function you need to make sure all the inputs are explicitly evaluated. Here that happens automatically because we use `df` and `formula` in `lm()`.
+   __[A]{.solved}__: `boot_model()` ultimately returns a function, and whenever you return a function you need to make sure all the inputs are explicitly evaluated. Here that happens automatically because we use `df` and `formula` in `lm()`.
    
     ```{r}
     boot_model <- function(df, formula) {
@@ -164,7 +164,7 @@ source("common.R")
     } 
     ```
 
-2. [Q]{.Q}: Why might you formulate the Box-Cox transformation like this?
+2. __[Q]{.Q}__: Why might you formulate the Box-Cox transformation like this?
 
     ```{r}
     boxcox3 <- function(x) {
@@ -178,7 +178,7 @@ source("common.R")
     }
     ```
 
-   [A]{.started}: `boxcox3` returns a function where `x` is fixed (though it is not forced, so it may manipulated later). This allows us to apply and test different transformations for different inputs and give them a descriptive name.
+   __[A]{.started}__: `boxcox3` returns a function where `x` is fixed (though it is not forced, so it may manipulated later). This allows us to apply and test different transformations for different inputs and give them a descriptive name.
 
     ```{r, out.width = "45%", fig.show = "hold", fig.align = "none"}
     # initial example (should be improved)
@@ -189,9 +189,9 @@ source("common.R")
     plot(boxcox_airpassengers(2))
     ```
 
-3. [Q]{.Q}: Why don't you need to worry that `boot_permute()` stores a copy of the data inside the function that it generates?
+3. __[Q]{.Q}__: Why don't you need to worry that `boot_permute()` stores a copy of the data inside the function that it generates?
 
-   [A]{.solved}: Because it doesn't actually store a copy; it's just a name that points to the same underlying object in memory.
+   __[A]{.solved}__: Because it doesn't actually store a copy; it's just a name that points to the same underlying object in memory.
    
     ```{r}
     boot_permute <- function(df, var) {
@@ -210,9 +210,9 @@ source("common.R")
     lobstr::obj_sizes(mtcars, boot_mtcars1)
     ```
    
-4. [Q]{.Q}: How much time does `ll_poisson2()` save compared to `ll_poisson1()`? Use `bench::mark()` to see how much faster the optimisation occurs. How does changing the length of `x` change the results?
+4. __[Q]{.Q}__: How much time does `ll_poisson2()` save compared to `ll_poisson1()`? Use `bench::mark()` to see how much faster the optimisation occurs. How does changing the length of `x` change the results?
 
-   [A]{.solved}: Let us recall the definitions of `ll_poisson1()` and `ll_poisson2()` and the test data `x1`:
+   __[A]{.solved}__: Let us recall the definitions of `ll_poisson1()` and `ll_poisson2()` and the test data `x1`:
    
     ```{r}
     ll_poisson1 <- function(x) {
@@ -279,7 +279,7 @@ source("common.R")
 
 
 ## Function factories + functionals
-1. [Q]{.Q}: Which of the following commands is equivalent to `with(x, f(z))`?
+1. __[Q]{.Q}__: Which of the following commands is equivalent to `with(x, f(z))`?
 
    (a) `x$f(x$z)`.
    (b) `f(x$z)`.
@@ -287,7 +287,7 @@ source("common.R")
    (d) `f(z)`.
    (e) It depends.
 
-   [A]{.solved}: (e) "It depends" is the correct answer. Usually `with()` is used with a data frame, so you'd usually expect (b), but if `x` is a list, it could be any of the options.
+   __[A]{.solved}__: (e) "It depends" is the correct answer. Usually `with()` is used with a data frame, so you'd usually expect (b), but if `x` is a list, it could be any of the options.
 
     ```{r}   
     f <- mean
@@ -300,7 +300,7 @@ source("common.R")
     identical(with(x, f(z)), f(z))
     ```
 
-2. [Q]{.Q}: Compare and contrast the effects of `env_bind()` vs. `attach()` for the following code.
+2. __[Q]{.Q}__: Compare and contrast the effects of `env_bind()` vs. `attach()` for the following code.
    
     ```{r}
     funs <- list(
@@ -317,7 +317,7 @@ source("common.R")
     env_unbind(globalenv(), names(funs))
     ```
 
-   [A]{.solved}: `attach()` adds `funs` to the search path. Therefore, the provided functions are found before their respective versions from the base package. Further, they can not get accidently overwritten by similar named functions in the global environment. One annoying downsinde of using `attach()` is the possibility to attach the same object multiple times, making it necessary to call `detach()` equally often.
+   __[A]{.solved}__: `attach()` adds `funs` to the search path. Therefore, the provided functions are found before their respective versions from the base package. Further, they can not get accidently overwritten by similar named functions in the global environment. One annoying downsinde of using `attach()` is the possibility to attach the same object multiple times, making it necessary to call `detach()` equally often.
    
    In contrast `rlang::env_bind()` just adds the functions in `fun` to the global environment. No further side effects are introduced and the functions are overwritten when similarly named functions are defined.
 
@@ -325,13 +325,13 @@ source("common.R")
 
 ### Closures
 
-1.  [Q]{.Q}: Why are functions created by other functions called closures?
+1.  __[Q]{.Q}__: Why are functions created by other functions called closures?
 
-   [A]{.solved}: As stated in the book:
+   __[A]{.solved}__: As stated in the book:
 
     > because they enclose the environment of the parent function and can access all its variables.
 
-2.  [Q]{.Q}: What does the following statistical function do? What would be a better
+2.  __[Q]{.Q}__: What does the following statistical function do? What would be a better
     name for it? (The existing name is a bit of a hint.)
 
     ```{r}
@@ -344,15 +344,15 @@ source("common.R")
     }
     ```  
     
-    [A]{.solved}: It is the logarithm, when lambda equals zero and `x ^ lambda - 1 / lambda` otherwise. A better name might be `box_cox_transformation` (one parametric), you can read about it (here)[https://en.wikipedia.org/wiki/Power_transform].
+    __[A]{.solved}__: It is the logarithm, when lambda equals zero and `x ^ lambda - 1 / lambda` otherwise. A better name might be `box_cox_transformation` (one parametric), you can read about it (here)[https://en.wikipedia.org/wiki/Power_transform].
     
-3.  [Q]{.Q}: What does `approxfun()` do? What does it return?
-[A]{.solved}: `approxfun` basically takes a combination of 2-dimensional data points + some extra specifications as arguments and returns a stepwise linear or constant interpolation function (defined on the range of given x-values, by default).
+3.  __[Q]{.Q}__: What does `approxfun()` do? What does it return?
+__[A]{.solved}__: `approxfun` basically takes a combination of 2-dimensional data points + some extra specifications as arguments and returns a stepwise linear or constant interpolation function (defined on the range of given x-values, by default).
 
-4.  [Q]{.Q}: What does `ecdf()` do? What does it return?
-[A]{.solved}: "ecdf" means empirical density function. For a numeric vector, `ecdf()` returns the appropriate density function (of class "ecdf", which is inheriting from class "stepfun"). You can describe it's behaviour in 2 steps. In the first part of it's body, the `(x,y)` pairs for the nodes of the density function are calculated. In the second part these pairs are given to `approxfun`.
+4.  __[Q]{.Q}__: What does `ecdf()` do? What does it return?
+__[A]{.solved}__: "ecdf" means empirical density function. For a numeric vector, `ecdf()` returns the appropriate density function (of class "ecdf", which is inheriting from class "stepfun"). You can describe it's behaviour in 2 steps. In the first part of it's body, the `(x,y)` pairs for the nodes of the density function are calculated. In the second part these pairs are given to `approxfun`.
 
-5.  [Q]{.Q}: Create a function that creates functions that compute the ith
+5.  __[Q]{.Q}__: Create a function that creates functions that compute the ith
     [central moment](http://en.wikipedia.org/wiki/Central_moment) of a numeric 
     vector. You can test it by running the following code:
 
@@ -365,7 +365,7 @@ source("common.R")
     stopifnot(all.equal(m2(x), var(x) * 99 / 100))
     ```  
     
-    [A]{.solved}: For a discrete formulation look [here](http://www.r-tutor.com/elementary-statistics/numerical-measures/moment)
+    __[A]{.solved}__: For a discrete formulation look [here](http://www.r-tutor.com/elementary-statistics/numerical-measures/moment)
     
     ```{r, eval = FALSE}
     moment <- function(i){
@@ -373,7 +373,7 @@ source("common.R")
     }
     ```
 
-6.  [Q]{.Q}: Create a function `pick()` that takes an index, `i`, as an argument and
+6.  __[Q]{.Q}__: Create a function `pick()` that takes an index, `i`, as an argument and
     returns a function with an argument `x` that subsets `x` with `i`.
 
     ```{r, eval = FALSE}
@@ -382,7 +382,7 @@ source("common.R")
     lapply(mtcars, function(x) x[[5]])
     ```  
     
-    [A]{.solved}:
+    __[A]{.solved}__:
     
     ```{r, eval = FALSE}
     pick <- function(i){
@@ -396,15 +396,15 @@ source("common.R")
 
 ### Case study: numerical integration
 
-1.  [Q]{.Q}: Instead of creating individual functions (e.g., `midpoint()`,
+1.  __[Q]{.Q}__: Instead of creating individual functions (e.g., `midpoint()`,
       `trapezoid()`, `simpson()`, etc.), we could store them in a list. If we 
     did that, how would that change the code? Can you create the list of 
     functions from a list of coefficients for the Newton-Cotes formulae?  
-    [A]{.solved}:
+    __[A]{.solved}__:
 
-2.  [Q]{.Q}: The trade-off between integration rules is that more complex rules are
+2.  __[Q]{.Q}__: The trade-off between integration rules is that more complex rules are
     slower to compute, but need fewer pieces. For `sin()` in the range 
     [0, $\pi$], determine the number of pieces needed so that each rule will 
     be equally accurate. Illustrate your results with a graph. How do they
     change for different functions? `sin(1 / x^2)` is particularly challenging.  
-    [A]{.solved}:
+    __[A]{.solved}__:

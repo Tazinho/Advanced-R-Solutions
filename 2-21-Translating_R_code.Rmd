@@ -6,7 +6,7 @@ source("common.R")
 
 ### HTML
 
-1. [Q]{.Q}: TODO: Adapt to the new exercise formulation:
+1. __[Q]{.Q}__: TODO: Adapt to the new exercise formulation:
 
    The escaping rules for `<script>` tags are different because they contain JavaScript, not HTML. Instead of escaping angle  brackets or ampersands, you need to escape `</script>` so that the tag isn't closed too early. For example, `script("'</script>'")`, shouldn't generate this:
 
@@ -82,7 +82,7 @@ source("common.R")
     }
     ```
     
-   [A]{.solved}: Sourcecode wrapped in `<script>` or `<style>` tags is different from the other HTML-tags: the `<script>` tag inserts (mainly) JavaScript into the HTML document. Here the angle brackets and ampersands should not be escaped so the code remains intact. Because JavaScript may contain multiple nested `<script>` tags, we need to escape the inner tags as `<\/script>`.
+   __[A]{.solved}__: Sourcecode wrapped in `<script>` or `<style>` tags is different from the other HTML-tags: the `<script>` tag inserts (mainly) JavaScript into the HTML document. Here the angle brackets and ampersands should not be escaped so the code remains intact. Because JavaScript may contain multiple nested `<script>` tags, we need to escape the inner tags as `<\/script>`.
     
    [check, what is meant with "want to escape `</script>` or `</style>`"]{.todo}
     
@@ -163,7 +163,7 @@ source("common.R")
     script("These signs will not be escaped: &, <, >, ", "but these ones will: </script> or </style>")
 ```
 
-2. [Q]{.Q}: The use of `...` for all functions has some big downsides. There's no input validation and there will be little information in the documentation or autocomplete about how they are used in the function. Create a new function that, when given a named list of tags and their attribute names (like below), creates tag functions with named arguments.
+2. __[Q]{.Q}__: The use of `...` for all functions has some big downsides. There's no input validation and there will be little information in the documentation or autocomplete about how they are used in the function. Create a new function that, when given a named list of tags and their attribute names (like below), creates tag functions with named arguments.
 
     ```{r, eval = FALSE}
     list(
@@ -174,7 +174,7 @@ source("common.R")
 
    All tags should get `class` and `id` attributes.
     
-   [A]{.started}: The use of `...` for all functions seems too general. It is known which attributes each tag function may have, so we can organize them in a named list of tags and attribute names.
+   __[A]{.started}__: The use of `...` for all functions seems too general. It is known which attributes each tag function may have, so we can organize them in a named list of tags and attribute names.
     
    We now need to create tag functions where these attributes are prespecified as arguments. This will enable *autocompletion* and *input validation*. (Documentation would require the functions to be bundeled as a package which we won't do here.)
     
@@ -289,7 +289,7 @@ source("common.R")
       map(~ tag)  # potentially use imap to operate on index as well
     ```
 
-3. [Q]{.Q}: Reason about the following code that calls `with_html()` referening objects from the environment. Will it work or fail? Why? Run the code to verify your predictions.
+3. __[Q]{.Q}__: Reason about the following code that calls `with_html()` referening objects from the environment. Will it work or fail? Why? Run the code to verify your predictions.
        
     ```{r, eval = FALSE}
     greeting <- "Hello!"
@@ -299,7 +299,7 @@ source("common.R")
     with_html(p(address))
     ```
     
-   [A]{.started}: (TODO: In the exercise the definition of `p` changed into `p <- function() "p"`. This needs to be added and the exercise/answer might need to get updated. Further `with_html` is defined in the next exercise. Therefore, a change to introduce it already here has to be made...and the chunks then need to be changed to `eval = TRUE`) When we created the various HTML tag functions, `address()` was one of them. This HTML tag may be used to provide contact information on an HTML page. All our tag functions are not present in the global environment, but rather elements of the list `html_tags`.
+   __[A]{.started}__: (TODO: In the exercise the definition of `p` changed into `p <- function() "p"`. This needs to be added and the exercise/answer might need to get updated. Further `with_html` is defined in the next exercise. Therefore, a change to introduce it already here has to be made...and the chunks then need to be changed to `eval = TRUE`) When we created the various HTML tag functions, `address()` was one of them. This HTML tag may be used to provide contact information on an HTML page. All our tag functions are not present in the global environment, but rather elements of the list `html_tags`.
     
    The DSL code wrapped in `with_html()` is evaluated in its own environment and in the "context" of `html_tags`. The tag functions are available, because we provided a list of them as a data mask. As `r ?as_data_mask` indicates: "Objects in the mask have precedence over objects in the environment."
     
@@ -323,10 +323,10 @@ source("common.R")
     with_html(p(address))
     ```
     
-4. [Q]{.Q}: Currently the HTML doesn't look terribly pretty, and it's hard to see the
+4. __[Q]{.Q}__: Currently the HTML doesn't look terribly pretty, and it's hard to see the
    structure. How could you adapt `tag()` to do indenting and formatting?
    
-   [A]{.solved}: First let us define all needed functions from the textbook:
+   __[A]{.solved}__: First let us define all needed functions from the textbook:
     
     ```{r required code from book, include=FALSE}
     tag <- function(tag) {
@@ -478,10 +478,10 @@ source("common.R")
 
 ## LaTeX
 
-1. [Q]{.Q}: Add escaping. The special symbols that should be escaped by adding a backslash in front of them are `\`, `$`, and `%`. Just as with HTML, you'll need to make sure you don't end up double-escaping. So you'll need to create a small S3 class and then use that in function operators. That will also allow you to embed arbitrary LaTeX if needed.
+1. __[Q]{.Q}__: Add escaping. The special symbols that should be escaped by adding a backslash in front of them are `\`, `$`, and `%`. Just as with HTML, you'll need to make sure you don't end up double-escaping. So you'll need to create a small S3 class and then use that in function operators. That will also allow you to embed arbitrary LaTeX if needed.
     
-   [A]{.solved}:
+   __[A]{.solved}__:
 
-2. [Q]{.Q}: Complete the DSL to support all the functions that `plotmath` supports.
+2. __[Q]{.Q}__: Complete the DSL to support all the functions that `plotmath` supports.
 
-   [A]{.solved}:
+   __[A]{.solved}__:

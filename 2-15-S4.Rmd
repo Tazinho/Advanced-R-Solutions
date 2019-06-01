@@ -15,9 +15,9 @@ library(lubridate)
 
 ## Basics
 
-1. [Q]{.Q}: `lubridate::period()` returns an S4 class. What slots does it have? What class is each slot? What accessors does it provide?
+1. __[Q]{.Q}__: `lubridate::period()` returns an S4 class. What slots does it have? What class is each slot? What accessors does it provide?
     
-   [A]{.solved}: Objects of the S4 `Period` class have the six slots `.Data`, `year`, `month`, `day`, `hour` and `minute`, which are each of type double. Except for `.Data` all fields have similar named accessors. `.Data` can be accessed via `methods::gedDataPart()`. As a short example, we create a period of 1 second, 2 minutes, 3 hours, 4 days and 5 weeks.
+   __[A]{.solved}__: Objects of the S4 `Period` class have the six slots `.Data`, `year`, `month`, `day`, `hour` and `minute`, which are each of type double. Except for `.Data` all fields have similar named accessors. `.Data` can be accessed via `methods::gedDataPart()`. As a short example, we create a period of 1 second, 2 minutes, 3 hours, 4 days and 5 weeks.
    
     ```{r}
     example12345 <- period(c(1, 2, 3, 4, 5), 
@@ -36,9 +36,9 @@ library(lubridate)
     str(example12345)
     ```
 
-2. [Q]{.Q}: What other ways can you find help for a method? Read `?"?"` and summarise the details.
+2. __[Q]{.Q}__: What other ways can you find help for a method? Read `?"?"` and summarise the details.
     
-   [A]{.solved}: Besides the already mentioned example of adding `?` in front of a function call (`?method(john)`), we can find:
+   __[A]{.solved}__: Besides the already mentioned example of adding `?` in front of a function call (`?method(john)`), we can find:
     
    * general documentation for a generic via `?genericName`
    * general documentation for the methods of a generic via `methods?genericName`
@@ -46,9 +46,9 @@ library(lubridate)
     
 ## Classes
 
-1. [Q]{.Q}: Extend the Person class with fields to match `utils::person()`. Think about what slots you will need, what class each slot should have, and what you’ll need to check in your validity method.
+1. __[Q]{.Q}__: Extend the Person class with fields to match `utils::person()`. Think about what slots you will need, what class each slot should have, and what you’ll need to check in your validity method.
     
-   [A]{.solved}: The Person class from the textbook contains the slots `name` and `age`. The person class from the utils package contains the slots `given`, `family`, `role`, `email` and `comment`. All these slots must be of type character. Further, the entries in the `role` slot must match one of the following abbreviations "aut", "com", "cph", "cre", "ctb", "ctr", "dtc", "fnd", "rev", "ths", "trl". Therefore, we include all these slots in our new definition of the `Person` class. As `role` might be of different length than the other slots, we include the constraint that all slots must be of length one to the validator.
+   __[A]{.solved}__: The Person class from the textbook contains the slots `name` and `age`. The person class from the utils package contains the slots `given`, `family`, `role`, `email` and `comment`. All these slots must be of type character. Further, the entries in the `role` slot must match one of the following abbreviations "aut", "com", "cph", "cre", "ctb", "ctr", "dtc", "fnd", "rev", "ths", "trl". Therefore, we include all these slots in our new definition of the `Person` class. As `role` might be of different length than the other slots, we include the constraint that all slots must be of length one to the validator.
    
     ```{r}
     # Definition of the Person class
@@ -113,9 +113,9 @@ library(lubridate)
     })
     ```
 
-2. [Q]{.Q}: What happens if you define a new S4 class that doesn’t have any slots?  (Hint: read about virtual classes in `?setClass`.)
+2. __[Q]{.Q}__: What happens if you define a new S4 class that doesn’t have any slots?  (Hint: read about virtual classes in `?setClass`.)
     
-   [A]{.solved}: It depends on the other arguments.
+   __[A]{.solved}__: It depends on the other arguments.
    
    If we supply a class that doesn't exist, we'll get an error
     
@@ -152,15 +152,15 @@ library(lubridate)
                                          programming = "ANY"))
     ```
 
-3. [Q]{.Q}: Imagine you were going to reimplement factors, dates, and data frames in S4. Sketch out the `setClass()` calls that you would use to define the classes. Think about appropriate `slots` and `prototype`.
+3. __[Q]{.Q}__: Imagine you were going to reimplement factors, dates, and data frames in S4. Sketch out the `setClass()` calls that you would use to define the classes. Think about appropriate `slots` and `prototype`.
 
-   [A]{.started}: The basic idea is to use a slot for the base type and one slot per attribute. Inheritance matters for ordered factors and dates. Special checks like equal lengths of list elements for columns of a data frame should be done within a validator.
+   __[A]{.started}__: The basic idea is to use a slot for the base type and one slot per attribute. Inheritance matters for ordered factors and dates. Special checks like equal lengths of list elements for columns of a data frame should be done within a validator.
 
 ## Generics and methods
 
-1. [Q]{.Q}: Add `age()` accessors for the `Person` class.
+1. __[Q]{.Q}__: Add `age()` accessors for the `Person` class.
 
-   [A]{.solved}: Similar as shown for `name()` in the chapter, we define an `age()` generic, with a method for the `Person` class and a replacement function `age<-()`:
+   __[A]{.solved}__: Similar as shown for `name()` in the chapter, we define an `age()` generic, with a method for the `Person` class and a replacement function `age<-()`:
    
     ```{r}
     setGeneric("age", function(x) standardGeneric("age"))
@@ -174,17 +174,17 @@ library(lubridate)
     })
     ```
 
-2. [Q]{.Q}: In the definition of the generic, why is it necessary to repeat the name of the generic twice?
+2. __[Q]{.Q}__: In the definition of the generic, why is it necessary to repeat the name of the generic twice?
 
-   [A]{.solved}: The name is needed as the name of the generic as well as to explicitly incorporate method dispatch via `standardGeneric()` within the generic's body (`def` parameter). This is similar to `UseMethod()` in S3.
+   __[A]{.solved}__: The name is needed as the name of the generic as well as to explicitly incorporate method dispatch via `standardGeneric()` within the generic's body (`def` parameter). This is similar to `UseMethod()` in S3.
 
-3. [Q]{.Q}: Why does the `show()` method defined in Section 15.4.3 use `is(object)[[1]]`? (Hint: try printing the employee subclass.)
+3. __[Q]{.Q}__: Why does the `show()` method defined in Section 15.4.3 use `is(object)[[1]]`? (Hint: try printing the employee subclass.)
 
-   [A]{.solved}: `is(object)` returns the class of the object. In cases of subclasses like `Employee`, `is(object)` contains also the superclass. In order to return always the most specific class (the subclass), `show()` returns the first element of `is(object)`.
+   __[A]{.solved}__: `is(object)` returns the class of the object. In cases of subclasses like `Employee`, `is(object)` contains also the superclass. In order to return always the most specific class (the subclass), `show()` returns the first element of `is(object)`.
 
-4. [Q]{.Q}: What happens if you define a method with different argument names to the generic?
+4. __[Q]{.Q}__: What happens if you define a method with different argument names to the generic?
 
-   [A]{.solved}: It depends. Lets first create the object `hadley` of class "Person":
+   __[A]{.solved}__: It depends. Lets first create the object `hadley` of class "Person":
     
     ```{r}
     .Person <- setClass("Person", 
@@ -241,28 +241,28 @@ library(lubridate)
 
 ## Method dispatch 
 
-1. [Q]{.Q}: Draw the method graph for `f(😅, 😽)`.
+1. __[Q]{.Q}__: Draw the method graph for `f(😅, 😽)`.
 
    __<span style="color:yellow">A</span>__: TODO: This should be straight forward. We just need the class graph from above and insert the graph including the superclasses for both emojis into `f(,)`. Everything then should follow the logic from the chapter...
 
-2. [Q]{.Q}: Draw the method graph for `f(😃, 😉, 😙)`.
+2. __[Q]{.Q}__: Draw the method graph for `f(😃, 😉, 😙)`.
 
-   [A]{.solved}: TODO: The same as in the last exercise. The challenge here might be to visualize the dispatch efficiently for the combination of three arguments at once.
+   __[A]{.solved}__: TODO: The same as in the last exercise. The challenge here might be to visualize the dispatch efficiently for the combination of three arguments at once.
 
-3. [Q]{.Q}: Take the last example which shows multiple dispatch over two classes that use multiple inheritance. What happens if you define a method for all terminal classes? Why does method dispatch not save us much work here?
+3. __[Q]{.Q}__: Take the last example which shows multiple dispatch over two classes that use multiple inheritance. What happens if you define a method for all terminal classes? Why does method dispatch not save us much work here?
 
-   [A]{.solved}: We will introduce ambiguity, since one class has distance 2 to all terminal nodes and the other four have distance 1 to two terminal nodes each. To resolve this ambiguity we have to define five more methods, one per class combination.
+   __[A]{.solved}__: We will introduce ambiguity, since one class has distance 2 to all terminal nodes and the other four have distance 1 to two terminal nodes each. To resolve this ambiguity we have to define five more methods, one per class combination.
 
 
 ## S4 and S3
 
-1. [Q]{.Q}: What would a full `setOldClass()` definition look like for an ordered factor (i.e. add `slots` and `prototype` the definition above)?
+1. __[Q]{.Q}__: What would a full `setOldClass()` definition look like for an ordered factor (i.e. add `slots` and `prototype` the definition above)?
 
-   [A]{.solved}:
+   __[A]{.solved}__:
 
-2. [Q]{.Q}: Define a `length` method for the `Person` class.
+2. __[Q]{.Q}__: Define a `length` method for the `Person` class.
 
-   [A]{.solved}: We can define this method as an S3 method and register it afterwards:
+   __[A]{.solved}__: We can define this method as an S3 method and register it afterwards:
    
     ```{r}
     length.Person <- function(x) "a"

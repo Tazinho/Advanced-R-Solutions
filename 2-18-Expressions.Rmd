@@ -14,7 +14,7 @@ library(lobstr)
 
 ## Abstract syntax trees
 
-1. [Q]{.Q}: Reconstruct the code represented by the trees below:
+1. __[Q]{.Q}__: Reconstruct the code represented by the trees below:
     
     ```{r, echo = FALSE}
     ast(f(g(h())))
@@ -24,7 +24,7 @@ library(lobstr)
     ast((x + y) * z)
     ```
     
-   [A]{.solved}: Let the source (of the codechunks above) be with you and show you how the ASTs were produced. :)
+   __[A]{.solved}__: Let the source (of the codechunks above) be with you and show you how the ASTs were produced. :)
 
     ```{r}
     ast(f(g(h())))
@@ -38,7 +38,7 @@ library(lobstr)
     ast((x + y) * z)
     ```
 
-2. [Q]{.Q}: Draw the following trees by hand then check your answers with `ast()`.
+2. __[Q]{.Q}__: Draw the following trees by hand then check your answers with `ast()`.
 
     ```{r, eval = FALSE}
     f(g(h(i(1, 2, 3))))
@@ -46,7 +46,7 @@ library(lobstr)
     f(g(1, 2), h(3, i(4, 5)))
     ```
 
-   [A]{.solved}: Let us delegate the drawing to the lobstr package.
+   __[A]{.solved}__: Let us delegate the drawing to the lobstr package.
    
     ```{r}
     ast(f(g(h(i(1, 2, 3)))))
@@ -54,7 +54,7 @@ library(lobstr)
     ast(f(g(1, 2), h(3, i(4, 5))))
     ```
 
-3. [Q]{.Q}: What's happening with the ASTs below? (Hint: carefully read `?"^"`)
+3. __[Q]{.Q}__: What's happening with the ASTs below? (Hint: carefully read `?"^"`)
 
     ```{r}
     ast(`x` + `y`)
@@ -62,23 +62,23 @@ library(lobstr)
     ast(1 -> x)
     ```
 
-   [A]{.solved}: ASTs start function calls with the name of the function, because of this the call in the first expression is translated into its prefix form. In the second case, `**` is translated by R's parser into `^`. In the last AST, the expression is flipped when R parses it:
+   __[A]{.solved}__: ASTs start function calls with the name of the function, because of this the call in the first expression is translated into its prefix form. In the second case, `**` is translated by R's parser into `^`. In the last AST, the expression is flipped when R parses it:
    
     ```{r}
     str(expr(a -> b))
     ```
 
-4. [Q]{.Q}: What is special about the AST below? (Hint: re-read Section 6.2.1)
+4. __[Q]{.Q}__: What is special about the AST below? (Hint: re-read Section 6.2.1)
 
     ```{r}
     ast(function(x = 1, y = 2) {})
     ```
 
-   [A]{.solved}: The last leaf of the AST is not explicitly specified in the expression. Instead the `srcref` attribute, which points to the functions source code, is automatically created by base R.
+   __[A]{.solved}__: The last leaf of the AST is not explicitly specified in the expression. Instead the `srcref` attribute, which points to the functions source code, is automatically created by base R.
 
-5. [Q]{.Q}: What does the call tree of an `if` statement with multiple `else if` conditions look like? Why?
+5. __[Q]{.Q}__: What does the call tree of an `if` statement with multiple `else if` conditions look like? Why?
 
-   [A]{.solved}: The AST of nested `else if` statements might look a bit confusing because it contains multiple curly braces. However, we can see that in the `else` part of the AST just another expression is being evaluated, which happens to be an `if` statement and so forth.
+   __[A]{.solved}__: The AST of nested `else if` statements might look a bit confusing because it contains multiple curly braces. However, we can see that in the `else` part of the AST just another expression is being evaluated, which happens to be an `if` statement and so forth.
     
     ```{r}
     ast(
@@ -100,9 +100,9 @@ library(lobstr)
 
 ## Expressions
 
-1. [Q]{.Q}: Which two of the six types of atomic vector can't appear in an expression?  Why? Similarly, why can't you create an expression that contains an atomic vector of length greater than one?
+1. __[Q]{.Q}__: Which two of the six types of atomic vector can't appear in an expression?  Why? Similarly, why can't you create an expression that contains an atomic vector of length greater than one?
     
-   [A]{.solved}: It is not possible to create an expression that evaluates to an atomic of length greater than one without using a function (e.g. the `c()` function). But expressions that include a function are calls.
+   __[A]{.solved}__: It is not possible to create an expression that evaluates to an atomic of length greater than one without using a function (e.g. the `c()` function). But expressions that include a function are calls.
     
    Let's make this observation concrete via an example:
     
@@ -117,11 +117,11 @@ library(lobstr)
     
    As there is no way to create raws and complex atomics without using a function call (this is only possible for imaginary scalars like *i*, *5i* etc.), both of these vector types can not appear in an expression.
 
-2. [Q]{.Q}: What happens when you subset a call object to remove the first element, e.g. `expr(read.csv("foo.csv", header = TRUE))[-1]` Why?
+2. __[Q]{.Q}__: What happens when you subset a call object to remove the first element, e.g. `expr(read.csv("foo.csv", header = TRUE))[-1]` Why?
     
-   [A]{.solved}: When the first element of a call object is removed, the second element moves to the first position, which is typically taken as the function to call. Therefore, we remain with the call `"food.csv"(header = TRUE)`
+   __[A]{.solved}__: When the first element of a call object is removed, the second element moves to the first position, which is typically taken as the function to call. Therefore, we remain with the call `"food.csv"(header = TRUE)`
     
-3. [Q]{.Q}: Describe the differences between the following call objects.
+3. __[Q]{.Q}__: Describe the differences between the following call objects.
 
     ```{r, results = FALSE}
     x <- 1:10
@@ -132,7 +132,7 @@ library(lobstr)
     call2(expr(median), expr(x), na.rm = TRUE)
     ```
     
-   [A]{.solved}: The call objects differ in their first two elements, which are in some cases evaluated before the call is constructed. In the first one, both `median()` and `x` are evaluated. Therefore, we can see in the constructed call that median is a generic and the `x` argument is 1:10.
+   __[A]{.solved}__: The call objects differ in their first two elements, which are in some cases evaluated before the call is constructed. In the first one, both `median()` and `x` are evaluated. Therefore, we can see in the constructed call that median is a generic and the `x` argument is 1:10.
    
     ```{r}
     call2(median, x, na.rm = TRUE)
@@ -151,7 +151,7 @@ library(lobstr)
     call2(expr(median), expr(x), na.rm = TRUE)
     ```
 
-4. [Q]{.Q}: `rlang::call_standardise()` doesn't work so well for the following calls.
+4. __[Q]{.Q}__: `rlang::call_standardise()` doesn't work so well for the following calls.
     Why? What makes `mean()` special?
 
     ```{r}
@@ -162,7 +162,7 @@ library(lobstr)
     call_standardise(quote(mean(x = 1:10, , TRUE)))
     ```
     
-   [A]{.solved}: The reason for this unexpected behaviour is that `mean()` uses the `...` argument and therefore can not standardise the regarding arguments. Since `mean()` uses S3 dispatch (i.e., `UseMethod()`) and the underlying `mean.default()` method specifies some more arguments, `rlang::call_standardise()` can do much better when the S3 dispatch is explicit.
+   __[A]{.solved}__: The reason for this unexpected behaviour is that `mean()` uses the `...` argument and therefore can not standardise the regarding arguments. Since `mean()` uses S3 dispatch (i.e., `UseMethod()`) and the underlying `mean.default()` method specifies some more arguments, `rlang::call_standardise()` can do much better when the S3 dispatch is explicit.
     
     ```{r}
     call_standardise(quote(mean.default(1:10, na.rm = TRUE)))
@@ -170,14 +170,14 @@ library(lobstr)
     call_standardise(quote(mean.default(x = 1:10, , TRUE)))
     ```
     
-5. [Q]{.Q}: Why does this code not make sense?
+5. __[Q]{.Q}__: Why does this code not make sense?
 
     ```{r, eval = FALSE}
     x <- expr(foo(x = 1))
     names(x) <- c("x", "")
     ```
     
-   [A]{.solved}: As stated in the book
+   __[A]{.solved}__: As stated in the book
     
    > The first element of a call is always the function that gets called.
     
@@ -196,9 +196,9 @@ library(lobstr)
     
    So giving the first element a name just adds unnecessary metadata.
    
-6. [Q]{.Q}: Construct the expression `if(x > 1) "a" else "b"` using multiple calls to `call2()`. How does the structure code reflect the structure of the AST?
+6. __[Q]{.Q}__: Construct the expression `if(x > 1) "a" else "b"` using multiple calls to `call2()`. How does the structure code reflect the structure of the AST?
 
-   [A]{.solved}: Similar to the prefix version we get
+   __[A]{.solved}__: Similar to the prefix version we get
     
     ```{r}
     call2("if", expr(x > 1), "a", "b")
@@ -212,7 +212,7 @@ library(lobstr)
 
 ## Parsing and grammar
 
-1. [Q]{.Q}: R uses parentheses in two slightly different ways as illustrated by these two calls:
+1. __[Q]{.Q}__: R uses parentheses in two slightly different ways as illustrated by these two calls:
 
     ```{r, eval = FALSE}
     f((1))
@@ -221,7 +221,7 @@ library(lobstr)
     
    Compare and contrast the two uses by referencing the AST.
     
-   [A]{.solved}: The trick with these examples lies in the fact, that `(` can be a part of R's general prefix function syntax, but also represent a primitive function.
+   __[A]{.solved}__: The trick with these examples lies in the fact, that `(` can be a part of R's general prefix function syntax, but also represent a primitive function.
     
    So in the AST of the first example, we will not see the outer `(`, since it is prefix function syntax and belongs to `f()`. In contrast, the inner `(` is a function (represented as a symbol in the AST):
     
@@ -241,9 +241,9 @@ library(lobstr)
     ast(((1 + 1)))
     ```
     
-2. [Q]{.Q}: `=` can also be used in two ways. Construct a simple example that shows both uses.
+2. __[Q]{.Q}__: `=` can also be used in two ways. Construct a simple example that shows both uses.
     
-   [A]{.solved}: I was not exactly aware of a similar case with multiple syntactical meanings for the `=` symbol, but one can get there somehow. `=` is used as an operator for assignment. It is also part of the logical operators `==`, `>=`, `<=`, `!=` and is also used within functions to assign parameters or the definition of default settings.
+   __[A]{.solved}__: I was not exactly aware of a similar case with multiple syntactical meanings for the `=` symbol, but one can get there somehow. `=` is used as an operator for assignment. It is also part of the logical operators `==`, `>=`, `<=`, `!=` and is also used within functions to assign parameters or the definition of default settings.
 
    <!-- HB: Not really sure, if I can help here. :-/ -->
     
@@ -268,9 +268,9 @@ library(lobstr)
     
    The second way is more explicit, but both return the same syntax tree. When we ignore the braces and compare the trees, we can see, that that the first `=` in the second tree is just part of the syntax and the second `=` one is for the usage of assignment.
 
-3. [Q]{.Q}: Does `-2^2` yield 4 or -4? Why?
+3. __[Q]{.Q}__: Does `-2^2` yield 4 or -4? Why?
 
-   [A]{.solved}: It yields `-4`, because `^` has a higher operator precedence than `-`, which we can verify by looking at the AST:
+   __[A]{.solved}__: It yields `-4`, because `^` has a higher operator precedence than `-`, which we can verify by looking at the AST:
    
     ```{r}
     -2^2
@@ -278,9 +278,9 @@ library(lobstr)
     ast(-2^2)
     ```
 
-4. [Q]{.Q}: What does `!1 + !1` return? Why?
+4. __[Q]{.Q}__: What does `!1 + !1` return? Why?
 
-   [A]{.solved}: The first answer is quite simple
+   __[A]{.solved}__: The first answer is quite simple
     
     ```{r}
     !1 + !1
@@ -300,9 +300,9 @@ library(lobstr)
    
    Please note that if `!` had a higher precedence, the intermediate result would be `FALSE + FALSE`, which would evalutate to `0`.
 
-5. [Q]{.Q}: Why does `x1 <- x2 <- x3 <- 0` work? Describe the two reasons.
+5. __[Q]{.Q}__: Why does `x1 <- x2 <- x3 <- 0` work? Describe the two reasons.
 
-   [A]{.solved}: One reason is that `<-` is right-associative. I.e. evaluation takes place from right to left:
+   __[A]{.solved}__: One reason is that `<-` is right-associative. I.e. evaluation takes place from right to left:
    
     ```{r}
     x1 <- x2 <- x3 <- 0
@@ -310,9 +310,9 @@ library(lobstr)
     
    The other reason it that the assignment operator has the lowest precedence of all operators in R (besides the `?`-shortcut for `help()`), see `?Syntax`.
 
-6. [Q]{.Q}: Compare the ASTs of `x + y %+% z` and `x ^ y %+% z`. What have you learned about the precedence of custom infix functions?
+6. __[Q]{.Q}__: Compare the ASTs of `x + y %+% z` and `x ^ y %+% z`. What have you learned about the precedence of custom infix functions?
 
-   [A]{.solved}: Let's take a look at the syntax trees:
+   __[A]{.solved}__: Let's take a look at the syntax trees:
     
     ```{r}
     ast(x + y %+% z)
@@ -327,17 +327,17 @@ library(lobstr)
     
    We can conclude that custom infix functions have precedence between addition and exponentiation.
    
-7. [Q]{.Q}: What happens if you call `parse_expr()` with a string that generates multiple expressions? e.g. `parse_expr("x + 1; y + 1")`
+7. __[Q]{.Q}__: What happens if you call `parse_expr()` with a string that generates multiple expressions? e.g. `parse_expr("x + 1; y + 1")`
 
-   [A]{.solved}: In this case `parse_expr()` notices that more than one expression would have to be generated and throws an error.
+   __[A]{.solved}__: In this case `parse_expr()` notices that more than one expression would have to be generated and throws an error.
    
     ```{r, error = TRUE}
     parse_expr("x + 1; y + 1")
     ```
 
-8. [Q]{.Q}: What happens if you attempt to parse an invalid expression? e.g. `"a +"` or `"f())"`.
+8. __[Q]{.Q}__: What happens if you attempt to parse an invalid expression? e.g. `"a +"` or `"f())"`.
 
-   [A]{.solved}: Invalid expressions will lead to an error from the underlying `parse()` function.
+   __[A]{.solved}__: Invalid expressions will lead to an error from the underlying `parse()` function.
     
     ```{r, error = TRUE}
     parse_expr("a +")
@@ -347,7 +347,7 @@ library(lobstr)
     parse(text = "f())")
     ```
 
-9. [Q]{.Q}: `deparse()` produces vectors when the input is long. For example, the
+9. __[Q]{.Q}__: `deparse()` produces vectors when the input is long. For example, the
     following call produces a vector of length two:
 
     ```{r, eval = FALSE}
@@ -359,7 +359,7 @@ library(lobstr)
 
    What does `expr_text()` do instead?
     
-   [A]{.solved}: `expr_text()` will paste the results from `deparse(expr)` together and use a linebreak `\n` as separator.
+   __[A]{.solved}__: `expr_text()` will paste the results from `deparse(expr)` together and use a linebreak `\n` as separator.
    
     ```{r}
     expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + 
@@ -368,9 +368,9 @@ library(lobstr)
     expr_text(expr)
     ```
 
-10. [Q]{.Q}: `pairwise.t.test()` assumes that `deparse()` always returns a length one character vector. Can you construct an input that violates this expectation? What happens?
+10. __[Q]{.Q}__: `pairwise.t.test()` assumes that `deparse()` always returns a length one character vector. Can you construct an input that violates this expectation? What happens?
 
-   [A]{.solved}: We can pass an expression to one of `pairwise.t.test()`’s data input arguments, which exceeds the default cutoff width in `deparse()`. The expression will be split into a character vector of length greater 1.
+   __[A]{.solved}__: We can pass an expression to one of `pairwise.t.test()`’s data input arguments, which exceeds the default cutoff width in `deparse()`. The expression will be split into a character vector of length greater 1.
    
    The deparsed data inputs are directly pasted (you may take a look at the source code) with “and” as separator and the result is just used to be displayed in the output. Just the data.name output will change (it will include more than one “and”).
    
@@ -381,9 +381,9 @@ library(lobstr)
 
 ## Walking AST with recursive functions {#ast-funs}
 
-1. [Q]{.Q}: `logical_abbr()` returns `TRUE` for `T(1, 2, 3)`. How could you modify `logical_abbr_rec()` so that it ignores function calls that use `T` or `F`?
+1. __[Q]{.Q}__: `logical_abbr()` returns `TRUE` for `T(1, 2, 3)`. How could you modify `logical_abbr_rec()` so that it ignores function calls that use `T` or `F`?
 
-   [A]{.solved}: We can apply a similar logic as in the multiple assignment example from the textbook. We just treat it as a special case handled within a sub function called `find_T_call()`, which finds `T()` calls and "bounces them out":
+   __[A]{.solved}__: We can apply a similar logic as in the multiple assignment example from the textbook. We just treat it as a special case handled within a sub function called `find_T_call()`, which finds `T()` calls and "bounces them out":
     
     ```{r, include = FALSE}
     library(lobstr)
@@ -449,7 +449,7 @@ library(lobstr)
     logical_abbr(c(T, T, T))
     ```
 
-2. [Q]{.Q}: `logical_abbr()` works with expressions. It currently fails when you give it a function. Why not? How could you modify `logical_abbr()` to make it work? What components of a function will you need to recurse over?
+2. __[Q]{.Q}__: `logical_abbr()` works with expressions. It currently fails when you give it a function. Why not? How could you modify `logical_abbr()` to make it work? What components of a function will you need to recurse over?
 
     ```{r, eval = FALSE}
     f <- function(x = TRUE) {
@@ -458,11 +458,11 @@ library(lobstr)
     logical_abbr(!!f)
     ```
     
-   [A]{.solved}: The function currently fails, because `"closure"` is not handled in `switch_expr()` within `logical_abbr_rec()`. If we want to make it work, we have to write a function to inspect the formals and the body of the input function.
+   __[A]{.solved}__: The function currently fails, because `"closure"` is not handled in `switch_expr()` within `logical_abbr_rec()`. If we want to make it work, we have to write a function to inspect the formals and the body of the input function.
 
-3. [Q]{.Q}: Modify `find_assign` to also detect assignment using replacement functions, i.e. `names(x) <- y`.
+3. __[Q]{.Q}__: Modify `find_assign` to also detect assignment using replacement functions, i.e. `names(x) <- y`.
 
-   [A]{.solved}: Let`s see what the AST of such an assignment looks like:
+   __[A]{.solved}__: Let`s see what the AST of such an assignment looks like:
     
     ```{r}
     ast(names(x) <- x)
@@ -523,9 +523,9 @@ library(lobstr)
     find_assign(names(x(y)) <- y <- z)
     ```
   
-4. [Q]{.Q}: Write a function that extracts all calls to a specified function.
+4. __[Q]{.Q}__: Write a function that extracts all calls to a specified function.
 
-   [A]{.solved}: Here we need to delete the previously added else statement and check for a call (not necessarily `<-`) within the first `if()` in `find_assign_call()`. We save a call when we found one and return it later as part of our character output. Everything else stays the same:
+   __[A]{.solved}__: Here we need to delete the previously added else statement and check for a call (not necessarily `<-`) within the first `if()` in `find_assign_call()`. We save a call when we found one and return it later as part of our character output. Everything else stays the same:
 
     ```{r}
     find_assign_call <- function(x) {
