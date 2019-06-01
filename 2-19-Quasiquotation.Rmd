@@ -297,9 +297,24 @@ library(rlang)
     
    __<span style="color:green">A</span>__: `exec()` takes a function together with its arguments and an environment as input. The idea is to construct a call from the function and its arguments and evaluate it in the supplied environment. As the `...` argument is handled via `list2()`, `exec()` supports tidy dots (quasiquotation), which means that one may unquote arguments and names (on the left-hand-side of `:=`) via `!!` and `!!!`.
 
-2. __<span style="color:red">Q</span>__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`.  Compare and contrast the techniques they use for switching between dots and list behaviour.
+2. __<span style="color:red">Q</span>__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`. Compare and contrast the techniques they use for switching between dots and list behaviour.
 
-   __<span style="color:green">A</span>__: 
+   __<span style="color:yellow">A</span>__: All three functions capture the dots via `args <- list(...)` and return early in case of `length(args) == 0`. 
+   
+   As `interaction()` computes factors regarding combinations of `args` elements, `interaction()` iterates over `args` and doesn't differentiate further between list and dots behaviour. Only the case `length(args) == 1 & is.list(args[[1]])` gets treated via `args <- args[[1]]`. Consequently lists deeper than 1 level raise errors in other 
+   
+    ```{r, error = FALSE}
+    # These are the same
+    identical(
+      interaction(     a = c("a", "b", "c", "d"), b = c("e", "f")),
+      interaction(list(a = c("a", "b", "c", "d"), b = c("e", "f")))
+    )
+    
+    # This doesn't work
+    interaction(list(list(a = c("a", "b", "c", "d"), b = c("e", "f"))))
+    ```
+    
+   
 
 3. __<span style="color:red">Q</span>__: Explain the problem with this defintion of `set_attr()`
     
