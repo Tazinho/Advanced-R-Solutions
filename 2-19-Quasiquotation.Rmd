@@ -138,7 +138,7 @@ library(rlang)
     
 3. __<span style="color:red">Q</span>__: What happens if you try to use `enexpr()` with an expression (i.e. `enexpr(x + y)`)? What happens if `enexpr()` is passed a missing argument?
     
-   __<span style="color:green">A</span>__: In the first case we'll get an error:
+   __<span style="color:green">A</span>__: In the first case we get an error:
     
     ```{r, error = TRUE}
     on_expr <- function(x) {enexpr(expr(x))}
@@ -272,7 +272,7 @@ library(rlang)
     
    __<span style="color:green">A</span>__: `exec()` takes a function together with its arguments and an environment as input. The idea is to construct a call from the function and its arguments and evaluate it in the supplied environment. As the `...` argument is handled via `list2()`, `exec()` supports tidy dots (quasiquotation), which means that one may unquote arguments via `!!!` and names on the LHS of `:=` via `!!`.
 
-2. __<span style="color:red">Q</span>__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`.  Compare and constract the techniques they use for switching between dots and list behaviour.
+2. __<span style="color:red">Q</span>__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`.  Compare and contrast the techniques they use for switching between dots and list behaviour.
 
    __<span style="color:green">A</span>__: 
 
