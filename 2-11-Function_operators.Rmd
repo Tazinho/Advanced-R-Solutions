@@ -11,9 +11,9 @@ library(purrr)
 
 ## Existing function operators
 
-1. __<span style="color:red">Q</span>__: Base R provides a function operator in the form of `Vectorize()`. What does it do? When might you use it?    
+1. [Q]{.Q}: Base R provides a function operator in the form of `Vectorize()`. What does it do? When might you use it?
    
-   __<span style="color:green">A</span>__: In R a lot of functions are "vectorised". Vectorised has two meanings. First, it means (broadly) that a function inputs a vector or vectors, and does something to each element. Secondly, it usually implies that these operations are implemented in a compiled language such as C or Fortran, so that the implementation is very fast.
+   [A]{.solved}: In R a lot of functions are "vectorised". Vectorised has two meanings. First, it means (broadly) that a function inputs a vector or vectors, and does something to each element. Secondly, it usually implies that these operations are implemented in a compiled language such as C or Fortran, so that the implementation is very fast.
    
    However, despite what the functions name implies, `Vectorize()` is not able to speed up the provided function. It rather changes the input format of the supplied arguments (`vectorize.args`), so that they can be iterated over.
 
@@ -32,9 +32,9 @@ library(purrr)
 
    `Vectorize()` provides a convenient and concise notation to iterate over multiple arguments, but has some major drawbacks that mean you generally shouldn't use it. See <https://www.jimhester.com/2018/04/12/vectorize/> for more details.
 
-2. __<span style="color:red">Q</span>__: Read the source code for `possibly()`. How does it work?
+2. [Q]{.Q}: Read the source code for `possibly()`. How does it work?
    
-   __<span style="color:green">A</span>__: `possibly()` modifies functions to return a specified default value in case of an error (`otherwise`) and to suppress any error messages (`quiet = TRUE`).
+   [A]{.solved}: `possibly()` modifies functions to return a specified default value in case of an error (`otherwise`) and to suppress any error messages (`quiet = TRUE`).
    
    While reading the source code, we notice that `possibly()` internally uses `purrr::as_mapper()`. This enables users to supply not only functions, but also formulas or atomics via the same syntax as known from other functions in the purrr package. Besides this, the new default value (`otherwise`) gets evaluated once to make it (almost) immutable from now on.
    
@@ -44,9 +44,9 @@ library(purrr)
     possibly
     ```
 
-3. __<span style="color:red">Q</span>__: Read the source code for `safely()`. How does it work?
+3. [Q]{.Q}: Read the source code for `safely()`. How does it work?
    
-   __<span style="color:green">A</span>__: `safely()` modifies functions to return a list, containing the elements "result" and "error". It works in a similar fashion as `possibly()` and besides using `as_mapper()`, `safely()` also provides the `otherwise` and `quiet` argument. However, in order to provide the result and the error in a consistent way, the `tryCatch()` part of the implementation returns a list with the same structure in both cases. In the case of successful evaluation "error" equals to `NULL` and in case of an error "result" equals to `otherwise`, which is `NULL` by default.
+   [A]{.solved}: `safely()` modifies functions to return a list, containing the elements "result" and "error". It works in a similar fashion as `possibly()` and besides using `as_mapper()`, `safely()` also provides the `otherwise` and `quiet` argument. However, in order to provide the result and the error in a consistent way, the `tryCatch()` part of the implementation returns a list with the same structure in both cases. In the case of successful evaluation "error" equals to `NULL` and in case of an error "result" equals to `otherwise`, which is `NULL` by default.
    
    As the `tryCatch()` part is hidden in the internal `purrr:::capture_output()` function, we provide it here in addition to `safely()`:
    
@@ -60,21 +60,21 @@ library(purrr)
 
 ## Case study: Creating your own function operators
 
-1. __<span style="color:red">Q</span>__: Weigh the pros and cons of `download.file %>% dot_every(10) %>% delay_by(0.1)` vs `download.file %>% delay_by(0.1) %>% dot_every(10)`.
+1. [Q]{.Q}: Weigh the pros and cons of `download.file %>% dot_every(10) %>% delay_by(0.1)` vs `download.file %>% delay_by(0.1) %>% dot_every(10)`.
    
-   __<span style="color:green">A</span>__: 
+   [A]{.solved}:
    
    <!-- HW: do you get the dot before or after the pause. It probably doesn't make such difference here -->
    
-2. __<span style="color:red">Q</span>__: Should you memoise `file.download()`? Why/why not?
+2. [Q]{.Q}: Should you memoise `file.download()`? Why/why not?
    
-   __<span style="color:green">A</span>__: Memoising `file.download()` will only work if the files are immutable; i.e. if the file at a given url is always same. There's no point memoising unless this is true. Even if this is true, however, memoise has to store the results in memory, and large files will potentially take up a lot of memory.
+   [A]{.solved}: Memoising `file.download()` will only work if the files are immutable; i.e. if the file at a given url is always same. There's no point memoising unless this is true. Even if this is true, however, memoise has to store the results in memory, and large files will potentially take up a lot of memory.
    
    This implies that it's probably not beneficial to memoise `file.download()` in most cases. The only exception is if you are downloading small files many times, and the file at a given url is guaranteed not to change.
    
-3. __<span style="color:red">Q</span>__: Create a function operator that reports whenever a file is created or deleted in the working directory, using `dir()` and `setdiff()`. What other global function effects might you want to track?
+3. [Q]{.Q}: Create a function operator that reports whenever a file is created or deleted in the working directory, using `dir()` and `setdiff()`. What other global function effects might you want to track?
    
-   __<span style="color:green">A</span>__: We first start with a function that simply reports the difference between two vectors of files:
+   [A]{.solved}: We first start with a function that simply reports the difference between two vectors of files:
    
     ```{r}
     dir_compare <- function(old, new) {
@@ -129,9 +129,9 @@ track_dir <- function(f) {
    * the path of the working directory
    * environment variables
    
-4. __<span style="color:red">Q</span>__: Write a function operator that logs a timestamp and message to a file every time a function is run.
+4. [Q]{.Q}: Write a function operator that logs a timestamp and message to a file every time a function is run.
    
-   __<span style="color:green">A</span>__: 
+   [A]{.solved}:
     
     ```{r}
     append_line <- function(path, ...) { 
@@ -162,9 +162,9 @@ track_dir <- function(f) {
     readLines(log_path)
     ```
    
-5. __<span style="color:red">Q</span>__: Modify `delay_by()` so that instead of delaying by a fixed amount of time, it ensures that a certain amount of time has elapsed since the function was last called. That is, if you called `g <- delay_by(1, f); g(); Sys.sleep(2); g()` there shouldn't be an extra delay.
+5. [Q]{.Q}: Modify `delay_by()` so that instead of delaying by a fixed amount of time, it ensures that a certain amount of time has elapsed since the function was last called. That is, if you called `g <- delay_by(1, f); g(); Sys.sleep(2); g()` there shouldn't be an extra delay.
    
-   __<span style="color:green">A</span>__: We can do this with three little tricks (and the help of 42):
+   [A]{.solved}: We can do this with three little tricks (and the help of 42):
     
     ```{r, eval = FALSE}
     delay_atleast <- function(f, amount) {

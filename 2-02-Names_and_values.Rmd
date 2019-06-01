@@ -13,7 +13,7 @@ library(lobstr)
 
 ## Binding basics
 
-1. __<span style="color:red">Q</span>__: Explain the relationship between `a`, `b`, `c` and `d` in the following code:
+1. [Q]{.Q}: Explain the relationship between `a`, `b`, `c` and `d` in the following code:
 
     ```{r}
     a <- 1:10
@@ -22,14 +22,14 @@ library(lobstr)
     d <- 1:10
     ```
     
-   __<span style="color:green">A</span>__: `a`, `b`, `c` point to the same object (with the same address in memory). This object has the value `1:10`. `d` points to a different object with the same value.
+   [A]{.solved}: `a`, `b`, `c` point to the same object (with the same address in memory). This object has the value `1:10`. `d` points to a different object with the same value.
 
     ```{r}
     list_of_names <- list(a, b, c, d)
     obj_addrs(list_of_names)
     ```
 
-2. __<span style="color:red">Q</span>__: The following code accesses the mean function in multiple ways. Do they all point to the same underlying function object? Verify with `lobstr::obj_addr()`.
+2. [Q]{.Q}: The following code accesses the mean function in multiple ways. Do they all point to the same underlying function object? Verify with `lobstr::obj_addr()`.
     
     ```{r, eval = FALSE}
     mean
@@ -39,7 +39,7 @@ library(lobstr)
     match.fun("mean")
     ```
     
-   __<span style="color:green">A</span>__: Yes, they point to the same object. We confirm this by inspecting the address of the underlying function object.
+   [A]{.solved}: Yes, they point to the same object. We confirm this by inspecting the address of the underlying function object.
        
     ```{r}
     mean_functions <- list(mean,
@@ -51,15 +51,15 @@ library(lobstr)
     unique(obj_addrs(mean_functions))
     ```
     
-3. __<span style="color:red">Q</span>__: By default, base R data import functions, like `read.csv()`, will automatically convert non-syntactic names to syntactic names. Why might this be problematic? What option allows you to suppress this behaviour?
+3. [Q]{.Q}: By default, base R data import functions, like `read.csv()`, will automatically convert non-syntactic names to syntactic names. Why might this be problematic? What option allows you to suppress this behaviour?
 
-   __<span style="color:green">A</span>__: When automatic and implicit (name) conversion occurs, the prediction of a scripts output will be more difficult. For example when R is used non-interactively and some data is read, transformed and written, then the output may not contain the same names as the original data source. This behaviour may introduce problems in downstream analysis. To avoid automatic name conversion set `check.names = FALSE`.
+   [A]{.solved}: When automatic and implicit (name) conversion occurs, the prediction of a scripts output will be more difficult. For example when R is used non-interactively and some data is read, transformed and written, then the output may not contain the same names as the original data source. This behaviour may introduce problems in downstream analysis. To avoid automatic name conversion set `check.names = FALSE`.
    
    <!-- I think the key point is that column names are often data, and the make.names() transformation is non-invertible, so the default behaviour corrupts data -->
     
-4. __<span style="color:red">Q</span>__: What rules does `make.names()` use to convert non-syntactic names into syntactic names?
+4. [Q]{.Q}: What rules does `make.names()` use to convert non-syntactic names into syntactic names?
     
-   __<span style="color:green">A</span>__: A valid name starts with a letter or a dot (which must not be followed by a number). It also consists of letters, numbers, dots and underscores only (`"_"` are allowed since R version 1.9.0).
+   [A]{.solved}: A valid name starts with a letter or a dot (which must not be followed by a number). It also consists of letters, numbers, dots and underscores only (`"_"` are allowed since R version 1.9.0).
    
    Three main mechanisms ensure syntactically valid names (see `?make.names`):
    - The variable name will be prepended by an `X` when names do not start with a letter or start with a dot followed by a number
@@ -87,22 +87,22 @@ library(lobstr)
 
    > The definition of a letter depends on the current locale, but only ASCII digits are considered to be digits.
 
-5. __<span style="color:red">Q</span>__: I slightly simplified the rules that govern syntactic names. Why is `.123e1` not a syntactic name? Read `?make.names` for the full details.
+5. [Q]{.Q}: I slightly simplified the rules that govern syntactic names. Why is `.123e1` not a syntactic name? Read `?make.names` for the full details.
     
-   __<span style="color:green">A</span>__: `.123e1` is not a syntactic name, because it starts with one dot which is followed by a number. This makes it a double, `1.23`.
+   [A]{.solved}: `.123e1` is not a syntactic name, because it starts with one dot which is followed by a number. This makes it a double, `1.23`.
 
 ## Copy-on-modify
 
-1. __<span style="color:red">Q</span>__: Why is `tracemem(1:10)` not useful?
+1. [Q]{.Q}: Why is `tracemem(1:10)` not useful?
 
-   __<span style="color:green">A</span>__: 
+   [A]{.solved}:
    When `1:10` is called an object with an address in memory is created, but it is not bound to a name. Therefore the object cannot be called or manipulated from R. As no copies will be made, it is not useful to track the object for copying.
    
     ```{r}
     obj_addr(1:10)  # the object exists, but has no name
     ```
    
-2. __<span style="color:red">Q</span>__: Explain why `tracemem()` shows two copies when you run this code. Hint: carefully look at the difference between this code and the code show earlier in the section.
+2. [Q]{.Q}: Explain why `tracemem()` shows two copies when you run this code. Hint: carefully look at the difference between this code and the code show earlier in the section.
      
     ```{r, results = FALSE}
     x <- c(1L, 2L, 3L)
@@ -111,7 +111,7 @@ library(lobstr)
     x[[3]] <- 4
     ```
     
-   __<span style="color:green">A</span>__: Initially the vector `x` has integer type. The replacement call assigns a double to the third element of `x`, which triggers copy-on-modify.
+   [A]{.solved}: Initially the vector `x` has integer type. The replacement call assigns a double to the third element of `x`, which triggers copy-on-modify.
 
     ```{r, eval=FALSE}
     # two copies
@@ -139,7 +139,7 @@ library(lobstr)
 
    <!-- code-chunks above were hard-coded to fix knitr output. -->
 
-3. __<span style="color:red">Q</span>__: Sketch out the relationship between the following objects:
+3. [Q]{.Q}: Sketch out the relationship between the following objects:
 
     ```{r}
     a <- 1:10
@@ -147,7 +147,7 @@ library(lobstr)
     c <- list(b, a, 1:10)
     ```
     
-   __<span style="color:green">A</span>__: `a` contains a reference to an address with the value `1:10`. `b` contains a list of two references to the same address as `a`. `c` contains a list of `b` (containing two references to `a`), `a` (containing the same reference again) and a reference pointing to a different address containing the same value (`1:10`).
+   [A]{.solved}: `a` contains a reference to an address with the value `1:10`. `b` contains a list of two references to the same address as `a`. `c` contains a list of `b` (containing two references to `a`), `a` (containing the same reference again) and a reference pointing to a different address containing the same value (`1:10`).
    
    <!-- could you insert an actual drawing here? -->
 
@@ -161,7 +161,7 @@ library(lobstr)
     #> └─[4:0x55eec7aa6968] <int>     # - 1:10
     ```
 
-4. __<span style="color:red">Q</span>__: What happens when you run this code:
+4. [Q]{.Q}: What happens when you run this code:
 
     ```{r}
     x <- list(1:10)
@@ -172,7 +172,7 @@ library(lobstr)
     
    Draw a picture.
 
-   __<span style="color:green">A</span>__: The initial reference tree of `x` shows, that the name `x` binds to a list object. This object contains a reference to the integer vector `1:10`.
+   [A]{.solved}: The initial reference tree of `x` shows, that the name `x` binds to a list object. This object contains a reference to the integer vector `1:10`.
 
     ```{r, eval=FALSE}
     x <- list(1:10)
@@ -212,7 +212,7 @@ library(lobstr)
 
 ## Object size
 
-1. __<span style="color:red">Q</span>__: In the following example, why are `object.size(y)` and `obj_size(y)` so radically different? Consult the documentation of `object.size()`.
+1. [Q]{.Q}: In the following example, why are `object.size(y)` and `obj_size(y)` so radically different? Consult the documentation of `object.size()`.
 
     ```{r}
     y <- rep(list(runif(1e4)), 100)
@@ -221,16 +221,16 @@ library(lobstr)
     obj_size(y)
     ```
     
-   __<span style="color:green">A</span>__: `object.size()` doesn't account for shared elements within lists. Therefore, the results differ by a factor of ~ 100.
+   [A]{.solved}: `object.size()` doesn't account for shared elements within lists. Therefore, the results differ by a factor of ~ 100.
 
-2. __<span style="color:red">Q</span>__: Take the following list. Why is its size somewhat misleading?
+2. [Q]{.Q}: Take the following list. Why is its size somewhat misleading?
 
     ```{r, return = FALSE}
     x <- list(mean, sd, var)
     # obj_size(x)
     #> 16,928 B
     ```
-    __<span style="color:green">A</span>__: It is somewhat misleading, because all three functions are built-in to R as part of the base and stats packages and hence always available. 
+    [A]{.solved}: It is somewhat misleading, because all three functions are built-in to R as part of the base and stats packages and hence always available.
     
    From the following calculations we can see that this applies to about 2400 objects usually loaded by default.
    
@@ -260,7 +260,7 @@ library(lobstr)
     as.numeric(obj_size(!!!base_objs)) / 1024^2
     ```
 
-3. __<span style="color:red">Q</span>__: Predict the output of the following code:
+3. [Q]{.Q}: Predict the output of the following code:
 
     ```{r, eval = FALSE}
     x <- runif(1e6)
@@ -282,7 +282,7 @@ library(lobstr)
     
     <!-- I think I accidentally made this too hard too - the important thing is the size of y, not of x -->
     
-   __<span style="color:green">A</span>__: In R (on most platforms) a length-0
+   [A]{.solved}: In R (on most platforms) a length-0
   vector has 48 bytes of overhead:
 
     ```{r}
@@ -350,14 +350,14 @@ library(lobstr)
 
 ## Modify-in-place
 
-1. __<span style="color:red">Q</span>__: Explain why the following code doesn't create a circular list.
+1. [Q]{.Q}: Explain why the following code doesn't create a circular list.
 
     ```{r}
     x <- list()
     x[[1]] <- x
     ```
     
-   __<span style="color:green">A</span>__: In this situation Copy-on-modify prevents the creation of a circular list. Let's step through the details as follows:
+   [A]{.solved}: In this situation Copy-on-modify prevents the creation of a circular list. Let's step through the details as follows:
    
    <!-- can't use tracemem with knitr -->
    
@@ -372,9 +372,9 @@ library(lobstr)
     obj_addr(x[[1]])  # list element contains old memory adress
     ```
 
-2. __<span style="color:red">Q</span>__: Wrap the two methods for subtracting medians into two functions, then use the bench package to carefully compare their speeds. How does performance change as the number of columns increase?
+2. [Q]{.Q}: Wrap the two methods for subtracting medians into two functions, then use the bench package to carefully compare their speeds. How does performance change as the number of columns increase?
     
-   __<span style="color:green">A</span>__: First, let's define a function to create some random data and a function to subtract the median from each column.
+   [A]{.solved}: First, let's define a function to create some random data and a function to subtract the median from each column.
 
     ```{r}
     create_random_df <- function(nrow, ncol) {
@@ -435,9 +435,9 @@ library(lobstr)
    
    Obviously in the long run, linear growth creates shorter run-times, but there is some cost to this strategy - we have to convert between data structures with `as.list()` and `as.data.frame()`. This means that the improved approach doesn't pay off until we get to a data frame that's ~800 columns wide.
 
-3. __<span style="color:red">Q</span>__: What happens if you attempt to use `tracemem()` on an environment?
+3. [Q]{.Q}: What happens if you attempt to use `tracemem()` on an environment?
 
-   __<span style="color:green">A</span>__: `tracemem()` cannot be used to mark and trace environments.
+   [A]{.solved}: `tracemem()` cannot be used to mark and trace environments.
 
     ```{r, error=TRUE}
     x <- new.env()

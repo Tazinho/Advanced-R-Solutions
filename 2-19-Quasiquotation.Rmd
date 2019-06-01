@@ -13,7 +13,7 @@ library(rlang)
 
 ## Motivation
 
-1. __<span style="color:red">Q</span>__: For each function in the following base R code, identify which arguments are quoted and which are evaluated.
+1. [Q]{.Q}: For each function in the following base R code, identify which arguments are quoted and which are evaluated.
 
     ```{r, eval = FALSE}
     library(MASS)
@@ -26,7 +26,7 @@ library(rlang)
     rm(mtcars2)
     ```
     
-   __<span style="color:green">A</span>__: For each argument we first follow the advice from the textbook and execute the argument outside of the regarding function. Since `MASS`, `cyl`, `vs` and `am` are not objects contained in the global environment, their execution raises an "Object not found" error. Hence, we can be sure that the regarding function arguments are quoted. For the other arguments, we carefully inspect the source code (and the documentation) to check if any quoting mechanisms are applied or the arguments are evaluated.
+   [A]{.solved}: For each argument we first follow the advice from the textbook and execute the argument outside of the regarding function. Since `MASS`, `cyl`, `vs` and `am` are not objects contained in the global environment, their execution raises an "Object not found" error. Hence, we can be sure that the regarding function arguments are quoted. For the other arguments, we carefully inspect the source code (and the documentation) to check if any quoting mechanisms are applied or the arguments are evaluated.
 
     ```{r, eval = FALSE}
     library(MASS)  # MASS -> quoted
@@ -50,7 +50,7 @@ library(rlang)
     rm(mtcars2)  # mtcars2 -> quoted
     ```
    
-2. __<span style="color:red">Q</span>__: For each function in the following tidyverse code, identify which arguments are quoted and which are evaluated.
+2. [Q]{.Q}: For each function in the following tidyverse code, identify which arguments are quoted and which are evaluated.
 
     ```{r, eval = FALSE}
     library(dplyr)
@@ -63,7 +63,7 @@ library(rlang)
     ggplot(by_cyl, aes(cyl, mean)) + geom_point()
     ```
 
-   __<span style="color:green">A</span>__: From the last exercise we already know that `library()` quotes its first argument.
+   [A]{.solved}: From the last exercise we already know that `library()` quotes its first argument.
     
     ```{r, eval = FALSE}
     library(dplyr)    # dplyr -> quoted
@@ -103,15 +103,15 @@ library(rlang)
     
 ## Quoting
 
-1. __<span style="color:red">Q</span>__: How is `expr()` implemented? Look at its source code.
+1. [Q]{.Q}: How is `expr()` implemented? Look at its source code.
 
-   __<span style="color:green">A</span>__: `expr()` simply directs its argument into `enexpr()`.
+   [A]{.solved}: `expr()` simply directs its argument into `enexpr()`.
    
     ```{r}
     expr
     ```
 
-2. __<span style="color:red">Q</span>__: Compare and contrast the following two functions. Can you predict the ouput before running them?
+2. [Q]{.Q}: Compare and contrast the following two functions. Can you predict the ouput before running them?
    
     ```{r, results = FALSE}
     f1 <- function(x, y) {
@@ -124,7 +124,7 @@ library(rlang)
     f2(a + b, c + d)
     ```
     
-   __<span style="color:green">A</span>__: Both functions are able to capture multiple arguments and will return a named list of expressions. `f1()` will return the arguments defined within the body of `f1()`, because `exprs()` captures the expressions as specified by the developer during the definition of `f1`.   
+   [A]{.solved}: Both functions are able to capture multiple arguments and will return a named list of expressions. `f1()` will return the arguments defined within the body of `f1()`, because `exprs()` captures the expressions as specified by the developer during the definition of `f1`.
    
     ```{r}
     f1(a + b, c + d)
@@ -136,9 +136,9 @@ library(rlang)
     f2(a + b, c + d)
     ```
     
-3. __<span style="color:red">Q</span>__: What happens if you try to use `enexpr()` with an expression (i.e. `enexpr(x + y)`)? What happens if `enexpr()` is passed a missing argument?
+3. [Q]{.Q}: What happens if you try to use `enexpr()` with an expression (i.e. `enexpr(x + y)`)? What happens if `enexpr()` is passed a missing argument?
     
-   __<span style="color:green">A</span>__: In the first case we get an error:
+   [A]{.solved}: In the first case we get an error:
     
     ```{r, error = TRUE}
     on_expr <- function(x) {enexpr(expr(x))}
@@ -153,9 +153,9 @@ library(rlang)
     is_missing(on_missing())
     ```
 
-4. __<span style="color:red">Q</span>__: How are `exprs(a)` and `exprs(a = )` different? Think about both the input and the output.
+4. [Q]{.Q}: How are `exprs(a)` and `exprs(a = )` different? Think about both the input and the output.
     
-   __<span style="color:green">A</span>__: In `exprs(a)` the input `a` is interpreted as a symbol for an unnamed argument. Consequently the output shows an unnamed list with the first element containing the symbol `a`.
+   [A]{.solved}: In `exprs(a)` the input `a` is interpreted as a symbol for an unnamed argument. Consequently the output shows an unnamed list with the first element containing the symbol `a`.
    
     ```{r}
     out1 <- exprs(a)
@@ -170,11 +170,11 @@ library(rlang)
     is_missing(out2$a)
     ```
 
-5. __<span style="color:red">Q</span>__: What are other differences between `exprs()` and `alist()`? Read the documentation for the named arguments of `exprs()` to find out.
+5. [Q]{.Q}: What are other differences between `exprs()` and `alist()`? Read the documentation for the named arguments of `exprs()` to find out.
 
-   __<span style="color:green">A</span>__: `exprs()` provides the additional arguments `.named` (`= FALSE`), `.ignore_empty` (`c("trailing", "none", "all")`) and `.unquote_names` (`TRUE`). `.named` allows to ensure that all dots are named. `ignore_empty` allows to specify how empty arguments should be handled for dots (`"trailing"`) or all arguments (`"none"` and `"all"`). Further via `.unquote_names` one can specify if `:=` should be treated like `=`. `:=` can be useful as it supports unquoting (`!!`) on the left-hand-side.
+   [A]{.solved}: `exprs()` provides the additional arguments `.named` (`= FALSE`), `.ignore_empty` (`c("trailing", "none", "all")`) and `.unquote_names` (`TRUE`). `.named` allows to ensure that all dots are named. `ignore_empty` allows to specify how empty arguments should be handled for dots (`"trailing"`) or all arguments (`"none"` and `"all"`). Further via `.unquote_names` one can specify if `:=` should be treated like `=`. `:=` can be useful as it supports unquoting (`!!`) on the left-hand-side.
 
-6. __<span style="color:red">Q</span>__: The documentation for `substitute()` says:
+6. [Q]{.Q}: The documentation for `substitute()` says:
 
     > Substitution takes place by examining each component of the parse tree 
     > as follows: 
@@ -185,7 +185,7 @@ library(rlang)
 
     Create examples that illustrate each of the above cases.
     
-   __<span style="color:green">A</span>__: Let's create a new environment `a` containing no objects. In this case `substitute()` will just return its first argument (`expr`):
+   [A]{.solved}: Let's create a new environment `a` containing no objects. In this case `substitute()` will just return its first argument (`expr`):
    
     ```{r}
     a <- base::new.env()
@@ -212,7 +212,7 @@ library(rlang)
     
 ## Unquoting
 
-1. __<span style="color:red">Q</span>__: Given the following components:
+1. [Q]{.Q}: Given the following components:
 
     ```{r}
     xy <- expr(x + y)
@@ -234,7 +234,7 @@ library(rlang)
     foo(a = x + y, b = y + z)       # (8)
     ```
     
-   __<span style="color:green">A</span>__: 
+   [A]{.solved}:
     
     ```{r}
     expr(!!xy / !!yz)                    # (1)
@@ -254,7 +254,7 @@ library(rlang)
     expr(foo(a = xy, b = yz))            # (8)
     ```
 
-2. __<span style="color:red">Q</span>__: The following two calls print the same, but are actually different:
+2. [Q]{.Q}: The following two calls print the same, but are actually different:
 
     ```{r}
     (a <- expr(mean(1:10)))
@@ -264,7 +264,7 @@ library(rlang)
 
    What's the difference? Which one is more natural?
     
-   __<span style="color:green">A</span>__: As `expr()` quotes expressions and `!!()` evaluates expressions `1:10` is already evaluated to an integer vector in `b`, while still being a call object in `a`.
+   [A]{.solved}: As `expr()` quotes expressions and `!!()` evaluates expressions `1:10` is already evaluated to an integer vector in `b`, while still being a call object in `a`.
    
     ```{r}
     as.list(a)
@@ -285,7 +285,7 @@ library(rlang)
 
 ## Dot-dot-dot (`...`)
 
-1. __<span style="color:red">Q</span>__: One way to implement `exec()` is shown below. Describe how it works. What are the
+1. [Q]{.Q}: One way to implement `exec()` is shown below. Describe how it works. What are the
     key ideas?
     
     ```{r, eval = FALSE}
@@ -295,9 +295,9 @@ library(rlang)
     }
     ```
     
-   __<span style="color:green">A</span>__: `exec()` takes a function together with its arguments and an environment as input. The idea is to construct a call from the function and its arguments and evaluate it in the supplied environment. As the `...` argument is handled via `list2()`, `exec()` supports tidy dots (quasiquotation), which means that one may unquote arguments and names (on the left-hand-side of `:=`) via `!!` and `!!!`.
+   [A]{.solved}: `exec()` takes a function together with its arguments and an environment as input. The idea is to construct a call from the function and its arguments and evaluate it in the supplied environment. As the `...` argument is handled via `list2()`, `exec()` supports tidy dots (quasiquotation), which means that one may unquote arguments and names (on the left-hand-side of `:=`) via `!!` and `!!!`.
 
-2. __<span style="color:red">Q</span>__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`. Compare and contrast the techniques they use for switching between dots and list behaviour.
+2. [Q]{.Q}: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`. Compare and contrast the techniques they use for switching between dots and list behaviour.
 
    __<span style="color:yellow">A</span>__: All three functions capture the dots via `args <- list(...)` and return early in case of `length(args) == 0`. 
    
@@ -316,7 +316,7 @@ library(rlang)
     
    
 
-3. __<span style="color:red">Q</span>__: Explain the problem with this defintion of `set_attr()`
+3. [Q]{.Q}: Explain the problem with this defintion of `set_attr()`
     
     ```{r, error = TRUE}
     set_attr <- function(x, ...) {
@@ -327,7 +327,7 @@ library(rlang)
     set_attr(1:10, x = 10)
     ```
     
-   __<span style="color:green">A</span>__: As correctly given out by the error message, attributes must be named. 
+   [A]{.solved}: As correctly given out by the error message, attributes must be named.
    
    `set_attr()` expects an object to be passed as the `x` argument and its new attributes via the ellipsis. Unfortunately, this prohibits us to provide attributes named `x` as these would always collide with the argument name of our object. Even omitting the object's argument name doesn't help in this case - as can be seen in the example where the object is consequently treated as an unnamed attribute. 
    
@@ -346,11 +346,11 @@ library(rlang)
 
 ## Case studies {#expr-case-studies}
     
-1. __<span style="color:red">Q</span>__: In the linear-model example, we could replace the `expr()` in `reduce(summands, ~ expr(!!.x + !!.y))` with `call2()`: `reduce(summands, call2, "+")`. Compare and contrast the two approaches. Which do you think is easier to read?
+1. [Q]{.Q}: In the linear-model example, we could replace the `expr()` in `reduce(summands, ~ expr(!!.x + !!.y))` with `call2()`: `reduce(summands, call2, "+")`. Compare and contrast the two approaches. Which do you think is easier to read?
 
-   __<span style="color:green">A</span>__: 
+   [A]{.solved}:
 
-2. __<span style="color:red">Q</span>__:Re-implement the Box-Cox transform defined below using unquoting and `new_function()`:
+2. [Q]{.Q}:Re-implement the Box-Cox transform defined below using unquoting and `new_function()`:
    
     ```{r}
     bc <- function(lambda) {
@@ -362,7 +362,7 @@ library(rlang)
     }
     ```
     
-   __<span style="color:green">A</span>__:
+   [A]{.solved}:
     
     ```{r}
     bc2 <- function(lambda){
@@ -380,7 +380,7 @@ library(rlang)
     bc2(2)(2)
     ```
    
-3. __<span style="color:red">Q</span>__:Re-implement the simple `compose()` defined below using quasiquotation and `new_function()`:
+3. [Q]{.Q}:Re-implement the simple `compose()` defined below using quasiquotation and `new_function()`:
      
     ```{r}
     compose <- function(f, g) {
@@ -388,7 +388,7 @@ library(rlang)
     }
     ```
     
-   __<span style="color:green">A</span>__: The implementation is straight forward. However, it can become tough to handle all bracktes correct at the first try:
+   [A]{.solved}: The implementation is straight forward. However, it can become tough to handle all bracktes correct at the first try:
     
     ```{r}
     compose2 <- function(f, g){
@@ -406,7 +406,7 @@ library(rlang)
 
 ## Old exercises Unquoting
 
-1. __<span style="color:red">Q</span>__: What does the following command return? What information is lost? Why?
+1. [Q]{.Q}: What does the following command return? What information is lost? Why?
 
     ```{r, eval = FALSE}
     expr({
@@ -414,7 +414,7 @@ library(rlang)
     })
     ```
 
-   __<span style="color:green">A</span>__: When we look at the captured expression, we see that the extra whitespaces and comments are lost. R ignores them when parsing an expression. They do do not need to be represented in the AST, because they do not affect the evaluation of the expression.
+   [A]{.solved}: When we look at the captured expression, we see that the extra whitespaces and comments are lost. R ignores them when parsing an expression. They do do not need to be represented in the AST, because they do not affect the evaluation of the expression.
     
     ```{r}
     library(rlang)
@@ -433,9 +433,9 @@ library(rlang)
 
 ## Unquoting
 
-2. __<span style="color:red">Q</span>__: Explain why both `!0 + !0` and `!1 + !1` return `FALSE` while `!0 + !1` returns `TRUE`.
+2. [Q]{.Q}: Explain why both `!0 + !0` and `!1 + !1` return `FALSE` while `!0 + !1` returns `TRUE`.
     
-   __<span style="color:green">A</span>__: To answer this question we look at the AST of the first example:
+   [A]{.solved}: To answer this question we look at the AST of the first example:
     
     ```{r}
     library(lobstr)
@@ -458,13 +458,13 @@ library(rlang)
      `0 + FALSE` is `0`.  
      `!0` is `TRUE`.  
 
-3. __<span style="color:red">Q</span>__: Base functions `match.fun()`, `page()`, and `ls()` all try to automatically determine whether you want standard or non-standard evaluation. Each uses a different approach. Figure out the essence of each approach by reading the source code, then compare and contrast the techniques.
+3. [Q]{.Q}: Base functions `match.fun()`, `page()`, and `ls()` all try to automatically determine whether you want standard or non-standard evaluation. Each uses a different approach. Figure out the essence of each approach by reading the source code, then compare and contrast the techniques.
 
 ## Case studies {#quasi-case-studies}
 
-1. __<span style="color:red">Q</span>__: Implement `arrange_desc()`, a variant of `dplyr::arrange()` that sorts in descending order by default.
+1. [Q]{.Q}: Implement `arrange_desc()`, a variant of `dplyr::arrange()` that sorts in descending order by default.
    
-   __<span style="color:green">A</span>__: We just have to catch the `...` from `arrange()` as an expression and modify the expression to be wrapped inside `desc()`. Afterwards we evaluate this new code within a regular `arrange()` call:
+   [A]{.solved}: We just have to catch the `...` from `arrange()` as an expression and modify the expression to be wrapped inside `desc()`. Afterwards we evaluate this new code within a regular `arrange()` call:
        
     ```{r}
     library(dplyr)
@@ -492,9 +492,9 @@ library(rlang)
     d %>% arrange_desc(id2, id1)
     ```
   
-2. __<span style="color:red">Q</span>__: Implement `filter_or()`, a variant of `dplyr::filter()` that combines multiple arguments using `|` instead of `&`.
+2. [Q]{.Q}: Implement `filter_or()`, a variant of `dplyr::filter()` that combines multiple arguments using `|` instead of `&`.
        
-   __<span style="color:green">A</span>__: This time we just need to collapse the `...` arguments with `|`. Therefore we can use `purrr::reduce()` and afterwards we just need to evaluate the new code within a regular filter call:
+   [A]{.solved}: This time we just need to collapse the `...` arguments with `|`. Therefore we can use `purrr::reduce()` and afterwards we just need to evaluate the new code within a regular filter call:
     
     ```{r}
     filter_or <- function(.data, ...){
@@ -510,9 +510,9 @@ library(rlang)
     filter_or(d, x < 3, y < 3)
     ```
 
-3. __<span style="color:red">Q</span>__:Implement `partition_rows()` which, like `partition_cols()`, returns two data frames, one containing the selected rows, and the other containing the rows that weren't selected.
+3. [Q]{.Q}:Implement `partition_rows()` which, like `partition_cols()`, returns two data frames, one containing the selected rows, and the other containing the rows that weren't selected.
    
-   __<span style="color:green">A</span>__: We just have to decide if we focus on integer subsetting via `dplyr::slice()` or logical subsetting via `dplyr::filter()`. The rest is straightforward. Since the implementations of both subsetting styles are completely equivalent we just choose one without any particular reason:
+   [A]{.solved}: We just have to decide if we focus on integer subsetting via `dplyr::slice()` or logical subsetting via `dplyr::filter()`. The rest is straightforward. Since the implementations of both subsetting styles are completely equivalent we just choose one without any particular reason:
     
     ```{r}
     partition_rows <- function(.data, ...){
@@ -529,4 +529,4 @@ library(rlang)
     partition_rows(d, x <= 3)
     ```
 
-4. __<span style="color:red">Q</span>__:Add error handling to `slice()`. Give clear error messages if either `along` or `index` have invalid values (i.e. not numeric, not length 1, too small, or too big).
+4. [Q]{.Q}:Add error handling to `slice()`. Give clear error messages if either `along` or `index` have invalid values (i.e. not numeric, not length 1, too small, or too big).

@@ -13,9 +13,9 @@ library(purrr)
 
 ## Evaluation basics
 
-1. __<span style="color:red">Q</span>__: Carefully read the documentation for `source()`. What environment does it use by default? What if you supply `local = TRUE`? How do you provide a custom environment?
+1. [Q]{.Q}: Carefully read the documentation for `source()`. What environment does it use by default? What if you supply `local = TRUE`? How do you provide a custom environment?
     
-   __<span style="color:green">A</span>__: By default, `source()` uses the global environment, but another evaluation environment may also be chosen, by passing it to the `local` argument. To use a local environment set `local = TRUE`.
+   [A]{.solved}: By default, `source()` uses the global environment, but another evaluation environment may also be chosen, by passing it to the `local` argument. To use a local environment set `local = TRUE`.
     
     ```{r}
     # Create temporary, sourcable R script
@@ -37,7 +37,7 @@ library(purrr)
     locate_evaluation(tmp_file, local = TRUE)
     ```
 
-2. __<span style="color:red">Q</span>__: Predict the results of the following lines of code:
+2. [Q]{.Q}: Predict the results of the following lines of code:
 
     ```{r, eval = FALSE}
     eval(quote(eval(quote(eval(quote(2 + 2))))))
@@ -45,7 +45,7 @@ library(purrr)
     quote(eval(quote(eval(quote(eval(quote(2 + 2))))))) 
     ```
 
-   __<span style="color:green">A</span>__: You can see the output of the code above here:
+   [A]{.solved}: You can see the output of the code above here:
 
     ```{r, echo = FALSE}
     eval(quote(eval(quote(eval(quote(2 + 2))))))
@@ -69,7 +69,7 @@ library(purrr)
 
    When we wrap this expression in another `eval()` the `4` will be evaluated once more, but the result doesn't change. When we quote it, no evaluation takes place and we capture the expression instead.
 
-3. __<span style="color:red">Q</span>__: Fill in the function bodies below to re-implement `get()` using `sym()` and `eval()`, and`assign()` using `sym()`, `expr()`, and `eval()`. Don't worry about the multiple ways of choosing an environment that `get()` and `assign()` support; assume that the user supplies it explicitly
+3. [Q]{.Q}: Fill in the function bodies below to re-implement `get()` using `sym()` and `eval()`, and`assign()` using `sym()`, `expr()`, and `eval()`. Don't worry about the multiple ways of choosing an environment that `get()` and `assign()` support; assume that the user supplies it explicitly
 
     ```{r}
     # name is a string
@@ -77,7 +77,7 @@ library(purrr)
     assign2 <- function(name, value, env) {}
     ```
 
-   __<span style="color:green">A</span>__: The reimplemantion of these two functions using tidy evaluation is based on building an expression, which is then evaluated.
+   [A]{.solved}: The reimplemantion of these two functions using tidy evaluation is based on building an expression, which is then evaluated.
 
     ```{r}
     get2 <- function(name, env = caller_env()) {
@@ -112,9 +112,9 @@ library(purrr)
     x
     ```
     
-4. __<span style="color:red">Q</span>__: Modify `source2()` so it returns the result of _every_ expression, not just the last one. Can you eliminate the for loop?
+4. [Q]{.Q}: Modify `source2()` so it returns the result of _every_ expression, not just the last one. Can you eliminate the for loop?
 
-   __<span style="color:orange">A</span>__: 
+   [A]{.started}:
 
    - keep in mind `<-` invisibly returns its value
 
@@ -140,7 +140,7 @@ library(purrr)
     y
     ```
 
-5. __<span style="color:red">Q</span>__: We can make `base::local()` slightly easier to understand by spreading it over multiple lines:
+5. [Q]{.Q}: We can make `base::local()` slightly easier to understand by spreading it over multiple lines:
 
     ```{r}
     local3 <- function(expr, envir = new.env()) {
@@ -151,7 +151,7 @@ library(purrr)
     
    Explain how `local()` works in words. (Hint: you might want to `print(call)` to help understand what `substitute()` is doing, and read the documentation to remind yourself what environment `new.env()` will inherit from.)
 
-   __<span style="color:green">A</span>__:
+   [A]{.solved}:
 
     ```{r}
     local3 <- function(expr, envir = new.env()) {
@@ -189,7 +189,7 @@ library(purrr)
     
 ## Quosures
 
-1. __<span style="color:red">Q</span>__: Predict what evaluating each of the following quosures will return if evaluated.
+1. [Q]{.Q}: Predict what evaluating each of the following quosures will return if evaluated.
 
     ```{r}
     library(rlang)
@@ -204,7 +204,7 @@ library(purrr)
     q3
     ```
     
-   __<span style="color:green">A</span>__: Each quosure will be evaluated in its own environment. This leads us to:
+   [A]{.solved}: Each quosure will be evaluated in its own environment. This leads us to:
     
     ```{r}
     eval_tidy(q1)
@@ -212,9 +212,9 @@ library(purrr)
     eval_tidy(q3)
     ```
 
-2. __<span style="color:red">Q</span>__: Write an `enenv()` function that captures the environment associated with an argument. (Hint: this should only require two function calls.)
+2. [Q]{.Q}: Write an `enenv()` function that captures the environment associated with an argument. (Hint: this should only require two function calls.)
 
-   __<span style="color:green">A</span>__: A quosure captures both the expression and the environment. From a quosure, we can access the environment with the help of `get_env()`.
+   [A]{.solved}: A quosure captures both the expression and the environment. From a quosure, we can access the environment with the help of `get_env()`.
 
     ```{r}
     enenv <- function(x){
@@ -233,9 +233,9 @@ library(purrr)
 
 ## Data masks
 
-1. __<span style="color:red">Q</span>__: Why did I use a for loop in `transform2()` instead of `map()`? Consider `transform2(df, x = x * 2, x = x * 2)`.
+1. [Q]{.Q}: Why did I use a for loop in `transform2()` instead of `map()`? Consider `transform2(df, x = x * 2, x = x * 2)`.
    
-   __<span style="color:green">A</span>__: Within the `for`-loop the evaluation of previous steps has already been assigned to `.data`, which makes the specification of chained transformations possible.
+   [A]{.solved}: Within the `for`-loop the evaluation of previous steps has already been assigned to `.data`, which makes the specification of chained transformations possible.
 
     ```{r}
     transform2 <- function(.data, ...) {
@@ -274,7 +274,7 @@ library(purrr)
 
    The repeated retransformation of columns is very useful in interactive data analysis and can also be used within `dplyr::mutate()`. Be a little careful with reusing the same name too often though, because this spreads out related transformations across multiple statements.
 
-2. __<span style="color:red">Q</span>__: Here's an alternative implementation of `subset2()`:
+2. [Q]{.Q}: Here's an alternative implementation of `subset2()`:
 
     ```{r, results = FALSE}
     subset3 <- function(data, rows) {
@@ -288,7 +288,7 @@ library(purrr)
 
    Compare and contrast `subset3()` to `subset2()`. What are its advantages and disadvantages?
 
-   __<span style="color:green">A</span>__: Let's take a closer look at subset2() first:
+   [A]{.solved}: Let's take a closer look at subset2() first:
    
     ```{r}
     subset2 <- function(data, rows) {
@@ -325,7 +325,7 @@ library(purrr)
 
 <!-- is there an advantage of `subset3()`, that I am missing? -->
 
-3. __<span style="color:red">Q</span>__: The following function implements the basics of `dplyr::arrange()`. Annotate each line with a comment explaining what it does. Can you explain why `!!.na.last` is strictly correct, but omitting the `!!` is unlikely to cause problems?
+3. [Q]{.Q}: The following function implements the basics of `dplyr::arrange()`. Annotate each line with a comment explaining what it does. Can you explain why `!!.na.last` is strictly correct, but omitting the `!!` is unlikely to cause problems?
 
     ```{r}
     arrange2 <- function(.df, ..., .na.last = TRUE) {
@@ -340,7 +340,7 @@ library(purrr)
     }
     ```
 
-   __<span style="color:green">A</span>__: This function builds an expression, which contains the specified `order()`-call. The `!!!`-operator is used, which allows multiple arguments to be included (to break ties). Once the correct roworder is determined, numeric subsetting is used to return the rearranged data frame.
+   [A]{.solved}: This function builds an expression, which contains the specified `order()`-call. The `!!!`-operator is used, which allows multiple arguments to be included (to break ties). Once the correct roworder is determined, numeric subsetting is used to return the rearranged data frame.
 
     ```{r}
     arrange2 <- function(.df, ..., .na.last = TRUE) {
@@ -373,7 +373,7 @@ library(purrr)
 
 ## Using tidy evaluation
 
-1. __<span style="color:red">Q</span>__:  I've included an alternative implementation of `threshold_var()` below. What makes it different to the approach I used above? What makes it harder?
+1. [Q]{.Q}:  I've included an alternative implementation of `threshold_var()` below. What makes it different to the approach I used above? What makes it harder?
 
     ```{r}
     threshold_var2 <- function(df, var, val) {
@@ -383,7 +383,7 @@ library(purrr)
     }
     ```
 
-   __<span style="color:orange">A</span>__: Lets compare this approach to the original implementation:
+   [A]{.started}: Lets compare this approach to the original implementation:
 
     ```{r}
     threshold_var <- function(df, var, val) {
@@ -406,7 +406,7 @@ library(purrr)
 
 ## Base evaluation
 
-1. __<span style="color:red">Q</span>__: Why does this function fail?
+1. [Q]{.Q}: Why does this function fail?
 
     ```{r, error = TRUE}
     lm3a <- function(formula, data) {
@@ -418,7 +418,7 @@ library(purrr)
     lm3a(mpg ~ disp, mtcars)$call
     ```
 
-   __<span style="color:green">A</span>__: In this function, `lm_call` is evaluated in the caller environment, which happens to be the global environment. In this environment, the name `data` is bound to `utils::data`. To fix the error, we can either set the evaluation environment to the functions execution environment or unquote the data argument when building the call to `lm()`.
+   [A]{.solved}: In this function, `lm_call` is evaluated in the caller environment, which happens to be the global environment. In this environment, the name `data` is bound to `utils::data`. To fix the error, we can either set the evaluation environment to the functions execution environment or unquote the data argument when building the call to `lm()`.
     
     ```{r, error = TRUE}
     # change evaluation environment
@@ -447,7 +447,7 @@ library(purrr)
     lm3c(mpg ~ disp, mtcars)$call
     ```
 
-2. __<span style="color:red">Q</span>__: When model building, typically the response and data are relatively constant while you rapidly experiment with different predictors. Write a small wrapper that allows you to reduce duplication in the code below.
+2. [Q]{.Q}: When model building, typically the response and data are relatively constant while you rapidly experiment with different predictors. Write a small wrapper that allows you to reduce duplication in the code below.
 
     ```{r, eval = FALSE}
     lm(mpg ~ disp, data = mtcars)
@@ -455,7 +455,7 @@ library(purrr)
     lm(mpg ~ disp * cyl, data = mtcars)
     ```
 
-   __<span style="color:green">A</span>__: In the wrapping function below, the response and the data were defined as default argument to the function. It would also be acceptable to "hardcode" them into the `lm()`-expression instead, but this way provides a little more flexibility.
+   [A]{.solved}: In the wrapping function below, the response and the data were defined as default argument to the function. It would also be acceptable to "hardcode" them into the `lm()`-expression instead, but this way provides a little more flexibility.
 
     ```{r}
     lm_wrap <- function(pred, resp = mpg, data = mtcars){
@@ -470,9 +470,9 @@ library(purrr)
 
    In practice, small wrappers like this can help keeping your scripts well organized and make it easy to see, what is being changed.
 
-3. __<span style="color:red">Q</span>__: Another way to write `resample_lm()` would be to include the resample expression `(data[sample(nrow(data), replace = TRUE), , drop = FALSE])` in the data argument. Implement that approach. What are the advantages? What are the disadvantages?
+3. [Q]{.Q}: Another way to write `resample_lm()` would be to include the resample expression `(data[sample(nrow(data), replace = TRUE), , drop = FALSE])` in the data argument. Implement that approach. What are the advantages? What are the disadvantages?
 
-   __<span style="color:green">A</span>__: We can take advantage of the lazy evaluation of function arguments, by moving the resampling step into the argument definition. The uses passes the data to the function, but only a permutation of this data (`rsampled_data`) will be used.
+   [A]{.solved}: We can take advantage of the lazy evaluation of function arguments, by moving the resampling step into the argument definition. The uses passes the data to the function, but only a permutation of this data (`rsampled_data`) will be used.
 
     ```{r}
     resample_lm0 <- function(
@@ -500,7 +500,7 @@ library(purrr)
 
 ## Old exercises
 
-1. __<span style="color:red">Q</span>__: Run this code in your head and predict what it will print. Confirm or refute your prediction by running the code in R.
+1. [Q]{.Q}: Run this code in your head and predict what it will print. Confirm or refute your prediction by running the code in R.
 
     ```{r, results = FALSE}
     f <- function(...) {
@@ -521,16 +521,16 @@ library(purrr)
     purrr::map_chr(out, eval_tidy)
     ```
 
-1. __<span style="color:red">Q</span>__: What happens if you use `expr()` instead of `enexpr()` inside of `subset2()`?
+1. [Q]{.Q}: What happens if you use `expr()` instead of `enexpr()` inside of `subset2()`?
 
 
-1. __<span style="color:red">Q</span>__: Improve `subset2()` to make it more like real `base::subset()`:
+1. [Q]{.Q}: Improve `subset2()` to make it more like real `base::subset()`:
     
    * Drop rows where `subset` evaluates to `NA`
    * Give a clear error message if `subset` doesn't yield a logical vector
    * What happens if `subset` yields a vector that's not the same as the number of rows in `data`? What do you think should happen?
       
-2. __<span style="color:red">Q</span>__: The third argument in `base::subset()` allows you to select variables. It treats variable names as if they were positions. This allows you to do things like `subset(mtcars, , -cyl)` to drop the cylinder variable, or `subset(mtcars, , disp:drat)` to select all the variables between `disp` and `drat`. How does this work? I've made this easier to understand by extracting it out into its own function that uses tidy evaluation.
+2. [Q]{.Q}: The third argument in `base::subset()` allows you to select variables. It treats variable names as if they were positions. This allows you to do things like `subset(mtcars, , -cyl)` to drop the cylinder variable, or `subset(mtcars, , disp:drat)` to select all the variables between `disp` and `drat`. How does this work? I've made this easier to understand by extracting it out into its own function that uses tidy evaluation.
 
     ```{r, eval = FALSE}
     select <- function(df, vars) {
@@ -543,7 +543,7 @@ library(purrr)
     select(mtcars, -cyl)
     ```
     
-3. __<span style="color:red">Q</span>__: Here's an alternative implementation of `arrange()`:
+3. [Q]{.Q}: Here's an alternative implementation of `arrange()`:
 
     ```{r}
     invoke <- function(fun, ...) do.call(fun, dots_list(...))
@@ -561,7 +561,7 @@ library(purrr)
     
    One advantage of this approach is that you could check each element of `...` to make sure that input is correct. What property should each element of `ords` have?
 
-4. __<span style="color:red">Q</span>__: Here's an alternative implementation of `subset2()`: 
+4. [Q]{.Q}: Here's an alternative implementation of `subset2()`:
 
     ```{r}
     subset3 <- function(data, rows) {
@@ -572,7 +572,7 @@ library(purrr)
    Use intermediate variables to make the function easier to understand, then
    explain how this approach differs to the approach in the text.
 
-5. __<span style="color:red">Q</span>__: Implement a form of `arrange()` where you can request a variable to sorted in descending order using named arguments:
+5. [Q]{.Q}: Implement a form of `arrange()` where you can request a variable to sorted in descending order using named arguments:
     
     ```{r, eval = FALSE}
     arrange(mtcars, cyl, desc = mpg, vs)
@@ -580,13 +580,13 @@ library(purrr)
     
    (Hint:  The `descreasing` argument to `order()` will not help you. Instead, look at the definition of `dplyr::desc()`, and read the help for `xtfrm()`.)
 
-6. __<span style="color:red">Q</span>__: Why do you not need to worry about ambiguous argument names with `...` in
+6. [Q]{.Q}: Why do you not need to worry about ambiguous argument names with `...` in
     `arrange()`? Why is it a good idea to use the `.` prefix anyway?
 
-7. __<span style="color:red">Q</span>__: What does `transform()` do? Read the documentation. How does it work?
+7. [Q]{.Q}: What does `transform()` do? Read the documentation. How does it work?
    Read the source code for `transform.data.frame()`. What does `substitute(list(...))` do?
    
-8. __<span style="color:red">Q</span>__: Use tidy evaluation to implement your own version of `transform()`. 
+8. [Q]{.Q}: Use tidy evaluation to implement your own version of `transform()`.
    Extend it so that a calculation can refer to variables created by transform, i.e. make this work:
     
     ```{r, error = TRUE}
@@ -594,15 +594,15 @@ library(purrr)
     transform(df, x1 = x + 1, x2 = x1 + 1)
     ```
 
-9. __<span style="color:red">Q</span>__: What does `with()` do? How does it work? Read the source code for `with.default()`. What does `within()` do? How does it work? Read the source code for `within.data.frame()`. Why is the code so much more
+9. [Q]{.Q}: What does `with()` do? How does it work? Read the source code for `with.default()`. What does `within()` do? How does it work? Read the source code for `within.data.frame()`. Why is the code so much more
     complex than `with()`?
    
-10. __<span style="color:red">Q</span>__: Implement a version of `within.data.frame()` that uses tidy evaluation. 
+10. [Q]{.Q}: Implement a version of `within.data.frame()` that uses tidy evaluation.
     Read the documentation and make sure that you understand what `within()` does, then read the source code.
     
 <!-- ## Wrapping quoting functions -->
 
-1. __<span style="color:red">Q</span>__: When model building, typically the response and data are relatively constant while you rapidly experiment with different predictors. Write a small wrapper that allows you to reduce duplication in this situation.
+1. [Q]{.Q}: When model building, typically the response and data are relatively constant while you rapidly experiment with different predictors. Write a small wrapper that allows you to reduce duplication in this situation.
     
     ```{r, eval = FALSE}
     pred_mpg <- function(resp, ...) {
@@ -613,19 +613,19 @@ library(purrr)
     pred_mpg(~ disp * cyl)
     ```
     
-2. __<span style="color:red">Q</span>__: Another way to way to write `boot_lm()` would be to include the boostrapping expression (`data[sample(nrow(data), replace = TRUE), , drop = FALSE]`) in the data argument. Implement that approach. What are the advantages? What are the disadvantages?
+2. [Q]{.Q}: Another way to way to write `boot_lm()` would be to include the boostrapping expression (`data[sample(nrow(data), replace = TRUE), , drop = FALSE]`) in the data argument. Implement that approach. What are the advantages? What are the disadvantages?
 
-3. __<span style="color:red">Q</span>__: To make these functions somewhat more robust, instead of always using the `caller_env()` we could capture a quosure, and then use its environment. However, if there are multiple arguments, they might be associated with different environments. Write a function that takes a list of quosures, and returns the common environment, if they have one, or otherwise throws an error.
+3. [Q]{.Q}: To make these functions somewhat more robust, instead of always using the `caller_env()` we could capture a quosure, and then use its environment. However, if there are multiple arguments, they might be associated with different environments. Write a function that takes a list of quosures, and returns the common environment, if they have one, or otherwise throws an error.
 
-4. __<span style="color:red">Q</span>__: Write a function that takes a data frame and a list of formulas, fitting a linear model with each formula, generating a useful model call.
+4. [Q]{.Q}: Write a function that takes a data frame and a list of formulas, fitting a linear model with each formula, generating a useful model call.
 
-5. __<span style="color:red">Q</span>__: Create a formula generation function that allows you to optionally supply a transformation function (e.g. `log()`) to the response or the predictors.
+5. [Q]{.Q}: Create a formula generation function that allows you to optionally supply a transformation function (e.g. `log()`) to the response or the predictors.
 
 ## Deprecated evaluation basics
 
-1. __<span style="color:red">Q</span>__: The code generated by `source2()` lacks source references. Read the source code for `sys.source()` and the help for `srcfilecopy()`, then modify `source2()` to preserve source references. You can test your code by sourcing a function that contains a comment. If successful, when you look at the function, you'll see the comment and not just the source code.
+1. [Q]{.Q}: The code generated by `source2()` lacks source references. Read the source code for `sys.source()` and the help for `srcfilecopy()`, then modify `source2()` to preserve source references. You can test your code by sourcing a function that contains a comment. If successful, when you look at the function, you'll see the comment and not just the source code.
 
-   __<span style="color:orange">A</span>__: 
+   [A]{.started}:
 
     ```{r, error=TRUE}
     tmp_file <- tempfile()

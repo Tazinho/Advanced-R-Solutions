@@ -10,7 +10,7 @@ source("common.R")
 
 ## Profiling
 
-1. __<span style="color:red">Q</span>__: Profile the following function with `torture = TRUE`. What is surprising? Read the source code of `rm()` to figure out what's going on.
+1. [Q]{.Q}: Profile the following function with `torture = TRUE`. What is surprising? Read the source code of `rm()` to figure out what's going on.
 
     ```{r}
     f <- function(n = 1e5) {
@@ -19,7 +19,7 @@ source("common.R")
     }
     ```
 
-   __<span style="color:green">A</span>__:
+   [A]{.solved}:
 
     ```{r, eval = FALSE, include = FALSE}
     profvis::profvis(f(), torture = TRUE)
@@ -31,7 +31,7 @@ source("common.R")
 
 ## Microbenchmarking
 
-1. __<span style="color:red">Q</span>__: Instead of using `bench::mark()`, you could use the built-in function `system.time()`. But `system.time()` is much less precise, so you'll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.
+1. [Q]{.Q}: Instead of using `bench::mark()`, you could use the built-in function `system.time()`. But `system.time()` is much less precise, so you'll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.
 
     ```{r, eval = FALSE}
     n <- 1e6
@@ -41,7 +41,7 @@ source("common.R")
     
    How do the estimates from `system.time()` compare to those from `bench::mark()`? Why are they different?
 
-   __<span style="color:orange">A</span>__: (TODO: Last part of the quesiton: Why are the results different?)
+   [A]{.started}: (TODO: Last part of the quesiton: Why are the results different?)
 
     ```{r}
     n <- 1e6
@@ -66,14 +66,14 @@ source("common.R")
 
 <!-- Just in case, that you are not sold on bench::mark yet - remember, there is no fancy default plot for system.time. ;) -->
 
-2. __<span style="color:red">Q</span>__: Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.
+2. [Q]{.Q}: Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.
 
     ```{r, eval = FALSE}
     x ^ (1 / 2)
     exp(log(x) / 2)
     ```
 
-   __<span style="color:green">A</span>__: We'll use the "bench"-package to estimate the relative execution time of these expression, with the fastest expression standardized to 1.
+   [A]{.solved}: We'll use the "bench"-package to estimate the relative execution time of these expression, with the fastest expression standardized to 1.
    
     ```{r, message=FALSE}
     x <- runif(100)
@@ -90,7 +90,7 @@ source("common.R")
    As supposed, `exp(log(x)/2)` needs the longest time to calculate the square root of `x`.
 
 ## Old exercises
-1. __<span style="color:red">Q</span>__: Instead of using `microbenchmark()`, you could use the built-in function `system.time()`. But `system.time()` is much less precise, so you'll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.
+1. [Q]{.Q}: Instead of using `microbenchmark()`, you could use the built-in function `system.time()`. But `system.time()` is much less precise, so you'll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.
 
     ```{r, eval = FALSE}
     n <- 1:1e6
@@ -100,14 +100,14 @@ source("common.R")
     
    How do the estimates from `system.time()` compare to those from `microbenchmark()`? Why are they different?
 
-2. __<span style="color:red">Q</span>__: Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.
+2. [Q]{.Q}: Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.
 
     ```{r, eval = FALSE}
     x ^ (1 / 2)
     exp(log(x) / 2)
     ```
     
-   __<span style="color:green">A</span>__: The second one looks more complex, but you never know...unless you test it.
+   [A]{.solved}: The second one looks more complex, but you never know...unless you test it.
     
     ```{r}
     x <- runif(100)
@@ -119,9 +119,9 @@ source("common.R")
     )
     ```
 
-3. __<span style="color:red">Q</span>__: Use microbenchmarking to rank the basic arithmetic operators (`+`, `-`, `*`, `/`, and `^`) in terms of their speed. Visualise the results. Compare the speed of arithmetic on integers vs. doubles.
+3. [Q]{.Q}: Use microbenchmarking to rank the basic arithmetic operators (`+`, `-`, `*`, `/`, and `^`) in terms of their speed. Visualise the results. Compare the speed of arithmetic on integers vs. doubles.
    
-   __<span style="color:green">A</span>__: Since I am on a Windows system, where these short execution times are hard to measure, I just ran the following code on a linux and paste the results here:
+   [A]{.solved}: Since I am on a Windows system, where these short execution times are hard to measure, I just ran the following code on a linux and paste the results here:
     
     ```{r, eval = FALSE}
     mb_integer <- microbenchmark::microbenchmark(
@@ -181,16 +181,16 @@ source("common.R")
       scale_y_continuous(breaks = seq(0, max(mb_median$time), 10))
     ```
 
-4. __<span style="color:red">Q</span>__: You can change the units in which the microbenchmark results are
+4. [Q]{.Q}: You can change the units in which the microbenchmark results are
     expressed with the `unit` parameter. Use `unit = "eps"` to show
     the number of evaluations needed to take 1 second. Repeat the benchmarks
     above with the eps unit. How does this change your intuition for performance?
 
 <!-- ## Language performance -->
 
-1. __<span style="color:red">Q</span>__: `scan()` has the most arguments (21) of any base function. About how much time does it take to make 21 promises each time scan is called? Given a simple input (e.g., `scan(text = "1 2 3", quiet = T)`) what proportion of the total run time is due to creating those promises?
+1. [Q]{.Q}: `scan()` has the most arguments (21) of any base function. About how much time does it take to make 21 promises each time scan is called? Given a simple input (e.g., `scan(text = "1 2 3", quiet = T)`) what proportion of the total run time is due to creating those promises?
     
-   __<span style="color:green">A</span>__: According to the textbook every extra argument slows the function down by approximately 20 nanoseconds, which I can't reproduce on my system:
+   [A]{.solved}: According to the textbook every extra argument slows the function down by approximately 20 nanoseconds, which I can't reproduce on my system:
     
     ```{r}
     f5 <- function(a = 1, b = 2, c = 4, d = 4, e = 5) NULL
@@ -217,16 +217,16 @@ source("common.R")
     
    This lets us calculate, that ~`r round(420 / mb_prom_median, 4) * 100`% of the median run time are caused by the extra arguments.
 
-2. __<span style="color:red">Q</span>__: Read ["Evaluating the Design of the R Language"](http://r.cs.purdue.edu/pub/ecoop12.pdf). What other aspects of the R-language slow it down? Construct microbenchmarks to illustrate. 
+2. [Q]{.Q}: Read ["Evaluating the Design of the R Language"](http://r.cs.purdue.edu/pub/ecoop12.pdf). What other aspects of the R-language slow it down? Construct microbenchmarks to illustrate.
 
-3. __<span style="color:red">Q</span>__: How does the performance of S3 method dispatch change with the length of the class vector? How does performance of S4 method dispatch change with number of superclasses? How about RC?
+3. [Q]{.Q}: How does the performance of S3 method dispatch change with the length of the class vector? How does performance of S4 method dispatch change with number of superclasses? How about RC?
 
-4. __<span style="color:red">Q</span>__: What is the cost of multiple inheritance and multiple dispatch on S4 method dispatch?
+4. [Q]{.Q}: What is the cost of multiple inheritance and multiple dispatch on S4 method dispatch?
 
-5. __<span style="color:red">Q</span>__: Why is the cost of name lookup less for functions in the base package?
+5. [Q]{.Q}: Why is the cost of name lookup less for functions in the base package?
 
 <!-- ## Implementations performance -->
 
-1. __<span style="color:red">Q</span>__: The performance characteristics of `squish_ife()`, `squish_p()`, and `squish_in_place()` vary considerably with the size of `x`. Explore the differences. Which sizes lead to the biggest and smallest differences?
+1. [Q]{.Q}: The performance characteristics of `squish_ife()`, `squish_p()`, and `squish_in_place()` vary considerably with the size of `x`. Explore the differences. Which sizes lead to the biggest and smallest differences?
 
-2. __<span style="color:red">Q</span>__: Compare the performance costs of extracting an element from a list, a column from a matrix, and a column from a data frame. Do the same for rows.
+2. [Q]{.Q}: Compare the performance costs of extracting an element from a list, a column from a matrix, and a column from a data frame. Do the same for rows.

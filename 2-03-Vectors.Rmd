@@ -6,11 +6,11 @@ source("common.R")
 
 ## Atomic vectors
 
-1. __<span style="color:red">Q</span>__: How do you create scalars of type raw and complex? (See `?raw` and `?complex`)
+1. [Q]{.Q}: How do you create scalars of type raw and complex? (See `?raw` and `?complex`)
 
   <!-- I'd say there's no way to create a literal raw scalar; you have to create a vector. You can't create complex scalars, but you can create imaginary scalars with the i prefix: i, 5i etc.  You could mention the complex() and raw() constructors in the next paragraph.  -->
 
-   __<span style="color:green">A</span>__: In R scalars are represented as vectors of length one. For raw and complex types these can be created via `raw()` and `complex()`, i.e.:
+   [A]{.solved}: In R scalars are represented as vectors of length one. For raw and complex types these can be created via `raw()` and `complex()`, i.e.:
   
     ```{r}
     raw(1)
@@ -30,7 +30,7 @@ source("common.R")
     complex(length.out = 1, real = 1, imaginary = 1)
     ```
 
-2. __<span style="color:red">Q</span>__: Test your knowledge of vector coercion rules by predicting the output of the following uses of `c()`: 
+2. [Q]{.Q}: Test your knowledge of vector coercion rules by predicting the output of the following uses of `c()`:
 
     ```{r, eval=FALSE}
     c(1, FALSE)      # will be coerced to numeric   -> 1 0
@@ -38,26 +38,26 @@ source("common.R")
     c(TRUE, 1L)      # will be coerced to integer   -> 1 1
     ```
 
-3. __<span style="color:red">Q</span>__: Why is `1 == "1"` true? Why is `-1 < FALSE` true? Why is `"one" < 2` false?  
+3. [Q]{.Q}: Why is `1 == "1"` true? Why is `-1 < FALSE` true? Why is `"one" < 2` false?
 
-   __<span style="color:green">A</span>__: These comparisons are carried out by operator-functions, which coerce their arguments to a common type. In the examples above these cases will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` turns into `"2"` (and numerals precede letters in the lexicographic order (may depend on locale)).
+   [A]{.solved}: These comparisons are carried out by operator-functions, which coerce their arguments to a common type. In the examples above these cases will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` turns into `"2"` (and numerals precede letters in the lexicographic order (may depend on locale)).
 
-4. __<span style="color:red">Q</span>__: Why is the default missing value, `NA`, a logical vector? What's special about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)  
+4. [Q]{.Q}: Why is the default missing value, `NA`, a logical vector? What's special about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)
    
-   __<span style="color:green">A</span>__: The presence of missing values shouldn´t affect the type of an object. Recall that there is a type-hierarchy for coercion from character >> double >> integer >> logical. When combining `NA`s  with other atomic types, the `NA`s will be coerced to integer (`NA_integer_`), double (`NA_real_`) or character (`NA_character_`) and not the other way round.  If `NA` was a character and added to a set of other values all of these would be coerced to character as well.
+   [A]{.solved}: The presence of missing values shouldn´t affect the type of an object. Recall that there is a type-hierarchy for coercion from character >> double >> integer >> logical. When combining `NA`s  with other atomic types, the `NA`s will be coerced to integer (`NA_integer_`), double (`NA_real_`) or character (`NA_character_`) and not the other way round.  If `NA` was a character and added to a set of other values all of these would be coerced to character as well.
 
-5. __<span style="color:red">Q</span>__: Precisely what do `is.atomic()`, `is.numeric()`, and `is.vector()` test for?
+5. [Q]{.Q}: Precisely what do `is.atomic()`, `is.numeric()`, and `is.vector()` test for?
    
-   __<span style="color:green">A</span>__: The documentation states that:
+   [A]{.solved}: The documentation states that:
    - `is.atomic()` tests if is an atomic vector (as defined in Advanced R) or is `NULL` (!).
    - `is.numeric()` tests if an object has type integer or double and is not of `"factor"`, `"Date"`, `"POSIXt"` or `"difftime"` class.
    - `is.vector()` tests if an object is vector (as defined in Advanced R) and has no attributes, apart from names.
 
 ## Attributes
 
-1. __<span style="color:red">Q</span>__: How is `setNames()` implemented? How is `unname()` implemented? Read the source code.
+1. [Q]{.Q}: How is `setNames()` implemented? How is `unname()` implemented? Read the source code.
    
-   __<span style="color:green">A</span>__: `setNames()` is implemented as:
+   [A]{.solved}: `setNames()` is implemented as:
    
     ```{r, eval = FALSE}
     setNames <- function (object = nm, nm){
@@ -87,9 +87,9 @@ source("common.R")
    
    `unname()` removes existing names (or dimnames) by setting them to `NULL`.
    
-2. __<span style="color:red">Q</span>__: What does `dim()` return when applied to a 1d vector? When might you use `NROW()` or `NCOL()`?
+2. [Q]{.Q}: What does `dim()` return when applied to a 1d vector? When might you use `NROW()` or `NCOL()`?
     
-   __<span style="color:green">A</span>__: From `?nrow`:
+   [A]{.solved}: From `?nrow`:
     
    > `dim()` will return `NULL` when applied to a 1d vector.
    
@@ -106,7 +106,7 @@ source("common.R")
     NCOL(x)
     ```
 
-3. __<span style="color:red">Q</span>__: How would you describe the following three objects? What makes them different to `1:5`?
+3. [Q]{.Q}: How would you describe the following three objects? What makes them different to `1:5`?
 
     ```{r}
     x1 <- array(1:5, c(1, 1, 5))  # 1 row,  1 column,  5 in third dimension
@@ -114,11 +114,11 @@ source("common.R")
     x3 <- array(1:5, c(5, 1, 1))  # 5 rows, 1 column,  1 in third dimension
     ```
     
-   __<span style="color:green">A</span>__: These are all "one dimensional".
+   [A]{.solved}: These are all "one dimensional".
    If you imagine a 3d cube, `x1` is in "x" dimension, `x2` is in the "y"
    dimension, and `x3` is in the "z" dimension.
 
-4. __<span style="color:red">Q</span>__: An early draft used this code to illustrate `structure()`:
+4. [Q]{.Q}: An early draft used this code to illustrate `structure()`:
 
     ```{r}
     structure(1:5, comment = "my attribute")
@@ -126,7 +126,7 @@ source("common.R")
 
    But when you print that object you don't see the comment attribute. Why? Is the attribute missing, or is there something else special about it? (Hint: try using help.) \index{attributes!comment}
     
-   __<span style="color:green">A</span>__: The documentation states (see `?comment`):  
+   [A]{.solved}: The documentation states (see `?comment`):
     
    > Contrary to other attributes, the comment is not printed (by print or print.default).
     
@@ -145,9 +145,9 @@ source("common.R")
 
 
 ## S3 atomic vectors
-1. __<span style="color:red">Q</span>__: What sort of object does `table()` return? What is its type? What attributes does it have? How does the dimensionality change as you tabulate more variables?
+1. [Q]{.Q}: What sort of object does `table()` return? What is its type? What attributes does it have? How does the dimensionality change as you tabulate more variables?
     
-   __<span style="color:green">A</span>__: `table()` returns a contingency table of its input variables, which has the class `"table"`. Internally it is represented as an array (implicit class) of integers (type) with the attributes `dim` (dimension of the underlying array) and `dimnames` (one name for each input column). The dimensions correspond to the number of unique values (factor levels) in each input variable.
+   [A]{.solved}: `table()` returns a contingency table of its input variables, which has the class `"table"`. Internally it is represented as an array (implicit class) of integers (type) with the attributes `dim` (dimension of the underlying array) and `dimnames` (one name for each input column). The dimensions correspond to the number of unique values (factor levels) in each input variable.
 
     ```{r}
     x <- table(mtcars[c("vs", "cyl", "am")])
@@ -156,14 +156,14 @@ source("common.R")
     attributes(x)
     ```
     
-2. __<span style="color:red">Q</span>__: What happens to a factor when you modify its levels? 
+2. [Q]{.Q}: What happens to a factor when you modify its levels?
     
     ```{r, eval = FALSE}
     f1 <- factor(letters)
     levels(f1) <- rev(levels(f1))
     ```
     
-   __<span style="color:green">A</span>__: The underlying integer values stay the same, but the levels are changed, making it look like the data as changed.
+   [A]{.solved}: The underlying integer values stay the same, but the levels are changed, making it look like the data as changed.
     
     ```{r}
     f1 <- factor(letters[1:10])
@@ -177,20 +177,20 @@ source("common.R")
     as.integer(f1)
     ```
     
-3. __<span style="color:red">Q</span>__: What does this code do? How do `f2` and `f3` differ from `f1`?
+3. [Q]{.Q}: What does this code do? How do `f2` and `f3` differ from `f1`?
 
     ```{r, results = "none"}
     f2 <- rev(factor(letters))  # reverses element order (only)
     f3 <- factor(letters, levels = rev(letters))  # reverses factor level order (only)
     ```
     
-   __<span style="color:green">A</span>__: For `f2` and `f3` either the order of the factor elements *or* its levels are being reversed. For `f1` both transformations are occurring.
+   [A]{.solved}: For `f2` and `f3` either the order of the factor elements *or* its levels are being reversed. For `f1` both transformations are occurring.
 
 
 ## Lists
-1. __<span style="color:red">Q</span>__: List all the ways that a list differs from an atomic vector.
+1. [Q]{.Q}: List all the ways that a list differs from an atomic vector.
 
-   __<span style="color:green">A</span>__: To summarise:
+   [A]{.solved}: To summarise:
    <!-- Would be good to link these to sections in Advanced R -->
    - Atomic vectors are always homogeneous (all elements must be of the same type). Lists may be heterogeneous (the elements can be of different types). 
    - Atomic vectors point to one address in memory, while lists contain a separate references for each element.
@@ -212,9 +212,9 @@ source("common.R")
     as.list(1:2)[NA]
     ```
    
-2. __<span style="color:red">Q</span>__: Why do you need to use `unlist()` to convert a list to an atomic vector? Why doesn't `as.vector()` work?  
+2. [Q]{.Q}: Why do you need to use `unlist()` to convert a list to an atomic vector? Why doesn't `as.vector()` work?
    
-   __<span style="color:green">A</span>__: A list is already a vector, though not an atomic one!
+   [A]{.solved}: A list is already a vector, though not an atomic one!
    
     Note that `as.vector()` and `is.vector()` use different defintions of 
     "vector"!
@@ -223,9 +223,9 @@ source("common.R")
     is.vector(as.vector(mtcars))
     ```
    
-3. __<span style="color:red">Q</span>__: Compare and contrast `c()` and `unlist()` when combining a date and date-time into a single vector.
+3. [Q]{.Q}: Compare and contrast `c()` and `unlist()` when combining a date and date-time into a single vector.
 
-   __<span style="color:green">A</span>__: Date and date-time objects are built upon doubles. Dates are represented as days, while date-time-objects (POSIXct) represent seconds (counted in respect to the reference date 1970-01-01, also known as "The Epoch").
+   [A]{.solved}: Date and date-time objects are built upon doubles. Dates are represented as days, while date-time-objects (POSIXct) represent seconds (counted in respect to the reference date 1970-01-01, also known as "The Epoch").
    
    Combining these objects leads to surprising output because `c()` does not consider the class of both inputs:
 
@@ -264,9 +264,9 @@ source("common.R")
    <!-- link to vctrs package for resolution of this problem? -->
    
 ## Data frames and tibbles
-1. __<span style="color:red">Q</span>__: Can you have a data frame with 0 rows? What about 0 columns?  
+1. [Q]{.Q}: Can you have a data frame with 0 rows? What about 0 columns?
 
-   __<span style="color:green">A</span>__: Yes, you can create these data frames easily and in many ways. Even both dimensions can be 0. E.g. you might subset the respective dimension with either `0`, `NULL` or a valid 0-length atomic (`logical(0)`, `character(0)`, `integer(0)`, `double(0)`). Negative integer sequences would also work. The following example uses a zero:
+   [A]{.solved}: Yes, you can create these data frames easily and in many ways. Even both dimensions can be 0. E.g. you might subset the respective dimension with either `0`, `NULL` or a valid 0-length atomic (`logical(0)`, `character(0)`, `integer(0)`, `double(0)`). Negative integer sequences would also work. The following example uses a zero:
 
     ```{r}
     iris[0, ]
@@ -282,9 +282,9 @@ source("common.R")
     data.frame()
     ```
 
-2. __<span style="color:red">Q</span>__: What happens if you attempt to set rownames that are not unique?
+2. [Q]{.Q}: What happens if you attempt to set rownames that are not unique?
 
-   __<span style="color:green">A</span>__ Matrices can have duplicated row names, so this does now cause problems 
+   [A]{.solved} Matrices can have duplicated row names, so this does now cause problems
    
    Data frames, however, required unique rownames and you get different results depending on how you attempt to set them. If you use `row.names()` directly, you 
    get an error:
@@ -303,9 +303,9 @@ source("common.R")
     
     <!-- I think discussing `.rowNamesDF<-` is going too deep -->
 
-3. __<span style="color:red">Q</span>__: If `df` is a data frame, what can you say about `t(df)`, and `t(t(df))`? Perform some experiments, making sure to try different column types.
+3. [Q]{.Q}: If `df` is a data frame, what can you say about `t(df)`, and `t(t(df))`? Perform some experiments, making sure to try different column types.
 
-   __<span style="color:green">A</span>__ Both will return matrices:
+   [A]{.solved} Both will return matrices:
    
     ```{r}
     df <- data.frame(x = 1:5, y = 5:1)
@@ -324,9 +324,9 @@ source("common.R")
     
    Because the output is a matrix, every column is coerced to the same type by `as.matrix()`, as described below.
 
-4. __<span style="color:red">Q</span>__: What does `as.matrix()` do when applied to a data frame with columns of different types? How does it differ from `data.matrix()`?
+4. [Q]{.Q}: What does `as.matrix()` do when applied to a data frame with columns of different types? How does it differ from `data.matrix()`?
     
-   __<span style="color:green">A</span>__: From `?as.matrix`:
+   [A]{.solved}: From `?as.matrix`:
     
    > The method for data frames will return a character matrix if there is only atomic columns and any non-(numeric/logical/complex) column, applying as.vector to factors and format to other non-character columns. Otherwise the usual coercion hierarchy (logical < integer < double < complex) will be used, e.g., all-logical data frames will be coerced to a logical matrix, mixed logical-integer will give a integer matrix, etc.
     
