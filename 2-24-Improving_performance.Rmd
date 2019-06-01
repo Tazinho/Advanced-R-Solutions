@@ -8,8 +8,8 @@ source("common.R")
 
 1. __[Q]{.Q}__: What are faster alternatives to `lm`? Which are specifically designed to work with larger datasets?
 
-   __[A]{.solved}__: Within the [Cran task view](https://cran.rstudio.com/web/views/) for [HighPerformanceComputing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and its `speedlm()` function. We might not gain any performance improvements on small datasets:
-    
+   __[A]{.solved}__: In the [Cran Task View](https://cran.rstudio.com/web/views/) for [High Performance Computing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and its `speedlm()` function. For small datasets, there may be only minor performance gains:
+
     ```{r}
     stopifnot(all.equal(
       coef(speedglm::speedlm(Sepal.Length ~ Sepal.Width + Species, data = iris)),
@@ -46,7 +46,7 @@ source("common.R")
     
    Note that there are many other opportunities mentioned in the task view, also some that make it possible to handle data which is not in memory. 
     
-   When it comes to pure speed a quick google search on [r fastest lm](http://stackoverflow.com/questions/25416413/is-there-a-faster-lm-function) provides a stackoverflow thread where someone already solved this problem for us...
+   When it comes to pure speed a quick search on [r fastest lm](http://stackoverflow.com/questions/25416413/is-there-a-faster-lm-function) provides a stackoverflow thread where someone already solved this problem for us...
 
 2. __[Q]{.Q}__: What package implements a version of `match()` that's faster for repeated lookups? How much faster is it?
     
