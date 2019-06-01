@@ -237,22 +237,21 @@ library(rlang)
    __<span style="color:green">A</span>__: 
     
     ```{r}
-    # 1:  (x + y) / (y + z)
-    expr(!!xy / !!yz)
-    # 2:  -(x + z) ^ (y + z)
-    expr(-(!!xz)^(!!yz))
-    # 3:  (x + y) + (y + z) - (x + y)
-    expr(!!xy + !!yz - !!xz)
-    # 4:  atan2(x + y, y + z)
-    expr(atan2(!!xy, !!yz))
-    # 5:  sum(x + y, x + y, y + z)
-    expr(sum(!!xy, !!xy, !!yz))
-    # 6:  sum(a, b, c)
-    expr(sum(!!!abc))
-    # 7:  mean(c(a, b, c), na.rm = TRUE)
-    expr(mean(c(!!!abc), na.rm = TRUE))
-    # 8:  foo(a = x + y, b = y + z)
-    expr(foo(a = xy, b = yz))
+    expr(!!xy / !!yz)                    # (1)
+    
+    expr(-(!!xz)^(!!yz))                 # (2)
+    
+    expr(!!xy + !!yz - !!xz)             # (3)
+    
+    expr(atan2(!!xy, !!yz))              # (4)
+    
+    expr(sum(!!xy, !!xy, !!yz))          # (5)
+    
+    expr(sum(!!!abc))                    # (6)
+    
+    expr(mean(c(!!!abc), na.rm = TRUE))  # (7)
+    
+    expr(foo(a = xy, b = yz))            # (8)
     ```
 
 2. __<span style="color:red">Q</span>__: The following two calls print the same, but are actually different:
