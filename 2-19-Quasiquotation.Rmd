@@ -63,7 +63,7 @@ library(rlang)
     ggplot(by_cyl, aes(cyl, mean)) + geom_point()
     ```
 
-   __<span style="color:green">A</span>__: From the last exercise we already know that `library()` calls its first argument.
+   __<span style="color:green">A</span>__: From the last exercise we already know that `library()` quotes its first argument.
     
     ```{r, eval = FALSE}
     library(dplyr)    # dplyr -> quoted
@@ -73,8 +73,8 @@ library(rlang)
      In similar manner, it becomes obvious that `cyl` is quoted by `group_by()`.
     
     ```{r, eval = FALSE}
-    by_cyl <- mtcars %>%  # mtcars -> evaluated
-      group_by(cyl) %>%   # cyl -> quoted
+    by_cyl <- mtcars %>%           # mtcars -> evaluated
+      group_by(cyl) %>%            # cyl -> quoted
       summarise(mean = mean(mpg))  # mean = mean(mpg) -> quoted
     ```
    
@@ -89,7 +89,7 @@ library(rlang)
    In the following ggplot2 code it should be already obvious that `cyl` and `mean` are quoted.
     
     ```{r, eval = FALSE}
-    ggplot(by_cyl,  # by_cyl -> evaluated
+    ggplot(by_cyl,            # by_cyl -> evaluated
            aes(cyl, mean)) +  # aes() -> evaluated
                               # cyl, mean -> quoted (via aes)
       geom_point() 
