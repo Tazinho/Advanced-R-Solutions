@@ -64,8 +64,6 @@ source("common.R")
    - this is surprising to me, because this approach also get's the (small) overhead of the `for`-loop
    - `system.time`-approach is only able to return the average execution time, which is not optimal for the skewed distribution of execution times.
 
-<!-- Just in case, that you are not sold on bench::mark yet - remember, there is no fancy default plot for system.time. ;) -->
-
 2. __[Q]{.Q}__: Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.
 
     ```{r, eval = FALSE}
@@ -73,8 +71,8 @@ source("common.R")
     exp(log(x) / 2)
     ```
 
-   __[A]{.solved}__: We'll use the "bench"-package to estimate the relative execution time of these expression, with the fastest expression standardized to 1.
-   
+   __[A]{.solved}__: We'll use the bench package to estimate the relative execution time of these expression, with the fastest expression standardized to 1.
+
     ```{r, message=FALSE}
     x <- runif(100)
     
@@ -87,7 +85,7 @@ source("common.R")
       dplyr::arrange(median)
     ```
 
-   As supposed, `exp(log(x)/2)` needs the longest time to calculate the square root of `x`.
+   As wxpected, `exp(log(x)/2)` requires the most time to calculate the square root of `x`.
 
 ## Old exercises
 1. __[Q]{.Q}__: Instead of using `microbenchmark()`, you could use the built-in function `system.time()`. But `system.time()` is much less precise, so you'll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.
@@ -121,7 +119,7 @@ source("common.R")
 
 3. __[Q]{.Q}__: Use microbenchmarking to rank the basic arithmetic operators (`+`, `-`, `*`, `/`, and `^`) in terms of their speed. Visualise the results. Compare the speed of arithmetic on integers vs. doubles.
    
-   __[A]{.solved}__: Since I am on a Windows system, where these short execution times are hard to measure, I just ran the following code on a linux and paste the results here:
+   __[A]{.solved}__: On a Windows system, these short execution times are hard to measure. The following code was executed on Linux and pasted here:
     
     ```{r, eval = FALSE}
     mb_integer <- microbenchmark::microbenchmark(
@@ -156,7 +154,7 @@ source("common.R")
     #    1^1  79 92 127.07686    103 135   641524 1e+06
     ```
     
-   To visualise and compare the results, we make some short spaghetties:
+   Let's compare the results visually.
     
     ```{r}
     mb_median <- data.frame(operator = c("+", "-", "*", "/", "^"),
