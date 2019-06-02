@@ -428,20 +428,28 @@ library(purrr)
     lm(mpg ~ disp * cyl, data = mtcars)
     ```
 
-   __[A]{.solved}__: In the wrapping function below, the response and the data were defined as default argument to the function. It would also be acceptable to "hardcode" them into the `lm()`-expression instead, but this way provides a little more flexibility.
+   __[A]{.solved}__: In our wrapper `lm_wrap()`, the `mpg` and `mtcars` are provided as default response and data. This provides a good mix of usability and flexibility.
 
     ```{r}
-    lm_wrap <- function(pred, resp = mpg, data = mtcars){
-      # unquoting using base tools
-      lm(substitute(resp ~ pred, environment()), data = data)
+    lm_wrap <- function(pred, resp = mpg, data = mtcars, env = caller_env()) {
+      pred <- enexpr(pred)
+      resp <- enexpr(resp)
+      data <- enexpr(data)
+      
+      formula <- expr(!!resp ~ !!pred)
+      lm_call <- expr(lm(!!formula, data = !!data))
+      eval(lm_call, envir = env)
     }
     
-    lm_wrap(disp)$coef
-    lm_wrap(I(1 / disp))$coef
-    lm_wrap(disp * cyl)$coef
+    # Test if the output looks ok
+    lm_wrap(I(1 / disp) + disp * cyl)
+    
+    # Test if the result is identical to calling lm() directly
+    identical(
+      lm_wrap(I(1 / disp) + disp * cyl),
+      lm(mpg ~ I(1 / disp) + disp * cyl, data = mtcars)
+    )
     ```
-
-   In practice, small wrappers like this can help keeping your scripts well organized and make it easy to see, what is being changed.
 
 3. __[Q]{.Q}__: Another way to write `resample_lm()` would be to include the resample expression `(data[sample(nrow(data), replace = TRUE), , drop = FALSE])` in the data argument. Implement that approach. What are the advantages? What are the disadvantages?
 
