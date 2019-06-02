@@ -245,44 +245,7 @@ library(purrr)
 
 1. __[Q]{.Q}__: Why did I use a for loop in `transform2()` instead of `map()`? Consider `transform2(df, x = x * 2, x = x * 2)`.
    
-   __[A]{.solved}__: Within the `for`-loop the evaluation of previous steps has already been assigned to `.data`, which makes the specification of chained transformations possible.
-
-    ```{r}
-    transform2 <- function(.data, ...) {
-      dots <- enquos(...)
-      
-      for (i in seq_along(dots)) {
-        name <- names(dots)[[i]]
-        dot <- dots[[i]]
-        
-        .data[[name]] <- eval_tidy(dot, .data)
-      }
-      
-      .data
-    }
-    
-    df <- data.frame(x = 1)
-    transform2(df, x = x * 2, x = x * 2)  # (re-)transforms x
-    transform2(df, x1 = x * 2, x2 = x1 * 2)  # stores intermediate variables
-    ```
-
-   We see, that the computation `(x * 2) * 2` has been taking place - the output of the first transformation has been used as input for the second transformation. 
-   This feature is not available, with `map()`, becaus it evaluates each element of the input seperately. This implies, that the individual transformations are independent of another and that intermediate computations are not available for the subsequent transformations.
-
-    ```{r, error=TRUE}
-    transform3 <- function(.data, ...) {
-      dots <- enquos(...)
-      
-      dots %>% 
-        map(eval_tidy, .data) %>% 
-        dplyr::bind_cols(.data, .)
-    }
-    
-    transform3(df, x = x * 2, x = x * 2)  # bind_cols() corrects duplicate names
-    transform3(df, x1 = x * 2, x2 = x1 * 2)
-    ```
-
-   The repeated retransformation of columns is very useful in interactive data analysis and can also be used within `dplyr::mutate()`. Be a little careful with reusing the same name too often though, because this spreads out related transformations across multiple statements.
+   __[A]{.solved}__: Via the for-loop approach the processing steps regarding `.data` are applied iteratively. This includes updating `.data` and reusing the same variable names, which enables to apply transformations sequentially so that transformation can refer to columns that were just created.
 
 2. __[Q]{.Q}__: Here's an alternative implementation of `subset2()`:
 
