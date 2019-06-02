@@ -40,34 +40,18 @@ library(purrr)
 2. __[Q]{.Q}__: Predict the results of the following lines of code:
 
     ```{r, eval = FALSE}
-    eval(quote(eval(quote(eval(quote(2 + 2))))))
-    eval(eval(quote(eval(quote(eval(quote(2 + 2)))))))
-    quote(eval(quote(eval(quote(eval(quote(2 + 2))))))) 
+    eval(expr(eval(expr(eval(expr(2 + 2))))))        # (1)
+    eval(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (2)
+    expr(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (3)
     ```
 
-   __[A]{.solved}__: You can see the output of the code above here:
-
-    ```{r, echo = FALSE}
-    eval(quote(eval(quote(eval(quote(2 + 2))))))
-    eval(eval(quote(eval(quote(eval(quote(2 + 2)))))))
-    quote(eval(quote(eval(quote(eval(quote(2 + 2)))))))
-    ```
-
-   Generally, `2 + 2` is first quoted as an expression and than evaluated to `4`. When we nest calls to `quote()` and `eval()` more calls will be added to the AST, but the pattern of quoting and evaluating stays the same.
+   __[A]{.solved}__: To quote Hadley analogously from the first edition of Advanced R: "`expr()` and `eval()` are opposites. ... each `eval()` peels off one layer of `expr()`'s". I.e. `eval(expr(x))` evaluates to  `x`. Therefore, (1) evaluates to $2 + 2 = 4$. Adding another `eval()` doesn't have impact here. So, also (2) evaluates to 4. However, when wrapping (1) into `expr()` the whole expression gets quoted. 
 
     ```{r}
-    # pattern: evaluate a quoted expression
-    eval(quote(
-      eval(quote(
-        eval(quote(
-          2 + 2))
-      ))
-    ))
-    
-    lobstr::ast(eval(quote(eval(quote(eval(quote(2 + 2)))))))
+    eval(expr(eval(expr(eval(expr(2 + 2))))))        # (1)
+    eval(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (2)
+    expr(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (3)
     ```
-
-   When we wrap this expression in another `eval()` the `4` will be evaluated once more, but the result doesn't change. When we quote it, no evaluation takes place and we capture the expression instead.
 
 3. __[Q]{.Q}__: Fill in the function bodies below to re-implement `get()` using `sym()` and `eval()`, and`assign()` using `sym()`, `expr()`, and `eval()`. Don't worry about the multiple ways of choosing an environment that `get()` and `assign()` support; assume that the user supplies it explicitly
 
