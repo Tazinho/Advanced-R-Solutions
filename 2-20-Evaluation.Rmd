@@ -134,7 +134,7 @@ library(purrr)
     (source2(tmp_file))
     ```
     
-   To eliminate the for-loop, we can simply use `map()`:
+   To eliminate the for loop, we can simply use `map()`:
    
     ```{r}
     source2 <- function(path, env = caller_env()) {
@@ -245,7 +245,7 @@ library(purrr)
 
 1. __[Q]{.Q}__: Why did I use a for loop in `transform2()` instead of `map()`? Consider `transform2(df, x = x * 2, x = x * 2)`.
    
-   __[A]{.solved}__: Via the for-loop approach the processing steps regarding `.data` are applied iteratively. This includes updating `.data` and reusing the same variable names, which enables to apply transformations sequentially so that transformation can refer to columns that were just created.
+   __[A]{.solved}__: Via the for loop approach the processing steps regarding `.data` are applied iteratively. This includes updating `.data` and reusing the same variable names, which enables to apply transformations sequentially so that transformation can refer to columns that were just created.
 
 2. __[Q]{.Q}__: Here's an alternative implementation of `subset2()`:
 
@@ -428,7 +428,7 @@ library(purrr)
     lm(mpg ~ disp * cyl, data = mtcars)
     ```
 
-   __[A]{.solved}__: In our wrapper `lm_wrap()`, the `mpg` and `mtcars` are provided as default response and data. This provides a good mix of usability and flexibility.
+   __[A]{.solved}__: In our wrapper `lm_wrap()`, we provide `mpg` and `mtcars` as default response and data. This seems to give us a good mix of usability and flexibility.
 
     ```{r}
     lm_wrap <- function(pred, resp = mpg, data = mtcars, env = caller_env()) {
