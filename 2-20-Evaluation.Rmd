@@ -98,30 +98,56 @@ library(purrr)
     
 4. __[Q]{.Q}__: Modify `source2()` so it returns the result of _every_ expression, not just the last one. Can you eliminate the for loop?
 
-   __[A]{.started}__:
-
-   - keep in mind `<-` invisibly returns its value
-
-    ```{r, error=TRUE}
-    tmp_file <- tempfile()
-    writeLines("x <- 1
-            x
-            y <- 2
-            y  # another comment
-           ", tmp_file)
-    
-    source2 <- function(file, env = caller_env()){
-      readLines(file) %>% 
-        parse_exprs() %>%
-        map(eval_tidy, env = env)
+   __[A]{.started}__: In order to make the modifications more apparent, we just keep the code from the former `source2()`-version as a comment.
+   
+    ```{r}
+    source2 <- function(path, env = caller_env()) {
+      file <- paste(readLines(path, warn = FALSE), collapse = "\n")
+      exprs <- parse_exprs(file)
       
-      # alternatively: 
-      # for (i in seq_along(exprs)) eval(exprs[i], env)
+      # res <- NULL
+      # for (i in seq_along(exprs)) {
+      #   res <- eval(exprs[[i]], env)
+      # }
+      
+      res <- vector(mode = "list", length = length(exprs))      
+      for (i in seq_along(exprs)) {
+        res[[i]] <- eval(exprs[[i]], env)
+      }
+      
+      invisible(res)
+    }
+    ```
+    
+   Let's create a file and test `source2()`. Keep in mind that `<-` returns invisibly.
+   
+    ```{r}
+    tmp_file <- tempfile()
+    writeLines(
+      "x <- 1
+      x
+      y <- 2
+      y  # some comment",
+      tmp_file
+    )
+
+    (source2(tmp_file))
+    ```
+    
+   To eliminate the for-loop, we can simply use `map()`:
+   
+    ```{r}
+    source2 <- function(path, env = caller_env()) {
+      file <- paste(readLines(path, warn = FALSE), collapse = "\n")
+      exprs <- parse_exprs(file)
+      
+      res <- map(exprs, eval, env)
+      
+      invisible(res)
     }
     
-    source2(tmp_file)
-    x
-    y
+    # Test:
+    (source2(tmp_file))
     ```
 
 5. __[Q]{.Q}__: We can make `base::local()` slightly easier to understand by spreading it over multiple lines:
