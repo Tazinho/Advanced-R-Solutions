@@ -40,34 +40,18 @@ library(purrr)
 2. __[Q]{.Q}__: Predict the results of the following lines of code:
 
     ```{r, eval = FALSE}
-    eval(quote(eval(quote(eval(quote(2 + 2))))))
-    eval(eval(quote(eval(quote(eval(quote(2 + 2)))))))
-    quote(eval(quote(eval(quote(eval(quote(2 + 2))))))) 
+    eval(expr(eval(expr(eval(expr(2 + 2))))))        # (1)
+    eval(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (2)
+    expr(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (3)
     ```
 
-   __[A]{.solved}__: You can see the output of the code above here:
-
-    ```{r, echo = FALSE}
-    eval(quote(eval(quote(eval(quote(2 + 2))))))
-    eval(eval(quote(eval(quote(eval(quote(2 + 2)))))))
-    quote(eval(quote(eval(quote(eval(quote(2 + 2)))))))
-    ```
-
-   Generally, `2 + 2` is first quoted as an expression and than evaluated to `4`. When we nest calls to `quote()` and `eval()` more calls will be added to the AST, but the pattern of quoting and evaluating stays the same.
+   __[A]{.solved}__: To quote Hadley analogously from the first edition of Advanced R: "`expr()` and `eval()` are opposites. ... each `eval()` peels off one layer of `expr()`'s". I.e. `eval(expr(x))` evaluates to  `x`. Therefore, (1) evaluates to $2 + 2 = 4$. Adding another `eval()` doesn't have impact here. So, also (2) evaluates to 4. However, when wrapping (1) into `expr()` the whole expression gets quoted. 
 
     ```{r}
-    # pattern: evaluate a quoted expression
-    eval(quote(
-      eval(quote(
-        eval(quote(
-          2 + 2))
-      ))
-    ))
-    
-    lobstr::ast(eval(quote(eval(quote(eval(quote(2 + 2)))))))
+    eval(expr(eval(expr(eval(expr(2 + 2))))))        # (1)
+    eval(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (2)
+    expr(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (3)
     ```
-
-   When we wrap this expression in another `eval()` the `4` will be evaluated once more, but the result doesn't change. When we quote it, no evaluation takes place and we capture the expression instead.
 
 3. __[Q]{.Q}__: Fill in the function bodies below to re-implement `get()` using `sym()` and `eval()`, and`assign()` using `sym()`, `expr()`, and `eval()`. Don't worry about the multiple ways of choosing an environment that `get()` and `assign()` support; assume that the user supplies it explicitly
 
@@ -114,30 +98,56 @@ library(purrr)
     
 4. __[Q]{.Q}__: Modify `source2()` so it returns the result of _every_ expression, not just the last one. Can you eliminate the for loop?
 
-   __[A]{.started}__:
-
-   - keep in mind `<-` invisibly returns its value
-
-    ```{r, error=TRUE}
-    tmp_file <- tempfile()
-    writeLines("x <- 1
-            x
-            y <- 2
-            y  # another comment
-           ", tmp_file)
-    
-    source2 <- function(file, env = caller_env()){
-      readLines(file) %>% 
-        parse_exprs() %>%
-        map(eval_tidy, env = env)
+   __[A]{.solved}__: In order to make the modifications more apparent, we just keep the code from the former `source2()`-version as a comment.
+   
+    ```{r}
+    source2 <- function(path, env = caller_env()) {
+      file <- paste(readLines(path, warn = FALSE), collapse = "\n")
+      exprs <- parse_exprs(file)
       
-      # alternatively: 
-      # for (i in seq_along(exprs)) eval(exprs[i], env)
+      # res <- NULL
+      # for (i in seq_along(exprs)) {
+      #   res <- eval(exprs[[i]], env)
+      # }
+      
+      res <- vector(mode = "list", length = length(exprs))      
+      for (i in seq_along(exprs)) {
+        res[[i]] <- eval(exprs[[i]], env)
+      }
+      
+      invisible(res)
+    }
+    ```
+    
+   Let's create a file and test `source2()`. Keep in mind that `<-` returns invisibly.
+   
+    ```{r}
+    tmp_file <- tempfile()
+    writeLines(
+      "x <- 1
+      x
+      y <- 2
+      y  # some comment",
+      tmp_file
+    )
+
+    (source2(tmp_file))
+    ```
+    
+   To eliminate the for loop, we can simply use `map()`:
+   
+    ```{r}
+    source2 <- function(path, env = caller_env()) {
+      file <- paste(readLines(path, warn = FALSE), collapse = "\n")
+      exprs <- parse_exprs(file)
+      
+      res <- map(exprs, eval, env)
+      
+      invisible(res)
     }
     
-    source2(tmp_file)
-    x
-    y
+    # Test:
+    (source2(tmp_file))
     ```
 
 5. __[Q]{.Q}__: We can make `base::local()` slightly easier to understand by spreading it over multiple lines:
@@ -235,44 +245,7 @@ library(purrr)
 
 1. __[Q]{.Q}__: Why did I use a for loop in `transform2()` instead of `map()`? Consider `transform2(df, x = x * 2, x = x * 2)`.
    
-   __[A]{.solved}__: Within the `for`-loop the evaluation of previous steps has already been assigned to `.data`, which makes the specification of chained transformations possible.
-
-    ```{r}
-    transform2 <- function(.data, ...) {
-      dots <- enquos(...)
-      
-      for (i in seq_along(dots)) {
-        name <- names(dots)[[i]]
-        dot <- dots[[i]]
-        
-        .data[[name]] <- eval_tidy(dot, .data)
-      }
-      
-      .data
-    }
-    
-    df <- data.frame(x = 1)
-    transform2(df, x = x * 2, x = x * 2)  # (re-)transforms x
-    transform2(df, x1 = x * 2, x2 = x1 * 2)  # stores intermediate variables
-    ```
-
-   We see, that the computation `(x * 2) * 2` has been taking place - the output of the first transformation has been used as input for the second transformation. 
-   This feature is not available, with `map()`, becaus it evaluates each element of the input seperately. This implies, that the individual transformations are independent of another and that intermediate computations are not available for the subsequent transformations.
-
-    ```{r, error=TRUE}
-    transform3 <- function(.data, ...) {
-      dots <- enquos(...)
-      
-      dots %>% 
-        map(eval_tidy, .data) %>% 
-        dplyr::bind_cols(.data, .)
-    }
-    
-    transform3(df, x = x * 2, x = x * 2)  # bind_cols() corrects duplicate names
-    transform3(df, x1 = x * 2, x2 = x1 * 2)
-    ```
-
-   The repeated retransformation of columns is very useful in interactive data analysis and can also be used within `dplyr::mutate()`. Be a little careful with reusing the same name too often though, because this spreads out related transformations across multiple statements.
+   __[A]{.solved}__: Via the for loop approach the processing steps regarding `.data` are applied iteratively. This includes updating `.data` and reusing the same variable names, which enables to apply transformations sequentially so that transformation can refer to columns that were just created.
 
 2. __[Q]{.Q}__: Here's an alternative implementation of `subset2()`:
 
@@ -340,36 +313,38 @@ library(purrr)
     }
     ```
 
-   __[A]{.solved}__: This function builds an expression, which contains the specified `order()`-call. The `!!!`-operator is used, which allows multiple arguments to be included (to break ties). Once the correct roworder is determined, numeric subsetting is used to return the rearranged data frame.
+   __[A]{.solved}__: `arrange2()` basically reorders a data frame by one or more of its variables. As `arrange2()` allows to provide the variables as expressions (via `...`), these need to be quoted first. Next they are used to build up an `order()` call, which then gets evaluated inside the data frame. Finally, the data frame gets reordered via integer subsetting. Let's jump into the source code:
 
     ```{r}
     arrange2 <- function(.df, ..., .na.last = TRUE) {
-      args <- enquos(...)  # capture arguments, which determine order
+      # Capture and quote arguments, which determine the order
+      args <- enquos(...)  
       
-      order_call <- expr(order(!!!args, na.last = !!.na.last))
       # `!!!`: unquote-splice arguments into order()
       # `!!.na.last`: pass option for treatment of NAs to order()
       # return expression-object
-
-      ord <- eval_tidy(order_call, .df)    # evaluate order_call within .df
-      stopifnot(length(ord) == nrow(.df))  # ensure that no rows are dropped
-
-      .df[ord, , drop = FALSE]  # reorder rows by numeric subsetting
+      order_call <- expr(order(!!!args, na.last = !!.na.last))
+      
+      # evaluate order_call within .df
+      ord <- eval_tidy(order_call, .df)    
+      # ensure that no rows are dropped
+      stopifnot(length(ord) == nrow(.df))  
+      
+      # reorder rows via integer subsetting
+      .df[ord, , drop = FALSE]  
     }
     ```
 
-   By using `!!.na.last` the `.na.last`-argument is unquoted, when the `order()`-call is built. That way, the `na.last`-argeument is already correctly specified (typically `TRUE`, `FALSE` or `NA`).
+   By using `!!.na.last` the `.na.last` argument is unquoted, when the `order()` call is built. That way, the `na.last` argument is already correctly specified (typically `TRUE`, `FALSE` or `NA`).
 
-   Without the unquoting, the expression would read `na.last = .na.last`. The value for `.na.last` would still have to be looked up and found. Because these computations take place inside of the functions execution environment (which contains `.na.last`), this is unlikely to cause problems.
+   Without the unquoting, the expression would read `na.last = .na.last` and the value for `.na.last` would still need to be looked up and found. Because these computations take place inside of the functions execution environment (which contains `.na.last`), this is unlikely to cause problems.
 
     ```{r}
-    # the effect of unquoting .na.last
+    # The effect of unquoting .na.last
     .na.last <- FALSE
     expr(order(..., na.last = !!.na.last))
     expr(order(..., na.last = .na.last))
     ```
-
-   PS: Putting breakpoints (`browser()`) inside these functions was really helpful to figure out, what's going on inside of them.
 
 ## Using tidy evaluation
 
@@ -455,20 +430,28 @@ library(purrr)
     lm(mpg ~ disp * cyl, data = mtcars)
     ```
 
-   __[A]{.solved}__: In the wrapping function below, the response and the data were defined as default argument to the function. It would also be acceptable to "hardcode" them into the `lm()`-expression instead, but this way provides a little more flexibility.
+   __[A]{.solved}__: In our wrapper `lm_wrap()`, we provide `mpg` and `mtcars` as default response and data. This seems to give us a good mix of usability and flexibility.
 
     ```{r}
-    lm_wrap <- function(pred, resp = mpg, data = mtcars){
-      # unquoting using base tools
-      lm(substitute(resp ~ pred, environment()), data = data)
+    lm_wrap <- function(pred, resp = mpg, data = mtcars, env = caller_env()) {
+      pred <- enexpr(pred)
+      resp <- enexpr(resp)
+      data <- enexpr(data)
+      
+      formula <- expr(!!resp ~ !!pred)
+      lm_call <- expr(lm(!!formula, data = !!data))
+      eval(lm_call, envir = env)
     }
     
-    lm_wrap(disp)$coef
-    lm_wrap(I(1 / disp))$coef
-    lm_wrap(disp * cyl)$coef
+    # Test if the output looks ok
+    lm_wrap(I(1 / disp) + disp * cyl)
+    
+    # Test if the result is identical to calling lm() directly
+    identical(
+      lm_wrap(I(1 / disp) + disp * cyl),
+      lm(mpg ~ I(1 / disp) + disp * cyl, data = mtcars)
+    )
     ```
-
-   In practice, small wrappers like this can help keeping your scripts well organized and make it easy to see, what is being changed.
 
 3. __[Q]{.Q}__: Another way to write `resample_lm()` would be to include the resample expression `(data[sample(nrow(data), replace = TRUE), , drop = FALSE])` in the data argument. Implement that approach. What are the advantages? What are the disadvantages?
 
