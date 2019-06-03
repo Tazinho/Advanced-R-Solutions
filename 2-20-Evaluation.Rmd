@@ -161,7 +161,7 @@ library(purrr)
     
    Explain how `local()` works in words. (Hint: you might want to `print(call)` to help understand what `substitute()` is doing, and read the documentation to remind yourself what environment `new.env()` will inherit from.)
 
-   __[A]{.solved}__:
+   __[A]{.solved}__: Let's follow the advice and add `print(call)` inside of `local3()`:
 
     ```{r}
     local3 <- function(expr, envir = new.env()) {
@@ -170,21 +170,19 @@ library(purrr)
       eval(call, envir = parent.frame())
     }
     
-    foo <- local3({
+    local3({
       x <- 10
       x * 2
     })
+    ```
     
-    foo
-    ```
-
-   `substitute()` only replaces the expr with the input and the environment (for the call to eval) by the relate
-
-    ```{r}
-    # how does substitute work?
-    ```
-
-   - substitute opperates in function execution environment, it replaces the variables bound in this environments by their expression (expr becomes the input, and envir, becomes the environment passed to `local3` (new.env() by default))
+   `substitute()` operates (by default) in the current evaluation argument. However, this doesn't matter here, as both, `expr` and `envir` are promises and therefore "... the expression slots of the promises replace the symbols", from `?substitute`. 
+   
+   Next, the call will be evaluated in the global environment. 
+   
+   From now on I don't understand: When we are in the global environment and evaluate the call. Where does it get evaluated? Obviously inside of `new.envir()`. However, when the expressions are not found there, it is more of a question, whis environment is the parent environment of `new.envir`. The documentation `new.envir()` and also the default argument (`parent.frame()`) suggest that it is `parent.frame()`, so the global environment (this also makes completely sense, as I tested that local finds variables in the global environment, but none which are only provided in `local3()`'s execution environment). However, when I manually check and add `env_parent(envir)` inside `local3()` I always get identical(env_parent(envir), environment()), which IMO suggests, that the parent of `envir` is the execution environment of `local3()` and the global environment is only the grandparent.
+   
+   Also I don't understand these older bullet points (I just keep them in for now in case they help you, Henning/Hadley?)
 
    <!-- this needs a better description based on the AST, @Malte -->
     
