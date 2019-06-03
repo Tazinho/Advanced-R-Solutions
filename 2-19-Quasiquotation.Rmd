@@ -235,7 +235,7 @@ library(rlang)
     foo(a = x + y, b = y + z)       # (8)
     ```
     
-   __[A]{.solved}__:
+   __[A]{.solved}__: We combine and unquote the given quoted expressions to construct the desired calls like this:
     
     ```{r}
     expr(!!xy / !!yz)                    # (1)
@@ -272,17 +272,17 @@ library(rlang)
     as.list(b)
     ```
     
-   The first version (`a`) is more natural, as it resembles lazy evaluation, where a promise is evaluated when the function gets called. The second version (`b`) resembles to force an expression inside a function factory, to ensure it is properly evaluated and contained in the enclosing environment of the new function. In the following example we highlight this and replace `1:10` by a variable called `promise`:
+   The first version (`a`) is more natural, as it resembles lazy evaluation, where a promise is evaluated when the function is called. The second version (`b`) resembles to force an expression inside a function factory, to ensure it is properly evaluated and contained in the enclosing environment of the new function. In the following example we highlight this and replace `1:10` by a variable called `promise`:
    
-   ```{r}
-   promise <- 1 
-   (a <- expr(mean(promise)))
-   (b <- expr(mean(!!(promise))))
-   
-   promise <- 2
-   a # here promise depends on the current environment
-   b # here promise depends on the environment at function definition
-   ```
+    ```{r}
+    promise <- 1 
+    (a <- expr(mean(promise)))
+    (b <- expr(mean(!!(promise))))
+    
+    promise <- 2
+    a # here promise depends on the current environment
+    b # here promise depends on the environment at function definition
+    ```
 
 ## Dot-dot-dot (`...`)
 
