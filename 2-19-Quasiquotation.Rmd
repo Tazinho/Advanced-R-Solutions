@@ -106,7 +106,7 @@ library(rlang)
 
 1. __[Q]{.Q}__: How is `expr()` implemented? Look at its source code.
 
-   __[A]{.solved}__: `expr()` simply directs its argument into `enexpr()`.
+   __[A]{.solved}__: `expr()` acts as a simple wrapper, which passes its argument to `enexpr()`.
    
     ```{r}
     expr
@@ -125,7 +125,7 @@ library(rlang)
     f2(a + b, c + d)
     ```
     
-   __[A]{.solved}__: Both functions are able to capture multiple arguments and will return a named list of expressions. `f1()` will return the arguments defined within the body of `f1()`, because `exprs()` captures the expressions as specified by the developer during the definition of `f1`.
+   __[A]{.solved}__: Both functions are able to capture multiple arguments and will return a named list of expressions. `f1()` will return the arguments defined within the body of `f1()`. This happens because `exprs()` captures the expressions as specified by the developer during the definition of `f1`.
    
     ```{r}
     f1(a + b, c + d)
@@ -139,7 +139,7 @@ library(rlang)
     
 3. __[Q]{.Q}__: What happens if you try to use `enexpr()` with an expression (i.e. `enexpr(x + y)`)? What happens if `enexpr()` is passed a missing argument?
     
-   __[A]{.solved}__: In the first case we get an error:
+   __[A]{.solved}__: In the first case an error is thrown:
     
     ```{r, error = TRUE}
     on_expr <- function(x) {enexpr(expr(x))}
@@ -177,31 +177,31 @@ library(rlang)
 
 6. __[Q]{.Q}__: The documentation for `substitute()` says:
 
-    > Substitution takes place by examining each component of the parse tree 
-    > as follows: 
-    > 
-    > * If it is not a bound symbol in `env`, it is unchanged. 
-    > * If it is a promise object (i.e., a formal argument to a function) the expression slot of the promise replaces the symbol. 
-    > * If it is an ordinary variable, its value is substituted, unless `env` is .GlobalEnv in which case the symbol is left unchanged.
+   > Substitution takes place by examining each component of the parse tree 
+   > as follows: 
+   > 
+   > * If it is not a bound symbol in `env`, it is unchanged. 
+   > * If it is a promise object (i.e., a formal argument to a function) the expression slot of the promise replaces the symbol. 
+   > * If it is an ordinary variable, its value is substituted, unless `env` is .GlobalEnv in which case the symbol is left unchanged.
 
-    Create examples that illustrate each of the above cases.
+   Create examples that illustrate each of the above cases.
     
-   __[A]{.solved}__: Let's create a new environment `a` containing no objects. In this case `substitute()` will just return its first argument (`expr`):
+   __[A]{.solved}__: Let's create a new environment `a`, which contains no objects. In this case `substitute()` will just return its first argument (`expr`):
    
     ```{r}
     a <- base::new.env()
     substitute(x, a)
     ```
     
-   Now, let's create a function containing one argument, which gets directly returned after substitution. This function just returns the provided expression:
+   When we create a function containing one argument, which is directly returned after substitution. This function just returns the provided expression:
    
     ```{r}
-    bla <- function(x) {substitute(x)}
+    foo <- function(x) {substitute(x)}
 
-    bla(x + y * sin(0))
+    foo(x + y * sin(0))
     ```
     
-   In case `substitute()` can find (parts of) the expression in `env`, it will litterally substitute. However, unless `env` is `.GlobalEnv`.
+   In case `substitute()` can find (parts of) the expression in `env`, it will literally substitute. However, unless `env` is `.GlobalEnv`.
    
     ```{r}
     a$x <- 7
