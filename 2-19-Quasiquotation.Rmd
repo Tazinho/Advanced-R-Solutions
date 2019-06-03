@@ -5,7 +5,7 @@ source("common.R")
 # Quasiquotation
 ## Prerequisites {-}
 
-To further compute on the language, we mainly use the rlang package in this chapter.
+To continue computing on the language, we keep using the rlang package in this chapter.
 
 ```{r}
 library(rlang)
@@ -26,16 +26,17 @@ library(rlang)
     rm(mtcars2)
     ```
     
-   __[A]{.solved}__: For each argument we first follow the advice from the textbook and execute the argument outside of the regarding function. Since `MASS`, `cyl`, `vs` and `am` are not objects contained in the global environment, their execution raises an "Object not found" error. Hence, we can be sure that the regarding function arguments are quoted. For the other arguments, we carefully inspect the source code (and the documentation) to check if any quoting mechanisms are applied or the arguments are evaluated.
+   __[A]{.solved}__: For each argument we first follow the advice from the textbook and execute the argument outside of the respective function. Since `MASS`, `cyl`, `vs` and `am` are not objects contained in the global environment, their execution raises an "Object not found" error. This way we confirm that the respective function arguments are quoted. For the other arguments, we may inspect the source code (and the documentation) to check if any quoting mechanisms are applied or the arguments are evaluated.
 
     ```{r, eval = FALSE}
     library(MASS)  # MASS -> quoted
-    # library also accepts character vectors and doesn't quote
-    # when character.only is set to TRUE.
-    # Try: library(MASS, character.only = TRUE)
-    
+    ```
+
+   `library()` also accepts character vectors and doesn't quote when `character.only` is set to `TRUE`, so `library(MASS, character.only = TRUE)` will raise an error.
+
+    ```{r, eval = FALSE}
     mtcars2 <- subset(mtcars, cyl == 4)  # mtcars -> evaluated
-                                         # cyl    -> quoted
+                                         # cyl -> quoted
                                          
     with(mtcars2, sum(vs))  # mtcars2 -> evaluated
                             # sum(vs) -> quoted
@@ -44,7 +45,7 @@ library(rlang)
                      # am -> quoted by $()    
     ```
     
-   When we inspect the source code of `rm()`, we notice that `rm()` catches its `...` argument internally via `match.call()` as an unevaluated call (in this case a pairlist) and afterwards converts it into a string for further evaluation.
+   When we inspect the source code of `rm()`, we notice that `rm()` catches its `...` argument as an unevaluated call (in this case a pairlist) via `match.call()`. This call is then converted into a string for further evaluation.
 
     ```{r, eval = FALSE}
     rm(mtcars2)  # mtcars2 -> quoted
@@ -63,14 +64,14 @@ library(rlang)
     ggplot(by_cyl, aes(cyl, mean)) + geom_point()
     ```
 
-   __[A]{.solved}__: From the last exercise we already know that `library()` quotes its first argument.
+   __[A]{.solved}__: From the previous exercise we've already learned that `library()` quotes its first argument.
     
     ```{r, eval = FALSE}
-    library(dplyr)    # dplyr -> quoted
+    library(dplyr)    # dplyr   -> quoted
     library(ggplot2)  # ggplot2 -> quoted
     ```
     
-     In similar manner, it becomes obvious that `cyl` is quoted by `group_by()`.
+   In similar fashion, it becomes clear that `cyl` is quoted by `group_by()`.
     
     ```{r, eval = FALSE}
     by_cyl <- mtcars %>%           # mtcars -> evaluated
@@ -78,7 +79,7 @@ library(rlang)
       summarise(mean = mean(mpg))  # mean = mean(mpg) -> quoted
     ```
    
-   To find out what happens in `summarise()`, we need to inspect its source code. While following the S3-dispatch of `summarise()`, it turns out that the `...` argument gets quoted in the underlying `summarise.tbl_df()` method.
+   To find out what happens in `summarise()`, we inspect the source code. Tracing down the S3-dispatch of `summarise()`, we see that the `...` argument is quoted in the underlying `summarise.tbl_df()` method.
     
     ```{r}
     dplyr::summarise
@@ -86,7 +87,7 @@ library(rlang)
     dplyr:::summarise.tbl_df
     ```
     
-   In the following ggplot2 code it should be already obvious that `cyl` and `mean` are quoted.
+   In the following ggplot2 expression the `cyl`- and `mean`-objects are quoted.
     
     ```{r, eval = FALSE}
     ggplot(by_cyl,            # by_cyl -> evaluated
@@ -95,7 +96,7 @@ library(rlang)
       geom_point() 
     ```
     
-   We can unveil this also explicitly by inspecting `aes()`'s source code.
+   We can confirm this also by inspecting `aes()`'s source code.
    
     ```{r}
     ggplot2::aes
