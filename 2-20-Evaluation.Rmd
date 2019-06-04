@@ -161,7 +161,7 @@ library(purrr)
     
    Explain how `local()` works in words. (Hint: you might want to `print(call)` to help understand what `substitute()` is doing, and read the documentation to remind yourself what environment `new.env()` will inherit from.)
 
-   __[A]{.solved}__: Let's follow the advice and add `print(call)` inside of `local3()`:
+   __[A]{.started}__: Let's follow the advice and add `print(call)` inside of `local3()`:
 
     ```{r}
     local3 <- function(expr, envir = new.env()) {
@@ -180,9 +180,9 @@ library(purrr)
    
    Next, the call will be evaluated in the global environment. 
    
-   From now on I don't understand: When we are in the global environment and evaluate the call. Where does it get evaluated? Obviously inside of `new.envir()`. However, when the expressions are not found there, it is more of a question, whis environment is the parent environment of `new.envir`. The documentation `new.envir()` and also the default argument (`parent.frame()`) suggest that it is `parent.frame()`, so the global environment (this also makes completely sense, as I tested that local finds variables in the global environment, but none which are only provided in `local3()`'s execution environment). However, when I manually check and add `env_parent(envir)` inside `local3()` I always get identical(env_parent(envir), environment()), which IMO suggests, that the parent of `envir` is the execution environment of `local3()` and the global environment is only the grandparent.
+   From now on I don't understand what happens exactly: When we are in the global environment and evaluate the call. Where does it get evaluated? Obviously inside of `new.envir()`. However, when the expressions are not found there, it is more of a question, which environment is the parent environment of `new.envir()`. The documentation of `new.envir()` and also the default argument (`parent.frame()`) suggest that it is `parent.frame()`, so the global environment (this also makes completely sense, as in some tests I did `local3()` finds variables in the global environment, but it doesn't find variables when provided in `local3()`'s execution environment). However, when I manually check and add `env_parent(envir)` inside `local3()` I get `identical(env_parent(envir), environment())` is `TRUE`, which IMO suggests, that the parent of `envir` is the execution environment of `local3()` and the global environment is only the grandparent.
    
-   Also I don't understand these older bullet points (I just keep them in for now in case they help you, Henning/Hadley?)
+   Also I don't understand these older bullet points (I just keep them in for now in case they help you. What do you think? Henning/Hadley?)
 
    <!-- this needs a better description based on the AST, @Malte -->
     
@@ -259,7 +259,7 @@ library(purrr)
 
    Compare and contrast `subset3()` to `subset2()`. What are its advantages and disadvantages?
 
-   __[A]{.solved}__: Let's take a closer look at subset2() first:
+   __[A]{.solved}__: Let's take a closer look at `subset2()` first:
    
     ```{r}
     subset2 <- function(data, rows) {
@@ -271,7 +271,7 @@ library(purrr)
     }
     ```
 
-   We see, that there is an additional logical check, which is missing from `subset3()`. The here the logical condition `rows` is evaluated in the context of `data`, which results in a logical vector used for subsetting. Afterwards only `[` needs to be used to return the subset.
+   `subset2()` provides an additional logical check, which is missing from `subset3()`. Here, `rows` is evaluated in the context of `data`, which results in a logical vector. Afterwards only `[()` needs to be used for subsetting.
 
     ```{r}
     # subset2() evaluation
@@ -283,10 +283,10 @@ library(purrr)
 
     ```{r}
     # subset3() evaluation
-    eval_tidy(expr(df[x == 1, ,drop = FALSE]), df)
+    eval_tidy(expr(df[x == 1, , drop = FALSE]), df)
     ```
 
-   This is shorter, but also less readable, because the evaluation and the subsetting take place in the same expression. It may also introduce unwanted errors, if the data mask should contain an element named `data`, because the object from the data mask takes precedence over argument of the function.
+   This is shorter (but probably also less readable), because the evaluation and the subsetting take place in the same expression. However, it may introduce unwanted errors, if the data mask contains an element named `data`, as the objects from the data mask take precedence over arguments of the function.
 
     ```{r, error=TRUE}
     df <- data.frame(x = 1:3, data = 1)
