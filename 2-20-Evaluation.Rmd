@@ -178,7 +178,7 @@ library(purrr)
     
    `substitute()` operates (by default) in the current evaluation argument. However, this doesn't matter here, as both, `expr` and `envir` are promises and therefore "... the expression slots of the promises replace the symbols", from `?substitute`. 
    
-   Next, the call will be evaluated in the global environment. 
+   Next, `call` will be evaluated in the global environment. 
    
    From now on I don't understand what happens exactly: When we are in the global environment and evaluate the call. Where does it get evaluated? Obviously inside of `new.envir()`. However, when the expressions are not found there, it is more of a question, which environment is the parent environment of `new.envir()`. The documentation of `new.envir()` and also the default argument (`parent.frame()`) suggest that it is `parent.frame()`, so the global environment (this also makes completely sense, as in some tests I did `local3()` finds variables in the global environment, but it doesn't find variables when provided in `local3()`'s execution environment). However, when I manually check and add `env_parent(envir)` inside `local3()` I get `identical(env_parent(envir), environment())` is `TRUE`, which IMO suggests, that the parent of `envir` is the execution environment of `local3()` and the global environment is only the grandparent.
    
