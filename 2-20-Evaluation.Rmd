@@ -161,7 +161,7 @@ library(purrr)
     
    Explain how `local()` works in words. (Hint: you might want to `print(call)` to help understand what `substitute()` is doing, and read the documentation to remind yourself what environment `new.env()` will inherit from.)
 
-   __[A]{.solved}__:
+   __[A]{.started}__: Let's follow the advice and add `print(call)` inside of `local3()`:
 
     ```{r}
     local3 <- function(expr, envir = new.env()) {
@@ -170,21 +170,19 @@ library(purrr)
       eval(call, envir = parent.frame())
     }
     
-    foo <- local3({
+    local3({
       x <- 10
       x * 2
     })
+    ```
     
-    foo
-    ```
-
-   `substitute()` only replaces the expr with the input and the environment (for the call to eval) by the relate
-
-    ```{r}
-    # how does substitute work?
-    ```
-
-   - substitute opperates in function execution environment, it replaces the variables bound in this environments by their expression (expr becomes the input, and envir, becomes the environment passed to `local3` (new.env() by default))
+   `substitute()` operates (by default) in the current evaluation argument. However, this doesn't matter here, as both, `expr` and `envir` are promises and therefore "... the expression slots of the promises replace the symbols", from `?substitute`. 
+   
+   Next, `call` will be evaluated in the global environment. 
+   
+   From now on I don't understand what happens exactly: When we are in the global environment and evaluate the call. Where does it get evaluated? Obviously inside of `new.envir()`. However, when the expressions are not found there, it is more of a question, which environment is the parent environment of `new.envir()`. The documentation of `new.envir()` and also the default argument (`parent.frame()`) suggest that it is `parent.frame()`, so the global environment (this also makes completely sense, as in some tests I did `local3()` finds variables in the global environment, but it doesn't find variables when provided in `local3()`'s execution environment). However, when I manually check and add `env_parent(envir)` inside `local3()` I get `identical(env_parent(envir), environment())` is `TRUE`, which IMO suggests, that the parent of `envir` is the execution environment of `local3()` and the global environment is only the grandparent.
+   
+   Also I don't understand these older bullet points (I just keep them in for now in case they help you. What do you think? Henning/Hadley?)
 
    <!-- this needs a better description based on the AST, @Malte -->
     
@@ -261,7 +259,7 @@ library(purrr)
 
    Compare and contrast `subset3()` to `subset2()`. What are its advantages and disadvantages?
 
-   __[A]{.solved}__: Let's take a closer look at subset2() first:
+   __[A]{.solved}__: Let's take a closer look at `subset2()` first:
    
     ```{r}
     subset2 <- function(data, rows) {
@@ -273,7 +271,7 @@ library(purrr)
     }
     ```
 
-   We see, that there is an additional logical check, which is missing from `subset3()`. The here the logical condition `rows` is evaluated in the context of `data`, which results in a logical vector used for subsetting. Afterwards only `[` needs to be used to return the subset.
+   `subset2()` provides an additional logical check, which is missing from `subset3()`. Here, `rows` is evaluated in the context of `data`, which results in a logical vector. Afterwards only `[()` needs to be used for subsetting.
 
     ```{r}
     # subset2() evaluation
@@ -285,10 +283,10 @@ library(purrr)
 
     ```{r}
     # subset3() evaluation
-    eval_tidy(expr(df[x == 1, ,drop = FALSE]), df)
+    eval_tidy(expr(df[x == 1, , drop = FALSE]), df)
     ```
 
-   This is shorter, but also less readable, because the evaluation and the subsetting take place in the same expression. It may also introduce unwanted errors, if the data mask should contain an element named `data`, because the object from the data mask takes precedence over argument of the function.
+   This is shorter (but probably also less readable), because the evaluation and the subsetting take place in the same expression. However, it may introduce unwanted errors, if the data mask contains an element named "data", as the objects from the data mask take precedence over arguments of the function.
 
     ```{r, error=TRUE}
     df <- data.frame(x = 1:3, data = 1)
@@ -393,10 +391,10 @@ library(purrr)
     lm3a(mpg ~ disp, mtcars)$call
     ```
 
-   __[A]{.solved}__: In this function, `lm_call` is evaluated in the caller environment, which happens to be the global environment. In this environment, the name `data` is bound to `utils::data`. To fix the error, we can either set the evaluation environment to the functions execution environment or unquote the data argument when building the call to `lm()`.
+   __[A]{.solved}__: In this function, `lm_call` is evaluated in the caller environment, which happens to be the global environment. In this environment, the name `data` is bound to `utils::data`. To fix the error, we can either set the evaluation environment to the functions execution environment or unquote the `data` argument when building the call to `lm()`.
     
     ```{r, error = TRUE}
-    # change evaluation environment
+    # Change evaluation environment
     lm3b <- function(formula, data) {
       formula <- enexpr(formula)
       
@@ -411,7 +409,7 @@ library(purrr)
    When we want to unquote an argument within a function, we first need to capture the user-input (by `enenxpr()`).
 
     ```{r, error = TRUE}
-    # unquoting data-argument
+    # Unquoting data-argument
     lm3c <- function(formula, data) {
       formula <- enexpr(formula)
       data_quo <- enexpr(data)
@@ -480,155 +478,3 @@ library(purrr)
    Overall, putting an essential part of the preprocessing outside of the functions body is not common practice in R. Compared to the unquoting-implementation (`resample_lm1()`), this approach captures the model-call in a more meaningful way.
 
 <!-- would be nice to list a few more advantages and disadvantages -->
-
-## Old exercises
-
-1. __[Q]{.Q}__: Run this code in your head and predict what it will print. Confirm or refute your prediction by running the code in R.
-
-    ```{r, results = FALSE}
-    f <- function(...) {
-      x <- "f"
-      g(f = x, ...)
-    }
-    g <- function(...) {
-      x <- "g"
-      h(g = x, ...)
-    }
-    h <- function(...) {
-      enquos(...)
-    }
-    x <- "top"
-    
-    out <- f(top = x)
-    out
-    purrr::map_chr(out, eval_tidy)
-    ```
-
-1. __[Q]{.Q}__: What happens if you use `expr()` instead of `enexpr()` inside of `subset2()`?
-
-
-1. __[Q]{.Q}__: Improve `subset2()` to make it more like real `base::subset()`:
-    
-   * Drop rows where `subset` evaluates to `NA`
-   * Give a clear error message if `subset` doesn't yield a logical vector
-   * What happens if `subset` yields a vector that's not the same as the number of rows in `data`? What do you think should happen?
-      
-2. __[Q]{.Q}__: The third argument in `base::subset()` allows you to select variables. It treats variable names as if they were positions. This allows you to do things like `subset(mtcars, , -cyl)` to drop the cylinder variable, or `subset(mtcars, , disp:drat)` to select all the variables between `disp` and `drat`. How does this work? I've made this easier to understand by extracting it out into its own function that uses tidy evaluation.
-
-    ```{r, eval = FALSE}
-    select <- function(df, vars) {
-      vars <- enexpr(vars)
-      var_pos <- set_names(as.list(seq_along(df)), names(df))
-      
-      cols <- eval_tidy(vars, var_pos)
-      df[, cols, drop = FALSE]
-    }
-    select(mtcars, -cyl)
-    ```
-    
-3. __[Q]{.Q}__: Here's an alternative implementation of `arrange()`:
-
-    ```{r}
-    invoke <- function(fun, ...) do.call(fun, dots_list(...))
-    arrange3 <- function(.data, ..., .na.last = TRUE) {
-      args <- enquos(...)
-      
-      ords <- purrr::map(args, eval_tidy, data = .data)
-      ord <- invoke(order, !!!ords, na.last = .na.last)
-      
-      .data[ord, , drop = FALSE]
-    }
-    ```
-    
-   Describe the primary difference in approach compared to the function defined in the text. 
-    
-   One advantage of this approach is that you could check each element of `...` to make sure that input is correct. What property should each element of `ords` have?
-
-4. __[Q]{.Q}__: Here's an alternative implementation of `subset2()`:
-
-    ```{r}
-    subset3 <- function(data, rows) {
-      eval_tidy(quo(data[!!enquo(rows), , drop = FALSE]), data = data)
-    }
-    ```
-    
-   Use intermediate variables to make the function easier to understand, then
-   explain how this approach differs to the approach in the text.
-
-5. __[Q]{.Q}__: Implement a form of `arrange()` where you can request a variable to sorted in descending order using named arguments:
-    
-    ```{r, eval = FALSE}
-    arrange(mtcars, cyl, desc = mpg, vs)
-    ```
-    
-   (Hint:  The `descreasing` argument to `order()` will not help you. Instead, look at the definition of `dplyr::desc()`, and read the help for `xtfrm()`.)
-
-6. __[Q]{.Q}__: Why do you not need to worry about ambiguous argument names with `...` in
-    `arrange()`? Why is it a good idea to use the `.` prefix anyway?
-
-7. __[Q]{.Q}__: What does `transform()` do? Read the documentation. How does it work?
-   Read the source code for `transform.data.frame()`. What does `substitute(list(...))` do?
-   
-8. __[Q]{.Q}__: Use tidy evaluation to implement your own version of `transform()`.
-   Extend it so that a calculation can refer to variables created by transform, i.e. make this work:
-    
-    ```{r, error = TRUE}
-    df <- data.frame(x = 1:3)
-    transform(df, x1 = x + 1, x2 = x1 + 1)
-    ```
-
-9. __[Q]{.Q}__: What does `with()` do? How does it work? Read the source code for `with.default()`. What does `within()` do? How does it work? Read the source code for `within.data.frame()`. Why is the code so much more
-    complex than `with()`?
-   
-10. __[Q]{.Q}__: Implement a version of `within.data.frame()` that uses tidy evaluation.
-    Read the documentation and make sure that you understand what `within()` does, then read the source code.
-    
-<!-- ## Wrapping quoting functions -->
-
-1. __[Q]{.Q}__: When model building, typically the response and data are relatively constant while you rapidly experiment with different predictors. Write a small wrapper that allows you to reduce duplication in this situation.
-    
-    ```{r, eval = FALSE}
-    pred_mpg <- function(resp, ...) {
-      
-    }
-    pred_mpg(~ disp)
-    pred_mpg(~ I(1 / disp))
-    pred_mpg(~ disp * cyl)
-    ```
-    
-2. __[Q]{.Q}__: Another way to way to write `boot_lm()` would be to include the boostrapping expression (`data[sample(nrow(data), replace = TRUE), , drop = FALSE]`) in the data argument. Implement that approach. What are the advantages? What are the disadvantages?
-
-3. __[Q]{.Q}__: To make these functions somewhat more robust, instead of always using the `caller_env()` we could capture a quosure, and then use its environment. However, if there are multiple arguments, they might be associated with different environments. Write a function that takes a list of quosures, and returns the common environment, if they have one, or otherwise throws an error.
-
-4. __[Q]{.Q}__: Write a function that takes a data frame and a list of formulas, fitting a linear model with each formula, generating a useful model call.
-
-5. __[Q]{.Q}__: Create a formula generation function that allows you to optionally supply a transformation function (e.g. `log()`) to the response or the predictors.
-
-## Deprecated evaluation basics
-
-1. __[Q]{.Q}__: The code generated by `source2()` lacks source references. Read the source code for `sys.source()` and the help for `srcfilecopy()`, then modify `source2()` to preserve source references. You can test your code by sourcing a function that contains a comment. If successful, when you look at the function, you'll see the comment and not just the source code.
-
-   __[A]{.started}__:
-
-    ```{r, error=TRUE}
-    tmp_file <- tempfile()
-    writeLines('x <- 1
-    test_function <- function() {
-    "source me!"  # testcomment
-    }', tmp_file)
-    
-    file <- tmp_file
-    
-    source2 <- function(file, env = caller_env()){
-      lines <- readLines(file)
-      srcfile <- srcfilecopy(file, lines)
-      
-      parse(text = lines, srcfile = srcfile, keep.source = TRUE) %>% 
-        map(eval_tidy, env = env) 
-    }
-    
-    source2(tmp_file)
-    test_function
-    ```
-
-   - the comment is still missing
