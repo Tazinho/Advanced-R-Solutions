@@ -391,10 +391,10 @@ library(purrr)
     lm3a(mpg ~ disp, mtcars)$call
     ```
 
-   __[A]{.solved}__: In this function, `lm_call` is evaluated in the caller environment, which happens to be the global environment. In this environment, the name `data` is bound to `utils::data`. To fix the error, we can either set the evaluation environment to the functions execution environment or unquote the data argument when building the call to `lm()`.
+   __[A]{.solved}__: In this function, `lm_call` is evaluated in the caller environment, which happens to be the global environment. In this environment, the name `data` is bound to `utils::data`. To fix the error, we can either set the evaluation environment to the functions execution environment or unquote the `data` argument when building the call to `lm()`.
     
     ```{r, error = TRUE}
-    # change evaluation environment
+    # Change evaluation environment
     lm3b <- function(formula, data) {
       formula <- enexpr(formula)
       
@@ -409,7 +409,7 @@ library(purrr)
    When we want to unquote an argument within a function, we first need to capture the user-input (by `enenxpr()`).
 
     ```{r, error = TRUE}
-    # unquoting data-argument
+    # Unquoting data-argument
     lm3c <- function(formula, data) {
       formula <- enexpr(formula)
       data_quo <- enexpr(data)
