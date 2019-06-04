@@ -43,7 +43,7 @@ source("common.R")
     
    How do the estimates from `system.time()` compare to those from `bench::mark()`? Why are they different?
 
-   __[A]{.started}__: (TODO: Last part of the quesiton: Why are the results different?)
+   __[A]{.started}__: (TODO: Last part of the question: Why are the results different?)
    
    As `bench::mark()` doesn't calculate the mean value, we calculate it from the `time` list-column in the tibble output. 
 
@@ -67,14 +67,16 @@ source("common.R")
 
     # Compare the results for sqrt(x)
     systime_sqrt
-    systime_power
+    bench_sqrt
+    abs(systime_sqrt - bench_sqrt)
     
     # Compare the results for x ^ sqrt(0.5)
-    bench_sqrt
+    systime_power
     bench_power
+    abs(systime_power - bench_power)
     ```
 
-   Both approaches get the order of magnitude right, but the average method is a little faster. This is surprising, because the approach also gets the (small) overhead of the for loop.
+   Both approaches get the order of magnitude right. They are different, as `bench::mark()` is more precise. However, on average they give comparable results.
 
 2. __[Q]{.Q}__: Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.
 
