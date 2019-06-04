@@ -1892,3 +1892,158 @@ does it work?
     ```
 
 4. __[Q]{.Q}__:Add error handling to `slice()`. Give clear error messages if either `along` or `index` have invalid values (i.e. not numeric, not length 1, too small, or too big).
+
+
+
+## More old evaluation exercises
+
+1. __[Q]{.Q}__: Run this code in your head and predict what it will print. Confirm or refute your prediction by running the code in R.
+
+    ```{r, results = FALSE}
+    f <- function(...) {
+      x <- "f"
+      g(f = x, ...)
+    }
+    g <- function(...) {
+      x <- "g"
+      h(g = x, ...)
+    }
+    h <- function(...) {
+      enquos(...)
+    }
+    x <- "top"
+    
+    out <- f(top = x)
+    out
+    purrr::map_chr(out, eval_tidy)
+    ```
+
+1. __[Q]{.Q}__: What happens if you use `expr()` instead of `enexpr()` inside of `subset2()`?
+
+
+1. __[Q]{.Q}__: Improve `subset2()` to make it more like real `base::subset()`:
+    
+   * Drop rows where `subset` evaluates to `NA`
+   * Give a clear error message if `subset` doesn't yield a logical vector
+   * What happens if `subset` yields a vector that's not the same as the number of rows in `data`? What do you think should happen?
+      
+2. __[Q]{.Q}__: The third argument in `base::subset()` allows you to select variables. It treats variable names as if they were positions. This allows you to do things like `subset(mtcars, , -cyl)` to drop the cylinder variable, or `subset(mtcars, , disp:drat)` to select all the variables between `disp` and `drat`. How does this work? I've made this easier to understand by extracting it out into its own function that uses tidy evaluation.
+
+    ```{r, eval = FALSE}
+    select <- function(df, vars) {
+      vars <- enexpr(vars)
+      var_pos <- set_names(as.list(seq_along(df)), names(df))
+      
+      cols <- eval_tidy(vars, var_pos)
+      df[, cols, drop = FALSE]
+    }
+    select(mtcars, -cyl)
+    ```
+    
+3. __[Q]{.Q}__: Here's an alternative implementation of `arrange()`:
+
+    ```{r}
+    invoke <- function(fun, ...) do.call(fun, dots_list(...))
+    arrange3 <- function(.data, ..., .na.last = TRUE) {
+      args <- enquos(...)
+      
+      ords <- purrr::map(args, eval_tidy, data = .data)
+      ord <- invoke(order, !!!ords, na.last = .na.last)
+      
+      .data[ord, , drop = FALSE]
+    }
+    ```
+    
+   Describe the primary difference in approach compared to the function defined in the text. 
+    
+   One advantage of this approach is that you could check each element of `...` to make sure that input is correct. What property should each element of `ords` have?
+
+4. __[Q]{.Q}__: Here's an alternative implementation of `subset2()`:
+
+    ```{r}
+    subset3 <- function(data, rows) {
+      eval_tidy(quo(data[!!enquo(rows), , drop = FALSE]), data = data)
+    }
+    ```
+    
+   Use intermediate variables to make the function easier to understand, then
+   explain how this approach differs to the approach in the text.
+
+5. __[Q]{.Q}__: Implement a form of `arrange()` where you can request a variable to sorted in descending order using named arguments:
+    
+    ```{r, eval = FALSE}
+    arrange(mtcars, cyl, desc = mpg, vs)
+    ```
+    
+   (Hint:  The `descreasing` argument to `order()` will not help you. Instead, look at the definition of `dplyr::desc()`, and read the help for `xtfrm()`.)
+
+6. __[Q]{.Q}__: Why do you not need to worry about ambiguous argument names with `...` in
+    `arrange()`? Why is it a good idea to use the `.` prefix anyway?
+
+7. __[Q]{.Q}__: What does `transform()` do? Read the documentation. How does it work?
+   Read the source code for `transform.data.frame()`. What does `substitute(list(...))` do?
+   
+8. __[Q]{.Q}__: Use tidy evaluation to implement your own version of `transform()`.
+   Extend it so that a calculation can refer to variables created by transform, i.e. make this work:
+    
+    ```{r, error = TRUE}
+    df <- data.frame(x = 1:3)
+    transform(df, x1 = x + 1, x2 = x1 + 1)
+    ```
+
+9. __[Q]{.Q}__: What does `with()` do? How does it work? Read the source code for `with.default()`. What does `within()` do? How does it work? Read the source code for `within.data.frame()`. Why is the code so much more
+    complex than `with()`?
+   
+10. __[Q]{.Q}__: Implement a version of `within.data.frame()` that uses tidy evaluation.
+    Read the documentation and make sure that you understand what `within()` does, then read the source code.
+    
+<!-- ## Wrapping quoting functions -->
+
+1. __[Q]{.Q}__: When model building, typically the response and data are relatively constant while you rapidly experiment with different predictors. Write a small wrapper that allows you to reduce duplication in this situation.
+    
+    ```{r, eval = FALSE}
+    pred_mpg <- function(resp, ...) {
+      
+    }
+    pred_mpg(~ disp)
+    pred_mpg(~ I(1 / disp))
+    pred_mpg(~ disp * cyl)
+    ```
+    
+2. __[Q]{.Q}__: Another way to way to write `boot_lm()` would be to include the boostrapping expression (`data[sample(nrow(data), replace = TRUE), , drop = FALSE]`) in the data argument. Implement that approach. What are the advantages? What are the disadvantages?
+
+3. __[Q]{.Q}__: To make these functions somewhat more robust, instead of always using the `caller_env()` we could capture a quosure, and then use its environment. However, if there are multiple arguments, they might be associated with different environments. Write a function that takes a list of quosures, and returns the common environment, if they have one, or otherwise throws an error.
+
+4. __[Q]{.Q}__: Write a function that takes a data frame and a list of formulas, fitting a linear model with each formula, generating a useful model call.
+
+5. __[Q]{.Q}__: Create a formula generation function that allows you to optionally supply a transformation function (e.g. `log()`) to the response or the predictors.
+
+## Deprecated evaluation basics
+
+1. __[Q]{.Q}__: The code generated by `source2()` lacks source references. Read the source code for `sys.source()` and the help for `srcfilecopy()`, then modify `source2()` to preserve source references. You can test your code by sourcing a function that contains a comment. If successful, when you look at the function, you'll see the comment and not just the source code.
+
+   __[A]{.started}__:
+
+    ```{r, error=TRUE}
+    tmp_file <- tempfile()
+    writeLines('x <- 1
+    test_function <- function() {
+    "source me!"  # testcomment
+    }', tmp_file)
+    
+    file <- tmp_file
+    
+    source2 <- function(file, env = caller_env()){
+      lines <- readLines(file)
+      srcfile <- srcfilecopy(file, lines)
+      
+      parse(text = lines, srcfile = srcfile, keep.source = TRUE) %>% 
+        map(eval_tidy, env = env) 
+    }
+    
+    source2(tmp_file)
+    test_function
+    ```
+
+   - the comment is still missing
+   
