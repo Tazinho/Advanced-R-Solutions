@@ -73,6 +73,19 @@ source("common.R")
    *   f5: `pmin()`
 
 1. __[Q]{.Q}__:  To practice your function writing skills, convert the following functions into C++. For now, assume the inputs have no missing values.
+  
+    1. `all()`.
+    
+    2. `cumprod()`, `cummin()`, `cummax()`.
+    
+    3. `diff()`. Start by assuming lag 1, and then generalise for lag `n`.
+    
+    4. `range()`.
+    
+    5. `var()`. Read about the approaches you can take on 
+       [Wikipedia](http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance).
+       Whenever implementing a numerical algorithm, it's always good to check 
+       what is already known about the problem.
 
    __[A]{.started}__: (TODO: The last one, `var()` still needs to be implemented)
    
@@ -178,8 +191,10 @@ source("common.R")
 
 1. __[Q]{.Q}__:  Rewrite any of the functions from the first exercise to deal with missing values. If `na.rm` is true, ignore the missing values. If `na.rm` is false, return a missing value if the input contains any missing values. Some good functions to practice with are `min()`, `max()`, `range()`, `mean()`, and `var()`.
 
-   __[A]{.started}__: (TODO: `var`'s implementation is still missing)
+   __[A]{.started}__: (TODO: `var`'s implementation is still missing. The functions from the 1st (NOT THE SECOND EXERCISE) need to be (also/especially) solved)
    
+   Let's follow the advice and rewrite `min()`, `max()`, `range()`, `mean()` and `var()` first. After this, we look at `cumsum()`, `any()`, `Position()` and `pmin()` from the first exercise.
+    
     ```cpp
     NumericVector minC(NumericVector x, bool narm){
       int n = x.size();
