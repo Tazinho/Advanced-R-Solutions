@@ -87,7 +87,7 @@ source("common.R")
        Whenever implementing a numerical algorithm, it's always good to check 
        what is already known about the problem.
 
-   __[A]{.started}__: (TODO: The last one, `var()` still needs to be implemented)
+   __[A]{.solved}__:
    
    1. `all()`
   
@@ -186,6 +186,29 @@ source("common.R")
     ```
   
    5. `var`. Read about the approaches you can take on [wikipedia](http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance). Whenever implementing a numerical algorithm, it's always good to check what is already known about the problem.
+   
+    ```cpp
+    double varC(NumericVector x) {
+      int n = x.size();
+      double mx = 0;
+      double out = 0;
+      
+      if(n < 2) {
+        return NA_REAL;
+      }
+      
+      for(int i = 0; i < n; ++i) {
+        mx += x[i] / n;
+      }
+      
+      for(int i = 0; i < n; ++i) {
+        out += pow(x[i] - mx, 2);
+      }
+      
+      out = out / (n-1);
+      return out;
+    }
+    ```
 
 ## Missing values
 
