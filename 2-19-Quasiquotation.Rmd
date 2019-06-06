@@ -112,7 +112,7 @@ library(rlang)
     expr
     ```
 
-2. __[Q]{.Q}__: Compare and contrast the following two functions. Can you predict the ouput before running them?
+2. __[Q]{.Q}__: Compare and contrast the following two functions. Can you predict the output before running them?
    
     ```{r, results = FALSE}
     f1 <- function(x, y) {
@@ -265,14 +265,16 @@ library(rlang)
 
    What's the difference? Which one is more natural?
     
-   __[A]{.solved}__: As `expr()` quotes expressions and `!!()` evaluates expressions `1:10` is already evaluated to an integer vector in `b`, while still being a call object in `a`.
+   __[A]{.solved}__: We quote expressions with `expr()`  evaluate them with `!!()`. In the expression assigned to `b` the call `1:10` is evaluated to an integer vector, while still being a call object in `a`.
    
     ```{r}
     as.list(a)
     as.list(b)
     ```
     
-   The first version (`a`) is more natural, as it resembles lazy evaluation, where a promise is evaluated when the function is called. The second version (`b`) resembles to force an expression inside a function factory, to ensure it is properly evaluated and contained in the enclosing environment of the new function. In the following example we highlight this and replace `1:10` by a variable called `promise`:
+   The first version (assigned to `a`) seems more natural. It captures lazy evaluation, with a promise that is evaluated when the function is called. The second version (`b`) forces the evaluation of the expression. We may see this pattern in function factories, to ensure the expression is properly evaluated and captured in the enclosing environment of the generated function.
+   
+   In the following example we highlight the difference by replacing `1:10` with a variable called `promise`:
    
     ```{r}
     promise <- 1 
@@ -286,8 +288,7 @@ library(rlang)
 
 ## Dot-dot-dot (`...`)
 
-1. __[Q]{.Q}__: One way to implement `exec()` is shown below. Describe how it works. What are the
-    key ideas?
+1. __[Q]{.Q}__: One way to implement `exec()` is shown below. Describe how it works. What are the key ideas?
     
     ```{r, eval = FALSE}
     exec <- function(f, ..., .env = caller_env()) {
@@ -296,13 +297,13 @@ library(rlang)
     }
     ```
     
-   __[A]{.solved}__: `exec()` takes a function together with its arguments and an environment as input. The idea is to construct a call from the function and its arguments and evaluate it in the supplied environment. As the `...` argument is handled via `list2()`, `exec()` supports tidy dots (quasiquotation), which means that one may unquote arguments and names (on the left-hand-side of `:=`) via `!!` and `!!!`.
+   __[A]{.solved}__: `exec()` takes a function and its arguments as input, as well as an environment. This allows to construct a call from the function and the arguments and evaluate it in the supplied environment. As the `...` argument is handled via `list2()`, `exec()` supports tidy dots (quasiquotation), which means that arguments and names (on the left-hand-side of `:=`) can be unquoted via `!!` and `!!!`.
 
 2. __[Q]{.Q}__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`. Compare and contrast the techniques they use for switching between dots and list behaviour.
 
    __[A]{.solved}__:  All three functions capture the dots via `args <- list(...)`. `interaction()` and `expand.grid()` return early in case of `length(args) == 0`. 
    
-   As `interaction()` computes factors regarding combinations of `args` elements, `interaction()` iterates over `args` and doesn't differentiate further between list and dots behaviour. Only the case `length(args) == 1 && is.list(args[[1]])` gets treated via `args <- args[[1]]`. Consequently lists deeper than 1 level raise errors in other parts of the code.
+   As `interaction()` computes factors regarding combinations of `args` elements, `interaction()` iterates over `args` and doesn't differentiate further between list and dots behaviour. Only the case `length(args) == 1 && is.list(args[[1]])` are treated via `args <- args[[1]]`. Consequently lists deeper than 1 level raise errors in other parts of the code.
    
     ```{r, error = TRUE}
     # These work and return the same
@@ -317,9 +318,9 @@ library(rlang)
     
    `expand.grid()` switches in exactly the same way as `interaction()`. I.e. it also assigns `args <- args[[1]]` in case of `length(args) == 1 && is.list(args[[1]])` is `TRUE`.
    
-   `par()` preprocesses `args` the most in order to ensure that it becomes a list (or `NULL`). First, in case no dots were supplied (`length(list(...)) == 0`) `par()` creates a list from an internal character vector (partly depending on `par()`'s `no.readonly` argument). Furter, in case all elements of `args` are character vectors (`all(unlist(lapply(args, is.character)))`) `args` is turned into a list via `as.list(unlist(args))`. When `args` is of length one with its first element being a list or `NULL` `args` becomes `args <- args[1]`.
+   `par()` preprocesses `args` the most in order to ensure that it becomes a list (or `NULL`). First, in case no dots were supplied (`length(list(...)) == 0`) `par()` creates a list from an internal character vector (partly depending on `par()`'s `no.readonly` argument). Further, in case all elements of `args` are character vectors (`all(unlist(lapply(args, is.character)))`) `args` is turned into a list via `as.list(unlist(args))`. When `args` is of length one with its first element being a list or `NULL` `args` becomes `args <- args[1]`.
 
-3. __[Q]{.Q}__: Explain the problem with this defintion of `set_attr()`
+3. __[Q]{.Q}__: Explain the problem with this definition of `set_attr()`
     
     ```{r, error = TRUE}
     set_attr <- function(x, ...) {
@@ -330,11 +331,11 @@ library(rlang)
     set_attr(1:10, x = 10)
     ```
     
-   __[A]{.solved}__: As correctly given out by the error message, attributes must be named.
+   __[A]{.solved}__: As correctly hinted by the error message, the attributes must be named.
    
-   `set_attr()` expects an object to be passed as the `x` argument and its new attributes via the ellipsis. Unfortunately, this prohibits us to provide attributes named `x` as these would always collide with the argument name of our object. Even omitting the object's argument name doesn't help in this case - as can be seen in the example where the object is consequently treated as an unnamed attribute. 
+   `set_attr()` expects an object to be passed as the `x` argument and its new attributes via the dots. Unfortunately, this prohibits us to provide attributes named `x` as these would collide with the argument name of our object. Even omitting the object's argument name doesn't help in this case - as can be seen in the example where the object is consequently treated as an unnamed attribute. 
    
-   However, the function becomes probably clearer and less error-prone when we name the first argument `.x` again. In this case `1:10` will get the (named) attribute `x = 10` assigned:
+   However, we may name the first argument `.x`, which seems clearer and less likely to invoke errors. In this case `1:10` will get the (named) attribute `x = 10` assigned:
 
     ```{r}
     set_attr <- function(.x, ...) {
@@ -351,7 +352,7 @@ library(rlang)
     
 1. __[Q]{.Q}__: In the linear-model example, we could replace the `expr()` in `reduce(summands, ~ expr(!!.x + !!.y))` with `call2()`: `reduce(summands, call2, "+")`. Compare and contrast the two approaches. Which do you think is easier to read?
 
-   __[A]{.solved}__:
+   __[A]{.solved}__: We would consider the first version to be more readable. There seems to be a little more boilerplate code at first, but the unquoting syntax is very readable. Overall whole expression seems more more explicit and less complex.
 
 2. __[Q]{.Q}__:Re-implement the Box-Cox transform defined below using unquoting and `new_function()`:
    
@@ -365,7 +366,7 @@ library(rlang)
     }
     ```
     
-   __[A]{.solved}__:
+   __[A]{.solved}__: Here `new_function()` allows us to create a function factory using tidy evaluation.
     
     ```{r}
     bc2 <- function(lambda){
@@ -373,10 +374,10 @@ library(rlang)
       
       if (!!lambda == 0) {
         new_function(exprs(x = ), expr(log(x)))
-        } else {
-          new_function(exprs(x = ), expr((x^(!!lambda) - 1) / !!lambda))
-        }
+      } else {
+        new_function(exprs(x = ), expr((x ^ (!!lambda) - 1) / !!lambda))
       }
+    }
     
     bc2(0)
     bc2(2)
@@ -391,7 +392,7 @@ library(rlang)
     }
     ```
     
-   __[A]{.solved}__: The implementation is straight forward. However, it can become tough to handle all bracktes correct at the first try:
+   __[A]{.solved}__: The implementation is fairly straightforward, even though a lot of parentheses are required:
     
     ```{r}
     compose2 <- function(f, g){
