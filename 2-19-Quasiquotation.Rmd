@@ -265,14 +265,14 @@ library(rlang)
 
    What's the difference? Which one is more natural?
     
-   __[A]{.solved}__: We quote expressions with `expr()`  evaluate them with `!!()`. In the expression assigned to `b` the call `1:10` is evaluated to an integer vector, while still being a call object in `a`.
+   __[A]{.solved}__: We quote expressions with `expr()` and evaluate them with `!!`. In the expression assigned to `b` the call `1:10` is evaluated to an integer vector, while still being a call object in `a`.
    
     ```{r}
     as.list(a)
     as.list(b)
     ```
     
-   The first version (assigned to `a`) seems more natural. It captures lazy evaluation, with a promise that is evaluated when the function is called. The second version (`b`) forces the evaluation of the expression. We may see this pattern in function factories, to ensure the expression is properly evaluated and captured in the enclosing environment of the generated function.
+   The first version (`a`) seems more natural. It captures lazy evaluation, with a promise that is evaluated when the function is called. The second version (`b`) forces the evaluation of the expression. We may see this pattern in function factories, to ensure the expression is properly evaluated and captured in the enclosing environment of the generated function.
    
    In the following example we highlight the difference by replacing `1:10` with a variable called `promise`:
    
@@ -352,7 +352,7 @@ library(rlang)
     
 1. __[Q]{.Q}__: In the linear-model example, we could replace the `expr()` in `reduce(summands, ~ expr(!!.x + !!.y))` with `call2()`: `reduce(summands, call2, "+")`. Compare and contrast the two approaches. Which do you think is easier to read?
 
-   __[A]{.solved}__: We would consider the first version to be more readable. There seems to be a little more boilerplate code at first, but the unquoting syntax is very readable. Overall whole expression seems more more explicit and less complex.
+   __[A]{.solved}__: We would consider the first version to be more readable. There seems to be a little more boilerplate code at first, but the unquoting syntax is very readable. Overall whole expression seems more explicit and less complex.
 
 2. __[Q]{.Q}__:Re-implement the Box-Cox transform defined below using unquoting and `new_function()`:
    
