@@ -90,10 +90,8 @@ source("common.R")
     ```{r, message=FALSE}
     x <- runif(100)
     
-    bench::mark(sqrt(x),          # (1)
-                x ^ 0.5,          # (2)
-                x ^ (1 / 2),      # (3)
-                exp(log(x) / 2),  # (4)
+    bench::mark(x ^ (1 / 2),      # (1)
+                exp(log(x) / 2),  # (2)
                 relative = TRUE) %>% 
       dplyr::select(expression, median) %>% 
       dplyr::arrange(median)
