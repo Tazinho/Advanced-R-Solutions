@@ -24,7 +24,7 @@ library(purrr)
     
     # Set x globally
     x <- "global environment"
-    env2 <- rlang::env(x = "specified envirionment")
+    env2 <- rlang::env(x = "specified environment")
     
     locate_evaluation <- function(file, local){
       x <- "local environment"
@@ -45,7 +45,11 @@ library(purrr)
     expr(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (3)
     ```
 
-   __[A]{.solved}__: To quote Hadley analogously from the first edition of Advanced R: "`expr()` and `eval()` are opposites. ... each `eval()` peels off one layer of `expr()`'s". I.e. `eval(expr(x))` evaluates to  `x`. Therefore, (1) evaluates to $2 + 2 = 4$. Adding another `eval()` doesn't have impact here. So, also (2) evaluates to 4. However, when wrapping (1) into `expr()` the whole expression gets quoted. 
+   __[A]{.solved}__: Let's look at a quote from the first edition of Advanced R:
+   
+   > "`expr()` and `eval()` are opposites. [...] each `eval()` peels off one layer of `expr()`'s".
+   
+   In general `eval(expr(x))` evaluates to  `x`. Therefore, (1) evaluates to $2 + 2 = 4$. Adding another `eval()` doesn't have impact here. So, also (2) evaluates to `4`. However, when wrapping (1) into `expr()` the whole expression will be quoted. 
 
     ```{r}
     eval(expr(eval(expr(eval(expr(2 + 2))))))        # (1)
@@ -61,7 +65,7 @@ library(purrr)
     assign2 <- function(name, value, env) {}
     ```
 
-   __[A]{.solved}__: The reimplemantion of these two functions using tidy evaluation is based on building an expression, which is then evaluated.
+   __[A]{.solved}__: We reimplement these two functions using tidy evaluation. First expression is build, which is then evaluated.
 
     ```{r}
     get2 <- function(name, env = caller_env()) {
@@ -73,7 +77,7 @@ library(purrr)
     get2("x")
     ```
 
-   The implementation could be even more concise, if the user would provide an expression instead of a string:
+   The implementation would be even more concise, if the user provided an expression instead of a string:
 
     ```{r}
     get3 <- function(name, env = caller_env()){
@@ -98,7 +102,7 @@ library(purrr)
     
 4. __[Q]{.Q}__: Modify `source2()` so it returns the result of _every_ expression, not just the last one. Can you eliminate the for loop?
 
-   __[A]{.solved}__: In order to make the modifications more apparent, we just keep the code from the former `source2()`-version as a comment.
+   __[A]{.solved}__: In order to highlight the modifications, we've preserved the code from the former `source2()`-function in a comment.
    
     ```{r}
     source2 <- function(path, env = caller_env()) {
@@ -125,16 +129,16 @@ library(purrr)
     tmp_file <- tempfile()
     writeLines(
       "x <- 1
-      x
-      y <- 2
-      y  # some comment",
+       x
+       y <- 2
+       y  # some comment",
       tmp_file
     )
 
     (source2(tmp_file))
     ```
     
-   To eliminate the for loop, we can simply use `map()`:
+   To eliminate the for loop, we may also use `map()`:
    
     ```{r}
     source2 <- function(path, env = caller_env()) {
@@ -176,7 +180,7 @@ library(purrr)
     })
     ```
     
-   `substitute()` operates (by default) in the current evaluation argument. However, this doesn't matter here, as both, `expr` and `envir` are promises and therefore "... the expression slots of the promises replace the symbols", from `?substitute`. 
+   By default `substitute()` operates in the current evaluation argument. However, this doesn't matter here, as both, `expr` and `envir` are promises and therefore "the expression slots of the promises replace the symbols", from `?substitute`.
    
    Next, `call` will be evaluated in the global environment. 
    
@@ -243,7 +247,7 @@ library(purrr)
 
 1. __[Q]{.Q}__: Why did I use a for loop in `transform2()` instead of `map()`? Consider `transform2(df, x = x * 2, x = x * 2)`.
    
-   __[A]{.solved}__: Via the for loop approach the processing steps regarding `.data` are applied iteratively. This includes updating `.data` and reusing the same variable names, which enables to apply transformations sequentially so that transformation can refer to columns that were just created.
+   __[A]{.solved}__: A for loop applies the processing steps regarding `.data` iteratively. This includes updating `.data` and reusing the same variable names. This makes it possible to apply transformations sequentially, so that subsequent transformations can refer to columns that were just created.
 
 2. __[Q]{.Q}__: Here's an alternative implementation of `subset2()`:
 
@@ -311,7 +315,7 @@ library(purrr)
     }
     ```
 
-   __[A]{.solved}__: `arrange2()` basically reorders a data frame by one or more of its variables. As `arrange2()` allows to provide the variables as expressions (via `...`), these need to be quoted first. Next they are used to build up an `order()` call, which then gets evaluated inside the data frame. Finally, the data frame gets reordered via integer subsetting. Let's jump into the source code:
+   __[A]{.solved}__: `arrange2()` basically reorders a data frame by one or more of its variables. As `arrange2()` allows to provide the variables as expressions (via `...`), these need to be quoted first. Afterwards they are used to build up an `order()` call, which is then evaluated in the context of the data frame. Finally, the data frame is reordered via integer subsetting. Let's take a closer look at the source code:
 
     ```{r}
     arrange2 <- function(.df, ..., .na.last = TRUE) {
@@ -323,17 +327,17 @@ library(purrr)
       # return expression-object
       order_call <- expr(order(!!!args, na.last = !!.na.last))
       
-      # evaluate order_call within .df
+      # Evaluate order_call within .df
       ord <- eval_tidy(order_call, .df)    
-      # ensure that no rows are dropped
+      # Ensure that no rows are dropped
       stopifnot(length(ord) == nrow(.df))  
       
-      # reorder rows via integer subsetting
+      # Reorder rows via integer subsetting
       .df[ord, , drop = FALSE]  
     }
     ```
 
-   By using `!!.na.last` the `.na.last` argument is unquoted, when the `order()` call is built. That way, the `na.last` argument is already correctly specified (typically `TRUE`, `FALSE` or `NA`).
+   By using `!!.na.last` the `.na.last` argument is unquoted, when the `order()` call is built. This way, the `na.last` argument is already correctly specified (typically `TRUE`, `FALSE` or `NA`).
 
    Without the unquoting, the expression would read `na.last = .na.last` and the value for `.na.last` would still need to be looked up and found. Because these computations take place inside of the functions execution environment (which contains `.na.last`), this is unlikely to cause problems.
 
@@ -365,7 +369,7 @@ library(purrr)
     }
     ```
 
-   We can see, that the symbol in no longer coerced to a string in `threshold_var2()`. Therefore `$` instead of `[[` is used for subsetting. Initially we suspected partial matching to work with `$`, but this seems to avoided, when the expression is tidily evaluated.
+   We can see, that `threshold_var2()` no longer coerces the symbol to a string. Therefore `$` instead of `[[` can be used for subsetting. Initially we suspected partial matching to work with `$`, but this seems to avoided, when the expression is tidily evaluated.
 
    The prefix call to `$()` is less common than infix-subsetting using `[[`, but ultimately both functions seem to behave the same.
 
