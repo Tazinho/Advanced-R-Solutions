@@ -355,48 +355,55 @@ source("common.R")
       
       return out;
     }
+    ```
     
-    NumericVector meanC(NumericVector x, bool narm){
+   To make `meanC()` aware of `NAs`, we consider the same cases as in previous functions.
+    
+    ```cpp
+    double meanC(NumericVector x, bool na_rm = false){
       int n = x.size();
-      LogicalVector index = is_na(x);
-      bool na_check = false;
-      bool na_check_all = true;
-      int n_corrected = 0;
-      NumericVector out(1);
-              
+      LogicalVector i_na = is_na(x);
+      bool any_na = false;
+      bool all_na = true;
+      int n_non_na = 0;
+      double out = 0;
+  
+      // Calculate any_na
       for(int i = 0; i<n; i++){
-          if (index[i]) na_check = true;
-      }
-              
-      for(int i = 0; i<n; i++){
-          if (!index[i]) na_check_all = false;
+        if (i_na[i]) {
+          any_na = true;
+          break;
+        }
       }
   
-      for(int i = 0; i<n; i++){
-          if (!index[i]) n_corrected++;
+      if (!any_na) {
+        for (int i = 0; i < n; i++) {
+          out += x[i] / n;
+        }
+        return out;
       }
   
-      /* narm = T */
-      if (narm){
-          if (na_check_all) {
-              out[0] = NA_REAL;
-          }  else {
-              out[0] = 0;
-              for(int i = 0; i < n; ++i) {
-                  if (!index[i]) out[0] += x[i] / n_corrected;
-              }
+      // Calculate all_na and count of non-NAs
+      for(int i = 0; i<n; i++){
+          if (!i_na[i]) {
+            all_na = false;
+            n_non_na++;
           }
       }
-  
-      /* narm = F */
-      if (!narm){
-          if (na_check) {
-              out[0] = NA_REAL;
-          } else {
-              for(int i = 0; i < n; ++i) {
-                  out[0] += x[i] / n;
-                }
-          }
+    
+      if (!na_rm & any_na) {
+        return NA_REAL;
+      }
+    
+      // Case na_rm and any_na
+      if (na_rm & all_na) {
+        return NAN;
+      }
+      
+      if (na_rm) {
+        for(int i = 0; i < n; i++) {
+          if (!i_na[i]) out += x[i] / n_non_na;
+        }
       }
   
       return out;
