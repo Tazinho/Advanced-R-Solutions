@@ -220,7 +220,7 @@ source("common.R")
    
    To make `minC()` aware of `NA`s, we introduce an `na_rm` argument and need to differ between the following cases:
     * `x` doesn't contain any NAs
-    * `x` contains NAs and `na_rm = false`: we return `NA_REAL`
+    * `x` contains NAs and `na_rm = false`: return `NA_REAL`
     * `x` comtains only NAs and `na_rm = true`: return `R_PosInf`
     * `x` contains some NAs and `na_rm = true`
 
@@ -283,7 +283,7 @@ source("common.R")
     }
     ```
     
-   To make `maxC()` aware of NAs, we follow our implementation of `minC` and exclusively change `std::min` to `std::max` and `R_PosInf` to `R_NegInf`.
+   To make `maxC()` aware of NAs, we follow our implementation of `minC()` and only change `std::min` to `std::max` and `R_PosInf` to `R_NegInf`.
 
     ```cpp
     double maxC(NumericVector x, bool na_rm = false){
@@ -344,7 +344,7 @@ source("common.R")
     }
     ```
    
-   `minC()` and `maxC()` enable us a compact implementation of an `NA`-aware `rangeC()` function.
+   `minC()` and `maxC()` enable us to write a compact and NA-aware `rangeC()` function.
    
     ```cpp    
     NumericVector rangeC(NumericVector x, bool na_rm = false){
