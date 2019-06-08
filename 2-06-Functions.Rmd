@@ -6,9 +6,9 @@ source("common.R")
 
 ## Function fundamentals
 
-1. __<span style="color:red">Q</span>__: Given a name, like `"mean"`, `match.fun()` lets you find a function. Given a function, can you find its name? Why doesn't that make sense in R?  
+1. __[Q]{.Q}__: Given a name, like `"mean"`, `match.fun()` lets you find a function. Given a function, can you find its name? Why doesn't that make sense in R?
 
-   __<span style="color:orange">A</span>__: A name can only point to a single object, but an object can be pointed to by 0, 1, or many names. What are names of the functions in the following block?
+   __[A]{.started}__: A name can only point to a single object, but an object can be pointed to by 0, 1, or many names. What are names of the functions in the following block?
    
     ```{r}
     function(x) sd(x) / mean(x)
@@ -19,14 +19,14 @@ source("common.R")
     ```
    
   
-2. __<span style="color:red">Q</span>__: It’s possible (although typically not useful) to call an anonymous function. Which of the two approaches below is correct? Why?
+2. __[Q]{.Q}__: It’s possible (although typically not useful) to call an anonymous function. Which of the two approaches below is correct? Why?
    
     ```{r}
     function(x) 3()
     (function(x) 3)()
     ```
 
-   __<span style="color:green">A</span>__: The second approach is correct.
+   __[A]{.solved}__: The second approach is correct.
    
    The anonymous function `function(x) 3` is surrounded by a pair of parentheses before it is called by `()`. These extra parentheses separate the function call from the anonymous functions body. Without these a function with the invalid body `3()` is returned, which throws an error when we call it. This is easier to see if we name the  function:
    
@@ -37,19 +37,19 @@ source("common.R")
     ```
 
 
-3. __<span style="color:red">Q</span>__: A good rule of thumb is that an anonymous function should fit on one line and shouldn't need to use `{}`. Review your code. Where could you have used an anonymous function instead of a named function? Where should you have used a named function instead of an anonymous function?  
+3. __[Q]{.Q}__: A good rule of thumb is that an anonymous function should fit on one line and shouldn't need to use `{}`. Review your code. Where could you have used an anonymous function instead of a named function? Where should you have used a named function instead of an anonymous function?
     
-   __<span style="color:green">A</span>__: The use of anonymous functions allows concise and elegant code in certain situations. However, they miss a descriptive name and when re-reading the code it can take a while to figure out what they do (even it it's future you reading). That's why it's helpful to give long and complex functions a descriptive name. It may be worthwhile to take a look at your own projects or other peoples code to reflect on this part of your coding style.
+   __[A]{.solved}__: The use of anonymous functions allows concise and elegant code in certain situations. However, they miss a descriptive name and when re-reading the code it can take a while to figure out what they do (even it it's future you reading). That's why it's helpful to give long and complex functions a descriptive name. It may be worthwhile to take a look at your own projects or other peoples code to reflect on this part of your coding style.
 
 <!-- @hb: maybe describe advantages of anonymous functions more clearly. -->
 <!-- comment: maybe write about use of anonymous functions
 for functional programming (lapply, purrr) -->
 
-4. __<span style="color:red">Q</span>__: What function allows you to tell if an object is a function? What function allows you to tell if a function is a primitive function?
+4. __[Q]{.Q}__: What function allows you to tell if an object is a function? What function allows you to tell if a function is a primitive function?
        
-   __<span style="color:green">A</span>__: Use `is.function()` to test, if an object is a function. You may also consider `is.primitive()` to test specifically for primitive functions.
+   __[A]{.solved}__: Use `is.function()` to test, if an object is a function. You may also consider `is.primitive()` to test specifically for primitive functions.
 
-5. __<span style="color:red">Q</span>__: This code makes a list of all functions in the base package. 
+5. __[Q]{.Q}__: This code makes a list of all functions in the base package.
     
     ```{r}
     objs <- mget(ls("package:base", all = TRUE), inherits = TRUE)
@@ -64,7 +64,7 @@ for functional programming (lapply, purrr) -->
    
    a. How could you adapt the code to find all primitive functions?  
     
-   __<span style="color:green">A</span>__: Let's look at each sub-question separately:
+   __[A]{.solved}__: Let's look at each sub-question separately:
    
    a. To find the function with the most arguments, we first compute the length of `formals()`
    
@@ -109,30 +109,30 @@ for functional programming (lapply, purrr) -->
       length(funs)
       ```
       
-6. __<span style="color:red">Q</span>__: What are the three important components of a function?  
+6. __[Q]{.Q}__: What are the three important components of a function?
     
-   __<span style="color:green">A</span>__: These components are the function's `body()`, `formals()` and `environment()`. However, as mentioned in the textbook:
+   __[A]{.solved}__: These components are the function's `body()`, `formals()` and `environment()`. However, as mentioned in the textbook:
     
    > There is one exception to the rule that functions have three components. Primitive functions, like `sum()`, call C code directly with `.Primitive()` and contain no R code. Therefore their `formals()`, `body()`, and `environment()` are all `NULL`.
 
-7. __<span style="color:red">Q</span>__: When does printing a function not show what environment it was created in?  
+7. __[Q]{.Q}__: When does printing a function not show what environment it was created in?
 
-   __<span style="color:green">A</span>__: Primitive functions and functions created in the global environment do not print their environment.
+   __[A]{.solved}__: Primitive functions and functions created in the global environment do not print their environment.
 
 ## Lexical Scoping
 
-1. __<span style="color:red">Q</span>__: What does the following code return? Why? Describe how each of the three `c`’s is interpreted.
+1. __[Q]{.Q}__: What does the following code return? Why? Describe how each of the three `c`’s is interpreted.
 
     ```{r, eval = FALSE}
     c <- 10
     c(c = c)
     ```  
     
-   __<span style="color:green">A</span>__: This code returns a named numeric vector of length one - with one element of the value `10` and the name `"c"`. The first `c` represents the `c()` function, the second `c` is interpreted as a (quoted) name and the third `c` as a value.
+   __[A]{.solved}__: This code returns a named numeric vector of length one - with one element of the value `10` and the name `"c"`. The first `c` represents the `c()` function, the second `c` is interpreted as a (quoted) name and the third `c` as a value.
        
-2. __<span style="color:red">Q</span>__: What are the four principles that govern how R looks for values?  
+2. __[Q]{.Q}__: What are the four principles that govern how R looks for values?
     
-   __<span style="color:green">A</span>__: R's lexical scoping rules are based on these four principles:
+   __[A]{.solved}__: R's lexical scoping rules are based on these four principles:
    
    <!-- Link to adv-r sections? -->
    * Name masking
@@ -140,7 +140,7 @@ for functional programming (lapply, purrr) -->
    * A fresh start
    * Dynamic lookup
 
-3. __<span style="color:red">Q</span>__: What does the following function return? Make a prediction before running the code yourself.
+3. __[Q]{.Q}__: What does the following function return? Make a prediction before running the code yourself.
 
     ```{r, eval = FALSE}
     f <- function(x) {
@@ -155,12 +155,12 @@ for functional programming (lapply, purrr) -->
     f(10)
     ```
         
-   __<span style="color:green">A</span>__: Within this function two more functions also named `f()` are defined and called. Because the functions are each executed in their own environment R will look up and use the functions defined in these environments. The innermost `f()` is called last, though it is the first function to return a value. Because of this the order of the calculation passes "from the inside to the outside" and the function returns `((10 ^ 2) + 1) * 2`, i.e. 202.
+   __[A]{.solved}__: Within this function two more functions also named `f()` are defined and called. Because the functions are each executed in their own environment R will look up and use the functions defined in these environments. The innermost `f()` is called last, though it is the first function to return a value. Because of this the order of the calculation passes "from the inside to the outside" and the function returns `((10 ^ 2) + 1) * 2`, i.e. 202.
 
 
 ## Lazy evaluation
 
-1. __<span style="color:red">Q</span>__: What important property of `&&` makes `x_ok()` work?
+1. __[Q]{.Q}__: What important property of `&&` makes `x_ok()` work?
 
     ```{r}
     x_ok <- function(x) {
@@ -184,10 +184,10 @@ for functional programming (lapply, purrr) -->
     x_ok(1:3)
     ```
     
-   __<span style="color:green">A</span>__: 
+   __[A]{.solved}__:
    <!-- HW: The explanation needs to start with shortcircuiting - the RHS of && is ever evaluated is the LHS is NULL. The same is not true for & -->
    
-   We expect `x_ok()` to validate its input vie certain criteria: it must not be `NULL`, but have length `1` and a value greater than `0`. Meaningful outcomes for this assertion will be `TRUE`, `FALSE` or `NA`.
+   We expect `x_ok()` to validate its input via certain criteria: it must not be `NULL`, but have length `1` and a value greater than `0`. Meaningful outcomes for this assertion will be `TRUE`, `FALSE` or `NA`.
    
    The desired behaviour is reached by combining the assertions through `&&` instead of `&`. `&&` does not perform elementwise comparisons, instead it uses the first element of each value only. It also uses lazy evaluation, in the sense that evaluation "proceeds only until the result is determined" (from `?Logic`).
    
@@ -195,7 +195,7 @@ for functional programming (lapply, purrr) -->
    
    We can also see the difference in behaviour, when we set `x = 1:3`. The `&&`-operator returns the result from `length(x) == 1`, which is `FALSE`. Using `&` as the logical operator leads to the (vectorised) `x > 0` condition being be evaluated and also returned.
 
-2. __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
+2. __[Q]{.Q}__: What does this function return? Why? Which principle does it illustrate?
 
     ```{r, eval = FALSE}
     f2 <- function(x = z) {
@@ -205,9 +205,9 @@ for functional programming (lapply, purrr) -->
     f2()
     ```  
     
-   __<span style="color:green">A</span>__: The function returns `100`. The default arguments are evaluated in the function environment. Because of *lazy evaluation* these arguments are not evaluated before they are accessed. At the time `x` is accessed `z` has already been bound to the value `100`.
+   __[A]{.solved}__: The function returns `100`. The default arguments are evaluated in the function environment. Because of *lazy evaluation* these arguments are not evaluated before they are accessed. At the time `x` is accessed `z` has already been bound to the value `100`.
     
-3. __<span style="color:red">Q</span>__: What does this function return? Why? Which principle does it illustrate?
+3. __[Q]{.Q}__: What does this function return? Why? Which principle does it illustrate?
   
     ```{r, eval = FALSE}
     y <- 10
@@ -218,9 +218,9 @@ for functional programming (lapply, purrr) -->
     y
     ```  
     
-   __<span style="color:green">A</span>__: The function returns `c(2, 1)`. This is due to *name masking*. When `x` is accessed within `c()`, the promise `x = {y <- 1; 2}` is evaluated inside `f1()`'s environment. `y` is bound to the value `1` and the return value of `{()` (`2`) is assigned to `x`. When `y` is accessed within `c()`, it has already the value `1` and R doesn't need to look it up any further. Therefore, the promise `y = 0` won't be evaluated. Also, because `y` is assigned within `f1()`'s environment, the value of the global variable `y` is left untouched.
+   __[A]{.solved}__: The function returns `c(2, 1)`. This is due to *name masking*. When `x` is accessed within `c()`, the promise `x = {y <- 1; 2}` is evaluated inside `f1()`'s environment. `y` is bound to the value `1` and the return value of `{()` (`2`) is assigned to `x`. When `y` is accessed within `c()`, it has already the value `1` and R doesn't need to look it up any further. Therefore, the promise `y = 0` won't be evaluated. Also, because `y` is assigned within `f1()`'s environment, the value of the global variable `y` is left untouched.
 
-4. __<span style="color:red">Q</span>__: In `hist()`, the default value of `xlim` is `range(breaks)`, the default value for `breaks` is `"Sturges"`, and
+4. __[Q]{.Q}__: In `hist()`, the default value of `xlim` is `range(breaks)`, the default value for `breaks` is `"Sturges"`, and
 
     ```{r}
     range("Sturges")
@@ -228,11 +228,11 @@ for functional programming (lapply, purrr) -->
     
    Explain how `hist()` works to get a correct `xlim` value.
     
-   __<span style="color:green">A</span>__: The `xlim` argument of `hist()` defines the range of the histogram's x-axis. In order to provide a valid axis `xlim` must contain a numeric vector of exactly two unique values. Consequently for the default `xlim = range(breaks)`), `breaks` must evaluate to a vector with at least two unique values.
+   __[A]{.solved}__: The `xlim` argument of `hist()` defines the range of the histogram's x-axis. In order to provide a valid axis `xlim` must contain a numeric vector of exactly two unique values. Consequently for the default `xlim = range(breaks)`), `breaks` must evaluate to a vector with at least two unique values.
    
    During execution `hist()` overwrites the `breaks` argument. The `breaks` argument is quite flexible and allows the users to provide the breakpoints directly or compute them in several ways. Therefore the specific behaviour depends highly on the input. But `hist` ensures that `breaks` evaluates to a numeric vector containing at least two unique elements before `xlim` is computed.
    
-5. __<span style="color:red">Q</span>__: Explain why this function works. Why is it confusing?
+5. __[Q]{.Q}__: Explain why this function works. Why is it confusing?
 
     ```{r}
     show_time <- function(x = stop("Error!")) {
@@ -242,7 +242,7 @@ for functional programming (lapply, purrr) -->
     show_time()
     ```
     
-   __<span style="color:green">A</span>__: Before `show_time()` accesses `x` (default `stop("Error")`), the `stop()` function is masked by `function(...) Sys.time()`. Because default arguments are evaluated in the function environment, `print(x)` will be evaluated as `print(Sys.time())`.
+   __[A]{.solved}__: Before `show_time()` accesses `x` (default `stop("Error")`), the `stop()` function is masked by `function(...) Sys.time()`. Because default arguments are evaluated in the function environment, `print(x)` will be evaluated as `print(Sys.time())`.
    
    This function is confusing, because its behaviour changes when `x`'s value is supplied directly. Now the value from the calling environment will be used and the overwriting of `stop` won't affect the outcome any more.
   
@@ -250,9 +250,9 @@ for functional programming (lapply, purrr) -->
     show_time(x = stop("Error!"))
     ```
 
-6. __<span style="color:red">Q</span>__: How many arguments are required when calling `library()`?
+6. __[Q]{.Q}__: How many arguments are required when calling `library()`?
 
-   __<span style="color:green">A</span>__: `library()` doesn't require any arguments. When called without arguments `library()` (invisibly) returns a list of class "libraryIQR", which contains a results matrix with one row and three columns per installed package. These columns contain entries for the name of the package ("Package"), the path to the package ("LibPath") and the title of the package ("Title"). `library()` also has its own print method (`print.libraryIQR`), which displays this information conveniently in its own window.
+   __[A]{.solved}__: `library()` doesn't require any arguments. When called without arguments `library()` (invisibly) returns a list of class "libraryIQR", which contains a results matrix with one row and three columns per installed package. These columns contain entries for the name of the package ("Package"), the path to the package ("LibPath") and the title of the package ("Title"). `library()` also has its own print method (`print.libraryIQR`), which displays this information conveniently in its own window.
    
    This behaviour is also documented under the details section of the help page for `?library`:
    
@@ -266,7 +266,7 @@ for functional programming (lapply, purrr) -->
 
 ## `...` (dot-dot-dot)
 
-1. __<span style="color:red">Q</span>__: Explain the following results:
+1. __[Q]{.Q}__: Explain the following results:
     
     ```{r}
     sum(1, 2, 3)
@@ -276,7 +276,7 @@ for functional programming (lapply, purrr) -->
     mean(1, 2, 3, na.omit = TRUE)
     ```
     
-   __<span style="color:green">A</span>__: Let's inspect the arguments and their order for both functions. For `sum()` these are `...` and `na.rm`:
+   __[A]{.solved}__: Let's inspect the arguments and their order for both functions. For `sum()` these are `...` and `na.rm`:
    
     ```{r}
     str(sum)
@@ -292,13 +292,13 @@ for functional programming (lapply, purrr) -->
    
   Because `na.omit` is not one of `mean()`'s named arguments (and also not a candidate for partial matching), `na.omit` again becomes part of the `...` argument. The other supplied objects are matched by their order, i.e.: `x = 1`, `trim = 2` and `na.rm = 3`. Because `x` is of length 1 and not `NA`, the settings of `trim` and `na.rm` do not affect the calculation of the mean. Both calls (`mean(1, 2, 3)` and `mean(1, 2, 3, na.omit = TRUE)`) return `1`.
 
-2. __<span style="color:red">Q</span>__: In the following call, explain how to find the documentation for the named arguments in the following function call:
+2. __[Q]{.Q}__: In the following call, explain how to find the documentation for the named arguments in the following function call:
        
     ```{r, fig.asp = 1}
     plot(1:10, col = "red", pch = 20, xlab = "x", col.lab = "blue")
     ```
     
-   __<span style="color:green">A</span>__: First we type `?plot` in the console and check the "Usage" section:
+   __[A]{.solved}__: First we type `?plot` in the console and check the "Usage" section:
     
     ```
     plot(x, y, ...)
@@ -306,9 +306,9 @@ for functional programming (lapply, purrr) -->
     
    The arguments we want to learn more about are part of the `...` argument. We can find information for `xlab` and follow the recommendation to visit `?par` for the other arguments. Here we type "col" into the search bar, which leads us the section "Color Specification". We also search for the `pch` argument, which leads to the recommendation to check `?points`. Finally `col.lab` is also directly documented within `?par`.
     
-3. __<span style="color:red">Q</span>__: Why does `plot(1:10, col = "red")` only colour the points, not the axes or labels? Read the source code of `plot.default()` to find out.
+3. __[Q]{.Q}__: Why does `plot(1:10, col = "red")` only colour the points, not the axes or labels? Read the source code of `plot.default()` to find out.
     
-   __<span style="color:green">A</span>__: To learn about the internals of `plot.default()` we add `browser()` to the first line of the code and interactively run `plot(1:10, col = "red")`. This way we can see how the plot is build and learn where the axis are added.
+   __[A]{.solved}__: To learn about the internals of `plot.default()` we add `browser()` to the first line of the code and interactively run `plot(1:10, col = "red")`. This way we can see how the plot is build and learn where the axis are added.
    
    This leads us to the function call
 
@@ -326,15 +326,15 @@ for functional programming (lapply, purrr) -->
 
 ## Exiting a function
 
-1. __<span style="color:red">Q</span>__: What does `load()` return? Why don’t you normally see these values?
+1. __[Q]{.Q}__: What does `load()` return? Why don’t you normally see these values?
 
-   __<span style="color:green">A</span>__: `load()` loads objects saved to disk in `.Rdata` files by `save()`. When run successfully, `load()` invisibly returns a character vector containing the names of the newly loaded objects. To print these names to the console, one can set the argument `verbose` to `TRUE` or surround the call in parentheses to trigger R's auto-printing mechanism.
+   __[A]{.solved}__: `load()` loads objects saved to disk in `.Rdata` files by `save()`. When run successfully, `load()` invisibly returns a character vector containing the names of the newly loaded objects. To print these names to the console, one can set the argument `verbose` to `TRUE` or surround the call in parentheses to trigger R's auto-printing mechanism.
    
-2. __<span style="color:red">Q</span>__: What does `write.table()` return? What would be more useful?
+2. __[Q]{.Q}__: What does `write.table()` return? What would be more useful?
 
-   __<span style="color:green">A</span>__: `write.table()` writes an object, usually a data frame or a matrix, to disk. The function invisibly returns `NULL`. It would be more useful if `write.table()` would (invisibly) return the input data, `x`. This would allow to save intermediate results and directly take on further processing steps without breaking the flow of the code (i.e. breaking it into different lines). One package which uses this pattern is the readr package, which is part of the "tidyverse"-ecosystem.
+   __[A]{.solved}__: `write.table()` writes an object, usually a data frame or a matrix, to disk. The function invisibly returns `NULL`. It would be more useful if `write.table()` would (invisibly) return the input data, `x`. This would allow to save intermediate results and directly take on further processing steps without breaking the flow of the code (i.e. breaking it into different lines). One package which uses this pattern is the readr package, which is part of the "tidyverse"-ecosystem.
     
-3. __<span style="color:red">Q</span>__: How does the `chdir` parameter of `source()` compare to `in_dir()`? Why might you prefer one approach to the other?
+3. __[Q]{.Q}__: How does the `chdir` parameter of `source()` compare to `in_dir()`? Why might you prefer one approach to the other?
 
    The `in_dir()` approach was given in the book as
        
@@ -347,7 +347,7 @@ for functional programming (lapply, purrr) -->
     }
     ```
     
-   __<span style="color:orange">A</span>__: 
+   __[A]{.started}__:
    
    `in_dir()` takes a path to a working directory as an argument. First the working directory is changed accordingly. `on.exit()` ensures that the modification to the working directory are reset to the initial value when the function exits.
     
@@ -355,9 +355,9 @@ for functional programming (lapply, purrr) -->
    
    <!-- HW: I think I'm more intersted in supplying a path vs. a logical value here -->
 
-4. __<span style="color:red">Q</span>__: Write a function that opens a graphics device, runs the supplied code, and closes the graphics device (always, regardless of whether or not the plotting code worked).  
+4. __[Q]{.Q}__: Write a function that opens a graphics device, runs the supplied code, and closes the graphics device (always, regardless of whether or not the plotting code worked).
    
-   __<span style="color:green">A</span>__: To control the graphics device we use `pdf()` and `dev.off()`. To ensure a clean termination `on.exit()` is used.
+   __[A]{.solved}__: To control the graphics device we use `pdf()` and `dev.off()`. To ensure a clean termination `on.exit()` is used.
     
     ```{r, eval = FALSE}
     plot_pdf <- function(code) {
@@ -367,7 +367,7 @@ for functional programming (lapply, purrr) -->
     }
     ```
 
-5. __<span style="color:red">Q</span>__: We can use `on.exit()` to implement a simple version of `capture.output()`.
+5. __[Q]{.Q}__: We can use `on.exit()` to implement a simple version of `capture.output()`.
 
     ```{r}
     capture.output2 <- function(code) {
@@ -385,7 +385,7 @@ for functional programming (lapply, purrr) -->
     
    Compare `capture.output()` to `capture.output2()`. How do the functions differ? What features have I removed to make the key ideas easier to see? How have I rewritten the key ideas to be easier to understand?
     
-   __<span style="color:green">A</span>__: Using `body(capture.output)` we inspect the source code of the original `capture.output()` function. `capture.output()` is a quite a bit longer (39 lines vs. 7 lines). `capture.output()` writes out entire methods, such as `readLines()` <!-- HW: what does this mean? -->. Instead `capture.output2()` calls these methods directly. This brevity and modularity makes `capture.output2` easier to understand (given you know the underlying methods).
+   __[A]{.solved}__: Using `body(capture.output)` we inspect the source code of the original `capture.output()` function. `capture.output()` is a quite a bit longer (39 lines vs. 7 lines). `capture.output()` writes out entire methods, such as `readLines()` <!-- HW: what does this mean? -->. Instead `capture.output2()` calls these methods directly. This brevity and modularity makes `capture.output2` easier to understand (given you know the underlying methods).
    
    <!-- HW: main difference is that capture.output() uses substitute() + eval -->
 
@@ -393,7 +393,7 @@ for functional programming (lapply, purrr) -->
 
 ## Function forms
 
-1. __<span style="color:red">Q</span>__: Rewrite the following code snippets into prefix form:
+1. __[Q]{.Q}__: Rewrite the following code snippets into prefix form:
 
     ```{r, eval = FALSE}
     1 + 2 + 3
@@ -403,7 +403,7 @@ for functional programming (lapply, purrr) -->
     if (length(x) <= 5) x[[5]] else x[[n]]
     ```
     
-   __<span style="color:green">A</span>__: Let's rewrite the expressions to match the exact syntax from the code above. Because prefix functions already define the execution order, we may omit the parentheses in the second expression.
+   __[A]{.solved}__: Let's rewrite the expressions to match the exact syntax from the code above. Because prefix functions already define the execution order, we may omit the parentheses in the second expression.
     
     ```{r, eval = FALSE}
     `+`(`+`(1, 2), 3)
@@ -414,7 +414,7 @@ for functional programming (lapply, purrr) -->
     `if`(`<=`(length(x), 5), `[[`(x, 5), `[[`(x, n))
     ```
 
-2. __<span style="color:red">Q</span>__: Clarify the following list of odd function calls:
+2. __[Q]{.Q}__: Clarify the following list of odd function calls:
 
     ```{r, eval = FALSE}
     x <- sample(replace = TRUE, 20, x = c(1:10, NA))
@@ -422,7 +422,7 @@ for functional programming (lapply, purrr) -->
     cor(m = "k", y = y, u = "p", x = x)
     ```  
     
-   __<span style="color:green">A</span>__: None of these functions provides a `...` argument. Therefore the function arguments are first matched exactly, then via partial matching and finally by position. This leads us to the following explicit function calls:
+   __[A]{.solved}__: None of these functions provides a `...` argument. Therefore the function arguments are first matched exactly, then via partial matching and finally by position. This leads us to the following explicit function calls:
    
     ```{r, eval = FALSE}
     x <- sample(c(1:10, NA), size = 20, replace = TRUE)
@@ -430,14 +430,14 @@ for functional programming (lapply, purrr) -->
     cor(x, y, use = "pairwise.complete.obs", method = "kendall")
     ```
     
-3. __<span style="color:red">Q</span>__: Explain why the following code fails:
+3. __[Q]{.Q}__: Explain why the following code fails:
 
     ```{r, eval = FALSE}
     modify(get("x"), 1) <- 10
     #> Error: target of assignment expands to non-language object
     ```
     
-   __<span style="color:orange">A</span>__: First, let's define `x` and recall the definition of `modify()` from the textbook:
+   __[A]{.started}__: First, let's define `x` and recall the definition of `modify()` from the textbook:
     
     ```{r}
     x <- 1:3
@@ -463,9 +463,9 @@ for functional programming (lapply, purrr) -->
     #> Error in get("x") <- 2 : target of assignment expands to non-language object
     ```
     
-4. __<span style="color:red">Q</span>__: Create a replacement function that modifies a random location in a vector.
+4. __[Q]{.Q}__: Create a replacement function that modifies a random location in a vector.
     
-   __<span style="color:green">A</span>__: Lets define `%random%` like this:
+   __[A]{.solved}__: Lets define `%random%` like this:
 
     ```{r, eval = FALSE}
     `random<-` <- function(x, value) {
@@ -475,7 +475,7 @@ for functional programming (lapply, purrr) -->
     }
     ```
 
-5. __<span style="color:red">Q</span>__: Write your own version of `+` that will paste its inputs together if they are character vectors but behaves as usual otherwise. In other words, make this code work:
+5. __[Q]{.Q}__: Write your own version of `+` that will paste its inputs together if they are character vectors but behaves as usual otherwise. In other words, make this code work:
    
     ```{r, eval = FALSE}
     1 + 2
@@ -485,7 +485,7 @@ for functional programming (lapply, purrr) -->
     #> [1] "ab"
     ```
 
-   __<span style="color:green">A</span>__: To achieve this behaviour, we need to override the `+` operator. We need to take care to not use the `+` operator itself inside of the function definition, because this would lead to an undesired infinite recursion. We also add `b = 0L` as a default value to keep the behaviour of `+` as a unary operator, i.e. to keep `+ 1` working and not throwing an error
+   __[A]{.solved}__: To achieve this behaviour, we need to override the `+` operator. We need to take care to not use the `+` operator itself inside of the function definition, because this would lead to an undesired infinite recursion. We also add `b = 0L` as a default value to keep the behaviour of `+` as a unary operator, i.e. to keep `+ 1` working and not throwing an error
     
     ```{r}
     `+` <- function(a, b = 0L){
@@ -505,9 +505,9 @@ for functional programming (lapply, purrr) -->
     rm(`+`)
     ```
 
-6. __<span style="color:red">Q</span>__: Create a list of all the replacement functions found in the base package. Which ones are primitive functions? (Hint use `apropos()`)
+6. __[Q]{.Q}__: Create a list of all the replacement functions found in the base package. Which ones are primitive functions? (Hint use `apropos()`)
    
-   __<span style="color:green">A</span>__: The hint suggests to look for functions with a specific naming pattern: Replacement functions conventionally end on `<-`. We can search these objects with a regular expression (`<-$`). 
+   __[A]{.solved}__: The hint suggests to look for functions with a specific naming pattern: Replacement functions conventionally end on `<-`. We can search these objects with a regular expression (`<-$`).
    
     ```{r}
     apropos("<-$")
@@ -529,16 +529,16 @@ for functional programming (lapply, purrr) -->
     names(Filter(is.primitive, repl_functions))
     ```
 
-7. __<span style="color:red">Q</span>__: What are valid names for user-created infix functions?  
+7. __[Q]{.Q}__: What are valid names for user-created infix functions?
   
-   __<span style="color:green">A</span>__: Let's cite **Advanced R** here (section on "Function Forms"): 
+   __[A]{.solved}__: Let's cite **Advanced R** here (section on "Function Forms"):
    <!-- HW: link to section -->
    
    > ... names of infix functions are more flexible than regular R functions: they can contain any sequence of characters except “%”.
 
-8. __<span style="color:red">Q</span>__: Create an infix `xor()` operator.
+8. __[Q]{.Q}__: Create an infix `xor()` operator.
     
-   __<span style="color:green">A</span>__: We could create an infix `%xor%` like this:
+   __[A]{.solved}__: We could create an infix `%xor%` like this:
 
     ```{r}
     `%xor%` <- function(a, b) {
@@ -548,9 +548,9 @@ for functional programming (lapply, purrr) -->
     FALSE %xor% TRUE
     ```
 
-9. __<span style="color:red">Q</span>__: Create infix versions of the set functions `intersect()`, `union()`, and`setdiff()`. You might call them `%n%`, `%u%`, and `%/%` to match conventions from mathematics.
+9. __[Q]{.Q}__: Create infix versions of the set functions `intersect()`, `union()`, and`setdiff()`. You might call them `%n%`, `%u%`, and `%/%` to match conventions from mathematics.
    
-   __<span style="color:green">A</span>__: These infix operators could be defined in the following way. (`%/%` is chosen instead of `%\%`, because `\` serves as an escape character.)
+   __[A]{.solved}__: These infix operators could be defined in the following way. (`%/%` is chosen instead of `%\%`, because `\` serves as an escape character.)
    
     ```{r}
     `%n%` <- function(a, b) {

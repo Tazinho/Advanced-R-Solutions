@@ -8,17 +8,17 @@ source("common.R")
 
 ## Conditions
 
-1. __<span style="color:red">Q</span>__: What does `options(error = recover)` do? Why might you use it?
+1. __[Q]{.Q}__: What does `options(error = recover)` do? Why might you use it?
 
-   __<span style="color:green">A</span>__: In case of `options(error = recover)` `utils::recover()` will be called (without arguments) in case of an error. This will print out a list of calls which precede the error and lets the user choose to incorporate `browser()` directly in any of the regarding environments allowing a practical mode for debugging.
+   __[A]{.solved}__: In case of `options(error = recover)` `utils::recover()` will be called (without arguments) in case of an error. This will print out a list of calls which precede the error and lets the user choose to incorporate `browser()` directly in any of the regarding environments allowing a practical mode for debugging.
 
-2. __<span style="color:red">Q</span>__: What does `options(error = quote(dump.frames(to.file = TRUE)))` do? Why might you use it?
+2. __[Q]{.Q}__: What does `options(error = quote(dump.frames(to.file = TRUE)))` do? Why might you use it?
 
-   __<span style="color:green">A</span>__: This option writes a dump of the evaluation environment where an error occurs into a file ending on `.rda`. When this option is set, R will continue to run after the first error. To stop R at the first error use `quote({dump.frames(to.file=TRUE); q()})`. These options are especially useful for debugging non-interactive R scripts afterwards ("post mortem debugging").
+   __[A]{.solved}__: This option writes a dump of the evaluation environment where an error occurs into a file ending on `.rda`. When this option is set, R will continue to run after the first error. To stop R at the first error use `quote({dump.frames(to.file=TRUE); q()})`. These options are especially useful for debugging non-interactive R scripts afterwards ("post mortem debugging").
 
 ## Expressions (new)
 
-1.  __<span style="color:red">Q</span>__: `base::alist()` is useful for creating pairlists to be used for function arguments:
+1.  __[Q]{.Q}__: `base::alist()` is useful for creating pairlists to be used for function arguments:
     
     ```{r}
     foo <- function() {}
@@ -28,7 +28,7 @@ source("common.R")
     
     What makes `alist()` special compared to `list()`?
     
-    __<span style="color:green">A</span>__: From `?alist`:
+    __[A]{.solved}__: From `?alist`:
     
     > alist handles its arguments as if they described function arguments. So the values are not evaluated, and tagged arguments with no value are allowed whereas list simply ignores them. alist is most often used in conjunction with formals.
 
@@ -36,7 +36,7 @@ source("common.R")
 
 ### My first functional: `lapply()`
 
-1.  __<span style="color:red">Q</span>__: Why are the following two invocations of `lapply()` equivalent?
+1.  __[Q]{.Q}__: Why are the following two invocations of `lapply()` equivalent?
 
     ```{r, eval = FALSE}
     trims <- c(0, 0.1, 0.2, 0.5)
@@ -46,11 +46,11 @@ source("common.R")
     lapply(trims, mean, x = x)
     ```
     
-    __<span style="color:green">A</span>__: In the first statement each element of `trims` is explicitly supplied to `mean()`'s second argument. In the latter statement this happens via 
+    __[A]{.solved}__: In the first statement each element of `trims` is explicitly supplied to `mean()`'s second argument. In the latter statement this happens via
 positional matching, since `mean()`'s first argument is supplied via name
 in `lapply()`'s third argument (`...`).
 
-2.  __<span style="color:red">Q</span>__: The function below scales a vector so it falls in the range [0, 1]. How
+2.  __[Q]{.Q}__: The function below scales a vector so it falls in the range [0, 1]. How
     would you apply it to every column of a data frame? How would you apply it 
     to every numeric column in a data frame?
 
@@ -61,13 +61,13 @@ in `lapply()`'s third argument (`...`).
     }
     ```
     
-    __<span style="color:green">A</span>__: Since this function needs numeric input, one can check this via an if clause. If one also wants to return non-numeric input columns, these can be supplied to the `else` argument of the `if()` "function":
+    __[A]{.solved}__: Since this function needs numeric input, one can check this via an if clause. If one also wants to return non-numeric input columns, these can be supplied to the `else` argument of the `if()` "function":
     
     ```{r, eval = FALSE}
     data.frame(lapply(iris, function(x) if (is.numeric(x)) scale01(x) else x))
     ```
 
-3.  __<span style="color:red">Q</span>__: Use both for loops and `lapply()` to fit linear models to the
+3.  __[Q]{.Q}__: Use both for loops and `lapply()` to fit linear models to the
     `mtcars` using the formulas stored in this list:
 
     ```{r}
@@ -79,7 +79,7 @@ in `lapply()`'s third argument (`...`).
     )
     ```
     
-    __<span style="color:green">A</span>__: Like in the first exercise, we can create two `lapply()` versions:
+    __[A]{.solved}__: Like in the first exercise, we can create two `lapply()` versions:
     
     ```{r, eval = TRUE}
     # lapply (2 versions)
@@ -95,7 +95,7 @@ in `lapply()`'s third argument (`...`).
     
     Note that all versions return the same content, but they won't be identical, since the values of the "call" element will differ between each version.
     
-4.  __<span style="color:red">Q</span>__: Fit the model `mpg ~ disp` to each of the bootstrap replicates of `mtcars` 
+4.  __[Q]{.Q}__: Fit the model `mpg ~ disp` to each of the bootstrap replicates of `mtcars`
     in the list below by using a for loop and `lapply()`. Can you do it 
     without an anonymous function?
 
@@ -106,7 +106,7 @@ in `lapply()`'s third argument (`...`).
     })
     ```
     
-    __<span style="color:green">A</span>__: 
+    __[A]{.solved}__:
     
     ```{r, eval = TRUE}
     # lapply without anonymous function
@@ -119,14 +119,14 @@ in `lapply()`'s third argument (`...`).
     }
     ```
 
-5.  __<span style="color:red">Q</span>__: For each model in the previous two exercises, extract $R^2$ using the
+5.  __[Q]{.Q}__: For each model in the previous two exercises, extract $R^2$ using the
     function below.
 
     ```{r, eval = TRUE}
     rsq <- function(mod) summary(mod)$r.squared
     ```
     
-    __<span style="color:green">A</span>__: For the models in exercise 3:
+    __[A]{.solved}__: For the models in exercise 3:
     
     ```{r, eval = TRUE}
     sapply(la1, rsq)
@@ -143,14 +143,14 @@ in `lapply()`'s third argument (`...`).
 
 ### For loops functionals: friends of lapply():
 
-1.  __<span style="color:red">Q</span>__: Use `vapply()` to:
+1.  __[Q]{.Q}__: Use `vapply()` to:
     
     a) Compute the standard deviation of every column in a numeric data frame.
     
     a) Compute the standard deviation of every numeric column in a mixed data
        frame. (Hint: you'll need to use `vapply()` twice.)
        
-    __<span style="color:green">A</span>__: As a numeric `data.frame` we choose `cars`:
+    __[A]{.solved}__: As a numeric `data.frame` we choose `cars`:
     
     ```{r, eval = FALSE}
     vapply(cars, sd, numeric(1))
@@ -164,10 +164,10 @@ in `lapply()`'s third argument (`...`).
            numeric(1))
     ```
 
-2.  __<span style="color:red">Q</span>__: Why is using `sapply()` to get the `class()` of each element in 
+2.  __[Q]{.Q}__: Why is using `sapply()` to get the `class()` of each element in
     a data frame dangerous?
     
-    __<span style="color:green">A</span>__: Columns of data.frames might have more than one class, so the class of `sapply()`'s output may differ from time to time (silently). If ...
+    __[A]{.solved}__: Columns of data.frames might have more than one class, so the class of `sapply()`'s output may differ from time to time (silently). If ...
     
     * all columns have one class: `sapply()` returns a character vector
     * one column has more classes than the others: `sapply()` returns a list
@@ -186,7 +186,7 @@ in `lapply()`'s third argument (`...`).
     
     Note that this case often appears, wile working with the POSIXt types, POSIXct and POSIXlt.
     
-3.  __<span style="color:red">Q</span>__: The following code simulates the performance of a t-test for non-normal 
+3.  __[Q]{.Q}__: The following code simulates the performance of a t-test for non-normal
     data. Use `sapply()` and an anonymous function to extract the p-value from 
     every trial.
 
@@ -200,7 +200,7 @@ in `lapply()`'s third argument (`...`).
     
     Extra challenge: get rid of the anonymous function by using `[[` directly.
     
-    __<span style="color:green">A</span>__: 
+    __[A]{.solved}__:
     
     ```{r, eval = FALSE}
     # anonymous function:
@@ -209,10 +209,10 @@ in `lapply()`'s third argument (`...`).
     sapply(trials, "[[", "p.value")
     ```
 
-4.  __<span style="color:red">Q</span>__: What does `replicate()` do? What sort of for loop does it eliminate? Why 
+4.  __[Q]{.Q}__: What does `replicate()` do? What sort of for loop does it eliminate? Why
     do its arguments differ from `lapply()` and friends?
     
-    __<span style="color:green">A</span>__: As stated in `?replicate`:
+    __[A]{.solved}__: As stated in `?replicate`:
     
     > replicate is a wrapper for the common use of sapply for repeated evaluation of an expression (which will usually involve random number generation).
     
@@ -224,10 +224,10 @@ in `lapply()`'s third argument (`...`).
     
     Like `sapply()` `replicate()` eliminates a for loop. As explained for `Map()` in the textbook, also every `replicate()` could have been written via `lapply()`. But using `replicate()` is more concise, and more clearly indicates what you're trying to do.
 
-5.  __<span style="color:red">Q</span>__: Implement a version of `lapply()` that supplies `FUN` with both the name 
+5.  __[Q]{.Q}__: Implement a version of `lapply()` that supplies `FUN` with both the name
     and the value of each component.
     
-    __<span style="color:green">A</span>__:
+    __[A]{.solved}__:
     
     ```{r, eval = TRUE}
     lapply_nms <- function(X, FUN, ...){
@@ -236,12 +236,12 @@ in `lapply()`'s third argument (`...`).
     lapply_nms(iris, function(x, y) c(class(x), y))
     ```
 
-6.  __<span style="color:red">Q</span>__: Implement a combination of `Map()` and `vapply()` to create an `lapply()`
+6.  __[Q]{.Q}__: Implement a combination of `Map()` and `vapply()` to create an `lapply()`
     variant that iterates in parallel over all of its inputs and stores its 
     outputs in a vector (or a matrix). What arguments should the function 
     take?
     
-    __<span style="color:green">A</span>__ As we understand this exercise, it is about working with a list of lists, like in the following example:
+    __[A]{.solved}__ As we understand this exercise, it is about working with a list of lists, like in the following example:
     
     ```{r}
     testlist <- list(iris, mtcars, cars)
@@ -260,15 +260,15 @@ in `lapply()`'s third argument (`...`).
     lmapply(testlist, mean, numeric(1))
     ```
 
-7.  __<span style="color:red">Q</span>__: Implement `mcsapply()`, a multi-core version of `sapply()`. Can you
+7.  __[Q]{.Q}__: Implement `mcsapply()`, a multi-core version of `sapply()`. Can you
     implement `mcvapply()`, a parallel version of `vapply()`? Why or why not?
 
 ### Manipulating matrices and data frames
 
-1.  __<span style="color:red">Q</span>__: How does `apply()` arrange the output? Read the documentation and perform 
+1.  __[Q]{.Q}__: How does `apply()` arrange the output? Read the documentation and perform
     some experiments.
     
-    __<span style="color:green">A</span>__:
+    __[A]{.solved}__:
     
     `apply()` arranges its output columns (or list elements) according to the order of the margin.
 The rows are ordered by the other dimensions, starting with the "last" dimension
@@ -319,10 +319,10 @@ of the input object. What this means should become clear by looking at the three
     apply(arr4, 4, head, 81) # sorts by time, col, row
     ```
 
-2.  __<span style="color:red">Q</span>__: There's no equivalent to `split()` + `vapply()`. Should there be? When 
+2.  __[Q]{.Q}__: There's no equivalent to `split()` + `vapply()`. Should there be? When
     would it be useful? Implement one yourself.
     
-    __<span style="color:green">A</span>__: We can modify the `tapply2()` approach from the book, where `split()` and `sapply()` were combined:
+    __[A]{.solved}__: We can modify the `tapply2()` approach from the book, where `split()` and `sapply()` were combined:
     
     ```{r, eval = FALSE}
     v_tapply <- function(x, group, f, FUN.VALUE, ..., USE.NAMES = TRUE) {
@@ -333,10 +333,10 @@ of the input object. What this means should become clear by looking at the three
     
     `tapply()` has a `SIMPLIFY` argument. When you set it to `FALSE`, `tapply()` will always return a list. It is easy to create cases where the length and the types/classes of the list elements vary depending on the input. The `vapply()` version could be useful, if you want to control the structure of the output to get an error according to some logic of a specific usecase or you want typestable output to build up other functions on top of it.
     
-3.  __<span style="color:red">Q</span>__: Implement a pure R version of `split()`. (Hint: use `unique()` and 
+3.  __[Q]{.Q}__: Implement a pure R version of `split()`. (Hint: use `unique()` and
     subsetting.) Can you do it without a for loop?
     
-    __<span style="color:green">A</span>__: 
+    __[A]{.solved}__:
     
     ```{r, eval = FALSE}
     split2 <- function(x, f, drop = FALSE, ...){
@@ -358,9 +358,9 @@ of the input object. What this means should become clear by looking at the three
     }
     ```
 
-4.  __<span style="color:red">Q</span>__: What other types of input and output are missing? Brainstorm before you look up some answers in the [plyr paper](http://www.jstatsoft.org/v40/i01/).
+4.  __[Q]{.Q}__: What other types of input and output are missing? Brainstorm before you look up some answers in the [plyr paper](http://www.jstatsoft.org/v40/i01/).
     
-    __<span style="color:green">A</span>__: From the suggested plyr paper, we can extract a lot of possible combinations and list them up on a table. Sean C. Anderson already has done this based on a presentation from Hadley Wickham and provided the following result [here](http://seananderson.ca/2013/12/01/plyr.html). 
+    __[A]{.solved}__: From the suggested plyr paper, we can extract a lot of possible combinations and list them up on a table. Sean C. Anderson already has done this based on a presentation from Hadley Wickham and provided the following result [here](http://seananderson.ca/2013/12/01/plyr.html).
     
     | object type        | array       | data frame   | list        | nothing   |
     |--------------------|-------------|--------------|-------------|-----------|
@@ -374,15 +374,15 @@ of the input object. What this means should become clear by looking at the three
     
 ### Manipulating lists
 
-1.  __<span style="color:red">Q</span>__: Why isn't `is.na()` a predicate function? What base R function is closest
+1.  __[Q]{.Q}__: Why isn't `is.na()` a predicate function? What base R function is closest
     to being a predicate version of `is.na()`?
     
-    __<span style="color:green">A</span>__: Because a predicate function always returns `TRUE` or `FALSE`. `is.na(NULL)` returns `logical(0)`, which excludes it from being a predicate function. The closest in base that we are aware of is `anyNA()`, if one applies it elementwise.
+    __[A]{.solved}__: Because a predicate function always returns `TRUE` or `FALSE`. `is.na(NULL)` returns `logical(0)`, which excludes it from being a predicate function. The closest in base that we are aware of is `anyNA()`, if one applies it elementwise.
 
-2.  __<span style="color:red">Q</span>__: Use `Filter()` and `vapply()` to create a function that applies a summary 
+2.  __[Q]{.Q}__: Use `Filter()` and `vapply()` to create a function that applies a summary
     statistic to every numeric column in a data frame.
     
-    __<span style="color:green">A</span>__: 
+    __[A]{.solved}__:
     
     ```{r, eval = FALSE}
     vapply_num <- function(X, FUN, FUN.VALUE){
@@ -390,10 +390,10 @@ of the input object. What this means should become clear by looking at the three
     }
     ```
 
-3.  __<span style="color:red">Q</span>__: What's the relationship between `which()` and `Position()`? What's
+3.  __[Q]{.Q}__: What's the relationship between `which()` and `Position()`? What's
     the relationship between `where()` and `Filter()`?
     
-    __<span style="color:green">A</span>__: `which()` returns all indices of true entries from a logical vector. `Position()` returns just the first (default) or the last integer index of all true entries that occur by applying a predicate function on a vector. So the default relation is `Position(f, x) <=> min(which(f(x)))`.
+    __[A]{.solved}__: `which()` returns all indices of true entries from a logical vector. `Position()` returns just the first (default) or the last integer index of all true entries that occur by applying a predicate function on a vector. So the default relation is `Position(f, x) <=> min(which(f(x)))`.
     
     `where()`, defined in the book as:
     
@@ -407,11 +407,11 @@ of the input object. What this means should become clear by looking at the three
 the supplied predicate function returns `TRUE`. So the relation is
 `Filter(f, x) <=> x[where(f, x)]`.
 
-4.  __<span style="color:red">Q</span>__: Implement `Any()`, a function that takes a list and a predicate function, 
+4.  __[Q]{.Q}__: Implement `Any()`, a function that takes a list and a predicate function,
     and returns `TRUE` if the predicate function returns `TRUE` for any of 
     the inputs. Implement `All()` similarly.
     
-    __<span style="color:green">A</span>__: `Any()`:
+    __[A]{.solved}__: `Any()`:
     
     ```{r, eval = FALSE}
     Any <- function(l, pred){
@@ -439,12 +439,12 @@ the supplied predicate function returns `TRUE`. So the relation is
     }
     ```
 
-5.  __<span style="color:red">Q</span>__: Implement the `span()` function from Haskell: given a list `x` and a 
+5.  __[Q]{.Q}__: Implement the `span()` function from Haskell: given a list `x` and a
     predicate function `f`, `span` returns the location of the longest 
     sequential run of elements where the predicate is true. (Hint: you 
     might find `rle()` helpful.)
     
-    __<span style="color:green">A</span>__: Our `span_r()` function returns the first index of     the longest sequential run of elements where the predicate is true. In case of more than one longest sequenital, more than one first_index is returned.
+    __[A]{.solved}__: Our `span_r()` function returns the first index of     the longest sequential run of elements where the predicate is true. In case of more than one longest sequenital, more than one first_index is returned.
     
     ```{r, eval = FALSE}
     span_r <- function(l, pred){
@@ -481,11 +481,11 @@ the supplied predicate function returns `TRUE`. So the relation is
     
 ### List of functions
 
-1.  __<span style="color:red">Q</span>__: Implement a summary function that works like `base::summary()`, but uses a 
+1.  __[Q]{.Q}__: Implement a summary function that works like `base::summary()`, but uses a
     list of functions. Modify the function so it returns a closure, making it 
     possible to use it as a function factory.
 
-1.  __<span style="color:red">Q</span>__: Which of the following commands is equivalent to `with(x, f(z))`?
+1.  __[Q]{.Q}__: Which of the following commands is equivalent to `with(x, f(z))`?
 
     (a) `x$f(x$z)`.
     (b) `f(x$z)`.
@@ -495,13 +495,13 @@ the supplied predicate function returns `TRUE`. So the relation is
 
 ### Mathematical functionals
 
-1.  __<span style="color:red">Q</span>__: Implement `arg_max()`. It should take a function and a vector of inputs, 
+1.  __[Q]{.Q}__: Implement `arg_max()`. It should take a function and a vector of inputs,
     and return the elements of the input where the function returns the highest 
     value. For example, `arg_max(-10:5, function(x) x ^ 2)` should return -10.
     `arg_max(-5:5, function(x) x ^ 2)` should return `c(-5, 5)`.
     Also implement the matching `arg_min()` function.
     
-    __<span style="color:green">A</span>__: `arg_max()`:
+    __[A]{.solved}__: `arg_max()`:
     
     ```{r, eval = FALSE}
     arg_max <- function(x, f){
@@ -517,13 +517,13 @@ the supplied predicate function returns `TRUE`. So the relation is
     }
     ```
 
-2.  __<span style="color:red">Q</span>__: Challenge: read about the 
+2.  __[Q]{.Q}__: Challenge: read about the
     [fixed point algorithm](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-12.html#%25_idx_1096). 
     Complete the exercises using R.
 
 ### A family of functions
 
-1.  __<span style="color:red">Q</span>__: Implement `smaller` and `larger` functions that, given two inputs, return 
+1.  __[Q]{.Q}__: Implement `smaller` and `larger` functions that, given two inputs, return
     either the smaller or the larger value. Implement `na.rm = TRUE`: what 
     should the identity be? (Hint: 
     `smaller(x, smaller(NA, NA, na.rm = TRUE), na.rm = TRUE)` must be `x`, so 
@@ -531,7 +531,7 @@ the supplied predicate function returns `TRUE`. So the relation is
     Use `smaller` and `larger` to implement equivalents of `min()`, `max()`,
     `pmin()`, `pmax()`, and new functions `row_min()` and `row_max()`.
     
-    __<span style="color:green">A</span>__: We can do almost everything as shown in the case study in the textbook. First we define the functions `smaller_()` and `larger_()`. We use the underscore suffix, to built up non suffixed versions on top, which will include the `na.rm` parameter. In contrast to the `add()` example from the book, we change two things at this step. We won't include errorchecking, since this is done later at the top level and we return `NA_integer_` if any of the arguments is `NA` (this is important, if na.rm is set to `FALSE` and wasn't needed by the `add()` example, since `+` already returns `NA` in this case.)
+    __[A]{.solved}__: We can do almost everything as shown in the case study in the textbook. First we define the functions `smaller_()` and `larger_()`. We use the underscore suffix, to built up non suffixed versions on top, which will include the `na.rm` parameter. In contrast to the `add()` example from the book, we change two things at this step. We won't include errorchecking, since this is done later at the top level and we return `NA_integer_` if any of the arguments is `NA` (this is important, if na.rm is set to `FALSE` and wasn't needed by the `add()` example, since `+` already returns `NA` in this case.)
     
     ```{r}
     smaller_ <- function(x, y){
@@ -652,7 +652,7 @@ the supplied predicate function returns `TRUE`. So the relation is
     }
     ```
 
-2.  __<span style="color:red">Q</span>__: Create a table that has _and_, _or_, _add_, _multiply_, _smaller_, and 
+2.  __[Q]{.Q}__: Create a table that has _and_, _or_, _add_, _multiply_, _smaller_, and
     _larger_ in the columns and _binary operator_, _reducing variant_, 
     _vectorised variant_, and _array variants_ in the rows.
 
@@ -664,7 +664,7 @@ the supplied predicate function returns `TRUE`. So the relation is
 
     a) Complete the matrix by implementing any missing functions.
     
-    __<span style="color:green">A</span>__ In the following table we can see the requested base R functions, that we are aware of:
+    __[A]{.solved}__ In the following table we can see the requested base R functions, that we are aware of:
 
     |            | and      | or       | add      | multiply | smaller  | larger   |
     |------------|----------|----------|----------|----------|----------|----------|
@@ -717,12 +717,12 @@ the supplied predicate function returns `TRUE`. So the relation is
     
     The other point are the naming conventions. We think they are clear, but it could be useful to provide the missing binary operators and name them for example `++`, `**`, `<>`, `><` to be consistent.
 
-3.  __<span style="color:red">Q</span>__: How does `paste()` fit into this structure? What is the scalar binary 
+3.  __[Q]{.Q}__: How does `paste()` fit into this structure? What is the scalar binary
     function that underlies `paste()`? What are the `sep` and `collapse` 
     arguments to `paste()` equivalent to? Are there any `paste` variants 
     that don't have existing R implementations?
     
-    __<span style="color:green">A</span>__ `paste()` behaves like a mix. If you supply only length one arguments, it will behave like a reducing function, i.e. :
+    __[A]{.solved}__ `paste()` behaves like a mix. If you supply only length one arguments, it will behave like a reducing function, i.e. :
     
     ```{r}
     paste("a", "b", sep = "")
@@ -799,9 +799,9 @@ the supplied predicate function returns `TRUE`. So the relation is
 
 ## S3
 
-1. __<span style="color:red">Q</span>__: The most important S3 objects in base R are factors, data frames, difftimes, and date/times (Dates, POSIXct, POSIXlt). You've already seen the attributes and base type that factors are built on. What base types and attributes are the others built on?
+1. __[Q]{.Q}__: The most important S3 objects in base R are factors, data frames, difftimes, and date/times (Dates, POSIXct, POSIXlt). You've already seen the attributes and base type that factors are built on. What base types and attributes are the others built on?
     
-   __<span style="color:orange">A</span>__: TODO: Add answer for difftime.
+   __[A]{.started}__: TODO: Add answer for difftime.
     
    **data frame:** Data frames are build up on (named) lists. Together with the `row.names` attribute and after setting the class to "data.frame", we get a classical data frame
     
@@ -852,15 +852,15 @@ the supplied predicate function returns `TRUE`. So the relation is
     identical(POSIXlt_build, POSIXlt_classic)
     ```
 
-1.  __<span style="color:red">Q</span>__: Draw a Venn diagram illustrating the relationships between functions, generics, and methods.
+1.  __[Q]{.Q}__: Draw a Venn diagram illustrating the relationships between functions, generics, and methods.
     
-    __<span style="color:orange">A</span>__: Funtions don't have to be generics or methods, but both the latter are functions. It is also possible that a function is both, a method and a generic, at the same time, which seems to be relatively awkward, so that also the author of the textbook doesn't recommend it, see `?pryr::ftype`
+    __[A]{.started}__: Funtions don't have to be generics or methods, but both the latter are functions. It is also possible that a function is both, a method and a generic, at the same time, which seems to be relatively awkward, so that also the author of the textbook doesn't recommend it, see `?pryr::ftype`
 
     > This function figures out whether the input function is a regular/primitive/internal function, a internal/S3/S4 generic, or a S3/S4/RC method. This is function is slightly simplified as it's possible for a method from one class to be a generic for another class, but that seems like such a bad idea that hopefully no one has done it.
 
-2.  __<span style="color:red">Q</span>__: Write a constructor for `difftime` objects. What base type are they built on? What attributes do they use? You'll need to consult the documentation, read some code, and perform some experiments.
+2.  __[Q]{.Q}__: Write a constructor for `difftime` objects. What base type are they built on? What attributes do they use? You'll need to consult the documentation, read some code, and perform some experiments.
     
-    __<span style="color:green">A</span>__: Our constructor should be named `new_class_name`, have one argument for its base type and each attribute and check the base types of these arguments as well. 
+    __[A]{.solved}__: Our constructor should be named `new_class_name`, have one argument for its base type and each attribute and check the base types of these arguments as well.
     
     ```{r}
     new_difftime <- function(x, units = "auto") {
@@ -917,7 +917,7 @@ the supplied predicate function returns `TRUE`. So the relation is
     ```
 
 ### Inheritance
-1. __<span style="color:red">Q</span>__: The `ordered` class is a subclass of `factor`, but it's implemented in a very ad hoc way in base R. Implement it in a principled way by building a constructor and providing `vec_restore()` method.
+1. __[Q]{.Q}__: The `ordered` class is a subclass of `factor`, but it's implemented in a very ad hoc way in base R. Implement it in a principled way by building a constructor and providing `vec_restore()` method.
     
     ```{r}
     f1 <- factor("a", c("a", "b"))
@@ -925,7 +925,7 @@ the supplied predicate function returns `TRUE`. So the relation is
     as.ordered(f1) # loses levels
     ```
 
-   __<span style="color:orange">A</span>__: TODO: the olad exercise text ended on "an `as_ordered` generic". Check the answer if it needs to be updated.
+   __[A]{.started}__: TODO: the olad exercise text ended on "an `as_ordered` generic". Check the answer if it needs to be updated.
     
    ordered is a subclass of factor, so we need to do the following
     
@@ -1036,7 +1036,7 @@ the supplied predicate function returns `TRUE`. So the relation is
 ## S4
 
 ### Generics and methods
-2. __<span style="color:red">Q</span>__: What's the difference between the generics generated by these two calls?
+2. __[Q]{.Q}__: What's the difference between the generics generated by these two calls?
     
     ```{r, eval = FALSE}
     setGeneric("myGeneric", function(x) standardGeneric("myGeneric"))
@@ -1045,7 +1045,7 @@ the supplied predicate function returns `TRUE`. So the relation is
     })
     ```
     
-   __<span style="color:green">A</span>__: The first call defines a standard generic and the second one creates a nonstandard generic. One can confirm this directly whlie printing (showing in S4 jargon) the function.
+   __[A]{.solved}__: The first call defines a standard generic and the second one creates a nonstandard generic. One can confirm this directly whlie printing (showing in S4 jargon) the function.
     
     ```{r, eval = TRUE}
     setGeneric("myGeneric", function(x) standardGeneric("myGeneric"))
@@ -1061,9 +1061,9 @@ the supplied predicate function returns `TRUE`. So the relation is
 
 ### Abstract syntax trees
 
-1. __<span style="color:red">Q</span>__: Use `ast()` and experimentation to figure out the three arguments to an `if()` call. What would you call them? Which arguments are required and which are optional?
+1. __[Q]{.Q}__: Use `ast()` and experimentation to figure out the three arguments to an `if()` call. What would you call them? Which arguments are required and which are optional?
     
-   __<span style="color:green">A</span>__: You can write an `if()` statement in several ways: with or without `else`, formatted or in one line and also in prefix notation. Here are several versions focussing on the possibility of leaving out curly brackets.
+   __[A]{.solved}__: You can write an `if()` statement in several ways: with or without `else`, formatted or in one line and also in prefix notation. Here are several versions focussing on the possibility of leaving out curly brackets.
     
     ```{r}
     lobstr::ast(if (TRUE) {} else {})
@@ -1075,9 +1075,9 @@ the supplied predicate function returns `TRUE`. So the relation is
     
    The *condition* is always required. If the *condition* is `TRUE`, also the *conclusion* is required. If the *condition* is `FALSE` and `if()` is called in combination with `else()`, then also the *alternative* is required.
     
-2. __<span style="color:red">Q</span>__: What are the arguments to the `for()` and `while()` calls? 
+2. __[Q]{.Q}__: What are the arguments to the `for()` and `while()` calls?
 
-   __<span style="color:green">A</span>__: `for()` requires an *index* (called `var` in the docs), a *sequence* and an *expression*, for example
+   __[A]{.solved}__: `for()` requires an *index* (called `var` in the docs), a *sequence* and an *expression*, for example
     
     ```{r}
     `for`(i, 1:3, {print(i)})
@@ -1093,10 +1093,10 @@ the supplied predicate function returns `TRUE`. So the relation is
     
    Note that a minimal expression can consist of `{` only.
     
-3. __<span style="color:red">Q</span>__: Two arithmetic operators can be used in both prefix and infix style.
+3. __[Q]{.Q}__: Two arithmetic operators can be used in both prefix and infix style.
    What are they?
     
-   __<span style="color:green">A</span>__: I am not sure how this is meant to be. Theoretically every arithmetic operator can be written in prefix notation via backticks. On the other hand, `+` and `-` seem to be the only ones, which can be written in infix notation without backticks.
+   __[A]{.solved}__: I am not sure how this is meant to be. Theoretically every arithmetic operator can be written in prefix notation via backticks. On the other hand, `+` and `-` seem to be the only ones, which can be written in infix notation without backticks.
     
     ```{r}
     x <- 1
@@ -1131,15 +1131,15 @@ the supplied predicate function returns `TRUE`. So the relation is
 
 ## Quasiquotation (new)
 
-1.  __<span style="color:red">Q</span>__: Why does `as.Date.default()` use `substitute()` and `deparse()`? Why does `pairwise.t.test()` use them? Read the source code.
+1.  __[Q]{.Q}__: Why does `as.Date.default()` use `substitute()` and `deparse()`? Why does `pairwise.t.test()` use them? Read the source code.
 
-    __<span style="color:green">A</span>__: `as.Date.default()` uses them to convert unexpected input expressions (neither dates, nor `NAs`) into a character string and return it within an error message.
+    __[A]{.solved}__: `as.Date.default()` uses them to convert unexpected input expressions (neither dates, nor `NAs`) into a character string and return it within an error message.
     
     `pairwise.t.test()` uses them to convert the names of its datainputs (response vector `x` and grouping factor `g`) into character strings to format these further into a part of the desired output.
 
-1.  __<span style="color:red">Q</span>__: `pairwise.t.test()` assumes that `deparse()` always returns a length one character vector. Can you construct an input that violates this expectation? What happens? 
+1.  __[Q]{.Q}__: `pairwise.t.test()` assumes that `deparse()` always returns a length one character vector. Can you construct an input that violates this expectation? What happens?
 
-    __<span style="color:green">A</span>__: We can pass an expression to one of `pairwise.t.test()`'s data input arguments, which exceeds the default cutoff width in `deparse()`. The expression will be split into a character vector of length greater 1. The deparsed data inputs are directly pasted (read the source code!) with "and" as separator and the result is just used to be displayed in the output. Just the data.name output will change (it will include more than one "and").
+    __[A]{.solved}__: We can pass an expression to one of `pairwise.t.test()`'s data input arguments, which exceeds the default cutoff width in `deparse()`. The expression will be split into a character vector of length greater 1. The deparsed data inputs are directly pasted (read the source code!) with "and" as separator and the result is just used to be displayed in the output. Just the data.name output will change (it will include more than one "and").
     
     ```{r}
     d=1
@@ -1150,7 +1150,7 @@ the supplied predicate function returns `TRUE`. So the relation is
 
 ### Behavioural FOs
 
-2.  __<span style="color:red">Q</span>__: What does the following function do? What would be a good name for it?
+2.  __[Q]{.Q}__: What does the following function do? What would be a good name for it?
 
     ```{r}
     f <- function(g) {
@@ -1168,18 +1168,18 @@ the supplied predicate function returns `TRUE`. So the relation is
     runif2(10)
     ```
     
-    __<span style="color:green">A</span>__: It returns a new version of the inputfunction. That version will always return the result of it's first run (in case this not `NULL`), no matter how the input changes. Good names could be `first_run()` or `initial_return()`. 
+    __[A]{.solved}__: It returns a new version of the inputfunction. That version will always return the result of it's first run (in case this not `NULL`), no matter how the input changes. Good names could be `first_run()` or `initial_return()`.
 
-3.  __<span style="color:red">Q</span>__: Modify `delay_by()` so that instead of delaying by a fixed amount of time, 
+3.  __[Q]{.Q}__: Modify `delay_by()` so that instead of delaying by a fixed amount of time,
     it ensures that a certain amount of time has elapsed since the function 
     was last called. That is, if you called 
     `g <- delay_by(1, f); g(); Sys.sleep(2); g()` there shouldn't be an 
     extra delay.
     
-    __<span style="color:green">A</span>__:
-4.  __<span style="color:red">Q</span>__: Write `wait_until()` which delays execution until a specific time.
+    __[A]{.solved}__:
+4.  __[Q]{.Q}__: Write `wait_until()` which delays execution until a specific time.
 
-    __<span style="color:green">A</span>__: 
+    __[A]{.solved}__:
 
     ```{r, eval = FALSE}
     wait_until <- function(time, f) {
@@ -1197,7 +1197,7 @@ the supplied predicate function returns `TRUE`. So the relation is
     proc.time() - ptm
     ```
 
-5.  __<span style="color:red">Q</span>__: There are three places we could have added a memoise call: why did we 
+5.  __[Q]{.Q}__: There are three places we could have added a memoise call: why did we
     choose the one we did?
 
     ```{r, eval = FALSE}
@@ -1206,7 +1206,7 @@ the supplied predicate function returns `TRUE`. So the relation is
     download <- dot_every(10, delay_by(1, memoise(download_file)))
     ```
     
-    __<span style="color:green">A</span>__: The second was chosen. It's easy to see why, if we eliminate the other two options:
+    __[A]{.solved}__: The second was chosen. It's easy to see why, if we eliminate the other two options:
     
     * The first version only prints a dot at every tenth `download()` call with a new input.
     This is because `dot_every()` is inside of `memoise()` and the counter created by
@@ -1215,10 +1215,10 @@ the supplied predicate function returns `TRUE`. So the relation is
     * The third version takes one second for every call. Even if we already know the result and
     don't download anything again.
     
-6.  __<span style="color:red">Q</span>__: Why is the `remember()` function inefficient? How could you implement it 
+6.  __[Q]{.Q}__: Why is the `remember()` function inefficient? How could you implement it
     in more efficient way?
 
-7.  __<span style="color:red">Q</span>__: Why does the following code, from 
+7.  __[Q]{.Q}__: Why does the following code, from
     [stackoverflow](http://stackoverflow.com/questions/8440675), not do what you expect?
 
     ```{r}
@@ -1234,7 +1234,7 @@ the supplied predicate function returns `TRUE`. So the relation is
 
     How can you modify `f` so that it works correctly?
     
-    __<span style="color:green">A</span>__: You can read in the [stackoverflow](http://stackoverflow.com/questions/8440675) link that the question arose, because the original return of 
+    __[A]{.solved}__: You can read in the [stackoverflow](http://stackoverflow.com/questions/8440675) link that the question arose, because the original return of
     `fs[[1]](3)` was `4`, which is due to lazy evaluation and could be solved by two users via `force()`:
     
     ```{r, eval = FALSE}
@@ -1269,10 +1269,10 @@ the supplied predicate function returns `TRUE`. So the relation is
     
 ### Output FOs
 
-1.  __<span style="color:red">Q</span>__: Create a `negative()` FO that flips the sign of the output of the 
+1.  __[Q]{.Q}__: Create a `negative()` FO that flips the sign of the output of the
     function to which it is applied.
     
-    __<span style="color:green">A</span>__: 
+    __[A]{.solved}__:
     
     ```{r, eval = FALSE}
     negative <- function(f){
@@ -1283,12 +1283,12 @@ the supplied predicate function returns `TRUE`. So the relation is
     }
     ```
 
-2.  __<span style="color:red">Q</span>__: The `evaluate` package makes it easy to capture all the outputs (results, 
+2.  __[Q]{.Q}__: The `evaluate` package makes it easy to capture all the outputs (results,
     text, messages, warnings, errors, and plots) from an expression. Create a 
     function like `capture_it()` that also captures the warnings and errors 
     generated by a function.
     
-    __<span style="color:green">A</span>__: One way is just to capture the output of  `tryCatch()` with identity handlers for errors and warnings:
+    __[A]{.solved}__: One way is just to capture the output of  `tryCatch()` with identity handlers for errors and warnings:
     
     ```{r, eval = TRUE}
     capture_trials <- function(f){
@@ -1312,25 +1312,25 @@ the supplied predicate function returns `TRUE`. So the relation is
     # results_detailed
     ```
 
-3.  __<span style="color:red">Q</span>__: Create a FO that tracks files created or deleted in the working directory 
+3.  __[Q]{.Q}__: Create a FO that tracks files created or deleted in the working directory
     (Hint: use `dir()` and `setdiff()`.) What other global effects of 
     functions might you want to track?
     
-    __<span style="color:green">A</span>__:
+    __[A]{.solved}__:
 
 ### Input FOs
 
-1.  __<span style="color:red">Q</span>__: Our previous `download()` function only downloads a single file. How can 
+1.  __[Q]{.Q}__: Our previous `download()` function only downloads a single file. How can
     you use `partial()` and `lapply()` to create a function that downloads 
     multiple files at once? What are the pros and cons of using `partial()` vs. 
     writing a function by hand?
 
-2.  __<span style="color:red">Q</span>__: Read the source code for `plyr::colwise()`. How does the code work? What 
+2.  __[Q]{.Q}__: Read the source code for `plyr::colwise()`. How does the code work? What
     are `colwise()`'s three main tasks? How could you make `colwise()` simpler 
     by implementing each task as a function operator? (Hint: think about 
     `partial()`.)
     
-    __<span style="color:orange">A</span>__: We describe how it works by commenting the source code:
+    __[A]{.started}__: We describe how it works by commenting the source code:
     
     ```{r, eval = FALSE}
     function (.fun, .cols = true, ...) 
@@ -1377,11 +1377,11 @@ the supplied predicate function returns `TRUE`. So the relation is
     <environment: namespace:plyr>
     ```
 
-3.  __<span style="color:red">Q</span>__: Write FOs that convert a function to return a matrix instead of a data 
+3.  __[Q]{.Q}__: Write FOs that convert a function to return a matrix instead of a data
     frame, or a data frame instead of a matrix. If you understand S3, 
     call them `as.data.frame.function()` and `as.matrix.function()`.
     
-    __<span style="color:green">A</span>__: 
+    __[A]{.solved}__:
     
     ```{r, eval = FALSE}
     as.matrix.function <- function(f){
@@ -1399,18 +1399,18 @@ the supplied predicate function returns `TRUE`. So the relation is
     }
     ```
 
-4.  __<span style="color:red">Q</span>__: You've seen five functions that modify a function to change its output 
+4.  __[Q]{.Q}__: You've seen five functions that modify a function to change its output
     from one form to another. What are they? Draw a table of the various 
     combinations of types of outputs: what should go in the rows and what 
     should go in the columns? What function operators might you want to write 
     to fill in the missing cells? Come up with example use cases.
 
-5.  __<span style="color:red">Q</span>__: Look at all the examples of using an anonymous function to partially 
+5.  __[Q]{.Q}__: Look at all the examples of using an anonymous function to partially
     apply a function in this and the previous chapter. Replace the anonymous 
     function with `partial()`. What do you think of the result? Is it easier or 
     harder to read?
     
-    __<span style="color:green">A</span>__: The results are easy to read. Especially the `Map()` examples profit in readability:
+    __[A]{.solved}__: The results are easy to read. Especially the `Map()` examples profit in readability:
     
     ```{r}
     library(pryr)
@@ -1514,10 +1514,10 @@ the supplied predicate function returns `TRUE`. So the relation is
 
 ### Combining FOs
 
-1.  __<span style="color:red">Q</span>__: Implement your own version of `compose()` using `Reduce` and `%o%`. For 
+1.  __[Q]{.Q}__: Implement your own version of `compose()` using `Reduce` and `%o%`. For
     bonus points, do it without calling `function`.
     
-    __<span style="color:green">A</span>__: We use the definition from the textbook:
+    __[A]{.solved}__: We use the definition from the textbook:
     
     ```{r}
     compose <- function(f, g) {
@@ -1541,11 +1541,11 @@ the supplied predicate function returns `TRUE`. So the relation is
     compose_red_bonus(c(mean, length, unique))(1:10)
     ```
 
-2.  __<span style="color:red">Q</span>__: Extend `and()` and `or()` to deal with any number of input functions. Can 
+2.  __[Q]{.Q}__: Extend `and()` and `or()` to deal with any number of input functions. Can
     you do it with `Reduce()`? Can you keep them lazy (e.g., for `and()`, the 
     function returns once it sees the first `FALSE`)?
     
-    __<span style="color:green">A</span>__: We use `and()` and `or()` as defined in the textbook. They are lazy, since they are build up on `&&` and `||`. Also their reduced versions stay lazy, as we will show at the end of the code
+    __[A]{.solved}__: We use `and()` and `or()` as defined in the textbook. They are lazy, since they are build up on `&&` and `||`. Also their reduced versions stay lazy, as we will show at the end of the code
     
     ```{r}
     and <- function(f1, f2) {
@@ -1580,14 +1580,14 @@ the supplied predicate function returns `TRUE`. So the relation is
     or_red(c(is.logical, is.logical, is.character, stop))("a")
     ```
 
-3.  __<span style="color:red">Q</span>__: Implement the `xor()` binary operator. Implement it using the existing 
+3.  __[Q]{.Q}__: Implement the `xor()` binary operator. Implement it using the existing
     `xor()` function. Implement it as a combination of `and()` and `or()`. What 
     are the advantages and disadvantages of each approach? Also think about 
     what you'll call the resulting function to avoid a clash with the existing
     `xor()` function, and how you might change the names of `and()`, `not()`, 
     and `or()` to keep them consistent.
     
-    __<span style="color:orange">A</span>__: Both versions are implemented straight forward, as also the reduced versions. However, the parallel versions need a little bit more care:
+    __[A]{.started}__: Both versions are implemented straight forward, as also the reduced versions. However, the parallel versions need a little bit more care:
     
     ```{r, error = TRUE}
     xor_fb1 <- function(f1, f2){
@@ -1638,12 +1638,12 @@ the supplied predicate function returns `TRUE`. So the relation is
     xor_fb2_red(c(is.logical, is.logical, is.character, is.character))("a")
     ```
 
-4.  __<span style="color:red">Q</span>__: Above, we implemented boolean algebra for functions that return a logical 
+4.  __[Q]{.Q}__: Above, we implemented boolean algebra for functions that return a logical
     function. Implement elementary algebra (`plus()`, `minus()`, `multiply()`, 
     `divide()`, `exponentiate()`, `log()`) for functions that return numeric 
     vectors.
     
-    __<span style="color:green">A</span>__:
+    __[A]{.solved}__:
     
     ```{r, eval = FALSE}
     plus <- function(f1, f2) {
@@ -1698,10 +1698,10 @@ the supplied predicate function returns `TRUE`. So the relation is
 
 ### Data structures
 
-1. __<span style="color:red">Q</span>__: How is `rlang::maybe_missing()` implemented? Why
+1. __[Q]{.Q}__: How is `rlang::maybe_missing()` implemented? Why
 does it work?
 
-   __<span style="color:green">A</span>__: Let us take a look at the functions source code to see what's going on
+   __[A]{.solved}__: Let us take a look at the functions source code to see what's going on
     
     ```{r, eval = FALSE}
     lang::maybe_missing
@@ -1727,13 +1727,13 @@ does it work?
    
 ### Parsing and deparsing
 
-1. __<span style="color:red">Q</span>__: Why does as.Date.default() use substitute() and deparse()? Why does pairwise.t.test() use them? Read the source code.
+1. __[Q]{.Q}__: Why does as.Date.default() use substitute() and deparse()? Why does pairwise.t.test() use them? Read the source code.
 
-   __<span style="color:green">A</span>__:
+   __[A]{.solved}__:
 
 ### R's grammar
 
-1. __<span style="color:red">Q</span>__: `deparse()` produces vectors when the input is long. For example, the following call produces a vector of length two:
+1. __[Q]{.Q}__: `deparse()` produces vectors when the input is long. For example, the following call produces a vector of length two:
 
     ```{r, eval = TRUE}
     expr <- rlang::expr(g(a + b + c + d + e + f + g + h + i + j + k + l + m +
@@ -1744,7 +1744,7 @@ does it work?
 
    What do `expr_text()`, `expr_name()`, and `expr_label()` do with this input?
     
-   __<span style="color:green">A</span>__: 
+   __[A]{.solved}__:
     
    * `expr_text()` pastes the output string into one and inserts `\n` (new line identifiers) as separators
     
@@ -1763,3 +1763,428 @@ does it work?
     ```{r}
     rlang::expr_label(expr)
     ```
+
+## Quasiquotation
+
+### Old exercises Unquoting
+
+1. __[Q]{.Q}__: What does the following command return? What information is lost? Why?
+
+    ```{r, eval = FALSE}
+    expr({
+      x +              y # comment  
+    })
+    ```
+
+   __[A]{.solved}__: When we look at the captured expression, we see that the extra whitespaces and comments are lost. R ignores them when parsing an expression. They do do not need to be represented in the AST, because they do not affect the evaluation of the expression.
+    
+    ```{r}
+    library(rlang)
+    captured_expression <- expr({
+      x +              y # comment  
+    })
+    
+    captured_expression
+    ```
+   
+   However, it is possible to retrieve the original input through the attributes of the captured expression:
+    
+    ```{r}
+    attributes(captured_expression)
+    ```
+
+### Unquoting
+
+2. __[Q]{.Q}__: Explain why both `!0 + !0` and `!1 + !1` return `FALSE` while `!0 + !1` returns `TRUE`.
+    
+   __[A]{.solved}__: To answer this question we look at the AST of the first example:
+    
+    ```{r}
+    library(lobstr)
+    
+    ast(!0 + !0)
+    ```
+    
+   As the coercion rules are the same in all examples, we can use the precedence order (right to left) to explain all three examples:
+    
+   * `!0 + !0`:  
+     So the second zero gets coerced to `FALSE` and `!FALSE` becomes `TRUE`.  
+     `0 + TRUE` gets coerced to 1.  
+     `!1` becomes `!TRUE` which is `FALSE`  
+   * `!1 + !1`:  
+     So `!1` is `FALSE`.  
+     `1 + FALSE` is `1`.  
+     `!1` is `!TRUE` so `FALSE`.  
+   * `!0 + !1`:  
+     `!1` is `FALSE`.  
+     `0 + FALSE` is `0`.  
+     `!0` is `TRUE`.  
+
+3. __[Q]{.Q}__: Base functions `match.fun()`, `page()`, and `ls()` all try to automatically determine whether you want standard or non-standard evaluation. Each uses a different approach. Figure out the essence of each approach by reading the source code, then compare and contrast the techniques.
+
+### Case studies {#quasi-case-studies}
+
+1. __[Q]{.Q}__: Implement `arrange_desc()`, a variant of `dplyr::arrange()` that sorts in descending order by default.
+   
+   __[A]{.solved}__: We just have to catch the `...` from `arrange()` as an expression and modify the expression to be wrapped inside `desc()`. Afterwards we evaluate this new code within a regular `arrange()` call:
+       
+    ```{r}
+    library(dplyr)
+    library(purrr)
+    
+    arrange_desc <- function(.data, ...){
+      increasing <- enexprs(...)
+      decreasing <- map(increasing, ~ expr(desc(!!.x)))
+      
+      arrange(.data, !!!decreasing)
+    }
+    ```
+    
+   Let's try it out
+    
+    ```{r}
+    d <- data.frame(abc = letters[1:6],
+                    id1 = 1:6,
+                    id2 = rep(1:2, 3))
+      
+      # old behaviour
+    d %>% arrange(id2, id1)
+    
+    # new descending behaviour
+    d %>% arrange_desc(id2, id1)
+    ```
+  
+2. __[Q]{.Q}__: Implement `filter_or()`, a variant of `dplyr::filter()` that combines multiple arguments using `|` instead of `&`.
+       
+   __[A]{.solved}__: This time we just need to collapse the `...` arguments with `|`. Therefore we can use `purrr::reduce()` and afterwards we just need to evaluate the new code within a regular filter call:
+    
+    ```{r}
+    filter_or <- function(.data, ...){
+      normal <- enexprs(...)
+      
+      normal_or <- reduce(normal, function(x, y) expr(!!x | !!y))
+      
+      filter(.data, !!!normal_or)
+    }
+    
+    # and test it
+    d <- data.frame(x = 1:6, y = 6:1)
+    filter_or(d, x < 3, y < 3)
+    ```
+
+3. __[Q]{.Q}__:Implement `partition_rows()` which, like `partition_cols()`, returns two data frames, one containing the selected rows, and the other containing the rows that weren't selected.
+   
+   __[A]{.solved}__: We just have to decide if we focus on integer subsetting via `dplyr::slice()` or logical subsetting via `dplyr::filter()`. The rest is straightforward. Since the implementations of both subsetting styles are completely equivalent we just choose one without any particular reason:
+    
+    ```{r}
+    partition_rows <- function(.data, ...){
+      included <- enexprs(...)
+      excluded <- map(included, ~ expr(!(!!.x)))
+      
+      list(
+        incl = filter(.data, !!!included),
+        excl = filter(.data, !!!excluded)
+      )
+    }
+    
+    d <- data.frame(x = 1:6, y = 6:1)
+    partition_rows(d, x <= 3)
+    ```
+
+4. __[Q]{.Q}__:Add error handling to `slice()`. Give clear error messages if either `along` or `index` have invalid values (i.e. not numeric, not length 1, too small, or too big).
+
+
+
+## More old evaluation exercises
+
+1. __[Q]{.Q}__: Run this code in your head and predict what it will print. Confirm or refute your prediction by running the code in R.
+
+    ```{r, results = FALSE}
+    f <- function(...) {
+      x <- "f"
+      g(f = x, ...)
+    }
+    g <- function(...) {
+      x <- "g"
+      h(g = x, ...)
+    }
+    h <- function(...) {
+      enquos(...)
+    }
+    x <- "top"
+    
+    out <- f(top = x)
+    out
+    purrr::map_chr(out, eval_tidy)
+    ```
+
+1. __[Q]{.Q}__: What happens if you use `expr()` instead of `enexpr()` inside of `subset2()`?
+
+
+1. __[Q]{.Q}__: Improve `subset2()` to make it more like real `base::subset()`:
+    
+   * Drop rows where `subset` evaluates to `NA`
+   * Give a clear error message if `subset` doesn't yield a logical vector
+   * What happens if `subset` yields a vector that's not the same as the number of rows in `data`? What do you think should happen?
+      
+2. __[Q]{.Q}__: The third argument in `base::subset()` allows you to select variables. It treats variable names as if they were positions. This allows you to do things like `subset(mtcars, , -cyl)` to drop the cylinder variable, or `subset(mtcars, , disp:drat)` to select all the variables between `disp` and `drat`. How does this work? I've made this easier to understand by extracting it out into its own function that uses tidy evaluation.
+
+    ```{r, eval = FALSE}
+    select <- function(df, vars) {
+      vars <- enexpr(vars)
+      var_pos <- set_names(as.list(seq_along(df)), names(df))
+      
+      cols <- eval_tidy(vars, var_pos)
+      df[, cols, drop = FALSE]
+    }
+    select(mtcars, -cyl)
+    ```
+    
+3. __[Q]{.Q}__: Here's an alternative implementation of `arrange()`:
+
+    ```{r}
+    invoke <- function(fun, ...) do.call(fun, dots_list(...))
+    arrange3 <- function(.data, ..., .na.last = TRUE) {
+      args <- enquos(...)
+      
+      ords <- purrr::map(args, eval_tidy, data = .data)
+      ord <- invoke(order, !!!ords, na.last = .na.last)
+      
+      .data[ord, , drop = FALSE]
+    }
+    ```
+    
+   Describe the primary difference in approach compared to the function defined in the text. 
+    
+   One advantage of this approach is that you could check each element of `...` to make sure that input is correct. What property should each element of `ords` have?
+
+4. __[Q]{.Q}__: Here's an alternative implementation of `subset2()`:
+
+    ```{r}
+    subset3 <- function(data, rows) {
+      eval_tidy(quo(data[!!enquo(rows), , drop = FALSE]), data = data)
+    }
+    ```
+    
+   Use intermediate variables to make the function easier to understand, then
+   explain how this approach differs to the approach in the text.
+
+5. __[Q]{.Q}__: Implement a form of `arrange()` where you can request a variable to sorted in descending order using named arguments:
+    
+    ```{r, eval = FALSE}
+    arrange(mtcars, cyl, desc = mpg, vs)
+    ```
+    
+   (Hint:  The `descreasing` argument to `order()` will not help you. Instead, look at the definition of `dplyr::desc()`, and read the help for `xtfrm()`.)
+
+6. __[Q]{.Q}__: Why do you not need to worry about ambiguous argument names with `...` in
+    `arrange()`? Why is it a good idea to use the `.` prefix anyway?
+
+7. __[Q]{.Q}__: What does `transform()` do? Read the documentation. How does it work?
+   Read the source code for `transform.data.frame()`. What does `substitute(list(...))` do?
+   
+8. __[Q]{.Q}__: Use tidy evaluation to implement your own version of `transform()`.
+   Extend it so that a calculation can refer to variables created by transform, i.e. make this work:
+    
+    ```{r, error = TRUE}
+    df <- data.frame(x = 1:3)
+    transform(df, x1 = x + 1, x2 = x1 + 1)
+    ```
+
+9. __[Q]{.Q}__: What does `with()` do? How does it work? Read the source code for `with.default()`. What does `within()` do? How does it work? Read the source code for `within.data.frame()`. Why is the code so much more
+    complex than `with()`?
+   
+10. __[Q]{.Q}__: Implement a version of `within.data.frame()` that uses tidy evaluation.
+    Read the documentation and make sure that you understand what `within()` does, then read the source code.
+    
+<!-- ## Wrapping quoting functions -->
+
+1. __[Q]{.Q}__: When model building, typically the response and data are relatively constant while you rapidly experiment with different predictors. Write a small wrapper that allows you to reduce duplication in this situation.
+    
+    ```{r, eval = FALSE}
+    pred_mpg <- function(resp, ...) {
+      
+    }
+    pred_mpg(~ disp)
+    pred_mpg(~ I(1 / disp))
+    pred_mpg(~ disp * cyl)
+    ```
+    
+2. __[Q]{.Q}__: Another way to way to write `boot_lm()` would be to include the boostrapping expression (`data[sample(nrow(data), replace = TRUE), , drop = FALSE]`) in the data argument. Implement that approach. What are the advantages? What are the disadvantages?
+
+3. __[Q]{.Q}__: To make these functions somewhat more robust, instead of always using the `caller_env()` we could capture a quosure, and then use its environment. However, if there are multiple arguments, they might be associated with different environments. Write a function that takes a list of quosures, and returns the common environment, if they have one, or otherwise throws an error.
+
+4. __[Q]{.Q}__: Write a function that takes a data frame and a list of formulas, fitting a linear model with each formula, generating a useful model call.
+
+5. __[Q]{.Q}__: Create a formula generation function that allows you to optionally supply a transformation function (e.g. `log()`) to the response or the predictors.
+
+## Deprecated evaluation basics
+
+1. __[Q]{.Q}__: The code generated by `source2()` lacks source references. Read the source code for `sys.source()` and the help for `srcfilecopy()`, then modify `source2()` to preserve source references. You can test your code by sourcing a function that contains a comment. If successful, when you look at the function, you'll see the comment and not just the source code.
+
+   __[A]{.started}__:
+
+    ```{r, error=TRUE}
+    tmp_file <- tempfile()
+    writeLines('x <- 1
+    test_function <- function() {
+    "source me!"  # testcomment
+    }', tmp_file)
+    
+    file <- tmp_file
+    
+    source2 <- function(file, env = caller_env()){
+      lines <- readLines(file)
+      srcfile <- srcfilecopy(file, lines)
+      
+      parse(text = lines, srcfile = srcfile, keep.source = TRUE) %>% 
+        map(eval_tidy, env = env) 
+    }
+    
+    source2(tmp_file)
+    test_function
+    ```
+
+   - the comment is still missing
+   
+## Measuring performance (Old exercises)
+1. __[Q]{.Q}__: Instead of using `microbenchmark()`, you could use the built-in function `system.time()`. But `system.time()` is much less precise, so you'll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.
+
+    ```{r, eval = FALSE}
+    n <- 1:1e6
+    system.time(for (i in n) sqrt(x)) / length(n)
+    system.time(for (i in n) x ^ 0.5) / length(n)
+    ```
+    
+   How do the estimates from `system.time()` compare to those from `microbenchmark()`? Why are they different?
+
+2. __[Q]{.Q}__: Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.
+
+    ```{r, eval = FALSE}
+    x ^ (1 / 2)
+    exp(log(x) / 2)
+    ```
+    
+   __[A]{.solved}__: The second one looks more complex, but you never know...unless you test it.
+    
+    ```{r}
+    x <- runif(100)
+    microbenchmark::microbenchmark(
+      sqrt(x),
+      x ^ 0.5,
+      x ^ (1 / 2),
+      exp(log(x) / 2)
+    )
+    ```
+
+3. __[Q]{.Q}__: Use microbenchmarking to rank the basic arithmetic operators (`+`, `-`, `*`, `/`, and `^`) in terms of their speed. Visualise the results. Compare the speed of arithmetic on integers vs. doubles.
+   
+   __[A]{.solved}__: On a Windows system, these short execution times are hard to measure. The following code was executed on Linux and pasted here:
+    
+    ```{r, eval = FALSE}
+    mb_integer <- microbenchmark::microbenchmark(
+      1L + 1L, 1L - 1L, 1L * 1L, 1L / 1L, 1L ^ 1L, 
+      times = 1000000,
+      control = list(order = "random",
+                     warmup = 20000))
+    
+    mb_double <- microbenchmark::microbenchmark(
+      1 + 1, 1 - 1, 1 * 1, 1 / 1, 1 ^ 1, 
+      times = 1000000,
+      control = list(order = "random",
+                     warmup = 20000))
+    
+    mb_integer
+    # and got the following output:
+    # Unit: nanoseconds
+    #     expr min lq      mean median uq     max neval
+    #  1L + 1L  50 66  96.45262     69 73 7006051 1e+06
+    #  1L - 1L  52 69  88.76438     71 76  587594 1e+06
+    #  1L * 1L  51 68  88.51854     70 75  582521 1e+06
+    #    1L/1L  50 65  94.40669     68 74 7241972 1e+06
+    #    1L^1L  67 77 102.96209     84 92  574519 1e+06
+    
+    mb_double
+    # Unit: nanoseconds
+    #   expr min lq      mean median  uq      max neval
+    #  1 + 1  48 66  92.44331     69  75  7217242 1e+06
+    #  1 - 1  50 66  88.13654     68  77   625462 1e+06
+    #  1 * 1  48 66 135.88379     70  77 42974915 1e+06
+    #    1/1  48 65  87.11615     69  77   659032 1e+06
+    #    1^1  79 92 127.07686    103 135   641524 1e+06
+    ```
+    
+   Let's compare the results visually.
+    
+    ```{r}
+    mb_median <- data.frame(operator = c("+", "-", "*", "/", "^"),
+                            int = c(69, 71, 70, 68, 84),  # same as mb_integer$median
+                            dbl = c(69, 68, 70, 69, 103), # same as mb_double$median
+                            stringsAsFactors = FALSE)
+
+    mb_median <- tidyr::gather(mb_median, type, time, int, dbl)
+    mb_median <- dplyr::mutate(mb_median, type = factor(type, levels = c("int", "dbl")))
+
+    library(ggplot2)
+    ggplot(mb_median, aes(x = type, y = time, group = operator, color = operator)) +
+      geom_point(show.legend = FALSE) +
+      geom_line(show.legend = FALSE, size = 1.5) +
+      geom_label(aes(label = operator), show.legend = FALSE) +
+      theme_minimal() +
+      ylab("time in nanoseconds") +
+      theme(axis.title.x = element_blank(),
+            axis.title.y = element_text(size = 14),
+            axis.text.x = element_text(size = 14),
+            axis.text.y = element_text(size = 10)) +
+      scale_y_continuous(breaks = seq(0, max(mb_median$time), 10))
+    ```
+
+4. __[Q]{.Q}__: You can change the units in which the microbenchmark results are
+    expressed with the `unit` parameter. Use `unit = "eps"` to show
+    the number of evaluations needed to take 1 second. Repeat the benchmarks
+    above with the eps unit. How does this change your intuition for performance?
+
+<!-- ## Language performance -->
+
+1. __[Q]{.Q}__: `scan()` has the most arguments (21) of any base function. About how much time does it take to make 21 promises each time scan is called? Given a simple input (e.g., `scan(text = "1 2 3", quiet = T)`) what proportion of the total run time is due to creating those promises?
+    
+   __[A]{.solved}__: According to the textbook every extra argument slows the function down by approximately 20 nanoseconds, which I can't reproduce on my system:
+    
+    ```{r}
+    f5 <- function(a = 1, b = 2, c = 4, d = 4, e = 5) NULL
+    f6 <- function(a = 1, b = 2, c = 4, d = 4, e = 5, f = 6) NULL
+    f7 <- function(a = 1, b = 2, c = 4, d = 4, e = 5, f = 6, g = 7) NULL
+    f8 <- function(a = 1, b = 2, c = 4, d = 4, e = 5, f = 6, g = 7, h = 8) NULL
+    microbenchmark::microbenchmark(f5(), f6(), f7(), f8(), times = 10000)
+    ```
+    
+   However, for now we just assume that 20 nanoseconds are correct and in kind of doubt, we recommend to benchmark this value individually. With this assumption we calculate `21 * 20 = 420` nanoseconds of extra time for each call of `scan()`.
+    
+   For a percentage, we first benchmark a simple call of `scan()`:
+    
+    ```{r}
+    (mb_prom <- microbenchmark::microbenchmark(
+      scan(text = "1 2 3", quiet = T),
+      times = 100000,
+      unit = "ns",
+      control = list(warmup = 1000)
+      ))
+
+    mb_prom_median <- summary(mb_prom)$median
+    ```
+    
+   This lets us calculate, that ~`r round(420 / mb_prom_median, 4) * 100`% of the median run time are caused by the extra arguments.
+
+2. __[Q]{.Q}__: Read ["Evaluating the Design of the R Language"](http://r.cs.purdue.edu/pub/ecoop12.pdf). What other aspects of the R-language slow it down? Construct microbenchmarks to illustrate.
+
+3. __[Q]{.Q}__: How does the performance of S3 method dispatch change with the length of the class vector? How does performance of S4 method dispatch change with number of superclasses? How about RC?
+
+4. __[Q]{.Q}__: What is the cost of multiple inheritance and multiple dispatch on S4 method dispatch?
+
+5. __[Q]{.Q}__: Why is the cost of name lookup less for functions in the base package?
+
+<!-- ## Implementations performance -->
+
+1. __[Q]{.Q}__: The performance characteristics of `squish_ife()`, `squish_p()`, and `squish_in_place()` vary considerably with the size of `x`. Explore the differences. Which sizes lead to the biggest and smallest differences?
+
+2. __[Q]{.Q}__: Compare the performance costs of extracting an element from a list, a column from a matrix, and a column from a data frame. Do the same for rows.

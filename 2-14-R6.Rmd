@@ -6,7 +6,7 @@ source("common.R")
 
 ## Prerequisites
 
-To solve the exercises in this chapter we need to create R6 objects with the similar named package.
+To solve the exercises in this chapter we will have to to create R6 objects, which are implemented in the `R6` package.
 
 ```{r}
 library(R6)
@@ -14,9 +14,9 @@ library(R6)
 
 ## Classes and methods
 
-1. __<span style="color:red">Q</span>__: Create a bank account R6 class that stores a balance and allows you to deposit and withdraw money. Create a subclass that throws an error if you attempt to go into overdraft. Create another subclass that allows you to go into overdraft, but charges you a fee.
+1. __[Q]{.Q}__: Create a bank account R6 class that stores a balance and allows you to deposit and withdraw money. Create a subclass that throws an error if you attempt to go into overdraft. Create another subclass that allows you to go into overdraft, but charges you a fee.
 
-   __<span style="color:green">A</span>__: Let's start with a very basic bank account, similar to the `Accumulator` class in the text book.
+   __[A]{.solved}__: Let's start with a basic bank account, similar to the `Accumulator` class in the text book.
 
     ```{r}
     BankAccount <- R6Class("BankAccount", list(
@@ -73,7 +73,7 @@ library(R6)
     my_strict_account$balance
     ```
 
-   Finally, we create a class that charges a constant fee (of 1) for each withdraw which leaves the account with a negative balance.
+   Finally, we create a class that charges a constant fee of 1 for each withdrawal which leaves the account with a negative balance.
 
     ```{r}
     BankAccountCharging <- R6Class("BankAccount",
@@ -88,7 +88,7 @@ library(R6)
     ))
     ```
     
-   And provide a regarding test, which should result in -12, since we pay the fee twice.
+   Let's take a look at the implemented functionality. We expect a final balance of -12,  because we pay the fee twice.
     
     ```{r}
     my_charging_account <- BankAccountCharging$new()
@@ -102,7 +102,7 @@ library(R6)
     my_charging_account$balance
     ```
 
-2. __<span style="color:red">Q</span>__: Create an R6 class that represents a shuffled deck of cards. You should be able to draw cards from the deck with `$draw(n)`, and return all cards to the deck and reshuffle with `$reshuffle()`. Use the following code to make a vector of cards.
+2. __[Q]{.Q}__: Create an R6 class that represents a shuffled deck of cards. You should be able to draw cards from the deck with `$draw(n)`, and return all cards to the deck and reshuffle with `$reshuffle()`. Use the following code to make a vector of cards.
     
     ```{r}
     suit <- c("♠", "♥", "♦", "♣")
@@ -110,7 +110,7 @@ library(R6)
     cards <- paste0(rep(value, 4), suit)
     ```
 
-   __<span style="color:green">A</span>__: To keep the class flexible, we allow to specify any `deck` of cards at initialisation with the `cards` deck from the exercise text as the default value.
+   __[A]{.solved}__: We choose to keep the class flexible and allow the specification of any `deck` of cards at initialisation. The `cards` deck from the exercise text will serve as the default value.
 
     ```{r}
     ShuffledDeck <- R6Class("ShuffledDeck", public = list(
@@ -136,7 +136,7 @@ library(R6)
     ))
     ```
     
-   To test this class we initialise one instance, draw 20 cards and reshuffle the deck. 
+   To test this class we create a deck (initialise an instance), draw 20 cards and reshuffle the deck. 
 
     ```{r}
     my_deck <- ShuffledDeck$new()
@@ -146,9 +146,11 @@ library(R6)
       deck
     ```
 
-3. __<span style="color:red">Q</span>__: Why can't you model a bank account or a deck of cards with an S3 class?
+3. __[Q]{.Q}__: Why can't you model a bank account or a deck of cards with an S3 class?
     
-   __<span style="color:orange">A</span>__: (TODO: Check the requirements to how the class should look like). It is not clear why this should not be possible. Of course this would look different than R6, but one could still build up an S3 class based on i.e. a list or environment. Here an S3 version of a bank account and one method:
+   __[A]{.started}__: It is not entirely clear why this should not be possible. Of course this would look different than R6, but one could still build up an S3 class based on i.e. a list or an environment. Here an S3 version of a bank account and one method:
+   
+   <!-- (TODO: Check the requirements to how the class should look like). -->
    
     ```{r}
     # On top of a list
@@ -176,9 +178,9 @@ library(R6)
     ba2$balance
     ```
 
-4. __<span style="color:red">Q</span>__: Create an R6 class that allows you to get and set the current timezone. You can access the current timezone with `Sys.timezone()` and set it with `Sys.setenv(TZ = "newtimezone")`. When setting the time zone, make sure the new time zone is in the list provided by `OlsonNames()`.
+4. __[Q]{.Q}__: Create an R6 class that allows you to get and set the current time zone. You can access the current timezone with `Sys.timezone()` and set it with `Sys.setenv(TZ = "newtimezone")`. When setting the time zone, make sure the new time zone is in the list provided by `OlsonNames()`.
 
-   __<span style="color:green">A</span>__: To create an R6 class that allows us to get and set the timezone, we provide the regarding functions as public methods to the R6 class.
+   __[A]{.solved}__: To create an R6 class that allows us to get and set the time zone, we provide the respective functions as public methods to the R6 class.
    
     ```{r}
     TimeSetter <- R6Class("TimeSetter", public = list(
@@ -190,7 +192,7 @@ library(R6)
     )
     ```
     
-   Now let us create one instance of this class and test, if we can can set and get the timezone as we prefer.
+   Now, let us create one instance of this class and test, if we can can set and get the time zone as intended.
                       
     ```{r}
     time_setter <- TimeSetter$new()
@@ -201,10 +203,10 @@ library(R6)
     time_setter$set_timezone(old_tz)
     ```
 
-5. __<span style="color:red">Q</span>__: Create an R6 class that manages the current working directory. It should have `$get()` and `$set()` methods.
+5. __[Q]{.Q}__: Create an R6 class that manages the current working directory. It should have `$get()` and `$set()` methods.
     
-   __<span style="color:green">A</span>__: As the requirements are quite overseeable, our proposal for a `WDManager` class is also quite minimalistic:
-
+   __[A]{.solved}__: Take a look at the following implementation, which is quite minimalistic:
+   
     ```{r}
     WDManager <- R6Class("WDManager", list(
       get = getwd,
@@ -212,19 +214,19 @@ library(R6)
     ))
     ```
 
-6. __<span style="color:red">Q</span>__: Why can't you model the time zone or current working directory with an S3 class?
+6. __[Q]{.Q}__: Why can't you model the time zone or current working directory with an S3 class?
     
-   __<span style="color:green">A</span>__:
+   __[A]{.open}__:
 
-7. __<span style="color:red">Q</span>__: What base type are R6 objects built on top of? What attributes do they have?
+7. __[Q]{.Q}__: What base type are R6 objects built on top of? What attributes do they have?
 
-   __<span style="color:green">A</span>__: R6 objects are built on top of environments and have a `class` attribute, which is a character vector containing the class name, the name of any super classes (if existent) and as the last element the string `"R6"`.
+   __[A]{.solved}__: R6 objects are built on top of environments. They have a `class` attribute, which is a character vector containing the class name, the name of any super classes (if existent) and the string `"R6"` as the last element.
 
 ## Controlling access
 
-1. __<span style="color:red">Q</span>__: Create a bank account class that prevents you from directly setting the account balance, but you can still withdraw from and deposit to. Throw an error if you attempt to go into overdraft.
+1. __[Q]{.Q}__: Create a bank account class that prevents you from directly setting the account balance, but you can still withdraw from and deposit to. Throw an error if you attempt to go into overdraft.
     
-   __<span style="color:green">A</span>__: To fulfill this requirement, we make balance a private field. The user has to use the `deposit()` and `withdraw()` methods which will still have access to the balance field. 
+   __[A]{.solved}__: To fulfil this requirement, we make balance a private field. The user has to use the `deposit()` and `withdraw()` methods, which have access to the balance field.
    
     ```{r, error = TRUE}
     BankAccountStrict2 <- R6Class(
@@ -257,9 +259,9 @@ library(R6)
     my_account_strict_2$withdraw(10)
     ```
 
-2. __<span style="color:red">Q</span>__: Create a class with a write-only `$password` field. It should have `$check_password(password)` method that returns `TRUE` or `FALSE`, but there should be no way to view the complete password.
+2. __[Q]{.Q}__: Create a class with a write-only `$password` field. It should have `$check_password(password)` method that returns `TRUE` or `FALSE`, but there should be no way to view the complete password.
 
-   __<span style="color:green">A</span>__: To protect the password from changes and direct access, the password will be a private field. Further, our `PWClass` will get it's own print method, which hides the password.
+   __[A]{.solved}__: To protect the password from changes and direct access, the password will be a private field. Further, our `PWClass` will get it's own print method, which hides the password.
    
     ```{r}
     PWClass <- R6Class(
@@ -290,9 +292,9 @@ library(R6)
     my_pw$check_password()
     ```
 
-3. __<span style="color:red">Q</span>__: Extend the `Rando` class with another active binding that allows you to access the previous random value. Ensure that active binding is the only way to access the value.
+3. __[Q]{.Q}__: Extend the `Rando` class with another active binding that allows you to access the previous random value. Ensure that active binding is the only way to access the value.
 
-   __<span style="color:green">A</span>__: To access the previous random value from an instance, we add a private `last_random` field to our class, and we modify the `random()` method to write to this field whenever it is called. To access the `last_random` field we provide a `prvious_random` method.
+   __[A]{.solved}__: To access the previous random value from an instance, we add a private `last_random` field to our class, and we modify the `random()` method to write to this field, whenever it is called. To access the `last_random` field we provide a `previous_random` method.
    
     ```{r}
     Rando <- R6::R6Class(
@@ -325,9 +327,9 @@ library(R6)
     x$previous_random
     ```
 
-4. __<span style="color:red">Q</span>__: Can subclasses access private fields/methods from their parent? Perform an experiment to find out.
+4. __[Q]{.Q}__: Can subclasses access private fields/methods from their parent? Perform an experiment to find out.
 
-   __<span style="color:green">A</span>__: To find out if private fields/classes can be accessed from subclasses, we first create a class `A` with a private field `foo` and a privte method `bar`. Afterwards, an instance of a subclass `B` and call the `foobar()` methods, which tries to access the `foo` field and the `bar()` method from its superclass `A`.
+   __[A]{.solved}__: To find out if private fields/classes can be accessed from subclasses, we first create a class `A` with a private field `foo` and a private method `bar()`. Afterwards, an instance of a subclass `B`  is created and calls the `foobar()` methods, which tries to access the `foo` field and the `bar()` method from its superclass `A`.
 
     ```{r}
     A <- R6Class(
@@ -358,9 +360,9 @@ library(R6)
    We conclude, that subclasses can access private fields from their superclasses, but not private methods.
 
 ## Reference semantics
-1. __<span style="color:red">Q</span>__: Create a class that allows you to write a line to a specified file. You should open a connection to the file in `$initialize()`, append a line using `cat()` in `$append_line()`, and close the connection in `$finalize()`.
+1. __[Q]{.Q}__: Create a class that allows you to write a line to a specified file. You should open a connection to the file in `$initialize()`, append a line using `cat()` in `$append_line()`, and close the connection in `$finalize()`.
 
-   __<span style="color:green">A</span>__: Our `FileWriter` class will create a connection to a file at initialization. Therefore, we open a connection to a user specified file during the initialisation. Note that we need to set `open = "a"` in `file()` to open connection for appeding text. Otherwise `cat` would only work when applied to files, but not with connctions as explicitly asked for in the exercise. Further, we add the `append_line()` method and a `close()` statement as finalizer.
+   __[A]{.solved}__: Our `FileWriter` class will create a connection to a file at initialization. Therefore, we open a connection to a user specified file during the initialisation. Note that we need to set `open = "a"` in `file()` to open connection for appending text. Otherwise `cat` would only work when applied to files, but not with connections as explicitly asked for in the exercise. Further, we add the `append_line()` method and a `close()` statement as finalizer.
 
     ```{r, eval = TRUE, error = TRUE}
     FileWriter <- R6::R6Class(

@@ -11,18 +11,18 @@ library(sloop)
 
 ## Basics
 
-1. __<span style="color:red">Q</span>__: Describe the difference between `t.test()` and `t.data.frame()`? When is each function called?
+1. __[Q]{.Q}__: Describe the difference between `t.test()` and `t.data.frame()`? When is each function called?
 
-   __<span style="color:green">A</span>__: Because of S3's `generic.class()` naming scheme, both functions may initially look similar, while they are in fact unrelated.
+   __[A]{.solved}__: Because of S3's `generic.class()` naming scheme, both functions may initially look similar, while they are in fact unrelated.
    
    - `t.test()` is a *generic* function that performs a t-test. 
    - `t.data.frame()` is a *method* that gets called by the generic `t()` to transpose data frame input.
    
    Due to R's S3 dispatch rules, `t.test()` would also get called when `t()` is a applied to an object of class "test".
 
-2. __<span style="color:red">Q</span>__: Make a list of commonly used base R functions that contain `.` in their name but are not S3 methods.
+2. __[Q]{.Q}__: Make a list of commonly used base R functions that contain `.` in their name but are not S3 methods.
 
-   __<span style="color:green">A</span>__: In the recent years "snake_case"-style has become increasingly common when naming functions (and variables) in R. But many functions in base R will continue to be "point.separated", which is why some inconsistency in your R code most likely cannot be avoided.
+   __[A]{.solved}__: In the recent years "snake_case"-style has become increasingly common when naming functions (and variables) in R. But many functions in base R will continue to be "point.separated", which is why some inconsistency in your R code most likely cannot be avoided.
    
     ```{r, eval=FALSE}
     # Some base R functions with point.separated names
@@ -46,15 +46,15 @@ library(sloop)
 
 <!-- possibly mention https://journal.r-project.org/archive/2012/RJ-2012-018/RJ-2012-018.pdf (The State of Naming Conventions in R)    -->
 
-3. __<span style="color:red">Q</span>__: What does the `as.data.frame.data.frame()` method do? Why is it confusing? How could you avoid this confusion in your own code?
+3. __[Q]{.Q}__: What does the `as.data.frame.data.frame()` method do? Why is it confusing? How could you avoid this confusion in your own code?
 
-   __<span style="color:green">A</span>__: The function `as.data.frame.data.frame()` implements the data frame *method* for the `as.data.frame()` *generic*, which coerces objects to data frames.
+   __[A]{.solved}__: The function `as.data.frame.data.frame()` implements the data frame *method* for the `as.data.frame()` *generic*, which coerces objects to data frames.
 
    The name is confusing, because it does not clearly communicate the type of the function, which could be a regular function, a generic or a method. Even if we assume a method, the amount of `.`'s makes it difficult to separate the generic- and the class-part of the name.  
 
    We could avoid this confusion by applying a different naming convention (e.g. "snake_case") for our class and function names.
 
-4. __<span style="color:red">Q</span>__: Describe the difference in behaviour in these two calls.
+4. __[Q]{.Q}__: Describe the difference in behaviour in these two calls.
 
     ```{r}
     set.seed(1014)
@@ -64,36 +64,36 @@ library(sloop)
     mean(unclass(some_days))
     ```
     
-   __<span style="color:green">A</span>__: `mean()` is a generic function, which will select the appropriate method based on the class of the input. `some_days` has the class "Date" and `mean.Date(some_days)` will be used.
+   __[A]{.solved}__: `mean()` is a generic function, which will select the appropriate method based on the class of the input. `some_days` has the class "Date" and `mean.Date(some_days)` will be used.
     
    After `unclass()` has removed the class attribute the default method is chosen by the method dispatch. (`mean.default(unclass(some_days))`) calculates the mean of the underlying double.  
     
    <!-- When you look into the source code of `mean.Date()` (one line), you will see that the difference in the resulting objects is only the class attribute. -->
    <!-- I agree, that inspecting `mean.Date` is interesting, though I am not entirely sure, how the dots work here and how the origin of the date is passed to `.Date`. It looks to me, as if the result of `mean.default(unclass(x))` is then backtransformend into a Date... If we can describe this concisely, we can use it otherwise I think we can safely skip it. (HB, 2019-03-12) -->
 
-5. __<span style="color:red">Q</span>__: What class of object does the following code return? What base type is it built on? What attributes does it use?
+5. __[Q]{.Q}__: What class of object does the following code return? What base type is it built on? What attributes does it use?
     
     ```{r}
     x <- ecdf(rpois(100, 10))
     x
     ```
     
-   __<span style="color:green">A</span>__: This code returns an object of the class "ecdf" and contains an empirical cumulative distribution function of its input. The object is built on the base type "closure" and the expression, which was used to create it (`rpois(100, 10)`) is stored in in the `call` attribute.
+   __[A]{.solved}__: This code returns an object of the class "ecdf" and contains an empirical cumulative distribution function of its input. The object is built on the base type "closure" and the expression, which was used to create it (`rpois(100, 10)`) is stored in in the `call` attribute.
 
-6. __<span style="color:red">Q</span>__: What class of object does the following code return? What base type is it built on? What attributes does it use?
+6. __[Q]{.Q}__: What class of object does the following code return? What base type is it built on? What attributes does it use?
     
     ```{r}
     x <- table(rpois(100, 5))
     x
     ```
 
-   __<span style="color:green">A</span>__: This code returns a "table" object, which is build upon the base type "integer". The attribute "dimnames" are used to name the elements of the integer vector.
+   __[A]{.solved}__: This code returns a "table" object, which is build upon the base type "integer". The attribute "dimnames" are used to name the elements of the integer vector.
 
 ## Classes
 
-1. __<span style="color:red">Q</span>__: Write a constructor for `data.frame` objects. What base type is a data frame built on? What attributes does it use? What are the restrictions placed on the individual elements? What about the names?
+1. __[Q]{.Q}__: Write a constructor for `data.frame` objects. What base type is a data frame built on? What attributes does it use? What are the restrictions placed on the individual elements? What about the names?
 
-   __<span style="color:green">A</span>__: Data frames are built on (named) lists with the additional requirement that all elements must have the same length. Their only attribute is "row.names". These must be unique, have the same length as each list element and also must be of integer or character type.
+   __[A]{.solved}__: Data frames are built on (named) lists with the additional requirement that all elements must have the same length. Their only attribute is "row.names". These must be unique, have the same length as each list element and also must be of integer or character type.
    
    There are no additional restrictions to column names apart to those of lists, so one could use special characters and surround the names with backticks (which is not recommended).
    
@@ -134,9 +134,9 @@ library(sloop)
     new_data.frame(x, row.names = 1)
 ```
     
-2. __<span style="color:red">Q</span>__: Enhance my `factor()` helper to have better behaviour when one or more `values` is not found in `levels`. What does `base::factor()` do in this situation?
+2. __[Q]{.Q}__: Enhance my `factor()` helper to have better behaviour when one or more `values` is not found in `levels`. What does `base::factor()` do in this situation?
     
-   __<span style="color:green">A</span>__: `base::factor()` converts these values (silently) into `NA`'s. To improve our `factor()` helper we choose to return an informative error message instead.
+   __[A]{.solved}__: `base::factor()` converts these values (silently) into `NA`'s. To improve our `factor()` helper we choose to return an informative error message instead.
     
     ```{r, eval = FALSE}
     factor <- function(x, levels = unique(x)) {
@@ -155,13 +155,13 @@ library(sloop)
     }
     ```
 
-3. __<span style="color:red">Q</span>__: Carefully read the source code of `factor()`. What does it do that our constructor does not?
+3. __[Q]{.Q}__: Carefully read the source code of `factor()`. What does it do that our constructor does not?
 
-   __<span style="color:green">A</span>__: The original implementation allows a more flexible specification of input for `x`. The input is coerced to character or replaced by `character(0)` (in case of `NULL`). It also ensures that the factor levels are unique. This is achieved by setting the levels via `base::levels<-`, which fails when duplicate values are supplied.
+   __[A]{.solved}__: The original implementation allows a more flexible specification of input for `x`. The input is coerced to character or replaced by `character(0)` (in case of `NULL`). It also ensures that the factor levels are unique. This is achieved by setting the levels via `base::levels<-`, which fails when duplicate values are supplied.
 
-4. __<span style="color:red">Q</span>__: Factors have an optional “contrasts” attribute. Read the help for `C()`, and briefly describe the purpose of the attribute. What type should it have? Rewrite the `new_factor()` constructor to include this attribute.
+4. __[Q]{.Q}__: Factors have an optional “contrasts” attribute. Read the help for `C()`, and briefly describe the purpose of the attribute. What type should it have? Rewrite the `new_factor()` constructor to include this attribute.
 
-   __<span style="color:green">A</span>__: When factor variables (representing nominal or ordinal information) are used in statistical models, they are typically encoded as dummy variables and by default each level is compared with the first factor level. However, many different encodings ("contrasts") are possible: https://en.wikipedia.org/wiki/Contrast_(statistics)
+   __[A]{.solved}__: When factor variables (representing nominal or ordinal information) are used in statistical models, they are typically encoded as dummy variables and by default each level is compared with the first factor level. However, many different encodings ("contrasts") are possible: https://en.wikipedia.org/wiki/Contrast_(statistics)
 
    Within R's formula interface you can wrap a factor in `C` and specify the contrast of your choice. Alternatively you can set the "contrast" attribute of you factor variable, which accepts matrix input. (see `?contr.helmert` or similar for details)
 
@@ -185,9 +185,9 @@ library(sloop)
     }
     ```
 
-5. __<span style="color:red">Q</span>__: Read the documentation for `utils::as.roman()`. How would you write a constructor for this class? Does it need a validator? What would a helper look like?
+5. __[Q]{.Q}__: Read the documentation for `utils::as.roman()`. How would you write a constructor for this class? Does it need a validator? What would a helper look like?
 
-   __<span style="color:green">A</span>__: This function transforms numeric input into Roman numbers (how cool is this!). This class is built on the "integer" type, which results in the following constructor.
+   __[A]{.solved}__: This function transforms numeric input into Roman numbers (how cool is this!). This class is built on the "integer" type, which results in the following constructor.
 
     ```{r}
     new_roman <- function(x = integer()){
@@ -231,14 +231,14 @@ library(sloop)
 
 ## Generics and methods
 
-1. __<span style="color:red">Q</span>__: Read the source code for `t()` and `t.test()` and confirm that `t.test()` is an S3 generic and not an S3 method. What happens if you create an object with class `test` and call `t()` with it? Why?
+1. __[Q]{.Q}__: Read the source code for `t()` and `t.test()` and confirm that `t.test()` is an S3 generic and not an S3 method. What happens if you create an object with class `test` and call `t()` with it? Why?
     
     ```{r, eval=FALSE}
     x <- structure(1:10, class = "test")
     t(x)
     ```
     
-   __<span style="color:green">A</span>__: We can see that `t.test()` is a generic, because it calls `UseMethod()`
+   __[A]{.solved}__: We can see that `t.test()` is a generic, because it calls `UseMethod()`
     
     ```{r}
     t.test
@@ -269,9 +269,9 @@ library(sloop)
     t(x)
     ```
 
-2. __<span style="color:red">Q</span>__: What generics does the `table` class have methods for?
+2. __[Q]{.Q}__: What generics does the `table` class have methods for?
 
-   __<span style="color:green">A</span>__: We find methods specific for the `table` class, by searching for functions that end on ".table".
+   __[A]{.solved}__: We find methods specific for the `table` class, by searching for functions that end on ".table".
    
     ```{r}
     library(methods)
@@ -281,9 +281,9 @@ library(sloop)
     Filter(function(x) grepl(".table$", x), names(funs))
     ```
 
-3. __<span style="color:red">Q</span>__: What generics does the `ecdf` class have methods for?
+3. __[Q]{.Q}__: What generics does the `ecdf` class have methods for?
 
-   __<span style="color:green">A</span>__: We use the same approach as above. When this is not successful, we repeat using the superclass. Apparently the classes `ecdf` and `stepfun` exist, even though no specific methods are currently implemented (in base R).
+   __[A]{.solved}__: We use the same approach as above. When this is not successful, we repeat using the superclass. Apparently the classes `ecdf` and `stepfun` exist, even though no specific methods are currently implemented (in base R).
 
     ```{r}
     class(ecdf(1:2))
@@ -295,9 +295,9 @@ library(sloop)
 
    <!-- I think it would be nice to reflect on, why `ecdf` has a special class, but no specific methods tailored to this class. But I'm not sure about this for now. (HB, 2018-03-13) -->
 
-4. __<span style="color:red">Q</span>__: Which base generic has the greatest number of defined methods?
+4. __[Q]{.Q}__: Which base generic has the greatest number of defined methods?
     
-   __<span style="color:green">A</span>__: The generic `print()` clearly has the most defined methods.
+   __[A]{.solved}__: The generic `print()` clearly has the most defined methods.
 
     ```{r}
     generics <- Filter(
@@ -313,7 +313,7 @@ library(sloop)
     tail(sort(lengths(methods_per_generic)), 3)
     ```
     
-5. __<span style="color:red">Q</span>__: Carefully read the documentation for `UseMethod()` and explain why the following code returns the results that it does. What two usual rules of function evaluation does `UseMethod()` violate?
+5. __[Q]{.Q}__: Carefully read the documentation for `UseMethod()` and explain why the following code returns the results that it does. What two usual rules of function evaluation does `UseMethod()` violate?
     
     ```{r}
     g <- function(x) {
@@ -328,7 +328,7 @@ library(sloop)
     g(x)
     ```
     
-   __<span style="color:green">A</span>__: R looks for the `x` argument in `g()`'s calling environment (the global environment), in which `x` is bound to 1.
+   __[A]{.solved}__: R looks for the `x` argument in `g()`'s calling environment (the global environment), in which `x` is bound to 1.
 
    `g()` then dispatches to `g.default()`. The `x` argument is passed to `g.default()`. As `y` is not defined with `g.default`'s function environment, `y`'s value will be taken from the environment where `UseMethod()` created the call. There `y` is defined as 10.  
     
@@ -343,9 +343,9 @@ library(sloop)
     g(x)
     ```
     
-6. __<span style="color:red">Q</span>__: What are the arguments to `[`? Why is this a hard question to answer?
+6. __[Q]{.Q}__: What are the arguments to `[`? Why is this a hard question to answer?
 
-   __<span style="color:orange">A</span>__: The subsetting operator `[` is a primitive and generic function as can be inspected via `ftype()`. 
+   __[A]{.started}__: The subsetting operator `[` is a primitive and generic function as can be inspected via `ftype()`.
    
     ```{r}
     ftype(`[`)
@@ -361,18 +361,18 @@ library(sloop)
 
 ## Object styles
 
-1. __<span style="color:red">Q</span>__: Categorise the objects returned by `lm()`, `factor()`, `table()`, `as.Date()`, `ecdf()`, `ordered()`, `I()` into the styles described above.
+1. __[Q]{.Q}__: Categorise the objects returned by `lm()`, `factor()`, `table()`, `as.Date()`, `ecdf()`, `ordered()`, `I()` into the styles described above.
     
-   __<span style="color:orange">A</span>__: The returned objects correspond to the following object styles:
+   __[A]{.started}__: The returned objects correspond to the following object styles:
    
    Vector: `factor()`, `table()`, `as.Date()`, `ordered()`  
    Record:  
    Scalar: `lm()`, `ecdf()`  
    Other: `I()`  
    
-2. __<span style="color:red">Q</span>__: What would a constructor function for `lm` objects, `new_lm()`, look like? Use `?lm` and experimentation to figure out the required fields and their types.
+2. __[Q]{.Q}__: What would a constructor function for `lm` objects, `new_lm()`, look like? Use `?lm` and experimentation to figure out the required fields and their types.
 
-   __<span style="color:green">A</span>__: The constructor needs to populate the attributes of an `lm` object and check their type for correctness.
+   __[A]{.solved}__: The constructor needs to populate the attributes of an `lm` object and check their type for correctness.
     
     ```{r}
     # Learn about lm-attributes
@@ -415,9 +415,9 @@ library(sloop)
 
 ## Inheritance
 
-1. __<span style="color:red">Q</span>__: How does `[.Date` support subclasses? How does it fail to support subclasses?
+1. __[Q]{.Q}__: How does `[.Date` support subclasses? How does it fail to support subclasses?
 
-   __<span style="color:orange">A</span>__: 
+   __[A]{.started}__:
    
     ```{r, eval=FALSE}
     # inspect function
@@ -433,9 +433,9 @@ library(sloop)
 
    Maybe one would have to create a subclass to `Date` and see what `s3_dispatch` returns, when it is called on this subclass. I suspect, the delegation to the internal `[` to be related to the issue here.
 
-2. __<span style="color:red">Q</span>__: R has two classes for representing date time data, `POSIXct` and `POSIXlt`, which both inherit from `POSIXt`. Which generics have different behaviours for the two classes? Which generics share the same behaviour?
+2. __[Q]{.Q}__: R has two classes for representing date time data, `POSIXct` and `POSIXlt`, which both inherit from `POSIXt`. Which generics have different behaviours for the two classes? Which generics share the same behaviour?
     
-   __<span style="color:green">A</span>__: To answer this question, we have to get the respective generics
+   __[A]{.solved}__: To answer this question, we have to get the respective generics
     
     ```{r}
     # define helper
@@ -459,7 +459,7 @@ library(sloop)
     setdiff(generics_t, union(generics_ct, generics_lt))
     ```
     
-3. __<span style="color:red">Q</span>__: What do you expect this code to return? What does it actually return? Why?
+3. __[Q]{.Q}__: What do you expect this code to return? What does it actually return? Why?
 
     ```{r, eval = FALSE}
     generic2 <- function(x) UseMethod("generic2")
@@ -473,7 +473,7 @@ library(sloop)
     generic2(structure(list(), class = c("b", "a2")))
     ```
     
-   __<span style="color:green">A</span>__: When we execute the code above, this is what is happening:
+   __[A]{.solved}__: When we execute the code above, this is what is happening:
   
    * we pass an object of classes `b` and `a2` to `generic2()`, which prompts R to look for a method`generic2.b()`
    * the method `generic2.b()` then changes the class to `a1` and calls `NextMethod()`
@@ -485,7 +485,7 @@ library(sloop)
 
 ## Dispatch details
 
-1. __<span style="color:red">Q</span>__: Explain the differences in dispatch below:
+1. __[Q]{.Q}__: Explain the differences in dispatch below:
 
     ```{r}
     x1 <- 1:5
@@ -497,11 +497,11 @@ library(sloop)
     s3_dispatch(x2[1])
     ```
 
-   __<span style="color:orange">A</span>__: `class()` returns `"integer"` for `x1` and `x2`. However, they are not identical. While `x2` has the attribute "class" with the value `"integer"`, `x1` doesn't have a class attribute. Instead, `x1` has the implicit class `"numeric"`, see `?class`.
+   __[A]{.started}__: `class()` returns `"integer"` for `x1` and `x2`. However, they are not identical. While `x2` has the attribute "class" with the value `"integer"`, `x1` doesn't have a class attribute. Instead, `x1` has the implicit class `"numeric"`, see `?class`.
 
-2. __<span style="color:red">Q</span>__: What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
+2. __[Q]{.Q}__: What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
 
-   __<span style="color:green">A</span>__: The following functions belong to this group (see ?`Math`):
+   __[A]{.solved}__: The following functions belong to this group (see ?`Math`):
     
    * `abs`, `sign`, `sqrt`, `floor`, `ceiling`, `trunc`, `round`, `signif`
    * `exp`, `log`, `expm1`, `log1p`, `cos`, `sin`, `tan`, `cospi`, `sinpi`, `tanpi`, `acos`, `asin`, `atan`, `cosh`, `sinh`, `tanh`, `acosh`, `asinh`, `atanh`
@@ -546,6 +546,6 @@ library(sloop)
     
    The original source code of `Math.data.frame()` is a good example on how to invoke the string returned by `.Generic` into a specific method. `Math.factor()` is a good example of a method, which is simply defined for better error messages.
 
-3. __<span style="color:red">Q</span>__: `Math.difftime()` is more complicated than I described. Why?
+3. __[Q]{.Q}__: `Math.difftime()` is more complicated than I described. Why?
    
-   __<span style="color:green">A</span>__: `Math.difftime()` also excludes cases apart from `abs`, `sign`, `floor`, `ceiling`, `trunc`, `round` and `signif` and needs to return a fitting error message.
+   __[A]{.solved}__: `Math.difftime()` also excludes cases apart from `abs`, `sign`, `floor`, `ceiling`, `trunc`, `round` and `signif` and needs to return a fitting error message.

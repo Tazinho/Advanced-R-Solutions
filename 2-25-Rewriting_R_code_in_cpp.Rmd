@@ -6,7 +6,7 @@ source("common.R")
 
 ## Getting started with C++
 
-1. __<span style="color:red">Q</span>__: With the basics of C++ in hand, it's now a great time to practice by reading and writing some simple C++ functions. For each of the following functions, read the code and figure out what the corresponding base R function is. You might not understand every part of the code yet, but you should be able to figure out the basics of what the function does.
+1. __[Q]{.Q}__: With the basics of C++ in hand, it's now a great time to practice by reading and writing some simple C++ functions. For each of the following functions, read the code and figure out what the corresponding base R function is. You might not understand every part of the code yet, but you should be able to figure out the basics of what the function does.
 
     ```cpp
     double f1(NumericVector x) {
@@ -64,7 +64,7 @@ source("common.R")
     }
     ```
 
-   __<span style="color:green">A</span>__:  The R equivalents are:  
+   __[A]{.solved}__:  The R equivalents are:
 
    *   f1: `mean()`  
    *   f2: `cumsum()`  
@@ -72,9 +72,22 @@ source("common.R")
    *   f4: `Position()`
    *   f5: `pmin()`
 
-1. __<span style="color:red">Q</span>__:  To practice your function writing skills, convert the following functions into C++. For now, assume the inputs have no missing values.  
+1. __[Q]{.Q}__:  To practice your function writing skills, convert the following functions into C++. For now, assume the inputs have no missing values.
+  
+    1. `all()`.
+    
+    2. `cumprod()`, `cummin()`, `cummax()`.
+    
+    3. `diff()`. Start by assuming lag 1, and then generalise for lag `n`.
+    
+    4. `range()`.
+    
+    5. `var()`. Read about the approaches you can take on 
+       [Wikipedia](http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance).
+       Whenever implementing a numerical algorithm, it's always good to check 
+       what is already known about the problem.
 
-   __<span style="color:orange">A</span>__: (TODO: The last one, `var()` still needs to be implemented)
+   __[A]{.solved}__:
    
    1. `all()`
   
@@ -173,156 +186,233 @@ source("common.R")
     ```
   
    5. `var`. Read about the approaches you can take on [wikipedia](http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance). Whenever implementing a numerical algorithm, it's always good to check what is already known about the problem.
+   
+    ```cpp
+    double varC(NumericVector x) {
+      int n = x.size();
+      double mx = 0;
+      double out = 0;
+      
+      if(n < 2) {
+        return NA_REAL;
+      }
+      
+      for(int i = 0; i < n; ++i) {
+        mx += x[i] / n;
+      }
+      
+      for(int i = 0; i < n; ++i) {
+        out += pow(x[i] - mx, 2);
+      }
+      
+      out = out / (n-1);
+      return out;
+    }
+    ```
 
 ## Missing values
 
-1. __<span style="color:red">Q</span>__:  Rewrite any of the functions from the first exercise to deal with missing values. If `na.rm` is true, ignore the missing values. If `na.rm` is false, return a missing value if the input contains any missing values. Some good functions to practice with are `min()`, `max()`, `range()`, `mean()`, and `var()`.
+1. __[Q]{.Q}__:  Rewrite any of the functions from the first exercise to deal with missing values. If `na.rm` is true, ignore the missing values. If `na.rm` is false, return a missing value if the input contains any missing values. Some good functions to practice with are `min()`, `max()`, `range()`, `mean()`, and `var()`.
 
-   __<span style="color:orange">A</span>__: (TODO: `var`'s implementation is still missing)
+   __[A]{.started}__: (TODO: `var`'s implementation is still missing. The functions from the 1st (NOT THE SECOND EXERCISE) need to be (also/especially) solved)
    
+   Let's follow the advice and rewrite `min()`, `max()`, `range()`, `mean()` and `var()` first. After this, we look at `cumsum()`, `any()`, `Position()` and `pmin()` from the first exercise.
+   
+   To make `minC()` aware of `NA`s, we introduce an `na_rm` argument and need to differ between the following cases:
+    * `x` doesn't contain any NAs
+    * `x` contains NAs and `na_rm = false`: return `NA_REAL`
+    * `x` comtains only NAs and `na_rm = true`: return `R_PosInf`
+    * `x` contains some NAs and `na_rm = true`
+
     ```cpp
-    NumericVector minC(NumericVector x, bool narm){
+    double minC(NumericVector x, bool na_rm = false){
       int n = x.size();
-      LogicalVector index = is_na(x);
-      NumericVector omin(1);
-      bool na_check = false;
-      bool na_check_all = true;
-    
+      LogicalVector i_na = is_na(x);
+      double out = NA_REAL;
+      bool any_na = false;
+      bool all_na = true;
+      
+      // Calculate any_na
       for(int i = 0; i<n; i++){
-          if (index[i]) na_check = true;
-      }
-
-      for(int i = 0; i<n; i++){
-          if (!index[i]) na_check_all = false;
-      }
-
-      if (narm) {
-          for(int i = n-1; i >= 0; i--){
-              if (!index[i]) omin[0] = x[i];
-          }
-    
-          for(int i = 1; i < n; i++) {
-              if (!index[i]) omin[0] = std::min(x[i], omin[0]);
-          }
-        
-          if (na_check_all) {
-              omin[0] = NA_REAL;
-          }
-      } else if (na_check) {
-          omin[0] = NA_REAL;
-      } else {
-          omin[0] = x[0];
-          for(int i = 1; i < n; i++){
-              omin = std::min(x[i], omin[0]);
-          }
+        if (i_na[i]) {
+          any_na = true;
+          break;
+        }
       }
       
-      return omin;
-    }
-    
-    NumericVector maxC(NumericVector x, bool narm){
-      int n = x.size();
-      LogicalVector index = is_na(x);
-      NumericVector omax(1);
-      bool na_check = false;
-      bool na_check_all = true;
-      
-      for(int i = 0; i<n; i++){
-          if (index[i]) na_check = true;
-      }
-
-      for(int i = 0; i<n; i++){
-          if (!index[i]) na_check_all = false;
-      }
-  
-      if (narm) {
-          for(int i = n-1; i >= 0; i--){
-              if (!index[i]) omax[0] = x[i];
-          }
-    
-          for(int i = 1; i < n; i++) {
-              if (!index[i]) omax[0] = std::max(x[i], omax[0]);
-          }
-        
-          if (na_check_all) {
-              omax[0] = NA_REAL;
-          }
-      } else if (na_check) {
-          omax[0] = NA_REAL;
-      } else {
-          omax[0] = x[0];
-          for(int i = 1; i < n; i++){
-              omax = std::max(x[i], omax[0]);
-          }
+      if (!any_na) {
+        out = x[0];
+        for(int i = 0; i < n; i++) {
+          out = std::min(x[i], out);
+        }
+        return out;
       }
       
-      return omax;
-    }
-    
-    NumericVector rangeC(NumericVector x, bool narm){
-      NumericVector out(2);
-      NumericVector omin(1);
-      NumericVector omax(1);
+      if (!na_rm & any_na) {
+        return out;
+      }
       
-      omin = minC(x, narm);
-      omax = maxC(x, narm);
+      // Calculate all_na
+      for(int i = 0; i < n; i++){
+        if (!i_na[i]) {
+          all_na = false;
+          break;
+        }
+      }
       
-      out[0] = omin[0];
-      out[1] = omax[0];
+      // Case any_na & na_rm
+      if (na_rm & all_na) return R_PosInf;
+      
+      if (na_rm & any_na) {
+        // Find start value
+        for(int i = 0; i < n; i++){
+          if (!i_na[i]) {
+            out = x[i];
+            break;
+          }
+        }
+        // Calculate minimum
+        for(int i = 0; i < n; i++) {
+          if (!i_na[i]) {
+            out = std::min(x[i], out);
+          }
+        }
+      }
+      
       return out;
-      }
     }
+    ```
     
-    NumericVector meanC(NumericVector x, bool narm){
+   To make `maxC()` aware of NAs, we follow our implementation of `minC()` and only change `std::min` to `std::max` and `R_PosInf` to `R_NegInf`.
+
+    ```cpp
+    double maxC(NumericVector x, bool na_rm = false){
       int n = x.size();
-      LogicalVector index = is_na(x);
-      bool na_check = false;
-      bool na_check_all = true;
-      int n_corrected = 0;
-      NumericVector out(1);
-              
+      LogicalVector i_na = is_na(x);
+      double out = NA_REAL;
+      bool any_na = false;
+      bool all_na = true;
+      
+      // Calculate any_na
       for(int i = 0; i<n; i++){
-          if (index[i]) na_check = true;
-      }
-              
-      for(int i = 0; i<n; i++){
-          if (!index[i]) na_check_all = false;
-      }
-  
-      for(int i = 0; i<n; i++){
-          if (!index[i]) n_corrected++;
+        if (i_na[i]) {
+          any_na = true;
+          break;
+        }
       }
   
-      /* narm = T */
-      if (narm){
-          if (na_check_all) {
-              out[0] = NA_REAL;
-          }  else {
-              out[0] = 0;
-              for(int i = 0; i < n; ++i) {
-                  if (!index[i]) out[0] += x[i] / n_corrected;
-              }
+      if (!any_na) {
+        out = x[0];
+        for(int i = 0; i < n; i++) {
+          out = std::max(x[i], out);
+        }
+        return out;
+      }
+      
+      if (!na_rm & any_na) {
+        return out;
+      }
+      
+      // Calculate all_na
+      for(int i = 0; i < n; i++){
+        if (!i_na[i]) {
+          all_na = false;
+          break;
+        }
+      }
+      
+      // Case any_na & na_rm
+      if (na_rm & all_na) return R_NegInf;
+      
+      if (na_rm & any_na) {
+        // Find start value
+        for(int i = 0; i < n; i++){
+          if (!i_na[i]) {
+            out = x[i];
+            break;
+          }
+        }
+        // Calculate maximum
+        for(int i = 0; i < n; i++) {
+          if (!i_na[i]) {
+            out = std::max(x[i], out);
+          }
+        }
+      }
+      
+      return out;
+    }
+    ```
+   
+   `minC()` and `maxC()` enable us to write a compact and NA-aware `rangeC()` function.
+   
+    ```cpp    
+    NumericVector rangeC(NumericVector x, bool na_rm = false){
+      NumericVector out(2);
+      
+      out[0] = minC(x, na_rm);
+      out[1] = maxC(x, na_rm);
+      
+      return out;
+    }
+    ```
+    
+   To make `meanC()` aware of `NAs`, we consider the same cases as in previous functions.
+    
+    ```cpp
+    double meanC(NumericVector x, bool na_rm = false){
+      int n = x.size();
+      LogicalVector i_na = is_na(x);
+      bool any_na = false;
+      bool all_na = true;
+      int n_non_na = 0;
+      double out = 0;
+  
+      // Calculate any_na
+      for(int i = 0; i<n; i++){
+        if (i_na[i]) {
+          any_na = true;
+          break;
+        }
+      }
+  
+      if (!any_na) {
+        for (int i = 0; i < n; i++) {
+          out += x[i] / n;
+        }
+        return out;
+      }
+  
+      // Calculate all_na and count of non-NAs
+      for(int i = 0; i<n; i++){
+          if (!i_na[i]) {
+            all_na = false;
+            n_non_na++;
           }
       }
-  
-      /* narm = F */
-      if (!narm){
-          if (na_check) {
-              out[0] = NA_REAL;
-          } else {
-              for(int i = 0; i < n; ++i) {
-                  out[0] += x[i] / n;
-                }
-          }
+    
+      if (!na_rm & any_na) {
+        return NA_REAL;
+      }
+    
+      // Case na_rm and any_na
+      if (na_rm & all_na) {
+        return NAN;
+      }
+      
+      if (na_rm) {
+        for(int i = 0; i < n; i++) {
+          if (!i_na[i]) out += x[i] / n_non_na;
+        }
       }
   
       return out;
     }
     ```
 
-2. __<span style="color:red">Q</span>__: Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that these functions have slightly more complicated behaviour.  
+2. __[Q]{.Q}__: Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that these functions have slightly more complicated behaviour.
     
-   __<span style="color:green">A</span>__:
+   __[A]{.solved}__:
    
     ```cpp
     NumericVector cumsumC(NumericVector x) {
@@ -358,13 +448,13 @@ source("common.R")
     }
     ```
 
-## The STL
+## Standard Template Library
 
 To practice using the STL algorithms and data structures, implement the following using R functions in C++, using the hints provided:
 
-1. __<span style="color:red">Q</span>__: `median.default()` using `partial_sort`.
+1. __[Q]{.Q}__: `median.default()` using `partial_sort`.
 
-   __<span style="color:green">A</span>__:
+   __[A]{.solved}__:
    
     ```cpp
     #include <algorithm>
@@ -387,13 +477,13 @@ To practice using the STL algorithms and data structures, implement the followin
     }
     ```
 
-2. __<span style="color:red">Q</span>__: `%in%` using `unordered_set` and the `find()` or `count()` methods.
+2. __[Q]{.Q}__: `%in%` using `unordered_set` and the `find()` or `count()` methods.
 
-   __<span style="color:green">A</span>__:
+   __[A]{.solved}__:
 
-3. __<span style="color:red">Q</span>__: `unique()` using an `unordered_set` (challenge: do it in one line!).  
+3. __[Q]{.Q}__: `unique()` using an `unordered_set` (challenge: do it in one line!).
 
-   __<span style="color:orange">A</span>__: (TODO: address the challenge.)
+   __[A]{.started}__: (TODO: address the challenge.)
 
     ```cpp
     // [[Rcpp::plugins(cpp11)]]
@@ -415,9 +505,9 @@ To practice using the STL algorithms and data structures, implement the followin
     }
     ```
 
-4. __<span style="color:red">Q</span>__: `min()` using `std::min()`, or `max()` using `std::max()`.
+4. __[Q]{.Q}__: `min()` using `std::min()`, or `max()` using `std::max()`.
 
-   __<span style="color:green">A</span>__:
+   __[A]{.solved}__:
 
     ```cpp
     #include <Rcpp.h>
@@ -436,9 +526,9 @@ To practice using the STL algorithms and data structures, implement the followin
     }
     ```
 
-5. __<span style="color:red">Q</span>__: `which.min()` using `min_element`, or `which.max()` using `max_element`.  
+5. __[Q]{.Q}__: `which.min()` using `min_element`, or `which.max()` using `max_element`.
 
-   __<span style="color:green">A</span>__:
+   __[A]{.solved}__:
 
     ```cpp
     #include <Rcpp.h>
@@ -457,7 +547,7 @@ To practice using the STL algorithms and data structures, implement the followin
     }
     ```
 
-6. __<span style="color:red">Q</span>__: `setdiff()`, `union()`, and `intersect()` for integers using sorted ranges and `set_union`, `set_intersection` and `set_difference`.
+6. __[Q]{.Q}__: `setdiff()`, `union()`, and `intersect()` for integers using sorted ranges and `set_union`, `set_intersection` and `set_difference`.
 
-   __<span style="color:green">A</span>__:
+   __[A]{.solved}__:
    

@@ -4,12 +4,12 @@ source("common.R")
 
 # Improving performance
 
-## Check for existing solutions
+## Checking for existing solutions
 
-1. __<span style="color:red">Q</span>__: What are faster alternatives to `lm`? Which are specifically designed to work with larger datasets?
+1. __[Q]{.Q}__: What are faster alternatives to `lm`? Which are specifically designed to work with larger datasets?
 
-   __<span style="color:green">A</span>__: Within the [Cran task view](https://cran.rstudio.com/web/views/) for [HighPerformanceComputing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and its `speedlm()` function. We might not gain any performance improvements on small datasets:
-    
+   __[A]{.solved}__: In the [Cran Task View](https://cran.rstudio.com/web/views/) for [High Performance Computing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and its `speedlm()` function. For small datasets, there may be only minor performance gains:
+
     ```{r}
     stopifnot(all.equal(
       coef(speedglm::speedlm(Sepal.Length ~ Sepal.Width + Species, data = iris)),
@@ -46,11 +46,11 @@ source("common.R")
     
    Note that there are many other opportunities mentioned in the task view, also some that make it possible to handle data which is not in memory. 
     
-   When it comes to pure speed a quick google search on [r fastest lm](http://stackoverflow.com/questions/25416413/is-there-a-faster-lm-function) provides a stackoverflow thread where someone already solved this problem for us...
+   When it comes to pure speed a quick search on [r fastest lm](http://stackoverflow.com/questions/25416413/is-there-a-faster-lm-function) provides a stackoverflow thread where someone already solved this problem for us...
 
-2. __<span style="color:red">Q</span>__: What package implements a version of `match()` that's faster for repeated lookups? How much faster is it?
+2. __[Q]{.Q}__: What package implements a version of `match()` that's faster for repeated lookups? How much faster is it?
     
-   __<span style="color:green">A</span>__: Again google gives a good recommendation for the search term [r faster match](http://stackoverflow.com/questions/32934933/faster-in-operator):
+   __[A]{.solved}__: Again google gives a good recommendation for the search term [r faster match](http://stackoverflow.com/questions/32934933/faster-in-operator):
     
     ```{r}
     set.seed(1)
@@ -67,15 +67,15 @@ source("common.R")
     
    On my laptop `fastmatch::fmatch()` is around 25 times as fast as `match()`.
 
-3. __<span style="color:red">Q</span>__: List four functions (not just those in base R) that convert a string into a date time object. What are their strengths and weaknesses?
+3. __[Q]{.Q}__: List four functions (not just those in base R) that convert a string into a date time object. What are their strengths and weaknesses?
     
-   __<span style="color:orange">A</span>__: At least these functions will do the trick: `as.POSIXct()`, `as.POSIXlt()`, `strftime()`, `strptime()`, `lubridate::ymd_hms()`. There might also be some in the timeseries packages `xts` or `zoo` and in `anytime`. An update on this will follow.
+   __[A]{.started}__: At least these functions will do the trick: `as.POSIXct()`, `as.POSIXlt()`, `strftime()`, `strptime()`, `lubridate::ymd_hms()`. There might also be some in the timeseries packages `xts` or `zoo` and in `anytime`. An update on this will follow.
 
 <!-- add fasttime -->
 
-4. __<span style="color:red">Q</span>__: Which packages provide the ability to compute a rolling mean?
+4. __[Q]{.Q}__: Which packages provide the ability to compute a rolling mean?
     
-   __<span style="color:green">A</span>__: Again google [r rolling mean](http://stackoverflow.com/questions/743812/calculating-moving-average-in-r)
+   __[A]{.solved}__: Again google [r rolling mean](http://stackoverflow.com/questions/743812/calculating-moving-average-in-r)
 provides us with enough information and guides our attention on solutions in the following packages:
     * `zoo`
     ```{r}
@@ -97,15 +97,15 @@ provides us with enough information and guides our attention on solutions in the
 
    Note that an exhaustive example on how to create a rolling mean function is provided in the [textbook](http://adv-r.had.co.nz/Functionals.html).
 
-5. __<span style="color:red">Q</span>__: What are the alternatives to `optim()`?
+5. __[Q]{.Q}__: What are the alternatives to `optim()`?
     
-   __<span style="color:green">A</span>__: Depending on the use case a lot of different options might be considered. For a general overview we would suggest the corresponding taskview on [Optimization](https://cran.r-project.org/web/views/Optimization.html).
+   __[A]{.solved}__: Depending on the use case a lot of different options might be considered. For a general overview we would suggest the corresponding taskview on [Optimization](https://cran.r-project.org/web/views/Optimization.html).
 
-## Do as little as possible
+## Doing as little as possible
 
-1. __<span style="color:red">Q</span>__: What's the difference between `rowSums()` and `.rowSums()`?
+1. __[Q]{.Q}__: What's the difference between `rowSums()` and `.rowSums()`?
     
-   __<span style="color:green">A</span>__: `.rowSums()` is defined as
+   __[A]{.solved}__: `.rowSums()` is defined as
     
     ```{r}
     .rowSums
@@ -124,9 +124,9 @@ provides us with enough information and guides our attention on solutions in the
     rowSums
     ```
 
-2. __<span style="color:red">Q</span>__: Make a faster version of `chisq.test()` that only computes the chi-square test statistic when the input is two numeric vectors with no missing values. You can try simplifying `chisq.test()` or by coding from the [mathematical definition](http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test).
+2. __[Q]{.Q}__: Make a faster version of `chisq.test()` that only computes the chi-square test statistic when the input is two numeric vectors with no missing values. You can try simplifying `chisq.test()` or by coding from the [mathematical definition](http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test).
     
-   __<span style="color:green">A</span>__: Since `chisq.test()` has a relatively long source code, we try a new implementation from scratch:
+   __[A]{.solved}__: Since `chisq.test()` has a relatively long source code, we try a new implementation from scratch:
     
     ```{r}
     chisq.test2 <- function(x, y){
@@ -186,9 +186,9 @@ provides us with enough information and guides our attention on solutions in the
     )
     ```
 
-5. __<span style="color:red">Q</span>__: Can you make a faster version of `table()` for the case of an input of two integer vectors with no missing values? Can you use it to speed up your chi-square test?
+3. __[Q]{.Q}__: Can you make a faster version of `table()` for the case of an input of two integer vectors with no missing values? Can you use it to speed up your chi-square test?
     
-   __<span style="color:green">A</span>__: When analysing the source code of `table`, we can omit everything unnecessary and extract the main building blocks:
+   __[A]{.solved}__: When analysing the source code of `table`, we can omit everything unnecessary and extract the main building blocks:
    
     ```{r}
     table2 <- function(a, b){
@@ -220,9 +220,9 @@ provides us with enough information and guides our attention on solutions in the
 
 ## Vectorise
 
-1. __<span style="color:red">Q</span>__: The density functions, e.g., `dnorm()`, have a common interface. Which arguments are vectorised over? What does `rnorm(10, mean = 10:1)` do?
+1. __[Q]{.Q}__: The density functions, e.g., `dnorm()`, have a common interface. Which arguments are vectorised over? What does `rnorm(10, mean = 10:1)` do?
     
-   __<span style="color:green">A</span>__: We can see the interface of these functions via `?dnorm`:
+   __[A]{.solved}__: We can see the interface of these functions via `?dnorm`:
     
     ```{r, eval = FALSE}
     dnorm(x, mean = 0, sd = 1, log = FALSE)
@@ -235,9 +235,9 @@ provides us with enough information and guides our attention on solutions in the
     
    `rnorm(10, mean = 10:1)` generates ten random numbers from different normal distributions. The normal distributions differ in their means. The first has mean 10, the second has mean 9, the third mean 8 etc.
 
-1. __<span style="color:red">Q</span>__: Compare the speed of `apply(x, 1, sum)` with `rowSums(x)` for varying sizes of `x`.
+2. __[Q]{.Q}__: Compare the speed of `apply(x, 1, sum)` with `rowSums(x)` for varying sizes of `x`.
     
-   __<span style="color:green">A</span>__: We compare regarding different sizes for square matrices:
+   __[A]{.solved}__: We compare regarding different sizes for square matrices:
     
     ```{r long calculation, eval=FALSE}
     library(microbenchmark)
@@ -276,9 +276,9 @@ provides us with enough information and guides our attention on solutions in the
     
    The graph is a good indicator to notice, that `apply()` is not "vectorised for performance".
   
-1. __<span style="color:red">Q</span>__: How can you use `crossprod()` to compute a weighted sum? How much faster is it than the naive `sum(x * w)`?
+3. __[Q]{.Q}__: How can you use `crossprod()` to compute a weighted sum? How much faster is it than the naive `sum(x * w)`?
     
-   __<span style="color:green">A</span>__: We can just give the vectors to `crossprod()` which converts them to row- and column-vectors and then multiplies these. The result is the dot product which is also a weighted sum.
+   __[A]{.solved}__: We can just give the vectors to `crossprod()` which converts them to row- and column-vectors and then multiplies these. The result is the dot product which is also a weighted sum.
     
     ```{r}
     a <- rnorm(10)
@@ -319,14 +319,15 @@ provides us with enough information and guides our attention on solutions in the
     ```
     
 ## Old Exercises
-1. __<span style="color:red">Q</span>__: How many different ways can you compute a 1d density estimate in R?
+
+1. __[Q]{.Q}__: How many different ways can you compute a 1d density estimate in R?
     
-    __<span style="color:green">A</span>__: According to [Deng and Wickham (2011)](https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=3&ved=0ahUKEwim0sTI9JLRAhVScFAKHdLuBOIQFggxMAI&url=http%3A%2F%2Fvita.had.co.nz%2Fpapers%2Fdensity-estimation.pdf&usg=AFQjCNFBdOT4DvSTXtGoawIFkgf6JlXV9Q&sig2=APnTeIL55Zj_0oATw15mBA&cad=rja) density estimation is implemented in over 20 R packages. 
+    __[A]{.solved}__: According to [Deng and Wickham (2011)](https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=3&ved=0ahUKEwim0sTI9JLRAhVScFAKHdLuBOIQFggxMAI&url=http%3A%2F%2Fvita.had.co.nz%2Fpapers%2Fdensity-estimation.pdf&usg=AFQjCNFBdOT4DvSTXtGoawIFkgf6JlXV9Q&sig2=APnTeIL55Zj_0oATw15mBA&cad=rja) density estimation is implemented in over 20 R packages.
 
 
 <!-- ## Memory profiling with lineprof -->
 
-1. __<span style="color:red">Q</span>__: When the input is a list, we can make a more efficient `as.data.frame()` by using special knowledge. A data frame is a list with class `data.frame` and `row.names` attribute. `row.names` is either a character vector or vector of sequential integers, stored in a special format created by `.set_row_names()`. This leads to an alternative `as.data.frame()`:
+1. __[Q]{.Q}__: When the input is a list, we can make a more efficient `as.data.frame()` by using special knowledge. A data frame is a list with class `data.frame` and `row.names` attribute. `row.names` is either a character vector or vector of sequential integers, stored in a special format created by `.set_row_names()`. This leads to an alternative `as.data.frame()`:
 
     ```{r}
     to_df <- function(x) {
@@ -338,7 +339,7 @@ provides us with enough information and guides our attention on solutions in the
 
    What impact does this function have on `read_delim()`?  What are the downsides of this function?
 
-1. __<span style="color:red">Q</span>__: Line profile the following function with `torture = TRUE`. What is surprising? Read the source code of `rm()` to figure out what's going on.
+1. __[Q]{.Q}__: Line profile the following function with `torture = TRUE`. What is surprising? Read the source code of `rm()` to figure out what's going on.
 
     ```{r}
     f <- function(n = 1e5) {
@@ -349,9 +350,9 @@ provides us with enough information and guides our attention on solutions in the
 
 <!-- ## Do as little as possible -->
 
-1. __<span style="color:red">Q</span>__: How do the results change if you compare `mean()` and `mean.default()` on 10,000 observations, rather than on 100?
+1. __[Q]{.Q}__: How do the results change if you compare `mean()` and `mean.default()` on 10,000 observations, rather than on 100?
     
-   __<span style="color:green">A</span>__: We start with 100 observations as shown in the textbook:
+   __[A]{.solved}__: We start with 100 observations as shown in the textbook:
     
     ```{r}
     x <- runif(1e2)
@@ -383,7 +384,7 @@ provides us with enough information and guides our attention on solutions in the
     )
     ```
 
-2. __<span style="color:red">Q</span>__: The following code provides an alternative implementation of `rowSums()`. Why is it faster for this input?
+2. __[Q]{.Q}__: The following code provides an alternative implementation of `rowSums()`. Why is it faster for this input?
 
     ```{r}
     rowSums2 <- function(df) {
@@ -403,9 +404,9 @@ provides us with enough information and guides our attention on solutions in the
     system.time(rowSums2(df))
     ```
     
-   __<span style="color:green">A</span>__: 
+   __[A]{.solved}__:
    
-3. __<span style="color:red">Q</span>__: Imagine you want to compute the bootstrap distribution of a sample correlation using `cor_df()` and the data in the example below. Given that you want to run this many times, how can you make this code faster? (Hint: the  function has three components that you can speed up.)
+3. __[Q]{.Q}__: Imagine you want to compute the bootstrap distribution of a sample correlation using `cor_df()` and the data in the example below. Given that you want to run this many times, how can you make this code faster? (Hint: the  function has three components that you can speed up.)
 
     ```{r, eval = FALSE}
     n <- 1e6
@@ -421,7 +422,7 @@ provides us with enough information and guides our attention on solutions in the
 
    Is there a way to vectorise this procedure?
     
-   __<span style="color:green">A</span>__: The three components (mentioned in the questions hint) are:
+   __[A]{.solved}__: The three components (mentioned in the questions hint) are:
 
    1. sampling of indices
    2. subsetting the data frame/conversion to matrix (or vector input)
