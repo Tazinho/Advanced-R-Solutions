@@ -218,14 +218,13 @@ source("common.R")
    
    Let's follow the advice and rewrite `min()`, `max()`, `range()`, `mean()` and `var()` first. After this, we look at `cumsum()`, `any()`, `Position()` and `pmin()` from the first exercise.
    
-   To make `minC()` aware of `NAs`, we introduce the `na_rm` argument and differ between the following cases:
+   To make `minC()` aware of `NA`s, we introduce an `na_rm` argument and need to differ between the following cases:
     * `x` doesn't contain any NAs
     * `x` contains NAs and `na_rm = false`: we return `NA_REAL`
     * `x` comtains only NAs and `na_rm = true`: return `R_PosInf`
     * `x` contains some NAs and `na_rm = true`
 
     ```cpp
-    cppFunction('
     double minC(NumericVector x, bool na_rm = false){
       int n = x.size();
       LogicalVector i_na = is_na(x);
@@ -243,7 +242,7 @@ source("common.R")
       
       if (!any_na) {
         out = x[0];
-        for(int i = 0; i < n-1; i++) {
+        for(int i = 0; i < n; i++) {
           out = std::min(x[i], out);
         }
         return out;
@@ -281,59 +280,80 @@ source("common.R")
       }
       
       return out;
-    }')
+    }
+    ```
     
-    NumericVector maxC(NumericVector x, bool narm){
-      int n = x.size();
-      LogicalVector index = is_na(x);
-      NumericVector omax(1);
-      bool na_check = false;
-      bool na_check_all = true;
-      
-      for(int i = 0; i<n; i++){
-          if (index[i]) na_check = true;
-      }
+   To make `maxC()` aware of NAs, we follow our implementation of `minC` and exclusively change `std::min` to `std::max` and `R_PosInf` to `R_NegInf`.
 
+    ```cpp
+    double maxC(NumericVector x, bool na_rm = false){
+      int n = x.size();
+      LogicalVector i_na = is_na(x);
+      double out = NA_REAL;
+      bool any_na = false;
+      bool all_na = true;
+      
+      // Calculate any_na
       for(int i = 0; i<n; i++){
-          if (!index[i]) na_check_all = false;
+        if (i_na[i]) {
+          any_na = true;
+          break;
+        }
       }
   
-      if (narm) {
-          for(int i = n-1; i >= 0; i--){
-              if (!index[i]) omax[0] = x[i];
-          }
-    
-          for(int i = 1; i < n; i++) {
-              if (!index[i]) omax[0] = std::max(x[i], omax[0]);
-          }
-        
-          if (na_check_all) {
-              omax[0] = NA_REAL;
-          }
-      } else if (na_check) {
-          omax[0] = NA_REAL;
-      } else {
-          omax[0] = x[0];
-          for(int i = 1; i < n; i++){
-              omax = std::max(x[i], omax[0]);
-          }
+      if (!any_na) {
+        out = x[0];
+        for(int i = 0; i < n; i++) {
+          out = std::max(x[i], out);
+        }
+        return out;
       }
       
-      return omax;
-    }
-    
-    NumericVector rangeC(NumericVector x, bool narm){
-      NumericVector out(2);
-      NumericVector omin(1);
-      NumericVector omax(1);
+      if (!na_rm & any_na) {
+        return out;
+      }
       
-      omin = minC(x, narm);
-      omax = maxC(x, narm);
+      // Calculate all_na
+      for(int i = 0; i < n; i++){
+        if (!i_na[i]) {
+          all_na = false;
+          break;
+        }
+      }
       
-      out[0] = omin[0];
-      out[1] = omax[0];
+      // Case any_na & na_rm
+      if (na_rm & all_na) return R_NegInf;
+      
+      if (na_rm & any_na) {
+        // Find start value
+        for(int i = 0; i < n; i++){
+          if (!i_na[i]) {
+            out = x[i];
+            break;
+          }
+        }
+        // Calculate maximum
+        for(int i = 0; i < n; i++) {
+          if (!i_na[i]) {
+            out = std::max(x[i], out);
+          }
+        }
+      }
+      
       return out;
-      }
+    }
+    ```
+   
+   `minC()` and `maxC()` enable us a compact implementation of an `NA`-aware `rangeC()` function.
+   
+    ```cpp    
+    NumericVector rangeC(NumericVector x, bool na_rm = false){
+      NumericVector out(2);
+      
+      out[0] = minC(x, na_rm);
+      out[1] = maxC(x, na_rm);
+      
+      return out;
     }
     
     NumericVector meanC(NumericVector x, bool narm){
