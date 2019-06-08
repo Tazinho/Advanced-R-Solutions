@@ -306,7 +306,7 @@ library(lobstr)
     
     (If you look carefully at the amount of memory occupied by short vectors, you'll notice that the pattern is actually more complicated. This is to do with how R allocates memory, and is not that important. If you want to know the full details, they're discussed in the 1st edition of Advanced R: http://adv-r.had.co.nz/memory.html#object-size)
 
-   In `y <- list(x, x)` both list elements of `y` contain references to the same memory address, so no additional memory is required for the second list element. The list itself requires 64 bytes, 48 byte for an empty list and 8 byte for each element (`obj_size(vector("list", 2))`). This let's us predict 8000048 B + 64 B = 8000112 B:
+   In `y <- list(x, x)` both list elements of `y` contain references to the same memory address, so no additional memory is required for the second list element. The list itself requires 64 bytes, 48 bytes for an empty list and 8 bytes for each element (`obj_size(vector("list", 2))`). This let's us predict 8000048 B + 64 B = 8000112 B:
    
     ```{r}
     y <- list(x, x) 
