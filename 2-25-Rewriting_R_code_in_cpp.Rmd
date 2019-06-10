@@ -409,6 +409,70 @@ source("common.R")
       return out;
     }
     ```
+    
+   To make `varC()` aware of NAs, we need to cover the following cases:
+
+    * `sum(!is.na(x)) <= 2`: return NA.
+    * `x` contains `NA`s and `na_rm = false`: return `NA`
+    * `x` doesn’t contain `NA`s and (`length(x) > 1`)
+    * `x` contains `NA`s (but `sum(!is.na(x)) > 1`) and narm = true
+    
+    ```cpp
+    double varC(NumericVector x, bool na_rm = false) {
+      int n = x.size();
+      LogicalVector i_na = is_na(x);
+      int n_na = 0;
+      double mx = 0;
+      double out = 0;
+      
+      // Calculate n_na
+      for(int i = 0; i<n; i++){
+          if (i_na[i]) {
+            n_na++;
+          }
+      }
+      
+      // sum(!is.na(x)) < 2: return NA
+      if (n - n_na < 2) {return NA_REAL;}
+      
+      // x contains NAs an na_rm = false: return NA
+      if (n_na > 0 & !na_rm) {return NA_REAL;}
+      
+      // x doesn’t contain NAs (and length(x) > 1):
+      // n_na = 0 (and n > 1)
+      if (n_na == 0) {
+        for(int i = 0; i < n; ++i) {
+          mx += x[i] / n;
+        }
+          
+        for(int i = 0; i < n; ++i) {
+          out += pow(x[i] - mx, 2);
+        }
+      
+        out = out / (n-1);
+      }
+  
+      // x contains NAs (but sum(!is.na(x)) > 1) and narm = true
+      // n_na > 0 and narm = true
+      if (n_na > 0 & na_rm) {
+        for(int i = 0; i < n; ++i) {
+          if (!i_na[i]) {
+            mx += x[i] / (n - n_na);
+          }
+        }
+      
+        for(int i = 0; i < n; ++i) {
+          if (!i_na[i]) {
+            out += pow(x[i] - mx, 2);
+          }
+        }
+      
+        out = out / (n - n_na - 1);
+      }
+  
+      return out;
+    }
+    ```
 
 2. __[Q]{.Q}__: Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that these functions have slightly more complicated behaviour.
     
