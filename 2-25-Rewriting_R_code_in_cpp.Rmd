@@ -473,6 +473,37 @@ source("common.R")
       return out;
     }
     ```
+    
+    Now, let's focus on the functions from the 1st exercise and start with `cumsumC()`. In case of `na_rm = false` and any `x` values contain an `NA`, `cumsumC()` will return `NA`. When `na_rm = true`, `cumsumC()` will treat `NA`s as zeros.
+    
+    ```cpp
+    NumericVector cumsumC(NumericVector x, bool na_rm = false) {
+      int n = x.size();
+      LogicalVector i_na = is_na(x);
+      NumericVector out(n);
+
+      if (!na_rm) {
+        if (i_na[0]) return NumericVector::create(NA_REAL);
+        out[0] = x[0];
+        
+        for(int i = 1; i < n; ++i) {
+          if (i_na[i]) return NumericVector::create(NA_REAL);
+          out[i] = x[i] + out[i-1];
+        }
+      } 
+      
+      if (na_rm) {
+        if ( i_na[0]) out[0] = 0;
+        if (!i_na[0]) out[0] = x[0];
+      
+        for(int i = 1; i < n; ++i) {
+          if ( i_na[i]) out[i] = out[i-1] + 0;
+          if (!i_na[i]) out[i] = out[i-1] + x[i];
+        }
+      } 
+      return out;
+    }
+    ```
 
 2. __[Q]{.Q}__: Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that these functions have slightly more complicated behaviour.
     
