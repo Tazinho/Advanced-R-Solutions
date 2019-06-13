@@ -4,7 +4,7 @@ source("common.R")
 
 # S3
 
-```{r}
+```{r setup}
 library(sloop)
 ```
 
@@ -48,9 +48,9 @@ library(sloop)
 
 3. __[Q]{.Q}__: What does the `as.data.frame.data.frame()` method do? Why is it confusing? How could you avoid this confusion in your own code?
 
-   __[A]{.solved}__: The function `as.data.frame.data.frame()` implements the data frame *method* for the `as.data.frame()` *generic*, which coerces objects to data frames.
+   __[A]{.solved}__: The function `as.data.frame.data.frame()` implements the `data.frame` *method* for the `as.data.frame()` *generic*, which coerces objects to data frames.
 
-   The name is confusing, because it does not clearly communicate the type of the function, which could be a regular function, a generic or a method. Even if we assume a method, the amount of `.`'s makes it difficult to separate the generic- and the class-part of the name.  
+   The name is confusing, because it does not clearly communicate the type of the function, which could be a regular function, a generic or a method. Even if we assume a method, the amount of `.`'s makes it difficult to separate the generic- and the class-part of the name" Is it the `data.frame.data.frame` method for the `as` generic? Is it the `frame.data.frame` method for the `as.data` generic? 
 
    We could avoid this confusion by applying a different naming convention (e.g. "snake_case") for our class and function names.
 
@@ -69,6 +69,7 @@ library(sloop)
    After `unclass()` has removed the class attribute the default method is chosen by the method dispatch. (`mean.default(unclass(some_days))`) calculates the mean of the underlying double.  
     
    <!-- When you look into the source code of `mean.Date()` (one line), you will see that the difference in the resulting objects is only the class attribute. -->
+   <!-- HW: that's because Dates don't have any attributes; all dates have the same origin -->
    <!-- I agree, that inspecting `mean.Date` is interesting, though I am not entirely sure, how the dots work here and how the origin of the date is passed to `.Date`. It looks to me, as if the result of `mean.default(unclass(x))` is then backtransformend into a Date... If we can describe this concisely, we can use it otherwise I think we can safely skip it. (HB, 2019-03-12) -->
 
 5. __[Q]{.Q}__: What class of object does the following code return? What base type is it built on? What attributes does it use?
@@ -78,7 +79,13 @@ library(sloop)
     x
     ```
     
-   __[A]{.solved}__: This code returns an object of the class "ecdf" and contains an empirical cumulative distribution function of its input. The object is built on the base type "closure" and the expression, which was used to create it (`rpois(100, 10)`) is stored in in the `call` attribute.
+   __[A]{.solved}__: This code returns an object of the class "ecdf" and contains an empirical cumulative distribution function of its input. The object is built on the base type "closure" (a function) and the expression, which was used to create it (`rpois(100, 10)`) is stored in in the `call` attribute.
+   
+    ```{r}
+    typeof(x)
+    
+    attributes(x)
+    ```
 
 6. __[Q]{.Q}__: What class of object does the following code return? What base type is it built on? What attributes does it use?
     
@@ -87,38 +94,37 @@ library(sloop)
     x
     ```
 
-   __[A]{.solved}__: This code returns a "table" object, which is build upon the base type "integer". The attribute "dimnames" are used to name the elements of the integer vector.
+   __[A]{.solved}__: This code returns a "table" object, which is build upon the "integer" type. The attribute "dimnames" are used to name the elements of the integer vector.
+   
+    ```{r}
+    typeof(x)
+    
+    attributes(x)
+    ```
+   
 
 ## Classes
 
 1. __[Q]{.Q}__: Write a constructor for `data.frame` objects. What base type is a data frame built on? What attributes does it use? What are the restrictions placed on the individual elements? What about the names?
 
-   __[A]{.solved}__: Data frames are built on (named) lists with the additional requirement that all elements must have the same length. Their only attribute is "row.names". These must be unique, have the same length as each list element and also must be of integer or character type.
+   __[A]{.solved}__: Data frames are built on a named lists of vectors, where every element is the same length. Their only attribute is "row.names" which must be a character vector the same length as the other elements. We need to provide the number of rows as an input to make it possible to create data frames with 0 columns but multiple rows.
    
-   There are no additional restrictions to column names apart to those of lists, so one could use special characters and surround the names with backticks (which is not recommended).
+   This leads to the following constructor:
    
-   A very good constructor implementing these criteria used to be part of the sloop package. It is no longer part of the package, but the source can still be found online (https://github.com/r-lib/sloop/blob/be7ce8a6be660536df4bdd3a31fa54f0d627f2d6/R/data.frame.R#L11).
-    
     ```{r, error=TRUE}
-    # Copied from older version of the sloop package
-    new_data.frame <- function(x, row.names = NULL) {
+    new_data.frame <- function(x, n, row.names = NULL) {
       stopifnot(is.list(x))
       
-      n <- if (length(x) == 0) 0 else length(x[[1]])
-      lengths <- vapply(x, length, integer(1))
-      stopifnot(all(lengths == n))
+      # Check all inputs are the same length
+      stopifnot(all(lengths(x) == n))
       
       if (is.null(row.names)) {
+        # Use special row names helper
         row.names <- .set_row_names(n)
       } else {
-        stopifnot(
-          is.character(row.names) || 
-            is.numeric(row.names)
-          )
-        stopifnot(
-          length(row.names) == n || 
-            length(row.names) == 2
-          )
+        # Otherwise check that they're a character vector with the 
+        # correct length
+        stopifnot(is.character(row.names), length(row.names) == n)
       }
       
       structure(
@@ -130,29 +136,38 @@ library(sloop)
     
     # Test
     x <- list(a = 1, b = 2)
-    new_data.frame(x, row.names = "l1")
-    new_data.frame(x, row.names = 1)
+    new_data.frame(x, n = 1)
+    new_data.frame(x, n = 1, row.names = "l1")
+  
+    # Create a data frame with 0 columns and 2 rows    
+    new_data.frame(list(), n = 2)
 ```
+    
+    There are two additional restrictions we could implement if we were being very strict: both the row names and column names should be unique.
+
     
 2. __[Q]{.Q}__: Enhance my `factor()` helper to have better behaviour when one or more `values` is not found in `levels`. What does `base::factor()` do in this situation?
     
    __[A]{.solved}__: `base::factor()` converts these values (silently) into `NA`'s. To improve our `factor()` helper we choose to return an informative error message instead.
     
-    ```{r, eval = FALSE}
-    factor <- function(x, levels = unique(x)) {
+    ```{r, error = TRUE}
+    factor2 <- function(x, levels = unique(x)) {
       new_levels <- match(x, levels)
       
-      # Return error if unseen levels are passed
-      if(any(is.na(new_levels))){
-        stop("The following values do not occur ",
-             "in the levels of x: ",
-             paste(setdiff(x, levels), collapse = ", ")
-             ".", 
-             call. = FALSE)
-        }
+      # Error if levels don't include all values
+      missing <- unique(setdiff(x, levels))
+      if (length(missing) > 0) {
+        stop(
+          "The following values do not occur in the levels of x: ",
+          paste0("'", missing, "'", collapse = ", "), ".", 
+          call. = FALSE
+        )
+      }
       
       validate_factor(new_factor(new_levels, levels))
     }
+    
+    factor2(c("a", "b", "c"), levels = c("a", "b"))
     ```
 
 3. __[Q]{.Q}__: Carefully read the source code of `factor()`. What does it do that our constructor does not?
@@ -161,21 +176,24 @@ library(sloop)
 
 4. __[Q]{.Q}__: Factors have an optional “contrasts” attribute. Read the help for `C()`, and briefly describe the purpose of the attribute. What type should it have? Rewrite the `new_factor()` constructor to include this attribute.
 
-   __[A]{.solved}__: When factor variables (representing nominal or ordinal information) are used in statistical models, they are typically encoded as dummy variables and by default each level is compared with the first factor level. However, many different encodings ("contrasts") are possible: https://en.wikipedia.org/wiki/Contrast_(statistics)
+   __[A]{.solved}__: When factor variables (representing nominal or ordinal information) are used in statistical models, they are typically encoded as dummy variables and by default each level is compared with the first factor level. However, many different encodings ("contrasts") are possible: <https://en.wikipedia.org/wiki/Contrast_(statistics)>
 
    Within R's formula interface you can wrap a factor in `C` and specify the contrast of your choice. Alternatively you can set the "contrast" attribute of you factor variable, which accepts matrix input. (see `?contr.helmert` or similar for details)
 
     ```{r}
     # Updated factor constructor
     new_factor <- function(
-      x = integer(),
-      levels = character(),
-      contrast = NULL
+                           x = integer(),
+                           levels = character(),
+                           contrast = NULL
     ) {
       stopifnot(is.integer(x))
       stopifnot(is.character(levels))
-      stopifnot(is.matrix(contrast) | is.null(contrast))
-      
+      if (!is.null(constrast)) {
+        # if supplied should be a numeric matrix
+        stopifnot(is.matrix(contrast) && is.numeric(contrast))
+      }
+
       structure(
         x,
         levels = levels,
@@ -202,10 +220,9 @@ library(sloop)
     validate_roman <- function(x) {
       values <- unclass(x)
       
-      if(any(values < 1 | values > 3899)) {
+      if (any(values < 1 | values > 3899)) {
         stop(
-          "Roman numbers are only defined between ",
-          "1 and 3899.",
+          "Roman numbers must fall between 1 and 3899.",
           call. = FALSE
         )
       }
@@ -216,7 +233,7 @@ library(sloop)
 
    For convenience, we allow the user to also pass real values to a helper function.
 
-    ```{r, error=TRUE}
+    ```{r, error = TRUE}
     roman <- function(x = integer()) {
       x <- as.integer(x)
       
@@ -227,7 +244,6 @@ library(sloop)
     roman(c(1, 753, 2019))
     roman(0)
     ```
-
 
 ## Generics and methods
 
@@ -247,8 +263,6 @@ library(sloop)
     sloop::ftype(t.test)
     ```  
     
-   `sloop::ftype()` confirms via a call to  `sloop:::is_s3_generic` (which then uses `codetools::findGlobals()`) that `t.test()` contains a call to `UseMethod()`.
-    
    Interestingly R also provides helpers, which list functions that look like methods, but in fact are not:
     
     ```{r}
@@ -257,65 +271,55 @@ library(sloop)
     
    When we create an object with class `test`, `t()`, will dispatch to `t.test()`. This happens, because `UseMethod()` simply searches for functions named `paste0("generic", ".", c(class(x), "default"))`.
    
-   Consequently `t.test()` is erroneously treated as a method of `t()`. Because `t.test()` is a generic itself and doesn't find a method called `t.test.test()`, it dispatches to `t.test.default()`.
-   
-   By defining `t.test.test()`, we demonstrate, that this is really what is happening internally.
+   Consequently `t.test()` is erroneously treated as a method of `t()`. Because `t.test()` is a generic itself and doesn't find a method called `t.test.test()`, it dispatches to `t.test.default()`. We can define  `t.test.test()` to demonstrate that this is really what is happening internally.
 
     ```{r, error=TRUE}
     x <- structure(1:10, class = "test")
     t(x)
     
-    t.test.test <- function(x) t.default(x)
+    t.test.test <- function(x) "Hi!"
     t(x)
     ```
 
 2. __[Q]{.Q}__: What generics does the `table` class have methods for?
 
-   __[A]{.solved}__: We find methods specific for the `table` class, by searching for functions that end on ".table".
+   __[A]{.solved}__: This is a simple application of `sloop::s3_methods_class()`:
    
     ```{r}
-    library(methods)
-    objs <- mget(ls("package:base"), inherits = TRUE)
-    funs <- Filter(is.function, objs)
-    
-    Filter(function(x) grepl(".table$", x), names(funs))
+    s3_methods_class("table")
     ```
-
+    
+    Interestingly, the `table` class has a number of methods designed to help plotting with base graphics.
+    
+    ```{r}
+    x <- rpois(100, 5)
+    plot(table(x))
+    ```
+    
 3. __[Q]{.Q}__: What generics does the `ecdf` class have methods for?
 
-   __[A]{.solved}__: We use the same approach as above. When this is not successful, we repeat using the superclass. Apparently the classes `ecdf` and `stepfun` exist, even though no specific methods are currently implemented (in base R).
+   __[A]{.solved}__: We use the same approach as above:
 
     ```{r}
-    class(ecdf(1:2))
-    
-    Filter(function(x) grepl(".ecdf$", x), names(funs))
-    Filter(function(x) grepl(".stepfun$", x), names(funs))
-    Filter(function(x) grepl(".function$", x), names(funs))
+    s3_methods_class("ecdf")
     ```
 
-   <!-- I think it would be nice to reflect on, why `ecdf` has a special class, but no specific methods tailored to this class. But I'm not sure about this for now. (HB, 2018-03-13) -->
+    The methods are primarily designed for display (`plot()`, `print()`, `summary()`), but you can also extract quantiles with `quantile()`.
 
+   
 4. __[Q]{.Q}__: Which base generic has the greatest number of defined methods?
     
-   __[A]{.solved}__: The generic `print()` clearly has the most defined methods.
+   __[A]{.solved}__: A little experimentation (and thinking about the most popular functions) suggests that the `print()` generic has the most defined methods.
 
     ```{r}
-    generics <- Filter(
-      function(x) "generic" %in% sloop::ftype(x),
-      funs
-    )
-    
-    methods_per_generic <- sapply(
-      names(generics), function(x) methods(x),
-      USE.NAMES = TRUE
-    )
-    
-    tail(sort(lengths(methods_per_generic)), 3)
+    nrow(s3_methods_generic("print"))
+    nrow(s3_methods_generic("summary"))
+    nrow(s3_methods_generic("plot"))
     ```
     
 5. __[Q]{.Q}__: Carefully read the documentation for `UseMethod()` and explain why the following code returns the results that it does. What two usual rules of function evaluation does `UseMethod()` violate?
     
-    ```{r}
+    ```{r, results = FALSE}
     g <- function(x) {
       x <- 10
       y <- 10
@@ -328,20 +332,19 @@ library(sloop)
     g(x)
     ```
     
-   __[A]{.solved}__: R looks for the `x` argument in `g()`'s calling environment (the global environment), in which `x` is bound to 1.
-
-   `g()` then dispatches to `g.default()`. The `x` argument is passed to `g.default()`. As `y` is not defined with `g.default`'s function environment, `y`'s value will be taken from the environment where `UseMethod()` created the call. There `y` is defined as 10.  
-    
-   When invoking `g.default()` explicitly, instead of using `UseMethod()`, the default argument, `x`, is evaluated in `g.default`'s calling environment, where it is `10` and further global variables like `y` are looked up via lexical scoping in the enclosing (global) environment, where `y` is `1`.
+   __[A]{.solved}__: Let's take this step by step. If you call `g.default()` directly you get `c(1, 1)` as you might expect. The value bound to `x` comes from the argument, the value from `y` comes from the global environment.
    
     ```{r}
-    g <- function(x) {
-      x <- 10
-      y <- 10
-      g.default(x)
-    }
+    g.default(x)
+    ```
+    
+    But when we call `g()` we get `c(1, 10)`:
+    
+    ```{r}
     g(x)
     ```
+    
+    This is seemingly inconsistent: why does `x` come from the value defined inside of `g()`, and `y` still come from the global environment? It's because `UseMethod()` calls `g.default()` in a special way so that variables defined inside the generic are available to methods. The exception is argument to the function: they are passed on as is, and cannot be affect by code inside the generic.
     
 6. __[Q]{.Q}__: What are the arguments to `[`? Why is this a hard question to answer?
 
@@ -365,10 +368,10 @@ library(sloop)
     
    __[A]{.started}__: The returned objects correspond to the following object styles:
    
-   Vector: `factor()`, `table()`, `as.Date()`, `ordered()`  
-   Record:  
-   Scalar: `lm()`, `ecdf()`  
-   Other: `I()`  
+    * Vector: `factor()`, `table()`, `as.Date()`, `ordered()`  
+    * Record:  
+    * Scalar: `lm()`, `ecdf()`  
+    * Other: `I()`  
    
 2. __[Q]{.Q}__: What would a constructor function for `lm` objects, `new_lm()`, look like? Use `?lm` and experimentation to figure out the required fields and their types.
 
@@ -381,7 +384,7 @@ library(sloop)
     
     # Define constructor
     new_lm <- function(
-      coefficiets, residuals, effects, rank, fitted.values, assign,
+      coefficients, residuals, effects, rank, fitted.values, assign,
       qr, df.residual, xlevels, call, terms, model
     ) {
       
@@ -419,34 +422,43 @@ library(sloop)
 
    __[A]{.started}__:
    
-    ```{r, eval=FALSE}
+   <!-- HW: I've included a few hints: -->
+   
+   `[.Date` calls `.Date` with the result of calling `[` on the parent class, along with `oldClass()`:
+    ```{r}
     # inspect function
     `[.Date`
-    
-    # see how it's used
-    x <- Sys.Date()
-    s3_dispatch(x[1])
-    
-    # attempt to find out, what oldclass does
-    oldClass()
     ```
-
-   Maybe one would have to create a subclass to `Date` and see what `s3_dispatch` returns, when it is called on this subclass. I suspect, the delegation to the internal `[` to be related to the issue here.
+    
+    `.Date` is kind of like a constructor for date classes, although it doesn't check the input is the correct type:
+    
+    ```{r}
+    .Date
+    ```
+  
+  So what does `oldClass()` do? It's implemented in C so we can't easily see what it does, and the documentation refers to S-PLUS:
+  
+  > Functions oldClass and oldClass<- behave in the same way as functions of those names in S-PLUS 5/6, but in R UseMethod dispatches on the class as returned by class (with some interpolated classes: see the link) rather than oldClass. However, group generics dispatch on the oldClass for efficiency, and internal generics only dispatch on objects for which is.object is true.
+  
+  Instead lets just try it out:
+  
+    ```{r}
+    oldClass(Sys.Date())
+    oldClass(numeric())
+    oldClass(data.frame())
+    oldClass(integer())
+    ```
+  
+    It seems similar to `class()`, but it returns `NULL` for base types. Together this means that `[.Date` effectively calls `mean()` on the underlying numeric data, then resets the class of the result to the input. This ignores the fact that a subclass might have additional attributes.
 
 2. __[Q]{.Q}__: R has two classes for representing date time data, `POSIXct` and `POSIXlt`, which both inherit from `POSIXt`. Which generics have different behaviours for the two classes? Which generics share the same behaviour?
     
    __[A]{.solved}__: To answer this question, we have to get the respective generics
     
     ```{r}
-    # define helper
-    get_generics <- function(x) {
-      attr(methods(class = x), "info")[["generic"]]
-    }
-    
-    # get generics
-    generics_t  <- get_generics("POSIXt")
-    generics_ct <- get_generics("POSIXct")
-    generics_lt <- get_generics("POSIXlt")
+    generics_t  <- s3_methods_class("POSIXt")$generic
+    generics_ct <- s3_methods_class("POSIXct")$generic
+    generics_lt <- s3_methods_class("POSIXlt")$generic
     ```
     
    The generics in `generics_t` with a method for the superclass POSIXt potentially share the same behaviour for both subclasses. However, if a generic has a specific method for one of the subclasses, it has to be subtracted:
@@ -497,7 +509,7 @@ library(sloop)
     s3_dispatch(x2[1])
     ```
 
-   __[A]{.started}__: `class()` returns `"integer"` for `x1` and `x2`. However, they are not identical. While `x2` has the attribute "class" with the value `"integer"`, `x1` doesn't have a class attribute. Instead, `x1` has the implicit class `"numeric"`, see `?class`.
+   __[A]{.started}__: `class()` returns `"integer"` for `x1` and `x2`, but the class of `x1` is implicit, while the class of `x2` is explicit.  This is important because `[` is an internal generic, so when the class is explicitly set, the "implicit" parent class `numeric` is not considered.
 
 2. __[Q]{.Q}__: What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
 
@@ -511,15 +523,13 @@ library(sloop)
    The following classes have a method for this group generic:
     
     ```{r}
-    methods("Math")
+    s3_methods_generic("Math")
     ```
-    
-   To read the source code of the S3 classes, we can just enter the name of the method into the console. To get the source code of the S4 classes, we can use `getMethod()`, i. e. `getMethod("Math", "nonStructure")`.
     
    To explain the basic idea, we just overwrite the data frame method:
     
     ```{r}
-    Math.data.frame <- function(x){"hello"}
+    Math.data.frame <- function(x) "hello"
     ```
     
    Now all functions from the math generic group, will return `"hello"`
