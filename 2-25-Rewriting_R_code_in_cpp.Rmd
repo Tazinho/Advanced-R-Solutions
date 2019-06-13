@@ -507,26 +507,27 @@ source("common.R")
    
    In our new `anyC()` implementation we use `LogicalVetor` as return type. Otherwise, i.e. when using `bool`, the C++ `NA_LOGICAL` would be converted into R's logical `TRUE`.
    
-    ```
+    ```cpp
     LogicalVector anyC(LogicalVector x, bool na_rm = false) {
       int n = x.size();
       LogicalVector i_na = is_na(x);
-      
+      LogicalVector out  = false;
+    
       if (!na_rm) {
         for (int i = 0; i < n; ++i) {
           if (i_na[i]) return LogicalVector::create(NA_LOGICAL);
+          if (   x[i]) out = true;
         }
       }
-  
-      for(int i = 0; i < n; ++i) {
-        if (i_na[i]) {
-          if ( na_rm) continue;
+      
+      if (na_rm) {
+        for(int i = 0; i < n; ++i) {
+          if (i_na[i]) continue;
+          if (   x[i]) out = true;
         }
+      }
     
-        if (x[i]) return true;
-      }
-  
-      return false;
+      return out;
     }
     ```
 
