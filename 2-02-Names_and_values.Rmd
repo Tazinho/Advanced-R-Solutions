@@ -263,24 +263,23 @@ library(lobstr)
 3. __[Q]{.Q}__: Predict the output of the following code:
 
     ```{r, eval = FALSE}
-    x <- runif(1e6)
-    obj_size(x)
-    #> 8,000,048 B
+    a <- runif(1e6)
+    obj_size(a)
     
-    y <- list(x, x)
-    obj_size(y)
-    obj_size(x, y)
+    b <- list(a, a)
+    obj_size(b)
+    obj_size(a, b)
     
-    y[[1]][[1]] <- 10
-    obj_size(y)
-    obj_size(x, y)
+    b[[1]][[1]] <- 10
+    obj_size(b)
+    obj_size(a, b)
     
-    y[[2]][[1]] <- 10
-    obj_size(y)
-    obj_size(x, y)
+    b[[2]][[1]] <- 10
+    obj_size(b)
+    obj_size(a, b)
     ```
     
-    <!-- I think I accidentally made this too hard too - the important thing is the size of y, not of x -->
+    <!-- I think I accidentally made this too hard too - the important thing is the size of b, not of a -->
     
    __[A]{.solved}__: In R (on most platforms) a length-0
   vector has 48 bytes of overhead:
@@ -306,46 +305,46 @@ library(lobstr)
     
     (If you look carefully at the amount of memory occupied by short vectors, you'll notice that the pattern is actually more complicated. This is to do with how R allocates memory, and is not that important. If you want to know the full details, they're discussed in the 1st edition of Advanced R: http://adv-r.had.co.nz/memory.html#object-size)
 
-   In `y <- list(x, x)` both list elements of `y` contain references to the same memory address, so no additional memory is required for the second list element. The list itself requires 64 bytes, 48 bytes for an empty list and 8 bytes for each element (`obj_size(vector("list", 2))`). This let's us predict 8000048 B + 64 B = 8000112 B:
+   In `b <- list(a, a)` both list elements of `b` contain references to the same memory address, so no additional memory is required for the second list element. The list itself requires 64 bytes, 48 bytes for an empty list and 8 bytes for each element (`obj_size(vector("list", 2))`). This let's us predict 8000048 B + 64 B = 8000112 B:
    
     ```{r}
-    y <- list(x, x) 
-    obj_size(y)
+    b <- list(a, a) 
+    obj_size(b)
     ```
    
-   The list `y` already contains references to `x`, so no extra memory is needed for `x` and the amount of required memory stays the same.
+   The list `b` already contains references to `a`, so no extra memory is needed for `a` and the amount of required memory stays the same.
    
     ```{r}
-    obj_size(x, y) 
-    ref(x, y)
+    obj_size(a, a) 
+    ref(a, b)
     ```
     
-   When we modify the first element of `y[[1]]` copy-on-modify occurs and the object will have the same size (8000040 bytes) and a new address in memory. So `y`'s elements don't share references anymore. Because of this their object sizes add up to the sum of of the two different vectors and the length-2 list: 8000048 B + 8000048 B + 64 B = 16000160 B (16 MB).
+   When we modify the first element of `b[[1]]` copy-on-modify occurs and the object will have the same size (8000040 bytes) and a new address in memory. So `b`'s elements don't share references anymore. Because of this their object sizes add up to the sum of of the two different vectors and the length-2 list: 8000048 B + 8000048 B + 64 B = 16000160 B (16 MB).
 
     ```{r}
-    y[[1]][[1]] <- 10
-    obj_size(y) 
+    b[[1]][[1]] <- 10
+    obj_size(b) 
     ```
     
-   The second element of `y` still references to the same address as `x`, so the combined size of `x` and `y` is the same as `y`:
+   The second element of `b` still references to the same address as `a`, so the combined size of `a` and `b` is the same as `b`:
    
     ```{r}
-    obj_size(x, y) 
-    ref(x, y)
+    obj_size(a, b) 
+    ref(a, b)
     ```
     
-   When we modify the second element of `y`, this element will also point to a new memory address. This doesn´t affect the size of the list:
+   When we modify the second element of `b`, this element will also point to a new memory address. This doesn´t affect the size of the list:
    
     ```{r}
-    y[[2]][[1]] <- 10
-    obj_size(y) 
+    b[[2]][[1]] <- 10
+    obj_size(b) 
     ```
    
-   However, as `y` doesn't share references with `x` anymore, the memory usage of the combined objects increases:
+   However, as `b` doesn't share references with `a` anymore, the memory usage of the combined objects increases:
    
     ```{r}
-    ref(x, y)
-    obj_size(x, y) 
+    ref(a, b)
+    obj_size(a, b) 
     ```
 
 ## Modify-in-place
