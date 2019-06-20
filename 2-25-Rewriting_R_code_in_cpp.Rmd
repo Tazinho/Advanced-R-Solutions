@@ -212,9 +212,7 @@ source("common.R")
 
 1. __[Q]{.Q}__:  Rewrite any of the functions from the first exercise to deal with missing values. If `na.rm` is true, ignore the missing values. If `na.rm` is false, return a missing value if the input contains any missing values. Some good functions to practice with are `min()`, `max()`, `range()`, `mean()`, and `var()`.
 
-   __[A]{.started}__: (TODO: `PositionC()` and `pminC()` are still missing.)
-   
-   Before we take a look at `cumsum()`, `any()`, `Position()` and `pmin()` from the first exercise, we follow the advice and rewrite `min()`, `max()`, `range()`, `mean()` and `var()`. When ignoring missing values (i.e. `na_rm = false`), we try to keep the overall function behaviour close to the original function. To avoid irregular type conversions we mostly stick with vector data types as return values.
+   __[A]{.started}__: Before we take a look at `cumsum()`, `any()`, `Position()` and `pmin()` from the first exercise, we follow the advice and rewrite `min()`, `max()`, `range()`, `mean()` and `var()`. When ignoring missing values (i.e. `na_rm = false`), we try to keep the overall function behaviour close to the original function. To avoid irregular type conversions we mostly stick with vector data types as return values.
    
    To make `minC()` aware of `NA`s, we introduce an `na_rm` argument. In case `x` contains only `NA`'s and `na_rm == TRUE` `minC()` should return `Inf`.
    
@@ -429,6 +427,38 @@ source("common.R")
         if (res[0]) return i + 1;
       }
       return 0;
+    }
+    ```
+    
+   When we set `na_rm = TRUE` in our `pminC()` function it only returns `NA`'s at indices where both, `x` and `y`, contain an `NA`.
+   
+    ```cpp
+    NumericVector pminC(NumericVector x, NumericVector y, bool na_rm = false) {
+      int n = std::max(x.size(), y.size());
+      NumericVector x1 = rep_len(x, n);
+      NumericVector y1 = rep_len(y, n);
+      
+      NumericVector out(n);
+      
+      for (int i = 0; i < n; ++i) {
+        if (na_rm == false) {
+          if (NumericVector::is_na(x[i])) return NumericVector::create(NA_REAL);
+          if (NumericVector::is_na(y[i])) return NumericVector::create(NA_REAL);
+        }
+        if (na_rm == true) {
+          if (NumericVector::is_na(x[i])) {
+            out[i] = y[i];
+            continue;
+          }
+          if (NumericVector::is_na(y[i])) {
+            out[i] = x[i];
+            continue;
+          }
+        }
+            out[i] = std::min(x1[i], y1[i]);
+      }
+      
+      return out;
     }
     ```
 
