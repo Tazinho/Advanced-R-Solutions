@@ -283,6 +283,7 @@ source("common.R")
         for(int i = 0; i < n; i++){
           if (NumericVector::is_na(x[i])) {
             out[0] = NA_REAL;
+            return out;
           }
           out[0] += x[i];
           n_count++;
@@ -309,71 +310,49 @@ source("common.R")
     }
     ```
     
-   To make `varC()` aware of NAs, we need to cover the following cases:
-
-    * `sum(!is.na(x)) <= 2`: return NA.
-    * `x` contains `NA`s and `na_rm = false`: return `NA`
-    * `x` doesn’t contain `NA`s and (`length(x) > 1`)
-    * `x` contains `NA`s (but `sum(!is.na(x)) > 1`) and narm = true
+   For `varC()`, we handle both cases of `na_rm` inside the first for loop, as this reduce code duplication.
     
     ```cpp
-    double varC(NumericVector x, bool na_rm = false) {
+    NumericVector varC(NumericVector x, bool na_rm = false) {
       int n = x.size();
-      LogicalVector i_na = is_na(x);
-      int n_na = 0;
-      double mx = 0;
-      double out = 0;
+      int n_count = 0;
+      double m_x = 0;
+      NumericVector out = NumericVector::create(0);
       
-      // Calculate n_na
-      for(int i = 0; i<n; i++){
-          if (i_na[i]) {
-            n_na++;
-          }
-      }
-      
-      // sum(!is.na(x)) < 2: return NA
-      if (n - n_na < 2) {return NA_REAL;}
-      
-      // x contains NAs an na_rm = false: return NA
-      if (n_na > 0 & !na_rm) {return NA_REAL;}
-      
-      // x doesn’t contain NAs (and length(x) > 1):
-      // n_na = 0 (and n > 1)
-      if (n_na == 0) {
-        for(int i = 0; i < n; ++i) {
-          mx += x[i] / n;
-        }
-          
-        for(int i = 0; i < n; ++i) {
-          out += pow(x[i] - mx, 2);
-        }
-      
-        out = out / (n-1);
-      }
-  
-      // x contains NAs (but sum(!is.na(x)) > 1) and narm = true
-      // n_na > 0 and narm = true
-      if (n_na > 0 & na_rm) {
-        for(int i = 0; i < n; ++i) {
-          if (!i_na[i]) {
-            mx += x[i] / (n - n_na);
+      for(int i = 0; i < n; i++) {
+        if (NumericVector::is_na(x[i])) {
+          if (na_rm == FALSE) {
+            out[0] = NA_REAL;
+            return out;
+          } else {
+            continue;
           }
         }
-      
-        for(int i = 0; i < n; ++i) {
-          if (!i_na[i]) {
-            out += pow(x[i] - mx, 2);
-          }
-        }
-      
-        out = out / (n - n_na - 1);
+        m_x += x[i];
+        n_count++;
       }
-  
+    
+      if (n_count < 2) {
+        out[0] = NA_REAL;
+        return out;
+      }
+      
+      m_x /= n_count;
+      
+      for(int i = 0; i < n; ++i) {
+        if (NumericVector::is_na(x[i])) {
+          continue;
+        }
+        out[0] += pow(x[i] - m_x, 2);
+      }
+    
+      out[0] /= n_count - 1;
+      
       return out;
     }
     ```
     
-    Now, let's focus on the functions from the 1st exercise and start with `cumsumC()`. In case of `na_rm = false` and any `x` values contain an `NA`, `cumsumC()` will return `NA`. When `na_rm = true`, `cumsumC()` will treat `NA`s as zeros.
+    Now, let's focus on the functions `cumsum()`, `any()`, `Position()` and `pmin()` from the first exercise. 
     
     ```cpp
     NumericVector cumsumC(NumericVector x, bool na_rm = false) {
