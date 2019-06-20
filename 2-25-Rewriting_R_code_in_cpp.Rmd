@@ -352,33 +352,28 @@ source("common.R")
     }
     ```
     
-    Now, let's focus on the functions `cumsum()`, `any()`, `Position()` and `pmin()` from the first exercise. 
+   Now, let's focus on the functions `cumsum()`, `any()`, `Position()` and `pmin()` from the first exercise.
+   
+   In case of `na_rm = true`, we keep the NA's in the output but ignore them in the cumulative sums.
     
     ```cpp
     NumericVector cumsumC(NumericVector x, bool na_rm = false) {
       int n = x.size();
-      LogicalVector i_na = is_na(x);
       NumericVector out(n);
-
-      if (!na_rm) {
-        if (i_na[0]) return NumericVector::create(NA_REAL);
-        out[0] = x[0];
-        
-        for(int i = 1; i < n; ++i) {
-          if (i_na[i]) return NumericVector::create(NA_REAL);
-          out[i] = x[i] + out[i-1];
-        }
-      } 
+      double sum_i = 0;
       
-      if (na_rm) {
-        if ( i_na[0]) out[0] = 0;
-        if (!i_na[0]) out[0] = x[0];
-      
-        for(int i = 1; i < n; ++i) {
-          if ( i_na[i]) out[i] = out[i-1] + 0;
-          if (!i_na[i]) out[i] = out[i-1] + x[i];
+      for(int i = 0; i < n; ++i) {
+        if (NumericVector::is_na(x[i])) {
+          if (na_rm == false) {
+            return NumericVector::create(NA_REAL);
+          }
+          out[i] = NA_REAL;
+          continue;
         }
-      } 
+        sum_i += x[i];
+        out[i] = sum_i;
+      }
+      
       return out;
     }
     ```
