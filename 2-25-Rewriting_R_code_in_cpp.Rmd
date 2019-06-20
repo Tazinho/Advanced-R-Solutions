@@ -225,122 +225,42 @@ source("common.R")
     * `x` contains some NAs and `na_rm = true`
 
     ```cpp
-    double minC(NumericVector x, bool na_rm = false){
+    NumericVector minC(NumericVector x, bool na_rm = false){
       int n = x.size();
-      LogicalVector i_na = is_na(x);
-      double out = NA_REAL;
-      bool any_na = false;
-      bool all_na = true;
+      NumericVector out = NumericVector::create(R_PosInf);
       
-      // Calculate any_na
-      for(int i = 0; i<n; i++){
-        if (i_na[i]) {
-          any_na = true;
-          break;
-        }
-      }
-      
-      if (!any_na) {
-        out = x[0];
-        for(int i = 0; i < n; i++) {
-          out = std::min(x[i], out);
-        }
-        return out;
-      }
-      
-      if (!na_rm & any_na) {
-        return out;
-      }
-      
-      // Calculate all_na
-      for(int i = 0; i < n; i++){
-        if (!i_na[i]) {
-          all_na = false;
-          break;
-        }
-      }
-      
-      // Case any_na & na_rm
-      if (na_rm & all_na) return R_PosInf;
-      
-      if (na_rm & any_na) {
-        // Find start value
-        for(int i = 0; i < n; i++){
-          if (!i_na[i]) {
-            out = x[i];
-            break;
+      if (na_rm == false) {
+        for(int i = 0; i < n; ++i) {
+          if (NumericVector::is_na(x[i])) {
+            out[0] = NA_REAL;
+            return out;
           }
-        }
-        // Calculate minimum
-        for(int i = 0; i < n; i++) {
-          if (!i_na[i]) {
-            out = std::min(x[i], out);
+          if (x[i] < out[0]) {
+            out[0] = x[i];
           }
         }
       }
-      
+  
+      if (na_rm) {
+        for(int i = 0; i < n; ++i) {
+          if (x[i] == NA_REAL) {
+            continue;
+          }
+          if (x[i] < out[0]) {
+            out[0] = x[i];
+          }
+        }
+      }
+    
       return out;
     }
     ```
     
-   To make `maxC()` aware of NAs, we follow our implementation of `minC()` and only change `std::min` to `std::max` and `R_PosInf` to `R_NegInf`.
+   To make `maxC()` aware of `NA`s, we use `minC()` together with the following relationship between the minimum and the maximum: $max(x) = -min(-x)$.
 
     ```cpp
-    double maxC(NumericVector x, bool na_rm = false){
-      int n = x.size();
-      LogicalVector i_na = is_na(x);
-      double out = NA_REAL;
-      bool any_na = false;
-      bool all_na = true;
-      
-      // Calculate any_na
-      for(int i = 0; i<n; i++){
-        if (i_na[i]) {
-          any_na = true;
-          break;
-        }
-      }
-  
-      if (!any_na) {
-        out = x[0];
-        for(int i = 0; i < n; i++) {
-          out = std::max(x[i], out);
-        }
-        return out;
-      }
-      
-      if (!na_rm & any_na) {
-        return out;
-      }
-      
-      // Calculate all_na
-      for(int i = 0; i < n; i++){
-        if (!i_na[i]) {
-          all_na = false;
-          break;
-        }
-      }
-      
-      // Case any_na & na_rm
-      if (na_rm & all_na) return R_NegInf;
-      
-      if (na_rm & any_na) {
-        // Find start value
-        for(int i = 0; i < n; i++){
-          if (!i_na[i]) {
-            out = x[i];
-            break;
-          }
-        }
-        // Calculate maximum
-        for(int i = 0; i < n; i++) {
-          if (!i_na[i]) {
-            out = std::max(x[i], out);
-          }
-        }
-      }
-      
-      return out;
+    NumericVector maxC(NumericVector x, bool na_rm = false){
+      return -minC(-x, na_rm);
     }
     ```
    
@@ -350,8 +270,8 @@ source("common.R")
     NumericVector rangeC(NumericVector x, bool na_rm = false){
       NumericVector out(2);
       
-      out[0] = minC(x, na_rm);
-      out[1] = maxC(x, na_rm);
+      out[0] = minC(x, na_rm)[0];
+      out[1] = maxC(x, na_rm)[0];
       
       return out;
     }
@@ -360,52 +280,37 @@ source("common.R")
    To make `meanC()` aware of `NAs`, we consider the same cases as in previous functions.
     
     ```cpp
-    double meanC(NumericVector x, bool na_rm = false){
+    NumericVector meanC(NumericVector x, bool na_rm = false){
       int n = x.size();
-      LogicalVector i_na = is_na(x);
-      bool any_na = false;
-      bool all_na = true;
-      int n_non_na = 0;
-      double out = 0;
-  
-      // Calculate any_na
-      for(int i = 0; i<n; i++){
-        if (i_na[i]) {
-          any_na = true;
-          break;
-        }
-      }
-  
-      if (!any_na) {
-        for (int i = 0; i < n; i++) {
-          out += x[i] / n;
-        }
-        return out;
-      }
-  
-      // Calculate all_na and count of non-NAs
-      for(int i = 0; i<n; i++){
-          if (!i_na[i]) {
-            all_na = false;
-            n_non_na++;
+      int n_count = 0;
+      NumericVector out = NumericVector::create(0);
+      
+      if (na_rm == false) {
+        for(int i = 0; i < n; i++){
+          if (NumericVector::is_na(x[i])) {
+            out[0] = NA_REAL;
           }
-      }
-    
-      if (!na_rm & any_na) {
-        return NA_REAL;
-      }
-    
-      // Case na_rm and any_na
-      if (na_rm & all_na) {
-        return NAN;
+          out[0] += x[i];
+          n_count++;
+        }
+        out[0] /= n_count;
       }
       
       if (na_rm) {
-        for(int i = 0; i < n; i++) {
-          if (!i_na[i]) out += x[i] / n_non_na;
+        for(int i = 0; i < n; i++){
+          if (NumericVector::is_na(x[i])) {
+            continue;
+          }
+          out[0] += x[i];
+          n_count++;
         }
+        if (n_count == 0) {
+          out[0] = NAN;
+          return out;
+        }
+        out[0] /= n_count;
       }
-  
+      
       return out;
     }
     ```
