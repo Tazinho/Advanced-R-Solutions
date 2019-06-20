@@ -214,14 +214,10 @@ source("common.R")
 
    __[A]{.started}__: (TODO: `PositionC()` and `pminC()` are still missing.)
    
-   Let's follow the advice and rewrite `min()`, `max()`, `range()`, `mean()` and `var()` first. After this, we look at `cumsum()`, `any()`, `Position()` and `pmin()` from the first exercise.
+   Before we take a look at `cumsum()`, `any()`, `Position()` and `pmin()` from the first exercise, we follow the advice and rewrite `min()`, `max()`, `range()`, `mean()` and `var()`. When ignoring missing values (i.e. `na_rm = false`), we try to keep the overall function behaviour close to the original function. To avoid irregular type conversions we mostly stick with vector data types as return values.
    
-   To make `minC()` aware of `NA`s, we introduce an `na_rm` argument and need to differ between the following cases:
-    * `x` doesn't contain any NAs
-    * `x` contains NAs and `na_rm = false`: return `NA_REAL`
-    * `x` comtains only NAs and `na_rm = true`: return `R_PosInf`
-    * `x` contains some NAs and `na_rm = true`
-
+   To make `minC()` aware of `NA`s, we introduce an `na_rm` argument. In case of `na_rm == TRUE` and `all(is.na(x))` `minC()` should return `Inf`.
+   
     ```cpp
     NumericVector minC(NumericVector x, bool na_rm = false){
       int n = x.size();
@@ -254,7 +250,7 @@ source("common.R")
     }
     ```
     
-   To make `maxC()` aware of `NA`s, we use `minC()` together with the following relationship between the minimum and the maximum: $max(x) = -min(-x)$.
+   For `maxC()` we use `minC()` together with the following relationship between the minimum and the maximum: $\max(x) = -\min(-x)$.
 
     ```cpp
     NumericVector maxC(NumericVector x, bool na_rm = false){
@@ -262,7 +258,7 @@ source("common.R")
     }
     ```
    
-   `minC()` and `maxC()` enable us to write a compact and NA-aware `rangeC()` function.
+   `minC()` and `maxC()` enable us to write a compact and `NA`-aware `rangeC()` function.
    
     ```cpp    
     NumericVector rangeC(NumericVector x, bool na_rm = false){
@@ -275,7 +271,7 @@ source("common.R")
     }
     ```
     
-   To make `meanC()` aware of `NAs`, we consider the same cases as in previous functions.
+   Our `NA`-aware `meanC()` function should return `NaN`, in case of `na_rm = TRUE` and `all(is.na(x))`.
     
     ```cpp
     NumericVector meanC(NumericVector x, bool na_rm = false){
