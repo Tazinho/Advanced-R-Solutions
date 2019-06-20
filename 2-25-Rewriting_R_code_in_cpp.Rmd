@@ -354,7 +354,7 @@ source("common.R")
     
    Now, let's focus on the functions `cumsum()`, `any()`, `Position()` and `pmin()` from the first exercise.
    
-   In case of `na_rm = true`, we keep the NA's in the output but ignore them in the cumulative sums.
+   In case of `na_rm = true`, we keep the `NA`'s in the output but ignore them in the cumulative sums.
     
     ```cpp
     NumericVector cumsumC(NumericVector x, bool na_rm = false) {
@@ -387,7 +387,7 @@ source("common.R")
       
       if (na_rm == false) {
         for(int i = 0; i < n; ++i) {
-          if (x[i] == NA_LOGICAL) {
+          if (LogicalVector::is_na(x[i])) {
             out[0] = NA_LOGICAL;
             return out;
           } else {
@@ -400,7 +400,7 @@ source("common.R")
       
       if (na_rm) {
         for(int i = 0; i < n; ++i) {
-          if (x[i] == NA_LOGICAL) {
+          if (LogicalVector::is_na(x[i])) {
             continue;
           }
           if (x[i]) {
