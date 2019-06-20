@@ -216,7 +216,7 @@ source("common.R")
    
    Before we take a look at `cumsum()`, `any()`, `Position()` and `pmin()` from the first exercise, we follow the advice and rewrite `min()`, `max()`, `range()`, `mean()` and `var()`. When ignoring missing values (i.e. `na_rm = false`), we try to keep the overall function behaviour close to the original function. To avoid irregular type conversions we mostly stick with vector data types as return values.
    
-   To make `minC()` aware of `NA`s, we introduce an `na_rm` argument. In case of `na_rm == TRUE` and `all(is.na(x))` `minC()` should return `Inf`.
+   To make `minC()` aware of `NA`s, we introduce an `na_rm` argument. In case `x` contains only `NA`'s and `na_rm == TRUE` `minC()` should return `Inf`.
    
     ```cpp
     NumericVector minC(NumericVector x, bool na_rm = false){
