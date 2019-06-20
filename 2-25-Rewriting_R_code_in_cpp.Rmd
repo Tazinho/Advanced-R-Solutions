@@ -510,23 +510,31 @@ source("common.R")
     ```cpp
     LogicalVector anyC(LogicalVector x, bool na_rm = false) {
       int n = x.size();
-      LogicalVector i_na = is_na(x);
-      LogicalVector out  = false;
-    
-      if (!na_rm) {
-        for (int i = 0; i < n; ++i) {
-          if (i_na[i]) return LogicalVector::create(NA_LOGICAL);
-          if (   x[i]) out = true;
+      LogicalVector out = LogicalVector::create(false);
+      
+      if (na_rm == false) {
+        for(int i = 0; i < n; ++i) {
+          if (LogicalVector::is_na(x[i])) {
+            return LogicalVector::create(NA_LOGICAL);
+          } else {
+            if (x[i]) {
+              out[0] = true;
+            }
+          }
         }
       }
-      
+  
       if (na_rm) {
         for(int i = 0; i < n; ++i) {
-          if (i_na[i]) continue;
-          if (   x[i]) out = true;
+          if (LogicalVector::is_na(x[i])) {
+            continue;
+          }
+          if (x[i]) {
+            out[0] = true;
+            return out;
+          }
         }
       }
-    
       return out;
     }
     ```
@@ -553,7 +561,7 @@ source("common.R")
       return out;
     }
     
-    NumericVector difflagC(NumericVector x, int lag){
+    NumericVector difflagC(NumericVector x, int lag = 1){
       int n = x.size();
       NumericVector out(n - lag);
       LogicalVector index = is_na(x);
