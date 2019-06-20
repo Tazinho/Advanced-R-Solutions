@@ -214,7 +214,7 @@ source("common.R")
 
    __[A]{.solved}__: Before we take a look at `cumsum()`, `any()`, `Position()` and `pmin()` from the first exercise, we follow the advice and rewrite `min()`, `max()`, `range()`, `mean()` and `var()`. When ignoring missing values (i.e. `na_rm = false`), we try to keep the overall function behaviour close to the original function. To avoid irregular type conversions we mostly stick with vector data types as return values.
    
-   To make `minC()` aware of `NA`s, we introduce an `na_rm` argument. In case `x` contains only `NA`'s and `na_rm == TRUE` `minC()` should return `Inf`.
+   To make `minC()` aware of `NA`s, we introduce an `na_rm` argument. In case `x` contains only `NA`s and `na_rm == TRUE` `minC()` should return `Inf`.
    
     ```cpp
     NumericVector minC(NumericVector x, bool na_rm = false){
@@ -464,7 +464,7 @@ source("common.R")
 
 2. __[Q]{.Q}__: Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that these functions have slightly more complicated behaviour.
     
-   __[A]{.solved}__:
+   __[A]{.solved}__: As we already wrote an `NA`-aware `cumsumC()` function under the assumption to return a single `NA` in case of `na_rm = false`, we modify it here a bit to always return a vector with the same length as it's `x` argument. Our new `cumsumC2()` treats `NA`'s always like zeros. In case of `na_rm = false` `NA`s are kept in the output and in case of `na_rm = true` `NA`s are replaced by the last occuring non-`NA`-value or zero, in case of only `NA`s. 
    
     ```cpp
     NumericVector cumsumC(NumericVector x) {
@@ -483,18 +483,23 @@ source("common.R")
     
       return out;
     }
+    ```
     
-    NumericVector difflagC(NumericVector x, int lag = 1){
+   For `diffC()`'s implementation, we stick again to the idiom from the last exercise and return just an `NA` whenever one occures. In case of `na_rm = true`, we ensure that calculations which are affected by `NA`'s will also return an `NA`. (An alternative would be to exclude `NA`s completely from the input or - equivalently - the output).
+   
+    ```cpp
+    NumericVector difflagC(NumericVector x, int lag = 1, bool na_rm = false){
       int n = x.size();
       NumericVector out(n - lag);
-      LogicalVector index = is_na(x);
-              
-      for(int i = lag; i < n; i++){
-          if ((index[i]) || (index[i - lag])) {
-              out[i - lag] = NA_REAL;
-          } else {
-              out[i - lag] = x[i] - x[i - lag];
+        for(int i = lag; i < n; i++){
+          if (NumericVector::is_na(x[i]) || NumericVector::is_na(x[i - lag])) {
+          if (na_rm == false) {
+            return NumericVector::create(NA_REAL);
           }
+          out[i - lag] = NA_REAL;
+          continue;
+        }
+        out[i - lag] = x[i] - x[i - lag];
       }
       return out;
     }
