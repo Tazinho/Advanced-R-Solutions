@@ -412,6 +412,25 @@ source("common.R")
       return out;
     }
     ```
+    
+   For `PositionC()` we check the results of the predicate function for `NA`s. In some cases it might also make sense to consider checking the elements of the list input for `NA`s, and provide an `NA`-handling for the predicate function.
+   
+    ```cpp
+    int PositionC(Function pred, List x, bool na_rm = false) {
+      int n = x.size();
+      
+      for(int i = 0; i < n; ++i) {
+        LogicalVector res = pred(x[i]);
+        
+        if (LogicalVector::is_na(res[0])) {
+          if (na_rm) {continue;}
+          return NA_INTEGER;
+        }
+        if (res[0]) return i + 1;
+      }
+      return 0;
+    }
+    ```
 
 2. __[Q]{.Q}__: Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that these functions have slightly more complicated behaviour.
     
