@@ -175,6 +175,25 @@ library(lubridate)
     abc <- new("Factor", x = c("a", "b", "c"))
     abc
     ```
+    
+   Our `DataFrame` class consists of a list and a slot for `row.names`. More serious checks should be part of a validator.
+   
+    ```{r}
+    setClass("DataFrame",
+         slots = c(
+           x = "list", 
+           row.names = "character"
+         ),
+         prototype = list(
+           x = list(),
+           row.names = character(0)
+           )
+         )
+         
+    df <- new("DataFrame", 
+              x = list(a = 1, b = 2))         
+    df
+    ```
 
 ## Generics and methods
 
