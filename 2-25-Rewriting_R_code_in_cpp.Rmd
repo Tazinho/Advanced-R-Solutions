@@ -537,6 +537,32 @@ To practice using the STL algorithms and data structures, implement the followin
 2. __[Q]{.Q}__: `%in%` using `unordered_set` and the `find()` or `count()` methods.
 
    __[A]{.solved}__:
+   
+    ```cpp
+    // [[Rcpp::plugins(cpp11)]]
+    #include <Rcpp.h>
+    #include <unordered_set>
+    using namespace Rcpp;
+    
+    // [[Rcpp::export]]
+    LogicalVector inC(CharacterVector x, CharacterVector table) {
+      std::unordered_set<String> seen;
+      int n_x = x.size();
+      std::vector<bool> out;
+  
+      seen.insert (table.begin(), table.end());
+
+      for (int i = 0; i < n_x; ++i) {
+       if (seen.find(x[i]) == seen.end()) {
+         out.push_back(false);
+         continue;
+       } 
+       out.push_back(true);
+      }
+      
+      return wrap(out);
+    }
+    ```
 
 3. __[Q]{.Q}__: `unique()` using an `unordered_set` (challenge: do it in one line!).
 
