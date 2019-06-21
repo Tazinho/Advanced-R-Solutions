@@ -154,7 +154,7 @@ library(lubridate)
 
 3. __[Q]{.Q}__: Imagine you were going to reimplement factors, dates, and data frames in S4. Sketch out the `setClass()` calls that you would use to define the classes. Think about appropriate `slots` and `prototype`.
 
-   __[A]{.started}__: The basic idea is to use a slot for the base type and one slot per attribute. Inheritance matters for ordered factors and dates. Special checks like equal lengths of list elements for columns of a data frame should be done within a validator.
+   __[A]{.solved}__: The basic idea is to use a slot for the base type and one slot per attribute. Inheritance matters for ordered factors and dates. Special checks like equal lengths of list elements for columns of a data frame should be done within a validator.
    
    For simplicity we don't introduce an own subclass for ordered factors. Instead, we introduce `ordered` as a slot.
    
@@ -174,6 +174,26 @@ library(lubridate)
  
     abc <- new("Factor", x = c("a", "b", "c"))
     abc
+    ```
+    
+   The `Date2` class stores it's Dates as integers, similarly as the base R variant. It's pretty obvious, that the next step would be to provide a print method for our new class.
+   
+    ```{r}
+    setClass("Date2",
+         slots = c(
+           Date = "integer", 
+           format = "character",
+           origin = "integer"
+           tz = "character"
+         ),
+         prototype = list(
+           Date = integer(),
+           format = "%Y-%m-%d",
+           tz = "UTC"
+         )
+    )
+         
+    new("Date2")
     ```
     
    Our `DataFrame` class consists of a list and a slot for `row.names`. More serious checks should be part of a validator.
