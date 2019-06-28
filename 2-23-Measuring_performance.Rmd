@@ -30,6 +30,7 @@ source("common.R")
     ```
 
 <!-- from `?profvis()`: `Toruture` triggers garbage collection after every torture memory allocation call. -->
+<!-- not really sure, what is 'surprising' here. -->
 
 ## Microbenchmarking
 
@@ -43,40 +44,35 @@ source("common.R")
     
    How do the estimates from `system.time()` compare to those from `bench::mark()`? Why are they different?
 
-   __[A]{.started}__: (TODO: Last part of the question: Why are the results different?)
-   
-   As `bench::mark()` doesn't calculate the mean value, we calculate it from the `time` list-column in the tibble output. 
+   __[A]{.started}__:  As `bench::mark()` doesn't calculate the mean value, we calculate it from the `time` list-column in the tibble output. 
 
     ```{r}
     n <- 1e6
     x <- runif(100)
     
-    bench_sqrt_power <- bench::mark(
+    bench_res <- bench::mark(
       sqrt(x), 
       x ^ 0.5
     )
     
-    bench_sqrt  <- mean(unlist(bench_sqrt_power[1, "time"]))
-    bench_power <- mean(unlist(bench_sqrt_power[2, "time"]))
+    # Compute mean across all runs
+    t_sqrt_bench  <- mean(unlist(bench_res[1, "time"]))
+    t_power_bench <- mean(unlist(bench_res[2, "time"]))
     
-    systime_sqrt  <- system.time(for (i in 1:n) sqrt(x)) / n
-    systime_power <- system.time(for (i in 1:n) x ^ 0.5) / n
+    t_sqrt_systime  <- system.time(for (i in 1:n) sqrt(x)) / n
+    t_power_systime <- system.time(for (i in 1:n) x ^ 0.5) / n
     
-    systime_sqrt  <- systime_sqrt[["elapsed"]]
-    systime_power <- systime_power[["elapsed"]]
+    # Compare the results
+    t_sqrt_systime["elapsed"]
+    t_sqrt_bench
 
-    # Compare the results for sqrt(x)
-    systime_sqrt
-    bench_sqrt
-    abs(systime_sqrt - bench_sqrt)
-    
-    # Compare the results for x ^ sqrt(0.5)
-    systime_power
-    bench_power
-    abs(systime_power - bench_power)
+    t_power_systime["elapsed"]
+    t_power_bench
     ```
 
-   Both approaches get the order of magnitude right. They are different, as `bench::mark()` is more precise. However, on average they give comparable results.
+   Both approaches get the order of magnitude right. The results differ a little and `bench::mark()` is generally more precise. 
+
+<!-- (TODO: Answer last part of the question: Why are the results different?) -->
 
 2. __[Q]{.Q}__: Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.
 
@@ -85,16 +81,17 @@ source("common.R")
     exp(log(x) / 2)
     ```
 
-   __[A]{.solved}__: We'll use the bench package to estimate the relative execution time of these expressions, with the fastest expression standardized to 1.
+   __[A]{.started}__: Here, we'll `bench::mark` the relative execution time of these expressions, with the fastest expression standardized to 1.
 
     ```{r, message=FALSE}
     x <- runif(100)
     
-    bench::mark(x ^ (1 / 2),      # (1)
-                exp(log(x) / 2),  # (2)
+    bench::mark(x ^ (1 / 2),
+                exp(log(x) / 2),
                 relative = TRUE) %>% 
-      dplyr::select(expression, median) %>% 
-      dplyr::arrange(median)
+      dplyr::select(expression, median)
     ```
 
-   As expected, `exp(log(x)/2)` requires the most time to calculate the square root of `x`.
+   We can see, that `x ^ (1 / 2)` takes about twice as long as `exp(log(x)/2)` to calculate the square root of `x`.
+
+<!-- TODO: Explain, why this is so. -->
