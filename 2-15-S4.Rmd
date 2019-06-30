@@ -6,39 +6,40 @@ source("common.R")
 
 ## Prerequisites
 
-We load the methods package for anything specifically related to S4 and the lubridate package for the first exercise.
+We load the methods package as it contains the S4 object-orientation system.
 
 ```{r, message = FALSE}
 library(methods)
-library(lubridate)
 ```
 
 ## Basics
 
 1. __[Q]{.Q}__: `lubridate::period()` returns an S4 class. What slots does it have? What class is each slot? What accessors does it provide?
     
-   __[A]{.solved}__: Objects of the S4 `Period` class have the six slots `.Data`, `year`, `month`, `day`, `hour` and `minute`, which are each of type double. Except for `.Data` all fields have similar named accessors. `.Data` can be accessed via `methods::gedDataPart()`. As a short example, we create a period of 1 second, 2 minutes, 3 hours, 4 days and 5 weeks.
+   __[A]{.solved}__: Objects of the S4 `Period` class have six slots named `.Data`, `year`, `month`, `day`, `hour` and `minute`, which are each of type double. Most fields can be retrieved by identically named accessor (e.g. `lubridate::year()` will return the field). Just the `.Data` has a specially named accessor, called `methods::gedDataPart()`.
+
+   As a short example, we';; create a period of 1 second, 2 minutes, 3 hours, 4 days and 5 weeks.
    
     ```{r}
-    example12345 <- period(c(1, 2, 3, 4, 5), 
+    example_12345 <- lubridate::period(c(1, 2, 3, 4, 5), 
               c("second", "minute", "hour", "day", "week"))
     ```
     
    This should add up to a period of 39 days, 3 hours, 2 minutes and 1 second.
    
     ```{r}
-    example12345
+    example_12345
     ```
     
-   When we inspect our `example12345`, we can see the fields and conclude that the seconds are stored in the `.Data` field.
+   When we inspect `example_12345`, we see the fields and infer that the seconds are stored in the `.Data` field.
    
     ```{r}
-    str(example12345)
+    str(example_12345)
     ```
 
 2. __[Q]{.Q}__: What other ways can you find help for a method? Read `?"?"` and summarise the details.
     
-   __[A]{.solved}__: Besides the already mentioned example of adding `?` in front of a function call (`?method(john)`), we can find:
+   __[A]{.solved}__: Besides adding `?` in front of a function call (`?method()`), we may find:
     
    * general documentation for a generic via `?genericName`
    * general documentation for the methods of a generic via `methods?genericName`
@@ -48,7 +49,9 @@ library(lubridate)
 
 1. __[Q]{.Q}__: Extend the Person class with fields to match `utils::person()`. Think about what slots you will need, what class each slot should have, and what you’ll need to check in your validity method.
     
-   __[A]{.solved}__: The Person class from the textbook contains the slots `name` and `age`. The person class from the utils package contains the slots `given`, `family`, `role`, `email` and `comment`. All these slots must be of type character. Further, the entries in the `role` slot must match one of the following abbreviations "aut", "com", "cph", "cre", "ctb", "ctr", "dtc", "fnd", "rev", "ths", "trl". Therefore, we include all these slots in our new definition of the `Person` class. As `role` might be of different length than the other slots, we include the constraint that all slots must be of length one to the validator.
+   __[A]{.solved}__: The Person class from the textbook contains the slots `name` and `age`. The person class from the utils package contains the slots `given`, `family`, `role`, `email` and `comment`. All these slots must be of type character.
+   
+   The entries in the `role` slot must match one of the following abbreviations "aut", "com", "cph", "cre", "ctb", "ctr", "dtc", "fnd", "rev", "ths", "trl". Therefore we include all these slots in our new definition of the `Person` class. `role` might be of different length than the other slots. Because of this we add a constraint to the validator, that all slots must be of length one.
    
     ```{r}
     # Definition of the Person class
@@ -134,7 +137,7 @@ library(lubridate)
                             contains = "Human")
     ```
     
-   Supplying neither `slots` nor `contains` results in a constructor for virtual classes 
+   Supplying neither `slots` nor `contains` results in a constructor for virtual classes.
     
     ```{r}
     .VirtualProgrammer <- setClass("VirtualProgrammer")
@@ -143,7 +146,7 @@ library(lubridate)
                                    contains = "VIRTUAL")
     ```
     
-   Just leaving out `contains`, but supplying slots results in a constructor without superclass
+   Just leaving out `contains`, but supplying slots results in a constructor without superclass.
     
     ```{r}
     .DataScientist <- setClass("RProgrammer",
@@ -176,7 +179,7 @@ library(lubridate)
     abc
     ```
     
-   The `Date2` class stores it's Dates as integers, similarly as the base R variant. It's pretty obvious, that the next step would be to provide a print method for our new class.
+   The `Date2` class stores it's dates as integers, similarly to base R. A print method for our new class could then be provided.
    
     ```{r}
     setClass("Date2",
@@ -236,15 +239,15 @@ library(lubridate)
 
 2. __[Q]{.Q}__: In the definition of the generic, why is it necessary to repeat the name of the generic twice?
 
-   __[A]{.solved}__: The name is needed as the name of the generic as well as to explicitly incorporate method dispatch via `standardGeneric()` within the generic's body (`def` parameter). This is similar to `UseMethod()` in S3.
+   __[A]{.solved}__: First the name is needed as the name of the generic. The name also explicitly incorporates method dispatch via `standardGeneric()` within the generic's body (`def` parameter). This behaviour is similar to `UseMethod()` in S3.
 
 3. __[Q]{.Q}__: Why does the `show()` method defined in Section 15.4.3 use `is(object)[[1]]`? (Hint: try printing the employee subclass.)
 
-   __[A]{.solved}__: `is(object)` returns the class of the object. In cases of subclasses like `Employee`, `is(object)` contains also the superclass. In order to return always the most specific class (the subclass), `show()` returns the first element of `is(object)`.
+   __[A]{.solved}__: `is(object)` returns the class of the object. `is(object)` also contains the superclass, for subclasses like `Employee`. In order to return always the most specific class (the subclass), `show()` returns the first element of `is(object)`.
 
 4. __[Q]{.Q}__: What happens if you define a method with different argument names to the generic?
 
-   __[A]{.solved}__: It depends. Lets first create the object `hadley` of class "Person":
+   __[A]{.solved}__: It depends. Let's first create the object `hadley` of class "Person":
     
     ```{r}
     .Person <- setClass("Person", 
@@ -255,7 +258,7 @@ library(lubridate)
     hadley
     ```
     
-   Now let us see, which arguments can be supplied to the `show()` generic
+   Now let's see, which arguments can be supplied to the `show()` generic.
     
     ```{r}
     formals("show")
@@ -290,7 +293,7 @@ library(lubridate)
               })
     ```
     
-   If we do this with arguments added to the correctly written `object` argument, we will get the informative error message, that we could add other argument names for generics, which can take the `...` argument.
+   If we do this with arguments added to the correctly written `object` argument, we will get an informative error message. It states, that we could add other argument names for generics, which can take the `...` argument.
     
     ```{r, eval = TRUE, error = TRUE}
     setMethod("show", "Person", 
@@ -318,8 +321,7 @@ library(lubridate)
 
 1. __[Q]{.Q}__: What would a full `setOldClass()` definition look like for an ordered factor (i.e. add `slots` and `prototype` the definition above)?
 
-   __[A]{.solved}__:
-
+   __[A]__[A]{.open
 2. __[Q]{.Q}__: Define a `length` method for the `Person` class.
 
    __[A]{.solved}__: We can define this method as an S3 method and register it afterwards:
