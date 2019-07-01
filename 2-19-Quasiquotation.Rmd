@@ -7,7 +7,7 @@ source("common.R")
 
 To continue computing on the language, we keep using the rlang package in this chapter.
 
-```{r}
+```{r setup}
 library(rlang)
 ```
 
@@ -189,14 +189,14 @@ library(rlang)
    __[A]{.solved}__: Let's create a new environment `a`, which contains no objects. In this case `substitute()` will just return its first argument (`expr`):
    
     ```{r}
-    a <- base::new.env()
-    substitute(x, a)
+    my_env <- env()
+    substitute(x, my_env)
     ```
     
    When we create a function containing one argument, which is directly returned after substitution. This function just returns the provided expression:
    
     ```{r}
-    foo <- function(x) {substitute(x)}
+    foo <- function(x) substitute(x)
 
     foo(x + y * sin(0))
     ```
@@ -204,8 +204,8 @@ library(rlang)
    In case `substitute()` can find (parts of) the expression in `env`, it will literally substitute. However, unless `env` is `.GlobalEnv`.
    
     ```{r}
-    a$x <- 7
-    substitute(x, a)
+    my_env$x <- 7
+    substitute(x, my_env)
     
     x <- 7
     substitute(x, .GlobalEnv)
@@ -265,26 +265,16 @@ library(rlang)
 
    What's the difference? Which one is more natural?
     
-   __[A]{.solved}__: We quote expressions with `expr()` and evaluate them with `!!`. In the expression assigned to `b` the call `1:10` is evaluated to an integer vector, while still being a call object in `a`.
+   __[A]{.solved}__: It's easiest to see the difference with `lobstr::ast()`:
    
     ```{r}
-    as.list(a)
-    as.list(b)
+    lobstr::ast(mean(1:10))
+    lobstr::ast(mean(!!(1:10)))
     ```
-    
-   The first version (`a`) seems more natural. It captures lazy evaluation, with a promise that is evaluated when the function is called. The second version (`b`) forces the evaluation of the expression. We may see this pattern in function factories, to ensure the expression is properly evaluated and captured in the enclosing environment of the generated function.
+
+   In the expression assigned to `b` the call `1:10` is evaluated to an integer vector, while still being a call object in `a`.
    
-   In the following example we highlight the difference by replacing `1:10` with a variable called `promise`:
-   
-    ```{r}
-    promise <- 1 
-    (a <- expr(mean(promise)))
-    (b <- expr(mean(!!(promise))))
-    
-    promise <- 2
-    a # here promise depends on the current environment
-    b # here promise depends on the environment at function definition
-    ```
+   The first version (`a`) seems more natural. It captures lazy evaluation, with a promise that is evaluated when the function is called. The second version (`b`) forces inlines a vector directly in to a call.
 
 ## Dot-dot-dot (`...`)
 
@@ -331,9 +321,7 @@ library(rlang)
     set_attr(1:10, x = 10)
     ```
     
-   __[A]{.solved}__: As correctly hinted by the error message, the attributes must be named.
-   
-   `set_attr()` expects an object to be passed as the `x` argument and its new attributes via the dots. Unfortunately, this prohibits us to provide attributes named `x` as these would collide with the argument name of our object. Even omitting the object's argument name doesn't help in this case - as can be seen in the example where the object is consequently treated as an unnamed attribute. 
+   __[A]{.solved}__: `set_attr()` expects an object to be passed as the `x` argument and its new attributes via the dots. Unfortunately, this prohibits us to provide attributes named `x` as these would collide with the argument name of our object. Even omitting the object's argument name doesn't help in this case - as can be seen in the example where the object is consequently treated as an unnamed attribute. 
    
    However, we may name the first argument `.x`, which seems clearer and less likely to invoke errors. In this case `1:10` will get the (named) attribute `x = 10` assigned:
 
@@ -354,7 +342,7 @@ library(rlang)
 
    __[A]{.solved}__: We would consider the first version to be more readable. There seems to be a little more boilerplate code at first, but the unquoting syntax is very readable. Overall the whole expression seems more explicit and less complex.
 
-2. __[Q]{.Q}__:Re-implement the Box-Cox transform defined below using unquoting and `new_function()`:
+2. __[Q]{.Q}__: Re-implement the Box-Cox transform defined below using unquoting and `new_function()`:
    
     ```{r}
     bc <- function(lambda) {
