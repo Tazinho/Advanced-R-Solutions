@@ -6,7 +6,7 @@ source("common.R")
 
 ## Prerequisites
 
-```{r, message=FALSE}
+```{r setup, message=FALSE}
 library(rlang)
 library(purrr)
 ```
@@ -15,7 +15,7 @@ library(purrr)
 
 1. __[Q]{.Q}__: Carefully read the documentation for `source()`. What environment does it use by default? What if you supply `local = TRUE`? How do you provide a custom environment?
     
-   __[A]{.solved}__: By default, `source()` uses the global environment. A specific evaluation environment may be chosen, by passing it to the `local` argument. To use a local environment set `local = TRUE`.
+   __[A]{.solved}__: By default, `source()` uses the global environment. A specific evaluation environment may be chosen, by passing it to the `local` argument. To use current environment (i.e. the calling environment of `source()`) set `local = TRUE`.
     
     ```{r}
     # Create temporary, sourcable R script
@@ -57,7 +57,7 @@ library(purrr)
     expr(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (3)
     ```
 
-3. __[Q]{.Q}__: Fill in the function bodies below to re-implement `get()` using `sym()` and `eval()`, and`assign()` using `sym()`, `expr()`, and `eval()`. Don't worry about the multiple ways of choosing an environment that `get()` and `assign()` support; assume that the user supplies it explicitly
+3. __[Q]{.Q}__: Fill in the function bodies below to re-implement `get()` using `sym()` and `eval()`, and `assign()` using `sym()`, `expr()`, and `eval()`. Don't worry about the multiple ways of choosing an environment that `get()` and `assign()` support; assume that the user supplies it explicitly
 
     ```{r}
     # name is a string
@@ -65,7 +65,7 @@ library(purrr)
     assign2 <- function(name, value, env) {}
     ```
 
-   __[A]{.solved}__: We reimplement these two functions using tidy evaluation. First expression is build, which is then evaluated.
+   __[A]{.solved}__: We reimplement these two functions using tidy evaluation. We turn the string `name` into a symbol, then evalute it:
 
     ```{r}
     get2 <- function(name, env = caller_env()) {
@@ -75,16 +75,6 @@ library(purrr)
     
     x <- 1
     get2("x")
-    ```
-
-   The implementation would be even more concise, if the user provided an expression instead of a string:
-
-    ```{r}
-    get3 <- function(name, env = caller_env()){
-      eval(name, env)
-    }
-    
-    get3(x)
     ```
 
    To build the correct expression for the value assignment, we unquote using `!!`.
@@ -145,13 +135,8 @@ library(purrr)
       file <- paste(readLines(path, warn = FALSE), collapse = "\n")
       exprs <- parse_exprs(file)
       
-      res <- map(exprs, eval, env)
-      
-      invisible(res)
+      invisible(map(exprs, eval, env))
     }
-    
-    # Test:
-    (source2(tmp_file))
     ```
 
 5. __[Q]{.Q}__: We can make `base::local()` slightly easier to understand by spreading it over multiple lines:
@@ -173,30 +158,26 @@ library(purrr)
       print(call)
       eval(call, envir = parent.frame())
     }
+    ```
     
+   The first line generates a call to `eval()`. Because  `substitute()` operates in the current evaluation argument. However, this doesn't matter here, as both, `expr` and `envir` are promises and therefore "the expression slots of the promises replace the symbols", from `?substitute`.
+   
+    ```{r}
     local3({
       x <- 10
       x * 2
     })
     ```
-    
-   By default `substitute()` operates in the current evaluation argument. However, this doesn't matter here, as both, `expr` and `envir` are promises and therefore "the expression slots of the promises replace the symbols", from `?substitute`.
    
-   Next, `call` will be evaluated in the global environment. 
-   
-   From now on I don't understand what happens exactly: When we are in the global environment and evaluate the call. Where does it get evaluated? Obviously inside of `new.envir()`. However, when the expressions are not found there, it is more of a question, which environment is the parent environment of `new.envir()`. The documentation of `new.envir()` and also the default argument (`parent.frame()`) suggest that it is `parent.frame()`, so the global environment (this also makes completely sense, as in some tests I did `local3()` finds variables in the global environment, but it doesn't find variables when provided in `local3()`'s execution environment). However, when I manually check and add `env_parent(envir)` inside `local3()` I get `identical(env_parent(envir), environment())` is `TRUE`, which IMO suggests, that the parent of `envir` is the execution environment of `local3()` and the global environment is only the grandparent.
-   
-   Also I don't understand these older bullet points (I just keep them in for now in case they help you. What do you think? Henning/Hadley?)
-
+   Next, `call` will be evaluated in the caller environment (aka the parent frame). Given that `call` contains another call `eval()` why does this matter? The answer is subtle: this outer environment determines where the bindings for `eval`, `quote`, and `new.env` are found. 
    <!-- this needs a better description based on the AST, @Malte -->
     
     ```{r}
-    # this is, what is happening afterwards
-    eval(eval(quote({x <- 10; x * 2}), new.env()), parent.frame())
-    
-    eval(quote({x <- 10; x * 2}), new.env())  # this is evaluated locally
-    
-    eval(20, parent.frame())  # makes it available in the caller environment
+    eval(quote({
+      x <- 10
+      x * 2
+    }), new.env())
+    exists("x")
     ```
     
 ## Quosures
@@ -216,7 +197,7 @@ library(purrr)
     q3
     ```
     
-   __[A]{.solved}__: Each quosure will be evaluated in its own environment. This leads us to:
+   __[A]{.solved}__: Each quosure will be evaluated in its own environment so each `x` is bound to a different value. This leads us to:
     
     ```{r}
     eval_tidy(q1)
@@ -230,8 +211,7 @@ library(purrr)
 
     ```{r}
     enenv <- function(x){
-      q <- enquo(x)
-      get_env(q) 
+      get_env(enquo(x))
     }
     
     # Test
@@ -299,6 +279,7 @@ library(purrr)
     ```
 
 <!-- is there an advantage of `subset3()`, that I am missing? -->
+<!-- HW: I think the primary advantage is that it generates code closer to what you'd produce by hand -->
 
 3. __[Q]{.Q}__: The following function implements the basics of `dplyr::arrange()`. Annotate each line with a comment explaining what it does. Can you explain why `!!.na.last` is strictly correct, but omitting the `!!` is unlikely to cause problems?
 
@@ -369,9 +350,9 @@ library(purrr)
     }
     ```
 
-   We can see, that `threshold_var2()` no longer coerces the symbol to a string. Therefore `$` instead of `[[` can be used for subsetting. Initially we suspected partial matching to work with `$`, but this seems to avoided, when the expression is tidily evaluated.
+   We can see, that `threshold_var2()` no longer coerces the symbol to a string. Therefore `$` instead of `[[` can be used for subsetting. Initially we suspected partial matching would work with `$`, but `.data` deliberately avoids this problem.
 
-   The prefix call to `$()` is less common than infix-subsetting using `[[`, but ultimately both functions seem to behave the same.
+   The prefix call to `$()` is less common than infix-subsetting using `[[`, but ultimately both functions behave the same.
 
     ```{r}
     df <- data.frame(x = 1:10)
@@ -380,6 +361,7 @@ library(purrr)
     ```
 
 <!-- I am probably missing sth here. What makes the second approach **harder**? -->
+<!-- HW: you have to remember that you can use prefix style calls for infix functions -->
 
 ## Base evaluation
 
@@ -482,3 +464,4 @@ library(purrr)
    Overall, putting an essential part of the preprocessing outside of the functions body is not common practice in R. Compared to the unquoting-implementation (`resample_lm1()`), this approach captures the model-call in a more meaningful way.
 
 <!-- would be nice to list a few more advantages and disadvantages -->
+<!-- HW if you `update()` the model, it will use a different resample -->
