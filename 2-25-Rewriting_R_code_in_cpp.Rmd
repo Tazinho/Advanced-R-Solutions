@@ -64,7 +64,7 @@ source("common.R")
     }
     ```
 
-   __[A]{.solved}__:  The R equivalents are:
+   __[A]{.solved}__:  The code above corresponds to the following R functions:
 
    *   f1: `mean()`  
    *   f2: `cumsum()`  
@@ -87,7 +87,9 @@ source("common.R")
        Whenever implementing a numerical algorithm, it's always good to check 
        what is already known about the problem.
 
-   __[A]{.solved}__: 1. `all()`
+   __[A]{.solved}__: We take this challenge, which leads us to:
+   
+   1. `all()`
   
     ```cpp
     bool allC(LogicalVector x) {
@@ -138,7 +140,7 @@ source("common.R")
     }
     ```
 
-   3. `diff()`. Start by assuming lag 1, and then generalise for lag `n`.
+   3. `diff()` (Start by assuming lag 1, and then generalise for lag `n`.)
     
     ```cpp
     NumericVector diffC(NumericVector x){
@@ -162,7 +164,7 @@ source("common.R")
     }
     ```
   
-   4. `range()`.  
+   4. `range()`
     
     ```cpp
     NumericVector rangeC(NumericVector x){
@@ -183,7 +185,7 @@ source("common.R")
       return out;
     ```
   
-   5. `var()`. Read about the approaches you can take on [wikipedia](http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance). Whenever implementing a numerical algorithm, it's always good to check what is already known about the problem.
+   5. `var()`
    
     ```cpp
     double varC(NumericVector x) {
@@ -212,9 +214,9 @@ source("common.R")
 
 1. __[Q]{.Q}__:  Rewrite any of the functions from the first exercise to deal with missing values. If `na.rm` is true, ignore the missing values. If `na.rm` is false, return a missing value if the input contains any missing values. Some good functions to practice with are `min()`, `max()`, `range()`, `mean()`, and `var()`.
 
-   __[A]{.solved}__: Before we take a look at `cumsum()`, `any()`, `Position()` and `pmin()` from the first exercise, we follow the advice and rewrite `min()`, `max()`, `range()`, `mean()` and `var()`. When ignoring missing values (i.e. `na_rm = false`), we try to keep the overall function behaviour close to the original function. To avoid irregular type conversions we mostly stick with vector data types as return values.
+   __[A]{.solved}__: We will refactor `cumsum()`, `any()`, `Position()` and `pmin()` so they can deal with missing values, bur we practice and rewrite `min()`, `max()`, `range()`, `mean()` and `var()` first. We try to keep the overall function behaviour close to the original function, whenever `na_rm = false`. We mostly stick with vector data types as return values, to avoid irregular type conversions.
    
-   To make `minC()` aware of `NA`s, we introduce an `na_rm` argument. In case `x` contains only `NA`s and `na_rm == TRUE` `minC()` should return `Inf`.
+   We introduce an `na_rm` argument to make `minC()` aware of `NA`s. In case `x` contains exclusively `NA` values `minC()` should return `Inf` for `na_rm == TRUE`.
    
     ```cpp
     NumericVector minC(NumericVector x, bool na_rm = false){
@@ -248,7 +250,7 @@ source("common.R")
     }
     ```
     
-   For `maxC()` we use `minC()` together with the following relationship between the minimum and the maximum: $\max(x) = -\min(-x)$.
+   To implement `maxC()` we reuse `minC()` and take advantage of a connection between the minimum and the maximum: $\max(x) = -\min(-x)$.
 
     ```cpp
     NumericVector maxC(NumericVector x, bool na_rm = false){
@@ -269,7 +271,7 @@ source("common.R")
     }
     ```
     
-   Our `NA`-aware `meanC()` function should return `NaN`, in case of `na_rm = TRUE` and `all(is.na(x))`.
+   Our `NA`-aware `meanC()` function should return `NaN`, if `na_rm = TRUE` and `all(is.na(x))`.
     
     ```cpp
     NumericVector meanC(NumericVector x, bool na_rm = false){
@@ -350,9 +352,9 @@ source("common.R")
     }
     ```
     
-   Now, let's focus on the functions `cumsum()`, `any()`, `Position()` and `pmin()` from the first exercise.
+   Now, let's extend the functions `cumsum()`, `any()`, `Position()` and `pmin()` from the (first exercise).
    
-   In case of `na_rm = true`, we keep the `NA`'s in the output but ignore them in the cumulative sums.
+   For `na_rm = true`, we keep the `NA`'s in the output but ignore them in the cumulative sums.
     
     ```cpp
     NumericVector cumsumC(NumericVector x, bool na_rm = false) {
@@ -376,7 +378,7 @@ source("common.R")
     }
     ```
    
-   In our new `anyC()` implementation we use `LogicalVetor` as return type. Otherwise, i.e. when using `bool`, the C++ `NA_LOGICAL` would be converted into R's logical `TRUE`.
+   In our new implementation of `anyC()` we use `LogicalVetor` as return type. If we would use `bool` instead, the C++ `NA_LOGICAL` would be converted into R's logical `TRUE`.
    
     ```cpp
     LogicalVector anyC(LogicalVector x, bool na_rm = false) {
@@ -411,7 +413,7 @@ source("common.R")
     }
     ```
     
-   For `PositionC()` we check the results of the predicate function for `NA`s. In some cases it might also make sense to consider checking the elements of the list input for `NA`s, and provide an `NA`-handling for the predicate function.
+   For `PositionC()` we check the results of the predicate function for `NA`s. In some cases it may also make sense check the elements of the list input for `NA`s, and provide an `NA`-handling for the predicate function.
    
     ```cpp
     int PositionC(Function pred, List x, bool na_rm = false) {
@@ -464,7 +466,7 @@ source("common.R")
 
 2. __[Q]{.Q}__: Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that these functions have slightly more complicated behaviour.
     
-   __[A]{.solved}__: As we already wrote an `NA`-aware `cumsumC()` function under the assumption to return a single `NA` in case of `na_rm = false`, we modify it here a bit to always return a vector with the same length as it's `x` argument. Our new `cumsumC2()` treats `NA`'s always like zeros. In case of `na_rm = false` `NA`s are kept in the output and in case of `na_rm = true` `NA`s are replaced by the last occuring non-`NA`-value or zero, in case of only `NA`s. 
+   __[A]{.solved}__: As we already wrote an `NA`-aware `cumsumC()` function under the assumption to return a single `NA` in case of `na_rm = false`, we modify it here slightly to always return a vector with the same length as it's `x` argument. Our new `cumsumC2()` function treats `NA` values always like zeros. In case of `na_rm = false` the `NA` values are kept in the output and in case of `na_rm = true` the `NA` values are replaced by the last occurring non-`NA`-value or zero (if it's entirely `NA` values). 
    
     ```cpp
     NumericVector cumsumC(NumericVector x) {
@@ -485,7 +487,7 @@ source("common.R")
     }
     ```
     
-   For `diffC()`'s implementation, we stick again to the idiom from the last exercise and return just an `NA` whenever one occures. In case of `na_rm = true`, we ensure that calculations which are affected by `NA`'s will also return an `NA`. (An alternative would be to exclude `NA`s completely from the input or - equivalently - the output).
+   For `diffC()`'s implementation, we again return just an `NA` whenever an `NA` value occurs. In case of `na_rm = true`, we ensure that calculations which are affected by `NA`'s will also return an `NA`. (We could have also chosen to exclude `NA`s completely from the input or - equivalently - the output).
    
     ```cpp
     NumericVector difflagC(NumericVector x, int lag = 1, bool na_rm = false){
