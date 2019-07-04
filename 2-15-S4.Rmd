@@ -120,7 +120,7 @@ library(methods)
     
    __[A]{.solved}__: It depends on the other arguments.
    
-   If we supply a class that doesn't exist, we'll get an error
+   If we supply a class that doesn't exist, we'll get an error.
     
     ```{r, error = TRUE}
     setClass("Programmer",
@@ -137,7 +137,7 @@ library(methods)
                             contains = "Human")
     ```
     
-   Supplying neither `slots` nor `contains` results in a constructor for virtual classes.
+   Supplying neither `slots` nor `contains` leads to a constructor for virtual classes.
     
     ```{r}
     .VirtualProgrammer <- setClass("VirtualProgrammer")
@@ -146,7 +146,7 @@ library(methods)
                                    contains = "VIRTUAL")
     ```
     
-   Just leaving out `contains`, but supplying slots results in a constructor without superclass.
+   Just leaving out `contains`, but supplying slots, creates a constructor without a superclass.
     
     ```{r}
     .DataScientist <- setClass("RProgrammer",
@@ -157,9 +157,9 @@ library(methods)
 
 3. __[Q]{.Q}__: Imagine you were going to reimplement factors, dates, and data frames in S4. Sketch out the `setClass()` calls that you would use to define the classes. Think about appropriate `slots` and `prototype`.
 
-   __[A]{.solved}__: The basic idea is to use a slot for the base type and one slot per attribute. Inheritance matters for ordered factors and dates. Special checks like equal lengths of list elements for columns of a data frame should be done within a validator.
+   __[A]{.solved}__: We may use a slot for the base type and one slot per attribute. Keep in mind, that inheritance matters for ordered factors and dates. Also, special checks like equal lengths of list elements for columns of a data frame should be done within a validator.
    
-   For simplicity we don't introduce an own subclass for ordered factors. Instead, we introduce `ordered` as a slot.
+   For simplicity we don't introduce an explicit subclass for ordered factors. Instead, we introduce `ordered` as a slot.
    
     ```{r}
     setClass("Factor", 
@@ -223,7 +223,7 @@ library(methods)
 
 1. __[Q]{.Q}__: Add `age()` accessors for the `Person` class.
 
-   __[A]{.solved}__: Similar as shown for `name()` in the chapter, we define an `age()` generic, with a method for the `Person` class and a replacement function `age<-()`:
+   __[A]{.solved}__: Here we define an `age()` generic, with a method for the `Person` class and a replacement function `age<-()`:
    
     ```{r}
     setGeneric("age", function(x) standardGeneric("age"))
@@ -243,11 +243,11 @@ library(methods)
 
 3. __[Q]{.Q}__: Why does the `show()` method defined in Section 15.4.3 use `is(object)[[1]]`? (Hint: try printing the employee subclass.)
 
-   __[A]{.solved}__: `is(object)` returns the class of the object. `is(object)` also contains the superclass, for subclasses like `Employee`. In order to return always the most specific class (the subclass), `show()` returns the first element of `is(object)`.
+   __[A]{.solved}__: `is(object)` returns the class of the object. `is(object)` also contains the superclass, for subclasses like `Employee`. In order to always return the most specific class (the subclass), `show()` returns the first element of `is(object)`.
 
 4. __[Q]{.Q}__: What happens if you define a method with different argument names to the generic?
 
-   __[A]{.solved}__: It depends. Let's first create the object `hadley` of class "Person":
+   __[A]{.solved}__: It depends. We first create the object `hadley` of class "Person":
     
     ```{r}
     .Person <- setClass("Person", 
@@ -264,7 +264,7 @@ library(methods)
     formals("show")
     ```
     
-   Usually we would use this argument when defining a new method
+   Usually we would use this argument when defining a new method.
     
     ```{r}
     setMethod("show", "Person", 
@@ -274,7 +274,7 @@ library(methods)
     hadley
     ```
     
-   When we supply another name as a first element of our method (e.g. `x` instead of `object`), this will be matched to the correct `object` argument and we receive a warning. Our method will work, though:
+   When we supply another name as a first element of our method (e.g. `x` instead of `object`), this element will be matched to the correct `object` argument and we receive a warning. Our method will work, though:
     
     ```{r, eval = TRUE}
     setMethod("show", "Person", 
@@ -293,7 +293,7 @@ library(methods)
               })
     ```
     
-   If we do this with arguments added to the correctly written `object` argument, we will get an informative error message. It states, that we could add other argument names for generics, which can take the `...` argument.
+   If we do this with arguments added to the correctly written `object` argument, we will receive an informative error message. It states, that we could add other argument names for generics, which can take the `...` argument.
     
     ```{r, eval = TRUE, error = TRUE}
     setMethod("show", "Person", 
@@ -321,7 +321,8 @@ library(methods)
 
 1. __[Q]{.Q}__: What would a full `setOldClass()` definition look like for an ordered factor (i.e. add `slots` and `prototype` the definition above)?
 
-   __[A]__[A]{.open
+   __[A]{.open}__:
+   
 2. __[Q]{.Q}__: Define a `length` method for the `Person` class.
 
    __[A]{.solved}__: We can define this method as an S3 method and register it afterwards:
