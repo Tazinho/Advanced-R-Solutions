@@ -4,6 +4,12 @@ source("common.R")
 
 # Translating R code
 
+```{r setup}
+library(rlang)
+library(purrr)
+```
+
+
 ## HTML
 
 1. __[Q]{.Q}__: TODO: Adapt to the new exercise formulation:
@@ -29,9 +35,6 @@ source("common.R")
    Required Code from Advanced R:
 
     ```{r required code from advr, include=TRUE}
-    library(rlang)
-    library(purrr)
-    
     html <- function(x) structure(x, class = "advr_html")
     
     cat_line <- function(...) cat(..., "\n", sep = "")
@@ -90,6 +93,9 @@ source("common.R")
     
    Our `tag` function factory needs two serve two competing requirements for escaping: For most of the tag functions the content (brackets and ampersands) needs to be escaped. In script and style tags the content should NOT be escaped, but closing `script`- and `style`-tags need to be escaped.
     
+    
+  <!-- HW: I'd create a separate function here, rather than using arguments because I think the intent is sufficiently different. -->    
+    
    To distinguish between these options, we extend `escape.character()` to include an argument (`escape_choice`) to choose the escape-style, that we want.
     
     ```{r}
@@ -120,6 +126,9 @@ source("common.R")
     ```
     
    When we create the tag functions we can then specify the escape style we want:
+    
+  <!-- HW: Instead of complicating this code, I'd just create specific tag functions for script and style by hand -->    
+
     
     ```{r}
     # create tag with specified escape-style
@@ -234,6 +243,36 @@ source("common.R")
       )
     }
     ```
+    
+<!-- HW: to generate attribs I thnk you'd be better off doing something like this. Note that the defaults need to be NULL so that the user isn't forced to rely on them, and then we can eliminate the use of validate_dots() because we're taking a different approach.
+ -->
+ 
+```{r}
+tag <- "img"
+tag_attrs <- c("src", "width", "height")
+attrs <- c("class", "id", tag_attrs)
+
+attr_args <- map(set_names(attrs), ~ NULL)
+attr_list <- call2("list", !!!syms(set_names(attrs)))
+
+new_function(
+  exprs(... = , !!!attr_args),
+  expr({
+    ellipsis::check_dots_unnamed() # cheat by using new package
+    
+    attribs <- !!attr_list
+    dots <- compact(list(...))
+
+    children <- map_chr(dots$unnamed, escape)
+    html(paste0(
+      !!paste0("<", tag), attribs, ">",
+      paste(children, collapse = ""),
+      !!paste0("</", tag, ">")
+    ))
+  })
+)
+```
+ 
     
    We also rewrite `validate_dots`. We check for any unexpected named arguments, which will serve as input validation. The list of unnamed arguments will be escaped as before.
     
