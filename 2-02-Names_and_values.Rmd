@@ -53,9 +53,7 @@ library(lobstr)
     
 3. __[Q]{.Q}__: By default, base R data import functions, like `read.csv()`, will automatically convert non-syntactic names to syntactic names. Why might this be problematic? What option allows you to suppress this behaviour?
 
-   __[A]{.solved}__: When automatic and implicit (name) conversion occurs, the prediction of a scripts output will be more difficult. For example when R is used non-interactively and some data is read, transformed and written, then the output may not contain the same names as the original data source. This behaviour may introduce problems in downstream analysis. To avoid automatic name conversion set `check.names = FALSE`.
-   
-   <!-- I think the key point is that column names are often data, and the make.names() transformation is non-invertible, so the default behaviour corrupts data -->
+   __[A]{.solved}__: Column names are often data, and the underlying `make.names()` transformation is non-invertible, so the default behaviour corrupts data. To avoid this, set `check.names = FALSE`.
     
 4. __[Q]{.Q}__: What rules does `make.names()` use to convert non-syntactic names into syntactic names?
     
