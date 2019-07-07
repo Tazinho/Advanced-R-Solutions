@@ -94,7 +94,7 @@ library(lobstr)
 1. __[Q]{.Q}__: Why is `tracemem(1:10)` not useful?
 
    __[A]{.solved}__:
-   When `1:10` is called an object with an address in memory is created, but it is not bound to a name. Therefore the object cannot be called or manipulated from R. As no copies will be made, it is not useful to track the object for copying.
+   When `1:10` is called an object with an address in memory is created, but it is not bound to a name. Therefore, the object cannot be called or manipulated from R. As no copies will be made, it is not useful to track the object for copying.
    
     ```{r}
     obj_addr(1:10)  # the object exists, but has no name
@@ -301,7 +301,7 @@ library(lobstr)
     obj_size(double(1e6))
     ```
     
-    (If you look carefully at the amount of memory occupied by short vectors, you'll notice that the pattern is actually more complicated. This is to do with how R allocates memory, and is not that important. If you want to know the full details, they're discussed in the 1st edition of Advanced R: http://adv-r.had.co.nz/memory.html#object-size)
+    (If you look carefully at the amount of memory occupied by short vectors, you'll notice that the pattern is actually more complicated. This is to do with how R allocates memory, and is not that important. If you want to know the full details, they're discussed in the 1st edition of Advanced R: http://adv-r.had.co.nz/memory.html#object-size).
 
    In `b <- list(a, a)` both list elements of `b` contain references to the same memory address, so no additional memory is required for the second list element. The list itself requires 64 bytes, 48 bytes for an empty list and 8 bytes for each element (`obj_size(vector("list", 2))`). This let's us predict 8000048 B + 64 B = 8000112 B:
    
@@ -359,7 +359,7 @@ library(lobstr)
    <!-- can't use tracemem with knitr -->
    
     ```{r}
-    x <- list()      # creates initial object
+    x <- list()  # creates initial object
     obj_addr(x)
     
     tracemem(x)
