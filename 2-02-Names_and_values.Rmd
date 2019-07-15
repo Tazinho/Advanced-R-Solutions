@@ -53,34 +53,32 @@ library(lobstr)
     
 3. __[Q]{.Q}__: By default, base R data import functions, like `read.csv()`, will automatically convert non-syntactic names to syntactic names. Why might this be problematic? What option allows you to suppress this behaviour?
 
-   __[A]{.solved}__: When automatic and implicit (name) conversion occurs, the prediction of a scripts output will be more difficult. For example when R is used non-interactively and some data is read, transformed and written, then the output may not contain the same names as the original data source. This behaviour may introduce problems in downstream analysis. To avoid automatic name conversion set `check.names = FALSE`.
-   
-   <!-- I think the key point is that column names are often data, and the make.names() transformation is non-invertible, so the default behaviour corrupts data -->
+   __[A]{.solved}__: Column names are often data, and the underlying `make.names()` transformation is non-invertible, so the default behaviour corrupts data. To avoid this, set `check.names = FALSE`.
     
 4. __[Q]{.Q}__: What rules does `make.names()` use to convert non-syntactic names into syntactic names?
     
    __[A]{.solved}__: A valid name starts with a letter or a dot (which must not be followed by a number). It also consists of letters, numbers, dots and underscores only (`"_"` are allowed since R version 1.9.0).
    
    Three main mechanisms ensure syntactically valid names (see `?make.names`):
-   - The variable name will be prepended by an `X` when names do not start with a letter or start with a dot followed by a number
+   - Variable names that do not start with a letter or start with a dot followed by a number will be prepended by an `"X"`
     
       ```{r}
-      make.names("")
-      make.names(".1")
+      make.names("")    # prepending "x"
+      make.names(".1")  # prepending "X"
       ```
     
    - (additionally) non-valid characters are replaced by a dot
     
       ```{r}
-      make.names("@")          # prepending + . replacement 
-      make.names("  ")         # prepending + .. replacement
-      make.names("non-valid")  # . replacement
+      make.names("@")          # prepending "X" + "." replacement 
+      make.names("  ")         # prepending "X" + ".." replacement
+      make.names("non-valid")  # "." replacement
       ```
     
    - reserved R keywords (see `?reserved`) are suffixed by a dot
     
       ```{r}
-      make.names("if")
+      make.names("if")  # "." suffix
       ```
     
    Interestingly, some of these transformations are influenced by the current locale (from `?make.names`):
@@ -96,7 +94,7 @@ library(lobstr)
 1. __[Q]{.Q}__: Why is `tracemem(1:10)` not useful?
 
    __[A]{.solved}__:
-   When `1:10` is called an object with an address in memory is created, but it is not bound to a name. Therefore the object cannot be called or manipulated from R. As no copies will be made, it is not useful to track the object for copying.
+   When `1:10` is called an object with an address in memory is created, but it is not bound to a name. Therefore, the object cannot be called or manipulated from R. As no copies will be made, it is not useful to track the object for copying.
    
     ```{r}
     obj_addr(1:10)  # the object exists, but has no name
@@ -303,7 +301,7 @@ library(lobstr)
     obj_size(double(1e6))
     ```
     
-    (If you look carefully at the amount of memory occupied by short vectors, you'll notice that the pattern is actually more complicated. This is to do with how R allocates memory, and is not that important. If you want to know the full details, they're discussed in the 1st edition of Advanced R: http://adv-r.had.co.nz/memory.html#object-size)
+    (If you look carefully at the amount of memory occupied by short vectors, you'll notice that the pattern is actually more complicated. This is to do with how R allocates memory, and is not that important. If you want to know the full details, they're discussed in the 1st edition of Advanced R: http://adv-r.had.co.nz/memory.html#object-size).
 
    In `b <- list(a, a)` both list elements of `b` contain references to the same memory address, so no additional memory is required for the second list element. The list itself requires 64 bytes, 48 bytes for an empty list and 8 bytes for each element (`obj_size(vector("list", 2))`). This let's us predict 8000048 B + 64 B = 8000112 B:
    
@@ -361,7 +359,7 @@ library(lobstr)
    <!-- can't use tracemem with knitr -->
    
     ```{r}
-    x <- list()      # creates initial object
+    x <- list()  # creates initial object
     obj_addr(x)
     
     tracemem(x)
