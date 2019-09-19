@@ -439,7 +439,7 @@ library(purrr)
 
 3. __[Q]{.Q}__: Another way to write `resample_lm()` would be to include the resample expression `(data[sample(nrow(data), replace = TRUE), , drop = FALSE])` in the data argument. Implement that approach. What are the advantages? What are the disadvantages?
 
-   __[A]{.solved}__: We can take advantage of the lazy evaluation of function arguments, by moving the resampling step into the argument definition. The uses passes the data to the function, but only a permutation of this data (`rsampled_data`) will be used.
+   __[A]{.solved}__: We can take advantage of the lazy evaluation of function arguments, by moving the resampling step into the argument definition. The uses passes the data to the function, but only a permutation of this data (`resample_data`) will be used.
 
     ```{r}
     resample_lm0 <- function(
