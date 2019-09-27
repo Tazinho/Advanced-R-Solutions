@@ -113,15 +113,14 @@ library(lobstr)
 
     ```{r, eval=FALSE}
     # two copies
-    x <- 1:3
+    x <- c(1L, 2L, 3L)
     tracemem(x)
     #> <0x66a4a70>
     
     x[[3]] <- 4
-    #> tracemem[0x55eec7b3af38 -> 0x55eec774cc18]: 
+    #> tracemem[0x00000286eddcec18 -> 0x00000286edec3070]: 
+    #> tracemem[0x00000286edec3070 -> 0x00000286f0ec95f0]: 
     ```
-    
-    <!-- I only see one copy when I run this in the console. Are you sure you didn't run inside RStudio?  -->
     
    We can avoid the copy by sub-assigning an integer instead of a double:
     
