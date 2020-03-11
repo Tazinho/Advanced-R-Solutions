@@ -19,17 +19,19 @@ library(R6)
    __[A]{.solved}__: Let's start with a basic bank account, similar to the `Accumulator` class in the text book.
 
     ```{r}
-    BankAccount <- R6Class("BankAccount", list(
-      balance = 0,
-      deposit = function(dep = 0) {
-        self$balance = self$balance + dep
-        invisible(self)
-      },
-      withdraw = function(draw) {
-        self$balance = self$balance - draw
-        invisible(self)
-      }
-    ))
+    BankAccount <- R6Class(
+      classname = "BankAccount", 
+      public = list(
+        balance = 0,
+        deposit = function(dep = 0) {
+          self$balance = self$balance + dep
+          invisible(self)
+        },
+        withdraw = function(draw) {
+          self$balance = self$balance - draw
+          invisible(self)
+        }
+      ))
     ```
     
    To test this class we create one instance and leave it with a negative balance.
@@ -47,7 +49,8 @@ library(R6)
    Now, we create the first subclass that prevents us from going into overdraft and throws an error in case we attempt to withdraw more than our current balance.
 
     ```{r}
-    BankAccountStrict <- R6Class("BankAccount",
+    BankAccountStrict <- R6Class(
+      classname = "BankAccount",
       inherit = BankAccount,
       public = list(
         withdraw = function(draw = 0) {
@@ -57,7 +60,7 @@ library(R6)
           }
           super$withdraw(draw = draw)
         }
-    ))
+      ))
     ```
     
    This time our test should throw an error.
@@ -76,7 +79,8 @@ library(R6)
    Finally, we create a class that charges a constant fee of 1 for each withdrawal which leaves the account with a negative balance.
 
     ```{r}
-    BankAccountCharging <- R6Class("BankAccount",
+    BankAccountCharging <- R6Class(
+      classname = "BankAccount",
       inherit = BankAccount,
       public = list(
         withdraw = function(draw = 0) {
@@ -85,7 +89,7 @@ library(R6)
           }
           super$withdraw(draw = draw)
         }
-    ))
+      ))
     ```
     
    Let's take a look at the implemented functionality. We expect a final balance of -12,  because we pay the fee twice.
@@ -115,28 +119,30 @@ library(R6)
    <!-- HW: the flexibility considerably increased the complexity for no real gain -->
 
     ```{r}
-    ShuffledDeck <- R6Class("ShuffledDeck", public = list(
-      deck = NULL,
-      initialize = function(deck = cards) {
-        self$deck <- sample(deck)
-      },
-      reshuffle = function() {
-        self$deck <- sample(cards)
-        invisible(self)
-      },
-      n = function() {
-        length(self$deck)
-      },
-      draw = function(n = 1) {
-        if (n > self$n()) {
-          stop("Only ", self$n(), " cards remaining", call. = FALSE)
+    ShuffledDeck <- R6Class(
+      classname = "ShuffledDeck", 
+      public = list(
+        deck = NULL,
+        initialize = function(deck = cards) {
+          self$deck <- sample(deck)
+        },
+        reshuffle = function() {
+          self$deck <- sample(cards)
+          invisible(self)
+        },
+        n = function() {
+          length(self$deck)
+        },
+        draw = function(n = 1) {
+          if (n > self$n()) {
+            stop("Only ", self$n(), " cards remaining", call. = FALSE)
+          }
+          
+          output <- self$deck[seq_len(n)]
+          self$deck <- self$deck[-seq_len(n)]
+          output
         }
-        
-        output <- self$deck[seq_len(n)]
-        self$deck <- self$deck[-seq_len(n)]
-        output
-      }
-    ))
+      ))
     ```
     
    To test this class we create a deck (initialise an instance), draw all the cards, then reshuffle, checking we get different cards each time.
@@ -161,17 +167,19 @@ library(R6)
    __[A]{.solved}__: To create an R6 class that allows us to get and set the time zone, we provide the respective functions as public methods to the R6 class.
    
     ```{r}
-    Timezone <- R6Class("Timezone", public = list(
-      get = function() {
-        Sys.timezone()
-      },
-      set = function(value) {
-        stopifnot(value %in% OlsonNames())
-        
-        old <- self$get()
-        Sys.setenv(TZ = value)
-        invisible(old)
-      })
+    Timezone <- R6Class(
+      classname = "Timezone", 
+      public = list(
+        get = function() {
+          Sys.timezone()
+        },
+        set = function(value) {
+          stopifnot(value %in% OlsonNames())
+          
+          old <- self$get()
+          Sys.setenv(TZ = value)
+          invisible(old)
+        })
     )
     ```
     
@@ -194,14 +202,16 @@ library(R6)
    __[A]{.solved}__: Take a look at the following implementation, which is quite minimalistic:
    
     ```{r}
-    WorkingDirectory <- R6Class("WorkingDirectory", list(
-      get = function() {
-        getwd()
-      },
-      set = function(value) {
-        setwd(value)
-      }
-    ))
+    WorkingDirectory <- R6Class(
+      classname = "WorkingDirectory", 
+      public = list(
+        get = function() {
+          getwd()
+        },
+        set = function(value) {
+          setwd(value)
+        }
+      ))
     ```
     
     <!-- HW: You should never do get = getwd() etc because in packages, that inlines the function definition at package build time, creating a subtle dependency that will cause bugs that are extremely difficult to track down -->
@@ -222,8 +232,8 @@ library(R6)
    
     ```{r, error = TRUE}
     BankAccountStrict2 <- R6Class(
-      "BankAccountStrict2",
-      list(
+      classname = "BankAccountStrict2",
+      public = list(
         deposit = function(dep = 0) {
           private$balance <- private$balance + dep
           invisible(self)
@@ -240,7 +250,7 @@ library(R6)
           invisible(self)
         }
       ),
-      list(
+      priviate = list(
         balance = 0
       )
     )
@@ -260,8 +270,9 @@ library(R6)
    __[A]{.solved}__: To protect the password from changes and direct access, the password will be a private field. Further, our `Password` will get its own print method which hides the password.
    
     ```{r}
-    Password <- R6Class("Password",
-      list(
+    Password <- R6Class(
+      classname = "Password",
+      public = list(
         print = function(...) {
           cat("<Password>: ********\n")
           invisible(self)
@@ -273,7 +284,7 @@ library(R6)
           identical(password, private$password)
         }
       ),
-      list(
+      private = list(
         password = NULL
       )
     )
@@ -296,7 +307,7 @@ library(R6)
    
     ```{r}
     Rando <- R6::R6Class(
-      "Rando",
+      classname = "Rando",
       private = list(
         last_random = NULL
       ),
@@ -341,7 +352,7 @@ library(R6)
         }
       )
     )
-
+    
     B <- R6Class(
       classname = "B",
       inherit = A,
@@ -352,7 +363,7 @@ library(R6)
         }
       )
     )
-
+    
     B$new()$test()
     ```
     
@@ -365,8 +376,8 @@ library(R6)
 
     ```{r, eval = TRUE, error = TRUE}
     FileWriter <- R6::R6Class(
-      "FileWriter",
-      list(
+      classname = "FileWriter",
+      public = list(
         con = NULL,
         initialize = function(filename) {
           self$con <- file(filename, open = "a")
