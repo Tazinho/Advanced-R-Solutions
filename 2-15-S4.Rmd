@@ -93,25 +93,26 @@ library(methods)
 
     # Validator to ensure that each slot is of length one
     setValidity("Person", function(object) {
+      invalids <- c()
       if (length(object@name)    != 1 |
           length(object@age)     != 1 |
           length(object@given)   != 1 |
           length(object@family)  != 1 |
           length(object@email)   != 1 |
           length(object@comment) != 1) {
-        "@name, @age, @given, @family, @email, @comment must be of length 1"
+        invalids <- "@name, @age, @given, @family, @email, @comment must be of length 1"
       } 
   
       if (!all(object@role %in% c(NA_character_, 
             "aut", "com", "cph", "cre", "ctb",
             "ctr", "dtc", "fnd", "rev", "ths", "trl"))) {
-        paste("@role (s) must be one of", 
+        invalids <- c(invalids, paste("@role (s) must be one of", 
               paste (c(NA_character_, 
                                      "aut", "com", "cph", "cre", "ctb",
                                      "ctr", "dtc", "fnd", "rev", "ths", "trl"),
-                     collapse = ", "), ".")
+                     collapse = ", "), "."))
       }
-  
+      if (length(invalids)) return(invalids)  
       TRUE
     })
     ```
