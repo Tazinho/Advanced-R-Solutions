@@ -62,11 +62,11 @@ library(purrr)
 
 1. __[Q]{.Q}__: Weigh the pros and cons of `download.file %>% dot_every(10) %>% delay_by(0.1)` vs `download.file %>% delay_by(0.1) %>% dot_every(10)`.
    
-   __[A]{.solved}__: `download.file %>% dot_every(10) %>% delay_by(0.1)` means that you print the dot per every 10 downloads and then delay by 0.1. Where `download.file %>% delay_by(0.1) %>% dot_every(10)` means that you delay by 0.1 every downloads, and then dot per every 10 downloads. So there is no difference in that you print the dot for every 10 downloads. But there is a difference in that you delay for 0.1 for every 10 downloads, or, you delay for 0.1 for each downloads.
-   <!-- It seems quite obvious, but maybe there are some reasons that you didn't write this out..? Please check this out -->
-   <!-- Plus, I think there is some error in the original page by Hadley. He used the former to spread out `dot_every(delay_by(download.file, 0.1), 10)`, but I think the latter is the right one. -->
+   __[A]{.solved}__: `download.file %>% dot_every(10) %>% delay_by(0.1)` will print a dot every 10 downloads and then delay by 0.1 second. `download.file %>% delay_by(0.1) %>% dot_every(10)` will delay by every download by 0.1 second and print a dot every 10 downloads.
    
-   <!-- HW: do you get the dot before or after the pause. It probably doesn't make such difference here -->
+   So both commands will print a dot every 10 downloads. In the first case there is a small delay every 10 downloads and in the second case there is a small delay after each download (which will make this version slightly slower).
+
+   <!-- Plus, I think there is some error in the original page by Hadley. He used the former to spread out `dot_every(delay_by(download.file, 0.1), 10)`, but I think the latter is the right one. -->
    
 2. __[Q]{.Q}__: Should you memoise `file.download()`? Why/why not?
    
