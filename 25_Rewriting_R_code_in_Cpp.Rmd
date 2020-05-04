@@ -8,7 +8,7 @@ source("common.R")
 
 1. __[Q]{.Q}__: With the basics of C++ in hand, it's now a great time to practice by reading and writing some simple C++ functions. For each of the following functions, read the code and figure out what the corresponding base R function is. You might not understand every part of the code yet, but you should be able to figure out the basics of what the function does.
 
-    ```cpp
+    ```{cpp}
     double f1(NumericVector x) {
       int n = x.size();
       double y = 0;
@@ -87,11 +87,11 @@ source("common.R")
        Whenever implementing a numerical algorithm, it's always good to check 
        what is already known about the problem.
 
-   __[A]{.solved}__: We take this challenge, which leads us to:
+   __[A]{.solved}__: Let's port these functions to C++.
    
    1. `all()`
   
-    ```cpp
+    ```{cpp}
     bool allC(LogicalVector x) {
       int n = x.size();
       
@@ -104,7 +104,7 @@ source("common.R")
   
    2. `cumprod()`, `cummin()`, `cummax()`.
   
-    ```cpp
+    ```{cpp}
     NumericVector cumprodC(NumericVector x) {
       
       int n = x.size();
@@ -142,7 +142,7 @@ source("common.R")
 
    3. `diff()` (Start by assuming lag 1, and then generalise for lag `n`.)
     
-    ```cpp
+    ```{cpp}
     NumericVector diffC(NumericVector x){
       int n = x.size();
       NumericVector out(n - 1);
@@ -166,7 +166,7 @@ source("common.R")
   
    4. `range()`
     
-    ```cpp
+    ```{cpp}
     NumericVector rangeC(NumericVector x){
       double omin, omax;  
       int n = x.size();
@@ -187,7 +187,7 @@ source("common.R")
   
    5. `var()`
    
-    ```cpp
+    ```{cpp}
     double varC(NumericVector x) {
       int n = x.size();
       double mx = 0;
@@ -214,11 +214,11 @@ source("common.R")
 
 1. __[Q]{.Q}__:  Rewrite any of the functions from the first exercise to deal with missing values. If `na.rm` is true, ignore the missing values. If `na.rm` is false, return a missing value if the input contains any missing values. Some good functions to practice with are `min()`, `max()`, `range()`, `mean()`, and `var()`.
 
-   __[A]{.solved}__: We will refactor `cumsum()`, `any()`, `Position()` and `pmin()` so they can deal with missing values, bur we practice and rewrite `min()`, `max()`, `range()`, `mean()` and `var()` first. We try to keep the overall function behaviour close to the original function, whenever `na_rm = false`. We mostly stick with vector data types as return values, to avoid irregular type conversions.
+   __[A]{.solved}__: We will refactor `cumsum()`, `any()`, `Position()` and `pmin()` so they can deal with missing values, but we practice and rewrite `min()`, `max()`, `range()`, `mean()` and `var()` first. We try to keep the overall function behaviour close to the original function, whenever `na_rm = false`. We mostly stick with vector data types as return values to avoid irregular type conversions.
    
    We introduce an `na_rm` argument to make `minC()` aware of `NA`s. In case `x` contains exclusively `NA` values `minC()` should return `Inf` for `na_rm == TRUE`.
    
-    ```cpp
+    ```{cpp}
     NumericVector minC(NumericVector x, bool na_rm = false){
       int n = x.size();
       NumericVector out = NumericVector::create(R_PosInf);
@@ -252,7 +252,7 @@ source("common.R")
     
    To implement `maxC()` we reuse `minC()` and take advantage of a connection between the minimum and the maximum: $\max(x) = -\min(-x)$.
 
-    ```cpp
+    ```{cpp}
     NumericVector maxC(NumericVector x, bool na_rm = false){
       return -minC(-x, na_rm);
     }
@@ -260,7 +260,7 @@ source("common.R")
    
    `minC()` and `maxC()` enable us to write a compact and `NA`-aware `rangeC()` function.
    
-    ```cpp    
+    ```{cpp}    
     NumericVector rangeC(NumericVector x, bool na_rm = false){
       NumericVector out(2);
       
@@ -273,7 +273,7 @@ source("common.R")
     
    Our `NA`-aware `meanC()` function should return `NaN`, if `na_rm = TRUE` and `all(is.na(x))`.
     
-    ```cpp
+    ```{cpp}
     NumericVector meanC(NumericVector x, bool na_rm = false){
       int n = x.size();
       int n_count = 0;
@@ -312,7 +312,7 @@ source("common.R")
     
    For `varC()`, we handle both cases of `na_rm` inside the first for loop, as this reduces code duplication.
     
-    ```cpp
+    ```{cpp}
     NumericVector varC(NumericVector x, bool na_rm = false) {
       int n = x.size();
       int n_count = 0;
@@ -356,7 +356,7 @@ source("common.R")
    
    For `na_rm = true`, we keep the `NA`'s in the output but ignore them in the cumulative sums.
     
-    ```cpp
+    ```{cpp}
     NumericVector cumsumC(NumericVector x, bool na_rm = false) {
       int n = x.size();
       NumericVector out(n);
@@ -380,7 +380,7 @@ source("common.R")
    
    In our new implementation of `anyC()` we use `LogicalVetor` as return type. If we would use `bool` instead, the C++ `NA_LOGICAL` would be converted into R's logical `TRUE`.
    
-    ```cpp
+    ```{cpp}
     LogicalVector anyC(LogicalVector x, bool na_rm = false) {
       int n = x.size();
       LogicalVector out = LogicalVector::create(false);
@@ -415,7 +415,7 @@ source("common.R")
     
    For `PositionC()` we check the results of the predicate function for `NA`s. In some cases it may also make sense check the elements of the list input for `NA`s, and provide an `NA`-handling for the predicate function.
    
-    ```cpp
+    ```{cpp}
     int PositionC(Function pred, List x, bool na_rm = false) {
       int n = x.size();
       
@@ -434,7 +434,7 @@ source("common.R")
     
    When we set `na_rm = TRUE` in our `pminC()` function it only returns `NA`s at indices where both, `x` and `y`, contain an `NA`.
    
-    ```cpp
+    ```{cpp}
     NumericVector pminC(NumericVector x, NumericVector y, bool na_rm = false) {
       int n = std::max(x.size(), y.size());
       NumericVector x1 = rep_len(x, n);
@@ -468,7 +468,7 @@ source("common.R")
     
    __[A]{.solved}__: As we already wrote an `NA`-aware `cumsumC()` function under the assumption to return a single `NA` in case of `na_rm = false`, we modify it here slightly to always return a vector with the same length as it's `x` argument. Our new `cumsumC2()` function treats `NA` values always like zeros. In case of `na_rm = false` the `NA` values are kept in the output and in case of `na_rm = true` the `NA` values are replaced by the last occurring non-`NA`-value or zero (if it's entirely `NA` values). 
    
-    ```cpp
+    ```{cpp}
     NumericVector cumsumC(NumericVector x) {
       int n = x.size();
       NumericVector out(n);
@@ -489,7 +489,7 @@ source("common.R")
     
    For `diffC()`'s implementation, we again return just an `NA` whenever an `NA` value occurs. In case of `na_rm = true`, we ensure that calculations which are affected by `NA`'s will also return an `NA`. (We could have also chosen to exclude `NA`s completely from the input or - equivalently - the output).
    
-    ```cpp
+    ```{cpp}
     NumericVector difflagC(NumericVector x, int lag = 1, bool na_rm = false){
       int n = x.size();
       NumericVector out(n - lag);
@@ -513,9 +513,9 @@ To practice using the STL algorithms and data structures, implement the followin
 
 1. __[Q]{.Q}__: `median.default()` using `partial_sort`.
 
-   __[A]{.solved}__:
+   __[A]{.solved}__: The median is computed differently for even or odd vectors, which we allow for in the function below.
    
-    ```cpp
+    ```{cpp}
     #include <algorithm>
     #include <Rcpp.h>
     using namespace Rcpp;
@@ -538,9 +538,9 @@ To practice using the STL algorithms and data structures, implement the followin
 
 2. __[Q]{.Q}__: `%in%` using `unordered_set` and the `find()` or `count()` methods.
 
-   __[A]{.solved}__:
+   __[A]{.solved}__: We use the `find()` method and loop through the `unordered_set` until we find a match or have scanned the entire set.
    
-    ```cpp
+    ```{cpp}
     // [[Rcpp::plugins(cpp11)]]
     #include <Rcpp.h>
     #include <unordered_set>
@@ -568,9 +568,9 @@ To practice using the STL algorithms and data structures, implement the followin
 
 3. __[Q]{.Q}__: `unique()` using an `unordered_set` (challenge: do it in one line!).
 
-   __[A]{.started}__: (TODO: address the challenge.)
+   __[A]{.started}__: The `insert()`-method will return if an equivalent element already existed. If a new element is inserted, we will add it to the (unique) return vector of our function.
 
-    ```cpp
+    ```{cpp}
     // [[Rcpp::plugins(cpp11)]]
     #include <Rcpp.h>
     #include <unordered_set>
@@ -590,11 +590,13 @@ To practice using the STL algorithms and data structures, implement the followin
     }
     ```
 
+   <!-- (TODO: address the challenge and transform this into a one-liner) Maybe use an iterator?-->
+
 4. __[Q]{.Q}__: `min()` using `std::min()`, or `max()` using `std::max()`.
 
-   __[A]{.solved}__:
+   __[A]{.solved}__: We will implement `min()` by iterating over the vector and recursively comparing each element to the current minimum value.
 
-    ```cpp
+    ```{cpp}
     #include <Rcpp.h>
     using namespace Rcpp;
     
@@ -613,9 +615,9 @@ To practice using the STL algorithms and data structures, implement the followin
 
 5. __[Q]{.Q}__: `which.min()` using `min_element`, or `which.max()` using `max_element`.
 
-   __[A]{.solved}__:
+   __[A]{.solved}__: To implement `which.min()`, we will first locate the `min_element()` and then compute the `distance()` to it (from the beginning of the vector).
 
-    ```cpp
+    ```{cpp}
     #include <Rcpp.h>
     #include <algorithm>
     #include <iterator>
@@ -625,7 +627,7 @@ To practice using the STL algorithms and data structures, implement the followin
     // [[Rcpp::export]]
     double which_minC(NumericVector x){
       int out;
-      out = std::distance(x.begin(),std::min_element(x.begin(),x.end()));
+      out = std::distance(x.begin(), std::min_element(x.begin(), x.end()));
       out++;
   
       return out;
@@ -634,5 +636,5 @@ To practice using the STL algorithms and data structures, implement the followin
 
 6. __[Q]{.Q}__: `setdiff()`, `union()`, and `intersect()` for integers using sorted ranges and `set_union`, `set_intersection` and `set_difference`.
 
-   __[A]{.solved}__:
+   __[A]{.open}__:
    
