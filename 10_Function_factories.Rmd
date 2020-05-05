@@ -6,12 +6,12 @@ source("common.R")
 
 ## Prerequisites
 
-   For most of this chapter base R is sufficient. Just a few exercises require **rlang** and **ggplot2** packages.
+   For most of this chapter base R is sufficient. Just a few exercises require *rlang* and *ggplot2* packages.
 
-    ```{r}
-    library(rlang)
-    library(ggplot2)
-    ```
+```{r, message=FALSE}
+library(rlang)
+library(ggplot2)
+```
 
 ## Factory fundamentals
 
@@ -141,10 +141,12 @@ source("common.R")
 
 1. __[Q]{.Q}__: Compare and contrast `ggplot2::label_bquote()` with `scales::number_format()`.
 
-   __[A]{.solved}__:
+   __[A]{.solved}__: Both functions will help you in styling your output, e.g. in your plots and they do this by returning the desired formatting function to you.
    
-   <!-- HW: not sure what I was thinking here, but I'd focus more on the results than the implementation. i.e. they're both function factories designed to create nice labels; `label_bquote()` is used with facets, and adds mathematical notation; `number_format()` is used with axes/legends, and adds commas etc -->
-
+   `ggplot2::label_bquote()` takes relatively straightforward [plotmath](https://stat.ethz.ch/R-manual/R-patched/library/grDevices/html/plotmath.html) expressions and uses them for facetting labels in ggplot2. Because this function is used in ggplot2 it needs to return a function of `class = "labeller"`.
+   
+   `scales::number_format()` initially `force()`s the computation of all parameters. It's essentially a parametrized wrapper around `scales::number()` and will help you format numbers appropriatly. It will return a simple function.
+   
 ## Statistical factories
 
 1. __[Q]{.Q}__: In `boot_model()`, why don't I need to force the evaluation of `df` or `model`?
@@ -178,15 +180,15 @@ source("common.R")
     }
     ```
 
-   __[A]{.started}__: `boxcox3` returns a function where `x` is fixed (though it is not forced, so it may manipulated later). This allows us to apply and test different transformations for different inputs and give them a descriptive name.
+   __[A]{.solved}__: `boxcox3()` returns a function where `x` is fixed (though it is not forced, so it may manipulated later). This allows us to apply and test different transformations for different inputs and give them a descriptive name.
 
     ```{r, out.width = "45%", fig.show = "hold", fig.align = "none"}
-    # initial example (should be improved)
     boxcox_airpassengers <- boxcox3(AirPassengers)
     
     plot(boxcox_airpassengers(0))
     plot(boxcox_airpassengers(1))
     plot(boxcox_airpassengers(2))
+    plot(boxcox_airpassengers(3))
     ```
 
 3. __[Q]{.Q}__: Why don't you need to worry that `boot_permute()` stores a copy of the data inside the function that it generates?
