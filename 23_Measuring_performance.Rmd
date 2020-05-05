@@ -126,4 +126,5 @@ source("common.R")
       dplyr::arrange(rel_speed)
     ```
 
-   As expected we see, that idiomatic primitive function `sqrt()` is the fastest. The approach `exp(log(x) / 2)` which builds on two primitive functions is second, even though already considerably slower. The other calculations are even slower: Surprisingly `x ^ 0.5` is (a little) slower than `x ^ (1 / 2)`, even though `0.5` seems to require less computation than `(1 / 2)` and everything else seems equal. 🤔
+   As expected we see, that idiomatic primitive function `sqrt()` is the fastest. The approach `exp(log(x) / 2)` which builds on two primitive functions is second, even though already considerably slower. The other calculations are even slower: `x ^ 0.5` is (slightly) faster than `x ^ (1 / 2)`, because `0.5` requires less computation than `(1 / 2)` and everything stays the same.
+   
