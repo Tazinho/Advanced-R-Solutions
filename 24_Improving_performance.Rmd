@@ -188,26 +188,33 @@ provides us with enough information and guides our attention on solutions in the
 
 3. __[Q]{.Q}__: Can you make a faster version of `table()` for the case of an input of two integer vectors with no missing values? Can you use it to speed up your chi-square test?
     
-   __[A]{.solved}__: When analysing the source code of `table`, we can omit everything unnecessary and extract the main building blocks:
-   
+   __[A]{.solved}__: When analysing the source code of `table()`, we can omit everything unnecessary and extract the main building blocks. That's where we realize that `table()` is mainly powered by `tabulate()`, which is a very fast counting function. However, we can not simply apply `tabulate()` to our two integer vectors directly. Instead, we need to be preprocess them accordingly, to match `tabulate()`'s expected input format. Therefore, the integer pairs in our two vectors need to be mapped to their corresponding index in the final output table (which is ordered columnwise in this implementation). The basic steps to get to this mapping can be adopted from `table()`'s source code again. So, the main challenge is to do these preprocessing steps as performant as possible.
+
+   First, we calculate the dimensions and names of the output table. Therefore, we need to apply `unique()`, `sort()` and `length()` to our integer vectors. Next, we map the elements of each vector according to their position within the vector itself (i.e. the smallest value is mapped to `1L`, the second smallest value to `2L`, ...). One fast way to do these lookups is to employ the combination of `match(x, sort(unique(x)))` or (even better) `fastmatch::fmatch(x, sort(unique(x)))`. Following the logic within `table()`, we combine and shift these looked up values similarly to finally get a mapping from integer pairs in our data to the index of the output table. After applying the lookup, `tabulate()` counts the values for us, and is returning an integer vector which contains counts for each position in our the table. As a last step, we reuse the code from `table()` to assign the correct dimension and class.
+
     ```{r}
     table2 <- function(a, b){
-      u_a <- unique(a)
-      u_b <- unique(b)
-        
-      dims <- c(length(u_a), length(u_b))
-      pd <- prod(dims)
-      dn <- list(a = as.character(sort(u_a)), 
-             b = as.character(sort(u_b)))
+    
+      s_u_a <- sort(unique(a))
+      s_u_b <- sort(unique(b))
+  
+      l_u_a <- length(s_u_a)
+      l_u_b <- length(s_u_b)
+  
+      dims <- c(l_u_a, l_u_b)
+      pr <- l_u_a * l_u_b
+      dn <- list(a = s_u_a, 
+                 b = s_u_b)
+
+      bin <- fastmatch::fmatch(a, s_u_a) + l_u_a * fastmatch::fmatch(b, s_u_b) - l_u_a
+      y <- tabulate(bin, pr)
       
-      bin <- (as.integer(as.factor(a))-1) + length(u_a) * (as.integer(as.factor(b)) - 1) + 1
-      
-      y <- array(tabulate(bin, pd), dim = dims, dimnames = dn)
+      y <- array(y, dim = dims, dimnames = dn)
       class(y) <- "table"
       
       y
     }
-    
+       
     a <- sample(100, 10000, TRUE)
     b <- sample(100, 10000, TRUE)
     
@@ -215,8 +222,6 @@ provides us with enough information and guides our attention on solutions in the
                 table2(a, b),
                 relative = TRUE)
     ```
-   
-   Unfortunately, the performance gain is very small.
 
 ## Vectorise
 
