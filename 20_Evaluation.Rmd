@@ -278,9 +278,6 @@ library(purrr)
     subset3(df, x == 1)
     ```
 
-<!-- is there an advantage of `subset3()`, that I am missing? -->
-<!-- HW: I think the primary advantage is that it generates code closer to what you'd produce by hand -->
-
 3. __[Q]{.Q}__: The following function implements the basics of `dplyr::arrange()`. Annotate each line with a comment explaining what it does. Can you explain why `!!.na.last` is strictly correct, but omitting the `!!` is unlikely to cause problems?
 
     ```{r}
@@ -341,7 +338,7 @@ library(purrr)
     }
     ```
 
-   __[A]{.started}__: Lets compare this approach to the original implementation:
+   __[A]{.solved}__: Lets compare this approach to the original implementation:
 
     ```{r}
     threshold_var <- function(df, var, val) {
@@ -359,9 +356,6 @@ library(purrr)
     threshold_var(df, x, 8)
     threshold_var2(df, x, 8)
     ```
-
-<!-- I am probably missing sth here. What makes the second approach **harder**? -->
-<!-- HW: you have to remember that you can use prefix style calls for infix functions -->
 
 ## Base evaluation
 
@@ -461,7 +455,4 @@ library(purrr)
 
    With this approach the evaluation needs to take place within the functions environments, because the resampled dataset (defined as a default argument) will only be available in the function environment.
 
-   Overall, putting an essential part of the preprocessing outside of the functions body is not common practice in R. Compared to the unquoting-implementation (`resample_lm1()`), this approach captures the model-call in a more meaningful way.
-
-<!-- would be nice to list a few more advantages and disadvantages -->
-<!-- HW if you `update()` the model, it will use a different resample -->
+   Overall, putting an essential part of the preprocessing outside of the functions body is not common practice in R. Compared to the unquoting-implementation (`resample_lm1()`), this approach captures the model-call in a more meaningful way. This approach will also lead to a new resample every time you `update()` the model.
