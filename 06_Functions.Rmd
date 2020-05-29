@@ -347,14 +347,12 @@ for functional programming (lapply, purrr) -->
     }
     ```
     
-   __[A]{.started}__:
+   __[A]{.solved}__:
    
-   `in_dir()` takes a path to a working directory as an argument. First the working directory is changed accordingly. `on.exit()` ensures that the modification to the working directory are reset to the initial value when the function exits.
+   `in_dir()` takes *a path* to a working directory as an argument. First the working directory is changed accordingly. `on.exit()` ensures that the modification to the working directory are reset to the initial value when the function exits. `in_dir()` expresses the change of the workig directory very explicitly.
     
-   In `source()` the `chdir` argument specifies if the working directory should be changed during the evaluation of the `file` argument (which in this case has to be a pathname). 
+   In `source()` the `chdir` argument specifies if the working directory should be changed during the evaluation of the `file` argument (which in this case has to be a pathname). The default for this *logical value* here is `FALSE`, so you can choose to change the working directory but don't have to provide a value, if you intend to use your current working directory.
    
-   <!-- HW: I think I'm more intersted in supplying a path vs. a logical value here -->
-
 4. __[Q]{.Q}__: Write a function that opens a graphics device, runs the supplied code, and closes the graphics device (always, regardless of whether or not the plotting code worked).
    
    __[A]{.solved}__: To control the graphics device we use `pdf()` and `dev.off()`. To ensure a clean termination `on.exit()` is used.
