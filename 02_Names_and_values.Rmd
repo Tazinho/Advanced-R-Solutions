@@ -60,14 +60,21 @@ library(lobstr)
    __[A]{.solved}__: A valid name starts with a letter or a dot (which must not be followed by a number). It also consists of letters, numbers, dots and underscores only (`"_"` are allowed since R version 1.9.0).
    
    Three main mechanisms ensure syntactically valid names (see `?make.names`):
-   - Variable names that do not start with a letter or start with a dot followed by a number will be prepended by an `"X"`
+   1. Prepending with `"X"`: Variable names that do not start with a letter or a dot will be prepended by an `"X"`
+    
+      ```{r}
+      make.names("")    # prepending "x"
+      make.names(".1")  # prepending "X"
+      ```
+      
+      The same holds for variable names that begin with a dot followed by a number 
     
       ```{r}
       make.names("")    # prepending "x"
       make.names(".1")  # prepending "X"
       ```
     
-   - (additionally) non-valid characters are replaced by a dot
+   2. Additionally, non-valid characters are replaced by a dot
     
       ```{r}
       make.names("@")          # prepending "X" + "." replacement 
@@ -75,13 +82,13 @@ library(lobstr)
       make.names("non-valid")  # "." replacement
       ```
     
-   - reserved R keywords (see `?reserved`) are suffixed by a dot
+   3. Reserved R keywords (see `?reserved`) are suffixed by a dot
     
       ```{r}
       make.names("if")  # "." suffix
       ```
     
-   Interestingly, some of these transformations are influenced by the current locale (from `?make.names`):
+   Interestingly, some of these transformations are influenced by the current locale. From `?make.names`:
 
    > The definition of a letter depends on the current locale, but only ASCII digits are considered to be digits.
 
