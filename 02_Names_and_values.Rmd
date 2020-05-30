@@ -307,7 +307,7 @@ library(lobstr)
     
     (If you look carefully at the amount of memory occupied by short vectors, you'll notice that the pattern is actually more complicated. This is to do with how R allocates memory, and is not that important. If you want to know the full details, they're discussed in the 1st edition of Advanced R: http://adv-r.had.co.nz/memory.html#object-size).
 
-   In `b <- list(a, a)` both list elements of `b` contain references to the same memory address, so no additional memory is required for the second list element. The list itself requires 64 bytes, 48 bytes for an empty list and 8 bytes for each element (`obj_size(vector("list", 2))`). This let's us predict 8000048 B + 64 B = 8000112 B:
+   In `b <- list(a, a)` both list elements of `b` contain references to the same memory address, so no additional memory is required for the second list element. The list itself requires 64 bytes, 48 bytes for an empty list and 8 bytes for each element (`obj_size(vector("list", 2))`). This let's us predict 8,000,048 B + 64 B = 8,000,112 B:
    
     ```{r}
     b <- list(a, a) 
@@ -321,7 +321,7 @@ library(lobstr)
     ref(a, b)
     ```
     
-   When we modify the first element of `b[[1]]` copy-on-modify occurs and the object will have the same size (8000040 bytes) and a new address in memory. So `b`'s elements don't share references anymore. Because of this their object sizes add up to the sum of of the two different vectors and the length-2 list: 8000048 B + 8000048 B + 64 B = 16000160 B (16 MB).
+   When we modify the first element of `b[[1]]` copy-on-modify occurs and the object will have the same size (8,000,040 bytes) and a new address in memory. So `b`'s elements don't share references anymore. Because of this their object sizes add up to the sum of of the two different vectors and the length-2 list: 8,000,048 B + 8,000,048 B + 64 B = 16,000,160 B (16 MB).
 
     ```{r}
     b[[1]][[1]] <- 10
