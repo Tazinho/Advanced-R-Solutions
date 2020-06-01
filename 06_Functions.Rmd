@@ -75,8 +75,8 @@ for functional programming (lapply, purrr) -->
         map(formals) %>%
         map_int(length)
       ```
-   
-    Then use `table()` to see the distribution, and `[` to find the largest:
+      
+      Then use `table()` to see the distribution, and `[` to find the largest:
    
       ```{r}
       table(n_args)
@@ -287,7 +287,7 @@ for functional programming (lapply, purrr) -->
     str(mean.default)
     ```
    
-  Because `na.omit` is not one of `mean()`'s named arguments (and also not a candidate for partial matching), `na.omit` again becomes part of the `...` argument. The other supplied objects are matched by their order, i.e.: `x = 1`, `trim = 2` and `na.rm = 3`. Because `x` is of length 1 and not `NA`, the settings of `trim` and `na.rm` do not affect the calculation of the mean. Both calls (`mean(1, 2, 3)` and `mean(1, 2, 3, na.omit = TRUE)`) return `1`.
+   Because `na.omit` is not one of `mean()`'s named arguments (and also not a candidate for partial matching), `na.omit` again becomes part of the `...` argument. The other supplied objects are matched by their order, i.e.: `x = 1`, `trim = 2` and `na.rm = 3`. Because `x` is of length 1 and not `NA`, the settings of `trim` and `na.rm` do not affect the calculation of the mean. Both calls (`mean(1, 2, 3)` and `mean(1, 2, 3, na.omit = TRUE)`) return `1`.
 
 2. __[Q]{.Q}__: In the following call, explain how to find the documentation for the named arguments in the following function call:
        
@@ -344,9 +344,7 @@ for functional programming (lapply, purrr) -->
     }
     ```
     
-   __[A]{.solved}__:
-   
-   `in_dir()` takes *a path* to a working directory as an argument. First the working directory is changed accordingly. `on.exit()` ensures that the modification to the working directory are reset to the initial value when the function exits. `in_dir()` expresses the change of the workig directory very explicitly.
+   __[A]{.solved}__: `in_dir()` takes *a path* to a working directory as an argument. First the working directory is changed accordingly. `on.exit()` ensures that the modification to the working directory are reset to the initial value when the function exits. `in_dir()` expresses the change of the workig directory very explicitly.
     
    In `source()` the `chdir` argument specifies if the working directory should be changed during the evaluation of the `file` argument (which in this case has to be a pathname). The default for this *logical value* here is `FALSE`, so you can choose to change the working directory but don't have to provide a value, if you intend to use your current working directory.
    
