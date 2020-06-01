@@ -71,8 +71,8 @@ source("common.R")
     ```{r}
    setNames( , c("a", "b", "c"))
     ```
-  
-  `unname()` is implemented in the following way:
+   
+   `unname()` is implemented in the following way:
    
     ```{r, eval = FALSE}
     unname <- function (obj, force = FALSE){
@@ -143,10 +143,11 @@ source("common.R")
     ```
 
 ## S3 atomic vectors
-   1. __[Q]{.Q}__: What sort of object does `table()` return? What is its type? What attributes does it have? How does the dimensionality change as you tabulate more variables?
-    
-   __[A]{.solved}__: `table()` returns a contingency table of its input variables, which has the class `"table"`. Internally it is represented as an array (implicit class) of integers (type) with the attributes `dim` (dimension of the underlying array) and `dimnames` (one name for each input column). The dimensions correspond to the number of unique values (factor levels) in each input variable.
 
+1. __[Q]{.Q}__: What sort of object does `table()` return? What is its type? What attributes does it have? How does the dimensionality change as you tabulate more variables?
+   
+   __[A]{.solved}__: `table()` returns a contingency table of its input variables, which has the class `"table"`. Internally it is represented as an array (implicit class) of integers (type) with the attributes `dim` (dimension of the underlying array) and `dimnames` (one name for each input column). The dimensions correspond to the number of unique values (factor levels) in each input variable.
+   
     ```{r}
     x <- table(mtcars[c("vs", "cyl", "am")])
     
@@ -186,6 +187,7 @@ source("common.R")
 
 
 ## Lists
+
 1. __[Q]{.Q}__: List all the ways that a list differs from an atomic vector.
 
    __[A]{.solved}__: To summarise:
@@ -262,6 +264,7 @@ source("common.R")
    <!-- link to vctrs package for resolution of this problem? -->
    
 ## Data frames and tibbles
+
 1. __[Q]{.Q}__: Can you have a data frame with 0 rows? What about 0 columns?
 
    __[A]{.solved}__: Yes, you can create these data frames easily and in many ways. Even both dimensions can be 0. E.g. you might subset the respective dimension with either `0`, `NULL` or a valid 0-length atomic (`logical(0)`, `character(0)`, `integer(0)`, `double(0)`). Negative integer sequences would also work. The following example uses a zero:
