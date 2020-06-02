@@ -348,17 +348,20 @@ library(sloop)
     
 6. __[Q]{.Q}__: What are the arguments to `[`? Why is this a hard question to answer?
 
-   __[A]{.started}__: The subsetting operator `[` is a primitive and generic function as can be inspected via `ftype()`.
+   __[A]{.solved}__: The subsetting operator `[` is a primitive and generic function, which can confirmed via `ftype()`.
    
     ```{r}
     ftype(`[`)
     ```
    
-   Therefore, `formals(`[`)` returns `NULL` and one possible way to figure out `[`'s arguments would be to inspect the underlying C source code, which can be found online via `pryr::show_c_source(.Primitive("["))`. However, regarding the differing arguments of `[`'s methods, it seems most probable, that `[`'s arguemts are `x` and `...`.
+   For primitive functions `formals(`[`)` returns `NULL` so we need to find another way to determine the functions argurments. One possible way to figure out `[`'s arguments would be to inspect the underlying C source code, which can be searched for via `pryr::show_c_source(.Primitive("["))`.
+   
+   When we inspect the arguments the `[`'s methods, we see that the arguments vary with the class of `x`.
 
     ```{r}    
-    names(formals(`[.Date`))
+    names(formals(`[.data.frame`))
     names(formals(`[.table`))
+    names(formals(`[.Date`))
     names(formals(`[.AsIs`))
     ```
 
