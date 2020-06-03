@@ -369,13 +369,15 @@ library(sloop)
 
 1. __[Q]{.Q}__: Categorise the objects returned by `lm()`, `factor()`, `table()`, `as.Date()`, `ecdf()`, `ordered()`, `I()` into the styles described above.
     
-   __[A]{.started}__: The returned objects correspond to the following object styles:
+   __[A]{.solved}__: We can categorise the return values into the various object styles by observing how the [number of observations](https://vctrs.r-lib.org/articles/type-size.html#size) is calculated.
    
-    * Vector: `factor()`, `table()`, `as.Date()`, `ordered()`  
-    * Record:  
-    * Scalar: `lm()`, `ecdf()`  
-    * Other: `I()`  
-   
+   * Vector object-style: `factor()`, `table()`, `as.Date()`, `ordered()`
+   * Record object-style: not observed
+   * Data frame object-style: not observed
+   * Scalar object-style: `lm()`, `ecdf()`  
+
+   The object style of `I()` depends on the input, since this function returns a "copy of the object with class "AsIs" prepended to the class(es)".
+
 2. __[Q]{.Q}__: What would a constructor function for `lm` objects, `new_lm()`, look like? Use `?lm` and experimentation to figure out the required fields and their types.
 
    __[A]{.solved}__: The constructor needs to populate the attributes of an `lm` object and check their type for correctness.
@@ -423,17 +425,15 @@ library(sloop)
 
 1. __[Q]{.Q}__: How does `[.Date` support subclasses? How does it fail to support subclasses?
 
-   __[A]{.started}__:
-   
-   <!-- HW: I've included a few hints: -->
+   __[A]{.solved}__:
    
    `[.Date` calls `.Date` with the result of calling `[` on the parent class, along with `oldClass()`:
+   
     ```{r}
-    # inspect function
     `[.Date`
     ```
     
-    `.Date` is kind of like a constructor for date classes, although it doesn't check the input is the correct type:
+   `.Date` is kind of like a constructor for date classes, although it doesn't check the input is the correct type:
     
     ```{r}
     .Date
@@ -452,7 +452,7 @@ library(sloop)
     oldClass(integer())
     ```
   
-    It seems similar to `class()`, but it returns `NULL` for base types. Together this means that `[.Date` effectively calls `mean()` on the underlying numeric data, then resets the class of the result to the input. This ignores the fact that a subclass might have additional attributes.
+   It seems similar to `class()`, but it returns `NULL` for base types. Together this means that `[.Date` effectively calls `mean()` on the underlying numeric data, then resets the class of the result to the input. This ignores the fact that a subclass might have additional attributes.
 
 2. __[Q]{.Q}__: R has two classes for representing date time data, `POSIXct` and `POSIXlt`, which both inherit from `POSIXt`. Which generics have different behaviours for the two classes? Which generics share the same behaviour?
     
