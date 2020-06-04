@@ -512,7 +512,14 @@ library(sloop)
     s3_dispatch(x2[1])
     ```
 
-   __[A]{.started}__: `class()` returns `"integer"` for `x1` and `x2`, but the class of `x1` is implicit, while the class of `x2` is explicit.  This is important because `[` is an internal generic, so when the class is explicitly set, the "implicit" parent class `numeric` is not considered.
+   __[A]{.solved}__: `class()` returns `"integer"` in both cases. But the class of `x1` is created implicitly and inherits from the `"numeric"` class, while the class of `x2` is set explicitly and no parent class is assumed.
+   
+    ```{r}
+    s3_class(x1)  # implicit
+    s3_class(x2)  # explicit
+    ```
+   
+   The output of `s3_dispatch()` shows us, that various methods are not implemented. Rather an internal dispatch (written in C) is used, which shows `[` as an internal generic. We also see, that setting the class explicitly for `x2` avoids considering the implicit parent class `"numeric"` for method dispatch.
 
 2. __[Q]{.Q}__: What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
 
