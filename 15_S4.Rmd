@@ -331,8 +331,88 @@ library(methods)
 
 1. __[Q]{.Q}__: What would a full `setOldClass()` definition look like for an ordered factor (i.e. add `slots` and `prototype` the definition above)?
 
-   __[A]{.open}__:
+   __[A]{.open}started
+   <!-- @Hadley: New solution, please review. -->
+
+   Thoughts for an introduction
+   - What does setOldClass() do? it registers an S4 class as an S3 class, so that it can be used with S3 methods. (correct?)
+
+
+   From `?setOldClass`
+   - registers it as an S3 class  vs Register an old-style (a.k.a. ‘S3’) class as a formally defined class.
+
+   - `S4Class`: optionally, the class definition or the class name of an S4 class. The new class will have all the slots and other properties of this class, plus any S3 inheritance implied by multiple names in the Classes argument. See the section on “S3 classes with known attributes” below.
    
+
+   From `?Methods_for_S3`
+   - The systems can also be combined by using an S3 class with S4 method dispatch or in S4 class definitions.
+   
+   - S3 classes can be used for any S4 method selection, provided that the S3 classes have been registered by a call to setOldClass, with that call specifying the correct S3 inheritance pattern.
+   
+   
+   From Advanced R
+   Calls to setOldClass() in the code for a package allow the class to be used as a slot in formal (S4) classes and in signatures for methods (see Methods_for_S3).
+   
+   In slots and contains you can use S4 classes, S3 classes, or the implicit class 
+   To use an S3 class, you must first register it with setOldClass()
+
+    ```{r}
+    setOldClass(c("ordered", "factor"))
+    ```
+
+
+   - However, it’s generally better to be more specific and provide a full S4 definition with slots and a prototype:
+
+   - build an S4 class on top of an S3 class   
+
+   - If an S4 object inherits from an S3 class or a base type, it will have a special virtual slot called .Data. This contains the underlying base type or S3 object: 
+
+
+   Template from book (setOldClass seems to be raising an error)
+    ```{r}
+    setClass(Class = "factor",
+             contains = "integer",
+             slots = c(
+               levels = "character"
+             ),
+             prototype = structure(
+               integer(),
+               levels = character()
+             )
+    )
+    
+    setOldClass("factor", S4Class = "factor")
+    ```
+
+
+   First Attempt at solution
+
+    ```{r}
+    setOldClass("factor", S4Class = "factor")
+    
+    OrderedS4 <- setClass("ordered",
+                          contains = "factor",
+                          slots = c(
+                            levels = "character"
+                          ),
+                          prototype = structure(
+                            factor(),  # ordered() | factor(ordered = TRUE) ??
+                            levels = character()
+                          )
+    )
+    
+    
+    a <- OrderedS4(1L, levels = "A")
+    attributes(a)
+    a@.Data
+    ```
+
+   does the S3 dispatch / inheritance work?
+
+    ```{r}
+    new("ordered", c("A"))
+    ```
+
 2. __[Q]{.Q}__: Define a `length` method for the `Person` class.
 
    __[A]{.solved}__: We can define this method as an S3 method and register it afterwards:
