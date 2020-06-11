@@ -86,7 +86,7 @@ source("common.R")
     
     ```{r}
     attributes(date_lt)
-    date_plt$sec
+    date_lt$sec
     ```
    
    However, while lists can be a practical data strutcture, basic calculations are often faster and less memory hungry for objects with underlying integer type.
@@ -121,9 +121,9 @@ source("common.R")
 
     ```{r}
     bench::mark(
-      as.POSIXct("2020-01-01 12:30:25"),
-      as.POSIXct("2020-01-01 12:30:25", format = "%Y-%m-%d %H:%M:%S"),
-      strptime("2020-01-01 12:30:25", format = "%Y-%m-%d %H:%M:%S")
+      as.POSIXct = as.POSIXct("2020-01-01 12:30:25"),
+      as.POSIXct_format = as.POSIXct("2020-01-01 12:30:25", format = "%Y-%m-%d %H:%M:%S"),
+      strptime_fomat = strptime("2020-01-01 12:30:25", format = "%Y-%m-%d %H:%M:%S")
     )
     ```
     
