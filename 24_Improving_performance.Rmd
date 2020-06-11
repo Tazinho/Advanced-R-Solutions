@@ -127,7 +127,7 @@ source("common.R")
     )
     ```
     
-   A fourth way is to use the methods from the lubridate package. Those converter functions are basically wrappers for the POSIXct approach and come with a more intuitive syntax, which allows to specify the format components as part of the converter function names.
+   A fourth way is to use the converter functions from the lubridate package, which are basically wrappers for the POSIXct approach with a more intuitive syntax.
 
     ```{r}
     library(lubridate)
@@ -138,12 +138,12 @@ source("common.R")
 
     ```{r}
     bench::mark(
-      as.POSIXct("2013-07-24 23:55:26", tz = "UTC"),
-      ymd_hms("2013-07-24 23:55:26")
+      as.POSIXct = as.POSIXct("2013-07-24 23:55:26", tz = "UTC"),
+      ymd_hms = ymd_hms("2013-07-24 23:55:26")
     )
     ```
     
-   For further ways to convert characters into date time objects, have a look into the chron, the anytime and the fasttime packages. The chron package has it's own classes and stores times as fractions of days in the underlying double type. However, in contrast to the POSIXct and lt classes, chron doesn't deal with timezones and daylight savings. The anytime converts (accoring ot it's description) "Anything to POSIXct or Date". Similarly, the fasttime package's only function `fastPOSIXct()` is named after what the package does best.
+   For further ways to convert characters into date time objects, have a look into the chron, the anytime and the fasttime packages. The chron package has it's own classes and stores times as fractions of days in the underlying double type. However, in contrast to the POSIXct and lt classes, chron doesn't deal with timezones and daylight savings. The anytime package converts (accoring to its description) "Anything to POSIXct or Date". Similarly, the fasttime package and its only function `fastPOSIXct()` are named after what they do best.
 
 4. __[Q]{.Q}__: Which packages provide the ability to compute a rolling mean?
     
