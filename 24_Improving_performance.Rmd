@@ -69,9 +69,82 @@ source("common.R")
 
 3. __[Q]{.Q}__: List four functions (not just those in base R) that convert a string into a date time object. What are their strengths and weaknesses?
     
-   __[A]{.started}__: At least these functions will do the trick: `as.POSIXct()`, `as.POSIXlt()`, `strftime()`, `strptime()`, `lubridate::ymd_hms()`. There might also be some in the timeseries packages `xts` or `zoo` and in `anytime`. An update on this will follow.
+   __[A]{.solved}__: The usual base R way is to use the `as.POSIXct()` generic and create a date time object of class POSIXct and type integer.
+   
+    ```{r}
+    date_pct <- as.POSIXct("2020-01-01 12:30:25")
+    date_pct
+    ```
+   Under the hood `as.POSIXct()` employs `as.POSIXlt()` for the character conversion. This creates a date time object of class POSIXlt and type list.
+   
+    ```{r}
+    date_plt <- as.POSIXlt("2020-01-01 12:30:25")
+    date_plt
+    ```
 
-<!-- add fasttime -->
+   The POSIXlt class has the advantage that it carries the individual time components as attributes. This allows to extract the time components via typical list operators.
+    
+    ```{r}
+    attributes(date_plt)
+    date_plt$sec
+    ```
+   
+   However, while lists can be a practical data strutcture in some cases, basic calculations are often faster and less memory hungry on objects with underlying integer type.
+   
+    ```{r}
+    date_plt2 <- rep(date_plt, 10000)
+    date_pct2 <- rep(date_pct, 10000)
+    
+    bench::mark(
+      date_plt2 - date_plt2, 
+      date_pct2 - date_pct2
+    )
+    ```
+
+   Although, both date time classes inherit POSIXt as a second class, many functions only dispatch on the first argument and don't account for the possibility of mixed date time object usage. Therefore, better decide for an appropriate date time class, instead of mixing them.
+   
+    ```{r}
+    c(date_plt, date_pct)
+    c(date_pct, date_plt)
+    ```
+    
+   `as.POSIXlt()` in turn uses `strptime()` under the hood, which creates similar date time object.
+   
+    ```{r}
+    date_str <- strptime("2020-01-01 12:30:25", format = "%Y-%m-%d %H:%M:%S")
+    identical(date_plt, date_str)
+    ```
+
+   While `as.POSIXct()` and `as.POSIXlt()` accept different character inputs by default (e.g. "2001-01-01 12:30", "2001/1/1 12:30") the format needs to be set for `strptime()` in any case. If the input doesn't fit the provided formt, all three functions return `NA`
+
+   On the other hand, specifying the format and using `strptime()` can help to improve the character conversion rate.
+
+    ```{r}
+    bench::mark(
+      as.POSIXct("2020-01-01 12:30:25"),
+      as.POSIXct("2020-01-01 12:30:25", format = "%Y-%m-%d %H:%M:%S"),
+      strptime("2020-01-01 12:30:25", format = "%Y-%m-%d %H:%M:%S")
+    )
+    ```
+    
+   A fourth way is to use methods from the lubridate package. Those converter functions are basically wrappers for the POSIXct approach that come with a more intuitive syntax, which allows to specify the components as part of the converter funtion names.
+
+    ```{r}
+    library(lubridate)
+    ymd_hms("2013-07-24 23:55:26")
+    dym_hms("24-2013-07 23:55:26")
+    ```
+
+   However, in this case, intuitivity comes with the price of lower speed.
+
+    ```{r}
+    bench::mark(
+      as.POSIXct("2013-07-24 23:55:26", tz = "UTC"),
+      ymd_hms("2013-07-24 23:55:26")
+    )
+    ```
+    
+   For further ways to convert characters into date time objects, have a look into the chron, the anytime and the fasttime packages. The chron package has it's own classes and stores times as fractions of days in the underlying double type. However, in contrast to the POSIXct and lt classes, chron doesn't deal with timezones and daylight saving. The anytime converts into POSIXct and describes itself pretty close to it's name "Anything to POSIXct or Date Converter". Similarly the fasttime package's only function `fastPOSIXct()` is named after what it does best.
 
 4. __[Q]{.Q}__: Which packages provide the ability to compute a rolling mean?
     
