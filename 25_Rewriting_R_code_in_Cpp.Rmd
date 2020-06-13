@@ -636,5 +636,90 @@ To practice using the STL algorithms and data structures, implement the followin
 
 6. __[Q]{.Q}__: `setdiff()`, `union()`, and `intersect()` for integers using sorted ranges and `set_union`, `set_intersection` and `set_difference`.
 
-   __[A]{.open}__:
+   __[A]{.solved}__: The structure of the three functions will be very similar. 
    
+   We first sort both input vectors. Then we apply the respective `set_union`, `set_intersection` or `set_difference` function. After that, the result will be between the iterators `tmp.begin()` and `out_end`. To retrieve the result we loop once through the range between `tmp.begin()` and `out_end` in the last part of each function.
+
+   One note on the naming of the functions: `union` is a special class in cpp so we may not use it for our function definition and rather use `setunion`.
+
+    ```{cpp}
+    #include <Rcpp.h>
+    #include <unordered_set>
+    #include <algorithm>
+    using namespace Rcpp;
+    
+    // [[Rcpp::plugins(cpp11)]]
+    // [[Rcpp::export]]
+    IntegerVector setunion(IntegerVector x, IntegerVector y) {
+      int nx = x.size();
+      int ny = y.size();
+      
+      IntegerVector tmp(nx + ny);
+      
+      std::sort(x.begin(), x.end());
+      std::sort(y.begin(), y.end());
+      
+      IntegerVector::iterator out_end = std::set_union(x.begin(), x.end(), y.begin(), y.end(), tmp.begin());
+      
+      IntegerVector out;
+      for(IntegerVector::iterator it = tmp.begin(); it != out_end; ++it) {
+        out.push_back(*it);
+      }
+      
+      return out;
+    }
+    
+    // [[Rcpp::export]]
+    IntegerVector intersect(IntegerVector x, IntegerVector y) {
+      int nx = x.size();
+      int ny = y.size();
+      
+      IntegerVector tmp(std::min(nx, ny));
+      
+      std::sort(x.begin(), x.end());
+      std::sort(y.begin(), y.end());
+      
+      IntegerVector::iterator out_end = std::set_intersection(x.begin(), x.end(), y.begin(), y.end(), tmp.begin());
+      
+      IntegerVector out;
+      for(IntegerVector::iterator it = tmp.begin(); it != out_end; ++it) {
+        out.push_back(*it);
+      }
+      
+      return out;
+    }
+    
+    // [[Rcpp::export]]
+    IntegerVector setdiff(IntegerVector x, IntegerVector y) {
+      int nx = x.size();
+      int ny = y.size();
+      
+      IntegerVector tmp(nx);
+      
+      std::sort(x.begin(), x.end());
+      std::sort(y.begin(), y.end());
+      
+      IntegerVector::iterator out_end = std::set_difference(x.begin(), x.end(), y.begin(), y.end(), tmp.begin());
+      
+      IntegerVector out;
+      for(IntegerVector::iterator it = tmp.begin(); it != out_end; ++it) {
+        out.push_back(*it);
+      }
+      
+      return out;
+    }
+    ```
+    
+   Let's verify, that these functions work as intended.
+    
+    ```{r}
+    x <- c(1, 2, 3, 3)
+    y <- c(3, 2, 5)
+    
+    setunion(x, y)
+    intersect(x, y)
+    setdiff(x, y)
+    
+    typeof(setdiff(x, y))
+    ```
+
