@@ -6,6 +6,6 @@ We attempt to provide worked solutions for the exercises provided in the book [A
 
 We are currently in the process of working on the last chapters and more difficult exercises.
 
-Please feel invited to contributie or say hi!
+Please feel invited to contribute or say hi!
 
 [@malte_grosser](https://twitter.com/malte_grosser), [@henningsway](https://twitter.com/henningsway) and [@hadleywickham](https://twitter.com/hadleywickham)
