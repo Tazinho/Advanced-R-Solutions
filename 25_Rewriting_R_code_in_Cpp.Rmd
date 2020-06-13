@@ -570,7 +570,7 @@ To practice using the STL algorithms and data structures, implement the followin
 
    __[A]{.started}__: The `insert()`-method will return if an equivalent element already existed. If a new element is inserted, we will add it to the (unique) return vector of our function.
 
-    ```{cpp}
+    ```{Rcpp}
     // [[Rcpp::plugins(cpp11)]]
     #include <Rcpp.h>
     #include <unordered_set>
@@ -588,9 +588,15 @@ To practice using the STL algorithms and data structures, implement the followin
       
       return wrap(out);
     }
+
+    
+    // As a one-liner
+    // [[Rcpp::export]]
+    NumericVector uniqueCC(NumericVector x) {
+      return wrap(*(new std::unordered_set<double>(x.begin(), x.end())));
+    }
     ```
 
-   <!-- (TODO: address the challenge and transform this into a one-liner) Maybe use an iterator?-->
 
 4. __[Q]{.Q}__: `min()` using `std::min()`, or `max()` using `std::max()`.
 
@@ -642,7 +648,7 @@ To practice using the STL algorithms and data structures, implement the followin
 
    One note on the naming of the functions: `union` is a special class in cpp so we may not use it for our function definition and rather use `setunion`.
 
-    ```{cpp}
+    ```{Rcpp}
     #include <Rcpp.h>
     #include <unordered_set>
     #include <algorithm>
