@@ -392,11 +392,12 @@ for functional programming (lapply, purrr) -->
     
    Compare `capture.output()` to `capture.output2()`. How do the functions differ? What features have I removed to make the key ideas easier to see? How have I rewritten the key ideas to be easier to understand?
     
-   __[A]{.solved}__: Using `body(capture.output)` we inspect the source code of the original `capture.output()` function. `capture.output()` is a quite a bit longer (39 lines vs. 7 lines). `capture.output()` writes out entire methods, such as `readLines()` <!-- HW: what does this mean? -->. Instead `capture.output2()` calls these methods directly. This brevity and modularity makes `capture.output2` easier to understand (given you know the underlying methods).
+   __[A]{.solved}__: Using `body(capture.output)` we inspect the source code of the original `capture.output()` function: The implementation for `capture.output()` is a quite a bit longer (39 lines vs. 7 lines).
    
-   <!-- HW: main difference is that capture.output() uses substitute() + eval -->
+   The function strives to 'write output as far as possible to file', which is why an error handling is needed. This is achieved by first quoting the expressions (via `substitute()`) and then evaluatating them step-by-step (via `lapply()` and a variant of `eval`), which makes the function more robust.
+   
+   Additionally `capture.output()` also offers a choice between overwriting or appending to a file or a connection.
 
-   However `capture.output2()` does miss a couple of features: `capture.output()` appears to handle important exceptions and it also offers a choice between overwriting or appending to a file.
 
 ## Function forms
 
@@ -538,9 +539,8 @@ for functional programming (lapply, purrr) -->
 
 7. __[Q]{.Q}__: What are valid names for user-created infix functions?
   
-   __[A]{.solved}__: Let's cite **Advanced R** here (section on "Function Forms"):
-   <!-- HW: link to section -->
-   
+   __[A]{.solved}__: Let's cite **Advanced R** here (see [Function Forms](https://adv-r.hadley.nz/functions.html#function-forms)):
+
    > ... names of infix functions are more flexible than regular R functions: they can contain any sequence of characters except “%”.
 
 8. __[Q]{.Q}__: Create an infix `xor()` operator.

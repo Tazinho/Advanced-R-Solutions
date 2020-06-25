@@ -166,18 +166,19 @@ track_dir <- function(f) {
    
 5. __[Q]{.Q}__: Modify `delay_by()` so that instead of delaying by a fixed amount of time, it ensures that a certain amount of time has elapsed since the function was last called. That is, if you called `g <- delay_by(1, f); g(); Sys.sleep(2); g()` there shouldn't be an extra delay.
    
-   __[A]{.solved}__: We can do this with three little tricks (and the help of 42):
+   __[A]{.solved}__: We can achieve this with the help of three little tricks.
     
     ```{r, eval = FALSE}
-    delay_atleast <- function(f, amount) {
+    delay_atleast <- function(amount, f) {
       force(f)
       force(amount)
       
       # Store the last time the function was run
       last_time <- NULL
       
+      # Return modified 'delay-aware' function
       function(...) {
-        if (!is.null(last_runtime)) {
+        if (!is.null(last_time)) {
           wait <- (last_time - Sys.time()) + amount
           if (wait > 0) {
             Sys.sleep(wait)
@@ -191,6 +192,4 @@ track_dir <- function(f) {
       }
     }
     ```
-    
-    <!-- HW: Sys.sleep() is right the solution here. But can you check that I got the algebra correct? -->
-    
+
