@@ -62,12 +62,13 @@ library(purrr)
 
 1. __[Q]{.Q}__: Weigh the pros and cons of `download.file %>% dot_every(10) %>% delay_by(0.1)` vs `download.file %>% delay_by(0.1) %>% dot_every(10)`.
    
-   __[A]{.solved}__: `download.file %>% dot_every(10) %>% delay_by(0.1)` will print a dot every 10 downloads and then delay by 0.1 second. `download.file %>% delay_by(0.1) %>% dot_every(10)` will delay by every download by 0.1 second and print a dot every 10 downloads.
+   __[A]{.solved}__: Both commands will print a dot every 10 downloads and will take the same amout of time to run, so the differences may seem quite subtle.
    
-   So both commands will print a dot every 10 downloads. In the first case there is a small delay every 10 downloads and in the second case there is a small delay after each download (which will make this version slightly slower).
+   In the first case, first the dot functionality is added to `download.file`. Then the delay is added to this already tweaked function. This implies, that the printing of the dot will also be delayed and the first dot will be printed as soon as the download for the 10th url starts.
 
-   <!-- Plus, I think there is some error in the original page by Hadley. He used the former to spread out `dot_every(delay_by(download.file, 0.1), 10)`, but I think the latter is the right one. -->
-   
+  In the latter case. The delay is added first and the dot-functionality is wrapped around it. This order will print the first dot immediately after the 9th download is finished, the the short delay occurs before the 10th download actually starts.
+
+
 2. __[Q]{.Q}__: Should you memoise `file.download()`? Why/why not?
    
    __[A]{.solved}__: Memoising `file.download()` will only work if the files are immutable; i.e. if the file at a given url is always same. There's no point memoising unless this is true. Even if this is true, however, memoise has to store the results in memory, and large files will potentially take up a lot of memory.
