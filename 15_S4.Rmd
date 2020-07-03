@@ -329,88 +329,41 @@ library(methods)
 
 ## S4 and S3
 
-1. __[Q]{.Q}__: What would a full `setOldClass()` definition look like for an ordered factor (i.e. add `slots` and `prototype` the definition above)?
+1. __[Q]{.Q}__: What would a full `setOldClass()` definition look like for an ordered factor (i.e. add `slots` and `prototype` to the definition above)?
 
-   __[A]{.started}
-   <!-- @Hadley: New solution, please review. -->
-
-   Thoughts for an introduction
-   - What does setOldClass() do? it registers an S4 class as an S3 class, so that it can be used with S3 methods. (correct?)
-
-
-   From `?setOldClass`
-   - registers it as an S3 class  vs Register an old-style (a.k.a. ‘S3’) class as a formally defined class.
-
-   - `S4Class`: optionally, the class definition or the class name of an S4 class. The new class will have all the slots and other properties of this class, plus any S3 inheritance implied by multiple names in the Classes argument. See the section on “S3 classes with known attributes” below.
+   __[A]<!-- @Hadley: New solution, please review. -->
+   __[A]{.solved}purpose of `setOldClass()` lies in registering an S3 class as a "formally defined class", so that it can be used within the S4 OOP-system. When using it, we can also provide the argument`S4Class`, which will inherit the slots and the default values (prototype) to the registered class.
    
-
-   From `?Methods_for_S3`
-   - The systems can also be combined by using an S3 class with S4 method dispatch or in S4 class definitions.
-   
-   - S3 classes can be used for any S4 method selection, provided that the S3 classes have been registered by a call to setOldClass, with that call specifying the correct S3 inheritance pattern.
-   
-   
-   From Advanced R
-   Calls to setOldClass() in the code for a package allow the class to be used as a slot in formal (S4) classes and in signatures for methods (see Methods_for_S3).
-   
-   In slots and contains you can use S4 classes, S3 classes, or the implicit class 
-   To use an S3 class, you must first register it with setOldClass()
-
+   Let's build an S4 ordered factor on top of the S3 factor in such a way.
     ```{r}
-    setOldClass(c("ordered", "factor"))
-    ```
-
-
-   - However, it’s generally better to be more specific and provide a full S4 definition with slots and a prototype:
-
-   - build an S4 class on top of an S3 class   
-
-   - If an S4 object inherits from an S3 class or a base type, it will have a special virtual slot called .Data. This contains the underlying base type or S3 object: 
-
-
-   Template from book (setOldClass seems to be raising an error)
-    ```{r, error=TRUE}
-    setClass(Class = "factor",
-             contains = "integer",
-             slots = c(
-               levels = "character"
-             ),
-             prototype = structure(
-               integer(),
-               levels = character()
-             )
+    setOldClass("factor")  # using build-in definition for brevity
+    
+    OrderedFactor <- setClass(
+      "OrderedFactor",
+      contains = "factor",  # inherit from registered S3 class
+      slots = c(
+        levels = "character",
+        ordered = "logical"  # add logical order slot
+      ),
+      prototype = structure(
+        integer(),
+        levels = character(),
+        ordered = logical()  # add defaul value
+      )
     )
-    
-    setOldClass("factor", S4Class = "factor")
     ```
 
+   We can now register the (S3) ordered-class, while providing an 'S4 template'. We can also use the S4-class to create new object directly.
+   
+    ```{r, warning=FALSE}
+    setOldClass("ordered", S4Class = "OrderedFactor")
 
-   First Attempt at solution
-
-    ```{r}
-    setOldClass("factor", S4Class = "factor")
-    
-    OrderedS4 <- setClass("ordered",
-                          contains = "factor",
-                          slots = c(
-                            levels = "character"
-                          ),
-                          prototype = structure(
-                            factor(),  # ordered() | factor(ordered = TRUE) ??
-                            levels = character()
-                          )
+    x <- OrderedFactor(
+      c(1L, 2L, 2L),
+      levels = c("a", "b", "c"),
+      ordered = TRUE
     )
-    
-    
-    a <- OrderedS4(1L, levels = "A")
-    attributes(a)
-    a@.Data
-    ```
-
-   does the S3 dispatch / inheritance work?
-
-    ```{r, error=TRUE}
-    new("ordered", c("A"))
+    str(x)
     ```
 
 2. __[Q]{.Q}__: Define a `length` method for the `Person` class.
