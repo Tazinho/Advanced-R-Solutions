@@ -12,9 +12,7 @@ library(purrr)
 
 ## HTML
 
-1. __[Q]{.Q}__: TODO: Adapt to the new exercise formulation:
-
-   The escaping rules for `<script>` tags are different because they contain JavaScript, not HTML. Instead of escaping angle  brackets or ampersands, you need to escape `</script>` so that the tag isn't closed too early. For example, `script("'</script>'")`, shouldn't generate this:
+1. __[Q]{.Q}__: The escaping rules for `<script>` tags are different because they contain JavaScript, not HTML. Instead of escaping angle brackets or ampersands, you need to escape `</script>` so that the tag isn't closed too early. For example, `script("'</script>'")`, shouldn't generate this:
 
     ```html
     <script>'</script>'</script>
@@ -27,26 +25,45 @@ library(purrr)
     ```
 
    Adapt the `escape()` to follow these rules when a new argument `script` is set to `TRUE`.
+
+   __[A]{.solved}__: To solve this exercise we first recreate the required functions from the book chapter. We then confirm that our code reliably escapes for tags like `<p>` and `<b>`, but doesn't escape correctly for the `<script>` tag. Next, we modify the `escape()` function and redefine the `<script>` tag. Finally we confirm that all of these tags now escape correctly.
    
-   Old exercise text: The escaping rules for `<script>` and `<style>` tags are different: you don't want to escape angle brackets or ampersands, but you do want to escape `</script>` or `</style>`. Adapt the code above to follow these rules.
-
-   TODO: Check why escaping of script/style tags would be necessary and change answer accordingly: https://github.com/hadley/adv-r/issues/1190
-
-   Required Code from Advanced R:
+   Note that `<style>` tags encapsulate css-styling guidelines and the escaping follows the same rules as the `<script>` tag does. We therefore add the same behaviour also for `<style>` tags.
+   
+   Let's run the required code from Advanced R first:
 
     ```{r required code from advr, include=TRUE}
-    html <- function(x) structure(x, class = "advr_html")
+    # Escaping
     
-    cat_line <- function(...) cat(..., "\n", sep = "")
+    html <- function(x) structure(x, class = "advr_html")
     
     print.advr_html <- function(x, ...) {
       out <- paste0("<HTML> ", x)
-      cat_line(paste(strwrap(out), collapse = "\n"))
+      cat(paste(strwrap(out), collapse = "\n"), "\n", sep = "")
     }
-
+    
+    escape <- function(x) UseMethod("escape")
+    
+    escape.character <- function(x) {
+      x <- gsub("&", "&amp;", x)
+      x <- gsub("<", "&lt;", x)
+      x <- gsub(">", "&gt;", x)
+      
+      html(x)
+    }
+    
+    escape.advr_html <- function(x) x
+    
+    # Basic tag functions
+    
     dots_partition <- function(...) {
-      dots <- dots_list(...)
-      is_named <- names(dots) != ""
+      dots <- list2(...)
+      
+      if (is.null(names(dots))) {
+        is_named <- rep(FALSE, length(dots))
+      } else {
+        is_named <- names(dots) != ""
+      }
       
       list(
         named = dots[is_named],
@@ -54,8 +71,9 @@ library(purrr)
       )
     }
     
-    # html_attributes() funtion from the Github Repository of Advanced R
-    # (adv-r/dsl-html-attributes.r)
+    # html_attributes() function from the GitHub repository of Advanced R
+    # https://github.com/hadley/adv-r/blob/master/dsl-html-attributes.r
+
     html_attributes <- function(list) {
       if (length(list) == 0) return("")
       
@@ -83,36 +101,59 @@ library(purrr)
       x <- gsub("\n", '&#10;', x)
       x
     }
+    
+    # Tag functions
+    tag <- function(tag) {
+      new_function(
+        exprs(... = ),
+        expr({
+          dots <- dots_partition(...)
+          attribs <- html_attributes(dots$named)
+          children <- map_chr(dots$unnamed, escape)
+          
+          html(paste0(
+            !!paste0("<", tag), attribs, ">",
+            paste(children, collapse = ""),
+            !!paste0("</", tag, ">")
+            ))
+          }),
+        caller_env()
+      )
+    }
     ```
     
-   __[A]{.solved}__: Sourcecode wrapped in `<script>` or `<style>` tags is different from the other HTML-tags: the `<script>` tag inserts (mainly) JavaScript into the HTML document. Here the angle brackets and ampersands should not be escaped so the code remains intact. Because JavaScript may contain multiple nested `<script>` tags, we need to escape the inner tags as `<\/script>`.
-    
-   [check, what is meant with "want to escape `</script>` or `</style>`"]{.todo}
-    
-   `style` tags encapsulate css-styling guidelines and the escaping follows the same rules as for the JavaScript above.
-    
-   Our `tag` function factory needs two serve two competing requirements for escaping: For most of the tag functions the content (brackets and ampersands) needs to be escaped. In script and style tags the content should NOT be escaped, but closing `script`- and `style`-tags need to be escaped.
-    
-    
-  <!-- HW: I'd create a separate function here, rather than using arguments because I think the intent is sufficiently different. -->    
-    
-   To distinguish between these options, we extend `escape.character()` to include an argument (`escape_choice`) to choose the escape-style, that we want.
+   Now, we confirm correct escaping for the `<p>` and `<b>` tag functions as well as incorrect behaviour for the `<script>` tag function:
     
     ```{r}
-    # add argument `escape_choice` to escape-function
-    escape.character <- function(x,
-                                 escape_choice = c("content", "script_or_style")
-                                 ) {
+    p <- tag("p")
+    b <- tag("b")
+    
+    identical(p("This &","this <content>",
+                b("& this will be escaped")) %>%
+                as.character(),
+              "<p>This &amp;this &lt;content&gt;<b>&amp; this will be escaped</b></p>")
+    
+    script <- tag("script") #, script = TRUE)
+    
+    identical(script(
+      "These signs will not be escaped: &, <, >, ", "but these ones will: </script> or </style>") %>% as.character(),
+      "<script>These signs will not be escaped: &, <, >, but these ones will: <\\\\/script> or <\\\\/style></script>")
+    ```
+
+   Therefore, we modify the `escape()` and the `tag()` function.
+   
+    ```{r}
+    escape <- function(x, script = FALSE) UseMethod("escape")
+    
+    escape.character <- function(x, script = script) {
       
-      escape_choice <- match.arg(escape_choice)
-      
-      if (escape_choice == "content") {
+      if (!script) {
         x <- gsub("&", "&amp;", x)
         x <- gsub("<", "&lt;", x)
         x <- gsub(">", "&gt;", x)
       }
       
-      if (escape_choice == "script_or_style") {
+      if (script) {
         x <- gsub("</script>", "<\\/script>", x, fixed = TRUE)
         x <- gsub("</style>",  "<\\/style>",  x, fixed = TRUE)
       }
@@ -122,20 +163,7 @@ library(purrr)
     
     escape.advr_html <- function(x, ...) x
     
-    escape <- function(x, ...) UseMethod("escape")
-    ```
-    
-   When we create the tag functions we can then specify the escape style we want:
-    
-  <!-- HW: Instead of complicating this code, I'd just create specific tag functions for script and style by hand -->    
-
-    
-    ```{r}
-    # create tag with specified escape-style
-    tag <- function(tag,
-                    escape_choice = c("content", "script_or_style")) {
-      
-      escape_choice <- match.arg(escape_choice)
+    tag <- function(tag, script = FALSE) {
       
       new_function(
         exprs(... = ),
@@ -144,7 +172,7 @@ library(purrr)
           attribs <- html_attributes(dots$named)
           children <- map_chr(dots$unnamed,
                               # choose the escaping
-                              ~ escape(., escape_choice = !!escape_choice))
+                              ~ escape(., script = !!script))
           html(paste0(
           !!paste0("<", tag), attribs, ">",
           paste(children, collapse = ""),
@@ -156,8 +184,8 @@ library(purrr)
     }
     ```
     
-   Let's test our new `tag()` function:
-    
+   We create new `<p>` and `<b>` and `<script>` tag functions, which all pass their escaping tests now.
+   
     ```{r}
     p <- tag("p")
     b <- tag("b")
@@ -167,10 +195,13 @@ library(purrr)
                 as.character(),
               "<p>This &amp;this &lt;content&gt;<b>&amp; this will be escaped</b></p>")
     
-    script <- tag("script", escape_choice = "script_or_style")
+    script <- tag("script", script = TRUE)
+    style  <- tag("style" , script = TRUE)
     
-    script("These signs will not be escaped: &, <, >, ", "but these ones will: </script> or </style>")
-```
+    identical(script(
+      "These signs will not be escaped: &, <, >, ", "but these ones will: </script> or </style>") %>% as.character(),
+      "<script>These signs will not be escaped: &, <, >, but these ones will: <\\/script> or <\\/style></script>")
+    ```
 
 2. __[Q]{.Q}__: The use of `...` for all functions has some big downsides. There's no input validation and there will be little information in the documentation or autocomplete about how they are used in the function. Create a new function that, when given a named list of tags and their attribute names (like below), creates tag functions with named arguments.
 
