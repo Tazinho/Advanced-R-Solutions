@@ -135,7 +135,7 @@ library(purrr)
     
     identical(script(
       "These signs will not be escaped: &, <, >, ", "but these ones will: </script> or </style>") %>% as.character(),
-      "<script>These signs will not be escaped: &, <, >, but these ones will: <\\\\/script> or <\\\\/style></script>")
+      "<script>These signs will not be escaped: &, <, >, but these ones will: <\\/script> or <\\/style></script>")
     ```
 
    Therefore, we modify the `escape()` and the `tag()` function by adding a the argument `script=FALSE`. Note that we need to add this argument for all methods of the `escape()` generic.
@@ -199,6 +199,8 @@ library(purrr)
     identical(script(
       "These signs will not be escaped: &, <, >, ", "but these ones will: </script> or </style>") %>% as.character(),
       "<script>These signs will not be escaped: &, <, >, but these ones will: <\\/script> or <\\/style></script>")
+      
+    script("These signs will not be escaped: &, <, >, ", "but these ones will: </script> or </style>")
     ```
 
 2. __[Q]{.Q}__: The use of `...` for all functions has some big downsides. There's no input validation and there will be little information in the documentation or autocomplete about how they are used in the function. Create a new function that, when given a named list of tags and their attribute names (like below), creates tag functions with named arguments.
