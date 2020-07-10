@@ -120,7 +120,7 @@ library(purrr)
     }
     ```
     
-   Now, we confirm correct escaping for the `<p>` and `<b>` tag functions as well as incorrect behaviour for the `<script>` tag function:
+   We confirm correct escaping for the `<p>` and `<b>` tag functions and escaping for the `<script>` tag function:
     
     ```{r}
     p <- tag("p")
@@ -131,14 +131,14 @@ library(purrr)
                 as.character(),
               "<p>This &amp;this &lt;content&gt;<b>&amp; this will be escaped</b></p>")
     
-    script <- tag("script") #, script = TRUE)
+    script <- tag("script")
     
     identical(script(
       "These signs will not be escaped: &, <, >, ", "but these ones will: </script> or </style>") %>% as.character(),
       "<script>These signs will not be escaped: &, <, >, but these ones will: <\\\\/script> or <\\\\/style></script>")
     ```
 
-   Therefore, we modify the `escape()` and the `tag()` function by providing a `script=FALSE` argument. Note that we need to add this argument for all methods of the `escape()` generic.
+   Therefore, we modify the `escape()` and the `tag()` function by adding a the argument `script=FALSE`. Note that we need to add this argument for all methods of the `escape()` generic.
    
     ```{r}
     escape <- function(x, script = FALSE) UseMethod("escape")
@@ -182,7 +182,7 @@ library(purrr)
     }
     ```
     
-   We create new `<p>`, `<b>` and `<script>` tag functions, which finally pass all their escaping tests.
+   Finally we create new `<p>`, `<b>` and `<script>` tag functions, which all pass their escaping tests now.
    
     ```{r}
     p <- tag("p")
