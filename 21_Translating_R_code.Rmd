@@ -28,13 +28,12 @@ library(purrr)
 
    __[A]{.solved}__: To solve this exercise we first recreate the required functions from the book chapter. We then confirm that our code reliably escapes for tags like `<p>` and `<b>`, but doesn't escape correctly for the `<script>` tag. Next, we modify the `escape()` function and redefine the `<script>` tag. Finally we confirm that all of these tags now escape correctly.
    
-   Note that `<style>` tags encapsulate css-styling guidelines and the escaping follows the same rules as the `<script>` tag does. We therefore add the same behaviour also for `<style>` tags.
+   Note that `<style>` tags encapsulate css-styling guidelines and the escaping follows the same rules as the `<script>` tag does. We therefore add the same behaviour also for the `<style>` tag function.
    
    Let's run the required code from Advanced R first:
 
     ```{r required code from advr, include=TRUE}
     # Escaping
-    
     html <- function(x) structure(x, class = "advr_html")
     
     print.advr_html <- function(x, ...) {
@@ -55,7 +54,6 @@ library(purrr)
     escape.advr_html <- function(x) x
     
     # Basic tag functions
-    
     dots_partition <- function(...) {
       dots <- list2(...)
       
@@ -140,7 +138,7 @@ library(purrr)
       "<script>These signs will not be escaped: &, <, >, but these ones will: <\\\\/script> or <\\\\/style></script>")
     ```
 
-   Therefore, we modify the `escape()` and the `tag()` function.
+   Therefore, we modify the `escape()` and the `tag()` function by providing a `script=FALSE` argument. Note that we need to add this argument for all methods of the `escape()` generic.
    
     ```{r}
     escape <- function(x, script = FALSE) UseMethod("escape")
@@ -184,7 +182,7 @@ library(purrr)
     }
     ```
     
-   We create new `<p>` and `<b>` and `<script>` tag functions, which all pass their escaping tests now.
+   We create new `<p>`, `<b>` and `<script>` tag functions, which finally pass all their escaping tests.
    
     ```{r}
     p <- tag("p")
