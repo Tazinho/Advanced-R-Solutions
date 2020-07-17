@@ -79,13 +79,16 @@ library(rlang)
       summarise(mean = mean(mpg))  # mean = mean(mpg) -> quoted
     ```
    
-   To find out what happens in `summarise()`, we inspect the source code. Tracing down the S3-dispatch of `summarise()`, we see that the `...` argument is quoted in the underlying `summarise.tbl_df()` method.
+   To find out what happens in `summarise()`, we inspect the source code. Tracing down the S3-dispatch of `summarise()`, we see that the `...` argument is quoted in `dplyr:::summarise_cols()` which is called in the underlying `summarise.data.frame()` method.
     
     ```{r}
     dplyr::summarise
     
-    dplyr:::summarise.tbl_df
+    dplyr:::summarise.data.frame
+    
+    dplyr:::summarise_cols
     ```
+    
     
    In the following ggplot2 expression the `cyl`- and `mean`-objects are quoted.
     
