@@ -1,3 +1,4 @@
+
 ```{r, include=FALSE}
 source("common.R")
 ```
@@ -23,9 +24,7 @@ library(ggplot2)
     
    Why is it better to `force(x)` instead of just `x`?
     
-   __[A]{.solved}__: As you can see `force(x)` is just syntactic sugar for `x`. We prefer this explicit form, because
-    
-   > using this function clearly indicates that you’re forcing evaluation, not that you’ve accidentally typed `x`. (Quote from the textbook)
+   __[A]{.solved}__: As you can see `force(x)` is just syntactic sugar for `x`. We prefer this explicit form, because "using this function clearly indicates that you’re forcing evaluation, not that you’ve accidentally typed `x`." (Quote from the textbook).
 
 2. __[Q]{.Q}__: Base R contains two function factories, `approxfun()` and `ecdf()`. Read their documentation and experiment to figure out what the functions do and what they return.
 
@@ -258,9 +257,10 @@ library(ggplot2)
       x_i_length <- 10L ^ i
       x_i <- rpois(x_i_length, 100L)
       
-      rel_advantage <- bench::mark(llp1 = optimise(ll_poisson1(x_i), c(0, 100), maximum = TRUE),
-                  llp2 = optimise(ll_poisson2(x_i), c(0, 100), maximum = TRUE),
-                  relative = TRUE)$median %>% 
+      rel_advantage <- bench::mark(
+        llp1 = optimise(ll_poisson1(x_i), c(0, 100), maximum = TRUE),
+        llp2 = optimise(ll_poisson2(x_i), c(0, 100), maximum = TRUE),
+        relative = TRUE)$median %>% 
         max()
       
       rel_advantage
@@ -275,7 +275,9 @@ library(ggplot2)
       ggplot(aes(x_length, rel_advantage)) +
       geom_point() +
       geom_line() +
-      ggtitle("Rel. Speed of ll_poisson2() increases with vector length") +
+      ggtitle(
+        "Rel. Speed of ll_poisson2() increases with vector length"
+      ) +
       scale_x_log10()
     ```
 

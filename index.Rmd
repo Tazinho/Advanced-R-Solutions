@@ -40,7 +40,9 @@ We would also like to thank everybody else who contributed to this project by fi
 
 ```{r echo=FALSE, results='asis'}
 contributors <- paste0("`@",
-                       sort(unique(read.csv("contributors.csv")$username)),
+                       sort(
+                         unique(read.csv("contributors.csv")$username)
+                         ),
                        "`")
 
 cat(paste0(contributors, collapse = ", "))
@@ -60,7 +62,8 @@ library(ggplot2)
 df_long <- read.csv2("progress_data.csv", stringsAsFactors = FALSE, 
                       header = TRUE) %>% 
   as_tibble() %>% 
-  modify_at("status", factor, levels = c("open", "started", "solved")) %>% 
+  modify_at("status", factor,
+            levels = c("open", "started", "solved")) %>% 
   tibble::rowid_to_column("id") %>% 
   separate(chapter, "nr", sep = " ", remove = FALSE, extra = "drop") %>% 
   mutate(nr = as.integer(nr), 
@@ -120,13 +123,15 @@ plot_progress +
 
 # Create interactive version of plot
 # plot_progress %>%
-#   plotly::ggplotly(tooltip = c("subchapter", "exercise", "credits")) %>% 
-#   plotly::layout(legend = list(orientation = "h",
-#                                xanchor = "left",
-#                                x = 0,
-#                                yanchor = "bottom",
-#                                y = -.05,
-#                                font = list(size = 25)))
+# plotly::ggplotly(tooltip = c("subchapter",
+#                              "exercise",
+#                              "credits")) %>% 
+# plotly::layout(legend = list(orientation = "h",
+#                              xanchor = "left",
+#                              x = 0,
+#                              yanchor = "bottom",
+#                              y = -.05,
+#                              font = list(size = 25)))
 ```
 
 

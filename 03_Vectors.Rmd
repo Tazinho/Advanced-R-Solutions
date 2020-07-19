@@ -108,14 +108,12 @@ source("common.R")
 3. __[Q]{.Q}__: How would you describe the following three objects? What makes them different to `1:5`?
 
     ```{r}
-    x1 <- array(1:5, c(1, 1, 5))  # 1 row,  1 column,  5 in third dimension
-    x2 <- array(1:5, c(1, 5, 1))  # 1 row,  5 columns, 1 in third dimension
-    x3 <- array(1:5, c(5, 1, 1))  # 5 rows, 1 column,  1 in third dimension
+    x1 <- array(1:5, c(1, 1, 5))  # 1 row,  1 column,  5 in third dim.
+    x2 <- array(1:5, c(1, 5, 1))  # 1 row,  5 columns, 1 in third dim.
+    x3 <- array(1:5, c(5, 1, 1))  # 5 rows, 1 column,  1 in third dim.
     ```
     
-   __[A]{.solved}__: These are all "one dimensional".
-   If you imagine a 3d cube, `x1` is in "x" dimension, `x2` is in the "y"
-   dimension, and `x3` is in the "z" dimension.
+   __[A]{.solved}__: These are all "one dimensional". If you imagine a 3d cube, `x1` is in "x" dimension, `x2` is in the "y" dimension, and `x3` is in the "z" dimension.
 
 4. __[Q]{.Q}__: An early draft used this code to illustrate `structure()`:
 
@@ -179,8 +177,11 @@ source("common.R")
 3. __[Q]{.Q}__: What does this code do? How do `f2` and `f3` differ from `f1`?
 
     ```{r, results = "none"}
-    f2 <- rev(factor(letters))  # reverses element order (only)
-    f3 <- factor(letters, levels = rev(letters))  # reverses factor level order (only)
+    # reverse element order (only)
+    f2 <- rev(factor(letters))
+    
+    # reverse factor level order (only)
+    f3 <- factor(letters, levels = rev(letters))
     ```
     
    __[A]{.solved}__: For `f2` and `f3` either the order of the factor elements *or* its levels are being reversed. For `f1` both transformations are occurring.

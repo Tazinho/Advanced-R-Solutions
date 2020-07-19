@@ -10,14 +10,20 @@ source("common.R")
 
    __[A]{.solved}__: In the [Cran Task View](https://cran.rstudio.com/web/views/) for [High Performance Computing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and its `speedlm()` function. For small datasets, there may be only minor performance gains:
 
+<!-- TODO: replace with penguins! -->
+
     ```{r}
     stopifnot(all.equal(
-      coef(speedglm::speedlm(Sepal.Length ~ Sepal.Width + Species, data = iris)),
-      coef(lm(Sepal.Length ~ Sepal.Width + Species, data = iris))))
+      coef(speedglm::speedlm(Sepal.Length ~ Sepal.Width + Species,
+                             data = iris)),
+      coef(lm(Sepal.Length ~ Sepal.Width + Species,
+              data = iris))))
 
     microbenchmark::microbenchmark(
-      speedglm::speedlm(Sepal.Length ~ Sepal.Width + Species, data = iris),
-      lm(Sepal.Length ~ Sepal.Width + Species, data = iris)
+      speedglm::speedlm(Sepal.Length ~ Sepal.Width + Species,
+                        data = iris),
+      lm(Sepal.Length ~ Sepal.Width + Species,
+         data = iris)
     )
     ```
     
@@ -111,7 +117,8 @@ source("common.R")
    `as.POSIXlt()` in turn uses `strptime()` under the hood, which creates a similar date time object.
    
     ```{r}
-    date_str <- strptime("2020-01-01 12:30:25", format = "%Y-%m-%d %H:%M:%S")
+    date_str <- strptime("2020-01-01 12:30:25",
+                         format = "%Y-%m-%d %H:%M:%S")
     identical(date_lt, date_str)
     ```
 
@@ -122,8 +129,10 @@ source("common.R")
     ```{r}
     bench::mark(
       as.POSIXct = as.POSIXct("2020-01-01 12:30:25"),
-      as.POSIXct_format = as.POSIXct("2020-01-01 12:30:25", format = "%Y-%m-%d %H:%M:%S"),
-      strptime_fomat = strptime("2020-01-01 12:30:25", format = "%Y-%m-%d %H:%M:%S")
+      as.POSIXct_format = as.POSIXct("2020-01-01 12:30:25",
+                                     format = "%Y-%m-%d %H:%M:%S"),
+      strptime_fomat = strptime("2020-01-01 12:30:25",
+                                format = "%Y-%m-%d %H:%M:%S")
     )
     ```
     
@@ -278,7 +287,8 @@ provides us with enough information and guides our attention on solutions in the
       dn <- list(a = s_u_a, 
                  b = s_u_b)
 
-      bin <- fastmatch::fmatch(a, s_u_a) + l_u_a * fastmatch::fmatch(b, s_u_b) - l_u_a
+      bin <- fastmatch::fmatch(a, s_u_a) +
+        l_u_a * fastmatch::fmatch(b, s_u_b) - l_u_a
       y <- tabulate(bin, pr)
       
       y <- array(y, dim = dims, dimnames = dn)
@@ -323,15 +333,21 @@ provides us with enough information and guides our attention on solutions in the
                        function(x) tcrossprod(rnorm(x), rnorm(x)))
     
     bench_rs <- lapply(matrices,
-                       function(x) fivenum(microbenchmark(rowSums(x),
-                                                          unit = "ns")$time))
+                       function(x) fivenum(
+                         microbenchmark(rowSums(x),
+                                        unit = "ns")$time
+                       )
+    )
     
     bench_rs <- data.frame(time = unlist(bench_rs), 
                            call = "rowSums", stringsAsFactors = FALSE)
     
     bench_apply <- lapply(matrices,
-                          function(x) fivenum(microbenchmark(apply(x, 1, sum),
-                                                             unit = "ns")$time))
+                          function(x) fivenum(
+                            microbenchmark(apply(x, 1, sum),
+                                           unit = "ns")$time
+                          )
+    )
     bench_apply <- data.frame(time = unlist(bench_apply),
                               call = "apply", stringsAsFactors = FALSE)
     
@@ -341,13 +357,15 @@ provides us with enough information and guides our attention on solutions in the
     df$aggr <- rep(c("min", "lq", "median", "uq", "max"),
                    times = length(dimensions))
     df$aggr_size <- rep(c(1, 2, 3, 2, 1), times = length(dimensions))
-    df$group <- paste(as.character(df$call), as.character(df$aggr), sep = " ")
+    df$group <- paste(as.character(df$call), as.character(df$aggr))
     
     library(ggplot2)
     
-    ggplot(df, aes(x = dimension, y = time, colour = call, group = group)) +
+    ggplot(df, aes(x = dimension, y = time,
+                   colour = call, group = group)) +
       geom_point() + 
-      geom_line(aes(linetype = factor(aggr_size, levels = c("3", "2", "1"))),
+      geom_line(aes(linetype = factor(aggr_size,
+                                      levels = c("3", "2", "1"))),
             show.legend = FALSE) 
     ```
     
@@ -370,13 +388,17 @@ provides us with enough information and guides our attention on solutions in the
     xvector <- lapply(dimensions, rnorm)
     weights <- lapply(dimensions, rnorm)
     
-    bench_sum <- Map(function(x, y) fivenum(microbenchmark(sum(x * y))$time),
-                     xvector, weights)
+    bench_sum <- Map(function(x, y) fivenum(
+      microbenchmark(sum(x * y))$time
+    ),
+    xvector, weights)
     bench_sum <- data.frame(time = unlist(bench_sum),
                             call = "sum",
                             stringsAsFactors = FALSE)
-    bench_cp <- Map(function(x, y) fivenum(microbenchmark(crossprod(x, y)[1])$time),
-                    xvector, weights)
+    bench_cp <- Map(function(x, y) fivenum(
+      microbenchmark(crossprod(x, y)[1])$time
+    ),
+    xvector, weights)
     bench_cp <- data.frame(time = unlist(bench_cp),
                            call = "crossproduct",
                            stringsAsFactors = FALSE)
@@ -384,13 +406,16 @@ provides us with enough information and guides our attention on solutions in the
     df <- rbind(bench_sum, bench_cp)
     
     df$dimension <- rep(dimensions, each = 5)
-    df$aggr <- rep(c("min", "lq", "median", "uq", "max"), times = length(dimensions))
+    df$aggr <- rep(c("min", "lq", "median", "uq", "max"),
+                   times = length(dimensions))
     df$aggr_size <- rep(c(1, 2, 3, 2, 1), times = length(dimensions))
-    df$group <- paste(as.character(df$call), as.character(df$aggr), sep = " ")
+    df$group <- paste(as.character(df$call), as.character(df$aggr))
     
-    ggplot(df, aes(x = dimension, y = time, colour = call, group = group)) +
+    ggplot(df, aes(x = dimension, y = time,
+                   colour = call, group = group)) +
       geom_point() + 
-      geom_line(aes(linetype = factor(aggr_size, levels = c("3", "2", "1"))),
+      geom_line(aes(linetype = factor(aggr_size,
+                                      levels = c("3", "2", "1"))),
                 show.legend = FALSE) +
       scale_y_continuous(expand = c(0, 0))
     ```

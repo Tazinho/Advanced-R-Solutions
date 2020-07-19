@@ -84,13 +84,14 @@ library(purrr)
       if (setequal(old, new)) {
         return()
       }
-    
+      
       added <- setdiff(new, old)
       removed <- setdiff(old, new)
       
       changes <- c(
         if (length(added) > 0) paste0(" * '", added, "' was added"),
-        if (length(removed ) > 0) paste0(" * '", removed , "' was removed")
+        if (length(removed ) > 0) paste0(" * '", removed ,
+                                         "' was removed")
       )
       message(paste(changes, collapse = "\n"))
     }

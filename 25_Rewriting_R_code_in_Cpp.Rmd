@@ -435,7 +435,8 @@ source("common.R")
    When we set `na_rm = TRUE` in our `pminC()` function it only returns `NA`s at indices where both, `x` and `y`, contain an `NA`.
    
     ```{cpp}
-    NumericVector pminC(NumericVector x, NumericVector y, bool na_rm = false) {
+    NumericVector pminC(NumericVector x, NumericVector y,
+                        bool na_rm = false) {
       int n = std::max(x.size(), y.size());
       NumericVector x1 = rep_len(x, n);
       NumericVector y1 = rep_len(y, n);
@@ -444,8 +445,12 @@ source("common.R")
       
       for (int i = 0; i < n; ++i) {
         if (na_rm == false) {
-          if (NumericVector::is_na(x[i])) return NumericVector::create(NA_REAL);
-          if (NumericVector::is_na(y[i])) return NumericVector::create(NA_REAL);
+          if (NumericVector::is_na(x[i])) {
+            return NumericVector::create(NA_REAL);
+          }
+          if (NumericVector::is_na(y[i])) {
+            return NumericVector::create(NA_REAL);
+          }
         }
         if (na_rm == true) {
           if (NumericVector::is_na(x[i])) {
@@ -490,11 +495,13 @@ source("common.R")
    For `diffC()`'s implementation, we again return just an `NA` whenever an `NA` value occurs. In case of `na_rm = true`, we ensure that calculations which are affected by `NA`'s will also return an `NA`. (We could have also chosen to exclude `NA`s completely from the input or - equivalently - the output).
    
     ```{cpp}
-    NumericVector difflagC(NumericVector x, int lag = 1, bool na_rm = false){
+    NumericVector difflagC(NumericVector x, int lag = 1,
+                           bool na_rm = false){
       int n = x.size();
       NumericVector out(n - lag);
         for(int i = lag; i < n; i++){
-          if (NumericVector::is_na(x[i]) || NumericVector::is_na(x[i - lag])) {
+          if (NumericVector::is_na(x[i]) ||
+              NumericVector::is_na(x[i - lag])) {
           if (na_rm == false) {
             return NumericVector::create(NA_REAL);
           }
@@ -593,7 +600,9 @@ To practice using the STL algorithms and data structures, implement the followin
     // As a one-liner
     // [[Rcpp::export]]
     NumericVector uniqueCC(NumericVector x) {
-      return wrap(*(new std::unordered_set<double>(x.begin(), x.end())));
+      return wrap(
+        *(new std::unordered_set<double>(x.begin(), x.end()))
+      );
     }
     ```
 
@@ -633,7 +642,9 @@ To practice using the STL algorithms and data structures, implement the followin
     // [[Rcpp::export]]
     double which_minC(NumericVector x){
       int out;
-      out = std::distance(x.begin(), std::min_element(x.begin(), x.end()));
+      out = std::distance(
+        x.begin(), std::min_element(x.begin(), x.end())
+      );
       out++;
   
       return out;
@@ -665,10 +676,13 @@ To practice using the STL algorithms and data structures, implement the followin
       std::sort(x.begin(), x.end());
       std::sort(y.begin(), y.end());
       
-      IntegerVector::iterator out_end = std::set_union(x.begin(), x.end(), y.begin(), y.end(), tmp.begin());
+      IntegerVector::iterator out_end = std::set_union(
+        x.begin(), x.end(), y.begin(), y.end(), tmp.begin()
+      );
       
       IntegerVector out;
-      for(IntegerVector::iterator it = tmp.begin(); it != out_end; ++it) {
+      for(IntegerVector::iterator it = tmp.begin();
+          it != out_end; ++it) {
         out.push_back(*it);
       }
       
@@ -685,10 +699,13 @@ To practice using the STL algorithms and data structures, implement the followin
       std::sort(x.begin(), x.end());
       std::sort(y.begin(), y.end());
       
-      IntegerVector::iterator out_end = std::set_intersection(x.begin(), x.end(), y.begin(), y.end(), tmp.begin());
+      IntegerVector::iterator out_end = std::set_intersection(
+        x.begin(), x.end(), y.begin(), y.end(), tmp.begin()
+      );
       
       IntegerVector out;
-      for(IntegerVector::iterator it = tmp.begin(); it != out_end; ++it) {
+      for(IntegerVector::iterator it = tmp.begin();
+          it != out_end; ++it) {
         out.push_back(*it);
       }
       
@@ -705,10 +722,13 @@ To practice using the STL algorithms and data structures, implement the followin
       std::sort(x.begin(), x.end());
       std::sort(y.begin(), y.end());
       
-      IntegerVector::iterator out_end = std::set_difference(x.begin(), x.end(), y.begin(), y.end(), tmp.begin());
+      IntegerVector::iterator out_end = std::set_difference(
+        x.begin(), x.end(), y.begin(), y.end(), tmp.begin()
+      );
       
       IntegerVector out;
-      for(IntegerVector::iterator it = tmp.begin(); it != out_end; ++it) {
+      for(IntegerVector::iterator it = tmp.begin();
+          it != out_end; ++it) {
         out.push_back(*it);
       }
       

@@ -13,7 +13,8 @@ source("common.R")
     ```{r, error = TRUE}
     file_remove_strict <- function(path) {
       if (!file.exists(path)) {
-        stop("Can't delete '", path, "' because it doesn't exist.", call. = FALSE)
+        stop("Can't delete '", path, "' because it doesn't exist.",
+             call. = FALSE)
       }
       file.remove(path)
     }
@@ -98,7 +99,7 @@ source("common.R")
     show_condition(warning("?!"))  # warning raises a warning
     ```
 
-    The last example is the most interesting and makes us aware of the exiting qualities of `tryCatch()`, it will terminate the evaluation of the code as soon as it is called.
+   The last example is the most interesting and makes us aware of the exiting qualities of `tryCatch()`, it will terminate the evaluation of the code as soon as it is called.
 
     ```{r}
     show_condition({
@@ -218,7 +219,8 @@ source("common.R")
     suppressErrors <- function(expr) {
       tryCatch(
         error = function(cnd) invisible(cnd),
-        interrupt = function(cnd) stop("Terminated by the user", call. = FALSE),
+        interrupt = function(cnd) stop("Terminated by the user",
+                                       call. = FALSE),
         expr
       )
     }
@@ -239,7 +241,8 @@ source("common.R")
         message("message")
         warning("warning")
         abort("error")
-      })  # the messages/ wrarnings/ conditions are suppressed successfully
+      })
+    # the messages/ wrarnings/ conditions are suppressed successfully
     
     error_obj
     ```
@@ -267,7 +270,8 @@ source("common.R")
     traceback()
     #> 9: stop("error") at #2
     #> 8: (function (e) 
-    #>    stop("error"))(list(message = "hidden error\n", call = message("hidden error")))
+    #>    stop("error"))(list(message = "hidden error\n",
+    #>      call = message("hidden error")))
     #> 7: signalCondition(cond)
     #> 6: doWithOneRestart(return(expr), restart)
     #> 5: withOneRestart(expr, restarts[[1L]])
@@ -276,7 +280,8 @@ source("common.R")
     #>        defaultHandler(cond)
     #>    }, muffleMessage = function() NULL)
     #> 3: message("hidden error") at #1
-    #> 2: withCallingHandlers(code, message = function(e) stop("error")) at #2
+    #> 2: withCallingHandlers(code,
+    #>      message = function(e) stop("error")) at #2
     #> 1: message2error1({
     #>        1
     #>        message("hidden error")
@@ -343,7 +348,9 @@ source("common.R")
 
     ```{r, eval = FALSE}
     bottles_of_beer <- function(i = 99) {
-      message("There are ", i, " bottles of beer on the wall, ", i, " bottles of beer.")
+      message("There are ", i,
+              " bottles of beer on the wall, ", i,
+              " bottles of beer.")
       while(i > 0) {
         tryCatch(
           Sys.sleep(1),
@@ -358,7 +365,8 @@ source("common.R")
           }
         )
       }
-      message("No more bottles of beer on the wall, no more bottles of beer.")
+      message("No more bottles of beer on the wall, ",
+              "no more bottles of beer.")
     }
     ```
     

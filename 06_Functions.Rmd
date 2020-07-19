@@ -82,46 +82,46 @@ for functional programming (lapply, purrr) -->
    
    a. To find the function with the most arguments, we first compute the length of `formals()`
    
-      ```{r}
-      library(purrr)
+    ```{r}
+    library(purrr)
+    
+    n_args <- funs %>% 
+      map(formals) %>%
+      map_int(length)
+    ```
       
-      n_args <- funs %>% 
-        map(formals) %>%
-        map_int(length)
-      ```
-      
-      Then use `table()` to see the distribution, and `[` to find the largest:
+   Then use `table()` to see the distribution, and `[` to find the largest:
    
-      ```{r}
-      table(n_args)
-      names(n_args)[n_args == 22]
-      ```
+    ```{r}
+    table(n_args)
+    names(n_args)[n_args == 22]
+    ```
       
    b. We can also use `n_args` to find the number functions with no arguments:
    
-      ```{r}
-      sum(n_args == 0)
-      ```
+    ```{r}
+    sum(n_args == 0)
+    ```
       
-      However, this over counts because `formals()` returns `NULL` for primitive functions, and `length(NULL)` is 0. To fix that we can first remove the primitive functions
+   However, this over counts because `formals()` returns `NULL` for primitive functions, and `length(NULL)` is 0. To fix that we can first remove the primitive functions
       
-      ```{r}
-      n_args2 <- funs %>% 
-        discard(is.primitive) %>% 
-        map(formals) %>%
-        map_int(length)
-
-      sum(n_args2 == 0)
-      ```
+    ```{r}
+    n_args2 <- funs %>% 
+      discard(is.primitive) %>% 
+      map(formals) %>%
+      map_int(length)
+    
+    sum(n_args2 == 0)
+    ```
       
-      Indeed, most of functions with no arguments are actually primitive functions.
+   Indeed, most of functions with no arguments are actually primitive functions.
 
    c. To find all primitive functions, we can change the predicate in `Filter()` from `is.function()` to `is.primitive()`:
    
-      ```{r, eval = FALSE}
-      funs <- Filter(is.primitive, objs)
-      length(funs)
-      ```
+    ```{r, eval = FALSE}
+    funs <- Filter(is.primitive, objs)
+    length(funs)
+    ```
       
 6. __[Q]{.Q}__: What are the three important components of a function?
     
@@ -146,9 +146,8 @@ for functional programming (lapply, purrr) -->
        
 2. __[Q]{.Q}__: What are the four principles that govern how R looks for values?
     
-   __[A]{.solved}__: R's lexical scoping rules are based on these four principles:
+   __[A]{.solved}__: R's [lexical scoping](https://adv-r.hadley.nz/functions.html#lexical-scoping) rules are based on these four principles:
    
-   <!-- Link to adv-r sections? -->
    * Name masking
    * Functions vs. variables
    * A fresh start
@@ -170,7 +169,6 @@ for functional programming (lapply, purrr) -->
     ```
         
    __[A]{.solved}__: Within this function two more functions also named `f()` are defined and called. Because the functions are each executed in their own environment R will look up and use the functions defined in these environments. The innermost `f()` is called last, though it is the first function to return a value. Because of this the order of the calculation passes "from the inside to the outside" and the function returns `((10 ^ 2) + 1) * 2`, i.e. 202.
-
 
 ## Lazy evaluation
 
@@ -468,7 +466,8 @@ for functional programming (lapply, purrr) -->
     
     ```{r, eval = FALSE}
     get("x") <- 2
-    #> Error in get("x") <- 2 : target of assignment expands to non-language object
+    #> Error in get("x") <- 2 :
+    #>   target of assignment expands to non-language object
     ```
     
 4. __[Q]{.Q}__: Create a replacement function that modifies a random location in a vector.

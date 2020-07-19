@@ -37,12 +37,17 @@ source("common.R")
    We follow the hint in the question and inspect the source code of `rm()`:
    
     ```{r,eval=FALSE}
-    function (..., list = character(), pos = -1, envir = as.environment(pos), 
+    function (..., list = character(), pos = -1,
+              envir = as.environment(pos), 
               inherits = FALSE) 
     {
       dots <- match.call(expand.dots = FALSE)$...
-      if (length(dots) && !all(vapply(dots, function(x) is.symbol(x) || 
-                                      is.character(x), NA, USE.NAMES = FALSE))) 
+      if (
+        length(dots) && !all(
+          vapply(dots, function(x) is.symbol(x) || 
+                 is.character(x), NA, USE.NAMES = FALSE)
+        )
+      ) 
         stop("... must contain names or character strings")
       names <- vapply(dots, as.character, "")
       if (length(names) == 0L) 
