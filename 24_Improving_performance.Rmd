@@ -4,17 +4,19 @@ source("common.R")
 
 # Improving performance
 
+```{r}
+library(magrittr)
+library(palmerpenguins)
+```
+
+
 ## Checking for existing solutions
 
 1. __[Q]{.Q}__: What are faster alternatives to `lm`? Which are specifically designed to work with larger datasets?
 
    __[A]{.solved}__: In the [Cran Task View](https://cran.rstudio.com/web/views/) for [High Performance Computing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and its `speedlm()` function. For small datasets, there may be only minor performance gains:
 
-<!-- TODO: replace with penguins! -->
-
     ```{r}
-    library(palmerpenguins)
-    
     stopifnot(all.equal(
       coef(speedglm::speedlm(body_mass_g ~ bill_length_mm + species,
                              data = penguins)),
@@ -29,12 +31,13 @@ source("common.R")
       check = FALSE
     ) %>% 
       purrr::modify_at("expression", as.character) %>% 
-      dplyr::select(expression, median)  #TODO: consider writing function for this
+      dplyr::select(expression, median)
+    #TODO: consider writing function to display bench::mark()-results
     ```
     
    However on bigger datasets it can make a difference:
     
-    ```{r,collapse = TRUE}
+    ```{r,collapse = TRUE, warning=FALSE}
     eps <- rnorm(100000)
     x1 <- rnorm(100000, 5, 3)
     x2 <- rep(c("a", "b"), 50000)
