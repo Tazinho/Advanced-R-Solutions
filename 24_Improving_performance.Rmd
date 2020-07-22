@@ -13,18 +13,23 @@ source("common.R")
 <!-- TODO: replace with penguins! -->
 
     ```{r}
+    library(palmerpenguins)
+    
     stopifnot(all.equal(
-      coef(speedglm::speedlm(Sepal.Length ~ Sepal.Width + Species,
-                             data = iris)),
-      coef(lm(Sepal.Length ~ Sepal.Width + Species,
-              data = iris))))
-
-    microbenchmark::microbenchmark(
-      speedglm::speedlm(Sepal.Length ~ Sepal.Width + Species,
-                        data = iris),
-      lm(Sepal.Length ~ Sepal.Width + Species,
-         data = iris)
-    )
+      coef(speedglm::speedlm(body_mass_g ~ bill_length_mm + species,
+                             data = penguins)),
+      coef(lm(body_mass_g ~ bill_length_mm + species,
+              data = penguins))))
+    
+    bench::mark(
+      "speedglm" = speedglm::speedlm(body_mass_g ~ bill_length_mm + species,
+                                     data = penguins),
+      "lm" = lm(body_mass_g ~ bill_length_mm + species,
+                data = penguins),
+      check = FALSE
+    ) %>% 
+      purrr::modify_at("expression", as.character) %>% 
+      dplyr::select(expression, median)  #TODO: consider writing function for this
     ```
     
    However on bigger datasets it can make a difference:
@@ -40,10 +45,13 @@ source("common.R")
       coef(speedglm::speedlm(y ~ x1 + x2, data = td)),
       coef(lm(y ~ x1 + x2, data = td))))
     
-    microbenchmark::microbenchmark(
-      speedglm::speedlm(y ~ x1 + x2, data = td),
-      lm(y ~ x1 + x2, data = td)
-    )
+    bench::mark(
+      "speedglm" = speedglm::speedlm(y ~ x1 + x2, data = td),
+      "lm" = lm(y ~ x1 + x2, data = td),
+      check = FALSE
+    ) %>% 
+      purrr::modify_at("expression", as.character) %>% 
+      dplyr::select(expression, median)
     ```
     
    For further speed improvements, you might consider switching your linear algebra libraries as stated in `?speedglm::speedlm`
@@ -65,10 +73,13 @@ source("common.R")
     
     stopifnot(all.equal(match(x, table), fastmatch::fmatch(x, table)))
     
-    microbenchmark::microbenchmark(
-      match(x, table),
-      fastmatch::fmatch(x, table)
-    )
+    bench::mark(
+      "match" = match(x, table),
+      "fastmatch" = fastmatch::fmatch(x, table),
+      check = FALSE
+    ) %>% 
+      purrr::modify_at("expression", as.character) %>% 
+      dplyr::select(expression, median)
     ```
     
    On my laptop `fastmatch::fmatch()` is around 25 times as fast as `match()`.
