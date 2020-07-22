@@ -362,15 +362,20 @@ library(lobstr)
    
    <!-- can't use tracemem with knitr -->
    
-    ```{r}
+    ```{r, eval=FALSE}
     x <- list()  # creates initial object
     obj_addr(x)
+    #> [1] "0x55862f23ab80"
     
     tracemem(x)
+    #> [1] "<0x55862f23ab80>"
     x[[1]] <- x  # Copy-on-modify triggers new copy
+    #> tracemem[0x55862f23ab80 -> 0x55862e8ce028]:
     
     obj_addr(x)       # copied object has new memory address
+    #> [1] "0x55862e8ce028"
     obj_addr(x[[1]])  # list element contains old memory adress
+    #> [1] "0x55862f23ab80"
     ```
 
 2. __[Q]{.Q}__: Wrap the two methods for subtracting medians into two functions, then use the bench package to carefully compare their speeds. How does performance change as the number of columns increase?
