@@ -4,9 +4,18 @@ source("common.R")
 
 # Improving performance
 
+In this chapter we will run a few benchamrks and use the following helper-function to subset and pretty-print their results.
+
 ```{r}
-library(magrittr)
-library(palmerpenguins)
+library(rlang)
+
+print_bench_results <- function(bench_df, ...) {
+  dots <- enquos(...)
+  
+  bench_df %>% 
+    purrr::modify_at("expression", as.character) %>% 
+    dplyr::select(!!!dots)
+}
 ```
 
 
@@ -14,7 +23,7 @@ library(palmerpenguins)
 
 1. __[Q]{.Q}__: What are faster alternatives to `lm`? Which are specifically designed to work with larger datasets?
 
-   __[A]{.solved}__: In the [Cran Task View](https://cran.rstudio.com/web/views/) for [High Performance Computing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and its `speedlm()` function. For small datasets, there may be only minor performance gains:
+   __[A]{.solved}__: In the [Cran Task View for High Performance Computing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and its `speedlm()` function. For small datasets, there may be only minor performance gains (or even a small cost):
 
     ```{r}
     stopifnot(all.equal(
@@ -30,9 +39,7 @@ library(palmerpenguins)
                 data = penguins),
       check = FALSE
     ) %>% 
-      purrr::modify_at("expression", as.character) %>% 
-      dplyr::select(expression, median)
-    #TODO: consider writing function to display bench::mark()-results
+      print_bench_results(expression, median)
     ```
     
    However on bigger datasets it can make a difference:
@@ -53,21 +60,18 @@ library(palmerpenguins)
       "lm" = lm(y ~ x1 + x2, data = td),
       check = FALSE
     ) %>% 
-      purrr::modify_at("expression", as.character) %>% 
-      dplyr::select(expression, median)
+      print_bench_results(expression, median)
     ```
     
-   For further speed improvements, you might consider switching your linear algebra libraries as stated in `?speedglm::speedlm`
+   For further speed improvements, you might consider switching your linear algebra libraries (compare `?speedglm::speedlm`)
     
    > The functions of class 'speedlm' may speed up the fitting of LMs to large data sets. High performances can be obtained especially if R is linked against an optimized BLAS, such as ATLAS.
     
-   Note that there are many other opportunities mentioned in the task view, also some that make it possible to handle data which is not in memory. 
-    
-   When it comes to pure speed a quick search on [r fastest lm](http://stackoverflow.com/questions/25416413/is-there-a-faster-lm-function) provides a stackoverflow thread where someone already solved this problem for us...
-
+   Note that there are many other opportunities mentioned in the task view, for example the Rccp-based `fastLm()` (found in `{RcppEigen}` e.g.) is very fast as well. Some packages make it possible to handle data which is not in memory. 
+   
 2. __[Q]{.Q}__: What package implements a version of `match()` that's faster for repeated lookups? How much faster is it?
     
-   __[A]{.solved}__: Again google gives a good recommendation for the search term [r faster match](http://stackoverflow.com/questions/32934933/faster-in-operator):
+   __[A]{.solved}__: A Google search points use to the `{fastmatch}`-package. We compare it to `base::match()` and observe an impressive relative performance advantage (up to 35x faster).
     
     ```{r}
     set.seed(1)
@@ -79,37 +83,36 @@ library(palmerpenguins)
     bench::mark(
       "match" = match(x, table),
       "fastmatch" = fastmatch::fmatch(x, table),
-      check = FALSE
+      check = FALSE,
+      relative = TRUE
     ) %>% 
-      purrr::modify_at("expression", as.character) %>% 
-      dplyr::select(expression, median)
+      print_bench_results(expression, median)
     ```
     
-   On my laptop `fastmatch::fmatch()` is around 25 times as fast as `match()`.
-
 3. __[Q]{.Q}__: List four functions (not just those in base R) that convert a string into a date time object. What are their strengths and weaknesses?
     
-   __[A]{.solved}__: The usual base R way is to use the `as.POSIXct()` generic and create a date time object of class POSIXct and type integer.
+   __[A]{.solved}__: The usual base R way is to use the `as.POSIXct()` generic and create a date time object of class `POSIXct` and type `integer`.
    
     ```{r}
     date_ct <- as.POSIXct("2020-01-01 12:30:25")
     date_ct
     ```
-   Under the hood `as.POSIXct()` employs `as.POSIXlt()` for the character conversion. This creates a date time object of class POSIXlt and type list.
+   
+   Under the hood `as.POSIXct()` employs `as.POSIXlt()` for the character conversion. This creates a date time object of class `POSIXlt` and type `list`.
    
     ```{r}
     date_lt <- as.POSIXlt("2020-01-01 12:30:25")
     date_lt
     ```
 
-   The POSIXlt class has the advantage that it carries the individual time components as attributes. This allows to extract the time components via typical list operators.
+   The `POSIXlt` class has the advantage that it carries the individual time components as attributes. This allows to extract the time components via typical list operators.
     
     ```{r}
     attributes(date_lt)
     date_lt$sec
     ```
    
-   However, while lists can be a practical data strutcture, basic calculations are often faster and less memory hungry for objects with underlying integer type.
+   However, while `lists` may be practical basic calculations are often faster and require less memory for objects with underlying `integer` type.
    
     ```{r}
     date_lt2 <- rep(date_lt, 10000)
@@ -121,7 +124,7 @@ library(palmerpenguins)
     )
     ```
 
-   Although both date time classes inherit POSIXt as a second class, many functions only dispatch on the first argument and don't account for the possibility of mixed date time object usage. Therefore, better decide for an appropriate date time class, instead of mixing them.
+   Although both date time classes inherit from POSIXt, many functions only dispatch on the first argument and don't account for the possibility of mixed date time object usage. Therefore, better decide for an appropriate date time class, instead of mixing them.
    
     ```{r}
     c(date_lt, date_ct)
@@ -136,9 +139,7 @@ library(palmerpenguins)
     identical(date_lt, date_str)
     ```
 
-   While `as.POSIXct()` and `as.POSIXlt()` accept different character inputs by default (e.g. "2001-01-01 12:30", "2001/1/1 12:30"), the format argument when applying `strptime()` needs to be set in any case. If the format is set in any of the converter functions and the input doesn't fit to it, all three functions will return `NA`s.
-
-   On the other hand, specifying the format and using `strptime()` can help to improve the character conversion rate.
+   `as.POSIXct()` and `as.POSIXlt()` accept different character inputs by default (e.g. "2001-01-01 12:30", "2001/1/1 12:30"). `strptime()` requires the format argument to be set explicitly, but also offers an increase in performance.
 
     ```{r}
     bench::mark(
@@ -147,46 +148,37 @@ library(palmerpenguins)
                                      format = "%Y-%m-%d %H:%M:%S"),
       strptime_fomat = strptime("2020-01-01 12:30:25",
                                 format = "%Y-%m-%d %H:%M:%S")
-    )
+    ) %>% 
+      print_bench_results(expression, median)
     ```
     
-   A fourth way is to use the converter functions from the lubridate package, which are basically wrappers for the POSIXct approach with a more intuitive syntax.
+   A fourth way is to use the converter functions from the `{lubridate}` package, which contains wrapper functions (for the POSIXct approach) with an intuitive syntax. (There is a slight decrease in performance though.)
 
     ```{r}
     library(lubridate)
     ymd_hms("2013-07-24 23:55:26")
-    ```
-
-   However, in this case, intuitivity comes with a decrease in performance.
-
-    ```{r}
+    
     bench::mark(
       as.POSIXct = as.POSIXct("2013-07-24 23:55:26", tz = "UTC"),
       ymd_hms = ymd_hms("2013-07-24 23:55:26")
-    )
+    ) %>% 
+      print_bench_results(expression, median)
     ```
     
-   For further ways to convert characters into date time objects, have a look into the chron, the anytime and the fasttime packages. The chron package has it's own classes and stores times as fractions of days in the underlying double type. However, in contrast to the POSIXct and lt classes, chron doesn't deal with timezones and daylight savings. The anytime package converts (accoring to its description) "Anything to POSIXct or Date". Similarly, the fasttime package and its only function `fastPOSIXct()` are named after what they do best.
+   For additional ways to convert characters into date time objects, have a look at the `{chron}`, the `{anytime}` and the `{fasttime}` packages. The `{chron}` package introduces new classes and stores times as fractions of days in the underlying double type, while it doesn't deal with timezones and daylight savings. The `{anytime}` package aims to convert "Anything to POSIXct or Date". The `{fasttime}` package contains only one function (`fastPOSIXct()`).
 
 4. __[Q]{.Q}__: Which packages provide the ability to compute a rolling mean?
     
-   __[A]{.solved}__: Again google [r rolling mean](http://stackoverflow.com/questions/743812/calculating-moving-average-in-r)
-provides us with enough information and guides our attention on solutions in the following packages:
-    * `zoo`
+   __[A]{.solved}__: To compute a rolling mean the following packages and functions can be used:
+   
     ```{r}
     zoo::rollmean(1:10, 2, na.pad = TRUE, align = "left")
     zoo::rollapply(1:10, 2, mean, fill = NA, align = "left")
-    ```
-    * `TTR`
-    ```{r}
+
     TTR::SMA(1:10, 2)
-    ```
-    * `RcppRoll`
-    ```{r}
+
     RcppRoll::roll_mean(1:10, n = 2, fill = NA, align = "left")
-    ```
-    * `caTools`
-    ```{r}
+    
     caTools::runmean(1:10, k = 2, endrule = "NA", align = "left")
     ```
 
@@ -194,7 +186,8 @@ provides us with enough information and guides our attention on solutions in the
 
 5. __[Q]{.Q}__: What are the alternatives to `optim()`?
     
-   __[A]{.solved}__: Depending on the use case a lot of different options might be considered. For a general overview we would suggest the corresponding taskview on [Optimization](https://cran.r-project.org/web/views/Optimization.html).
+   __[A]{.solved}__: Depending on the use case a lot of different options might be considered. For a general overview we would suggest the corresponding [Taskview on Optimization](https://cran.r-project.org/web/views/Optimization.html).
+
 
 ## Doing as little as possible
 
