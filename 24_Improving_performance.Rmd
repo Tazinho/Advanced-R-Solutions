@@ -186,7 +186,7 @@ print_bench_results <- function(bench_df, ...) {
 
 5. __[Q]{.Q}__: What are the alternatives to `optim()`?
     
-   __[A]{.solved}__: Depending on the use case a lot of different options might be considered. For a general overview we would suggest the corresponding [Taskview on Optimization](https://cran.r-project.org/web/views/Optimization.html).
+   __[A]{.solved}__: The optimal choice depends on the use case: for a general overview we would suggest the corresponding [Taskview on Optimization](https://cran.r-project.org/web/views/Optimization.html).
 
 
 ## Doing as little as possible
@@ -201,12 +201,11 @@ print_bench_results <- function(bench_df, ...) {
     
    this means, that the internal `.rowSums()` function is called via `.Internal()`.
     
-   > .Internal performs a call to an internal code which is built in to the R
-    interpreter.
+   > .Internal performs a call to an internal code which is built in to the R interpreter.
     
-   The internal `.rowSums()` is a complete different function than the "normal" `rowSums()` function.
+   The internal `.rowSums()` is an entirely different function than the user-facing `rowSums()` function.
     
-   Of course (since they have the same name) in this case these functions are heavily related with each other: If we look into the source code of `rowSums()`, we see that it is a wrapper around the internal `.rowSums()`. Just some input checkings, conversions and the special cases (complex numbers) are added:
+   Of course (they share the same name!) these functions are heavily related: If we look into the source code of `rowSums()`, we see that it is a wrapper around the internal `.rowSums()`. Just some input validation, conversions and the special cases (complex numbers) are added:
     
     ```{r}
     rowSums
@@ -214,12 +213,12 @@ print_bench_results <- function(bench_df, ...) {
 
 2. __[Q]{.Q}__: Make a faster version of `chisq.test()` that only computes the chi-square test statistic when the input is two numeric vectors with no missing values. You can try simplifying `chisq.test()` or by coding from the [mathematical definition](http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test).
     
-   __[A]{.solved}__: Since `chisq.test()` has a relatively long source code, we try a new implementation from scratch:
+   __[A]{.solved}__: We aim to speed up our reimplementation of `chisq.test()` by *doing less*.
     
     ```{r}
     chisq.test2 <- function(x, y){
       
-      # Input
+      # Input Validation
       if (!is.numeric(x)) {
         stop("x must be numeric")}
       if (!is.numeric(y)) {
@@ -247,38 +246,38 @@ print_bench_results <- function(bench_df, ...) {
       dof <- (length(margin1) - 1) * (length(margin2) - 1)
       p <- pchisq(x_stat, df = dof, lower.tail = FALSE)
       
-      return(list(x_stat = x_stat, df = dof, `p-value` = p))
+      list(x_stat = x_stat, df = dof, `p-value` = p)
     }
     ```
     
-   We check if our new implementation returns the same results
+   We need to check if our new implementation returns the same results.
     
     ```{r}
-    a <- 21:25
-    b <- c(21, 23, 25, 27, 29)
-    m_test <- cbind(a, b)
+    m_test <- cbind(21:25, seq(21, 29, 2))
     
     chisq.test(m_test)
     chisq.test2(a, b)
     ```
-    
-   Finally we benchmark this implementation against a compiled version of itself and the original `stats::chisq.test()`:
+   
+   Finally we benchmark this implementation and compare it with the original `stats::chisq.test()` as well as a compiled version of itself.
     
     ```{r}
     chisq.test2c <- compiler::cmpfun(chisq.test2)
     
-    microbenchmark::microbenchmark(
+    bench::mark(
       chisq.test(m_test),
       chisq.test2(a, b),
-      chisq.test2c(a, b)
-    )
+      chisq.test2c(a, b),
+      check = FALSE
+    ) %>%
+      print_bench_results(expression, median)
     ```
 
 3. __[Q]{.Q}__: Can you make a faster version of `table()` for the case of an input of two integer vectors with no missing values? Can you use it to speed up your chi-square test?
     
-   __[A]{.solved}__: When analysing the source code of `table()`, we can omit everything unnecessary and extract the main building blocks. That's where we realize that `table()` is mainly powered by `tabulate()`, which is a very fast counting function. However, we can not simply apply `tabulate()` to our two integer vectors directly. Instead, we need to preprocess them accordingly, to match `tabulate()`'s expected input format. Therefore, the integer pairs in our two vectors need to be mapped to their corresponding index in the final output table (which is ordered columnwise in this implementation). The basic steps to get to this mapping can be adopted from `table()`'s source code again. So, the main challenge is to do these preprocessing steps as performant as possible.
+   __[A]{.solved}__: When analysing the source code of `table()`, we try to omit everything unnecessary and extract the main building blocks. That's where we realize that `table()` is mainly powered by `tabulate()`, which is a very fast counting function. However, we can not simply apply `tabulate()` to our two integer vectors directly. Instead, we need to preprocess them accordingly, to match `tabulate()`'s expected input format. Therefore, the integer pairs in our two vectors need to be mapped to their corresponding index in the final output table (which is ordered columnwise in this implementation). The basic steps to get to this mapping can be adopted from `table()`'s source code again. So the main challenge is to compute the preprocessing steps as performant as possible.
 
-   First, we calculate the dimensions and names of the output table. Therefore, we need to apply `unique()`, `sort()` and `length()` to our integer vectors. Next, we map the elements of each vector according to their position within the vector itself (i.e. the smallest value is mapped to `1L`, the second smallest value to `2L`, ...). One fast way to do these lookups is to employ the combination of `match(x, sort(unique(x)))` or (even better) `fastmatch::fmatch(x, sort(unique(x)))`. Following the logic within `table()`, we combine and shift these looked up values similarly to finally get a mapping from integer pairs in our data to the index of the output table. After applying the lookup, `tabulate()` counts the values for us, and is returning an integer vector which contains counts for each position in our the table. As a last step, we reuse the code from `table()` to assign the correct dimension and class.
+   First, we calculate the dimensions and names of the output table. Here we need to apply `unique()`, `sort()` and `length()` to our integer vectors. Next, we map the elements of each vector according to their position within the vector itself (i.e. the smallest value is mapped to `1L`, the second smallest value to `2L`, etc.). One fast way to do these lookups is to employ the combination of `match(x, sort(unique(x)))` or (even better) `fastmatch::fmatch(x, sort(unique(x)))`. Following the logic within `table()`, we combine and shift these looked up values to create a mapping of integer pairs in our data to the index of the output table. After applying the lookup, `tabulate()` counts the values for us and is returning an integer vector which contains counts for each position in our the table. As a last step, we reuse the code from `table()` to assign the correct dimension and class.
 
     ```{r}
     table2 <- function(a, b){
@@ -311,6 +310,8 @@ print_bench_results <- function(bench_df, ...) {
                 table2(a, b),
                 relative = TRUE)
     ```
+
+   <!-- TODO: we didn't apply this to our chi-square function. Is this okay? :) -->
 
 ## Vectorise
 
