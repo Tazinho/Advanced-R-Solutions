@@ -1,6 +1,11 @@
 # Specific for this project -------------------------------------
 Sys.setenv(LANGUAGE = "en")
 
+# load a few common packages
+library(magrittr)
+library(palmerpenguins)
+
+
 
 # Inherited from Advanced R -------------------------------------
 library(methods)
