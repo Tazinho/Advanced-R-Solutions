@@ -9,6 +9,11 @@ library(palmerpenguins)
 # options(width = 50)
 
 
+# Increase Font Size of plots
+ggplot2::theme_set(
+  ggplot2::theme_gray(base_size = 15)
+)
+
 # Inherited from Advanced R -------------------------------------
 library(methods)
 set.seed(1014)
