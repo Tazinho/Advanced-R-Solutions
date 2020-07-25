@@ -5,6 +5,8 @@ Sys.setenv(LANGUAGE = "en")
 library(magrittr)
 library(palmerpenguins)
 
+# Experiment with options output
+# options(width = 50)
 
 
 # Inherited from Advanced R -------------------------------------
