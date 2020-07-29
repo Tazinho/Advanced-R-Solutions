@@ -1,3 +1,8 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
 ```{r, include=FALSE}
 source("common.R")
 ```
@@ -319,114 +324,84 @@ print_bench_results <- function(bench_df, ...) {
 
 1. __[Q]{.Q}__: The density functions, e.g., `dnorm()`, have a common interface. Which arguments are vectorised over? What does `rnorm(10, mean = 10:1)` do?
     
-   __[A]{.solved}__: We can see the interface of these functions via `?dnorm`:
+   __[A]{.solved}__: We can get an overview of the interface of these functions via `?dnorm`:
     
     ```{r, eval = FALSE}
     dnorm(x, mean = 0, sd = 1, log = FALSE)
     pnorm(q, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
     qnorm(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
-    rnorm(n, mean = 0, sd = 1).
+    rnorm(n, mean = 0, sd = 1)
     ```
     
-   They are vectorised over their numeric arguments, which is always the first argument (`x`, `q`, `p`, `n`), `mean` and `sd`. Note that it's dangerous to supply a vector to `n` in the `rnorm()` function, since the behaviour will change, when `n` has length 1 (like in the second part of this question).
+   These functions are vectorised over their numeric arguments, which includes the first argument (`x`, `q`, `p`, `n`) as well as `mean` and `sd`. Note that it's dangerous to supply a vector to `n` in the `rnorm()` function, because the behaviour will change, when `n` has length 1.
+   
+   <!-- @Malte: could you explain the "danger" a little more clearly (1 sentence ideally)? Not sure, I see it fully. (Henning)-->
     
-   `rnorm(10, mean = 10:1)` generates ten random numbers from different normal distributions. The normal distributions differ in their means. The first has mean 10, the second has mean 9, the third mean 8 etc.
+   `rnorm(10, mean = 10:1)` generates ten random numbers from different normal distributions. These normal distributions differ in their means. The first has mean 10, the second mean 9, the third mean 8 and so on.
 
 2. __[Q]{.Q}__: Compare the speed of `apply(x, 1, sum)` with `rowSums(x)` for varying sizes of `x`.
     
-   __[A]{.solved}__: We compare regarding different sizes for square matrices:
+   __[A]{.solved}__: We compare the two functions for square matrices of increasing size
     
-    ```{r long calculation, eval=FALSE}
-    library(microbenchmark)
-    dimensions <- c(1e0, 1e1, 1e2, 1e3, 0.5e4, 1e4)
+    ```{r, warning=FALSE}
+    dimensions <- c(1, 10, 100, 1000, 5000, 10000)
     matrices <- lapply(dimensions,
                        function(x) tcrossprod(rnorm(x), rnorm(x)))
-    
-    bench_rs <- lapply(matrices,
-                       function(x) fivenum(
-                         microbenchmark(rowSums(x),
-                                        unit = "ns")$time
-                       )
-    )
-    
-    bench_rs <- data.frame(time = unlist(bench_rs), 
-                           call = "rowSums", stringsAsFactors = FALSE)
-    
-    bench_apply <- lapply(matrices,
-                          function(x) fivenum(
-                            microbenchmark(apply(x, 1, sum),
-                                           unit = "ns")$time
-                          )
-    )
-    bench_apply <- data.frame(time = unlist(bench_apply),
-                              call = "apply", stringsAsFactors = FALSE)
-    
-    df <- rbind(bench_rs, bench_apply)
-    
-    df$dimension <- rep(dimensions, each = 5)
-    df$aggr <- rep(c("min", "lq", "median", "uq", "max"),
-                   times = length(dimensions))
-    df$aggr_size <- rep(c(1, 2, 3, 2, 1), times = length(dimensions))
-    df$group <- paste(as.character(df$call), as.character(df$aggr))
-    
+    names(matrices) <- dimensions
+
+        
+    bench_res <- matrices %>% 
+      purrr::map_dfr(
+        ~ bench::mark(
+          rowSums(.),
+          apply(., 1, sum)
+        ) %>% 
+          purrr::modify_at("expression", as.character),
+        .id = "dimension"
+      )
+
     library(ggplot2)
-    
-    ggplot(df, aes(x = dimension, y = time,
-                   colour = call, group = group)) +
-      geom_point() + 
-      geom_line(aes(linetype = factor(aggr_size,
-                                      levels = c("3", "2", "1"))),
-            show.legend = FALSE) 
+    bench_res %>% 
+      purrr::modify_at("dimension", factor, levels = dimensions) %>% 
+      ggplot(aes(dimension, median, color = expression, group = expression)) +
+      geom_point() +
+      geom_line()
     ```
-    
-   The graph is a good indicator to notice, that `apply()` is not "vectorised for performance".
-  
+
+   We can see, that the difference in performance is negligible for small matrices, but becomes more and more relevant as the size of the data increases. `apply()` is a very versatile tool, but it's not "vectorised for performance" and not as optimized as `rowSums()`.
+
 3. __[Q]{.Q}__: How can you use `crossprod()` to compute a weighted sum? How much faster is it than the naive `sum(x * w)`?
     
-   __[A]{.solved}__: We can just give the vectors to `crossprod()` which converts them to row- and column-vectors and then multiplies these. The result is the dot product which is also a weighted sum.
+   __[A]{.solved}__: We can hand the vectors to `crossprod()`, which converts them to row- and column-vectors and then multiplies these. The result is the dot product, which corresponds to a weighted sum.
     
     ```{r}
-    a <- rnorm(10)
-    b <- rnorm(10)
-    sum(a * b) - crossprod(a, b)[1]
+    x <- rnorm(10)
+    w <- rnorm(10)
+    identical(sum(x * w),
+              as.numeric(crossprod(x, w)))
     ```
     
-   A benchmark of both alternatives for different vector lengths indicates, that the `crossprod()` variant is about 2.5 times faster than `sum()`:
-    
-    ```{r, eval=FALSE}
+   A benchmark of both approaches for different vector lengths indicates that the `crossprod()` variant is almost twice as fast as `sum()`.
+
+    ```{r}
     dimensions <- c(1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 0.5e7, 1e7)
-    xvector <- lapply(dimensions, rnorm)
-    weights <- lapply(dimensions, rnorm)
+    x_vector <- lapply(dimensions, rnorm)
+    w_vector <- lapply(dimensions, rnorm)
+
     
-    bench_sum <- Map(function(x, y) fivenum(
-      microbenchmark(sum(x * y))$time
-    ),
-    xvector, weights)
-    bench_sum <- data.frame(time = unlist(bench_sum),
-                            call = "sum",
-                            stringsAsFactors = FALSE)
-    bench_cp <- Map(function(x, y) fivenum(
-      microbenchmark(crossprod(x, y)[1])$time
-    ),
-    xvector, weights)
-    bench_cp <- data.frame(time = unlist(bench_cp),
-                           call = "crossproduct",
-                           stringsAsFactors = FALSE)
-    
-    df <- rbind(bench_sum, bench_cp)
-    
-    df$dimension <- rep(dimensions, each = 5)
-    df$aggr <- rep(c("min", "lq", "median", "uq", "max"),
-                   times = length(dimensions))
-    df$aggr_size <- rep(c(1, 2, 3, 2, 1), times = length(dimensions))
-    df$group <- paste(as.character(df$call), as.character(df$aggr))
-    
-    ggplot(df, aes(x = dimension, y = time,
-                   colour = call, group = group)) +
-      geom_point() + 
-      geom_line(aes(linetype = factor(aggr_size,
-                                      levels = c("3", "2", "1"))),
-                show.legend = FALSE) +
-      scale_y_continuous(expand = c(0, 0))
+    bench_res <- purrr::map2_dfr(
+      x_vector, w_vector,
+      ~ bench::mark(
+        sum(.x * .y),
+        crossprod(.x, .y)[[1]]
+      ) %>% 
+        purrr::modify_at("expression", as.character)
+    ) %>% 
+      dplyr::mutate(dimension = factor(rep(dimensions, each = 2)))
+
+    library(ggplot2)
+    bench_res %>% 
+      ggplot(aes(dimension, median, color = expression)) +
+      geom_point() +
+      geom_line(aes(group = expression))
     ```
-    
