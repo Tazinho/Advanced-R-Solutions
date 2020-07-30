@@ -138,12 +138,12 @@ library(purrr)
       "<script>These signs will not be escaped: &, <, >, but these ones will: <\\/script> or <\\/style></script>")
     ```
 
-   Therefore, we modify the `escape()` and the `tag()` function by adding the argument `script=FALSE`. Note that we need to add this argument for all methods of the `escape()` generic.
+   Therefore, we modify the `escape()` and the `tag()` function by adding the argument `script=FALSE`. Note that we need to add this argument for all methods of the `escape()` generic. Also note, that this only adds one line to the previous `tag()` function.
    
     ```{r}
     escape <- function(x, script = FALSE) UseMethod("escape")
     
-    escape.character <- function(x, script = script) {
+    escape.character <- function(x, script = FALSE) {
       
       if (!script) {
         x <- gsub("&", "&amp;", x)
@@ -213,152 +213,66 @@ library(purrr)
     ```
 
    All tags should get `class` and `id` attributes.
-    
-   __[A]{.started}__: The use of `...` for all functions seems too general. It is known which attributes each tag function may have, so we can organize them in a named list of tags and attribute names.
-    
-   We now need to create tag functions where these attributes are prespecified as arguments. This will enable *autocompletion* and *input validation*. (Documentation would require the functions to be bundeled as a package which we won't do here.)
-    
-   Let's start by programmatically creating one tag function now and worry about the iteration problem later.
-    
+   
+   __[A]{.solved}__: First, we create a list of default arguments within our new `tag_factory()` function. Note that these need to be `NULL` so that the user isn't forced to rely on them.
+   
+   Then we begin to create the tag function itself and cheat a bit by using `check_dots_unnamed()` from the ellipsis package to ensure that any named arguments are within our allowed default candidates.
+   
+   For the rest we follow the logic from the `tag()` function factory above. To keep the focus on the key ideas, we ignore special cases like <script>, <style> and void tags in this solution (even if this leads to an incorrect tag function for the `<img>` tag).
+   
     ```{r}
-    tag_info <- list(a = c("href", "src"))
-    ```
-    
-   The function factory needs to be changed: We need to parse the information provided by the list (tag name and arguments) and unquote-splice the provided arguments into the args part of `rlang::new_function()`. This will provide the autocompletion. In this step we also add the global attributes class and id. 
-    
-   The values of the provided named attributes need to be collected, when the function is called. We use a little "environment-hack" to accomplish this. 
-    
-    ```{r}
-    tag <- function(tag_i,
-                    attr,
-                    escape_choice = c("content", "script_or_style")
-                    ) {
-      # check list-input
-      if (length(tag_info) != 1) {
-        stop("Please provide information for just one function.")
-      }
+    tag_factory <- function(tag, tag_attrs) {
+      attrs <- c("class", "id", tag_attrs)
       
-      tag <- enquo(tag_i)
-      # split tag and attribute information
-      # tag <- names(tag_info)
-      # attr <- purrr::flatten_chr(tag_info)
-      # prepare attributes
-      attr_list <- rep(list(missing_arg()), length(attr))
-      names(attr_list) <- attr
-      
-      escape_choice <- match.arg(escape_choice)
+      attr_args <- map(set_names(attrs), ~ NULL)
+      attr_list <- call2("list", !!!syms(set_names(attrs)))
       
       new_function(
-        # unquote splice into fixed arguments
-        exprs(... = , class = , id = , !!!attr_list),
+        exprs(... = , !!!attr_args),
         expr({
-          attribs <- caller_env(0) %>%  # TODO: possibly encapsulate this
-            as.list() %>% 
-            Filter(function(x) !is.symbol(x), .) %>% 
-              html_attributes()
-          dots <- validate_dots(...)
+          ellipsis::check_dots_unnamed()
           
-          children <- map_chr(dots$unnamed,
-                              # choose the escaping
-                              ~ escape(., escape_choice = !!escape_choice))
+          attribs <- html_attributes(compact(!!attr_list))
+          dots <- compact(list(...))
+          children <- map_chr(dots, escape)
           
           html(paste0(
-            # TODO: check !!tag, may be clearer!
             !!paste0("<", tag), attribs, ">",
             paste(children, collapse = ""),
             !!paste0("</", tag, ">")
-            ))
-          }),
-        
-        caller_env()
+          ))
+        })
       )
     }
     ```
     
-<!-- HW: to generate attribs I thnk you'd be better off doing something like this. Note that the defaults need to be NULL so that the user isn't forced to rely on them, and then we can eliminate the use of validate_dots() because we're taking a different approach.
- -->
- 
-```{r}
-tag <- "img"
-tag_attrs <- c("src", "width", "height")
-attrs <- c("class", "id", tag_attrs)
-
-attr_args <- map(set_names(attrs), ~ NULL)
-attr_list <- call2("list", !!!syms(set_names(attrs)))
-
-new_function(
-  exprs(... = , !!!attr_args),
-  expr({
-    ellipsis::check_dots_unnamed() # cheat by using new package
-    
-    attribs <- !!attr_list
-    dots <- compact(list(...))
-
-    children <- map_chr(dots$unnamed, escape)
-    html(paste0(
-      !!paste0("<", tag), attribs, ">",
-      paste(children, collapse = ""),
-      !!paste0("</", tag, ">")
-    ))
-  })
-)
-```
- 
-    
-   We also rewrite `validate_dots`. We check for any unexpected named arguments, which will serve as input validation. The list of unnamed arguments will be escaped as before.
-    
+   To validate our new function factory, we modify the `with_html()` example from the textbook to work with our newly created `a()` and `img()` tag functions.
+  
     ```{r}
-    validate_dots <- function(...) {
-      dots <- dots_list(...)
-      # Input validation
-      if (any(have_name(dots))) { # names(dots) != ""
-        stop("Unexpected named argument found.")
-      }
-      
-      list(unnamed = dots)
-    }
-    ```
-
-   A few comments regarding the implementation details: The `...` had to be placed in front of the other arguments - otherwise positional matching would assign unnamed values to prespecified values and and unnamed content wouldn't be recognized properly. It was also a challenges to properly collect the prespecified arguments. These are prespecified but setting them at runtime is optional, so they had to be collected in a lazy fashion. Our hack via `caller_env()` isn't pretty and could certainly be improved upon - but it works, as we can see here:
-    
-    ```{r, error=TRUE}
-    # create a single tag function
-    a <- tag(list(a = "href"))
-    
-    # all the general and specific arguments exist, so autocompletion will work
-    formals(a)
-    
-    # named arguments are attributes, content is escaped properly
-    a(class = "anchor", id = "a-1", 
-      href = "http://somelink.com", "take a look at this & this")
-    
-    # not all named arguments need to be used
-    a(href = "http://somelink.com", "take a look at this")
-    
-    # unspecified named arguments will throw an error
-    a(href = "http://somelink.com", "take a look at this", width = "200")
-    ```
-    
-   To create many tag functions we can iterate over a list with inputs.
-    
-    ```{r}
-    tag_inputs <- list(
+    tag_list <- list(
       a = c("href"),
-      img = c("src", "width", "height"),
-      body = NULL,
-      h1 = NULL,
-      b = NULL,
-      p = NULL
+      img = c("src", "width", "height")
     )
-    # FIX required
     
-    # TODO: created functions not fully correct, somehow attribs is written into the tag function instead of the tag-name
+    tags <- map2(names(tag_list),
+                 unname(tag_list), 
+                 tag_factory) %>% 
+      set_names(names(tag_list))
     
-    # structure of the map/list structure not correct yet
-    html_tags <- tag_inputs %>% 
-      map(~ tag)  # potentially use imap to operate on index as well
+    with_tags <- function(code) {
+      code <- enquo(code)
+      eval_tidy(code, tags)
+    }
+    
+    with_tags(
+      a(
+        img("Correct me if I am wrong", id = "second"),
+        href = "https://github.com/Tazinho/Advanced-R-Solutions/issues",
+        id = "first"
+        )
+    )
     ```
-
+    
 3. __[Q]{.Q}__: Reason about the following code that calls `with_html()` referening objects from the environment. Will it work or fail? Why? Run the code to verify your predictions.
        
     ```{r, eval = FALSE}
