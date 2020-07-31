@@ -211,15 +211,15 @@ library(purrr)
       img = c("src", "width", "height")
     )
     ```
-
+    
    All tags should get `class` and `id` attributes.
    
    __[A]{.solved}__: First, we create a list of default arguments within our new `tag_factory()` function. Note that these need to be `NULL` so that the user isn't forced to rely on them.
    
    Then we begin to create the tag function itself and cheat a bit by using `check_dots_unnamed()` from the ellipsis package to ensure that any named arguments are within our allowed default candidates.
    
-   For the rest we follow the logic from the `tag()` function factory above. To keep the focus on the key ideas, we ignore special cases like <script>, <style> and void tags in this solution (even if this leads to an incorrect tag function for the `<img>` tag).
-   
+   For the rest we follow the logic from the `tag()` function factory above. To keep the focus on the key ideas, we ignore special cases like `<script>`, `<style>` and void tags in this solution (even if this leads to an incorrect tag function for the `<img>` tag).
+    
     ```{r}
     tag_factory <- function(tag, tag_attrs) {
       attrs <- c("class", "id", tag_attrs)
@@ -378,7 +378,7 @@ library(purrr)
       eval_tidy(code, html_tags)
     }
     ```
-
+    
    Now, let's look at the example from above:
 
     ```{r, error=TRUE}
@@ -392,7 +392,7 @@ library(purrr)
     ```
 
    The formatting comes down to just one long line of code. This output will be more difficult to work with, to inspect what the code does and if it's correct. What kind of formatting would we prefer instead? The [Google HTML Styleguide](https://google.github.io/styleguide/htmlcssguide.html#HTML_Formatting_Rules) suggests *indentation* by 2 spaces and *new lines* for every block, list, or table element. There are other recommendations, but we will keep things simple and will be satisfied with the following output.
-
+   
     ```{html, eval=FALSE}
     <body>
       <h1 id='first'>A heading</h1>
