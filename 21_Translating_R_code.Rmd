@@ -312,7 +312,7 @@ library(purrr)
    
    Now, let us briefly repeat, that `with_html()` was introduced to evaluate tag functions from within a list. Otherwise, defining some tag functions like `body()`, `source()`, `summary()` etc. within the global environment would collide with the regarding similar named base R functions. Therefore, the DSL code wrapped in `with_html()` is evaluated within the "context" of `html_tags` which was provided as a data mask to `eval_tidy()`. As `?rlang::as_data_mask` mentions: "Objects in the mask have precedence over objects in the environment".
    
-   Therefore, `p()` refers to the tag function from `html_tags` within both examples from the exercise. However, as `address` is not only a string within the global environment, but also a tag function within `html_tags` (the `<address>` HTML tag may be used to provide contact information on an HTML page), `p()` operates on `address()` in the second example which correctly leads to an error as we haven't implemented an `escape.function()` method.
+   Therefore, `p()` refers to the tag function from `html_tags` within both examples from the exercise. However, as `address` is not only a string within the global environment, but also a tag function within `html_tags` (the `<address>` HTML tag may be used to provide contact information on an HTML page), `p()` operates on `address()` in the second example. This correctly leads to an error as we haven't implemented an `escape.function()` method.
     
     ```{r, error=TRUE}
     greeting <- "Hello!"
