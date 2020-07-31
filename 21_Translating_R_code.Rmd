@@ -204,7 +204,6 @@ library(purrr)
     ```
 
 2. __[Q]{.Q}__: The use of `...` for all functions has some big downsides. There's no input validation and there will be little information in the documentation or autocomplete about how they are used in the function. Create a new function that, when given a named list of tags and their attribute names (like below), creates tag functions with named arguments.
-
     ```{r, eval = FALSE}
     list(
       a = c("href"),
@@ -279,31 +278,48 @@ library(purrr)
     greeting <- "Hello!"
     with_html(p(greeting))
     
+    p <- function() "p"
     address <- "123 anywhere street"
     with_html(p(address))
     ```
     
-   __[A]{.started}__: (TODO: In the exercise the definition of `p` changed into `p <- function() "p"`. This needs to be added and the exercise/answer might need to get updated. Further `with_html` is defined in the next exercise. Therefore, a change to introduce it already here has to be made...and the chunks then need to be changed to `eval = TRUE`) When we created the various HTML tag functions, `address()` was one of them. This HTML tag may be used to provide contact information on an HTML page. All our tag functions are not present in the global environment, but rather elements of the list `html_tags`.
+   __[A]{.solved}__: First, we rerun the relevant code from the textbook to define `with_html()`. Note that we skip the code for void tags, as none of them appear in the code chunk from this exercise.
+   
+    ```{r}
+    tags <- c("a", "abbr", "address", "article", "aside", "audio",
+              "b","bdi", "bdo", "blockquote", "body", "button", "canvas",
+              "caption","cite", "code", "colgroup", "data", "datalist",
+              "dd", "del","details", "dfn", "div", "dl", "dt", "em",
+              "eventsource","fieldset", "figcaption", "figure", "footer",
+              "form", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header",
+              "hgroup", "html", "i","iframe", "ins", "kbd", "label",
+              "legend", "li", "mark", "map","menu", "meter", "nav",
+              "noscript", "object", "ol", "optgroup", "option", "output",
+              "p", "pre", "progress", "q", "ruby", "rp","rt", "s", "samp",
+              "script", "section", "select", "small", "span", "strong",
+              "style", "sub", "summary", "sup", "table", "tbody", "td",
+              "textarea", "tfoot", "th", "thead", "time", "title", "tr",
+              "u", "ul", "var", "video"
+              )
     
-   The DSL code wrapped in `with_html()` is evaluated in its own environment and in the "context" of `html_tags`. The tag functions are available, because we provided a list of them as a data mask. As `r ?as_data_mask` indicates: "Objects in the mask have precedence over objects in the environment."
+    html_tags <- tags %>% set_names() %>% map(tag)
     
-    ```{r, error=TRUE, eval = FALSE}
+    with_html <- function(code) {
+      code <- enquo(code)
+      eval_tidy(code, html_tags)
+    }
+    ```
+   
+   Now, let us briefly repeat, that `with_html()` was introduced to evaluate tag functions from within a list. Otherwise, defining some tag functions like `body()`, `source()`, `summary()` etc. within the global environment would collide with the regarding similar named base R functions. Therefore, the DSL code wrapped in `with_html()` is evaluated within the "context" of `html_tags` which was provided as a data mask to `eval_tidy()`. As `?rlang::as_data_mask` mentions: "Objects in the mask have precedence over objects in the environment".
+   
+   Therefore, `p()` refers to the tag function from `html_tags` within both examples from the exercise. However, as `address` is not only a string within the global environment, but also a tag function within `html_tags` (the `<address>` HTML tag may be used to provide contact information on an HTML page), `p()` operates on `address()` in the second example which correctly leads to an error as we haven't implemented an `escape.function()` method.
+    
+    ```{r, error=TRUE}
     greeting <- "Hello!"
     with_html(p(greeting))
     
+    p <- function() "p"
     address <- "123 anywhere street"
-    with_html(p(address))
-    ```
-    
-   The error message then tells us, what the problem is: `p(address)` operates on `address()`, the function not the character, and we haven't implemented an `escape.function()` method. 
-    
-    ```{r, eval = FALSE}
-    # checking our list of tag functions
-    c("greeting", "address") %in% names(html_tags)
-    
-    # this works
-    html_tags$address <- "123 anywhere street"
-    
     with_html(p(address))
     ```
     
@@ -459,9 +475,7 @@ library(purrr)
         )
     )
     ```
-
 ## LaTeX
-
 1. __[Q]{.Q}__: Add escaping. The special symbols that should be escaped by adding a backslash in front of them are `\`, `$`, and `%`. Just as with HTML, you'll need to make sure you don't end up double-escaping. So you'll need to create a small S3 class and then use that in function operators. That will also allow you to embed arbitrary LaTeX if needed.
     
    __[A]{.solved}__:
