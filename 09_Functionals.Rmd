@@ -67,11 +67,11 @@ library(tibble)
     ```{r}
     map_dbl(mtcars, sd)
     
-    iris_numeric <- map_lgl(iris, is.numeric)
-    map_dbl(iris[iris_numeric], sd)
+    mtcars_numeric <- map_lgl(mtcars, is.numeric)
+    map_dbl(mtcars[mtcars_numeric], sd)
     
-    iris_factor <- map_lgl(iris, is.factor)
-    map_int(iris[iris_factor], ~ length(levels(.x)))
+    mtcars_factor <- map_lgl(mtcars, is.factor)
+    map_int(mtcars[mtcars_factor], ~ length(levels(.x)))
     ```
 
 4. __[Q]{.Q}__: The following code simulates the performance of a t-test for non-normal data. Extract the p-value from each test, then visualise.
@@ -309,9 +309,9 @@ library(tibble)
     }
     
     # Check that it works
-    span_r(iris, is.numeric)
-    span_r(iris, is.factor)
-    span_r(iris, is.character)
+    span_r(mtcars, is.numeric)
+    span_r(mtcars, is.factor)
+    span_r(mtcars, is.character)
     ```
     
 4. __[Q]{.Q}__: Implement `arg_max()`. It should take a function and a vector of inputs, and return the elements of the input where the function returns the highest value. For example, `arg_max(-10:5, function(x) x ^ 2)` should return -10. `arg_max(-5:5, function(x) x ^ 2)` should return `c(-5, 5)`. Also implement the matching `arg_min()` function.
@@ -345,7 +345,7 @@ library(tibble)
    __[A]{.solved}__: To apply a function to every function of a data frame, we can use `purrr::modify`, which also conveniently returns a data frame. To limit the application to numeric columns, the scoped versions `modify_if()` can be used.
 
     ```{r, eval = FALSE}
-    modify_if(iris, is.numeric, scale01)
+    modify_if(mtcars, is.numeric, scale01)
     ```
 
 ## Base functionals

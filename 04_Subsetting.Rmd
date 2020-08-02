@@ -124,10 +124,10 @@ source("common.R")
     
     ```{r,eval = FALSE}
     # Permute columns
-    iris[sample(ncol(iris))]
+    mtcars[sample(ncol(mtcars))]
     
     # Permute columns and rows in one step
-    iris[sample(nrow(iris)), sample(ncol(iris))]
+    mtcars[sample(nrow(mtcars)), sample(ncol(mtcars))]
     ```
 
 2. __[Q]{.Q}__: How would you select a random sample of `m` rows from a data frame? What if the sample had to be contiguous (i.e., with an initial row, a final row, and every row in between)?
@@ -136,15 +136,15 @@ source("common.R")
     
     ```{r, eval = FALSE}
     m <- 10
-    iris[sample(nrow(iris), m), , drop = FALSE]
+    mtcars[sample(nrow(mtcars), m), , drop = FALSE]
     ```
 
    Keeping subsequent rows together as a "[blocked sample](https://mlr.mlr-org.com/articles/tutorial/resample.html#stratification-blocking-and-grouping)" requires only some caution to get the start- and end-index correct.
 
     ```{r, eval = FALSE}
-    start <- sample(nrow(iris) - m + 1, 1)
+    start <- sample(nrow(mtcars) - m + 1, 1)
     end <- start + m - 1
-    iris[start:end, , drop = FALSE]
+    mtcars[start:end, , drop = FALSE]
     ```
     
 3. __[Q]{.Q}__: How could you put the columns in a data frame in alphabetical order?
@@ -152,5 +152,5 @@ source("common.R")
    __[A]{.solved}__: We combine `order()` with `[`:
 
     ```{r, eval = FALSE}
-    iris[order(names(iris))]
+    mtcars[order(names(mtcars))]
     ```

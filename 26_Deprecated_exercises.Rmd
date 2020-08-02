@@ -64,7 +64,7 @@ in `lapply()`'s third argument (`...`).
    __[A]{.solved}__: Since this function needs numeric input, one can check this via an if clause. If one also wants to return non-numeric input columns, these can be supplied to the `else` argument of the `if()` "function":
     
     ```{r, eval = FALSE}
-    data.frame(lapply(iris, function(x) if (is.numeric(x)) scale01(x) else x))
+    data.frame(lapply(mtcars, function(x) if (is.numeric(x)) scale01(x) else x))
     ```
 
 3.  __[Q]{.Q}__: Use both for loops and `lapply()` to fit linear models to the
@@ -156,10 +156,10 @@ in `lapply()`'s third argument (`...`).
     vapply(cars, sd, numeric(1))
     ```
     
-    And as a mixed `data.frame` we choose `iris`:
+    And as a mixed `data.frame` we choose `mtcars`:
 
     ```{r, eval = FALSE}    
-    vapply(iris[vapply(iris, is.numeric, logical(1))],
+    vapply(mtcars[vapply(mtcars, is.numeric, logical(1))],
            sd, 
            numeric(1))
     ```
@@ -233,7 +233,7 @@ in `lapply()`'s third argument (`...`).
     lapply_nms <- function(X, FUN, ...){
       Map(FUN, X, names(X), ...)
     }
-    lapply_nms(iris, function(x, y) c(class(x), y))
+    lapply_nms(mtcars, function(x, y) c(class(x), y))
     ```
 
 6.  __[Q]{.Q}__: Implement a combination of `Map()` and `vapply()` to create an `lapply()`
@@ -244,7 +244,7 @@ in `lapply()`'s third argument (`...`).
     __[A]{.solved}__ As we understand this exercise, it is about working with a list of lists, like in the following example:
     
     ```{r}
-    testlist <- list(iris, mtcars, cars)
+    testlist <- list(mtcars, mtcars, cars)
     lapply(testlist, function(x) vapply(x, mean, numeric(1)))
     ```
     
