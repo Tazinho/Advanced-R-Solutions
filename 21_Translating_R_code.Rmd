@@ -4,7 +4,7 @@ source("common.R")
 
 # Translating R code
 
-```{r setup}
+```{r setup, message=FALSE}
 library(rlang)
 library(purrr)
 ```
@@ -14,13 +14,13 @@ library(purrr)
 
 1. __[Q]{.Q}__: The escaping rules for `<script>` tags are different because they contain JavaScript, not HTML. Instead of escaping angle brackets or ampersands, you need to escape `</script>` so that the tag isn't closed too early. For example, `script("'</script>'")`, shouldn't generate this:
 
-    ```html
+    ```{html}
     <script>'</script>'</script>
     ```
    
    But
 
-    ```html
+    ```{html}
     <script>'<\/script>'</script>
     ```
 
@@ -323,8 +323,7 @@ library(purrr)
     with_html(p(address))
     ```
     
-4. __[Q]{.Q}__: Currently the HTML doesn't look terribly pretty, and it's hard to see the
-   structure. How could you adapt `tag()` to do indenting and formatting? (You may need to do some research into block and inline tags.)
+4. __[Q]{.Q}__: Currently the HTML doesn't look terribly pretty, and it's hard to see the structure. How could you adapt `tag()` to do indenting and formatting? (You may need to do some research into block and inline tags.)
    
    __[A]{.solved}__: First let us define all needed functions from the textbook:
     
