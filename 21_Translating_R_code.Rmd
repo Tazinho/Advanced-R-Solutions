@@ -475,9 +475,297 @@ library(purrr)
     )
     ```
 ## LaTeX
+
 1. __[Q]{.Q}__: Add escaping. The special symbols that should be escaped by adding a backslash in front of them are `\`, `$`, and `%`. Just as with HTML, you'll need to make sure you don't end up double-escaping. So you'll need to create a small S3 class and then use that in function operators. That will also allow you to embed arbitrary LaTeX if needed.
     
-   __[A]{.solved}__:
+   __[A]{.solved}__: Currently our `to_math()` function generates the following output:
+   
+    ```{r, eval=FALSE}
+    to_math(`$`)
+    #> <LATEX> \mathrm{f}($)  # instead of <LATEX> \$  
+    to_math(a$b)
+    #> <LATEX> \mathrm{$}(a b) # insteat of <LATEX> \mathrm{\$}(a b)
+    to_math(`\\`)
+    #> <LATEX> \mathrm{f}(\)  # instead of <LATEX> \\  
+    to_math(`%`)
+    #> <LATEX> \mathrm{f}(%)  # instead of <LATEX> \%
+    ```
+
+    ```{r include=FALSE}
+    ## 3.3 to_math()
+    to_math <- function(x) {
+      expr <- enexpr(x)
+      out <- eval_bare(expr, latex_env(expr))
+      
+      latex(out)
+    }
+    
+    latex <- function(x) structure(x, class = "advr_latex")
+    print.advr_latex <- function(x) {
+      cat("<LATEX> ", x, "\n", sep = "")
+    }
+
+    greek <- c(
+      "alpha", "theta", "tau", "beta", "vartheta", "pi", "upsilon",
+      "gamma", "varpi", "phi", "delta", "kappa", "rho",
+      "varphi", "epsilon", "lambda", "varrho", "chi", "varepsilon",
+      "mu", "sigma", "psi", "zeta", "nu", "varsigma", "omega", "eta",
+      "xi", "Gamma", "Lambda", "Sigma", "Psi", "Delta", "Xi",
+      "Upsilon", "Omega", "Theta", "Pi", "Phi"
+    )
+    
+    greek_list <- set_names(paste0("\\", greek), greek)
+    greek_env <- as_environment(greek_list)
+    
+    ## 3.4 Known symbols
+    latex_env <- function(expr) {
+      greek_env
+    }
+    
+    to_math(pi)
+    to_math(beta)
+    
+    ## 3.5 Unknown symbols (helpers added from the source)
+    expr_type <- function(x) {
+      if (rlang::is_syntactic_literal(x)) {
+        "constant"
+      } else if (is.symbol(x)) {
+        "symbol"
+      } else if (is.call(x)) {
+        "call"
+      } else if (is.pairlist(x)) {
+        "pairlist"
+      } else {
+        typeof(x)
+      }
+    }
+    
+    switch_expr <- function(x, ...) {
+      switch(expr_type(x),
+             ...,
+             stop("Don't know how to handle type ", typeof(x), call. = FALSE)
+      )
+    }
+    
+    flat_map_chr <- function(.x, .f, ...) {
+      purrr::flatten_chr(purrr::map(.x, .f, ...))
+    }
+    
+    all_names_rec <- function(x) {
+      switch_expr(x,
+                  constant = character(),
+                  symbol =   as.character(x),
+                  call =     flat_map_chr(as.list(x[-1]), all_names)
+      )
+    }
+    
+    all_names <- function(x) {
+      unique(all_names_rec(x))
+    }
+    
+    all_names(expr(x + y + f(a, b, c, 10)))
+    latex_env <- function(expr) {
+      names <- all_names(expr)
+      symbol_env <- as_environment(set_names(names))
+      
+      symbol_env
+    }
+    
+    to_math(x)
+    to_math(longvariablename)
+    to_math(pi)
+    
+    latex_env <- function(expr) {
+      
+      # Unknown symbols
+      names <- all_names(expr)
+      symbol_env <- as_environment(set_names(names))
+  
+      # Known symbols
+      env_clone(greek_env, parent = symbol_env)
+    }
+
+    to_math(x)
+    to_math(longvariablename)
+    to_math(pi)
+
+    # 3.6 Known functions
+    
+    unary_op <- function(left, right) {
+      new_function(
+        exprs(e1 = ),
+        expr(
+          paste0(!!left, e1, !!right)
+        ),
+        caller_env()
+      )
+    }
+
+    binary_op <- function(sep) {
+      new_function(
+        exprs(e1 = , e2 = ),
+        expr(
+          paste0(e1, !!sep, e2)
+        ),
+        caller_env()
+      )
+    }
+
+    unary_op("\\sqrt{", "}")
+    binary_op("+")
+
+    # Binary operators
+    f_env <- child_env(
+      .parent = empty_env(),
+      `+` = binary_op(" + "),
+      `-` = binary_op(" - "),
+      `*` = binary_op(" * "),
+      `/` = binary_op(" / "),
+      `^` = binary_op("^"),
+      `[` = binary_op("_"),
+  
+    # Grouping
+      `{` = unary_op("\\left{ ", " \\right}"),
+      `(` = unary_op("\\left( ", " \\right)"),
+      paste = paste,
+      
+    # Other math functions
+      sqrt = unary_op("\\sqrt{", "}"),
+      sin =  unary_op("\\sin(", ")"),
+      log =  unary_op("\\log(", ")"),
+      abs =  unary_op("\\left| ", "\\right| "),
+      frac = function(a, b) {
+        paste0("\\frac{", a, "}{", b, "}")
+      },
+  
+    # Labelling
+      hat =   unary_op("\\hat{", "}"),
+      tilde = unary_op("\\tilde{", "}")
+    )
+
+    latex_env <- function(expr) {
+      # Known functions
+      f_env
+  
+      # Default symbols
+      names <- all_names(expr)
+      symbol_env <- as_environment(set_names(names), parent = f_env)
+  
+      # Known symbols
+      greek_env <- env_clone(greek_env, parent = symbol_env)
+  
+      greek_env
+    }
+
+    to_math(sin(x + pi))
+    to_math(log(x[i]^2))
+    to_math(sin(sin))
+
+    # 3.7 Unknown functions
+    all_calls_rec <- function(x) {
+      switch_expr(x,
+                  constant = ,
+                  symbol =   character(),
+                  call = {
+                    fname <- as.character(x[[1]])
+                    children <- flat_map_chr(as.list(x[-1]), all_calls)
+                    c(fname, children)
+                  }
+      )
+    }
+    all_calls <- function(x) {
+      unique(all_calls_rec(x))
+    }
+
+    all_calls(expr(f(g + b, c, d(a))))
+ 
+    unknown_op <- function(op) {
+      new_function(
+        exprs(... = ),
+        expr({
+          contents <- paste(..., collapse = ", ")
+          paste0(!!paste0("\\mathrm{", op, "}("), contents, ")")
+        })
+      )
+    }
+    unknown_op("foo")
+
+    latex_env <- function(expr) {
+      calls <- all_calls(expr)
+      call_list <- map(set_names(calls), unknown_op)
+      call_env <- as_environment(call_list)
+  
+      # Known functions
+      f_env <- env_clone(f_env, call_env)
+  
+      # Default symbols
+      names <- all_names(expr)
+      symbol_env <- as_environment(set_names(names), parent = f_env)
+  
+      # Known symbols
+      greek_env <- env_clone(greek_env, parent = symbol_env)
+      greek_env 
+    }
+
+    to_math(sin(pi) + f(a))
+    ```
+
+   Therefore, we need an escape function with methods for the character and  advr_latex classes. 
+   
+    ```{r}
+    escape_latex <- function(x) UseMethod("escape_latex")
+
+    escape_latex.character <- function(x) {
+      x <- gsub("^\\\\$", "\\\\\\\\", x)
+      x <- gsub("^\\$$", "\\\\$", x)
+      x <- gsub("^\\%$", "\\\\%", x)
+      
+      latex(x)
+    }
+    
+    escape_latex.advr_latex <- function(x) x
+    ```
+
+   We apply this function within `latex_env()` when creating environments for unkown symbols and unknown functions. For the unknown function, we need to modify `unknown_op()` first.
+   
+    ```{r}
+    unknown_op <- function(op) {
+      new_function(
+        exprs(... = ),
+        expr({
+          contents <- paste(..., collapse = ", ")
+          paste0(!!paste0("\\mathrm{", escape_latex(op), "}("), contents, ")")
+          })
+      )
+    }
+    
+    latex_env <- function(expr) {
+      calls <- all_calls(expr)
+      call_list <- map(set_names(calls), unknown_op)
+      call_env <- as_environment(call_list)
+      
+      # Known functions
+      f_env <- env_clone(f_env, call_env)
+  
+      # Default symbols
+      names <- all_names(expr)
+      symbol_env <- as_environment(set_names(escape_latex(names), names),
+                                   parent = f_env)
+    
+      # Known symbols
+      greek_env <- env_clone(greek_env, parent = symbol_env)
+      greek_env
+    }
+    ```
+    
+   Now, we can validate `to_math()` on the test cases from above.
+   
+    ```{r}
+    to_math(`$`)
+    to_math(a$b)
+    to_math(`\\`)
+    to_math(`%`)
+    ```
 
 2. __[Q]{.Q}__: Complete the DSL to support all the functions that `plotmath` supports.
 
