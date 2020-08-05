@@ -63,7 +63,7 @@ df_long <- read.csv2("progress_data.csv", stringsAsFactors = FALSE,
                       header = TRUE) %>% 
   as_tibble() %>% 
   modify_at("status", factor,
-            levels = c("open", "started", "solved")) %>% 
+            levels = c("open", "started", "solved", "reviewed", "finalised")) %>% 
   tibble::rowid_to_column("id") %>% 
   separate(chapter, "nr", sep = " ", remove = FALSE, extra = "drop") %>% 
   mutate(nr = as.integer(nr), 
@@ -103,7 +103,8 @@ plot_progress <- df_long %>%
         panel.background = element_blank()) +
   guides(color = FALSE,
          fill = guide_legend(nrow = 1)) +
-  scale_fill_manual(values = c("#F99992", "orange", "#00BFC4")) +
+  scale_fill_manual(values = c("#F99992", "#fdcc8a", "#bae4b3", "#74c476", "#238b45"),
+                    drop = FALSE) +
   labs(title = paste("Solved Exercises:",
                      round(percent_solved, 1),
                      "% (2nd Edition)"),
@@ -113,6 +114,10 @@ plot_progress <- df_long %>%
                          sum(df_long$status == "started"),
                          " | Solved: ",
                          sum(df_long$status == "solved"),
+                         " | Solved: ",
+                         sum(df_long$status == "reviewed"),
+                         " | Solved: ",
+                         sum(df_long$status == "finalised"),
                         ")"),
        fill = "Status:")
 
