@@ -78,7 +78,7 @@ df_long <- read.csv2("progress_data.csv", stringsAsFactors = FALSE,
                                         "Metapr.", "Techn.")))
 
 # Intermediate calculations
-percent_solved <- mean(df_long$status == "solved", na.rm = TRUE) * 100
+percent_solved <- mean(df_long$status %in% c("solved", "reviewed", "finalised"), na.rm = TRUE) * 100
 
 # Create Plot
 plot_progress <- df_long %>% 
