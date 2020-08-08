@@ -491,7 +491,7 @@ for functional programming (lapply, purrr) -->
     #> [1] "ab"
     ```
 
-   __[A]{.solved}__: To achieve this behaviour, we need to override the `+` operator. We need to take care to not use the `+` operator itself inside of the function definition, because this would lead to an undesired infinite recursion. We also add `b = 0L` as a default value to keep the behaviour of `+` as a unary operator, i.e. to keep `+ 1` working and not throwing an error
+   __[A]{.solved}__: To achieve this behaviour, we need to override the `+` operator. We need to take care to not use the `+` operator itself inside of the function definition, as this would lead to an undesired infinite recursion. We also add `b = 0L` as a default value to keep the behaviour of `+` as a unary operator, i.e. to keep `+ 1` working and not throwing an error
     
     ```{r}
     `+` <- function(a, b = 0L){
@@ -502,18 +502,18 @@ for functional programming (lapply, purrr) -->
       }
     }
     
-    # test functionality
+    # Test functionality
     + 1
     1 + 2
     "a" + "b"
     
-    # return back to the original `+` operator
+    # Return back to the original `+` operator
     rm(`+`)
     ```
 
 6. __[Q]{.Q}__: Create a list of all the replacement functions found in the base package. Which ones are primitive functions? (Hint use `apropos()`)
    
-   __[A]{.solved}__: The hint suggests to look for functions with a specific naming pattern: Replacement functions conventionally end on `<-`. We can search these objects with a regular expression (`<-$`).
+   __[A]{.solved}__: The hint suggests to look for functions with a specific naming pattern: Replacement functions conventionally end on `<-`. We can search for these objects with the regular expression `"<-$"`.
    
     ```{r}
     apropos("<-$")
@@ -537,7 +537,7 @@ for functional programming (lapply, purrr) -->
 
 7. __[Q]{.Q}__: What are valid names for user-created infix functions?
   
-   __[A]{.solved}__: Let's cite **Advanced R** here (see [Function Forms](https://adv-r.hadley.nz/functions.html#function-forms)):
+   __[A]{.solved}__: Let's cite from the section on [Function Forms](https://adv-r.hadley.nz/functions.html#function-forms) from the textbook:
 
    > ... names of infix functions are more flexible than regular R functions: they can contain any sequence of characters except “%”.
 
