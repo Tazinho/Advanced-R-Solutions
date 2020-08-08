@@ -385,7 +385,7 @@ library(tibble)
 
    __[A]{.solved}__: A number $x$ is called a fixed point of a function $f$ if it satisfies the equation $f(x) = x$. For some functions we may find a fixed point by beginning with a starting value and applying $f$ repeatedly. Here `fixed_point()` acts as a functional, because it takes a function as an argument.
 
-    ```{r}
+    ```{r, error = TRUE}
     fixed_point <- function(f, x_init, n_max = 10000, tol = 0.0001) {
       n <- 0
       x <- x_init
@@ -408,9 +408,8 @@ library(tibble)
       
       x
     }
-    ```
-
-    ```{r, error = TRUE}
+    
+    
     # Functions with fixed points
     fixed_point(sin, x_init = 1)
     fixed_point(cos, x_init = 1)
