@@ -26,11 +26,11 @@ library(purrr)
 
    Adapt the `escape()` to follow these rules when a new argument `script` is set to `TRUE`.
 
-   __[A]{.solved}__: To solve this exercise we first recreate the required functions from the book chapter. We then confirm that our code reliably escapes for tags like `<p>` and `<b>`, but doesn't escape correctly for the `<script>` tag. Next, we modify the `escape()` and `tag()` function to redefine the `<script>` tag. Finally we confirm that all defined tags now escape correctly.
+   __[A]{.solved}__: We are asked to implement a special case of escaping for the `<script>` tag. At first we will revisit the relevant functions provided in the textbook and confirm that our code reliably escapes for tags like `<p>` and `<b>`, but doesn't escape correctly for the `<script>` tag. Then we modify the `escape()` and `tag()` functions to redefine the `<script>` tag and confirm that all defined tags now escape correctly.
    
-   Note that `<style>` tags encapsulate css-styling guidelines and the escaping follows the same rules as the `<script>` tag does. We therefore add the same behaviour also for the `<style>` tag function.
+   Note that the `<style>` tag, which contains styling information in CSS, follows the same escaping rules as the `<script>` tag. We therefore implement the desired escaping for the `<style>` tag function also.
    
-   Let's run the required code from Advanced R first:
+   Let's start by loading the relevant code from Advanced R first.
 
     ```{r required code from advr, include=TRUE}
     # Escaping
@@ -120,25 +120,29 @@ library(purrr)
     }
     ```
     
-   We confirm correct escaping for the `<p>` and `<b>` tag functions and incorrect escaping for the `<script>` tag function:
+   This code escapes the `<p>` and `<b>` tags correctly, but doesn't achieve the desired behaviour for the `<script>` tag yet:
     
     ```{r}
     p <- tag("p")
     b <- tag("b")
     
-    identical(p("This &","this <content>",
-                b("& this will be escaped")) %>%
-                as.character(),
-              "<p>This &amp;this &lt;content&gt;<b>&amp; this will be escaped</b></p>")
+    identical(
+        p("&","and <", b("& > will be escaped")) %>% 
+              as.character(),
+        "<p>&amp;and &lt;<b>&amp; &gt; will be escaped</b></p>"
+    )
     
     script <- tag("script")
     
-    identical(script(
-      "These signs will not be escaped: &, <, >, ", "but these ones will: </script> or </style>") %>% as.character(),
-      "<script>These signs will not be escaped: &, <, >, but these ones will: <\\/script> or <\\/style></script>")
+    identical(
+      script("Don't escape &, <, > - escape </script> and </style>") %>%
+        as.character(),
+      paste("<script>Don't escape &, <, >",
+            "- escape <\\/script> and <\\/style></script>")
+      )
     ```
 
-   Therefore, we modify the `escape()` and the `tag()` function by adding the argument `script=FALSE`. Note that we need to add this argument for all methods of the `escape()` generic. Also note, that this only adds one line to the previous `tag()` function.
+   We implement the desired change and add the optional argument `script` to the `escape()` and the `tag()` functions (default: `FALSE`). The argument has to be added for all methods of the `escape()` generic. For the `tag()` function the change only introduces one extra line!
    
     ```{r}
     escape <- function(x, script = FALSE) UseMethod("escape")
@@ -169,7 +173,7 @@ library(purrr)
           dots <- dots_partition(...)
           attribs <- html_attributes(dots$named)
           children <- map_chr(dots$unnamed,
-                              # choose the escaping
+                              # Choose the escaping
                               ~ escape(., script = !!script))
           html(paste0(
           !!paste0("<", tag), attribs, ">",
@@ -188,19 +192,23 @@ library(purrr)
     p <- tag("p")
     b <- tag("b")
     
-    identical(p("This &","this <content>",
-                b("& this will be escaped")) %>%
-                as.character(),
-              "<p>This &amp;this &lt;content&gt;<b>&amp; this will be escaped</b></p>")
+    identical(
+        p("&","and <", b("& > will be escaped")) %>% 
+              as.character(),
+        "<p>&amp;and &lt;<b>&amp; &gt; will be escaped</b></p>"
+    )
     
     script <- tag("script", script = TRUE)
     style  <- tag("style" , script = TRUE)
     
-    identical(script(
-      "These signs will not be escaped: &, <, >, ", "but these ones will: </script> or </style>") %>% as.character(),
-      "<script>These signs will not be escaped: &, <, >, but these ones will: <\\/script> or <\\/style></script>")
+    identical(
+      script("Don't escape &, <, > - escape </script> and </style>") %>%
+        as.character(),
+      paste("<script>Don't escape &, <, >",
+            "- escape <\\/script> and <\\/style></script>")
+      )
       
-    script("These signs will not be escaped: &, <, >, ", "but these ones will: </script> or </style>")
+    script("Don't escape &, <, > - escape </script> and </style>")
     ```
 
 2. __[Q]{.Q}__: The use of `...` for all functions has some big downsides. There's no input validation and there will be little information in the documentation or autocomplete about how they are used in the function. Create a new function that, when given a named list of tags and their attribute names (like below), creates tag functions with named arguments.
@@ -474,6 +482,8 @@ library(purrr)
         )
     )
     ```
+
+
 ## LaTeX
 
 1. __[Q]{.Q}__: Add escaping. The special symbols that should be escaped by adding a backslash in front of them are `\`, `$`, and `%`. Just as with HTML, you'll need to make sure you don't end up double-escaping. So you'll need to create a small S3 class and then use that in function operators. That will also allow you to embed arbitrary LaTeX if needed.
