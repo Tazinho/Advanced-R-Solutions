@@ -186,7 +186,7 @@ library(purrr)
     }
     ```
     
-   Finally we create new `<p>`, `<b>` and `<script>` tag functions, which all pass their escaping tests now.
+   Finally we create new `<p>`, `<b>` and `<script>` tag functions, which now pass their escaping tests.
    
     ```{r}
     p <- tag("p")
@@ -212,6 +212,7 @@ library(purrr)
     ```
 
 2. __[Q]{.Q}__: The use of `...` for all functions has some big downsides. There's no input validation and there will be little information in the documentation or autocomplete about how they are used in the function. Create a new function that, when given a named list of tags and their attribute names (like below), creates tag functions with named arguments.
+
     ```{r, eval = FALSE}
     list(
       a = c("href"),
@@ -221,11 +222,11 @@ library(purrr)
     
    All tags should get `class` and `id` attributes.
    
-   __[A]{.solved}__: First, we create a list of default arguments within our new `tag_factory()` function. Note that these need to be `NULL` so that the user isn't forced to rely on them.
+   __[A]{.solved}__: This exercise requires a function factory: The named list of attribute names will be extended (by `class` and `id`) and mapped to function arguments. These will default to `NULL`, so that the user isn't forced to provide them.
    
-   Then we begin to create the tag function itself and cheat a bit by using `check_dots_unnamed()` from the ellipsis package to ensure that any named arguments are within our allowed default candidates.
+   When creating the the tag functions itself we use `check_dots_unnamed()` from the `{ellipsis}` package to ensure named arguments correspond to the expected values (and are not created by some spelling mistake). After that we follow the logic from the `tag()` function factory above.
    
-   For the rest we follow the logic from the `tag()` function factory above. To keep the focus on the key ideas, we ignore special cases like `<script>`, `<style>` and void tags in this solution (even if this leads to an incorrect tag function for the `<img>` tag).
+   To keep the focus on the key ideas, we ignore special cases like `<script>`, `<style>` and void tags in this solution (even if this leads to an incorrect tag function for the `<img>` tag).
     
     ```{r}
     tag_factory <- function(tag, tag_attrs) {
@@ -261,9 +262,7 @@ library(purrr)
       img = c("src", "width", "height")
     )
     
-    tags <- map2(names(tag_list),
-                 unname(tag_list), 
-                 tag_factory) %>% 
+    tags <- map2(names(tag_list), unname(tag_list), tag_factory) %>% 
       set_names(names(tag_list))
     
     with_tags <- function(code) {
@@ -280,7 +279,7 @@ library(purrr)
     )
     ```
     
-3. __[Q]{.Q}__: Reason about the following code that calls `with_html()` referening objects from the environment. Will it work or fail? Why? Run the code to verify your predictions.
+3. __[Q]{.Q}__: Reason about the following code that calls `with_html()` referencing objects from the environment. Will it work or fail? Why? Run the code to verify your predictions.
        
     ```{r, eval = FALSE}
     greeting <- "Hello!"
@@ -318,7 +317,7 @@ library(purrr)
     }
     ```
    
-   Now, let us briefly repeat, that `with_html()` was introduced to evaluate tag functions from within a list. Otherwise, defining some tag functions like `body()`, `source()`, `summary()` etc. within the global environment would collide with the regarding similar named base R functions. Therefore, the DSL code wrapped in `with_html()` is evaluated within the "context" of `html_tags` which was provided as a data mask to `eval_tidy()`. As `?rlang::as_data_mask` mentions: "Objects in the mask have precedence over objects in the environment".
+   Now, let us briefly repeat, that `with_html()` was introduced to evaluate tag functions from within a list. Otherwise, defining some tag functions like `body()`, `source()`, `summary()` etc. within the global environment would collide with base R functions with the same name. To prevent this the DSL code wrapped in `with_html()` is evaluated within the "context" of `html_tags`, which was provided as a data mask to `eval_tidy()`. As `?rlang::as_data_mask` mentions: "Objects in the mask have precedence over objects in the environment".
    
    Therefore, `p()` refers to the tag function from `html_tags` within both examples from the exercise. However, as `address` is not only a string within the global environment, but also a tag function within `html_tags` (the `<address>` HTML tag may be used to provide contact information on an HTML page), `p()` operates on `address()` in the second example. This correctly leads to an error as we haven't implemented an `escape.function()` method.
     
@@ -333,7 +332,7 @@ library(purrr)
     
 4. __[Q]{.Q}__: Currently the HTML doesn't look terribly pretty, and it's hard to see the structure. How could you adapt `tag()` to do indenting and formatting? (You may need to do some research into block and inline tags.)
    
-   __[A]{.solved}__: First let us define all needed functions from the textbook:
+   __[A]{.solved}__: First, let us load all relevant functions from the textbook:
     
     ```{r required code from book, include=FALSE}
     tag <- function(tag) {
@@ -437,7 +436,7 @@ library(purrr)
     }
     ```
     
-   In our desired output we can see, that the content of the `body`-function requires another formatting than the other tag-functions. We will therefore create a new `format_code`-function, that allows for optional indentation and linbreaks. For this `strwarp` provides two helpful arguments: each element will start with a linebreak (`prefix = "\n"`) and will be indentend propely (`indent = 2`).
+   In our desired output we can see, that the content of the `body`-function requires another formatting than the other tag-functions. We will therefore create a new `format_code`-function, that allows for optional indentation and linebreaks. For this `strwarp` provides two helpful arguments: each element will start with a line break (`prefix = "\n"`) and will be indented properly (`indent = 2`).
     
     ```{r}
     format_code <- function(children, indent = FALSE){
@@ -450,7 +449,7 @@ library(purrr)
     }
     ```
     
-   We adjust the body function to include the `format_code()`-helper. (This could also be approached programatically in the tag function factory.)
+   We adjust the body function to include the `format_code()`-helper. (This could also be approached programmatically in the tag function factory.)
     
     ```{r}
     html_tags$body <- function(...){
@@ -494,7 +493,7 @@ library(purrr)
     to_math(`$`)
     #> <LATEX> \mathrm{f}($)  # instead of <LATEX> \$  
     to_math(a$b)
-    #> <LATEX> \mathrm{$}(a b) # insteat of <LATEX> \mathrm{\$}(a b)
+    #> <LATEX> \mathrm{$}(a b) # instead of <LATEX> \mathrm{\$}(a b)
     to_math(`\\`)
     #> <LATEX> \mathrm{f}(\)  # instead of <LATEX> \\  
     to_math(`%`)
@@ -600,7 +599,6 @@ library(purrr)
     to_math(pi)
 
     # 3.6 Known functions
-    
     unary_op <- function(left, right) {
       new_function(
         exprs(e1 = ),
@@ -720,7 +718,7 @@ library(purrr)
     to_math(sin(pi) + f(a))
     ```
 
-   Therefore, we need an escape function with methods for the character and  advr_latex classes. 
+   Therefore, we need an escape function with methods for the `character` and `advr_latex` classes. 
    
     ```{r}
     escape_latex <- function(x) UseMethod("escape_latex")
@@ -736,7 +734,7 @@ library(purrr)
     escape_latex.advr_latex <- function(x) x
     ```
 
-   We apply this function within `latex_env()` when creating environments for unkown symbols and unknown functions. For the unknown function, we need to modify `unknown_op()` first.
+   We apply this function within `latex_env()` when creating environments for unknown symbols and unknown functions. For the unknown function, we need to modify `unknown_op()` first.
    
     ```{r}
     unknown_op <- function(op) {
@@ -779,7 +777,7 @@ library(purrr)
 
 2. __[Q]{.Q}__: Complete the DSL to support all the functions that `plotmath` supports.
 
-   __[A]{.started}__: Under `?plotmath` we can lookup all supported functions by `plotmath`. Let's us it to see what `to_math()` is supposed to do. Comments with a star (`*`) are used in the following output to mark that the current `to_math()` implementation doesn't support the regarding conversion yet. In these cases we made a short note behind on how the LaTeX conversion shoud look like.
+   __[A]{.started}__: Through `?plotmath` we can lookup all supported functions by `plotmath`. Let's use it to see what `to_math()` is supposed to do. Comments with a star (`*`) are used in the following output to mark that the current `to_math()` implementation doesn't support the respective conversion yet. In these cases we added a short comment describing how the LaTeX conversion should look like.
    
     ```{r, eval=FALSE}
     to_math(x+y)             #   x plus y 
@@ -835,14 +833,17 @@ library(purrr)
     to_math(x %<-% y)        # * x left-arrow y: x \leftarrow y
     to_math(x %up% y)        # * x up-arrow y: x \uparrow y
     to_math(x %down% y)      # * x down-arrow y: x \downarrow y
-    to_math(x %<=>% y)       # * x is equivalent to y: x \Leftrightarrow y
+    to_math(x %<=>% y)       # * x is equivalent to y:
+                             # x \Leftrightarrow y
     to_math(x %=>% y)        # * x implies y: x \Rightarrow y
     to_math(x %<=% y)        # * y implies x: x \Leftarrow y
     to_math(x %dblup% y)     # * x double-up-arrow y: x \Uparrow y
     to_math(x %dbldown% y)   # * x double-down-arrow y: x \Downarrow y
     to_math(alpha -- omega)  # * Greek symbols: complete the list
-    to_math(Alpha -- Omega)  # * uppercase Greek symbols: complete the list
-    to_math(theta1, phi1, sigma1, omega1)  # * cursive Greek symbols: \mathit{\theta}
+    to_math(Alpha -- Omega)  # * uppercase Greek symbols:
+                             # complete the list
+    to_math(theta1, phi1,
+            sigma1, omega1)  # * cursive Greek symbols: \mathit{\theta}
     to_math(Upsilon1)        # * capital upsilon with hook
     to_math(aleph)           # * first letter of Hebrew alphabet: \aleph
     to_math(infinity)        # * infinity symbol: \infty 
@@ -854,28 +855,32 @@ library(purrr)
     to_math(displaystyle(x)) # * draw x in normal size (extra spacing)
     to_math(textstyle(x))    # * draw x in normal size
     to_math(scriptstyle(x))  # * draw x in small size
-    to_math(scriptscriptstyle(x))       # * draw x in very small size
-    to_math(underline(x))               # * draw x underlined
-    to_math(x ~~ y)                     # * put extra space between x and y
-    to_math(x + phantom(0) + y)         # * leave gap for "0", but don't draw it
-    to_math(x + over(1, phantom(0)))    # * leave vertical gap for "0" (don't draw)
-    to_math(frac(x, y))                 #   x over y
-    to_math(over(x, y))                 # * x over y
-    to_math(atop(x, y))                 # * x over y (no horizontal bar)
-    to_math(sum(x[i], i==1, n))         # * sum x[i] for i equals 1 to n
-    to_math(prod(plain(P)(X==x), x))    # * product of P(X=x) for all values of x
-    to_math(integral(f(x)*dx, a, b)     # * definite integral of f(x) wrt x
-    to_math(union(A[i], i==1, n))       # * union of A[i] for i equals 1 to n
-    to_math(intersect(A[i], i==1, n))   # * intersection of A[i]
-    to_math(lim(f(x), x %->% 0))        # * limit of f(x) as x tends to 0
-    to_math(min(g(x), x > 0))           # * minimum of g(x) for x greater than 0
-    to_math(inf(S))                     # * infimum of S
-    to_math(sup(S))                     # * supremum of S
-    to_math(x^y + z)                    #   normal operator precedence
-    to_math(x^(y + z))                  #   visible grouping of operands
-    to_math(x^{y + z})                  #   invisible grouping of operands
-    to_math(group("(",list(a, b),"]"))  # * specify left and right delimiters
+    to_math(scriptscriptstyle(x))  # * draw x in very small size
+    to_math(underline(x))    # * draw x underlined
+    to_math(x ~~ y)          # * put extra space between x and y
+    to_math(x + phantom(0) + y)  # * leave gap for "0", but don't draw it
+    to_math(x + over(1, phantom(0)))  # * leave vertical gap for "0"
+                                      # (don't draw)
+    to_math(frac(x, y))      #   x over y
+    to_math(over(x, y))      # * x over y
+    to_math(atop(x, y))      # * x over y (no horizontal bar)
+    to_math(sum(x[i], i==1, n))  # * sum x[i] for i equals 1 to n
+    to_math(prod(plain(P)(X==x), x))  # * product of P(X=x) for all
+                                      # values of x
+    to_math(integral(f(x)*dx, a, b)  # * definite integral of f(x) wrt x
+    to_math(union(A[i], i==1, n))  # * union of A[i] for i equals 1 to n
+    to_math(intersect(A[i], i==1, n)) # * intersection of A[i]
+    to_math(lim(f(x), x %->% 0))  # * limit of f(x) as x tends to 0
+    to_math(min(g(x), x > 0))  # * minimum of g(x) for x greater than 0
+    to_math(inf(S))          # * infimum of S
+    to_math(sup(S))          # * supremum of S
+    to_math(x^y + z)         #   normal operator precedence
+    to_math(x^(y + z))       #   visible grouping of operands
+    to_math(x^{y + z})       #   invisible grouping of operands
+    to_math(group("(",list(a, b),"]"))  # * specify left and right
+                                        # delimiters
     to_math(bgroup("(",atop(x,y),")"))  # * use scalable delimiters
-    to_math(group(lceil, x, rceil))     # * special delimiters
-    to_math(group(lfloor, x, rfloor)))  # * special delimiterstoo_math()
+    to_math(group(lceil, x, rceil))  # * special delimiters
+    to_math(group(lfloor, x, rfloor)))  # * special delimiters
+                                        # too_math()
     ```
