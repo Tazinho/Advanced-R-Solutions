@@ -131,7 +131,7 @@ library(tibble)
     )
     ```
 
-   __[A]{.solved}__: The data (`mtars`) is constant for all these models and we iterate over the `formulas` provided. Because the formula is the first argument of a `lm()`-call, it doesn't need to be specified explicitly.
+   __[A]{.solved}__: The data (`mtcars`) is constant for all these models and so we iterate over the `formulas` provided. As the formula is the first argument of `lm()`, we don't need to be specify it explicitly.
    
     ```{r}
     models <- map(formulas, lm, data = mtcars)
@@ -259,7 +259,7 @@ library(tibble)
     seq(2, 1)
     ```
    
-   Therefore, subsetting length-0 and length-1 vectors via `[[` will lead to a *subscript out of bounds* error. To avoid this, we allow `simple_reduce()` to `return()` before the for-loop is started and include default argument for 0-length vectors.
+   Therefore, subsetting length-0 and length-1 vectors via `[[` will lead to a *subscript out of bounds* error. To avoid this, we allow `simple_reduce()` to return before the for-loop is started and include a default argument for 0-length vectors.
    
     ```{r}
     simple_reduce <- function(x, f, default) {
@@ -292,12 +292,12 @@ library(tibble)
       idx <- unname(map_lgl(x, ~ f(.x)))
       rle <- rle(idx) 
   
-      # Check that predicate is never TRUE
+      # Check if the predicate is never true
       if (!any(rle$values)) {
         return(integer())
       }
       
-      # Find length of longest run of TRUEs
+      # Find the length of the longest sequence of true values
       longest <- max(rle$lengths[rle$values])
       # Find positition of (first) longest run
       longest_idx <- which(rle$values & rle$lengths == longest)[1]
@@ -314,7 +314,7 @@ library(tibble)
     span_r(mtcars, is.character)
     ```
     
-4. __[Q]{.Q}__: Implement `arg_max()`. It should take a function and a vector of inputs, and return the elements of the input where the function returns the highest value. For example, `arg_max(-10:5, function(x) x ^ 2)` should return -10. `arg_max(-5:5, function(x) x ^ 2)` should return `c(-5, 5)`. Also implement the matching `arg_min()` function.
+4. __[Q]{.Q}__: Implement `arg_max()`. It should take a function and a vector of inputs, and return the elements of the input where the function returns the highest value. For example, `arg_max(-10:5, function(x) x ^ 2)` should return `-10`. `arg_max(-5:5, function(x) x ^ 2)` should return `c(-5, 5)`. Also implement the matching `arg_min()` function.
 
    __[A]{.solved}__: Both functions take a vector of inputs and a function as an argument. The functions output are then used to subset the input accordingly.
  
@@ -342,7 +342,7 @@ library(tibble)
     }
     ```
     
-   __[A]{.solved}__: To apply a function to every function of a data frame, we can use `purrr::modify`, which also conveniently returns a data frame. To limit the application to numeric columns, the scoped versions `modify_if()` can be used.
+   __[A]{.solved}__: To apply a function to every column of a data frame, we can use `purrr::modify()`, which also conveniently returns a data frame. To limit the application to numeric columns, the scoped version `modify_if()` can be used.
 
     ```{r, eval = FALSE}
     modify_if(mtcars, is.numeric, scale01)
@@ -385,7 +385,7 @@ library(tibble)
 
    __[A]{.solved}__: A number $x$ is called a fixed point of a function $f$ if it satisfies the equation $f(x) = x$. For some functions we may find a fixed point by beginning with a starting value and applying $f$ repeatedly. Here `fixed_point()` acts as a functional, because it takes a function as an argument.
 
-    ```{r}
+    ```{r, error = TRUE}
     fixed_point <- function(f, x_init, n_max = 10000, tol = 0.0001) {
       n <- 0
       x <- x_init
@@ -408,9 +408,8 @@ library(tibble)
       
       x
     }
-    ```
-
-    ```{r, error = TRUE}
+    
+    
     # Functions with fixed points
     fixed_point(sin, x_init = 1)
     fixed_point(cos, x_init = 1)

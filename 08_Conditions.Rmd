@@ -29,7 +29,7 @@ source("common.R")
 
    __[A]{.solved}__: The `appendLF` argument automatically appends a new line to the message. Let's illustrate this behaviour with a small example function:
    
-    ```{r, eval=FALSE}
+    ```{r, eval=TRUE, message=TRUE}
     multiline_msg <- function(appendLF = TRUE) {
       message("first", appendLF = appendLF)
       cat("second")
@@ -37,14 +37,10 @@ source("common.R")
     }
     
     multiline_msg(appendLF = TRUE)
-    #> first
-    #> secondthird
     multiline_msg(appendLF = FALSE)
-    #> first line
-    #> secondthird
     ```
     
-    Compared to `cat()`, `message()` adds the newl line for you.
+    Comparable behaviour regarding line breaks for `cat()` can be achieved via setting its `sep` argument to `"\n".
 
 ## Handling conditions
 
@@ -140,7 +136,7 @@ source("common.R")
     ```
 
 
-   __[A]{.solved}__: `catch_cnd()` is a simple wrapper around `tryCatch`. If a condition is signalled, it's caught and returned. If no condition is signalled, execution proceeds sequentially and the function returns `NULL`.
+   __[A]{.solved}__: `catch_cnd()` is a simple wrapper around `tryCatch()`. If a condition is signalled, it's caught and returned. If no condition is signalled, execution proceeds sequentially and the function returns `NULL`.
    
    The current version of `catch_cnd()` is a little more complex because it allows you to specify which classes of condition you want to capture. This requires some manual code generation because the interface of `tryCatch()` provides condition classes as argument names.
 
@@ -178,7 +174,7 @@ source("common.R")
     })
     ```
 
-`tryCatch()` executes the code and captures any condition raised. The function provided as the `condition` handles this condition. In this case it dispatches on the class of the condition.
+    `tryCatch()` executes the code and captures any condition raised. The function provided as the `condition` handles this condition. In this case it dispatches on the class of the condition.
 
 ## Custom conditions
 

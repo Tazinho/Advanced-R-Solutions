@@ -24,7 +24,9 @@ library(ggplot2)
     
    Why is it better to `force(x)` instead of just `x`?
     
-   __[A]{.solved}__: As you can see `force(x)` is just syntactic sugar for `x`. We prefer this explicit form, because "using this function clearly indicates that you’re forcing evaluation, not that you’ve accidentally typed `x`." (Quote from the textbook).
+   __[A]{.solved}__: As you can see `force(x)` is just syntactic sugar for `x`. As being mentioned in the textbook we prefer this explicit form, because 
+   
+   > using this function clearly indicates that you’re forcing evaluation, not that you’ve accidentally typed `x`."
 
 2. __[Q]{.Q}__: Base R contains two function factories, `approxfun()` and `ecdf()`. Read their documentation and experiment to figure out what the functions do and what they return.
 
@@ -74,7 +76,7 @@ library(ggplot2)
     stopifnot(all.equal(m2(x), var(x) * 99 / 100))
     ```
 
-   __[A]{.solved}__: The first moment is closely related to the mean and describes the average deviation from the mean, which is 0 (within numerical margin of error). The second moment describes the variance of the input data. If we want compare it to `var`, we need to undo [Bessel's correction}(https://en.wikipedia.org/wiki/Bessel%27s_correction) correction by multiplying with $\frac{N-1}{N}$.
+   __[A]{.solved}__: The first moment is closely related to the mean and describes the average deviation from the mean, which is 0 (within numerical margin of error). The second moment describes the variance of the input data. If we want compare it to `var`, we need to undo [Bessel's correction](https://en.wikipedia.org/wiki/Bessel%27s_correction) correction by multiplying with $\frac{N-1}{N}$.
     
     ```{r}
     moment <- function(i){
