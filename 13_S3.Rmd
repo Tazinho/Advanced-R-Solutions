@@ -50,7 +50,7 @@ library(sloop)
 
    __[A]{.solved}__: The function `as.data.frame.data.frame()` implements the `data.frame` *method* for the `as.data.frame()` *generic*, which coerces objects to data frames.
 
-   The name is confusing, because it does not clearly communicate the type of the function, which could be a regular function, a generic or a method. Even if we assume a method, the amount of `.`'s makes it difficult to separate the generic- and the class-part of the name" Is it the `data.frame.data.frame` method for the `as` generic? Is it the `frame.data.frame` method for the `as.data` generic? 
+   The name is confusing, because it does not clearly communicate the type of the function, which could be a regular function, a generic or a method. Even if we assume a method, the amount of `.`'s makes it difficult to separate the generic- and the class-part of the name. Is it the `data.frame.data.frame` method for the `as` generic? Is it the `frame.data.frame` method for the `as.data` generic? 
 
    We could avoid this confusion by applying a different naming convention (e.g. "snake_case") for our class and function names.
 
@@ -94,7 +94,7 @@ library(sloop)
     x
     ```
 
-   __[A]{.solved}__: This code returns a "table" object, which is build upon the "integer" type. The attribute "dimnames" are used to name the elements of the integer vector.
+   __[A]{.solved}__: This code returns a "table" object, which is build upon the "integer" type. The attribute "dimnames" is used to name the elements of the integer vector.
    
     ```{r}
     typeof(x)
@@ -107,7 +107,7 @@ library(sloop)
 
 1. __[Q]{.Q}__: Write a constructor for `data.frame` objects. What base type is a data frame built on? What attributes does it use? What are the restrictions placed on the individual elements? What about the names?
 
-   __[A]{.solved}__: Data frames are built on a named lists of vectors, where every element is the same length. Their only attribute is "row.names" which must be a character vector the same length as the other elements. We need to provide the number of rows as an input to make it possible to create data frames with 0 columns but multiple rows.
+   __[A]{.solved}__: Data frames are built on named lists of vectors, where every element is the same length. Their only attribute is "row.names" which must be a character vector the same length as the other elements. We need to provide the number of rows as an input to make it possible to create data frames with 0 columns but multiple rows.
    
    This leads to the following constructor:
    
@@ -344,19 +344,19 @@ library(sloop)
     g(x)
     ```
     
-    This is seemingly inconsistent: why does `x` come from the value defined inside of `g()`, and `y` still come from the global environment? It's because `UseMethod()` calls `g.default()` in a special way so that variables defined inside the generic are available to methods. The exception is argument to the function: they are passed on as is, and cannot be affect by code inside the generic.
+    This is seemingly inconsistent: why does `x` come from the value defined inside of `g()`, and `y` still come from the global environment? It's because `UseMethod()` calls `g.default()` in a special way so that variables defined inside the generic are available to methods. The exception are arguments supplied to the function: they are passed on as is, and cannot be affected by code inside the generic.
     
 6. __[Q]{.Q}__: What are the arguments to `[`? Why is this a hard question to answer?
 
-   __[A]{.solved}__: The subsetting operator `[` is a primitive and generic function, which can confirmed via `ftype()`.
+   __[A]{.solved}__: The subsetting operator `[` is a primitive and a generic function, which can be confirmed via `ftype()`.
    
     ```{r}
     ftype(`[`)
     ```
    
-   For primitive functions `formals(`[`)` returns `NULL` so we need to find another way to determine the functions argurments. One possible way to figure out `[`'s arguments would be to inspect the underlying C source code, which can be searched for via `pryr::show_c_source(.Primitive("["))`.
+   For primitive functions `formals([)` returns `NULL` so we need to find another way to determine the functions argurments. One possible way to figure out `[`'s arguments would be to inspect the underlying C source code, which can be searched for via `pryr::show_c_source(.Primitive("["))`.
    
-   When we inspect the arguments the `[`'s methods, we see that the arguments vary with the class of `x`.
+   When we inspect the arguments of some of `[`'s methods, we see that the arguments vary with the class of `x`.
 
     ```{r}    
     names(formals(`[.data.frame`))
