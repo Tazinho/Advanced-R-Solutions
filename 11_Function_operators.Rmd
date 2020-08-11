@@ -25,9 +25,6 @@ library(purrr)
     
     # Application
     vrep(1:2, 3:4)
-    
-    # Naming arguments still works
-    vrep(times = 1:2, x = 3:4)  
     ```
 
    `Vectorize()` provides a convenient and concise notation to iterate over multiple arguments, but has some major drawbacks that mean you generally shouldn't use it. See <https://www.jimhester.com/post/2018-04-12-vectorize/> for more details.
@@ -36,7 +33,7 @@ library(purrr)
    
    __[A]{.solved}__: `possibly()` modifies functions to return a specified default value in case of an error (`otherwise`) and to suppress any error messages (`quiet = TRUE`).
    
-   While reading the source code, we notice that `possibly()` internally uses `purrr::as_mapper()`. This enables users to supply not only functions, but also formulas or atomics via the same syntax as known from other functions in the purrr package. Besides this, the new default value (`otherwise`) gets evaluated once to make it (almost) immutable from now on.
+   While reading the source code, we notice that `possibly()` internally uses `purrr::as_mapper()`. This enables users to supply not only functions, but also formulas or atomics via the same syntax as known from other functions in the purrr package. Besides this, the new default value (`otherwise`) gets evaluated once to make it (almost) immutable.
    
    The main functionality of `possibly()` is provided by `base::tryCatch()`. In this part the supplied function (`.f`) gets wrapped and the error and interrupt handling are specified.
    
