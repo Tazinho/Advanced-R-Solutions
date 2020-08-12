@@ -24,7 +24,7 @@ library(lobstr)
     ast((x + y) * z)
     ```
     
-   __[A]{.solved}__: Let the source (of the codechunks above) be with you and show you how the ASTs were produced. :)
+   __[A]{.solved}__: Let the source (of the code chunks above) be with you and show you how the ASTs were produced. :)
 
     ```{r}
     ast(f(g(h())))
@@ -62,7 +62,7 @@ library(lobstr)
     ast(1 -> x)
     ```
 
-   __[A]{.solved}__: ASTs start function calls with the name of the function, because of this the call in the first expression is translated into its prefix form. In the second case, `**` is translated by R's parser into `^`. In the last AST, the expression is flipped when R parses it:
+   __[A]{.solved}__: ASTs start function calls with the name of the function. This is why the call in the first expression is translated into its prefix form. In the second case, `**` is translated by R's parser into `^`. In the last AST, the expression is flipped when R parses it:
    
     ```{r}
     str(expr(a -> b))
@@ -82,13 +82,13 @@ library(lobstr)
     
     ```{r}
     ast(
-    if (FALSE) {
-      1
-    } else if (FALSE) {
-      2
-    } else if (TRUE) {
-      3
-    }
+      if (FALSE) {
+        1
+      } else if (FALSE) {
+        2
+      } else if (TRUE) {
+        3
+      }
     )
     ```
     
@@ -98,7 +98,7 @@ library(lobstr)
     ast(
       if (FALSE) 1 
       else if (FALSE) 2 
-      else if(TRUE) 3
+      else if (TRUE) 3
     )
     ```
 
@@ -268,7 +268,7 @@ library(lobstr)
     ast({b = c(c = 1)})
     ```
     
-   When we ignore the braces and compare the trees, we can see, that the first `=` is used for assignment, second `=` is part of the syntax of function calls.
+   When we ignore the braces and compare the trees, we can see, that the first `=` is used for assignment and the second `=` is part of the syntax of function calls.
   
 
 3. __[Q]{.Q}__: Does `-2^2` yield 4 or -4? Why?
