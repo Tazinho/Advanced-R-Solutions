@@ -300,7 +300,7 @@ library(lobstr)
     obj_size(double(2))
     ```
    
-   So 1 million double should take up 8,000,048 bytes: 
+   So a 1 million double should take up 8,000,048 bytes: 
 
     ```{r}
     a <- runif(1e6)
@@ -322,7 +322,7 @@ library(lobstr)
     obj_size(b)
     ```
    
-   When we modify the first element of `b[[1]]` copy-on-modify occurs. Both elements will still have the same size (8,000,040 bytes) but a the first one gets a new address in memory. As `b`'s elements don't share references anymore, its object size adds up to the sum of the elements and the length-2 list: 8,000,048 B + 8,000,048 B + 64 B = 16,000,160 B (16 MB).
+   When we modify the first element of `b[[1]]` copy-on-modify occurs. Both elements will still have the same size (8,000,040 bytes), but the first one gets a new address in memory. As `b`'s elements don't share references anymore, its object size adds up to the sum of the elements and the length-2 list: 8,000,048 B + 8,000,048 B + 64 B = 16,000,160 B (16 MB).
 
     ```{r}
     b[[1]][[1]] <- 10
