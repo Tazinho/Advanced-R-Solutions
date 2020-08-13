@@ -7,24 +7,15 @@ source("common.R")
 ## Atomic vectors
 
 1. __[Q]{.Q}__: How do you create scalars of type raw and complex? (See `?raw` and `?complex`)
-
-   <!-- I'd say there's no way to create a literal raw scalar; you have to create a vector. You can't create complex scalars, but you can create imaginary scalars with the i prefix: i, 5i etc.  You could mention the complex() and raw() constructors in the next paragraph.  -->
    
-   __[A]{.solved}__: In R scalars are represented as vectors of length one. For raw and complex types these can be created via `raw()` and `complex()`, i.e.:
-  
-    ```{r}
-    raw(1)
-    complex(1)
-    ```
-  
-   Raw vectors can easily be created from numeric or character values.
+   __[A]{.solved}__: In R scalars are represented as vectors of length one. However, there is no way to create a literal raw scalar directly; you have to create a vector first. Then you can easily create one from numeric or character values.
   
     ```{r}
     as.raw(42)
     charToRaw("A")
     ```
   
-   For complex numbers real and imaginary parts may be provided directly.
+   For complex numbers real and imaginary parts may be provided directly to the `complex()` constructor.
   
     ```{r}
     complex(length.out = 1, real = 1, imaginary = 1)
