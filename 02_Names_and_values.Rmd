@@ -229,13 +229,9 @@ library(lobstr)
     x <- list(mean, sd, var)
     obj_size(x)
     ```
-   __[A]{.solved}__: It is somewhat misleading, because all three functions are built-in to R as part of the `{base}` and `{stats}` packages and hence always available.
-    
-   From the following calculations we can see that this applies to about 2400 objects usually loaded by default.
+   __[A]{.solved}__: It is somewhat misleading, because all three functions are built-in to R as part of the `{base}` and `{stats}` packages and hence always available. Let's look for how many other objects this applies as well.
    
-   <!-- I couldn't get the forward reference here to work. I think you'd be better off rewriting the code block to be more self-explanatory -->
-  
-   <!-- Can you please the tidyverse style guide? -->
+   The following packages are usually loaded by default.
   
     ```{r}
     base_pkgs <- c(
@@ -243,17 +239,25 @@ library(lobstr)
       "package:utils", "package:datasets", "package:methods",
       "package:base"
     )
-    base_envs <- lapply(base_pkgs, as.environment)
-    names(base_envs) <- base_pkgs
-    base_objs <- lapply(base_envs, function(x) mget(ls(x), x))
-
+    ```
+    
+   To look up all functions from these packages we iterate over `base_pkgs` and apply `ls()` and `mget()` within each iteration.
+   
+    ```{r}
+    library(magrittr)
+    base_objs <- base_pkgs %>% 
+      lapply(as.environment) %>% 
+      lapply(function(x) mget(ls(x, all.names = TRUE), x)) %>% 
+      set_names(value = base_pkgs)
+    ```
+    
+   This gives us more than 2700 objects which are usually available by default.
+   
+    ```{r}
     sum(lengths(base_objs))
     
-    # Show sizes in MB
-    base_sizes <- vapply(base_objs, obj_size, double(1)) / 1024^2
-    
-    base_sizes
-    sum(base_sizes)
+    # We can also show the sizes in MB per package
+    vapply(base_objs, obj_size, double(1)) / 1024^2
     
     # Check if we've over-counted
     as.numeric(obj_size(!!!base_objs)) / 1024^2
