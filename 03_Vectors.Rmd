@@ -216,43 +216,46 @@ source("common.R")
    
 3. __[Q]{.Q}__: Compare and contrast `c()` and `unlist()` when combining a date and date-time into a single vector.
 
-   __[A]{.solved}__: Date and date-time objects are built upon doubles. Dates are represented as days, while date-time-objects (POSIXct) represent seconds (counted in respect to the reference date 1970-01-01, also known as "The Epoch").
+   __[A]{.solved}__: Date and date-time objects are both built upon doubles. While dates store the number of days since the reference date 1970-01-01 (also known as “The Epoch”) in days, date-time-objects (POSIXct) store the time difference to this date in seconds.
    
-   Combining these objects leads to surprising output because `c()` does not consider the class of both inputs:
-
     ```{r}
     date    <- as.Date("1970-01-02")
     dttm_ct <- as.POSIXct("1970-01-01 01:00", tz = "UTC")
+    
+    
+    # Internal representasions
+    unclass(date)
+    unclass(dttm_ct)
+    ```
 
+   Combining these objects via the `c()` leads to surprising results. This is because the `c()` generic does only dispatch on it's first argument:
+   
+    ```{r}
     c(date, dttm_ct)  # equal to c.Date(date, dttm_ct) 
     c(dttm_ct, date)  # equal to c.POSIXct(date, dttm_ct)
     ```
-
-   The generic function dispatches based on the class of its first argument. When `c.Date()` is executed, `dttm_ct` is converted to a date, but the 3600 seconds are mistaken for 3600 days! When `c.POSIXct()` is called on `date`, one day counts as one second only, as illustrated by the following line:
-
-    ```{r}
+    
+   In the first line above `c.Date()` is executed and `dttm_ct` is converted into a date. However, the 3600 seconds are mistakenly interpreted as 3600 days! In contrast, when `c.POSIXct()` is called on date, one day counts as one second only, as illustrated by the following line:
+    
+    ```{r}  
     unclass(c(date, dttm_ct))  # internal representation
     date + 3599
     ```
-
-   Some of these problems may be avoided via explicit conversion of the classes:
-
-    ```{r}
-    c(as.Date(dttm_ct, tz = "UTC"), date)
-    ```
-
+    
+   Some of these problems may be avoided via explicit conversion of the classes, i.e. `c(as.Date(dttm_ct, tz = "UTC"), date)`.
+   
+   A package that deals with these kind of problems in more depth and provides a structural solution for them is the [vctrs](https://github.com/r-lib/vctrs) package which is also used throughout the tidyverse.
+   
    Let's look at `unlist()`, which operates on list input.
 
     ```{r}    
-    # attributes are stripped
+    # Attributes are stripped
     unlist(list(date, dttm_ct))  
     ```
 
-   We see that internally dates(-times) are stored as doubles. Unfortunately this is all we are left with, when unlist strips the attributes of the list.
+   We see again that dates and date-times are internally stored as doubles. Unfortunately this is all we are left with, when unlist strips the attributes of the list.
 
    To summarise: `c()` coerces types and errors may occur because of inappropriate method dispatch. `unlist()` strips attributes. 
-   
-   <!-- link to vctrs package for resolution of this problem? -->
    
 ## Data frames and tibbles
 
