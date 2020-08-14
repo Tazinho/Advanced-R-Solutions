@@ -102,19 +102,19 @@ source("common.R")
     ```{r}
     mod <- lm(mpg ~ wt, data = mtcars)
     
-    mod$df.residual       # output preserved
+    mod$df.residual       # `$` returns a single the element
     mod$df.res            # `$` allows partial matching
-    mod["df.residual"]    # list output
-    mod[["df.residual"]]  # output preserved
+    mod["df.residual"]    # `[` generates list output
+    mod[["df.residual"]]  # `[[` returns a single element
     ```
     
-   The same also applies to `summary(mod)`, so we could use i.e.:
+   The same also applies to `summary(mod)`, so we could use e.g.:
     
     ```{r, eval = FALSE}
     summary(mod)$r.squared
     ```
     
-   (Tip: The `broom`-package provides a very useful approach to work with models in a tidy way).
+   (Tip: The [broom](https://github.com/tidymodels/broom) package provides a very useful approach to work with models in a tidy way).
     
 ## Applications
 
