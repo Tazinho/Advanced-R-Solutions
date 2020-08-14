@@ -300,7 +300,7 @@ source("common.R")
 
 3. __[Q]{.Q}__: If `df` is a data frame, what can you say about `t(df)`, and `t(t(df))`? Perform some experiments, making sure to try different column types.
 
-   __[A]{.solved}__: Both will return matrices:
+   __[A]{.solved}__: Both of `t(df)` and `t(t(df))` will return matrices:
    
     ```{r}
     df <- data.frame(x = 1:5, y = 5:1)
@@ -309,7 +309,7 @@ source("common.R")
     is.matrix(t(t(df)))
     ```   
     
-    Whose dimensions respect the typical transposition rules:
+    The dimensions will respect the typical transposition rules:
     
     ```{r}
     dim(df)
@@ -317,7 +317,7 @@ source("common.R")
     dim(t(t(df)))
     ```
     
-   Because the output is a matrix, every column is coerced to the same type by `as.matrix()`, as described below.
+   Because the output is a matrix, every column is coerced to the same type. (It is implemented within `t.data.frame()` via `as.matrix()` which is described below).
 
 4. __[Q]{.Q}__: What does `as.matrix()` do when applied to a data frame with columns of different types? How does it differ from `data.matrix()`?
     
