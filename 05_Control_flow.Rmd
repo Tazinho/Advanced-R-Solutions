@@ -51,7 +51,11 @@ source("common.R")
     out
     ```
 
-   __[A]{.solved}__: The vector we are iterating over are of length 0. Our loop goes from `i = 1` to `i = 0` because `:` counts down, as well as up. As we use `[<-` and `[` for indexing, we need to be aware of their subsetting behaviour for out-of-bounds and zero indices.
+   __[A]{.solved}__: This loop is a delicate issue and we have to consider a few points to explain why it is going through without any errors or warnings.
+   
+   The beginning of this code smell is the statement `1:length(x)` which creates the index of our for loop. As `x` has length 0 `1:length(x)` counts down from 1 to 0. This issue is typically avoided via usage of `seq_along(x)` or similar helpers which would just generate `integer(0)` in this case.
+   
+   As we use `[<-` and `[` for indexing 0-length vectors at their first and zeroth position, we need to be aware of their subsetting behaviour for out-of-bounds and zero indices.                                         
    
    During the first iteration `x[1]` will generate an `NA` (out-of-bounds indexing for atomics). The resulting `NA` (from squaring) will be assigned to the empty length-1 list `out[1]` (out-of-bounds indexing for lists).
    
