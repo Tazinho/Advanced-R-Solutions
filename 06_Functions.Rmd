@@ -504,27 +504,28 @@ for functional programming (lapply, purrr) -->
 
 6. __[Q]{.Q}__: Create a list of all the replacement functions found in the base package. Which ones are primitive functions? (Hint use `apropos()`)
    
-   __[A]{.solved}__: The hint suggests to look for functions with a specific naming pattern: Replacement functions conventionally end on `<-`. We can search for these objects with the regular expression `"<-$"`.
+   __[A]{.solved}__: The hint suggests to look for functions with a specific naming pattern: Replacement functions conventionally end on "<-". We can search for these objects by supplying the regular expression `"<-$"` to `apropos`. `apropos()` also allows to return the position of its hits on the search path (`search()`) via setting `where = TRUE`. Finally we can set `mode = function` to narrow down our search to relevant objects. This gives us the following statement to begin with:
    
     ```{r}
-    apropos("<-$")
+    repls <- apropos("<-", where = TRUE, mode = "function")
+    repls
     ```
-
-   However, instead of `apropros()` we will use `ls()` and adopt a bit of the code from a previous exercise. (This makes it easier to work with environments explicitly.) We first find all the objects in the base package which end on `<-`, then filter to only look at functions:
+    
+   To restrict `repl` to the subset of replacement functions from the base package, we select those with the regarding position on the search path.
    
     ```{r}
-    repl_nms <- ls(baseenv(), all.names = TRUE, pattern = "<-$")
-    repl_objects <- mget(repl_nms, baseenv())
-    repl_functions <- Filter(is.function, repl_objects)
-    length(repl_functions)
+    repls_base <- repls[names(repls) == length(search())]
+    repls_base
     ```
    
-   Additionally, we also filter for primitive functions.
-   Overall base R contains `r length(repl_functions)` replacement functions. The following `r length(Filter(is.primitive, repl_functions))` of them are also primitive functions:
+   To find out which of these functions are primitives, we first fetch those from the base package via `mget()` and then subset the result via `Filter()` and `is.primitive()`.
    
-    ```{r}
-    names(Filter(is.primitive, repl_functions))
+    ```{r}    
+    repl_base_prims <- mget(repl_base, envir = baseenv()) %>% Filter(is.primitive, .) %>% names()
+    repl_base_prims
     ```
+   
+   Overall base R contains `r length(repl_base)` replacement functions of which `r (length(repl_base_prims))` are primitive functions.
 
 7. __[Q]{.Q}__: What are valid names for user-created infix functions?
   
