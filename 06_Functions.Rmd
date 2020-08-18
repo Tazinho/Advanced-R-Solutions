@@ -217,7 +217,7 @@ for functional programming (lapply, purrr) -->
     y
     ```  
     
-   __[A]{.solved}__: The function returns `c(2, 1)`. This is due to *name masking*. When `x` is accessed within `c()`, the promise `x = {y <- 1; 2}` is evaluated inside `f1()`'s environment. `y` is bound to the value `1` and the return value of `{()` (`2`) is assigned to `x`. When `y` is accessed within `c()`, it has already the value `1` and R doesn't need to look it up any further. Therefore, the promise `y = 0` won't be evaluated. Also, because `y` is assigned within `f1()`'s environment, the value of the global variable `y` is left untouched.
+   __[A]{.solved}__: The function returns `c(2, 1)` which is due to *name masking*. When `x` is accessed within `c()`, the promise `x = {y <- 1; 2}` is evaluated inside `f1()`'s environment. `y` gets bound to the value `1` and the return value of `{()` (`2`) gets assigned to `x`. When `y` gets accessed next within `c()`, it has already the value `1` and R doesn't need to look it up any further. Therefore, the promise `y = 0` won't be evaluated. Also, as `y` is assigned within `f1()`'s environment, the value of the global variable `y` is left untouched.
 
 4. __[Q]{.Q}__: In `hist()`, the default value of `xlim` is `range(breaks)`, the default value for `breaks` is `"Sturges"`, and
 
