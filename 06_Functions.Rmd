@@ -187,7 +187,7 @@ for functional programming (lapply, purrr) -->
     ```
     
    __[A]{.solved}__:
-   We expect `x_ok()` to validate its input via certain criteria: it must not be `NULL`, but have length `1` and a value greater than `0`. Meaningful outcomes for this assertion will be `TRUE`, `FALSE` or `NA` and the desired behaviour is reached by combining the assertions through `&&` instead of `&`.
+   We expect `x_ok()` to validate its input via certain criteria: it must not be `NULL`, but have length `1` and a value greater than `0`. Meaningful outcomes for this assertion will be `TRUE`, `FALSE` or `NA`. The desired behaviour is reached by combining the assertions through `&&` instead of `&`.
    
    `&&` does not perform elementwise comparisons, instead it uses the first element of each value only. It also uses lazy evaluation, in the sense that evaluation "proceeds only until the result is determined" (from `?Logic`). This means that the RHS of `&&` won't be evaluated if the LHS already determines the outcome of the comparision (e.g. evaluate to `FALSE`). This behaviour is also known as 'shortcircuiting'. 
    For some situations (`x = 1`) both operators will lead to the same result. But this is not always the case. For `x = NULL`, the `&&`-operator will stop after the `!is.null`-statement and return the result. The following conditions won't even be evaluated! (If the other conditions are also evaluated (by the use of `&`), the outcome would change. `NULL > 0` returns `logical(0)`, which is not helpful in this case.)
