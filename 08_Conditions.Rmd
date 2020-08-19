@@ -63,7 +63,7 @@ source("common.R")
 
 2. __[Q]{.Q}__: Predict the results of evaluating the following code
 
-    ```{r}
+    ```{r, eval = FALSE}
     show_condition <- function(code) {
       tryCatch(
         error = function(cnd) "error",
@@ -75,9 +75,8 @@ source("common.R")
         }
       )
     }
-    ```
     
-    ```{r, eval = FALSE}
+    
     show_condition(stop("!"))
     show_condition(10)
     show_condition(warning("?!"))
@@ -86,6 +85,20 @@ source("common.R")
       message("?")
       warning("?!")
     })
+    ```
+    
+    ```{r, include = FALSE}
+    show_condition <- function(code) {
+      tryCatch(
+        error = function(cnd) "error",
+        warning = function(cnd) "warning",
+        message = function(cnd) "message",
+        {
+          code
+          NULL
+        }
+      )
+    }
     ```
     
    __[A]{.solved}__: The first three examples are straightforward:
