@@ -11,11 +11,11 @@ source("common.R")
 
 In this chapter we will run a few benchamrks and use the following helper-function to subset and pretty-print their results.
 
-```{r}
+```{r, include=FALSE}
 library(rlang)
 
 print_bench_results <- function(bench_df, ...) {
-  dots <- enquos(...)
+  dots <- rlang::enquos(...)
   
   bench_df %>% 
     purrr::modify_at("expression", as.character) %>% 
@@ -28,26 +28,28 @@ print_bench_results <- function(bench_df, ...) {
 
 1. __[Q]{.Q}__: What are faster alternatives to `lm`? Which are specifically designed to work with larger datasets?
 
-   __[A]{.solved}__: In the [Cran Task View for High Performance Computing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) we can find for example the `speedglm` package and its `speedlm()` function. For small datasets, there may be only minor performance gains (or even a small cost):
+   __[A]{.solved}__: The [Cran Task View for High Performance Computing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) provides many recommendations. For this question, we are most interested in the section on "Large memory and out-of-memory data". We could for example give `biglm::biglm()`, `speedglm::speedlm()` or `RcppEigen::fastLm()` a try.
+   
+   For small datasets, there will be only minor performance gains (or even a small cost):
 
     ```{r}
-    stopifnot(all.equal(
-      coef(speedglm::speedlm(body_mass_g ~ bill_length_mm + species,
-                             data = penguins)),
-      coef(lm(body_mass_g ~ bill_length_mm + species,
-              data = penguins))))
-    
     bench::mark(
-      "speedglm" = speedglm::speedlm(body_mass_g ~ bill_length_mm + species,
-                                     data = penguins),
-      "lm" = lm(body_mass_g ~ bill_length_mm + species,
-                data = penguins),
-      check = FALSE
-    ) %>% 
-      print_bench_results(expression, median)
+      "lm" = lm(
+        body_mass_g ~ bill_length_mm + species, data = penguins
+        ) %>% coef(),
+      "biglm" = biglm::biglm(
+        body_mass_g ~ bill_length_mm + species, data = penguins
+        ) %>% coef(),
+      "speedglm" = speedglm::speedlm(
+        body_mass_g ~ bill_length_mm + species, data = penguins
+        ) %>% coef(),
+      "fastLm" = RcppEigen::fastLm(
+        body_mass_g ~ bill_length_mm + species, data = penguins
+      ) %>% coef()
+    )
     ```
     
-   However on bigger datasets it can make a difference:
+   However for bigger data it will make a difference:
     
     ```{r,collapse = TRUE, warning=FALSE}
     eps <- rnorm(100000)
@@ -55,43 +57,33 @@ print_bench_results <- function(bench_df, ...) {
     x2 <- rep(c("a", "b"), 50000)
     y <- 7 * x1 + (x2 == "a") + eps
     td <- data.frame(y = y, x1 = x1, x2 = x2, eps = eps)
-    
-    stopifnot(all.equal(
-      coef(speedglm::speedlm(y ~ x1 + x2, data = td)),
-      coef(lm(y ~ x1 + x2, data = td))))
-    
+
     bench::mark(
-      "speedglm" = speedglm::speedlm(y ~ x1 + x2, data = td),
-      "lm" = lm(y ~ x1 + x2, data = td),
-      check = FALSE
-    ) %>% 
-      print_bench_results(expression, median)
+      "lm" = lm(y ~ x1 + x2, data = td) %>% coef(),
+      "biglm" = biglm::biglm(y ~ x1 + x2, data = td) %>% coef(),
+      "speedglm" = speedglm::speedlm(y ~ x1 + x2, data = td) %>% coef(),
+      "fastLm" = RcppEigen::fastLm(y ~ x1 + x2, data = td) %>% coef()
+    )
     ```
     
-   For further speed improvements, you might consider switching your linear algebra libraries (compare `?speedglm::speedlm`)
+   For further speed improvements, you could install a linear algebra library optimized for your system (see `?speedglm::speedlm`).
     
    > The functions of class 'speedlm' may speed up the fitting of LMs to large data sets. High performances can be obtained especially if R is linked against an optimized BLAS, such as ATLAS.
     
-   Note that there are many other opportunities mentioned in the task view, for example the Rccp-based `fastLm()` (found in `{RcppEigen}` e.g.) is very fast as well. Some packages make it possible to handle data which is not in memory. 
-   
 2. __[Q]{.Q}__: What package implements a version of `match()` that's faster for repeated lookups? How much faster is it?
     
-   __[A]{.solved}__: A Google search points use to the `{fastmatch}`-package. We compare it to `base::match()` and observe an impressive relative performance advantage (up to 35x faster).
+   __[A]{.solved}__: A web search points us to the `{fastmatch}`-package. We compare it to `base::match()` and observe an impressive relative performance gain (up to 35x faster computation).
     
     ```{r}
     set.seed(1)
     table <- 1L:100000L
     x <- sample(table, 10000, replace = TRUE)
     
-    stopifnot(all.equal(match(x, table), fastmatch::fmatch(x, table)))
-    
     bench::mark(
       "match" = match(x, table),
       "fastmatch" = fastmatch::fmatch(x, table),
-      check = FALSE,
       relative = TRUE
-    ) %>% 
-      print_bench_results(expression, median)
+    ) 
     ```
     
 3. __[Q]{.Q}__: List four functions (not just those in base R) that convert a string into a date time object. What are their strengths and weaknesses?
