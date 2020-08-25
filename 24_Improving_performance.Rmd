@@ -190,22 +190,25 @@ print_bench_results <- function(bench_df, ...) {
 
 1. __[Q]{.Q}__: What's the difference between `rowSums()` and `.rowSums()`?
     
-   __[A]{.solved}__: `.rowSums()` is defined as
+   __[A]{.solved}__: When we inspect the source code of the user-facing `rowSums()`, we see that it is designed as a wrapper around `.rowSums()` with some input validation, conversions and handling of a special case (complex numbers).
+    
+    ```{r}
+    rowSums
+    ```
+
+  `.rowSums()` calls an internal function, which is build into the R interpreter. These compiled functions can be very fast.
     
     ```{r}
     .rowSums
     ```
     
-   this means, that the internal `.rowSums()` function is called via `.Internal()`.
-    
-   > .Internal performs a call to an internal code which is built in to the R interpreter.
-    
-   The internal `.rowSums()` is an entirely different function than the user-facing `rowSums()` function.
-    
-   Of course (they share the same name!) these functions are heavily related: If we look into the source code of `rowSums()`, we see that it is a wrapper around the internal `.rowSums()`. Just some input validation, conversions and the special cases (complex numbers) are added:
-    
+   If the convenient features of `rowSums()` are not needed, then using `.rowSums()` will be more performant.
+
     ```{r}
-    rowSums
+    m <- matrix(rnorm(1e8), nrow = 10000)
+    
+    bench::mark(rowSums(m),
+                .rowSums(m, 10000, 10000))
     ```
 
 2. __[Q]{.Q}__: Make a faster version of `chisq.test()` that only computes the chi-square test statistic when the input is two numeric vectors with no missing values. You can try simplifying `chisq.test()` or by coding from the [mathematical definition](http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test).
