@@ -250,7 +250,7 @@ library(ggplot2)
     )
     ```
     
-   As the redundant calculations within `ll_poisson1()` become more expensive with growing length of `x1`, we expect even further relative performance improvements for `ll_poisson2()`. The following benchmark reveals a relative performance improvement of factor 20 for `ll_poisson2()` when `x1` is of length 1000:
+   As the redundant calculations within `ll_poisson1()` become more expensive with growing length of `x1`, we expect even further relative performance improvements for `ll_poisson2()`. The following benchmark reveals a relative performance improvement of factor 20 for `ll_poisson2()` when `x1` is of length 100000:
    
     ```{r, message = FALSE, warning = FALSE}    
     bench_poisson <- function(x_length){
@@ -274,7 +274,7 @@ library(ggplot2)
       geom_point() +
       geom_line() +
       ggtitle(
-        "Relative performance of ll_poisson2() over ll_poision1() \nincreases with length of x"
+        "Relative performance of ll_poisson2() over \nll_poision1() increases with length of x"
       ) +
       scale_x_log10()
     ```
