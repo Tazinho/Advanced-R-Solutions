@@ -303,12 +303,14 @@ library(tibble)
       
       # Find the length of the longest sequence of true values
       longest <- max(rle$lengths[rle$values])
-      # Find positition of the (first) longest run
+      # Find the positition of the (first) longest run in rle
       longest_idx <- which(rle$values & rle$lengths == longest)[1]
       
-      # Add up all lengths before the longest run
-      out_start <- sum(rle$lengths[seq_len(longest_idx - 1)]) + 1L
-      out_end <- out_start + rle$lengths[[longest_idx]] - 1L
+      # Add up all lengths in rle before the longest run
+      ind_before_longest <- sum(rle$lengths[seq_len(longest_idx - 1)])
+      
+      out_start <- ind_before_longest + 1L
+      out_end <- ind_before_longest + longest
       out_start:out_end
     }
     
