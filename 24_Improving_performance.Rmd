@@ -9,10 +9,11 @@ source("common.R")
 
 # Improving performance
 
-In this chapter we will run a few benchamrks and use the following helper-function to subset and pretty-print their results.
+In this chapter we will run a few benchamrks and pipe it into the following helper-function to subset and pretty-print their results.
 
 ```{r, include=FALSE}
 library(rlang)
+library(magrittr)
 
 print_bench_results <- function(bench_df, ...) {
   dots <- rlang::enquos(...)
