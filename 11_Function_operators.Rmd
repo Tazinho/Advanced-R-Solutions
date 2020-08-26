@@ -132,7 +132,7 @@ library(purrr)
    
 4. __[Q]{.Q}__: Write a function operator that logs a timestamp and message to a file every time a function is run.
    
-   __[A]{.solved}__:
+   __[A]{.solved}__: Our `logger()` function operator takes a function and a file path as input. One timestamp is written to the file under `log_path` when we call `logger()` and another timestamp is written to the same file each time the new function gets called.
     
     ```{r}
     append_line <- function(path, ...) { 
@@ -150,7 +150,8 @@ library(purrr)
       }
     }
     ```
-
+    
+   Now, lets check if our `logger()` works as intended and apply it to the `mean()` function:
 
     ```{r}
     log_path <- tempfile()
