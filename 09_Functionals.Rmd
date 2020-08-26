@@ -285,7 +285,11 @@ library(tibble)
 
 3. __[Q]{.Q}__: Implement the `span()` function from Haskell: given a list `x` and a predicate function `f`, `span(x, f)` returns the location of the longest sequential run of elements where the predicate is true. (Hint: you might find `rle()` helpful.)
 
-   __[A]{.solved}__: Our `span_r()` function returns the indices of the (first occuring) longest sequential run of elements where the predicate is true. If the predicate is never true, the longest run has length 0, so we return `integer()`.
+   __[A]{.solved}__: Our `span_r()` function returns the indices of the (first occuring) longest sequential run of elements where the predicate is true. If the predicate is never true, the longest run has length 0, so we return `integer(0)`.
+   
+    ```{r, include = FALSE}
+    rm(mtcars)
+    ```
    
     ```{r}
     span_r <- function(x, f) {
@@ -294,12 +298,12 @@ library(tibble)
   
       # Check if the predicate is never true
       if (!any(rle$values)) {
-        return(integer())
+        return(integer(0))
       }
       
       # Find the length of the longest sequence of true values
       longest <- max(rle$lengths[rle$values])
-      # Find positition of (first) longest run
+      # Find positition of the (first) longest run
       longest_idx <- which(rle$values & rle$lengths == longest)[1]
       
       # Add up all lengths before the longest run
