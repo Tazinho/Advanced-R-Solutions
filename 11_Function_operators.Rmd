@@ -62,9 +62,8 @@ library(purrr)
    __[A]{.solved}__: Both commands will print a dot every 10 downloads and will take the same amout of time to run, so the differences may seem quite subtle.
    
    In the first case, first the dot functionality is added to `download.file`. Then the delay is added to this already tweaked function. This implies, that the printing of the dot will also be delayed and the first dot will be printed as soon as the download for the 10th url starts.
-
-  In the latter case. The delay is added first and the dot-functionality is wrapped around it. This order will print the first dot immediately after the 9th download is finished, the the short delay occurs before the 10th download actually starts.
-
+   
+   In the latter case. The delay is added first and the dot-functionality is wrapped around it. This order will print the first dot immediately after the 9th download is finished, the the short delay occurs before the 10th download actually starts.
 
 2. __[Q]{.Q}__: Should you memoise `file.download()`? Why/why not?
    
@@ -74,7 +73,7 @@ library(purrr)
    
 3. __[Q]{.Q}__: Create a function operator that reports whenever a file is created or deleted in the working directory, using `dir()` and `setdiff()`. What other global function effects might you want to track?
    
-   __[A]{.solved}__: We first start with a function that simply reports the difference between two vectors of files:
+   __[A]{.solved}__: We start with a function that reports the difference between two vectors containing file names:
    
     ```{r}
     dir_compare <- function(old, new) {
@@ -87,7 +86,7 @@ library(purrr)
       
       changes <- c(
         if (length(added) > 0) paste0(" * '", added, "' was added"),
-        if (length(removed ) > 0) paste0(" * '", removed ,
+        if (length(removed) > 0) paste0(" * '", removed ,
                                          "' was removed")
       )
       message(paste(changes, collapse = "\n"))
@@ -100,7 +99,7 @@ library(purrr)
    Then we wrap it up in a function operator
     
     ```{r}
-track_dir <- function(f) {
+    track_dir <- function(f) {
       force(f)
       function(...) {
         dir_old <- dir()
@@ -129,6 +128,7 @@ track_dir <- function(f) {
    * `options()` and `par()` which modify global settings
    * the path of the working directory
    * environment variables
+   
    
 4. __[Q]{.Q}__: Write a function operator that logs a timestamp and message to a file every time a function is run.
    
