@@ -7,10 +7,12 @@ source("common.R")
 
 ## Prerequisites
 
-   For most of this chapter base R is sufficient. Just a few exercises require *rlang* and *ggplot2* packages.
+   For most of this chapter base R is sufficient. Just a few exercises require the *rlang*, *dplyr*, *purrr* and *ggplot2* packages.
 
 ```{r, message=FALSE}
 library(rlang)
+library(dplyr)
+library(purrr)
 library(ggplot2)
 ```
 
@@ -215,7 +217,7 @@ library(ggplot2)
    
 4. __[Q]{.Q}__: How much time does `ll_poisson2()` save compared to `ll_poisson1()`? Use `bench::mark()` to see how much faster the optimisation occurs. How does changing the length of `x` change the results?
 
-   __[A]{.solved}__: Let us recall the definitions of `ll_poisson1()` and `ll_poisson2()` and the test data `x1`:
+   __[A]{.solved}__: Let us recall the definitions of `ll_poisson1()`, `ll_poisson2()` and the test data `x1`:
    
     ```{r}
     ll_poisson1 <- function(x) {
@@ -236,11 +238,10 @@ library(ggplot2)
       }
     }
     
-    # provided test data
     x1 <- c(41, 30, 31, 38, 29, 24, 30, 29, 31, 38)
     ```
     
-   A benchmark with this data reveals a performance improvement of factor 2 for `ll_poisson2()` over `ll_poisson1()`
+   A benchmark on `x1` reveals a performance improvement of factor 2 for `ll_poisson2()` over `ll_poisson1()`:
    
     ```{r}    
     bench::mark(
@@ -249,36 +250,31 @@ library(ggplot2)
     )
     ```
     
-   Regarding differing lengths of `x1`, we expect even further performance improvements of `ll_poisson2()` compared to `ll_poisson1()`, as the redundant calculations within `ll_poisson1()`, become more expensive with growing length of `x1`. The following results imply that for a length of `x1` of 100000, `ll_poisson2()` is about 20+ times as fast as `ll_poisson1()`:
+   As the redundant calculations within `ll_poisson1()` become more expensive with growing length of `x1`, we expect even further relative performance improvements for `ll_poisson2()`. The following benchmark reveals a relative performance improvement of factor 20 for `ll_poisson2()` when `x1` is of length 1000:
    
-    ```{r, message = FALSE, warning = FALSE}
-    library(purrr)
-    library(dplyr)
-    
-    bench_poisson <- function(i){
-      x_i_length <- 10L ^ i
-      x_i <- rpois(x_i_length, 100L)
+    ```{r, message = FALSE, warning = FALSE}    
+    bench_poisson <- function(x_length){
+      x <- rpois(x_length, 100L)
       
       rel_advantage <- bench::mark(
-        llp1 = optimise(ll_poisson1(x_i), c(0, 100), maximum = TRUE),
-        llp2 = optimise(ll_poisson2(x_i), c(0, 100), maximum = TRUE),
-        relative = TRUE)$median %>% 
-        max()
+        llp1 = optimise(ll_poisson1(x), c(0, 100), maximum = TRUE),
+        llp2 = optimise(ll_poisson2(x), c(0, 100), maximum = TRUE),
+        relative = TRUE)$median %>% `[`(1)
       
       rel_advantage
     }
     
-    bench_df <- map_dbl(1:5, bench_poisson) %>% 
-      tibble(i = 1:5,
-             rel_advantage = .,
-             x_length = 10 ^ i)
+    bench_df <- tibble(
+      x_length = 10^(1:5),
+      relative_performance = map_dbl(x_length, bench_poisson)
+    )
     
     bench_df %>% 
-      ggplot(aes(x_length, rel_advantage)) +
+      ggplot(aes(x_length, relative_performance)) +
       geom_point() +
       geom_line() +
       ggtitle(
-        "Rel. Speed of ll_poisson2() increases with vector length"
+        "Relative performance of ll_poisson2() over ll_poision1() \nincreases with length of x"
       ) +
       scale_x_log10()
     ```
