@@ -167,20 +167,26 @@ print_bench_results <- function(bench_df, ...) {
 
 4. __[Q]{.Q}__: Which packages provide the ability to compute a rolling mean?
     
-   __[A]{.solved}__: To compute a rolling mean the following packages and functions can be used:
+   __[A]{.solved}__: A rolling mean can be a useful statistic to smooth time-series and other types of data. The size of the rolling window will determine the amount of smoothing and the number of missing values at the start or end of the data (e.g. because the rolling mean cannot be computed for a single data point).
+   
+   The general functionality can be found in multiple packages, which vary in the speed and flexibility of the computation:
    
     ```{r}
-    zoo::rollmean(1:10, 2, na.pad = TRUE, align = "left")
-    zoo::rollapply(1:10, 2, mean, fill = NA, align = "left")
-
-    TTR::SMA(1:10, 2)
-
-    RcppRoll::roll_mean(1:10, n = 2, fill = NA, align = "left")
+    x <- 1:10
+    zoo::rollmean(x, 2, na.pad = TRUE, align = "right")
     
-    caTools::runmean(1:10, k = 2, endrule = "NA", align = "left")
+    bench::mark(
+      zoo::rollmean(x, 2, na.pad = TRUE, align = "right"),
+      zoo::rollapply(x, 2, mean, fill = NA, align = "right"),
+      tibbletime::rollify(mean, window = 2)(x),
+      TTR::SMA(x, 2),
+      caTools::runmean(x, k = 2, endrule = "NA"),
+      data.table::frollmean(x, 2),
+      RcppRoll::roll_mean(x, n = 2, fill = NA, align = "right")
+    )
     ```
 
-   Note that an exhaustive example on how to create a rolling mean function is provided in the [textbook](http://adv-r.had.co.nz/Functionals.html).
+   You may also take a look at an extensive example in the [textbook](http://adv-r.had.co.nz/Functionals.html), which demonstrates how a rolling mean function can be created.
 
 5. __[Q]{.Q}__: What are the alternatives to `optim()`?
     
