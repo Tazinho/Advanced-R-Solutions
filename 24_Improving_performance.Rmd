@@ -224,62 +224,35 @@ print_bench_results <- function(bench_df, ...) {
     
     ```{r}
     chisq.test2 <- function(x, y){
-      
-      # Input Validation
-      if (!is.numeric(x)) {
-        stop("x must be numeric")}
-      if (!is.numeric(y)) {
-        stop("y must be numeric")}
-      if (length(x) != length(y)) {
-        stop("x and y must have the same length")}
-      if (length(x) <= 1) {
-        stop("length of x must be greater one")}
-      if (any(c(x, y) < 0)) {
-        stop("all entries of x and y must be greater or equal zero")}
-      if (sum(complete.cases(x, y)) != length(x)) {
-        stop("there must be no missing values in x and y")}
-      if (any(is.null(c(x, y)))) {
-        stop("entries of x and y must not be NULL")}
-      
-      # Help variables
       m <- rbind(x, y)
       margin1 <- rowSums(m)
       margin2 <- colSums(m)
       n <- sum(m)
       me <- tcrossprod(margin1, margin2) / n
       
-      # Output
       x_stat = sum((m - me)^2 / me)
-      dof <- (length(margin1) - 1) * (length(margin2) - 1)
-      p <- pchisq(x_stat, df = dof, lower.tail = FALSE)
+      df <- (length(margin1) - 1) * (length(margin2) - 1)
+      p.value <- pchisq(x_stat, df = df, lower.tail = FALSE)
       
-      list(x_stat = x_stat, df = dof, `p-value` = p)
+      list(x_stat = x_stat, df = df, p.value = p.value)
     }
     ```
     
-   We need to check if our new implementation returns the same results.
+   We check if our new implementation returns the same results and benchmark it afterwards.
     
     ```{r}
     a <- 21:25
     b <- seq(21, 29, 2)
-    m_test <- cbind(a, b)
+    m <- cbind(a, b)
     
-    chisq.test(m_test)
+    chisq.test(m) %>% print(digits=5)
     chisq.test2(a, b)
-    ```
-   
-   Finally we benchmark this implementation and compare it with the original `stats::chisq.test()` as well as a compiled version of itself.
-    
-    ```{r}
-    chisq.test2c <- compiler::cmpfun(chisq.test2)
-    
+
     bench::mark(
-      chisq.test(m_test),
+      chisq.test(m),
       chisq.test2(a, b),
-      chisq.test2c(a, b),
       check = FALSE
-    ) %>%
-      print_bench_results(expression, median)
+    )
     ```
 
 3. __[Q]{.Q}__: Can you make a faster version of `table()` for the case of an input of two integer vectors with no missing values? Can you use it to speed up your chi-square test?
