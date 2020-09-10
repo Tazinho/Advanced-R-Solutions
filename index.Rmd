@@ -79,6 +79,7 @@ df_long <- read.csv2("progress_data.csv", stringsAsFactors = FALSE,
 
 # Intermediate calculations
 percent_solved <- mean(df_long$status %in% c("solved", "reviewed", "finalised"), na.rm = TRUE) * 100
+percent_reviewed <- mean(df_long$status %in% c("reviewed", "finalised"), na.rm = TRUE) * 100
 
 # Create Plot
 plot_progress <- df_long %>% 
@@ -105,9 +106,12 @@ plot_progress <- df_long %>%
          fill = guide_legend(nrow = 1)) +
   scale_fill_manual(values = c("#F99992", "#fdcc8a", "#bae4b3", "#74c476", "#238b45"),
                     drop = FALSE) +
-  labs(title = paste("Solved Exercises:",
+  labs(title = paste0("Solved Exercises: ",
                      round(percent_solved, 1),
                      "% (2nd Edition)"),
+       subtitle = paste0("Reviewed: ",
+                     round(percent_reviewed, 1),
+                     "%"),
        caption = paste0("(Open: ",
                          sum(df_long$status == "open"),
                          " | Started: ",
