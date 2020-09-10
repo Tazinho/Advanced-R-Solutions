@@ -13,443 +13,444 @@ library(lobstr)
 
 ## Binding basics
 
-1. __[Q]{.Q}__: Explain the relationship between `a`, `b`, `c` and `d` in the following code:
+__[Q1]{.Q}__: Explain the relationship between `a`, `b`, `c` and `d` in the following code:
 
-    ```{r}
-    a <- 1:10
-    b <- a
-    c <- b
-    d <- 1:10
-    ```
-    
-   __[A]{.solved}__: `a`, `b`, `c` point to the same object (with the same address in memory). This object has the value `1:10`. `d` points to a different object with the same value.
+```{r}
+a <- 1:10
+b <- a
+c <- b
+d <- 1:10
+```
 
-    ```{r}
-    list_of_names <- list(a, b, c, d)
-    obj_addrs(list_of_names)
-    ```
+__[A]{.solved}__: `a`, `b`, `c` point to the same object (with the same address in memory). This object has the value `1:10`. `d` points to a different object with the same value.
 
-2. __[Q]{.Q}__: The following code accesses the mean function in multiple ways. Do they all point to the same underlying function object? Verify with `lobstr::obj_addr()`.
-    
-    ```{r, eval = FALSE}
-    mean
-    base::mean
-    get("mean")
-    evalq(mean)
-    match.fun("mean")
-    ```
-    
-   __[A]{.solved}__: Yes, they point to the same object. We confirm this by inspecting the address of the underlying function object.
-       
-    ```{r}
-    mean_functions <- list(mean,
-                           base::mean,
-                           get("mean"),
-                           evalq(mean),
-                           match.fun("mean"))
-    
-    unique(obj_addrs(mean_functions))
-    ```
-    
-3. __[Q]{.Q}__: By default, base R data import functions, like `read.csv()`, will automatically convert non-syntactic names to syntactic names. Why might this be problematic? What option allows you to suppress this behaviour?
+```{r}
+list_of_names <- list(a, b, c, d)
+obj_addrs(list_of_names)
+```
 
-   __[A]{.solved}__: Column names are often data, and the underlying `make.names()` transformation is non-invertible, so the default behaviour corrupts data. To avoid this, set `check.names = FALSE`.
-    
-4. __[Q]{.Q}__: What rules does `make.names()` use to convert non-syntactic names into syntactic names?
-    
-   __[A]{.solved}__: A valid name may contain letters, numbers, dots and underscores (`"_"` are allowed since R version 1.9.0). It must start with a letter or a dot. If it starts with a dot, it must not be followed by a number.
-   
-   Three main mechanisms ensure syntactically valid names (see `?make.names`):
-   1. Prepending with `"X"`: Variable names that do not start with a letter or a dot will be prepended by an `"X"`
-    
-      ```{r}
-      make.names("")    # prepending "x"
-      ```
-      
-      The same holds for variable names that begin with a dot followed by a number 
-    
-      ```{r}
-      make.names(".1")  # prepending "X"
-      ```
-    
-   2. Additionally, non-valid characters are replaced by a dot
-    
-      ```{r}
-      make.names("@")          # prepending "X" + "." replacement 
-      make.names("  ")         # prepending "X" + ".." replacement
-      make.names("non-valid")  # "." replacement
-      ```
-    
-   3. Reserved R keywords (see `?reserved`) are suffixed by a dot
-    
-      ```{r}
-      make.names("if")  # "." suffix
-      ```
-    
-   Interestingly, some of these transformations are influenced by the current locale. From `?make.names`:
+__[Q2]{.Q}__: The following code accesses the mean function in multiple ways. Do they all point to the same underlying function object? Verify with `lobstr::obj_addr()`.
 
-   > The definition of a letter depends on the current locale, but only ASCII digits are considered to be digits.
+```{r, eval = FALSE}
+mean
+base::mean
+get("mean")
+evalq(mean)
+match.fun("mean")
+```
 
-5. __[Q]{.Q}__: I slightly simplified the rules that govern syntactic names. Why is `.123e1` not a syntactic name? Read `?make.names` for the full details.
-    
-   __[A]{.solved}__: `.123e1` is not a syntactic name, because it starts with one dot which is followed by a number. This makes it a double, `1.23`.
+__[A]{.solved}__: Yes, they point to the same object. We confirm this by inspecting the address of the underlying function object.
+
+```{r}
+mean_functions <- list(mean,
+                       base::mean,
+                       get("mean"),
+                       evalq(mean),
+                       match.fun("mean"))
+
+unique(obj_addrs(mean_functions))
+```
+
+__[Q3]{.Q}__: By default, base R data import functions, like `read.csv()`, will automatically convert non-syntactic names to syntactic names. Why might this be problematic? What option allows you to suppress this behaviour?
+
+__[A]{.solved}__: Column names are often data, and the underlying `make.names()` transformation is non-invertible, so the default behaviour corrupts data. To avoid this, set `check.names = FALSE`.
+
+__[Q4]{.Q}__: What rules does `make.names()` use to convert non-syntactic names into syntactic names?
+
+__[A]{.solved}__: A valid name may contain letters, numbers, dots and underscores (`"_"` are allowed since R version 1.9.0). It must start with a letter or a dot. If it starts with a dot, it must not be followed by a number.
+
+Three main mechanisms ensure syntactically valid names (see `?make.names`):
+
+1. Prepending with `"X"`: Variable names that do not start with a letter or a dot will be prepended by an `"X"`
+
+```{r}
+make.names("")    # prepending "x"
+```
+
+The same holds for variable names that begin with a dot followed by a number 
+
+```{r}
+make.names(".1")  # prepending "X"
+```
+
+2. Additionally, non-valid characters are replaced by a dot
+
+```{r}
+make.names("@")          # prepending "X" + "." replacement 
+make.names("  ")         # prepending "X" + ".." replacement
+make.names("non-valid")  # "." replacement
+```
+
+3. Reserved R keywords (see `?reserved`) are suffixed by a dot
+
+```{r}
+make.names("if")  # "." suffix
+```
+
+Interestingly, some of these transformations are influenced by the current locale. From `?make.names`:
+
+> The definition of a letter depends on the current locale, but only ASCII digits are considered to be digits.
+
+__[Q5]{.Q}__: I slightly simplified the rules that govern syntactic names. Why is `.123e1` not a syntactic name? Read `?make.names` for the full details.
+
+__[A]{.solved}__: `.123e1` is not a syntactic name, because it starts with one dot which is followed by a number. This makes it a double, `1.23`.
 
 ## Copy-on-modify
 
-1. __[Q]{.Q}__: Why is `tracemem(1:10)` not useful?
+__[Q1]{.Q}__: Why is `tracemem(1:10)` not useful?
 
-   __[A]{.solved}__:
-   When `1:10` is called an object with an address in memory is created, but it is not bound to a name. Therefore, the object cannot be called or manipulated from R. As no copies will be made, it is not useful to track the object for copying.
-   
-    ```{r}
-    obj_addr(1:10)  # the object exists, but has no name
-    ```
-   
-2. __[Q]{.Q}__: Explain why `tracemem()` shows two copies when you run this code. Hint: carefully look at the difference between this code and the code show earlier in the section.
-     
-    ```{r, results = FALSE}
-    x <- c(1L, 2L, 3L)
-    tracemem(x)
-    
-    x[[3]] <- 4
-    ```
-    
-   __[A]{.solved}__: Initially the vector `x` has integer type. The replacement call assigns a double to the third element of `x`, which triggers copy-on-modify.
+__[A]{.solved}__:
+When `1:10` is called an object with an address in memory is created, but it is not bound to a name. Therefore, the object cannot be called or manipulated from R. As no copies will be made, it is not useful to track the object for copying.
 
-    ```{r, eval=FALSE}
-    # two copies
-    x <- 1:3
-    tracemem(x)
-    #> <0x66a4a70>
-    
-    x[[3]] <- 4
-    #> tracemem[0x55eec7b3af38 -> 0x55eec774cc18]: 
-    #> tracemem[0x55eec774cc18 -> 0x55eeca6ed5a8]: 
-    ```
-    
-   We can avoid the copy by sub-assigning an integer instead of a double:
-    
-    ```{r, eval=FALSE}
-    # the same as 
-    x <- 1:3
-    tracemem(x)
-    #> <0x55eec6940ae0>
-    
-    x[[3]] <- 4L
-    #> tracemem[0x55eec7021e10 -> 0x55eecb99e788]: 
-    ```
+```{r}
+obj_addr(1:10)  # the object exists, but has no name
+```
 
-   <!-- code-chunks above were hard-coded to fix knitr output. -->
+__[Q2]{.Q}__: Explain why `tracemem()` shows two copies when you run this code. Hint: carefully look at the difference between this code and the code show earlier in the section.
 
-3. __[Q]{.Q}__: Sketch out the relationship between the following objects:
+```{r, results = FALSE}
+x <- c(1L, 2L, 3L)
+tracemem(x)
 
-    ```{r}
-    a <- 1:10
-    b <- list(a, a)
-    c <- list(b, a, 1:10)
-    ```
-    
-   __[A]{.solved}__: `a` contains a reference to an address with the value `1:10`. `b` contains a list of two references to the same address as `a`. `c` contains a list of `b` (containing two references to `a`), `a` (containing the same reference again) and a reference pointing to a different address containing the same value (`1:10`).
-   
-   <!-- could you insert an actual drawing here? -->
+x[[3]] <- 4
+```
 
-    ```{r, eval = FALSE}
-    ref(c)
-    #> █ [1:0x55eec93cbdd8] <list>    # c
-    #> ├─█ [2:0x55eecb8246e8] <list>  # - b
-    #> │ ├─[3:0x55eec7df4e98] <int>   # -- a
-    #> │ └─[3:0x55eec7df4e98]         # -- a
-    #> ├─[3:0x55eec7df4e98]           # - a
-    #> └─[4:0x55eec7aa6968] <int>     # - 1:10
-    ```
+__[A]{.solved}__: Initially the vector `x` has integer type. The replacement call assigns a double to the third element of `x`, which triggers copy-on-modify.
 
-4. __[Q]{.Q}__: What happens when you run this code:
+```{r, eval=FALSE}
+# two copies
+x <- 1:3
+tracemem(x)
+#> <0x66a4a70>
 
-    ```{r}
-    x <- list(1:10)
-    x[[2]] <- x
-    ```
-    
-    <!-- I think I actually meant to say `x[[2]] <- x[[1]]` to make the problem slightly less complicated -->
-    
-   Draw a picture.
+x[[3]] <- 4
+#> tracemem[0x55eec7b3af38 -> 0x55eec774cc18]: 
+#> tracemem[0x55eec774cc18 -> 0x55eeca6ed5a8]: 
+```
 
-   __[A]{.solved}__: The initial reference tree of `x` shows, that the name `x` binds to a list object. This object contains a reference to the integer vector `1:10`.
+We can avoid the copy by sub-assigning an integer instead of a double:
 
-    ```{r, eval=FALSE}
-    x <- list(1:10)
-    ref(x)
-    #> █ [1:0x55853b74ff40] <list> 
-    #> └─[2:0x534t3abffad8] <int> 
-    ```
+```{r, eval=FALSE}
+# the same as 
+x <- 1:3
+tracemem(x)
+#> <0x55eec6940ae0>
 
-    ```{r, echo = FALSE}
-    knitr::include_graphics("images/copy_on_modify_fig1.png")
-    ```
+x[[3]] <- 4L
+#> tracemem[0x55eec7021e10 -> 0x55eecb99e788]: 
+```
 
-   When `x` is assigned to an element of itself copy-on-modify takes place and the list is copied to a new address in memory.
+<!-- code-chunks above were hard-coded to fix knitr output. -->
 
-    ```{r, eval=FALSE}
-    tracemem(x)
-    x[[2]] <- x
-    #> tracemem[0x55853b74ff40 -> 0x5d553bacdcd8]:
-    ```
+__[Q3]{.Q}__: Sketch out the relationship between the following objects:
 
-   The list object previously bound to `x` is now referenced in the newly created list object. It is no longer bound to a name. The integer vector is referenced twice.
+```{r}
+a <- 1:10
+b <- list(a, a)
+c <- list(b, a, 1:10)
+```
 
-    ```{r, eval=FALSE}
-    ref(x)
-    #> █ [1:0x5d553bacdcd8] <list> 
-    #> ├─[2:0x534t3abffad8] <int> 
-    #> └─█ [3:0x55853b74ff40] <list> 
-    #>   └─[2:0x534t3abffad8] 
-    ```
+__[A]{.solved}__: `a` contains a reference to an address with the value `1:10`. `b` contains a list of two references to the same address as `a`. `c` contains a list of `b` (containing two references to `a`), `a` (containing the same reference again) and a reference pointing to a different address containing the same value (`1:10`).
 
-    ```{r, echo = FALSE}
-    knitr::include_graphics("images/copy_on_modify_fig2.png",
-                            dpi = 300)
-    ```
-    
+<!-- could you insert an actual drawing here? -->
+
+```{r, eval = FALSE}
+ref(c)
+#> █ [1:0x55eec93cbdd8] <list>    # c
+#> ├─█ [2:0x55eecb8246e8] <list>  # - b
+#> │ ├─[3:0x55eec7df4e98] <int>   # -- a
+#> │ └─[3:0x55eec7df4e98]         # -- a
+#> ├─[3:0x55eec7df4e98]           # - a
+#> └─[4:0x55eec7aa6968] <int>     # - 1:10
+```
+
+__[Q4]{.Q}__: What happens when you run this code:
+
+```{r}
+x <- list(1:10)
+x[[2]] <- x
+```
+
+<!-- I think I actually meant to say `x[[2]] <- x[[1]]` to make the problem slightly less complicated -->
+
+Draw a picture.
+
+__[A]{.solved}__: The initial reference tree of `x` shows, that the name `x` binds to a list object. This object contains a reference to the integer vector `1:10`.
+
+```{r, eval=FALSE}
+x <- list(1:10)
+ref(x)
+#> █ [1:0x55853b74ff40] <list> 
+#> └─[2:0x534t3abffad8] <int> 
+```
+
+```{r, echo = FALSE}
+knitr::include_graphics("images/copy_on_modify_fig1.png")
+```
+
+When `x` is assigned to an element of itself copy-on-modify takes place and the list is copied to a new address in memory.
+
+```{r, eval=FALSE}
+tracemem(x)
+x[[2]] <- x
+#> tracemem[0x55853b74ff40 -> 0x5d553bacdcd8]:
+```
+
+The list object previously bound to `x` is now referenced in the newly created list object. It is no longer bound to a name. The integer vector is referenced twice.
+
+```{r, eval=FALSE}
+ref(x)
+#> █ [1:0x5d553bacdcd8] <list> 
+#> ├─[2:0x534t3abffad8] <int> 
+#> └─█ [3:0x55853b74ff40] <list> 
+#>   └─[2:0x534t3abffad8] 
+```
+
+```{r, echo = FALSE}
+knitr::include_graphics("images/copy_on_modify_fig2.png",
+                        dpi = 300)
+```
+
 ## Object size
 
-1. __[Q]{.Q}__: In the following example, why are `object.size(y)` and `obj_size(y)` so radically different? Consult the documentation of `object.size()`.
+__[Q1]{.Q}__: In the following example, why are `object.size(y)` and `obj_size(y)` so radically different? Consult the documentation of `object.size()`.
 
-    ```{r}
-    y <- rep(list(runif(1e4)), 100)
-    
-    object.size(y)
-    obj_size(y)
-    ```
-    
-   __[A]{.solved}__: `object.size()` doesn't account for shared elements within lists. Therefore, the results differ by a factor of ~ 100.
+```{r}
+y <- rep(list(runif(1e4)), 100)
 
-2. __[Q]{.Q}__: Take the following list. Why is its size somewhat misleading?
+object.size(y)
+obj_size(y)
+```
 
-    ```{r, return = FALSE}
-    x <- list(mean, sd, var)
-    obj_size(x)
-    ```
-   __[A]{.solved}__: It is somewhat misleading, because all three functions are built-in to R as part of the `{base}` and `{stats}` packages and hence always available. Let's look for how many other objects this applies as well.
-   
-   The following packages are usually loaded by default.
-  
-    ```{r}
-    base_pkgs <- c(
-      "package:stats", "package:graphics", "package:grDevices",
-      "package:utils", "package:datasets", "package:methods",
-      "package:base"
-    )
-    ```
-    
-   To look up all functions from these packages we iterate over `base_pkgs` and apply `ls()` and `mget()` within each iteration.
-   
-    ```{r}
-    library(magrittr)
-    base_objs <- base_pkgs %>% 
-      lapply(as.environment) %>% 
-      lapply(function(x) mget(ls(x, all.names = TRUE), x)) %>% 
-      set_names(value = base_pkgs)
-    ```
-    
-   This gives us more than 2700 objects which are usually available by default.
-   
-    ```{r}
-    sum(lengths(base_objs))
-    
-    # We can also show the sizes in MB per package
-    vapply(base_objs, obj_size, double(1)) / 1024^2
-    
-    # Check if we've over-counted
-    as.numeric(obj_size(!!!base_objs)) / 1024^2
-    ```
+__[A]{.solved}__: `object.size()` doesn't account for shared elements within lists. Therefore, the results differ by a factor of ~ 100.
 
-3. __[Q]{.Q}__: Predict the output of the following code:
+__[Q2]{.Q}__: Take the following list. Why is its size somewhat misleading?
 
-    ```{r, eval = FALSE}
-    a <- runif(1e6)
-    obj_size(a)
-    
-    b <- list(a, a)
-    obj_size(b)
-    obj_size(a, b)
-    
-    b[[1]][[1]] <- 10
-    obj_size(b)
-    obj_size(a, b)
-    
-    b[[2]][[1]] <- 10
-    obj_size(b)
-    obj_size(a, b)
-    ```
-    
-    <!-- I think I accidentally made this too hard too - the important thing is the size of b, not of a -->
-    
-   __[A]{.solved}__: In R (on most platforms) a length-0
-  vector has 48 bytes of overhead:
+```{r, return = FALSE}
+x <- list(mean, sd, var)
+obj_size(x)
+```
+__[A]{.solved}__: It is somewhat misleading, because all three functions are built-in to R as part of the `{base}` and `{stats}` packages and hence always available. Let's look for how many other objects this applies as well.
 
-    ```{r}
-    obj_size(list())
-    obj_size(double())
-    obj_size(character())
-    ```
-   
-   A single double takes up an additional 8 bytes of memory:
-   
-    ```{r}
-    obj_size(double(1))
-    obj_size(double(2))
-    ```
-   
-   So a 1 million double should take up 8,000,048 bytes: 
+The following packages are usually loaded by default.
 
-    ```{r}
-    a <- runif(1e6)
-    obj_size(a)
-    ```
-    
-    (If you look carefully at the amount of memory occupied by short vectors, you'll notice that the pattern is actually more complicated. This is to do with how R allocates memory, and is not that important. If you want to know the full details, they're discussed in the 1st edition of Advanced R: http://adv-r.had.co.nz/memory.html#object-size).
+```{r}
+base_pkgs <- c(
+  "package:stats", "package:graphics", "package:grDevices",
+  "package:utils", "package:datasets", "package:methods",
+  "package:base"
+)
+```
 
-   For `b <- list(a, a)` both list elements contain references to the same memory address.
-   
-    ```{r}
-    b <- list(a, a)
-    ref(a, b)
-    ```
-   
-   Therefore, no additional memory is required for the second list element. The list itself requires 64 bytes, 48 bytes for an empty list and 8 bytes for each element (`obj_size(vector("list", 2))`). This let's us predict 8,000,048 B + 64 B = 8,000,112 B:
-   
-    ```{r}
-    obj_size(b)
-    ```
-   
-   When we modify the first element of `b[[1]]` copy-on-modify occurs. Both elements will still have the same size (8,000,040 bytes), but the first one gets a new address in memory. As `b`'s elements don't share references anymore, its object size adds up to the sum of the elements and the length-2 list: 8,000,048 B + 8,000,048 B + 64 B = 16,000,160 B (16 MB).
+To look up all functions from these packages we iterate over `base_pkgs` and apply `ls()` and `mget()` within each iteration.
 
-    ```{r}
-    b[[1]][[1]] <- 10
-    obj_size(b) 
-    ```
-    
-   The second element of `b` still references to the same address as `a`, so the combined size of `a` and `b` is the same as `b`:
-   
-    ```{r}
-    obj_size(a, b) 
-    ref(a, b)
-    ```
-    
-   When we modify the second element of `b`, this element will also point to a new memory address. This doesn´t affect the size of the list:
-   
-    ```{r}
-    b[[2]][[1]] <- 10
-    obj_size(b) 
-    ```
-   
-   However, as `b` doesn't share references with `a` anymore, the memory usage of the combined objects increases:
-   
-    ```{r}
-    ref(a, b)
-    obj_size(a, b) 
-    ```
+```{r}
+library(magrittr)
+base_objs <- base_pkgs %>% 
+  lapply(as.environment) %>% 
+  lapply(function(x) mget(ls(x, all.names = TRUE), x)) %>% 
+  set_names(value = base_pkgs)
+```
+
+This gives us more than 2700 objects which are usually available by default.
+
+```{r}
+sum(lengths(base_objs))
+
+# We can also show the sizes in MB per package
+vapply(base_objs, obj_size, double(1)) / 1024^2
+
+# Check if we've over-counted
+as.numeric(obj_size(!!!base_objs)) / 1024^2
+```
+
+__[Q3]{.Q}__: Predict the output of the following code:
+
+```{r, eval = FALSE}
+a <- runif(1e6)
+obj_size(a)
+
+b <- list(a, a)
+obj_size(b)
+obj_size(a, b)
+
+b[[1]][[1]] <- 10
+obj_size(b)
+obj_size(a, b)
+
+b[[2]][[1]] <- 10
+obj_size(b)
+obj_size(a, b)
+```
+
+<!-- I think I accidentally made this too hard too - the important thing is the size of b, not of a -->
+
+__[A]{.solved}__: In R (on most platforms) a length-0
+vector has 48 bytes of overhead:
+
+```{r}
+obj_size(list())
+obj_size(double())
+obj_size(character())
+```
+
+A single double takes up an additional 8 bytes of memory:
+
+```{r}
+obj_size(double(1))
+obj_size(double(2))
+```
+
+So a 1 million double should take up 8,000,048 bytes: 
+
+```{r}
+a <- runif(1e6)
+obj_size(a)
+```
+
+(If you look carefully at the amount of memory occupied by short vectors, you'll notice that the pattern is actually more complicated. This is to do with how R allocates memory, and is not that important. If you want to know the full details, they're discussed in the 1st edition of Advanced R: http://adv-r.had.co.nz/memory.html#object-size).
+
+For `b <- list(a, a)` both list elements contain references to the same memory address.
+
+```{r}
+b <- list(a, a)
+ref(a, b)
+```
+
+Therefore, no additional memory is required for the second list element. The list itself requires 64 bytes, 48 bytes for an empty list and 8 bytes for each element (`obj_size(vector("list", 2))`). This let's us predict 8,000,048 B + 64 B = 8,000,112 B:
+
+```{r}
+obj_size(b)
+```
+
+When we modify the first element of `b[[1]]` copy-on-modify occurs. Both elements will still have the same size (8,000,040 bytes), but the first one gets a new address in memory. As `b`'s elements don't share references anymore, its object size adds up to the sum of the elements and the length-2 list: 8,000,048 B + 8,000,048 B + 64 B = 16,000,160 B (16 MB).
+
+```{r}
+b[[1]][[1]] <- 10
+obj_size(b) 
+```
+
+The second element of `b` still references to the same address as `a`, so the combined size of `a` and `b` is the same as `b`:
+
+```{r}
+obj_size(a, b) 
+ref(a, b)
+```
+
+When we modify the second element of `b`, this element will also point to a new memory address. This doesn't affect the size of the list:
+
+```{r}
+b[[2]][[1]] <- 10
+obj_size(b) 
+```
+
+However, as `b` doesn't share references with `a` anymore, the memory usage of the combined objects increases:
+
+```{r}
+ref(a, b)
+obj_size(a, b) 
+```
 
 ## Modify-in-place
 
-1. __[Q]{.Q}__: Explain why the following code doesn't create a circular list.
+__[Q1]{.Q}__: Explain why the following code doesn't create a circular list.
 
-    ```{r}
-    x <- list()
-    x[[1]] <- x
-    ```
-    
-   __[A]{.solved}__: In this situation Copy-on-modify prevents the creation of a circular list. Let's step through the details as follows:
-   
-   <!-- can't use tracemem with knitr -->
-   
-    ```{r, eval=FALSE}
-    x <- list()  # creates initial object
-    obj_addr(x)
-    #> [1] "0x55862f23ab80"
-    
-    tracemem(x)
-    #> [1] "<0x55862f23ab80>"
-    x[[1]] <- x  # Copy-on-modify triggers new copy
-    #> tracemem[0x55862f23ab80 -> 0x55862e8ce028]:
-    
-    obj_addr(x)       # copied object has new memory address
-    #> [1] "0x55862e8ce028"
-    obj_addr(x[[1]])  # list element contains old memory adress
-    #> [1] "0x55862f23ab80"
-    ```
+```{r}
+x <- list()
+x[[1]] <- x
+```
 
-2. __[Q]{.Q}__: Wrap the two methods for subtracting medians into two functions, then use the bench package to carefully compare their speeds. How does performance change as the number of columns increase?
-    
-   __[A]{.solved}__: First, let's define a function to create some random data and a function to subtract the median from each column.
+__[A]{.solved}__: In this situation Copy-on-modify prevents the creation of a circular list. Let's step through the details as follows:
 
-    ```{r}
-    create_random_df <- function(nrow, ncol) {
-      random_matrix <- matrix(runif(nrow * ncol), nrow = nrow)
-      as.data.frame(random_matrix)
-    }
-    
-    subtract_medians <- function(x, medians){
-      for (i in seq_along(medians)) {
-        x[[i]] <- x[[i]] - medians[[i]]
-      }
-      x
-    }
-    
-    subtract_medians_l <- function(x, medians){
-      x <- as.list(x)
-      x <- subtract_medians(x, medians)
-      as.data.frame(x)
-    }
-    ```
+<!-- can't use tracemem with knitr -->
 
-    <!-- Need to update text and code to use subtract_medians_2 -->
+```{r, eval=FALSE}
+x <- list()  # creates initial object
+obj_addr(x)
+#> [1] "0x55862f23ab80"
+
+tracemem(x)
+#> [1] "<0x55862f23ab80>"
+x[[1]] <- x  # Copy-on-modify triggers new copy
+#> tracemem[0x55862f23ab80 -> 0x55862e8ce028]:
+
+obj_addr(x)       # copied object has new memory address
+#> [1] "0x55862e8ce028"
+obj_addr(x[[1]])  # list element contains old memory adress
+#> [1] "0x55862f23ab80"
+```
+
+__[Q2]{.Q}__: Wrap the two methods for subtracting medians into two functions, then use the bench package to carefully compare their speeds. How does performance change as the number of columns increase?
+
+__[A]{.solved}__: First, let's define a function to create some random data and a function to subtract the median from each column.
+
+```{r}
+create_random_df <- function(nrow, ncol) {
+  random_matrix <- matrix(runif(nrow * ncol), nrow = nrow)
+  as.data.frame(random_matrix)
+}
+
+subtract_medians <- function(x, medians){
+  for (i in seq_along(medians)) {
+    x[[i]] <- x[[i]] - medians[[i]]
+  }
+  x
+}
+
+subtract_medians_l <- function(x, medians){
+  x <- as.list(x)
+  x <- subtract_medians(x, medians)
+  as.data.frame(x)
+}
+```
+
+<!-- Need to update text and code to use subtract_medians_2 -->
+
+We can then profile the performance, by benchmarking `subtract_medians()` on data frame- and list-input for a specified number of columns. The functions should both input and output a data frame, so one is going to do a bit more work.
+
+```{r}
+compare_speed <- function(ncol){
+  df_input   <- create_random_df(nrow = 1e4, ncol = ncol)
+  medians <- vapply(df_input, median, numeric(1))
   
-   We can then profile the performance, by benchmarking `subtract_medians()` on data frame- and list-input for a specified number of columns. The functions should both input and output a data frame, so one is going to do a bit more work.
+  bench::mark(`Data Frame` = subtract_medians(df_input,   medians),
+              List = as.data.frame(subtract_medians(as.list(df_input), medians)))
+}
+```
 
-    ```{r}
-    compare_speed <- function(ncol){
-      df_input   <- create_random_df(nrow = 1e4, ncol = ncol)
-      medians <- vapply(df_input, median, numeric(1))
-      
-      bench::mark(`Data Frame` = subtract_medians(df_input,   medians),
-                  List = as.data.frame(subtract_medians(as.list(df_input), medians)))
-    }
-    ```
+Then bench package allows us to run our benchmark across a grid of parameters easily. We will use it to slowly increase the number of columns containing random data.
 
-   Then bench package allows us to run our benchmark across a grid of parameters easily. We will use it to slowly increase the number of columns containing random data.
+```{r, warning=FALSE, message=FALSE, eval=FALSE}
+results <- bench::press(
+  ncol = c(1, 5, 10, 50, 100, 200, 400, 600, 800, 1000, 1500),
+  compare_speed(ncol)
+)
 
-    ```{r, warning=FALSE, message=FALSE, eval=FALSE}
-    results <- bench::press(
-      ncol = c(1, 5, 10, 50, 100, 200, 400, 600, 800, 1000, 1500),
-      compare_speed(ncol)
-    )
-    
-    library(ggplot2)
-    ggplot(results, aes(ncol, median, col = expression)) +
-      geom_point(size = 2) + 
-      geom_smooth() +
-      labs(x = "Number of Columns of Input Data",
-           y = "Computation Time",
-           color = "Input Data Structure",
-           title = "Benchmark: Median Subtraction")
-    ```
+library(ggplot2)
+ggplot(results, aes(ncol, median, col = expression)) +
+  geom_point(size = 2) + 
+  geom_smooth() +
+  labs(x = "Number of Columns of Input Data",
+       y = "Computation Time",
+       color = "Input Data Structure",
+       title = "Benchmark: Median Subtraction")
+```
 
-    ```{r, echo = FALSE}
-    knitr::include_graphics("images/median_benchmark.png")
-    ```
+```{r, echo = FALSE}
+knitr::include_graphics("images/median_benchmark.png")
+```
 
-   When working directly with the data frame, the execution time grows quadratically with the number of columns in the input data. This is because (e.g.) the first column must be copied `n` times, the second column `n-1` times, and so on. When working with a list, the execution time increases only linearly.
-   
-   Obviously in the long run, linear growth creates shorter run-times, but there is some cost to this strategy - we have to convert between data structures with `as.list()` and `as.data.frame()`. This means that the improved approach doesn't pay off until we get to a data frame that's ~800 columns wide.
+When working directly with the data frame, the execution time grows quadratically with the number of columns in the input data. This is because (e.g.) the first column must be copied `n` times, the second column `n-1` times, and so on. When working with a list, the execution time increases only linearly.
 
-3. __[Q]{.Q}__: What happens if you attempt to use `tracemem()` on an environment?
+Obviously in the long run, linear growth creates shorter run-times, but there is some cost to this strategy - we have to convert between data structures with `as.list()` and `as.data.frame()`. This means that the improved approach doesn't pay off until we get to a data frame that's ~800 columns wide.
 
-   __[A]{.solved}__: `tracemem()` cannot be used to mark and trace environments.
+__[Q3]{.Q}__: What happens if you attempt to use `tracemem()` on an environment?
 
-    ```{r, error=TRUE}
-    x <- new.env()
-    tracemem(x)
-    ```
+__[A]{.solved}__: `tracemem()` cannot be used to mark and trace environments.
 
-   The error occurs because "it is not useful to trace NULL, environments, promises, weak references, or external pointer objects, as these are not duplicated" (see `?tracemem`). Environments are always modified in place.
+```{r, error=TRUE}
+x <- new.env()
+tracemem(x)
+```
+
+The error occurs because "it is not useful to trace NULL, environments, promises, weak references, or external pointer objects, as these are not duplicated" (see `?tracemem`). Environments are always modified in place.

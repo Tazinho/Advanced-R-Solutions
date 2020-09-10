@@ -27,170 +27,170 @@ print_bench_results <- function(bench_df, ...) {
 
 ## Checking for existing solutions
 
-1. __[Q]{.Q}__: What are faster alternatives to `lm`? Which are specifically designed to work with larger datasets?
+__[Q1]{.Q}__: What are faster alternatives to `lm`? Which are specifically designed to work with larger datasets?
 
-   __[A]{.solved}__: The [Cran Task View for High Performance Computing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) provides many recommendations. For this question, we are most interested in the section on "Large memory and out-of-memory data". We could for example give `biglm::biglm()`, `speedglm::speedlm()` or `RcppEigen::fastLm()` a try.
-   
-   For small datasets, there will be only minor performance gains (or even a small cost):
+__[A]{.solved}__: The [Cran Task View for High Performance Computing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) provides many recommendations. For this question, we are most interested in the section on "Large memory and out-of-memory data". We could for example give `biglm::biglm()`, `speedglm::speedlm()` or `RcppEigen::fastLm()` a try.
 
-    ```{r}
-    bench::mark(
-      "lm" = lm(
-        body_mass_g ~ bill_length_mm + species, data = penguins
-        ) %>% coef(),
-      "biglm" = biglm::biglm(
-        body_mass_g ~ bill_length_mm + species, data = penguins
-        ) %>% coef(),
-      "speedglm" = speedglm::speedlm(
-        body_mass_g ~ bill_length_mm + species, data = penguins
-        ) %>% coef(),
-      "fastLm" = RcppEigen::fastLm(
-        body_mass_g ~ bill_length_mm + species, data = penguins
-      ) %>% coef()
-    )
-    ```
-    
-   However for bigger data it will make a difference:
-    
-    ```{r,collapse = TRUE, warning=FALSE}
-    eps <- rnorm(100000)
-    x1 <- rnorm(100000, 5, 3)
-    x2 <- rep(c("a", "b"), 50000)
-    y <- 7 * x1 + (x2 == "a") + eps
-    td <- data.frame(y = y, x1 = x1, x2 = x2, eps = eps)
+For small datasets, there will be only minor performance gains (or even a small cost):
 
-    bench::mark(
-      "lm" = lm(y ~ x1 + x2, data = td) %>% coef(),
-      "biglm" = biglm::biglm(y ~ x1 + x2, data = td) %>% coef(),
-      "speedglm" = speedglm::speedlm(y ~ x1 + x2, data = td) %>% coef(),
-      "fastLm" = RcppEigen::fastLm(y ~ x1 + x2, data = td) %>% coef()
-    )
-    ```
-    
-   For further speed improvements, you could install a linear algebra library optimized for your system (see `?speedglm::speedlm`).
-    
-   > The functions of class 'speedlm' may speed up the fitting of LMs to large data sets. High performances can be obtained especially if R is linked against an optimized BLAS, such as ATLAS.
-    
-2. __[Q]{.Q}__: What package implements a version of `match()` that's faster for repeated lookups? How much faster is it?
-    
-   __[A]{.solved}__: A web search points us to the `{fastmatch}`-package. We compare it to `base::match()` and observe an impressive relative performance gain (up to 35x faster computation).
-    
-    ```{r}
-    set.seed(1)
-    table <- 1L:100000L
-    x <- sample(table, 10000, replace = TRUE)
-    
-    bench::mark(
-      "match" = match(x, table),
-      "fastmatch" = fastmatch::fmatch(x, table),
-      relative = TRUE
-    ) 
-    ```
-    
-3. __[Q]{.Q}__: List four functions (not just those in base R) that convert a string into a date time object. What are their strengths and weaknesses?
-    
-   __[A]{.solved}__: The usual base R way is to use the `as.POSIXct()` generic and create a date time object of class `POSIXct` and type `integer`.
-   
-    ```{r}
-    date_ct <- as.POSIXct("2020-01-01 12:30:25")
-    date_ct
-    ```
-   
-   Under the hood `as.POSIXct()` employs `as.POSIXlt()` for the character conversion. This creates a date time object of class `POSIXlt` and type `list`.
-   
-    ```{r}
-    date_lt <- as.POSIXlt("2020-01-01 12:30:25")
-    date_lt
-    ```
+```{r}
+bench::mark(
+  "lm" = lm(
+    body_mass_g ~ bill_length_mm + species, data = penguins
+  ) %>% coef(),
+  "biglm" = biglm::biglm(
+    body_mass_g ~ bill_length_mm + species, data = penguins
+  ) %>% coef(),
+  "speedglm" = speedglm::speedlm(
+    body_mass_g ~ bill_length_mm + species, data = penguins
+  ) %>% coef(),
+  "fastLm" = RcppEigen::fastLm(
+    body_mass_g ~ bill_length_mm + species, data = penguins
+  ) %>% coef()
+)
+```
 
-   The `POSIXlt` class has the advantage that it carries the individual time components as attributes. This allows to extract the time components via typical list operators.
-    
-    ```{r}
-    attributes(date_lt)
-    date_lt$sec
-    ```
-   
-   However, while `lists` may be practical basic calculations are often faster and require less memory for objects with underlying `integer` type.
-   
-    ```{r}
-    date_lt2 <- rep(date_lt, 10000)
-    date_ct2 <- rep(date_ct, 10000)
-    
-    bench::mark(
-      date_lt2 - date_lt2, 
-      date_ct2 - date_ct2
-    )
-    ```
+However for bigger data it will make a difference:
 
-   Although both date time classes inherit from POSIXt, many functions only dispatch on the first argument and don't account for the possibility of mixed date time object usage. Therefore, better decide for an appropriate date time class, instead of mixing them.
-   
-    ```{r}
-    c(date_lt, date_ct)
-    c(date_ct, date_lt)
-    ```
-    
-   `as.POSIXlt()` in turn uses `strptime()` under the hood, which creates a similar date time object.
-   
-    ```{r}
-    date_str <- strptime("2020-01-01 12:30:25",
-                         format = "%Y-%m-%d %H:%M:%S")
-    identical(date_lt, date_str)
-    ```
+```{r,collapse = TRUE, warning=FALSE}
+eps <- rnorm(100000)
+x1 <- rnorm(100000, 5, 3)
+x2 <- rep(c("a", "b"), 50000)
+y <- 7 * x1 + (x2 == "a") + eps
+td <- data.frame(y = y, x1 = x1, x2 = x2, eps = eps)
 
-   `as.POSIXct()` and `as.POSIXlt()` accept different character inputs by default (e.g. "2001-01-01 12:30", "2001/1/1 12:30"). `strptime()` requires the format argument to be set explicitly, but also offers an increase in performance.
+bench::mark(
+  "lm" = lm(y ~ x1 + x2, data = td) %>% coef(),
+  "biglm" = biglm::biglm(y ~ x1 + x2, data = td) %>% coef(),
+  "speedglm" = speedglm::speedlm(y ~ x1 + x2, data = td) %>% coef(),
+  "fastLm" = RcppEigen::fastLm(y ~ x1 + x2, data = td) %>% coef()
+)
+```
 
-    ```{r}
-    bench::mark(
-      as.POSIXct = as.POSIXct("2020-01-01 12:30:25"),
-      as.POSIXct_format = as.POSIXct("2020-01-01 12:30:25",
-                                     format = "%Y-%m-%d %H:%M:%S"),
-      strptime_fomat = strptime("2020-01-01 12:30:25",
-                                format = "%Y-%m-%d %H:%M:%S")
-    ) %>% 
-      print_bench_results(expression, median)
-    ```
-    
-   A fourth way is to use the converter functions from the `{lubridate}` package, which contains wrapper functions (for the POSIXct approach) with an intuitive syntax. (There is a slight decrease in performance though.)
+For further speed improvements, you could install a linear algebra library optimized for your system (see `?speedglm::speedlm`).
 
-    ```{r}
-    library(lubridate)
-    ymd_hms("2013-07-24 23:55:26")
-    
-    bench::mark(
-      as.POSIXct = as.POSIXct("2013-07-24 23:55:26", tz = "UTC"),
-      ymd_hms = ymd_hms("2013-07-24 23:55:26")
-    ) %>% 
-      print_bench_results(expression, median)
-    ```
-    
-   For additional ways to convert characters into date time objects, have a look at the `{chron}`, the `{anytime}` and the `{fasttime}` packages. The `{chron}` package introduces new classes and stores times as fractions of days in the underlying double type, while it doesn't deal with timezones and daylight savings. The `{anytime}` package aims to convert "Anything to POSIXct or Date". The `{fasttime}` package contains only one function (`fastPOSIXct()`).
+> The functions of class 'speedlm' may speed up the fitting of LMs to large data sets. High performances can be obtained especially if R is linked against an optimized BLAS, such as ATLAS.
 
-4. __[Q]{.Q}__: Which packages provide the ability to compute a rolling mean?
-    
-   __[A]{.solved}__: A rolling mean can be a useful statistic to smooth time-series and other types of data. The size of the rolling window will determine the amount of smoothing and the number of missing values at the start or end of the data (e.g. because the rolling mean cannot be computed for a single data point).
-   
-   The general functionality can be found in multiple packages, which vary in the speed and flexibility of the computation:
-   
-    ```{r}
-    x <- 1:10
-    zoo::rollmean(x, 2, na.pad = TRUE, align = "right")
-    
-    bench::mark(
-      zoo::rollmean(x, 2, na.pad = TRUE, align = "right"),
-      zoo::rollapply(x, 2, mean, fill = NA, align = "right"),
-      tibbletime::rollify(mean, window = 2)(x),
-      TTR::SMA(x, 2),
-      caTools::runmean(x, k = 2, endrule = "NA"),
-      data.table::frollmean(x, 2),
-      RcppRoll::roll_mean(x, n = 2, fill = NA, align = "right")
-    )
-    ```
+__[Q2]{.Q}__: What package implements a version of `match()` that's faster for repeated lookups? How much faster is it?
 
-   You may also take a look at an extensive example in the [textbook](http://adv-r.had.co.nz/Functionals.html), which demonstrates how a rolling mean function can be created.
+__[A]{.solved}__: A web search points us to the `{fastmatch}`-package. We compare it to `base::match()` and observe an impressive relative performance gain (up to 35x faster computation).
 
-5. __[Q]{.Q}__: What are the alternatives to `optim()`?
-    
-   __[A]{.solved}__: The appropriate choice highly depends on the type of optimization you intend to do. The [Taskview on Optimization](https://cran.r-project.org/web/views/Optimization.html) can serve as a useful reference. Here a couple of examples:
+```{r}
+set.seed(1)
+table <- 1L:100000L
+x <- sample(table, 10000, replace = TRUE)
+
+bench::mark(
+  "match" = match(x, table),
+  "fastmatch" = fastmatch::fmatch(x, table),
+  relative = TRUE
+) 
+```
+
+__[Q3]{.Q}__: List four functions (not just those in base R) that convert a string into a date time object. What are their strengths and weaknesses?
+
+__[A]{.solved}__: The usual base R way is to use the `as.POSIXct()` generic and create a date time object of class `POSIXct` and type `integer`.
+
+```{r}
+date_ct <- as.POSIXct("2020-01-01 12:30:25")
+date_ct
+```
+
+Under the hood `as.POSIXct()` employs `as.POSIXlt()` for the character conversion. This creates a date time object of class `POSIXlt` and type `list`.
+
+```{r}
+date_lt <- as.POSIXlt("2020-01-01 12:30:25")
+date_lt
+```
+
+The `POSIXlt` class has the advantage that it carries the individual time components as attributes. This allows to extract the time components via typical list operators.
+
+```{r}
+attributes(date_lt)
+date_lt$sec
+```
+
+However, while `lists` may be practical basic calculations are often faster and require less memory for objects with underlying `integer` type.
+
+```{r}
+date_lt2 <- rep(date_lt, 10000)
+date_ct2 <- rep(date_ct, 10000)
+
+bench::mark(
+  date_lt2 - date_lt2, 
+  date_ct2 - date_ct2
+)
+```
+
+Although both date time classes inherit from POSIXt, many functions only dispatch on the first argument and don't account for the possibility of mixed date time object usage. Therefore, better decide for an appropriate date time class, instead of mixing them.
+
+```{r}
+c(date_lt, date_ct)
+c(date_ct, date_lt)
+```
+
+`as.POSIXlt()` in turn uses `strptime()` under the hood, which creates a similar date time object.
+
+```{r}
+date_str <- strptime("2020-01-01 12:30:25",
+                     format = "%Y-%m-%d %H:%M:%S")
+identical(date_lt, date_str)
+```
+
+`as.POSIXct()` and `as.POSIXlt()` accept different character inputs by default (e.g. "2001-01-01 12:30", "2001/1/1 12:30"). `strptime()` requires the format argument to be set explicitly, but also offers an increase in performance.
+
+```{r}
+bench::mark(
+  as.POSIXct = as.POSIXct("2020-01-01 12:30:25"),
+  as.POSIXct_format = as.POSIXct("2020-01-01 12:30:25",
+                                 format = "%Y-%m-%d %H:%M:%S"),
+  strptime_fomat = strptime("2020-01-01 12:30:25",
+                            format = "%Y-%m-%d %H:%M:%S")
+) %>% 
+  print_bench_results(expression, median)
+```
+
+A fourth way is to use the converter functions from the `{lubridate}` package, which contains wrapper functions (for the POSIXct approach) with an intuitive syntax. (There is a slight decrease in performance though.)
+
+```{r}
+library(lubridate)
+ymd_hms("2013-07-24 23:55:26")
+
+bench::mark(
+  as.POSIXct = as.POSIXct("2013-07-24 23:55:26", tz = "UTC"),
+  ymd_hms = ymd_hms("2013-07-24 23:55:26")
+) %>% 
+  print_bench_results(expression, median)
+```
+
+For additional ways to convert characters into date time objects, have a look at the `{chron}`, the `{anytime}` and the `{fasttime}` packages. The `{chron}` package introduces new classes and stores times as fractions of days in the underlying double type, while it doesn't deal with timezones and daylight savings. The `{anytime}` package aims to convert "Anything to POSIXct or Date". The `{fasttime}` package contains only one function (`fastPOSIXct()`).
+
+__[Q4]{.Q}__: Which packages provide the ability to compute a rolling mean?
+
+__[A]{.solved}__: A rolling mean can be a useful statistic to smooth time-series and other types of data. The size of the rolling window will determine the amount of smoothing and the number of missing values at the start or end of the data (e.g. because the rolling mean cannot be computed for a single data point).
+
+The general functionality can be found in multiple packages, which vary in the speed and flexibility of the computation:
+
+```{r}
+x <- 1:10
+zoo::rollmean(x, 2, na.pad = TRUE, align = "right")
+
+bench::mark(
+  zoo::rollmean(x, 2, na.pad = TRUE, align = "right"),
+  zoo::rollapply(x, 2, mean, fill = NA, align = "right"),
+  tibbletime::rollify(mean, window = 2)(x),
+  TTR::SMA(x, 2),
+  caTools::runmean(x, k = 2, endrule = "NA"),
+  data.table::frollmean(x, 2),
+  RcppRoll::roll_mean(x, n = 2, fill = NA, align = "right")
+)
+```
+
+You may also take a look at an extensive example in the [textbook](http://adv-r.had.co.nz/Functionals.html), which demonstrates how a rolling mean function can be created.
+
+__[Q5]{.Q}__: What are the alternatives to `optim()`?
+
+__[A]{.solved}__: The appropriate choice highly depends on the type of optimization you intend to do. The [Taskview on Optimization](https://cran.r-project.org/web/views/Optimization.html) can serve as a useful reference. Here a couple of examples:
 
 - `{optimx}` extends the `optim()` function with the same syntax but more 'method' choices.
 - `{RcppNumerical}` wraps several open source libraries for numerical computing (written in C++) and integrates them with R via `{Rcpp}`.
@@ -199,186 +199,186 @@ print_bench_results <- function(bench_df, ...) {
 
 ## Doing as little as possible
 
-1. __[Q]{.Q}__: What's the difference between `rowSums()` and `.rowSums()`?
-    
-   __[A]{.solved}__: When we inspect the source code of the user-facing `rowSums()`, we see that it is designed as a wrapper around `.rowSums()` with some input validation, conversions and handling of a special case (complex numbers).
-    
-    ```{r}
-    rowSums
-    ```
+__[Q1]{.Q}__: What's the difference between `rowSums()` and `.rowSums()`?
 
-  `.rowSums()` calls an internal function, which is build into the R interpreter. These compiled functions can be very fast.
-    
-    ```{r}
-    .rowSums
-    ```
-    
-   If the convenient features of `rowSums()` are not needed, then using `.rowSums()` will be more performant.
+__[A]{.solved}__: When we inspect the source code of the user-facing `rowSums()`, we see that it is designed as a wrapper around `.rowSums()` with some input validation, conversions and handling of a special case (complex numbers).
 
-    ```{r}
-    m <- matrix(rnorm(1e8), nrow = 10000)
-    
-    bench::mark(rowSums(m),
-                .rowSums(m, 10000, 10000))
-    ```
+```{r}
+rowSums
+```
 
-2. __[Q]{.Q}__: Make a faster version of `chisq.test()` that only computes the chi-square test statistic when the input is two numeric vectors with no missing values. You can try simplifying `chisq.test()` or by coding from the [mathematical definition](http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test).
-    
-   __[A]{.solved}__: We aim to speed up our reimplementation of `chisq.test()` by *doing less*.
-    
-    ```{r}
-    chisq.test2 <- function(x, y){
-      m <- rbind(x, y)
-      margin1 <- rowSums(m)
-      margin2 <- colSums(m)
-      n <- sum(m)
-      me <- tcrossprod(margin1, margin2) / n
-      
-      x_stat = sum((m - me)^2 / me)
-      df <- (length(margin1) - 1) * (length(margin2) - 1)
-      p.value <- pchisq(x_stat, df = df, lower.tail = FALSE)
-      
-      list(x_stat = x_stat, df = df, p.value = p.value)
-    }
-    ```
-    
-   We check if our new implementation returns the same results and benchmark it afterwards.
-    
-    ```{r}
-    a <- 21:25
-    b <- seq(21, 29, 2)
-    m <- cbind(a, b)
-    
-    chisq.test(m) %>% print(digits=5)
-    chisq.test2(a, b)
+`.rowSums()` calls an internal function, which is build into the R interpreter. These compiled functions can be very fast.
 
-    bench::mark(
-      chisq.test(m),
-      chisq.test2(a, b),
-      check = FALSE
-    )
-    ```
+```{r}
+.rowSums
+```
 
-3. __[Q]{.Q}__: Can you make a faster version of `table()` for the case of an input of two integer vectors with no missing values? Can you use it to speed up your chi-square test?
-    
-   __[A]{.solved}__: When analysing the source code of `table()` we aim to omit everything unnecessary and extract the main building blocks. We observe that `table()` is powered by `tabulate()` which is a very fast counting function. This leaves us with the the challenge to compute the preprocessing as performant as possible. 
-   
-   First, we calculate the dimensions and names of the output table. Then we use `fastmatch::fmatch()` to map the elements of each vector to their position within the vector itself (i.e. the smallest value is mapped to `1L`, the second smallest value to `2L`, etc.). Following the logic within `table()` we combine and shift these values to create a mapping of the integer pairs in our data to the index of the output table. After applying these lookups `tabulate()` counts the values and returns an integer vector with counts for each position in our the table. As a last step, we reuse the code from `table()` to assign the correct dimension and class.
+If the convenient features of `rowSums()` are not needed, then using `.rowSums()` will be more performant.
 
-    ```{r}
-    table2 <- function(a, b){
-    
-      a_s <- sort(unique(a))
-      b_s <- sort(unique(b))
+```{r}
+m <- matrix(rnorm(1e8), nrow = 10000)
+
+bench::mark(rowSums(m),
+            .rowSums(m, 10000, 10000))
+```
+
+__[Q2]{.Q}__: Make a faster version of `chisq.test()` that only computes the chi-square test statistic when the input is two numeric vectors with no missing values. You can try simplifying `chisq.test()` or by coding from the [mathematical definition](http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test).
+
+__[A]{.solved}__: We aim to speed up our reimplementation of `chisq.test()` by *doing less*.
+
+```{r}
+chisq.test2 <- function(x, y){
+  m <- rbind(x, y)
+  margin1 <- rowSums(m)
+  margin2 <- colSums(m)
+  n <- sum(m)
+  me <- tcrossprod(margin1, margin2) / n
   
-      a_l <- length(a_s)
-      b_l <- length(b_s)
+  x_stat = sum((m - me)^2 / me)
+  df <- (length(margin1) - 1) * (length(margin2) - 1)
+  p.value <- pchisq(x_stat, df = df, lower.tail = FALSE)
   
-      dims <- c(a_l, b_l)
-      pr <- a_l * b_l
-      dn <- list(a = a_s, b = b_s)
+  list(x_stat = x_stat, df = df, p.value = p.value)
+}
+```
 
-      bin <- fastmatch::fmatch(a, a_s) +
-        a_l * fastmatch::fmatch(b, b_s) - a_l
-      y <- tabulate(bin, pr)
-      
-      y <- array(y, dim = dims, dimnames = dn)
-      class(y) <- "table"
-      
-      y
-    }
-       
-    a <- sample(100, 10000, TRUE)
-    b <- sample(100, 10000, TRUE)
-    
-    bench::mark(table(a, b),
-                table2(a, b),
-                relative = TRUE)
-    ```
+We check if our new implementation returns the same results and benchmark it afterwards.
 
-   Since we didn't use `table()` in our `chisq.test2()`-implementation, we cannot benefit from the slight performance gain from `table2()`.
+```{r}
+a <- 21:25
+b <- seq(21, 29, 2)
+m <- cbind(a, b)
+
+chisq.test(m) %>% print(digits=5)
+chisq.test2(a, b)
+
+bench::mark(
+  chisq.test(m),
+  chisq.test2(a, b),
+  check = FALSE
+)
+```
+
+__[Q3]{.Q}__: Can you make a faster version of `table()` for the case of an input of two integer vectors with no missing values? Can you use it to speed up your chi-square test?
+
+__[A]{.solved}__: When analysing the source code of `table()` we aim to omit everything unnecessary and extract the main building blocks. We observe that `table()` is powered by `tabulate()` which is a very fast counting function. This leaves us with the the challenge to compute the preprocessing as performant as possible.
+
+First, we calculate the dimensions and names of the output table. Then we use `fastmatch::fmatch()` to map the elements of each vector to their position within the vector itself (i.e. the smallest value is mapped to `1L`, the second smallest value to `2L`, etc.). Following the logic within `table()` we combine and shift these values to create a mapping of the integer pairs in our data to the index of the output table. After applying these lookups `tabulate()` counts the values and returns an integer vector with counts for each position in our the table. As a last step, we reuse the code from `table()` to assign the correct dimension and class.
+
+```{r}
+table2 <- function(a, b){
+  
+  a_s <- sort(unique(a))
+  b_s <- sort(unique(b))
+  
+  a_l <- length(a_s)
+  b_l <- length(b_s)
+  
+  dims <- c(a_l, b_l)
+  pr <- a_l * b_l
+  dn <- list(a = a_s, b = b_s)
+  
+  bin <- fastmatch::fmatch(a, a_s) +
+    a_l * fastmatch::fmatch(b, b_s) - a_l
+  y <- tabulate(bin, pr)
+  
+  y <- array(y, dim = dims, dimnames = dn)
+  class(y) <- "table"
+  
+  y
+}
+
+a <- sample(100, 10000, TRUE)
+b <- sample(100, 10000, TRUE)
+
+bench::mark(table(a, b),
+            table2(a, b),
+            relative = TRUE)
+```
+
+Since we didn't use `table()` in our `chisq.test2()`-implementation, we cannot benefit from the slight performance gain from `table2()`.
 
 ## Vectorise
 
-1. __[Q]{.Q}__: The density functions, e.g., `dnorm()`, have a common interface. Which arguments are vectorised over? What does `rnorm(10, mean = 10:1)` do?
-    
-   __[A]{.solved}__: We can get an overview of the interface of these functions via `?dnorm`:
-    
-    ```{r, eval = FALSE}
-    dnorm(x, mean = 0, sd = 1, log = FALSE)
-    pnorm(q, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
-    qnorm(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
-    rnorm(n, mean = 0, sd = 1)
-    ```
-    
-   These functions are vectorised over their numeric arguments, which includes the first argument (`x`, `q`, `p`, `n`) as well as `mean` and `sd`.
-   
-   `rnorm(10, mean = 10:1)` generates ten random numbers from different normal distributions. These normal distributions differ in their means. The first has mean 10, the second mean 9, the third mean 8 and so on.
+__[Q1]{.Q}__: The density functions, e.g., `dnorm()`, have a common interface. Which arguments are vectorised over? What does `rnorm(10, mean = 10:1)` do?
 
-2. __[Q]{.Q}__: Compare the speed of `apply(x, 1, sum)` with `rowSums(x)` for varying sizes of `x`.
-    
-   __[A]{.solved}__: We compare the two functions for square matrices of increasing size
-    
-    ```{r, warning=FALSE}
-    dimensions <- c(1, 10, 100, 1000, 5000, 10000)
-    matrices <- lapply(dimensions,
-                       function(x) tcrossprod(rnorm(x), rnorm(x)))
-    names(matrices) <- dimensions
+__[A]{.solved}__: We can get an overview of the interface of these functions via `?dnorm`:
 
-        
-    bench_res <- matrices %>% 
-      purrr::map_dfr(
-        ~ bench::mark(
-          rowSums(.),
-          apply(., 1, sum)
-        ) %>% 
-          purrr::modify_at("expression", as.character),
-        .id = "dimension"
-      )
+```{r, eval = FALSE}
+dnorm(x, mean = 0, sd = 1, log = FALSE)
+pnorm(q, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
+qnorm(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
+rnorm(n, mean = 0, sd = 1)
+```
 
-    library(ggplot2)
-    bench_res %>% 
-      purrr::modify_at("dimension", factor, levels = dimensions) %>% 
-      ggplot(aes(dimension, median, color = expression, group = expression)) +
-      geom_point() +
-      geom_line()
-    ```
+These functions are vectorised over their numeric arguments, which includes the first argument (`x`, `q`, `p`, `n`) as well as `mean` and `sd`.
 
-   We can see, that the difference in performance is negligible for small matrices, but becomes more and more relevant as the size of the data increases. `apply()` is a very versatile tool, but it's not "vectorised for performance" and not as optimized as `rowSums()`.
+`rnorm(10, mean = 10:1)` generates ten random numbers from different normal distributions. These normal distributions differ in their means. The first has mean 10, the second mean 9, the third mean 8 and so on.
 
-3. __[Q]{.Q}__: How can you use `crossprod()` to compute a weighted sum? How much faster is it than the naive `sum(x * w)`?
-    
-   __[A]{.solved}__: We can hand the vectors to `crossprod()`, which converts them to row- and column-vectors and then multiplies these. The result is the dot product, which corresponds to a weighted sum.
-    
-    ```{r}
-    x <- rnorm(10)
-    w <- rnorm(10)
-    all.equal(sum(x * w),
-              as.numeric(crossprod(x, w)))
-    ```
-    
-   A benchmark of both approaches for different vector lengths indicates that the `crossprod()` variant is almost twice as fast as `sum()`.
+__[Q2]{.Q}__: Compare the speed of `apply(x, 1, sum)` with `rowSums(x)` for varying sizes of `x`.
 
-    ```{r}
-    dimensions <- c(1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 0.5e7, 1e7)
-    x_vector <- lapply(dimensions, rnorm)
-    w_vector <- lapply(dimensions, rnorm)
+__[A]{.solved}__: We compare the two functions for square matrices of increasing size
 
-    
-    bench_res <- purrr::map2_dfr(
-      x_vector, w_vector,
-      ~ bench::mark(
-        sum(.x * .y),
-        crossprod(.x, .y)[[1]]
-      ) %>% 
-        purrr::modify_at("expression", as.character)
+```{r, warning=FALSE}
+dimensions <- c(1, 10, 100, 1000, 5000, 10000)
+matrices <- lapply(dimensions,
+                   function(x) tcrossprod(rnorm(x), rnorm(x)))
+names(matrices) <- dimensions
+
+
+bench_res <- matrices %>% 
+  purrr::map_dfr(
+    ~ bench::mark(
+      rowSums(.),
+      apply(., 1, sum)
     ) %>% 
-      dplyr::mutate(dimension = factor(rep(dimensions, each = 2)))
+      purrr::modify_at("expression", as.character),
+    .id = "dimension"
+  )
 
-    library(ggplot2)
-    bench_res %>% 
-      ggplot(aes(dimension, median, color = expression)) +
-      geom_point() +
-      geom_line(aes(group = expression)) +
-      theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
-    ```
+library(ggplot2)
+bench_res %>% 
+  purrr::modify_at("dimension", factor, levels = dimensions) %>% 
+  ggplot(aes(dimension, median, color = expression, group = expression)) +
+  geom_point() +
+  geom_line()
+```
+
+We can see, that the difference in performance is negligible for small matrices, but becomes more and more relevant as the size of the data increases. `apply()` is a very versatile tool, but it's not "vectorised for performance" and not as optimized as `rowSums()`.
+
+__[Q3]{.Q}__: How can you use `crossprod()` to compute a weighted sum? How much faster is it than the naive `sum(x * w)`?
+
+__[A]{.solved}__: We can hand the vectors to `crossprod()`, which converts them to row- and column-vectors and then multiplies these. The result is the dot product, which corresponds to a weighted sum.
+
+```{r}
+x <- rnorm(10)
+w <- rnorm(10)
+all.equal(sum(x * w),
+          as.numeric(crossprod(x, w)))
+```
+
+A benchmark of both approaches for different vector lengths indicates that the `crossprod()` variant is almost twice as fast as `sum()`.
+
+```{r}
+dimensions <- c(1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 0.5e7, 1e7)
+x_vector <- lapply(dimensions, rnorm)
+w_vector <- lapply(dimensions, rnorm)
+
+
+bench_res <- purrr::map2_dfr(
+  x_vector, w_vector,
+  ~ bench::mark(
+    sum(.x * .y),
+    crossprod(.x, .y)[[1]]
+  ) %>% 
+    purrr::modify_at("expression", as.character)
+) %>% 
+  dplyr::mutate(dimension = factor(rep(dimensions, each = 2)))
+
+library(ggplot2)
+bench_res %>% 
+  ggplot(aes(dimension, median, color = expression)) +
+  geom_point() +
+  geom_line(aes(group = expression)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
+```

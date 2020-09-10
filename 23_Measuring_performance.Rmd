@@ -4,133 +4,132 @@ source("common.R")
 
 # Measuring performance
 
-    ```{r, include=FALSE}
-    library(magrittr)
-    ```
+```{r, include=FALSE}
+library(magrittr)
+```
 
 ## Profiling
 
-1. __[Q]{.Q}__: Profile the following function with `torture = TRUE`. What is surprising? Read the source code of `rm()` to figure out what's going on.
+__[Q1]{.Q}__: Profile the following function with `torture = TRUE`. What is surprising? Read the source code of `rm()` to figure out what's going on.
 
-    ```{r}
-    f <- function(n = 1e5) {
-      x <- rep(1, n)
-      rm(x)
-    }
-    ```
+```{r}
+f <- function(n = 1e5) {
+  x <- rep(1, n)
+  rm(x)
+}
+```
 
-   __[A]{.started}__: We expect `f()` to create a vector (`x`) of length `n`, which is then removed. When we profile this function the function executes very fast, too fast for meaningful profiling even.
-   
+__[A]{.started}__: We expect `f()` to create a vector (`x`) of length `n`, which is then removed. When we profile this function the function executes very fast, too fast for meaningful profiling even.
 
-    ```{r, error=TRUE}
-    profvis::profvis(f())
-    ```
 
-   Setting `torture = TRUE` triggers garbage collection after every memory allocation call, which may be useful for more exact memory profiling.
+```{r, error=TRUE}
+profvis::profvis(f())
+```
 
-    ```{r, eval=FALSE}
-    profvis::profvis(f(), torture = TRUE)
-    ```
+Setting `torture = TRUE` triggers garbage collection after every memory allocation call, which may be useful for more exact memory profiling.
 
-   Surprisingly profiling `f()` like this takes a very long time. What could be the reason?
-   
-   We follow the hint in the question and inspect the source code of `rm()`:
-   
-    ```{r,eval=FALSE}
-    function (..., list = character(), pos = -1,
-              envir = as.environment(pos), 
-              inherits = FALSE) 
-    {
-      dots <- match.call(expand.dots = FALSE)$...
-      if (
-        length(dots) && !all(
-          vapply(dots, function(x) is.symbol(x) || 
-                 is.character(x), NA, USE.NAMES = FALSE)
-        )
-      ) 
-        stop("... must contain names or character strings")
-      names <- vapply(dots, as.character, "")
-      if (length(names) == 0L) 
-        names <- character()
-      list <- .Primitive("c")(list, names)
-      .Internal(remove(list, envir, inherits))
-    }
-    ```
-   
-  We see, that rm is ultimately calls `remove` in the caller environment (`pos = -1`).
-  
- <!-- HB: But it's still not really clear to me, what is happening here... -->
- <!-- @HW Please clarify/help :) -->
+```{r, eval=FALSE}
+profvis::profvis(f(), torture = TRUE)
+```
+
+Surprisingly profiling `f()` like this takes a very long time. What could be the reason?
+
+We follow the hint in the question and inspect the source code of `rm()`:
+
+```{r,eval=FALSE}
+function (..., list = character(), pos = -1,
+          envir = as.environment(pos), 
+          inherits = FALSE) 
+{
+  dots <- match.call(expand.dots = FALSE)$...
+  if (
+    length(dots) && !all(
+      vapply(dots, function(x) is.symbol(x) || 
+             is.character(x), NA, USE.NAMES = FALSE)
+    )
+  ) 
+    stop("... must contain names or character strings")
+  names <- vapply(dots, as.character, "")
+  if (length(names) == 0L) 
+    names <- character()
+  list <- .Primitive("c")(list, names)
+  .Internal(remove(list, envir, inherits))
+}
+```
+
+We see, that rm is ultimately calls `remove` in the caller environment (`pos = -1`).
+
+<!-- HB: But it's still not really clear to me, what is happening here... -->
+<!-- @HW Please clarify/help :) -->
 
 ## Microbenchmarking
 
-1. __[Q]{.Q}__: Instead of using `bench::mark()`, you could use the built-in function `system.time()`. But `system.time()` is much less precise, so you'll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.
+__[Q1]{.Q}__: Instead of using `bench::mark()`, you could use the built-in function `system.time()`. But `system.time()` is much less precise, so you'll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.
 
-    ```{r, eval = FALSE}
-    n <- 1e6
-    system.time(for (i in 1:n) sqrt(x)) / n
-    system.time(for (i in 1:n) x ^ 0.5) / n
-    ```
-    
-   How do the estimates from `system.time()` compare to those from `bench::mark()`? Why are they different?
+```{r, eval = FALSE}
+n <- 1e6
+system.time(for (i in 1:n) sqrt(x)) / n
+system.time(for (i in 1:n) x ^ 0.5) / n
+```
 
-   __[A]{solved}__: We first microbenchmark these two expressions using `bench::mark()` and observe that the mean is not reported (as it is generally more affected by outliers).
+How do the estimates from `system.time()` compare to those from `bench::mark()`? Why are they different?
 
-    ```{r}
-    n <- 1e6
-    x <- runif(100)
-    
-    bench_df <- bench::mark(
-      sqrt(x), 
-      x ^ 0.5,
-      iterations = n
-    )
-    ```
+__[A]{solved}__: We first microbenchmark these two expressions using `bench::mark()` and observe that the mean is not reported (as it is generally more affected by outliers).
 
-  We need to access the raw data, so we can compare the results of both benchmarking approaches.
+```{r}
+n <- 1e6
+x <- runif(100)
 
-    ```{r}
-    t1_bench <- mean(unlist(bench_df[1, "time"]))
-    t2_bench <- mean(unlist(bench_df[2, "time"]))
-    
-    t1_systime <- system.time(for (i in 1:n) sqrt(x)) / n
-    t2_systime <- system.time(for (i in 1:n) x ^ 0.5) / n
-    ```
+bench_df <- bench::mark(
+  sqrt(x), 
+  x ^ 0.5,
+  iterations = n
+)
+```
 
-   We see, that both approaches get the order of magnitude right. We assume, that the `bench`-results may be a little more accurate, because of its high precision timer. There may also be a tiny overhead cost introduced by the for loop in the `system.time`-approach.
+We need to access the raw data, so we can compare the results of both benchmarking approaches.
 
-    ```{r}
-    # Compare the results
-    t1_systime["elapsed"]
-    t1_bench
+```{r}
+t1_bench <- mean(unlist(bench_df[1, "time"]))
+t2_bench <- mean(unlist(bench_df[2, "time"]))
 
-    t2_systime["elapsed"]
-    t2_bench
-    ```
+t1_systime <- system.time(for (i in 1:n) sqrt(x)) / n
+t2_systime <- system.time(for (i in 1:n) x ^ 0.5) / n
+```
 
-   Side Note: take a look at `?proc.time` if you want to learn about the differences between "user", "system" and "elapsed" time.
-   
-2. __[Q]{.Q}__: Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.
+We see, that both approaches get the order of magnitude right. We assume, that the `bench`-results may be a little more accurate, because of its high precision timer. There may also be a tiny overhead cost introduced by the for loop in the `system.time`-approach.
 
-    ```{r, eval = FALSE}
-    x ^ (1 / 2)
-    exp(log(x) / 2)
-    ```
+```{r}
+# Compare the results
+t1_systime["elapsed"]
+t1_bench
 
-   __[A]{.started}__: To compare these approaches, we'll `bench::mark` the *relative execution time*, with the fastest expression standardized to 1.
+t2_systime["elapsed"]
+t2_bench
+```
 
-    ```{r}
-    x <- runif(100)
-    
-    bench::mark(sqrt(x),
-                x ^ 0.5,
-                x ^ (1 / 2),
-                exp(log(x) / 2),
-                relative = TRUE) %>% 
-      dplyr::select(expression, rel_speed = median) %>% 
-      purrr::modify_at("expression", as.character) %>% 
-      dplyr::arrange(rel_speed)
-    ```
+Side Note: take a look at `?proc.time` if you want to learn about the differences between "user", "system" and "elapsed" time.
 
-   As expected we see, that idiomatic primitive function `sqrt()` is the fastest. The approach `exp(log(x) / 2)` which builds on two primitive functions is second, even though already considerably slower. The other calculations are even slower: `x ^ 0.5` is (slightly) faster than `x ^ (1 / 2)`, because `0.5` requires less computation than `(1 / 2)` and everything stays the same.
-   
+__[Q2]{.Q}__: Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.
+
+```{r, eval = FALSE}
+x ^ (1 / 2)
+exp(log(x) / 2)
+```
+
+__[A]{.started}__: To compare these approaches, we'll `bench::mark` the *relative execution time*, with the fastest expression standardized to 1.
+
+```{r}
+x <- runif(100)
+
+bench::mark(sqrt(x),
+            x ^ 0.5,
+            x ^ (1 / 2),
+            exp(log(x) / 2),
+            relative = TRUE) %>% 
+  dplyr::select(expression, rel_speed = median) %>% 
+  purrr::modify_at("expression", as.character) %>% 
+  dplyr::arrange(rel_speed)
+```
+
+As expected we see, that idiomatic primitive function `sqrt()` is the fastest. The approach `exp(log(x) / 2)` which builds on two primitive functions is second, even though already considerably slower. The other calculations are even slower: `x ^ 0.5` is (slightly) faster than `x ^ (1 / 2)`, because `0.5` requires less computation than `(1 / 2)` and everything stays the same.

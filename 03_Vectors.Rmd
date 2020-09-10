@@ -6,347 +6,347 @@ source("common.R")
 
 ## Atomic vectors
 
-1. __[Q]{.Q}__: How do you create scalars of type raw and complex? (See `?raw` and `?complex`)
-   
-   __[A]{.solved}__: In R scalars are represented as vectors of length one. However, there is no way to create a literal raw scalar directly; you have to create a vector first. Then you can easily create one from numeric or character values.
-  
-    ```{r}
-    as.raw(42)
-    charToRaw("A")
-    ```
-  
-   For complex numbers real and imaginary parts may be provided directly to the `complex()` constructor.
-  
-    ```{r}
-    complex(length.out = 1, real = 1, imaginary = 1)
-    ```
+__[Q1]{.Q}__: How do you create scalars of type raw and complex? (See `?raw` and `?complex`)
 
-2. __[Q]{.Q}__: Test your knowledge of vector coercion rules by predicting the output of the following uses of `c()`:
+__[A]{.solved}__: In R scalars are represented as vectors of length one. However, there is no way to create a literal raw scalar directly; you have to create a vector first. Then you can easily create one from numeric or character values.
 
-    ```{r, eval=FALSE}
-    c(1, FALSE)      # will be coerced to double    -> 1 0
-    c("a", 1)        # will be coerced to character -> "a" "1"
-    c(TRUE, 1L)      # will be coerced to integer   -> 1 1
-    ```
+```{r}
+as.raw(42)
+charToRaw("A")
+```
 
-3. __[Q]{.Q}__: Why is `1 == "1"` true? Why is `-1 < FALSE` true? Why is `"one" < 2` false?
+For complex numbers real and imaginary parts may be provided directly to the `complex()` constructor.
 
-   __[A]{.solved}__: These comparisons are carried out by operator-functions, which coerce their arguments to a common type. In the examples above these cases will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` turns into `"2"` (and numerals precede letters in the lexicographic order (may depend on locale)).
+```{r}
+complex(length.out = 1, real = 1, imaginary = 1)
+```
 
-4. __[Q]{.Q}__: Why is the default missing value, `NA`, a logical vector? What's special about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)
-   
-   __[A]{.solved}__: The presence of missing values shouldn´t affect the type of an object. Recall that there is a type-hierarchy for coercion from character >> double >> integer >> logical. When combining `NA`s  with other atomic types, the `NA`s will be coerced to integer (`NA_integer_`), double (`NA_real_`) or character (`NA_character_`) and not the other way round.  If `NA` was a character and added to a set of other values all of these would be coerced to character as well.
+__[Q2]{.Q}__: Test your knowledge of vector coercion rules by predicting the output of the following uses of `c()`:
 
-5. __[Q]{.Q}__: Precisely what do `is.atomic()`, `is.numeric()`, and `is.vector()` test for?
-   
-   __[A]{.solved}__: The documentation states that:
-   - `is.atomic()` tests if an object is an atomic vector (as defined in Advanced R) or is `NULL` (!).
-   - `is.numeric()` tests if an object has type integer or double and is not of class `"factor"`, `"Date"`, `"POSIXt"` or `"difftime"`.
-   - `is.vector()` tests if an object is vector (as defined in Advanced R) and has no attributes, apart from names.
+```{r, eval=FALSE}
+c(1, FALSE)      # will be coerced to double    -> 1 0
+c("a", 1)        # will be coerced to character -> "a" "1"
+c(TRUE, 1L)      # will be coerced to integer   -> 1 1
+```
+
+__[Q3]{.Q}__: Why is `1 == "1"` true? Why is `-1 < FALSE` true? Why is `"one" < 2` false?
+
+__[A]{.solved}__: These comparisons are carried out by operator-functions, which coerce their arguments to a common type. In the examples above these cases will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` turns into `"2"` (and numerals precede letters in the lexicographic order (may depend on locale)).
+
+__[Q4]{.Q}__: Why is the default missing value, `NA`, a logical vector? What's special about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)
+
+__[A]{.solved}__: The presence of missing values shouldn't affect the type of an object. Recall that there is a type-hierarchy for coercion from character >> double >> integer >> logical. When combining `NA`s  with other atomic types, the `NA`s will be coerced to integer (`NA_integer_`), double (`NA_real_`) or character (`NA_character_`) and not the other way round.  If `NA` was a character and added to a set of other values all of these would be coerced to character as well.
+
+__[Q5]{.Q}__: Precisely what do `is.atomic()`, `is.numeric()`, and `is.vector()` test for?
+
+__[A]{.solved}__: The documentation states that:
+- `is.atomic()` tests if an object is an atomic vector (as defined in Advanced R) or is `NULL` (!).
+- `is.numeric()` tests if an object has type integer or double and is not of class `"factor"`, `"Date"`, `"POSIXt"` or `"difftime"`.
+- `is.vector()` tests if an object is vector (as defined in Advanced R) and has no attributes, apart from names.
 
 ## Attributes
 
-1. __[Q]{.Q}__: How is `setNames()` implemented? How is `unname()` implemented? Read the source code.
-   
-   __[A]{.solved}__: `setNames()` is implemented as:
-   
-    ```{r, eval = FALSE}
-    setNames <- function (object = nm, nm){
-      names(object) <- nm
-      object
-    }
-    ```
-   
-   Because the data argument comes first `setNames()` also works well with the magrittr-pipe operator. When no first argument is given, the result is a named vector (this is rather untypical as required arguments usually come first):
-   
-    ```{r}
-    setNames( , c("a", "b", "c"))
-    ```
-   
-   `unname()` is implemented in the following way:
-   
-    ```{r, eval = FALSE}
-    unname <- function (obj, force = FALSE){
-      if (!is.null(names(obj))) 
-        names(obj) <- NULL
-      if (!is.null(dimnames(obj)) && (force || !is.data.frame(obj))) 
-        dimnames(obj) <- NULL
-      obj
-    }
-    ```
-   
-   `unname()` removes existing names (or dimnames) by setting them to `NULL`.
-   
-2. __[Q]{.Q}__: What does `dim()` return when applied to a 1d vector? When might you use `NROW()` or `NCOL()`?
-    
-   __[A]{.solved}__: From `?nrow`:
-    
-   > `dim()` will return `NULL` when applied to a 1d vector.
-   
-   One may want to use `NROW()` or `NCOL()` to handle atomic vectors, lists and NULL values in the same way as one column matrices or data frames. For these objects `nrow()` and `ncol()` return `NULL`. 
+__[Q1]{.Q}__: How is `setNames()` implemented? How is `unname()` implemented? Read the source code.
 
-    ```{r}
-    x <- 1:10
-    # Return NULL
-    nrow(x)
-    ncol(x)
-    
-    # Pretend it's a column vector
-    NROW(x)
-    NCOL(x)
-    ```
+__[A]{.solved}__: `setNames()` is implemented as:
 
-3. __[Q]{.Q}__: How would you describe the following three objects? What makes them different to `1:5`?
+```{r, eval = FALSE}
+setNames <- function (object = nm, nm){
+  names(object) <- nm
+  object
+}
+```
 
-    ```{r}
-    x1 <- array(1:5, c(1, 1, 5))  # 1 row,  1 column,  5 in third dim.
-    x2 <- array(1:5, c(1, 5, 1))  # 1 row,  5 columns, 1 in third dim.
-    x3 <- array(1:5, c(5, 1, 1))  # 5 rows, 1 column,  1 in third dim.
-    ```
-    
-   __[A]{.solved}__: These are all "one dimensional". If you imagine a 3d cube, `x1` is the x-dimension, `x2` is the y-dimension, and `x3` is the z-dimension.
+Because the data argument comes first `setNames()` also works well with the magrittr-pipe operator. When no first argument is given, the result is a named vector (this is rather untypical as required arguments usually come first):
 
-4. __[Q]{.Q}__: An early draft used this code to illustrate `structure()`:
+```{r}
+setNames( , c("a", "b", "c"))
+```
 
-    ```{r}
-    structure(1:5, comment = "my attribute")
-    ```
+`unname()` is implemented in the following way:
 
-   But when you print that object you don't see the comment attribute. Why? Is the attribute missing, or is there something else special about it? (Hint: try using help.)
-    
-   __[A]{.solved}__: The documentation states (see `?comment`):
-    
-   > Contrary to other attributes, the comment is not printed (by print or print.default).
-    
-   Also, from `?attributes`:
-    
-   > Note that some attributes (namely class, comment, dim, dimnames, names, row.names and tsp) are treated specially and have restrictions on the values which can be set.
-   
-   We can retrieve comment attributes by calling them explicitly:
+```{r, eval = FALSE}
+unname <- function (obj, force = FALSE){
+  if (!is.null(names(obj))) 
+    names(obj) <- NULL
+  if (!is.null(dimnames(obj)) && (force || !is.data.frame(obj))) 
+    dimnames(obj) <- NULL
+  obj
+}
+```
 
-    ```{r}
-    foo <- structure(1:5, comment = "my attribute")
-    
-    attributes(foo)
-    attr(foo, which = "comment")
-    ```
+`unname()` removes existing names (or dimnames) by setting them to `NULL`.
+
+__[Q2]{.Q}__: What does `dim()` return when applied to a 1d vector? When might you use `NROW()` or `NCOL()`?
+
+__[A]{.solved}__: From `?nrow`:
+
+> `dim()` will return `NULL` when applied to a 1d vector.
+
+One may want to use `NROW()` or `NCOL()` to handle atomic vectors, lists and NULL values in the same way as one column matrices or data frames. For these objects `nrow()` and `ncol()` return `NULL`. 
+
+```{r}
+x <- 1:10
+# Return NULL
+nrow(x)
+ncol(x)
+
+# Pretend it's a column vector
+NROW(x)
+NCOL(x)
+```
+
+__[Q3]{.Q}__: How would you describe the following three objects? What makes them different to `1:5`?
+
+```{r}
+x1 <- array(1:5, c(1, 1, 5))  # 1 row,  1 column,  5 in third dim.
+x2 <- array(1:5, c(1, 5, 1))  # 1 row,  5 columns, 1 in third dim.
+x3 <- array(1:5, c(5, 1, 1))  # 5 rows, 1 column,  1 in third dim.
+```
+
+__[A]{.solved}__: These are all "one dimensional". If you imagine a 3d cube, `x1` is the x-dimension, `x2` is the y-dimension, and `x3` is the z-dimension.
+
+__[Q4]{.Q}__: An early draft used this code to illustrate `structure()`:
+
+```{r}
+structure(1:5, comment = "my attribute")
+```
+
+But when you print that object you don't see the comment attribute. Why? Is the attribute missing, or is there something else special about it? (Hint: try using help.)
+
+__[A]{.solved}__: The documentation states (see `?comment`):
+
+> Contrary to other attributes, the comment is not printed (by print or print.default).
+
+Also, from `?attributes`:
+
+> Note that some attributes (namely class, comment, dim, dimnames, names, row.names and tsp) are treated specially and have restrictions on the values which can be set.
+
+We can retrieve comment attributes by calling them explicitly:
+
+```{r}
+foo <- structure(1:5, comment = "my attribute")
+
+attributes(foo)
+attr(foo, which = "comment")
+```
 
 ## S3 atomic vectors
 
-1. __[Q]{.Q}__: What sort of object does `table()` return? What is its type? What attributes does it have? How does the dimensionality change as you tabulate more variables?
-   
-   __[A]{.solved}__: `table()` returns a contingency table of its input variables, which has the class `"table"`. Internally it is represented as an array (implicit class) of integers (type) with the attributes `dim` (dimension of the underlying array) and `dimnames` (one name for each input column). The dimensions correspond to the number of unique values (factor levels) in each input variable.
-   
-    ```{r}
-    x <- table(mtcars[c("vs", "cyl", "am")])
-    
-    typeof(x)
-    attributes(x)
-    ```
-    
-2. __[Q]{.Q}__: What happens to a factor when you modify its levels?
-    
-    ```{r, eval = FALSE}
-    f1 <- factor(letters)
-    levels(f1) <- rev(levels(f1))
-    ```
-    
-   __[A]{.solved}__: The underlying integer values stay the same, but the levels are changed, making it look like the data as changed.
-    
-    ```{r}
-    f1 <- factor(letters[1:10])
-    levels(f1)
-    f1
-    as.integer(f1)
-    
-    levels(f1) <- rev(levels(f1))
-    levels(f1)
-    f1
-    as.integer(f1)
-    ```
-    
-3. __[Q]{.Q}__: What does this code do? How do `f2` and `f3` differ from `f1`?
+__[Q1]{.Q}__: What sort of object does `table()` return? What is its type? What attributes does it have? How does the dimensionality change as you tabulate more variables?
 
-    ```{r, results = "none"}
-    # Reverse element order (only)
-    f2 <- rev(factor(letters))
-    
-    # Reverse factor level order (only)
-    f3 <- factor(letters, levels = rev(letters))
-    ```
-    
-   __[A]{.solved}__: For `f2` and `f3` either the order of the factor elements *or* its levels are being reversed. For `f1` both transformations are occurring.
+__[A]{.solved}__: `table()` returns a contingency table of its input variables, which has the class `"table"`. Internally it is represented as an array (implicit class) of integers (type) with the attributes `dim` (dimension of the underlying array) and `dimnames` (one name for each input column). The dimensions correspond to the number of unique values (factor levels) in each input variable.
+
+```{r}
+x <- table(mtcars[c("vs", "cyl", "am")])
+
+typeof(x)
+attributes(x)
+```
+
+__[Q2]{.Q}__: What happens to a factor when you modify its levels?
+
+```{r, eval = FALSE}
+f1 <- factor(letters)
+levels(f1) <- rev(levels(f1))
+```
+
+__[A]{.solved}__: The underlying integer values stay the same, but the levels are changed, making it look like the data as changed.
+
+```{r}
+f1 <- factor(letters[1:10])
+levels(f1)
+f1
+as.integer(f1)
+
+levels(f1) <- rev(levels(f1))
+levels(f1)
+f1
+as.integer(f1)
+```
+
+__[Q3]{.Q}__: What does this code do? How do `f2` and `f3` differ from `f1`?
+
+```{r, results = "none"}
+# Reverse element order (only)
+f2 <- rev(factor(letters))
+
+# Reverse factor level order (only)
+f3 <- factor(letters, levels = rev(letters))
+```
+
+__[A]{.solved}__: For `f2` and `f3` either the order of the factor elements *or* its levels are being reversed. For `f1` both transformations are occurring.
 
 
 ## Lists
 
-1. __[Q]{.Q}__: List all the ways that a list differs from an atomic vector.
+__[Q1]{.Q}__: List all the ways that a list differs from an atomic vector.
 
-   __[A]{.solved}__: To summarise:
-   - Atomic vectors are always homogeneous (all elements must be of the same type). Lists may be heterogeneous (the elements can be of different types) as described in the [introduction of the vectors chapter]{https://adv-r.hadley.nz/vectors-chap.html#introduction}.
-   - Atomic vectors point to one address in memory, while lists contain a separate references for each element. (This was described in the list sections of the [vectors](https://adv-r.hadley.nz/vectors-chap.html#lists) and the [names and values](https://adv-r.hadley.nz/names-values.html#list-references) chapters.)
+__[A]{.solved}__: To summarise:
+- Atomic vectors are always homogeneous (all elements must be of the same type). Lists may be heterogeneous (the elements can be of different types) as described in the [introduction of the vectors chapter]{https://adv-r.hadley.nz/vectors-chap.html#introduction}.
+- Atomic vectors point to one address in memory, while lists contain a separate references for each element. (This was described in the list sections of the [vectors](https://adv-r.hadley.nz/vectors-chap.html#lists) and the [names and values](https://adv-r.hadley.nz/names-values.html#list-references) chapters.)
 
-    ```{r}
-    lobstr::ref(1:2)
-    lobstr::ref(list(1:2, 2))
-    ```
-    
-   - Subsetting with out-of-bound and `NA` values leads to different output. E.g. for `[` we get `NA` for atomics and `NULL` for lists. (This will be described in more detail within the [subsetting chapter](https://adv-r.hadley.nz/subsetting.html).)
+```{r}
+lobstr::ref(1:2)
+lobstr::ref(list(1:2, 2))
+```
 
-    ```{r}
-    # Subsetting atomic vectors
-    (1:2)[3]
-    (1:2)[NA]
-    
-    # Subsetting lists
-    as.list(1:2)[3]
-    as.list(1:2)[NA]
-    ```
-   
-2. __[Q]{.Q}__: Why do you need to use `unlist()` to convert a list to an atomic vector? Why doesn't `as.vector()` work?
-   
-   __[A]{.solved}__: A list is already a vector, though not an atomic one!
-   
-    Note that `as.vector()` and `is.vector()` use different defintions of 
-    "vector"!
-   
-    ```{r}
-    is.vector(as.vector(mtcars))
-    ```
-   
-3. __[Q]{.Q}__: Compare and contrast `c()` and `unlist()` when combining a date and date-time into a single vector.
+- Subsetting with out-of-bound and `NA` values leads to different output. E.g. for `[` we get `NA` for atomics and `NULL` for lists. (This will be described in more detail within the [subsetting chapter](https://adv-r.hadley.nz/subsetting.html).)
 
-   __[A]{.solved}__: Date and date-time objects are both built upon doubles. While dates store the number of days since the reference date 1970-01-01 (also known as “The Epoch”) in days, date-time-objects (POSIXct) store the time difference to this date in seconds.
-   
-    ```{r}
-    date    <- as.Date("1970-01-02")
-    dttm_ct <- as.POSIXct("1970-01-01 01:00", tz = "UTC")
-    
-    
-    # Internal representasions
-    unclass(date)
-    unclass(dttm_ct)
-    ```
+```{r}
+# Subsetting atomic vectors
+(1:2)[3]
+(1:2)[NA]
 
-   Combining these objects via the `c()` leads to surprising results. This is because the `c()` generic does only dispatch on it's first argument:
-   
-    ```{r}
-    c(date, dttm_ct)  # equal to c.Date(date, dttm_ct) 
-    c(dttm_ct, date)  # equal to c.POSIXct(date, dttm_ct)
-    ```
-    
-   In the first line above `c.Date()` is executed and `dttm_ct` is converted into a date. However, the 3600 seconds are mistakenly interpreted as 3600 days! In contrast, when `c.POSIXct()` is called on date, one day counts as one second only, as illustrated by the following line:
-    
-    ```{r}  
-    unclass(c(date, dttm_ct))  # internal representation
-    date + 3599
-    ```
-    
-   Some of these problems may be avoided via explicit conversion of the classes, i.e. `c(as.Date(dttm_ct, tz = "UTC"), date)`.
-   
-   A package that deals with these kind of problems in more depth and provides a structural solution for them is the [vctrs](https://github.com/r-lib/vctrs) package which is also used throughout the tidyverse.
-   
-   Let's look at `unlist()`, which operates on list input.
+# Subsetting lists
+as.list(1:2)[3]
+as.list(1:2)[NA]
+```
 
-    ```{r}    
-    # Attributes are stripped
-    unlist(list(date, dttm_ct))  
-    ```
+__[Q2]{.Q}__: Why do you need to use `unlist()` to convert a list to an atomic vector? Why doesn't `as.vector()` work?
 
-   We see again that dates and date-times are internally stored as doubles. Unfortunately this is all we are left with, when unlist strips the attributes of the list.
+__[A]{.solved}__: A list is already a vector, though not an atomic one!
 
-   To summarise: `c()` coerces types and errors may occur because of inappropriate method dispatch. `unlist()` strips attributes. 
-   
+Note that `as.vector()` and `is.vector()` use different defintions of 
+"vector"!
+
+```{r}
+is.vector(as.vector(mtcars))
+```
+
+__[Q3]{.Q}__: Compare and contrast `c()` and `unlist()` when combining a date and date-time into a single vector.
+
+__[A]{.solved}__: Date and date-time objects are both built upon doubles. While dates store the number of days since the reference date 1970-01-01 (also known as “The Epoch”) in days, date-time-objects (POSIXct) store the time difference to this date in seconds.
+
+```{r}
+date    <- as.Date("1970-01-02")
+dttm_ct <- as.POSIXct("1970-01-01 01:00", tz = "UTC")
+
+
+# Internal representasions
+unclass(date)
+unclass(dttm_ct)
+```
+
+Combining these objects via the `c()` leads to surprising results. This is because the `c()` generic does only dispatch on it's first argument:
+
+```{r}
+c(date, dttm_ct)  # equal to c.Date(date, dttm_ct) 
+c(dttm_ct, date)  # equal to c.POSIXct(date, dttm_ct)
+```
+
+In the first line above `c.Date()` is executed and `dttm_ct` is converted into a date. However, the 3600 seconds are mistakenly interpreted as 3600 days! In contrast, when `c.POSIXct()` is called on date, one day counts as one second only, as illustrated by the following line:
+
+```{r}
+unclass(c(date, dttm_ct))  # internal representation
+date + 3599
+```
+
+Some of these problems may be avoided via explicit conversion of the classes, i.e. `c(as.Date(dttm_ct, tz = "UTC"), date)`.
+
+A package that deals with these kind of problems in more depth and provides a structural solution for them is the [vctrs](https://github.com/r-lib/vctrs) package which is also used throughout the tidyverse.
+
+Let's look at `unlist()`, which operates on list input.
+
+```{r}
+# Attributes are stripped
+unlist(list(date, dttm_ct))  
+```
+
+We see again that dates and date-times are internally stored as doubles. Unfortunately this is all we are left with, when unlist strips the attributes of the list.
+
+To summarise: `c()` coerces types and errors may occur because of inappropriate method dispatch. `unlist()` strips attributes. 
+
 ## Data frames and tibbles
 
-1. __[Q]{.Q}__: Can you have a data frame with 0 rows? What about 0 columns?
+__[Q1]{.Q}__: Can you have a data frame with 0 rows? What about 0 columns?
 
-   __[A]{.solved}__: Yes, you can create these data frames easily and in many ways. Even both dimensions can be 0. E.g. you might subset the respective dimension with either `0`, `NULL` or a valid 0-length atomic (`logical(0)`, `character(0)`, `integer(0)`, `double(0)`). Negative integer sequences would also work. The following example uses a zero:
+__[A]{.solved}__: Yes, you can create these data frames easily and in many ways. Even both dimensions can be 0. E.g. you might subset the respective dimension with either `0`, `NULL` or a valid 0-length atomic (`logical(0)`, `character(0)`, `integer(0)`, `double(0)`). Negative integer sequences would also work. The following example uses a zero:
 
-    ```{r}
-    mtcars[0, ]
-    
-    mtcars[, 0] # or mtcars[0]
-    
-    mtcars[0, 0]
-    ```
-    
-   Empty data frames can also be created directly (without subsetting):
-   
-    ```{r}
-    data.frame()
-    ```
+```{r}
+mtcars[0, ]
 
-2. __[Q]{.Q}__: What happens if you attempt to set rownames that are not unique?
+mtcars[, 0] # or mtcars[0]
 
-   __[A]{.solved}__: Matrices can have duplicated row names, so this does now cause problems
-   
-   Data frames, however, require unique rownames and you get different results depending on how you attempt to set them. If you use `row.names()` directly, you 
-   get an error:
-   
-    ```{r, error = TRUE}
-    df <- data.frame(x = 1:3)
-    row.names(df) <- c("x", "y", "y")
-    ```
-   
-    If you use subsetting, `[` automatically deduplicates:
-   
-    ```{r}
-    row.names(df) <- c("x", "y", "z")
-    df[c(1, 1, 1), , drop = FALSE]
-    ```
-    
-    <!-- I think discussing `.rowNamesDF<-` is going too deep -->
+mtcars[0, 0]
+```
 
-3. __[Q]{.Q}__: If `df` is a data frame, what can you say about `t(df)`, and `t(t(df))`? Perform some experiments, making sure to try different column types.
+Empty data frames can also be created directly (without subsetting):
 
-   __[A]{.solved}__: Both of `t(df)` and `t(t(df))` will return matrices:
-   
-    ```{r}
-    df <- data.frame(x = 1:5, y = 5:1)
-    is.matrix(df)
-    is.matrix(t(df))
-    is.matrix(t(t(df)))
-    ```   
-    
-    The dimensions will respect the typical transposition rules:
-    
-    ```{r}
-    dim(df)
-    dim(t(df))
-    dim(t(t(df)))
-    ```
-    
-   Because the output is a matrix, every column is coerced to the same type. (It is implemented within `t.data.frame()` via `as.matrix()` which is described below).
+```{r}
+data.frame()
+```
 
-4. __[Q]{.Q}__: What does `as.matrix()` do when applied to a data frame with columns of different types? How does it differ from `data.matrix()`?
-    
-   __[A]{.solved}__: From `?as.matrix`:
-    
-   > The method for data frames will return a character matrix if there is only atomic columns and any non-(numeric/logical/complex) column, applying as.vector to factors and format to other non-character columns. Otherwise the usual coercion hierarchy (logical < integer < double < complex) will be used, e.g., all-logical data frames will be coerced to a logical matrix, mixed logical-integer will give a integer matrix, etc.
-    
-   Let´s transform a dummy data frame into a character matrix.
+__[Q2]{.Q}__: What happens if you attempt to set rownames that are not unique?
 
-    ```{r}
-    df_coltypes <- data.frame(
-      a = c("a", "b"),
-      b = c(TRUE, FALSE),
-      c = c(1L, 0L),
-      d = c(1.5, 2),
-      e = c("one" = 1, "two" = 2),
-      g = factor(c("f1", "f2")),
-      stringsAsFactors = FALSE
-    )
-    
-    as.matrix(df_coltypes)
-    ```
-    
-   From `?as.data.matrix`:
-    
-   > Return the matrix obtained by converting all the variables in a data frame to numeric mode and then binding them together as the columns of a matrix. Factors and ordered factors are replaced by their internal codes.
-    
-   `data.matrix()` returns a numeric matrix, where characters are replace by missing values:
-    
-    ```{r}
-    data.matrix(df_coltypes)
-    ```
+__[A]{.solved}__: Matrices can have duplicated row names, so this does now cause problems
+
+Data frames, however, require unique rownames and you get different results depending on how you attempt to set them. If you use `row.names()` directly, you 
+get an error:
+
+```{r, error = TRUE}
+df <- data.frame(x = 1:3)
+row.names(df) <- c("x", "y", "y")
+```
+
+If you use subsetting, `[` automatically deduplicates:
+
+```{r}
+row.names(df) <- c("x", "y", "z")
+df[c(1, 1, 1), , drop = FALSE]
+```
+
+<!-- I think discussing `.rowNamesDF<-` is going too deep -->
+
+__[Q3]{.Q}__: If `df` is a data frame, what can you say about `t(df)`, and `t(t(df))`? Perform some experiments, making sure to try different column types.
+
+__[A]{.solved}__: Both of `t(df)` and `t(t(df))` will return matrices:
+
+```{r}
+df <- data.frame(x = 1:5, y = 5:1)
+is.matrix(df)
+is.matrix(t(df))
+is.matrix(t(t(df)))
+```
+
+The dimensions will respect the typical transposition rules:
+
+```{r}
+dim(df)
+dim(t(df))
+dim(t(t(df)))
+```
+
+Because the output is a matrix, every column is coerced to the same type. (It is implemented within `t.data.frame()` via `as.matrix()` which is described below).
+
+__[Q4]{.Q}__: What does `as.matrix()` do when applied to a data frame with columns of different types? How does it differ from `data.matrix()`?
+
+__[A]{.solved}__: From `?as.matrix`:
+
+> The method for data frames will return a character matrix if there is only atomic columns and any non-(numeric/logical/complex) column, applying as.vector to factors and format to other non-character columns. Otherwise the usual coercion hierarchy (logical < integer < double < complex) will be used, e.g., all-logical data frames will be coerced to a logical matrix, mixed logical-integer will give a integer matrix, etc.
+
+Let´s transform a dummy data frame into a character matrix.
+
+```{r}
+df_coltypes <- data.frame(
+  a = c("a", "b"),
+  b = c(TRUE, FALSE),
+  c = c(1L, 0L),
+  d = c(1.5, 2),
+  e = c("one" = 1, "two" = 2),
+  g = factor(c("f1", "f2")),
+  stringsAsFactors = FALSE
+)
+
+as.matrix(df_coltypes)
+```
+
+From `?as.data.matrix`:
+
+> Return the matrix obtained by converting all the variables in a data frame to numeric mode and then binding them together as the columns of a matrix. Factors and ordered factors are replaced by their internal codes.
+
+`data.matrix()` returns a numeric matrix, where characters are replace by missing values:
+
+```{r}
+data.matrix(df_coltypes)
+```

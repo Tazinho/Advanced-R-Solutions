@@ -6,82 +6,82 @@ source("common.R")
 
 ## Choices
 
-1. __[Q]{.Q}__: What type of vector does each of the following calls to `ifelse()` return?
+__[Q1]{.Q}__: What type of vector does each of the following calls to `ifelse()` return?
 
-    ```{r, eval = FALSE}
-    ifelse(TRUE, 1, "no")
-    ifelse(FALSE, 1, "no")
-    ifelse(NA, 1, "no")
-    ```
+```{r, eval = FALSE}
+ifelse(TRUE, 1, "no")
+ifelse(FALSE, 1, "no")
+ifelse(NA, 1, "no")
+```
 
-   Read the documentation and write down the rules in your own words.
+Read the documentation and write down the rules in your own words.
 
-   __[A]{.solved}__: `ifelse()` has some special characteristics. E.g. it's vectorised over its arguments `test`, `yes` and `no`. If `yes` or `no` are shorter than `test`, they are recycled. Otherwise, their additional elements will be ignored.
-   
-   Further, the documentation says about the output type:
-   
-   > A vector of the same length and attributes (including dimensions and "class") as test and data values from the values of yes or no. The mode of the answer will be coerced from logical to accommodate first any values taken from yes and then any values taken from no.
+__[A]{.solved}__: `ifelse()` has some special characteristics. E.g. it's vectorised over its arguments `test`, `yes` and `no`. If `yes` or `no` are shorter than `test`, they are recycled. Otherwise, their additional elements will be ignored.
 
-   This is surprising because it uses the type of `test` .
-   
-   The function returns the entry for `yes` when `test` is `TRUE`, `no` when `test` is `FALSE` or `NA` when `test` is `NA`. Therefore, the expressions above return vectors of type `double`, `character` and `logical`.
+Further, the documentation says about the output type:
 
-2. __[Q]{.Q}__: Why does the following code work?
+> A vector of the same length and attributes (including dimensions and "class") as test and data values from the values of yes or no. The mode of the answer will be coerced from logical to accommodate first any values taken from yes and then any values taken from no.
 
-    ```{r}
-    x <- 1:10
-    if (length(x)) "not empty" else "empty"
-      
-    x <- numeric()
-    if (length(x)) "not empty" else "empty"
-    ```
+This is surprising because it uses the type of `test` .
 
-   __[A]{.solved}__: `if()` expects a logical condition, but also accepts a numeric vector where `0` is treated as `FALSE` and all other numbers are treated as `TRUE`. Numeric missing values (including `NaN`) lead to an error in the same way that a logical missing, `NA`, does.
+The function returns the entry for `yes` when `test` is `TRUE`, `no` when `test` is `FALSE` or `NA` when `test` is `NA`. Therefore, the expressions above return vectors of type `double`, `character` and `logical`.
+
+__[Q2]{.Q}__: Why does the following code work?
+
+```{r}
+x <- 1:10
+if (length(x)) "not empty" else "empty"
+
+x <- numeric()
+if (length(x)) "not empty" else "empty"
+```
+
+__[A]{.solved}__: `if()` expects a logical condition, but also accepts a numeric vector where `0` is treated as `FALSE` and all other numbers are treated as `TRUE`. Numeric missing values (including `NaN`) lead to an error in the same way that a logical missing, `NA`, does.
 
 ## Loops
 
-1. __[Q]{.Q}__: Why does this code succeed without errors or warnings?
-    
-    ```{r, results = FALSE}
-    x <- numeric()
-    out <- vector("list", length(x))
-    for (i in 1:length(x)) {
-      out[i] <- x[i] ^ 2
-    }
-    out
-    ```
+__[Q1]{.Q}__: Why does this code succeed without errors or warnings?
 
-   __[A]{.solved}__: This loop is a delicate issue and we have to consider a few points to explain why it is going through without any errors or warnings.
-   
-   The beginning of this code smell is the statement `1:length(x)` which creates the index of our for loop. As `x` has length 0 `1:length(x)` counts down from 1 to 0. This issue is typically avoided via usage of `seq_along(x)` or similar helpers which would just generate `integer(0)` in this case.
-   
-   As we use `[<-` and `[` for indexing 0-length vectors at their first and zeroth position, we need to be aware of their subsetting behaviour for out-of-bounds and zero indices.                                         
-   
-   During the first iteration `x[1]` will generate an `NA` (out-of-bounds indexing for atomics). The resulting `NA` (from squaring) will be assigned to the empty length-1 list `out[1]` (out-of-bounds indexing for lists).
-   
-   In the next iteration, `x[0]` will return `numeric(0)` (zero indexing for atomics). Again squaring doesn't change the value and `numeric(0)` is assigned to `out[0]` (zero indexing for lists). Assigning a 0-length vector to a 0-length subset works, but doesn't change anything.
-   
-   Overall the code works, because each step includes valid R operations. (Though it may have been helpful to warn the user about the unusual inputs to this loop.)
+```{r, results = FALSE}
+x <- numeric()
+out <- vector("list", length(x))
+for (i in 1:length(x)) {
+  out[i] <- x[i] ^ 2
+}
+out
+```
 
-2. __[Q]{.Q}__: What does the following code tell you about when the vector being iterated over is evaluated?
+__[A]{.solved}__: This loop is a delicate issue and we have to consider a few points to explain why it is going through without any errors or warnings.
 
-    ```{r}
-    xs <- c(1, 2, 3)
-    for (x in xs) {
-      xs <- c(xs, x * 2)
-    }
-    xs
-    ```
+The beginning of this code smell is the statement `1:length(x)` which creates the index of our for loop. As `x` has length 0 `1:length(x)` counts down from 1 to 0. This issue is typically avoided via usage of `seq_along(x)` or similar helpers which would just generate `integer(0)` in this case.
 
-   __[A]{.solved}__: In this loop `x` takes on the values of the initial `xs` (`1`, `2` and `3`), indicating that it is evaluated just once in the beginning of the loop, not after each iteration.
+As we use `[<-` and `[` for indexing 0-length vectors at their first and zeroth position, we need to be aware of their subsetting behaviour for out-of-bounds and zero indices.                                         
 
-3. __[Q]{.Q}__: What does the following code tell you about when the index is updated?
+During the first iteration `x[1]` will generate an `NA` (out-of-bounds indexing for atomics). The resulting `NA` (from squaring) will be assigned to the empty length-1 list `out[1]` (out-of-bounds indexing for lists).
 
-    ```{r}
-    for (i in 1:3) {
-      i <- i * 2
-      print(i) 
-    }
-    ```
+In the next iteration, `x[0]` will return `numeric(0)` (zero indexing for atomics). Again squaring doesn't change the value and `numeric(0)` is assigned to `out[0]` (zero indexing for lists). Assigning a 0-length vector to a 0-length subset works, but doesn't change anything.
 
-   __[A]{.solved}__: In a `for`-loop the index is updated in the beginning of each iteration. Therefore, reassigning the index symbol during one iteration doesn't affect the following iterations.
+Overall the code works, because each step includes valid R operations. (Though it may have been helpful to warn the user about the unusual inputs to this loop.)
+
+__[Q2]{.Q}__: What does the following code tell you about when the vector being iterated over is evaluated?
+
+```{r}
+xs <- c(1, 2, 3)
+for (x in xs) {
+  xs <- c(xs, x * 2)
+}
+xs
+```
+
+__[A]{.solved}__: In this loop `x` takes on the values of the initial `xs` (`1`, `2` and `3`), indicating that it is evaluated just once in the beginning of the loop, not after each iteration.
+
+__[Q3]{.Q}__: What does the following code tell you about when the index is updated?
+
+```{r}
+for (i in 1:3) {
+  i <- i * 2
+  print(i) 
+}
+```
+
+__[A]{.solved}__: In a `for`-loop the index is updated in the beginning of each iteration. Therefore, reassigning the index symbol during one iteration doesn't affect the following iterations.
