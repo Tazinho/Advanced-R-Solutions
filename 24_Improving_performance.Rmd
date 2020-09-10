@@ -9,7 +9,7 @@ source("common.R")
 
 # Improving performance
 
-In this chapter we will run a few benchamrks and pipe it into the following helper-function to subset and pretty-print their results.
+In this chapter we will run a few benchmarks and pipe it into the following helper-function to subset and pretty-print their results.
 
 ```{r, include=FALSE}
 library(rlang)
@@ -190,7 +190,11 @@ print_bench_results <- function(bench_df, ...) {
 
 5. __[Q]{.Q}__: What are the alternatives to `optim()`?
     
-   __[A]{.solved}__: The optimal choice depends on the use case: for a general overview we would suggest the corresponding [Taskview on Optimization](https://cran.r-project.org/web/views/Optimization.html).
+   __[A]{.solved}__: The appropriate choice highly depends on the type of optimization you intend to do. The [Taskview on Optimization](https://cran.r-project.org/web/views/Optimization.html) can serve as a useful reference. Here a couple of examples:
+
+- `{optimx}` extends the `optim()` function with the same syntax but more 'method' choices.
+- `{RcppNumerical}` wraps several open source libraries for numerical computing (written in C++) and integrates them with R via `{Rcpp}`.
+- `{DEoptim}` provides a global optimizer based on the Differential Evolution algorithm.
 
 
 ## Doing as little as possible
@@ -257,26 +261,25 @@ print_bench_results <- function(bench_df, ...) {
 
 3. __[Q]{.Q}__: Can you make a faster version of `table()` for the case of an input of two integer vectors with no missing values? Can you use it to speed up your chi-square test?
     
-   __[A]{.solved}__: When analysing the source code of `table()`, we try to omit everything unnecessary and extract the main building blocks. That's where we realize that `table()` is mainly powered by `tabulate()`, which is a very fast counting function. However, we can not simply apply `tabulate()` to our two integer vectors directly. Instead, we need to preprocess them accordingly, to match `tabulate()`'s expected input format. Therefore, the integer pairs in our two vectors need to be mapped to their corresponding index in the final output table (which is ordered columnwise in this implementation). The basic steps to get to this mapping can be adopted from `table()`'s source code again. So the main challenge is to compute the preprocessing steps as performant as possible.
-
-   First, we calculate the dimensions and names of the output table. Here we need to apply `unique()`, `sort()` and `length()` to our integer vectors. Next, we map the elements of each vector according to their position within the vector itself (i.e. the smallest value is mapped to `1L`, the second smallest value to `2L`, etc.). One fast way to do these lookups is to employ the combination of `match(x, sort(unique(x)))` or (even better) `fastmatch::fmatch(x, sort(unique(x)))`. Following the logic within `table()`, we combine and shift these looked up values to create a mapping of integer pairs in our data to the index of the output table. After applying the lookup, `tabulate()` counts the values for us and is returning an integer vector which contains counts for each position in our the table. As a last step, we reuse the code from `table()` to assign the correct dimension and class.
+   __[A]{.solved}__: When analysing the source code of `table()` we aim to omit everything unnecessary and extract the main building blocks. We observe that `table()` is powered by `tabulate()` which is a very fast counting function. This leaves us with the the challenge to compute the preprocessing as performant as possible. 
+   
+   First, we calculate the dimensions and names of the output table. Then we use `fastmatch::fmatch()` to map the elements of each vector to their position within the vector itself (i.e. the smallest value is mapped to `1L`, the second smallest value to `2L`, etc.). Following the logic within `table()` we combine and shift these values to create a mapping of the integer pairs in our data to the index of the output table. After applying these lookups `tabulate()` counts the values and returns an integer vector with counts for each position in our the table. As a last step, we reuse the code from `table()` to assign the correct dimension and class.
 
     ```{r}
     table2 <- function(a, b){
     
-      s_u_a <- sort(unique(a))
-      s_u_b <- sort(unique(b))
+      a_s <- sort(unique(a))
+      b_s <- sort(unique(b))
   
-      l_u_a <- length(s_u_a)
-      l_u_b <- length(s_u_b)
+      a_l <- length(a_s)
+      b_l <- length(b_s)
   
-      dims <- c(l_u_a, l_u_b)
-      pr <- l_u_a * l_u_b
-      dn <- list(a = s_u_a, 
-                 b = s_u_b)
+      dims <- c(a_l, b_l)
+      pr <- a_l * b_l
+      dn <- list(a = a_s, b = b_s)
 
-      bin <- fastmatch::fmatch(a, s_u_a) +
-        l_u_a * fastmatch::fmatch(b, s_u_b) - l_u_a
+      bin <- fastmatch::fmatch(a, a_s) +
+        a_l * fastmatch::fmatch(b, b_s) - a_l
       y <- tabulate(bin, pr)
       
       y <- array(y, dim = dims, dimnames = dn)
@@ -293,7 +296,7 @@ print_bench_results <- function(bench_df, ...) {
                 relative = TRUE)
     ```
 
-   <!-- TODO: we didn't apply this to our chi-square function. Is this okay? :) -->
+   Since we didn't use `table()` in our `chisq.test2()`-implementation, we cannot benefit from the slight performance gain from `table2()`.
 
 ## Vectorise
 
@@ -308,10 +311,8 @@ print_bench_results <- function(bench_df, ...) {
     rnorm(n, mean = 0, sd = 1)
     ```
     
-   These functions are vectorised over their numeric arguments, which includes the first argument (`x`, `q`, `p`, `n`) as well as `mean` and `sd`. Note that it's dangerous to supply a vector to `n` in the `rnorm()` function, because the behaviour will change, when `n` has length 1.
+   These functions are vectorised over their numeric arguments, which includes the first argument (`x`, `q`, `p`, `n`) as well as `mean` and `sd`.
    
-   <!-- @Malte: could you explain the "danger" a little more clearly (1 sentence ideally)? Not sure, I see it fully. (Henning)-->
-    
    `rnorm(10, mean = 10:1)` generates ten random numbers from different normal distributions. These normal distributions differ in their means. The first has mean 10, the second mean 9, the third mean 8 and so on.
 
 2. __[Q]{.Q}__: Compare the speed of `apply(x, 1, sum)` with `rowSums(x)` for varying sizes of `x`.
@@ -352,7 +353,7 @@ print_bench_results <- function(bench_df, ...) {
     ```{r}
     x <- rnorm(10)
     w <- rnorm(10)
-    identical(sum(x * w),
+    all.equal(sum(x * w),
               as.numeric(crossprod(x, w)))
     ```
     
@@ -378,5 +379,6 @@ print_bench_results <- function(bench_df, ...) {
     bench_res %>% 
       ggplot(aes(dimension, median, color = expression)) +
       geom_point() +
-      geom_line(aes(group = expression))
+      geom_line(aes(group = expression)) +
+      theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
     ```
