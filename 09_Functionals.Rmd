@@ -205,31 +205,23 @@ Compare and contrast the `map2()` approach to this `map()` approach:
 mtcars[vars] <- map(vars, ~ trans[[.x]](mtcars[[.x]]))
 ```
 
-__[A]{.solved}__: In the first approach the list of functions and the appropriately selected data frame columns are supplied to `map2()`. `map2()` creates an anonymous function `f(var)` which applies the functions to the variables when `map2()` iterates over their (similar) index. On the left hand side the regarding elements of `mtcars` are being replaced by their new transformations.
+__[A]{.solved}__: In the first approach the list of functions and the appropriately selected data frame columns are supplied to `map2()`. `map2()` creates an anonymous function `f(var)` which applies the functions to the variables when `map2()` iterates over their (similar) index. On the left hand side the respective elements of `mtcars` are being replaced by their new transformations.
 
 The `map()` variant does basically the same. However, it directly iterates over the names of the transformations. Therefore, the data frame columns are selected during the iteration.
 
-Besides the iteration pattern, the approaches differ in the possibilities for appropriate argument naming in the `.f` argument. In the `map2()` approach we iterate over the elements of `x` and `y`. Therefore, it is possible to choose appropriate placeholders like `f` and `var`. This makes the anonymous function more expressive at the cost of making it longer. However, we think using the formula interface here makes for rather cryptic code: `mtcars[vars] <- map2(trans, mtcars[vars], ~ .x(.y))`. 
+Besides the iteration pattern, the approaches differ in the possibilities for appropriate argument naming in the `.f` argument. In the `map2()` approach we iterate over the elements of `x` and `y`. Therefore, it is possible to choose appropriate placeholders like `f` and `var`. This makes the anonymous function more expressive at the cost of making it longer.  We think using the formula interface in this way is preferable compared to the rather cryptic `mtcars[vars] <- map2(trans, mtcars[vars], ~ .x(.y))`.
 
-In the `map()` approach we map over the variable names. It is therefore not possible to introduce placeholders for the function and variable names. The formula syntax together with the `.x` shortcut is pretty compact. The object names and the brackets indicate clearly the application of transformations to specific columns of `mtcars`. In this case the iteration over the variable names comes in handy, as it highlights the importance of matching between `trans` and `mtcars` element names. Together with the replacement form on the left hand side, this line is relatively easy to inspect. To summarise, in situations where `map()` and `map2()` provide solutions for an iteration problem, several points are to consider before deciding for one or the other approach.
+In the `map()` approach we map over the variable names. It is therefore not possible to introduce placeholders for the function and variable names. The formula syntax together with the `.x` pronoun is pretty compact. The object names and the brackets indicate clearly the application of transformations to specific columns of `mtcars`. In this case the iteration over the variable names comes in handy, as it highlights the importance of matching between `trans` and `mtcars` element names. Together with the replacement form on the left hand side, this line is relatively easy to inspect. To summarise, in situations where `map()` and `map2()` provide solutions for an iteration problem, several points may be considered before deciding for one or the other approach.
 
 __[Q4]{.Q}__: What does `write.csv()` return? i.e. what happens if you use it with `map2()` instead of `walk2()`?
 
-__[A]{.solved}__: `write.csv()` returns `NULL`. In the example above we iterated over a list of data frames and file names a named list of `NULL`s would be returned.
+__[A]{.solved}__: `write.csv()` returns `NULL` and we generally call the function for their side-effect (creating a csv-file). So `walk2()` would be the appropriate functional here, otherwise we receive a rather uninformative lists of `NULL`s.
 
-```{r, eval=FALSE}
+```{r}
 cyls <- split(mtcars, mtcars$cyl)
-paths <- file.path(temp_dir, paste0("cyl-", names(cyls), ".csv"))
+paths <- file.path(tempdir(), paste0("cyl-", names(cyls), ".csv"))
 
 map2(cyls, paths, write.csv)
-#> $`4`
-#> NULL
-#> 
-#> $`6`
-#> NULL
-#> 
-#> $`8`
-#> NULL
 ```
 
 ## Predicate Functionals
