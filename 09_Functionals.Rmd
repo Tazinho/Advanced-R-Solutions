@@ -80,7 +80,7 @@ __[Q4]{.Q}__: The following code simulates the performance of a t-test for non-n
 trials <- map(1:100, ~ t.test(rpois(10, 10), rpois(10, 7)))
 ```
 
-__[A]{.solved}__: There are many ways to visualise this data, but since it's relatively small, a dot plot allows us to see both the individual values and the overall distribution.
+__[A]{.solved}__: There are many ways to visualise this data, but since there are only 100 data points we choose a dot plot to visualize the individual values and the overall distribution. Unfortunately the dot plot doesn't compute proper counts for us (because it was created to visualize distribution densities instead of frequencies), so a histogram could be a suitable alternative.
 
 ```{r, message = FALSE}
 library(ggplot2)
@@ -89,8 +89,10 @@ trials_df <- tibble(p_value = map_dbl(trials, "p.value"))
 
 trials_df %>% 
   ggplot(aes(x = p_value, fill = p_value < 0.05)) + 
-  geom_histogram(binwidth = .01) +
-  ggtitle("Distribution of p-values for random poisson data.")
+  geom_dotplot(binwidth = .01) +  # geom_histogram() as alternative
+  ggtitle("Distribution of p-values for random poisson data.") +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
 ```
 
 __[Q5]{.Q}__: The following code uses a map nested inside another map to apply a function to every element of a nested list. Why does it fail, and what do you need to do to make it work?

@@ -321,11 +321,15 @@ Because the output is a matrix, every column is coerced to the same type. (It is
 
 __[Q4]{.Q}__: What does `as.matrix()` do when applied to a data frame with columns of different types? How does it differ from `data.matrix()`?
 
-__[A]{.solved}__: From `?as.matrix`:
+__[A]{.solved}__: The type of the result of `as.matrix` can vary and depends on the types of the input columns (see `?as.matrix`):
 
 > The method for data frames will return a character matrix if there is only atomic columns and any non-(numeric/logical/complex) column, applying as.vector to factors and format to other non-character columns. Otherwise the usual coercion hierarchy (logical < integer < double < complex) will be used, e.g., all-logical data frames will be coerced to a logical matrix, mixed logical-integer will give a integer matrix, etc.
 
-Let´s transform a dummy data frame into a character matrix.
+On the other hand `data.matrix` will always return a numeric matrix (see `?data.matrix()`).
+
+> Return the matrix obtained by converting all the variables in a data frame to numeric mode and then binding them together as the columns of a matrix. Factors and ordered factors are replaced by their internal codes. [...] Character columns are first converted to factors and then to integers.
+
+We can illustrate and compare the mechanics of these functions for a concrete an example. `as.matrix()` makes it possible to retrieve most of the original information from the dataframe, but leaves us with characters. To retrieve all the information from the `data.matrix()` output, we would need a mapping table for each column.
 
 ```{r}
 df_coltypes <- data.frame(
@@ -333,20 +337,10 @@ df_coltypes <- data.frame(
   b = c(TRUE, FALSE),
   c = c(1L, 0L),
   d = c(1.5, 2),
-  e = c("one" = 1, "two" = 2),
-  g = factor(c("f1", "f2")),
+  e = factor(c("f1", "f2")),
   stringsAsFactors = FALSE
 )
 
 as.matrix(df_coltypes)
-```
-
-From `?as.data.matrix`:
-
-> Return the matrix obtained by converting all the variables in a data frame to numeric mode and then binding them together as the columns of a matrix. Factors and ordered factors are replaced by their internal codes.
-
-`data.matrix()` returns a numeric matrix, where characters are replace by missing values:
-
-```{r}
 data.matrix(df_coltypes)
 ```

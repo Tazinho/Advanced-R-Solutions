@@ -34,14 +34,23 @@ __[A]{.solved}__: In contrast to `NA_real`, `NA` has logical type and logical ve
 
 __[Q3]{.Q}__: What does `upper.tri()` return? How does subsetting a matrix with it work? Do we need any additional subsetting rules to describe its behaviour?
 
-```{r, eval = FALSE}
+```{r echo=TRUE, results = 'hide'}
 x <- outer(1:5, 1:5, FUN = "*")
 x[upper.tri(x)]
 ```
 
-__[A]{.solved}__: `upper.tri()` returns a logical matrix containing `TRUE` for all upper diagonal elements and `FALSE` otherwise. The implementation of `upper.tri()` is straightforward, but quite interesting as it uses `.row(dim(x)) <= .col(dim(x))` to create the logical matrix. Its subsetting-behaviour will be identical to subsetting with logical matrices, where all elements that correspond to `TRUE` will be selected. We don't need to treat this form of subsetting in a special way.
+__[A]{.solved}__: `upper.tri()` returns a logical matrix containing `TRUE` for the upper diagonal elements and `FALSE` for the includes the lower diagonal elements and the diagonal elements (when `diag = FALSE`)). Internally this matrix is created by comparing the row and column indexes of `x` dimensions (`.row(dim(x)) < .col(dim(x))`).
 
-<!-- The text doesn't mention subsetting with logical matrices so I think this deserves a little more text. I'd make sure to point out that this returns a vector, not a matrix -->
+```{r}
+x
+upper.tri(x)
+```
+When subsetting with logical matrices, all elements that correspond to `TRUE` will be selected. Matrices extend vectors with an dimension attribute, so the vector forms of subsetting can be used (including logical subsetting). We should take care, that the dimensions of the subsetting matrix match the object of interest - otherwise unintended selections due to vector recycling may occur. Please also note, that this form of subsetting returns a vector instead of a matrix, as the subsetting alters the dimensions of the object.
+
+```{r}
+x[upper.tri(x)]
+x[upper.tri(x)[5:6]]
+```
 
 __[Q4]{.Q}__: Why does `mtcars[1:20]` return an error? How does it differ from the similar `mtcars[1:20, ]`?
 
