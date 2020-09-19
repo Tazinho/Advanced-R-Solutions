@@ -151,16 +151,21 @@ c <- list(b, a, 1:10)
 
 __[A]{.solved}__: `a` contains a reference to an address with the value `1:10`. `b` contains a list of two references to the same address as `a`. `c` contains a list of `b` (containing two references to `a`), `a` (containing the same reference again) and a reference pointing to a different address containing the same value (`1:10`).
 
-<!-- could you insert an actual drawing here? -->
+```{r, echo = FALSE, out.width='200pt'}
+knitr::include_graphics("images/copy_on_modify_fig3.png",
+                        dpi = 300)
+```
+
+We can confirm these relationships by inspecting the reference tree in R.
 
 ```{r, eval = FALSE}
 ref(c)
-#> █ [1:0x55eec93cbdd8] <list>    # c
-#> ├─█ [2:0x55eecb8246e8] <list>  # - b
-#> │ ├─[3:0x55eec7df4e98] <int>   # -- a
-#> │ └─[3:0x55eec7df4e98]         # -- a
-#> ├─[3:0x55eec7df4e98]           # - a
-#> └─[4:0x55eec7aa6968] <int>     # - 1:10
+#> █ [1:0x55erc93cbdd8] <list>    # c
+#> ├─█ [2:0x55efcb8246e8] <list>  # - b
+#> │ ├─[3:0x55eac7df4e98] <int>   # -- a
+#> │ └─[3:0x55eac7df4e98]         # -- a
+#> ├─[3:0x55eac7df4e98]           # - a
+#> └─[4:0x55etc7aa6968] <int>     # - 1:10
 ```
 
 __[Q4]{.Q}__: What happens when you run this code:
@@ -169,8 +174,6 @@ __[Q4]{.Q}__: What happens when you run this code:
 x <- list(1:10)
 x[[2]] <- x
 ```
-
-<!-- I think I actually meant to say `x[[2]] <- x[[1]]` to make the problem slightly less complicated -->
 
 Draw a picture.
 
@@ -360,9 +363,7 @@ x <- list()
 x[[1]] <- x
 ```
 
-__[A]{.solved}__: In this situation Copy-on-modify prevents the creation of a circular list. Let's step through the details as follows:
-
-<!-- can't use tracemem with knitr -->
+__[A]{.solved}__: In this situation copy-on-modify prevents the creation of a circular list. Let's step through the details as follows:
 
 ```{r, eval=FALSE}
 x <- list()  # creates initial object
