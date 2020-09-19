@@ -180,260 +180,260 @@ NumericVector rangeC(NumericVector x){
   out[0] = omin;
   out[1] = omax;
   return out;
-  ```
+```
   
-  5. `var()`
+5. `var()`
   
-  ```{cpp}
-  double varC(NumericVector x) {
-    int n = x.size();
-    double mx = 0;
-    double out = 0;
-    
-    if(n < 2) {
-      return NA_REAL;
-    }
-    
+```{cpp}
+double varC(NumericVector x) {
+  int n = x.size();
+  double mx = 0;
+  double out = 0;
+  
+  if(n < 2) {
+    return NA_REAL;
+  }
+  
+  for(int i = 0; i < n; ++i) {
+    mx += x[i] / n;
+  }
+  
+  for(int i = 0; i < n; ++i) {
+    out += pow(x[i] - mx, 2);
+  }
+  
+  out = out / (n-1);
+  return out;
+}
+```
+
+## Missing values
+
+__[Q1]{.Q}__:  Rewrite any of the functions from the first exercise to deal with missing values. If `na.rm` is true, ignore the missing values. If `na.rm` is false, return a missing value if the input contains any missing values. Some good functions to practice with are `min()`, `max()`, `range()`, `mean()`, and `var()`.
+
+__[A]{.solved}__: We will refactor `cumsum()`, `any()`, `Position()` and `pmin()` so they can deal with missing values, but we practice and rewrite `min()`, `max()`, `range()`, `mean()` and `var()` first. We try to keep the overall function behaviour close to the original function, whenever `na_rm = false`. We mostly stick with vector data types as return values to avoid irregular type conversions.
+
+We introduce an `na_rm` argument to make `minC()` aware of `NA`s. In case `x` contains exclusively `NA` values `minC()` should return `Inf` for `na_rm == TRUE`.
+
+```{cpp}
+NumericVector minC(NumericVector x, bool na_rm = false){
+  int n = x.size();
+  NumericVector out = NumericVector::create(R_PosInf);
+  
+  if (na_rm == false) {
     for(int i = 0; i < n; ++i) {
-      mx += x[i] / n;
-    }
-    
-    for(int i = 0; i < n; ++i) {
-      out += pow(x[i] - mx, 2);
-    }
-    
-    out = out / (n-1);
-    return out;
-  }
-  ```
-  
-  ## Missing values
-  
-  __[Q1]{.Q}__:  Rewrite any of the functions from the first exercise to deal with missing values. If `na.rm` is true, ignore the missing values. If `na.rm` is false, return a missing value if the input contains any missing values. Some good functions to practice with are `min()`, `max()`, `range()`, `mean()`, and `var()`.
-  
-  __[A]{.solved}__: We will refactor `cumsum()`, `any()`, `Position()` and `pmin()` so they can deal with missing values, but we practice and rewrite `min()`, `max()`, `range()`, `mean()` and `var()` first. We try to keep the overall function behaviour close to the original function, whenever `na_rm = false`. We mostly stick with vector data types as return values to avoid irregular type conversions.
-  
-  We introduce an `na_rm` argument to make `minC()` aware of `NA`s. In case `x` contains exclusively `NA` values `minC()` should return `Inf` for `na_rm == TRUE`.
-  
-  ```{cpp}
-  NumericVector minC(NumericVector x, bool na_rm = false){
-    int n = x.size();
-    NumericVector out = NumericVector::create(R_PosInf);
-    
-    if (na_rm == false) {
-      for(int i = 0; i < n; ++i) {
-        if (NumericVector::is_na(x[i])) {
-          out[0] = NA_REAL;
-          return out;
-        }
-        if (x[i] < out[0]) {
-          out[0] = x[i];
-        }
-      }
-    }
-    
-    if (na_rm) {
-      for(int i = 0; i < n; ++i) {
-        if (x[i] == NA_REAL) {
-          continue;
-        }
-        if (x[i] < out[0]) {
-          out[0] = x[i];
-        }
-      }
-    }
-    
-    return out;
-  }
-  ```
-  
-  To implement `maxC()` we reuse `minC()` and take advantage of a connection between the minimum and the maximum: $\max(x) = -\min(-x)$.
-  
-  ```{cpp}
-  NumericVector maxC(NumericVector x, bool na_rm = false){
-    return -minC(-x, na_rm);
-  }
-  ```
-  
-  `minC()` and `maxC()` enable us to write a compact and `NA`-aware `rangeC()` function.
-  
-  ```{cpp}
-  NumericVector rangeC(NumericVector x, bool na_rm = false){
-    NumericVector out(2);
-    
-    out[0] = minC(x, na_rm)[0];
-    out[1] = maxC(x, na_rm)[0];
-    
-    return out;
-  }
-  ```
-  
-  Our `NA`-aware `meanC()` function should return `NaN`, if `na_rm = TRUE` and `all(is.na(x))`.
-  
-  ```{cpp}
-  NumericVector meanC(NumericVector x, bool na_rm = false){
-    int n = x.size();
-    int n_count = 0;
-    NumericVector out = NumericVector::create(0);
-    
-    if (na_rm == false) {
-      for(int i = 0; i < n; i++){
-        if (NumericVector::is_na(x[i])) {
-          out[0] = NA_REAL;
-          return out;
-        }
-        out[0] += x[i];
-        n_count++;
-      }
-      out[0] /= n_count;
-    }
-    
-    if (na_rm) {
-      for(int i = 0; i < n; i++){
-        if (NumericVector::is_na(x[i])) {
-          continue;
-        }
-        out[0] += x[i];
-        n_count++;
-      }
-      if (n_count == 0) {
-        out[0] = NAN;
+      if (NumericVector::is_na(x[i])) {
+        out[0] = NA_REAL;
         return out;
       }
-      out[0] /= n_count;
-    }
-    
-    return out;
-  }
-  ```
-  
-  For `varC()`, we handle both cases of `na_rm` inside the first for loop, as this reduces code duplication.
-  
-  ```{cpp}
-  NumericVector varC(NumericVector x, bool na_rm = false) {
-    int n = x.size();
-    int n_count = 0;
-    double m_x = 0;
-    NumericVector out = NumericVector::create(0);
-    
-    for(int i = 0; i < n; i++) {
-      if (NumericVector::is_na(x[i])) {
-        if (na_rm == FALSE) {
-          out[0] = NA_REAL;
-          return out;
-        } else {
-          continue;
-        }
+      if (x[i] < out[0]) {
+        out[0] = x[i];
       }
-      m_x += x[i];
+    }
+  }
+  
+  if (na_rm) {
+    for(int i = 0; i < n; ++i) {
+      if (x[i] == NA_REAL) {
+        continue;
+      }
+      if (x[i] < out[0]) {
+        out[0] = x[i];
+      }
+    }
+  }
+  
+  return out;
+}
+```
+
+To implement `maxC()` we reuse `minC()` and take advantage of a connection between the minimum and the maximum: $\max(x) = -\min(-x)$.
+
+```{cpp}
+NumericVector maxC(NumericVector x, bool na_rm = false){
+  return -minC(-x, na_rm);
+}
+```
+
+`minC()` and `maxC()` enable us to write a compact and `NA`-aware `rangeC()` function.
+
+```{cpp}
+NumericVector rangeC(NumericVector x, bool na_rm = false){
+  NumericVector out(2);
+  
+  out[0] = minC(x, na_rm)[0];
+  out[1] = maxC(x, na_rm)[0];
+  
+  return out;
+}
+```
+
+Our `NA`-aware `meanC()` function should return `NaN`, if `na_rm = TRUE` and `all(is.na(x))`.
+
+```{cpp}
+NumericVector meanC(NumericVector x, bool na_rm = false){
+  int n = x.size();
+  int n_count = 0;
+  NumericVector out = NumericVector::create(0);
+  
+  if (na_rm == false) {
+    for(int i = 0; i < n; i++){
+      if (NumericVector::is_na(x[i])) {
+        out[0] = NA_REAL;
+        return out;
+      }
+      out[0] += x[i];
       n_count++;
     }
-    
-    if (n_count < 2) {
-      out[0] = NA_REAL;
+    out[0] /= n_count;
+  }
+  
+  if (na_rm) {
+    for(int i = 0; i < n; i++){
+      if (NumericVector::is_na(x[i])) {
+        continue;
+      }
+      out[0] += x[i];
+      n_count++;
+    }
+    if (n_count == 0) {
+      out[0] = NAN;
       return out;
     }
-    
-    m_x /= n_count;
-    
-    for(int i = 0; i < n; ++i) {
-      if (NumericVector::is_na(x[i])) {
+    out[0] /= n_count;
+  }
+  
+  return out;
+}
+```
+
+For `varC()`, we handle both cases of `na_rm` inside the first for loop, as this reduces code duplication.
+
+```{cpp}
+NumericVector varC(NumericVector x, bool na_rm = false) {
+  int n = x.size();
+  int n_count = 0;
+  double m_x = 0;
+  NumericVector out = NumericVector::create(0);
+  
+  for(int i = 0; i < n; i++) {
+    if (NumericVector::is_na(x[i])) {
+      if (na_rm == FALSE) {
+        out[0] = NA_REAL;
+        return out;
+      } else {
         continue;
       }
-      out[0] += pow(x[i] - m_x, 2);
     }
-    
-    out[0] /= n_count - 1;
-    
+    m_x += x[i];
+    n_count++;
+  }
+  
+  if (n_count < 2) {
+    out[0] = NA_REAL;
     return out;
   }
-  ```
   
-  Now, let's extend the functions `cumsum()`, `any()`, `Position()` and `pmin()` from the (first exercise).
+  m_x /= n_count;
   
-  For `na_rm = true`, we keep the `NA`'s in the output but ignore them in the cumulative sums.
+  for(int i = 0; i < n; ++i) {
+    if (NumericVector::is_na(x[i])) {
+      continue;
+    }
+    out[0] += pow(x[i] - m_x, 2);
+  }
   
-  ```{cpp}
-  NumericVector cumsumC(NumericVector x, bool na_rm = false) {
-    int n = x.size();
-    NumericVector out(n);
-    double sum_i = 0;
-    
-    for(int i = 0; i < n; ++i) {
-      if (NumericVector::is_na(x[i])) {
-        if (na_rm == false) {
-          return NumericVector::create(NA_REAL);
-        }
-        out[i] = NA_REAL;
-        continue;
+  out[0] /= n_count - 1;
+  
+  return out;
+}
+```
+
+Now, let's extend the functions `cumsum()`, `any()`, `Position()` and `pmin()` from the (first exercise).
+
+For `na_rm = true`, we keep the `NA`'s in the output but ignore them in the cumulative sums.
+
+```{cpp}
+NumericVector cumsumC(NumericVector x, bool na_rm = false) {
+  int n = x.size();
+  NumericVector out(n);
+  double sum_i = 0;
+  
+  for(int i = 0; i < n; ++i) {
+    if (NumericVector::is_na(x[i])) {
+      if (na_rm == false) {
+        return NumericVector::create(NA_REAL);
       }
-      sum_i += x[i];
-      out[i] = sum_i;
+      out[i] = NA_REAL;
+      continue;
     }
-    
-    return out;
+    sum_i += x[i];
+    out[i] = sum_i;
   }
-  ```
   
-  In our new implementation of `anyC()` we use `LogicalVetor` as return type. If we would use `bool` instead, the C++ `NA_LOGICAL` would be converted into R's logical `TRUE`.
-  
-  ```{cpp}
-  LogicalVector anyC(LogicalVector x, bool na_rm = false) {
+  return out;
+}
+```
+
+In our new implementation of `anyC()` we use `LogicalVetor` as return type. If we would use `bool` instead, the C++ `NA_LOGICAL` would be converted into R's logical `TRUE`.
+
+```{cpp}
+LogicalVector anyC(LogicalVector x, bool na_rm = false) {
   int n = x.size();
   LogicalVector out = LogicalVector::create(false);
   
   if (na_rm == false) {
-  for(int i = 0; i < n; ++i) {
-  if (LogicalVector::is_na(x[i])) {
-  out[0] = NA_LOGICAL;
-  return out;
-  } else {
-  if (x[i]) {
-  out[0] = true;
-  }
-  }
-  }
+    for(int i = 0; i < n; ++i) {
+      if (LogicalVector::is_na(x[i])) {
+        out[0] = NA_LOGICAL;
+        return out;
+      } else {
+        if (x[i]) {
+          out[0] = true;
+        }
+      }
+    }
   }
   
   if (na_rm) {
-  for(int i = 0; i < n; ++i) {
-  if (LogicalVector::is_na(x[i])) {
-  continue;
+    for(int i = 0; i < n; ++i) {
+      if (LogicalVector::is_na(x[i])) {
+        continue;
+      }
+      if (x[i]) {
+        out[0] = true;
+        return out;
+      }
+    }
   }
-  if (x[i]) {
-  out[0] = true;
   return out;
-  }
-  }
-  }
-  return out;
-  }
-  ```
-  
-  For `PositionC()` we check the results of the predicate function for `NA`s. In some cases it may also make sense check the elements of the list input for `NA`s, and provide an `NA`-handling for the predicate function.
-  
-  ```{cpp}
-  int PositionC(Function pred, List x, bool na_rm = false) {
+}
+```
+
+For `PositionC()` we check the results of the predicate function for `NA`s. In some cases it may also make sense check the elements of the list input for `NA`s, and provide an `NA`-handling for the predicate function.
+
+```{cpp}
+int PositionC(Function pred, List x, bool na_rm = false) {
   int n = x.size();
   
   for(int i = 0; i < n; ++i) {
-  LogicalVector res = pred(x[i]);
-  
-  if (LogicalVector::is_na(res[0])) {
-  if (na_rm) {continue;}
-  return NA_INTEGER;
-  }
-  if (res[0]) return i + 1;
+    LogicalVector res = pred(x[i]);
+    
+    if (LogicalVector::is_na(res[0])) {
+      if (na_rm) {continue;}
+      return NA_INTEGER;
+    }
+    if (res[0]) return i + 1;
   }
   return 0;
-  }
-  ```
-  
-  When we set `na_rm = TRUE` in our `pminC()` function it only returns `NA`s at indices where both, `x` and `y`, contain an `NA`.
-  
-  ```{cpp}
-  NumericVector pminC(NumericVector x, NumericVector y,
-  bool na_rm = false) {
+}
+```
+
+When we set `na_rm = TRUE` in our `pminC()` function it only returns `NA`s at indices where both, `x` and `y`, contain an `NA`.
+
+```{cpp}
+NumericVector pminC(NumericVector x, NumericVector y,
+                    bool na_rm = false) {
   int n = std::max(x.size(), y.size());
   NumericVector x1 = rep_len(x, n);
   NumericVector y1 = rep_len(y, n);
@@ -441,117 +441,117 @@ NumericVector rangeC(NumericVector x){
   NumericVector out(n);
   
   for (int i = 0; i < n; ++i) {
-  if (na_rm == false) {
-  if (NumericVector::is_na(x[i])) {
-  return NumericVector::create(NA_REAL);
-  }
-  if (NumericVector::is_na(y[i])) {
-  return NumericVector::create(NA_REAL);
-  }
-  }
-  if (na_rm == true) {
-  if (NumericVector::is_na(x[i])) {
-  out[i] = y[i];
-  continue;
-  }
-  if (NumericVector::is_na(y[i])) {
-  out[i] = x[i];
-  continue;
-  }
-  }
-  out[i] = std::min(x1[i], y1[i]);
+    if (na_rm == false) {
+      if (NumericVector::is_na(x[i])) {
+        return NumericVector::create(NA_REAL);
+      }
+      if (NumericVector::is_na(y[i])) {
+        return NumericVector::create(NA_REAL);
+      }
+    }
+    if (na_rm == true) {
+      if (NumericVector::is_na(x[i])) {
+        out[i] = y[i];
+        continue;
+      }
+      if (NumericVector::is_na(y[i])) {
+        out[i] = x[i];
+        continue;
+      }
+    }
+    out[i] = std::min(x1[i], y1[i]);
   }
   
   return out;
-  }
-  ```
-  
-  __[Q2]{.Q}__: Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that these functions have slightly more complicated behaviour.
-  
-  __[A]{.solved}__: As we already wrote an `NA`-aware `cumsumC()` function under the assumption to return a single `NA` in case of `na_rm = false`, we modify it here slightly to always return a vector with the same length as it's `x` argument. Our new `cumsumC2()` function treats `NA` values always like zeros. In case of `na_rm = false` the `NA` values are kept in the output and in case of `na_rm = true` the `NA` values are replaced by the last occurring non-`NA`-value or zero (if it's entirely `NA` values).
-  
-  ```{cpp}
-  NumericVector cumsumC(NumericVector x) {
+}
+```
+
+__[Q2]{.Q}__: Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that these functions have slightly more complicated behaviour.
+
+__[A]{.solved}__: As we already wrote an `NA`-aware `cumsumC()` function under the assumption to return a single `NA` in case of `na_rm = false`, we modify it here slightly to always return a vector with the same length as it's `x` argument. Our new `cumsumC2()` function treats `NA` values always like zeros. In case of `na_rm = false` the `NA` values are kept in the output and in case of `na_rm = true` the `NA` values are replaced by the last occurring non-`NA`-value or zero (if it's entirely `NA` values).
+
+```{cpp}
+NumericVector cumsumC(NumericVector x) {
   int n = x.size();
   NumericVector out(n);
   LogicalVector index = is_na(x);
   
   out[0] = x[0];
   for(int i = 1; i < n; ++i) {
-  if (index[i - 1]) {
-  out[i] = NA_REAL;
-  } else{
-  out[i] = out[i - 1] + x[i];
-  }
+    if (index[i - 1]) {
+      out[i] = NA_REAL;
+    } else{
+      out[i] = out[i - 1] + x[i];
+    }
   }
   
   return out;
-  }
-  ```
-  
-  For `diffC()`'s implementation, we again return just an `NA` whenever an `NA` value occurs. In case of `na_rm = true`, we ensure that calculations which are affected by `NA`'s will also return an `NA`. (We could have also chosen to exclude `NA`s completely from the input or - equivalently - the output).
-  
-  ```{cpp}
-  NumericVector difflagC(NumericVector x, int lag = 1,
-  bool na_rm = false){
+}
+```
+
+For `diffC()`'s implementation, we again return just an `NA` whenever an `NA` value occurs. In case of `na_rm = true`, we ensure that calculations which are affected by `NA`'s will also return an `NA`. (We could have also chosen to exclude `NA`s completely from the input or - equivalently - the output).
+
+```{cpp}
+NumericVector difflagC(NumericVector x, int lag = 1,
+                       bool na_rm = false){
   int n = x.size();
   NumericVector out(n - lag);
   for(int i = lag; i < n; i++){
-  if (NumericVector::is_na(x[i]) ||
-  NumericVector::is_na(x[i - lag])) {
-  if (na_rm == false) {
-  return NumericVector::create(NA_REAL);
-  }
-  out[i - lag] = NA_REAL;
-  continue;
-  }
-  out[i - lag] = x[i] - x[i - lag];
+    if (NumericVector::is_na(x[i]) ||
+        NumericVector::is_na(x[i - lag])) {
+      if (na_rm == false) {
+        return NumericVector::create(NA_REAL);
+      }
+      out[i - lag] = NA_REAL;
+      continue;
+    }
+    out[i - lag] = x[i] - x[i - lag];
   }
   return out;
-  }
-  ```
-  
-  ## Standard Template Library
-  
-  To practice using the STL algorithms and data structures, implement the following using R functions in C++, using the hints provided:
-  
-  __[Q1]{.Q}__: `median.default()` using `partial_sort`.
-  
-  __[A]{.solved}__: The median is computed differently for even or odd vectors, which we allow for in the function below.
-  
-  ```{cpp}
-  #include <algorithm>
-  #include <Rcpp.h>
-  using namespace Rcpp;
-  
-  // [[Rcpp::export]]
-  double medianC(NumericVector x) {
+}
+```
+
+## Standard Template Library
+
+To practice using the STL algorithms and data structures, implement the following using R functions in C++, using the hints provided:
+
+__[Q1]{.Q}__: `median.default()` using `partial_sort`.
+
+__[A]{.solved}__: The median is computed differently for even or odd vectors, which we allow for in the function below.
+
+```{cpp}
+#include <algorithm>
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+double medianC(NumericVector x) {
   int n = x.size();
   double out;
   if (n % 2 == 0){
-  std::partial_sort (x.begin(), x.begin() + n / 2 + 1, x.end());
-  out = (x[n / 2 - 1] + x[n / 2]) / 2;
+    std::partial_sort (x.begin(), x.begin() + n / 2 + 1, x.end());
+    out = (x[n / 2 - 1] + x[n / 2]) / 2;
   } else {
-  std::partial_sort (x.begin(), x.begin() + (n + 1) / 2, x.end());
-  out = x[(n + 1) / 2 - 1];
+    std::partial_sort (x.begin(), x.begin() + (n + 1) / 2, x.end());
+    out = x[(n + 1) / 2 - 1];
   }
   
   return out;
-  }
-  ```
-  
-  __[Q2]{.Q}__: `%in%` using `unordered_set` and the `find()` or `count()` methods.
-  
-  __[A]{.solved}__: We use the `find()` method and loop through the `unordered_set` until we find a match or have scanned the entire set.
-  
-  ```{cpp}
-  // [[Rcpp::plugins(cpp11)]]
-  #include <Rcpp.h>
-  #include <unordered_set>
-  using namespace Rcpp;
-  
-  // [[Rcpp::export]]
-  LogicalVector inC(CharacterVector x, CharacterVector table) {
+}
+```
+
+__[Q2]{.Q}__: `%in%` using `unordered_set` and the `find()` or `count()` methods.
+
+__[A]{.solved}__: We use the `find()` method and loop through the `unordered_set` until we find a match or have scanned the entire set.
+
+```{cpp}
+// [[Rcpp::plugins(cpp11)]]
+#include <Rcpp.h>
+#include <unordered_set>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+LogicalVector inC(CharacterVector x, CharacterVector table) {
   std::unordered_set<String> seen;
   int n_x = x.size();
   std::vector<bool> out;
@@ -559,22 +559,22 @@ NumericVector rangeC(NumericVector x){
   seen.insert (table.begin(), table.end());
   
   for (int i = 0; i < n_x; ++i) {
-  if (seen.find(x[i]) == seen.end()) {
-  out.push_back(false);
-  continue;
-  } 
-  out.push_back(true);
+    if (seen.find(x[i]) == seen.end()) {
+      out.push_back(false);
+      continue;
+    } 
+    out.push_back(true);
   }
   
   return wrap(out);
-  }
-  ```
-  
-  __[Q3]{.Q}__: `unique()` using an `unordered_set` (challenge: do it in one line!).
-  
-  __[A]{.started}__: The `insert()`-method will return if an equivalent element already existed. If a new element is inserted, we will add it to the (unique) return vector of our function.
-  
-  ```{Rcpp}
+}
+```
+
+__[Q3]{.Q}__: `unique()` using an `unordered_set` (challenge: do it in one line!).
+
+__[A]{.solved}__: The `insert()`-method will return if an equivalent element already existed. If a new element is inserted, we will add it to the (unique) return vector of our function.
+
+```{Rcpp}
 // [[Rcpp::plugins(cpp11)]]
 #include <Rcpp.h>
 #include <unordered_set>
@@ -582,24 +582,24 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 NumericVector uniqueC(NumericVector x) {
-std::unordered_set<int> seen;
-int n = x.size();
-std::vector<double> out;
-
-for (int i = 0; i < n; ++i) {
-if (seen.insert(x[i]).second) out.push_back(x[i]);
-}
-
-return wrap(out);
+  std::unordered_set<int> seen;
+  int n = x.size();
+  std::vector<double> out;
+  
+  for (int i = 0; i < n; ++i) {
+    if (seen.insert(x[i]).second) out.push_back(x[i]);
+  }
+  
+  return wrap(out);
 }
 
 
 // As a one-liner
 // [[Rcpp::export]]
 NumericVector uniqueCC(NumericVector x) {
-return wrap(
-  *(new std::unordered_set<double>(x.begin(), x.end()))
-);
+  return wrap(
+    *(new std::unordered_set<double>(x.begin(), x.end()))
+  );
 }
 ```
 
@@ -745,4 +745,3 @@ setdiff(x, y)
 
 typeof(setdiff(x, y))
 ```
-
