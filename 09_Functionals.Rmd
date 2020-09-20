@@ -80,7 +80,7 @@ __[Q4]{.Q}__: The following code simulates the performance of a t-test for non-n
 trials <- map(1:100, ~ t.test(rpois(10, 10), rpois(10, 7)))
 ```
 
-__[A]{.solved}__: There are many ways to visualise this data, but since there are only 100 data points we choose a dot plot to visualize the individual values and the overall distribution. Unfortunately the dot plot doesn't compute proper counts for us (because it was created to visualize distribution densities instead of frequencies), so a histogram could be a suitable alternative.
+__[A]{.solved}__: There are many ways to visualise this data. However, since there are only 100 data points, we choose a to visualize the distribution via a dot plot. (Unfortunately `ggplot2`s `geom_dotplot()` doesn't compute proper counts as it was created to visualize distribution densities instead of frequencies, so a histogram could be a suitable alternative).
 
 ```{r, message = FALSE}
 library(ggplot2)
