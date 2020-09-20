@@ -51,19 +51,17 @@ for (i in 1:length(x)) {
 out
 ```
 
-__[A]{.solved}__: This loop is a interesting combination of a few common no-so-defensive patterns and we have to consider a few points to explain why it is evaluated without raising errors or warnings.
+__[A]{.solved}__: This loop is a delicate issue and we have to consider a few points to explain why it is evaluated without raising any errors or warnings.
 
-Generally it seems that the objects `x` and `out` (which could have also have been explicitly created as `out <- list()`) are initialized first and then used and filled within the loop.
+The beginning of this code smell is the statement `1:length(x)` which creates the index of our for loop. As `x` has length 0 `1:length(x)` counts down from 1 to 0. This issue is typically avoided via usage of `seq_along(x)` or similar helpers which would just generate `integer(0)` in this case.
 
-The statement `1:length(x)` indicates that iteration along `x` is intended. Since `x` has length 0 `1:length(x)` counts down from 1 to 0. This issue is typically avoided by using `seq_along(x)` or similar helpers which would just generate `integer(0)` in this case.
-
-In the following assignment `[<-` and `[` are use for indexing 0-length vectors at their first and zeroth position. Let us review their subsetting behaviour for out-of-bounds and zero indices.                                         
+As we use `[<-` and `[` for indexing 0-length vectors at their first and zeroth position, we need to be aware of their subsetting behaviour for out-of-bounds and zero indices.
 
 During the first iteration `x[1]` will generate an `NA` (out-of-bounds indexing for atomics). The resulting `NA` (from squaring) will be assigned to the empty length-1 list `out[1]` (out-of-bounds indexing for lists).
 
 In the next iteration, `x[0]` will return `numeric(0)` (zero indexing for atomics). Again squaring doesn't change the value and `numeric(0)` is assigned to `out[0]` (zero indexing for lists). Assigning a 0-length vector to a 0-length subset works, but doesn't change the object.
 
-Overall the code works, because each step includes valid R operations even though the result may not be what the user intended.
+Overall the code works, because each step includes valid R operations (even though the result may not be what the user intended).
 
 __[Q2]{.Q}__: What does the following code tell you about when the vector being iterated over is evaluated?
 
