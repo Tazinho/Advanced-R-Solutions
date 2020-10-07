@@ -57,10 +57,19 @@ function (..., list = character(), pos = -1,
 }
 ```
 
-We see, that rm is ultimately calls `remove` in the caller environment (`pos = -1`).
+<!-- HW: I think this is the reason why, but I can't get profiling to complete :| -->
 
-<!-- HB: But it's still not really clear to me, what is happening here... -->
-<!-- @HW Please clarify/help :) -->
+`rm()` does a surprising amount of work because it relies on non-standard evaluation to get the name of the object to delete.
+
+We can make the job of `rm()` considerably simpler by using the `list` argument:
+
+```{r}
+f2 <- function(n = 1e5) {
+  x <- rep(1, n)
+  rm(list = "x")
+}
+profvis::profvis(f(), torture = TRUE)
+```
 
 ## Microbenchmarking
 
@@ -97,7 +106,7 @@ t1_systime <- system.time(for (i in 1:n) sqrt(x)) / n
 t2_systime <- system.time(for (i in 1:n) x ^ 0.5) / n
 ```
 
-We see, that both approaches get the order of magnitude right. We assume, that the `bench`-results may be a little more accurate, because of its high precision timer. There may also be a tiny overhead cost introduced by the for loop in the `system.time`-approach.
+We see, that both approaches get the order of magnitude right. We assume, that the `bench`-results may be a little more accurate, because of its high precision timer. There may also be overhead introduced by the for loop in the `system.time`-approach.
 
 ```{r}
 # Compare the results
