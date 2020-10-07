@@ -149,21 +149,20 @@ escape <- function(x, script = FALSE) UseMethod("escape")
 
 escape.character <- function(x, script = FALSE) {
   
-  if (!script) {
+  if (script) {
+    x <- gsub("</script>", "<\\/script>", x, fixed = TRUE)
+    x <- gsub("</style>",  "<\\/style>",  x, fixed = TRUE)
+  } else {
     x <- gsub("&", "&amp;", x)
     x <- gsub("<", "&lt;", x)
     x <- gsub(">", "&gt;", x)
   }
-  
-  if (script) {
-    x <- gsub("</script>", "<\\/script>", x, fixed = TRUE)
-    x <- gsub("</style>",  "<\\/style>",  x, fixed = TRUE)
-  }
-  
+
   html(x)
 }
 
-escape.advr_html <- function(x, ...) x
+escape.advr_html <- function(x, script = FALSE) x
+
 
 tag <- function(tag, script = FALSE) {
   
@@ -172,9 +171,7 @@ tag <- function(tag, script = FALSE) {
     expr({
       dots <- dots_partition(...)
       attribs <- html_attributes(dots$named)
-      children <- map_chr(dots$unnamed,
-                          # Choose the escaping
-                          ~ escape(., script = !!script))
+      children <- map_chr(dots$unnamed, escape, script = !!script)
       html(paste0(
         !!paste0("<", tag), attribs, ">",
         paste(children, collapse = ""),
@@ -232,7 +229,7 @@ To keep the focus on the key ideas, we ignore special cases like `<script>`, `<s
 tag_factory <- function(tag, tag_attrs) {
   attrs <- c("class", "id", tag_attrs)
   
-  attr_args <- map(set_names(attrs), ~ NULL)
+  attr_args <- set_names(rep(list(NULL), length(attrs)), attrs)
   attr_list <- call2("list", !!!syms(set_names(attrs)))
   
   new_function(
@@ -293,20 +290,21 @@ with_html(p(address))
 __[A]{.solved}__: First, we rerun the relevant code from the textbook to define `with_html()`. Note that we skip the code for void tags, as none of them appear in the code chunk from this exercise.
 
 ```{r}
-tags <- c("a", "abbr", "address", "article", "aside", "audio",
-          "b","bdi", "bdo", "blockquote", "body", "button", "canvas",
-          "caption","cite", "code", "colgroup", "data", "datalist",
-          "dd", "del","details", "dfn", "div", "dl", "dt", "em",
-          "eventsource","fieldset", "figcaption", "figure", "footer",
-          "form", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header",
-          "hgroup", "html", "i","iframe", "ins", "kbd", "label",
-          "legend", "li", "mark", "map","menu", "meter", "nav",
-          "noscript", "object", "ol", "optgroup", "option", "output",
-          "p", "pre", "progress", "q", "ruby", "rp","rt", "s", "samp",
-          "script", "section", "select", "small", "span", "strong",
-          "style", "sub", "summary", "sup", "table", "tbody", "td",
-          "textarea", "tfoot", "th", "thead", "time", "title", "tr",
-          "u", "ul", "var", "video"
+tags <- c(
+  "a", "abbr", "address", "article", "aside", "audio",
+  "b", "bdi", "bdo", "blockquote", "body", "button", "canvas",
+  "caption", "cite", "code", "colgroup", "data", "datalist",
+  "dd", "del", "details", "dfn", "div", "dl", "dt", "em",
+  "eventsource", "fieldset", "figcaption", "figure", "footer",
+  "form", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header",
+  "hgroup", "html", "i", "iframe", "ins", "kbd", "label",
+  "legend", "li", "mark", "map", "menu", "meter", "nav",
+  "noscript", "object", "ol", "optgroup", "option", "output",
+  "p", "pre", "progress", "q", "ruby", "rp", "rt", "s", "samp",
+  "script", "section", "select", "small", "span", "strong",
+  "style", "sub", "summary", "sup", "table", "tbody", "td",
+  "textarea", "tfoot", "th", "thead", "time", "title", "tr",
+  "u", "ul", "var", "video"
 )
 
 html_tags <- tags %>% set_names() %>% map(tag)
@@ -359,10 +357,10 @@ void_tag <- function(tag) {
     expr({
       dots <- dots_partition(...)
       if (length(dots$unnamed) > 0) {
-        stop(!!paste0("<",
-                      tag,
-                      "> must not have unnamed arguments"),
-             call. = FALSE)
+        stop(
+          !!paste0("<", tag, "> must not have unnamed arguments"),
+          call. = FALSE
+        )
       }
       
       attribs <- html_attributes(dots$named)
@@ -373,26 +371,31 @@ void_tag <- function(tag) {
   )
 }
 
-tags <- c("a", "abbr", "address", "article", "aside", "audio", "b",
-          "bdi", "bdo", "blockquote", "body", "button", "canvas",
-          "caption","cite", "code", "colgroup", "data", "datalist",
-          "dd", "del","details", "dfn", "div", "dl", "dt", "em",
-          "eventsource","fieldset", "figcaption", "figure", "footer",
-          "form", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header",
-          "hgroup", "html", "i","iframe", "ins", "kbd", "label", "legend",
-          "li", "mark", "map","menu", "meter", "nav", "noscript", "object",
-          "ol", "optgroup", "option", "output", "p", "pre", "progress", "q",
-          "ruby", "rp","rt", "s", "samp", "script", "section", "select",
-          "small", "span", "strong", "style", "sub", "summary", "sup",
-          "table", "tbody", "td", "textarea", "tfoot", "th", "thead",
-          "time", "title", "tr", "u", "ul", "var", "video")
+tags <- c(
+  "a", "abbr", "address", "article", "aside", "audio", "b",
+  "bdi", "bdo", "blockquote", "body", "button", "canvas",
+  "caption", "cite", "code", "colgroup", "data", "datalist",
+  "dd", "del", "details", "dfn", "div", "dl", "dt", "em",
+  "eventsource", "fieldset", "figcaption", "figure", "footer",
+  "form", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header",
+  "hgroup", "html", "i", "iframe", "ins", "kbd", "label", "legend",
+  "li", "mark", "map", "menu", "meter", "nav", "noscript", "object",
+  "ol", "optgroup", "option", "output", "p", "pre", "progress", "q",
+  "ruby", "rp", "rt", "s", "samp", "script", "section", "select",
+  "small", "span", "strong", "style", "sub", "summary", "sup",
+  "table", "tbody", "td", "textarea", "tfoot", "th", "thead",
+  "time", "title", "tr", "u", "ul", "var", "video"
+)
 
-void_tags <- c("area", "base", "br", "col", "command", "embed", "hr", "img",
-               "input", "keygen", "link", "meta", "param", "source", 
-               "track", "wbr")
+void_tags <- c(
+  "area", "base", "br", "col", "command", "embed", "hr", "img",
+  "input", "keygen", "link", "meta", "param", "source", 
+  "track", "wbr"
+)
 
-html_tags <- c(tags %>% set_names() %>% map(tag),
-               void_tags %>% set_names() %>% map(void_tag)
+html_tags <- c(
+  tags %>% set_names() %>% map(tag),
+  void_tags %>% set_names() %>% map(void_tag)
 )
 
 with_html <- function(code) {
@@ -413,36 +416,38 @@ with_html(
 )
 ```
 
-The formatting comes down to just one long line of code. This output will be more difficult to work with, to inspect what the code does and if it's correct. What kind of formatting would we prefer instead? The [Google HTML Styleguide](https://google.github.io/styleguide/htmlcssguide.html#HTML_Formatting_Rules) suggests *indentation* by 2 spaces and *new lines* for every block, list, or table element. There are other recommendations, but we will keep things simple and will be satisfied with the following output.
+The formatting comes down to just one long line of code. This output makes it harder to inspect what the HTML and check that it's correct. 
+
+What kind of formatting would we prefer instead? The [Google HTML style guide](https://google.github.io/styleguide/htmlcssguide.html#HTML_Formatting_Rules) suggests *indentation* by 2 spaces and *new lines* for every block, list, or table element. There are other recommendations, but we will keep things simple and will be satisfied with the following output.
 
 ```{html, eval=FALSE}
 <body>
   <h1 id='first'>A heading</h1>
   <p>Some text &amp;<b>some bold text.</b></p>
   <img src='myimg.png'width='100' height='100' />
-  </body>
+</body>
 ```
 
-First we adjust the `print.advr_html` method. We replace the `strwrap` function, because this will wrap HTML-code into one long line regardless of its input. We use `cat` instead, because it prints linebreaks (`"\n"`) nicely.
+First we adjust the `print.advr_html` method, removing `strwrap()` function, because this will re-wrap the HTML, making it harder to understand what's happening.
 
 ```{r}
 html <- function(x) structure(x, class = "advr_html")
-cat_line <- function(...) cat(..., sep = "")
 
 print.advr_html <- function(x, ...) {
-  out <- paste("<HTML>", x, sep = "\n")  # linebreak added
-  # cat_line(paste(strwrap(out), collapse = ""))
-  cat_line(out)
+  cat(paste("<HTML>", x, sep = "\n"))
 }
 ```
 
-In our desired output we can see, that the content of the `body`-function requires another formatting than the other tag-functions. We will therefore create a new `format_code`-function, that allows for optional indentation and linebreaks. For this `strwarp` provides two helpful arguments: each element will start with a line break (`prefix = "\n"`) and will be indented properly (`indent = 2`).
+In our desired output we can see that the content of the `body`-function requires different formatting than the other tag-functions. We will therefore create a new `format_code`-function, that allows for optional indentation and linebreaks. 
 
 ```{r}
-format_code <- function(children, indent = FALSE){
+indent <- function(x) {
+  paste0("  ", gsub("\n", "\n  ", x))
+}
+
+format_code <- function(children, indent = FALSE) {
   if (indent) {
-    paste0(paste(strwrap(children, indent = 2, prefix = "\n"),
-                 collapse = ""), "\n")
+    paste0("\n", paste0(indent(children), collapse = "\n"), "\n")
   } else {
     paste(children, collapse = "") 
   }
@@ -452,21 +457,16 @@ format_code <- function(children, indent = FALSE){
 We adjust the body function to include the `format_code()`-helper. (This could also be approached programmatically in the tag function factory.)
 
 ```{r}
-html_tags$body <- function(...){
-  attribs <- caller_env(0) %>%
-    as.list() %>%
-    Filter(function(x) !is.symbol(x), .) %>%
-    html_attributes()
+html_tags$body <- function(...) {
+  dots <- dots_partition(...)
+  attribs <- html_attributes(dots$named)
+  children <- map_chr(dots$unnamed, escape)
   
-  dots <- validate_dots(...)
-  children <- map_chr(dots$unnamed, ~escape(., escape_choice = "content"))
-  
-  html(paste0("<body",
-              attribs, ">",
-              # instead of `paste(children, collapse = "")`
-              format_code(children, indent = TRUE),  
-              "</body>")
-  )
+  html(paste0(
+    "<body", attribs, ">",
+    format_code(children, indent = TRUE),  
+    "</body>"
+  ))
 }
 ```
 
@@ -883,3 +883,5 @@ to_math(bgroup("(",atop(x,y),")"))  # * use scalable delimiters
 to_math(group(lceil, x, rceil))  # * special delimiters
 to_math(group(lfloor, x, rfloor)))  # * special delimiters
 ```
+
+<!-- HW: I don't think you need to do all of these; just pick a couple of interseting ones -->
