@@ -103,7 +103,6 @@ bool allC(LogicalVector x) {
 
 ```{cpp}
 NumericVector cumprodC(NumericVector x) {
-  
   int n = x.size();
   NumericVector out(n);
   
@@ -161,49 +160,49 @@ NumericVector difflagC(NumericVector x, int lag = 1){
 }
 ```
 
+<!-- HW: you might need a check here that lag is < length(x) -->
+
 4. `range()`
 
 ```{cpp}
 NumericVector rangeC(NumericVector x){
-  double omin, omax;  
+  double omin = x[0], omax = x[0];
+  
   int n = x.size();
-  NumericVector out(2);
-  
-  omin = x[0];
-  omax = x[0];
-  
   for(int i = 1; i < n; i++){
     omin = std::min(x[i], omin);
     omax = std::max(x[i], omax);
   }
   
+  NumericVector out(2);
   out[0] = omin;
   out[1] = omax;
   return out;
 ```
+  
+<!-- this needs a check that n > 0 -->
   
 5. `var()`
   
 ```{cpp}
 double varC(NumericVector x) {
   int n = x.size();
-  double mx = 0;
-  double out = 0;
   
-  if(n < 2) {
+  if (n < 2) {
     return NA_REAL;
   }
   
-  for(int i = 0; i < n; ++i) {
+  double mx = 0;
+  for (int i = 0; i < n; ++i) {
     mx += x[i] / n;
   }
   
-  for(int i = 0; i < n; ++i) {
+  double out = 0;
+  for (int i = 0; i < n; ++i) {
     out += pow(x[i] - mx, 2);
   }
   
-  out = out / (n-1);
-  return out;
+  return out / (n - 1);
 }
 ```
 
@@ -220,7 +219,16 @@ NumericVector minC(NumericVector x, bool na_rm = false){
   int n = x.size();
   NumericVector out = NumericVector::create(R_PosInf);
   
-  if (na_rm == false) {
+  if (na_rm) {
+    for(int i = 0; i < n; ++i) {
+      if (x[i] == NA_REAL) {
+        continue;
+      }
+      if (x[i] < out[0]) {
+        out[0] = x[i];
+      }
+    }
+  } else {
     for(int i = 0; i < n; ++i) {
       if (NumericVector::is_na(x[i])) {
         out[0] = NA_REAL;
@@ -231,21 +239,14 @@ NumericVector minC(NumericVector x, bool na_rm = false){
       }
     }
   }
-  
-  if (na_rm) {
-    for(int i = 0; i < n; ++i) {
-      if (x[i] == NA_REAL) {
-        continue;
-      }
-      if (x[i] < out[0]) {
-        out[0] = x[i];
-      }
-    }
-  }
+
   
   return out;
 }
 ```
+
+<!-- HW: I think just showing how you'd rewrite one function is probably adequate here. If you wanted to do more, I'd suggest a variation where you put the `na_rm` check inside the inner loop. You can discuss that's a bit slower but there's less duplicated code -->
+
 
 To implement `maxC()` we reuse `minC()` and take advantage of a connection between the minimum and the maximum: $\max(x) = -\min(-x)$.
 
@@ -468,17 +469,17 @@ NumericVector pminC(NumericVector x, NumericVector y,
 
 __[Q2]{.Q}__: Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that these functions have slightly more complicated behaviour.
 
-__[A]{.solved}__: As we already wrote an `NA`-aware `cumsumC()` function under the assumption to return a single `NA` in case of `na_rm = false`, we modify it here slightly to always return a vector with the same length as it's `x` argument. Our new `cumsumC2()` function treats `NA` values always like zeros. In case of `na_rm = false` the `NA` values are kept in the output and in case of `na_rm = true` the `NA` values are replaced by the last occurring non-`NA`-value or zero (if it's entirely `NA` values).
+__[A]{.solved}__: As we already wrote an `NA`-aware `cumsumC()` function under the assumption to return a single `NA` in case of `na_rm = false`, we modify it here slightly to always return a vector with the same length as its `x` argument. Our new `cumsumC2()` function treats `NA` values always like zeros. In case of `na_rm = false` the `NA` values are kept in the output and in case of `na_rm = true` the `NA` values are replaced by the last occurring non-`NA`-value or zero (if it's entirely `NA` values).
 
 ```{cpp}
 NumericVector cumsumC(NumericVector x) {
   int n = x.size();
   NumericVector out(n);
-  LogicalVector index = is_na(x);
+  LogicalVector is_missing = is_na(x);
   
   out[0] = x[0];
   for(int i = 1; i < n; ++i) {
-    if (index[i - 1]) {
+    if (is_missing[i - 1]) {
       out[i] = NA_REAL;
     } else{
       out[i] = out[i - 1] + x[i];
@@ -499,7 +500,7 @@ NumericVector difflagC(NumericVector x, int lag = 1,
   for(int i = lag; i < n; i++){
     if (NumericVector::is_na(x[i]) ||
         NumericVector::is_na(x[i - lag])) {
-      if (na_rm == false) {
+      if (!na_rm) {
         return NumericVector::create(NA_REAL);
       }
       out[i - lag] = NA_REAL;
@@ -527,16 +528,14 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 double medianC(NumericVector x) {
   int n = x.size();
-  double out;
+
   if (n % 2 == 0){
     std::partial_sort (x.begin(), x.begin() + n / 2 + 1, x.end());
-    out = (x[n / 2 - 1] + x[n / 2]) / 2;
+    return (x[n / 2 - 1] + x[n / 2]) / 2;
   } else {
     std::partial_sort (x.begin(), x.begin() + (n + 1) / 2, x.end());
-    out = x[(n + 1) / 2 - 1];
+    return x[(n + 1) / 2 - 1];
   }
-  
-  return out;
 }
 ```
 
@@ -553,20 +552,15 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 LogicalVector inC(CharacterVector x, CharacterVector table) {
   std::unordered_set<String> seen;
-  int n_x = x.size();
-  std::vector<bool> out;
+  seen.insert(table.begin(), table.end());
   
-  seen.insert (table.begin(), table.end());
-  
-  for (int i = 0; i < n_x; ++i) {
-    if (seen.find(x[i]) == seen.end()) {
-      out.push_back(false);
-      continue;
-    } 
-    out.push_back(true);
+  int n = x.size();
+  LogicalVector out(n);
+  for (int i = 0; i < n; ++i) {
+    out[i] = seen.find(x[i]) != seen.end();
   }
   
-  return wrap(out);
+  return out;
 }
 ```
 
@@ -584,8 +578,8 @@ using namespace Rcpp;
 NumericVector uniqueC(NumericVector x) {
   std::unordered_set<int> seen;
   int n = x.size();
-  std::vector<double> out;
   
+  std::vector<double> out;
   for (int i = 0; i < n; ++i) {
     if (seen.insert(x[i]).second) out.push_back(x[i]);
   }
@@ -603,10 +597,17 @@ NumericVector uniqueCC(NumericVector x) {
 }
 ```
 
+<!-- HW: does this work?
+std::unordered_set<double> uniqueCC(NumericVector x) {
+  return std::unordered_set<double>(x.begin(), x.end());
+}
+-->
 
 __[Q4]{.Q}__: `min()` using `std::min()`, or `max()` using `std::max()`.
 
 __[A]{.solved}__: We will implement `min()` by iterating over the vector and recursively comparing each element to the current minimum value.
+
+<!-- HW: I think this was an error; it feels rather different to the other questions -->
 
 ```{cpp}
 #include <Rcpp.h>
@@ -638,13 +639,11 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 double which_minC(NumericVector x){
-  int out;
-  out = std::distance(
+  int out = std::distance(
     x.begin(), std::min_element(x.begin(), x.end())
   );
-  out++;
-  
-  return out;
+
+  return out + 1;
 }
 ```
 
