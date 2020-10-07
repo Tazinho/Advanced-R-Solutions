@@ -9,21 +9,15 @@ source("common.R")
 
 # Improving performance
 
-In this chapter we will run a few benchmarks and pipe it into the following helper-function to subset and pretty-print their results.
+In this chapter we will run a few benchmarks.
 
 ```{r, include=FALSE}
 library(rlang)
 library(magrittr)
-
-print_bench_results <- function(bench_df, ...) {
-  dots <- rlang::enquos(...)
-  
-  bench_df %>% 
-    purrr::modify_at("expression", as.character) %>% 
-    dplyr::select(!!!dots)
-}
 ```
 
+
+<!-- HW: just using [1:3] is rougly equivalent and doesn't require any explanation -->
 
 ## Checking for existing solutions
 
@@ -73,7 +67,7 @@ For further speed improvements, you could install a linear algebra library optim
 
 __[Q2]{.Q}__: What package implements a version of `match()` that's faster for repeated lookups? How much faster is it?
 
-__[A]{.solved}__: A web search points us to the `{fastmatch}`-package. We compare it to `base::match()` and observe an impressive relative performance gain (up to 35x faster computation).
+__[A]{.solved}__: A web search points us to the `{fastmatch}`-package. We compare it to `base::match()` and observe an impressive  performance gain (up to 35x faster computation).
 
 ```{r}
 set.seed(1)
@@ -81,11 +75,12 @@ table <- 1L:100000L
 x <- sample(table, 10000, replace = TRUE)
 
 bench::mark(
-  "match" = match(x, table),
-  "fastmatch" = fastmatch::fmatch(x, table),
-  relative = TRUE
+  match = match(x, table),
+  fastmatch = fastmatch::fmatch(x, table)
 ) 
 ```
+
+<!-- HW: I think relative benchmarks are fundamentally dangerous because you don't know what the denominators are - they might be really small and you're just looking at noise -->
 
 __[Q3]{.Q}__: List four functions (not just those in base R) that convert a string into a date time object. What are their strengths and weaknesses?
 
@@ -137,7 +132,7 @@ date_str <- strptime("2020-01-01 12:30:25",
 identical(date_lt, date_str)
 ```
 
-`as.POSIXct()` and `as.POSIXlt()` accept different character inputs by default (e.g. "2001-01-01 12:30", "2001/1/1 12:30"). `strptime()` requires the format argument to be set explicitly, but also offers an increase in performance.
+`as.POSIXct()` and `as.POSIXlt()` accept different character inputs by default (e.g. "2001-01-01 12:30", "2001/1/1 12:30"). `strptime()` requires the format argument to be set explicitly, and in returns offers an increase in performance.
 
 ```{r}
 bench::mark(
@@ -146,8 +141,7 @@ bench::mark(
                                  format = "%Y-%m-%d %H:%M:%S"),
   strptime_fomat = strptime("2020-01-01 12:30:25",
                             format = "%Y-%m-%d %H:%M:%S")
-) %>% 
-  print_bench_results(expression, median)
+)[1:3]
 ```
 
 A fourth way is to use the converter functions from the `{lubridate}` package, which contains wrapper functions (for the POSIXct approach) with an intuitive syntax. (There is a slight decrease in performance though.)
@@ -159,8 +153,7 @@ ymd_hms("2013-07-24 23:55:26")
 bench::mark(
   as.POSIXct = as.POSIXct("2013-07-24 23:55:26", tz = "UTC"),
   ymd_hms = ymd_hms("2013-07-24 23:55:26")
-) %>% 
-  print_bench_results(expression, median)
+)[1:3]
 ```
 
 For additional ways to convert characters into date time objects, have a look at the `{chron}`, the `{anytime}` and the `{fasttime}` packages. The `{chron}` package introduces new classes and stores times as fractions of days in the underlying double type, while it doesn't deal with timezones and daylight savings. The `{anytime}` package aims to convert "Anything to POSIXct or Date". The `{fasttime}` package contains only one function (`fastPOSIXct()`).
@@ -216,11 +209,15 @@ rowSums
 If the convenient features of `rowSums()` are not needed, then using `.rowSums()` will be more performant.
 
 ```{r}
-m <- matrix(rnorm(1e8), nrow = 10000)
+m <- matrix(rnorm(1e6), nrow = 1000)
 
-bench::mark(rowSums(m),
-            .rowSums(m, 10000, 10000))
+bench::mark(
+  rowSums(m),
+  .rowSums(m, 1000, 1000)
+)
 ```
+
+<!-- HW: these take exactly the same amount of time for me - I think the story here is that these "internal" functions aren't actually appreciably faster for this use case, so you're better off with the safer version. -->
 
 __[Q2]{.Q}__: Make a faster version of `chisq.test()` that only computes the chi-square test statistic when the input is two numeric vectors with no missing values. You can try simplifying `chisq.test()` or by coding from the [mathematical definition](http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test).
 
@@ -291,10 +288,13 @@ table2 <- function(a, b){
 a <- sample(100, 10000, TRUE)
 b <- sample(100, 10000, TRUE)
 
-bench::mark(table(a, b),
-            table2(a, b),
-            relative = TRUE)
+bench::mark(
+  table(a, b),
+  table2(a, b)
+)
 ```
+
+<!-- HW: are you sure you need fastmatch here? I think you should be able to work out the bin with a little algebra -->
 
 Since we didn't use `table()` in our `chisq.test2()`-implementation, we cannot benefit from the slight performance gain from `table2()`.
 
@@ -320,28 +320,25 @@ __[Q2]{.Q}__: Compare the speed of `apply(x, 1, sum)` with `rowSums(x)` for vary
 __[A]{.solved}__: We compare the two functions for square matrices of increasing size
 
 ```{r, warning=FALSE}
-dimensions <- c(1, 10, 100, 1000, 5000, 10000)
-matrices <- lapply(dimensions,
-                   function(x) tcrossprod(rnorm(x), rnorm(x)))
-names(matrices) <- dimensions
-
-
-bench_res <- matrices %>% 
-  purrr::map_dfr(
-    ~ bench::mark(
-      rowSums(.),
-      apply(., 1, sum)
-    ) %>% 
-      purrr::modify_at("expression", as.character),
-    .id = "dimension"
-  )
+rowsums <- bench::press(
+  p = seq(500, 5000, length.out = 10),
+  {
+    mat <- tcrossprod(rnorm(p), rnorm(p))
+    bench::mark(
+      rowSums = rowSums(mat),
+      apply = apply(mat, 1, sum)
+    )
+  }
+)
 
 library(ggplot2)
-bench_res %>% 
-  purrr::modify_at("dimension", factor, levels = dimensions) %>% 
-  ggplot(aes(dimension, median, color = expression, group = expression)) +
+rowsums %>% 
+  summary() %>% 
+  dplyr::mutate(expression = as.character(expression)) %>% 
+  ggplot(aes(p, median, color = expression, group = expression)) +
   geom_point() +
-  geom_line()
+  geom_line() + 
+  theme(legend.position = "bottom")
 ```
 
 We can see, that the difference in performance is negligible for small matrices, but becomes more and more relevant as the size of the data increases. `apply()` is a very versatile tool, but it's not "vectorised for performance" and not as optimized as `rowSums()`.
@@ -353,32 +350,29 @@ __[A]{.solved}__: We can hand the vectors to `crossprod()`, which converts them 
 ```{r}
 x <- rnorm(10)
 w <- rnorm(10)
-all.equal(sum(x * w),
-          as.numeric(crossprod(x, w)))
+all.equal(sum(x * w), as.numeric(crossprod(x, w)))
 ```
 
 A benchmark of both approaches for different vector lengths indicates that the `crossprod()` variant is almost twice as fast as `sum()`.
 
 ```{r}
-dimensions <- c(1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 0.5e7, 1e7)
-x_vector <- lapply(dimensions, rnorm)
-w_vector <- lapply(dimensions, rnorm)
+weightedsum <- bench::press(
+  n = 1:10,
+  {
+    x <- rnorm(n * 1e6)
+    bench::mark(
+      sum = sum(x * x),
+      crossprod = crossprod(x, x)[[1]]
+    )
+  }
+)
 
-
-bench_res <- purrr::map2_dfr(
-  x_vector, w_vector,
-  ~ bench::mark(
-    sum(.x * .y),
-    crossprod(.x, .y)[[1]]
-  ) %>% 
-    purrr::modify_at("expression", as.character)
-) %>% 
-  dplyr::mutate(dimension = factor(rep(dimensions, each = 2)))
-
-library(ggplot2)
-bench_res %>% 
-  ggplot(aes(dimension, median, color = expression)) +
+weightedsum %>% 
+  summary() %>% 
+  dplyr::mutate(expression = as.character(expression)) %>% 
+  ggplot(aes(n, median, color = expression, group = expression)) +
   geom_point() +
-  geom_line(aes(group = expression)) +
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
+  geom_line() + 
+  labs(x = "n (millions)") + 
+  theme(legend.position = "bottom")
 ```
