@@ -127,7 +127,7 @@ library(methods)
    happens if we don't inherit from an existing class. We get a virtual
    class. A virtual class can't be instantiated:
     
-    ```{r, eval = TRUE}
+    ```{r, eval = TRUE, error = TRUE}
     setClass("Human")
     new("Human")
     ```
@@ -158,7 +158,7 @@ library(methods)
       )
     )
  
-    abc <- new("Factor", data = c(1, 2), levels = letters[1:3])
+    abc <- new("Factor", data = c(1L, 2L), levels = letters[1:3])
     abc
     ```
     
@@ -167,10 +167,10 @@ library(methods)
     ```{r}
     setClass("Date2",
       slots = list(
-        data = "integer",
+        data = "integer"
       ),
       prototype = list(
-        data = integer(),
+        data = integer()
       )
     )
          
@@ -186,12 +186,12 @@ library(methods)
         row.names = "character"
       ),
       prototype = list(
-        x = list(),
+        data = list(),
         row.names = character(0)
       )
     )
          
-    df <- new("DataFrame", x = list(a = 1, b = 2))         
+    df <- new("DataFrame", data = list(a = 1, b = 2))         
     df
     ```
 
