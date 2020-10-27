@@ -172,9 +172,9 @@ __[A]{.solved}__: The original implementation allows a more flexible specificati
 
 __[Q4]{.Q}__: Factors have an optional “contrasts” attribute. Read the help for `C()`, and briefly describe the purpose of the attribute. What type should it have? Rewrite the `new_factor()` constructor to include this attribute.
 
-__[A]{.solved}__: When factor variables (representing nominal or ordinal information) are used in statistical models, they are typically encoded as dummy variables and by default each level is compared with the first factor level. However, many different encodings ("contrasts") are possible: <https://en.wikipedia.org/wiki/Contrast_(statistics)>
+__[A]{.solved}__: When factor variables (representing nominal or ordinal information) are used in statistical models, they are typically encoded as dummy variables and by default each level is compared with the first factor level. However, many different encodings ("contrasts") are possible, see <https://en.wikipedia.org/wiki/Contrast_(statistics)>.
 
-Within R's formula interface you can wrap a factor in `C` and specify the contrast of your choice. Alternatively you can set the "contrast" attribute of you factor variable, which accepts matrix input. (see `?contr.helmert` or similar for details)
+Within R's formula interface you can wrap a factor in `C` and specify the contrast of your choice. Alternatively you can set the "contrast" attribute of you factor variable, which accepts matrix input. (See `?contr.helmert` or similar for details).
 
 ```{r}
 # Updated factor constructor
@@ -421,9 +421,7 @@ new_lm <- function(
 
 __[Q1]{.Q}__: How does `[.Date` support subclasses? How does it fail to support subclasses?
 
-__[A]{.solved}__:
-
-`[.Date` calls `.Date` with the result of calling `[` on the parent class, along with `oldClass()`:
+__[A]{.solved}__: `[.Date` calls `.Date` with the result of calling `[` on the parent class, along with `oldClass()`:
 
 ```{r}
 `[.Date`
@@ -472,7 +470,7 @@ setdiff(generics_t, union(generics_ct, generics_lt))
 
 __[Q3]{.Q}__: What do you expect this code to return? What does it actually return? Why?
 
-```{r, eval = FALSE}
+```{r, results = "hide"}
 generic2 <- function(x) UseMethod("generic2")
 generic2.a1 <- function(x) "a1"
 generic2.a2 <- function(x) "a2"
@@ -493,6 +491,10 @@ __[A]{.solved}__: When we execute the code above, this is what is happening:
 > doesn’t actually work with the class attribute of the object, but instead uses a special global variable (.Class) to keep track of which method to call next.
 
 This is why `generic2.a2()` is called instead.
+
+```{r}
+generic2(structure(list(), class = c("b", "a2")))
+```
 
 ## Dispatch details
 
