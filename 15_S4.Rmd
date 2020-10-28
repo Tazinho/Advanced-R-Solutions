@@ -174,7 +174,7 @@ setClass("Date2",
          )
 )
 
-new("Date2")
+new("Date2", data = 1L)
 ```
 
 Our `DataFrame` class consists of a list and a slot for `row.names`. Most of the logic (e.g. checking that all elements of the list are a vector, and that they all have the same length) would need to be part of a validator.
@@ -294,7 +294,6 @@ __[A]{.solved}__: We see, that the method graph below looks simpler than the one
 ```{r, echo = FALSE, out.width='350pt'}
 knitr::include_graphics("diagrams/s4/method_dispatch2.png", dpi = 300)
 ```
-
 
 __[Q3]{.Q}__: Take the last example which shows multiple dispatch over two classes that use multiple inheritance. What happens if you define a method for all terminal classes? Why does method dispatch not save us much work here?
 
