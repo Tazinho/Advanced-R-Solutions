@@ -202,7 +202,7 @@ rowSums
 .rowSums
 ```
 
-If the convenient features of `rowSums()` are not needed, then using `.rowSums()` will be more performant.
+However, as our benchmark reveals almost identical computing times, we prefer the safer variant over the internal function for this case.
 
 ```{r}
 m <- matrix(rnorm(1e6), nrow = 1000)
@@ -212,8 +212,6 @@ bench::mark(
   .rowSums(m, 1000, 1000)
 )
 ```
-
-<!-- HW: these take exactly the same amount of time for me - I think the story here is that these "internal" functions aren't actually appreciably faster for this use case, so you're better off with the safer version. -->
 
 __[Q2]{.Q}__: Make a faster version of `chisq.test()` that only computes the chi-square test statistic when the input is two numeric vectors with no missing values. You can try simplifying `chisq.test()` or by coding from the [mathematical definition](http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test).
 
