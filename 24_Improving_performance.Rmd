@@ -156,26 +156,26 @@ For additional ways to convert characters into date time objects, have a look at
 
 __[Q4]{.Q}__: Which packages provide the ability to compute a rolling mean?
 
-__[A]{.solved}__: A rolling mean can be a useful statistic to smooth time-series and other types of data. The size of the rolling window will determine the amount of smoothing and the number of missing values at the start or end of the data (e.g. because the rolling mean cannot be computed for a single data point).
+__[A]{.solved}__: A rolling mean is a a useful statistic to smooth time-series, spatial and other types of data. The size of the rolling window usually determines the amount of smoothing and the number of missing values at the boundaries of the data.
 
-The general functionality can be found in multiple packages, which vary in the speed and flexibility of the computation:
+The general functionality can be found in multiple packages, which vary in speed and flexibility of the computations. Here is a benchmark for several functions that all serve our purpose.
 
 ```{r}
 x <- 1:10
-zoo::rollmean(x, 2, na.pad = TRUE, align = "right")
+slider::slide_dbl(x, mean, .before = 1, .complete = TRUE)
 
 bench::mark(
-  zoo::rollmean(x, 2, na.pad = TRUE, align = "right"),
-  zoo::rollapply(x, 2, mean, fill = NA, align = "right"),
-  tibbletime::rollify(mean, window = 2)(x),
-  TTR::SMA(x, 2),
   caTools::runmean(x, k = 2, endrule = "NA"),
   data.table::frollmean(x, 2),
-  RcppRoll::roll_mean(x, n = 2, fill = NA, align = "right")
+  RcppRoll::roll_mean(x, n = 2, fill = NA, align = "right"),
+  slider::slide_dbl(x, mean, .before = 1, .complete = TRUE),
+  TTR::SMA(x, 2),
+  zoo::rollapply(x, 2, mean, fill = NA, align = "right"),
+  zoo::rollmean(x, 2, fill = NA, align = "right")
 )
 ```
 
-You may also take a look at an extensive example in the [textbook](http://adv-r.had.co.nz/Functionals.html), which demonstrates how a rolling mean function can be created.
+You may also take a look at an extensive example in the [first edition of the textbook](http://adv-r.had.co.nz/Functionals.html), which demonstrates how a rolling mean function can be created.
 
 __[Q5]{.Q}__: What are the alternatives to `optim()`?
 
