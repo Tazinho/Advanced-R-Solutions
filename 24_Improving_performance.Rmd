@@ -344,10 +344,10 @@ __[A]{.solved}__: We can hand the vectors to `crossprod()`, which converts them 
 ```{r}
 x <- rnorm(10)
 w <- rnorm(10)
-all.equal(sum(x * w), as.numeric(crossprod(x, w)))
+all.equal(sum(x * w), crossprod(x, w)[[1]])
 ```
 
-A benchmark of both approaches for different vector lengths indicates that the `crossprod()` variant is almost twice as fast as `sum()`.
+A benchmark of both approaches for different vector lengths indicates that the `crossprod()` variant is almost twice as fast as `sum(x * w)`.
 
 ```{r}
 weightedsum <- bench::press(
