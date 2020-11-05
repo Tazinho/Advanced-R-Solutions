@@ -321,4 +321,18 @@ env_unbind(globalenv(), names(funs))
 
 __[A]{.solved}__: `attach()` adds `funs` to the search path. Therefore, the provided functions are found before their respective versions from the base package. Further, they can not get accidently overwritten by similar named functions in the global environment. One annoying downsinde of using `attach()` is the possibility to attach the same object multiple times, making it necessary to call `detach()` equally often.
 
+```{r}
+attach(funs)
+attach(funs)
+
+head(search())
+detach(funs)
+detach(funs)
+```
+
 In contrast `rlang::env_bind()` just adds the functions in `fun` to the global environment. No further side effects are introduced and the functions are overwritten when similarly named functions are defined.
+
+```{r}
+env_bind(globalenv(), !!!funs)
+head(search())
+```
