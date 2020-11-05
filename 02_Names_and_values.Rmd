@@ -394,7 +394,7 @@ create_random_df <- function(nrow, ncol) {
 create_random_df(2,2)
 ```
 
-Next, we wrap the two approaches to subtract numerical values (in our case medians) from each column of a data frame in their own function and name these functions depending on whether the approach operates on a data frame or a list. For a fairer comparison the second function contains the overhead code to convert between data frame and list object.
+Next, we wrap the two approaches to subtract numerical values (in our case medians) from each column of a data frame in their own function. We name these functions depending on whether the approach operates on a data frame or a list. For a fairer comparison the second function contains also the overhead code to convert between data frame and list objects.
 
 ```{r}
 subtract_df <- function(x, medians){
@@ -411,7 +411,7 @@ subtract_list <- function(x, medians){
 }
 ```
 
-We can then profile their performance, via benchmarkis on data frames with differening numbers of columns. Let's create a small helper that creates our random data frame and it's medians before it benchmarks the two approaches for subtraction.
+We can then profile the performance, via benchmarks on data frames with differening numbers of columns. Therefore, we create a small helper that creates our random data frame and it's medians before it benchmarks the two approaches.
 
 ```{r}
 benchmark_helper <- function(ncol){
