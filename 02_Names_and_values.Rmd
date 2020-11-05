@@ -383,7 +383,7 @@ obj_addr(x[[1]])  # list element contains old memory adress
 
 __[Q2]{.Q}__: Wrap the two methods for subtracting medians into two functions, then use the bench package to carefully compare their speeds. How does performance change as the number of columns increase?
 
-__[A]{.solved}__: First, let's define a function to create some random data and a function to subtract the median from each column.
+__[A]{.solved}__: First, let’s define a function to create some random data.
 
 ```{r}
 create_random_df <- function(nrow, ncol) {
@@ -391,59 +391,67 @@ create_random_df <- function(nrow, ncol) {
   as.data.frame(random_matrix)
 }
 
-subtract_medians <- function(x, medians){
+create_random_df(2,2)
+```
+
+Next, we wrap the two approaches to subtract numerical values (in our case medians) from each column of a data frame in their own function and name these functions depending on whether the approach operates on a data frame or a list. For a fairer comparison the second function contains the overhead code to convert between data frame and list object.
+
+```{r}
+subtract_df <- function(x, medians){
   for (i in seq_along(medians)) {
     x[[i]] <- x[[i]] - medians[[i]]
   }
   x
 }
 
-subtract_medians_l <- function(x, medians){
+subtract_list <- function(x, medians){
   x <- as.list(x)
-  x <- subtract_medians(x, medians)
-  as.data.frame(x)
+  x <- subtract_df(x, medians)
+  list2DF(x)
 }
 ```
 
-<!-- Need to update text and code to use subtract_medians_2 -->
-
-We can then profile the performance, by benchmarking `subtract_medians()` on data frame- and list-input for a specified number of columns. The functions should both input and output a data frame, so one is going to do a bit more work.
+We can then profile their performance, via benchmarkis on data frames with differening numbers of columns. Let's create a small helper that creates our random data frame and it's medians before it benchmarks the two approaches for subtraction.
 
 ```{r}
-compare_speed <- function(ncol){
-  df_input   <- create_random_df(nrow = 1e4, ncol = ncol)
-  medians <- vapply(df_input, median, numeric(1))
+benchmark_helper <- function(ncol){
+  df <- create_random_df(nrow = 1e4, ncol = ncol)
+  medians <- vapply(df, median, numeric(1), USE.NAMES = FALSE)
   
-  bench::mark(`Data Frame` = subtract_medians(df_input,   medians),
-              List = as.data.frame(subtract_medians(as.list(df_input), medians)))
+  bench::mark(df   = subtract_df(df, medians),
+              list = subtract_list(df, medians))
 }
+
+benchmark_helper(1)
 ```
 
-Then bench package allows us to run our benchmark across a grid of parameters easily. We will use it to slowly increase the number of columns containing random data.
+The `bench::press()` function allows us to run our helper across a grid of parameters easily. We will use it to slowly increase the number of data frame columns in our benchmark.
 
-```{r, warning=FALSE, message=FALSE, eval=FALSE}
+```{r}
 results <- bench::press(
-  ncol = c(1, 5, 10, 50, 100, 200, 400, 600, 800, 1000, 1500),
-  compare_speed(ncol)
+  ncol = c(1, 10, 50, 100, 250, 300, 400, 500, 750, 1000),
+  benchmark_helper(ncol)
 )
+```
 
+Finally, we can plot and interprete our results.
+
+```{r}
 library(ggplot2)
-ggplot(results, aes(ncol, median, col = expression)) +
+ggplot(results, aes(ncol, median,
+                    col = as.character(expression))) +
   geom_point(size = 2) + 
   geom_smooth() +
-  labs(x = "Number of Columns of Input Data",
+  labs(x = "Number of Data Frame Columns",
        y = "Computation Time",
-       color = "Input Data Structure",
-       title = "Benchmark: Median Subtraction")
+       color = "Operating Data Structure",
+       title = "Benchmark: Median Subtraction",
+       subtitle = "For a data frame with 10,000 rows")
 ```
 
-```{r, echo = FALSE}
-knitr::include_graphics("images/median_benchmark.png")
-```
+When working directly with the data frame, the execution time grows quadratically with the number of columns in the input data. This is because (e.g.) the first column must be copied n times, the second column n-1 times, and so on. When working with a list, the execution time increases only linearly.
 
-When working directly with the data frame, the execution time grows quadratically with the number of columns in the input data. This is because (e.g.) the first column must be copied `n` times, the second column `n-1` times, and so on. When working with a list, the execution time increases only linearly.
-
-Obviously in the long run, linear growth creates shorter run-times, but there is some cost to this strategy - we have to convert between data structures with `as.list()` and `as.data.frame()`. This means that the improved approach doesn't pay off until we get to a data frame that's ~800 columns wide.
+Obviously in the long run, linear growth creates shorter run-times, but there is some cost to this strategy - we have to convert between data structures with `as.list()` and `list2DF()`. This means that the improved approach doesn’t pay off in this scenario until we get to a data frame that’s ~300 columns wide.
 
 __[Q3]{.Q}__: What happens if you attempt to use `tracemem()` on an environment?
 
