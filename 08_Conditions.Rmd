@@ -197,7 +197,7 @@ show_condition2({
 
 __[Q1]{.Q}__: Inside a package, it’s occasionally useful to check that a package is installed before using it. Write a function that checks if a package is installed (with `requireNamespace("pkg", quietly = FALSE))` and if not, throws a custom condition that includes the package name in the metadata.
 
-__[A]{.solved}__:
+__[A]{.solved}__: We use `rlang::abort()` to supply error metadata:
 
 ```{r, error = TRUE}
 check_installed <- function(package)  {
