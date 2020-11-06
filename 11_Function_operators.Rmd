@@ -166,7 +166,7 @@ readLines(log_path)
 
 __[Q5]{.Q}__: Modify `delay_by()` so that instead of delaying by a fixed amount of time, it ensures that a certain amount of time has elapsed since the function was last called. That is, if you called `g <- delay_by(1, f); g(); Sys.sleep(2); g()` there shouldn't be an extra delay.
 
-__[A]{.solved}__: We can achieve this with the help of three little tricks.
+__[A]{.solved}__: To ensure that the function created by `delay_by()` waits that a certain amount of time has passed since it's last execuiton, we incorporate three little changes into our new `delay_atleast()` as indicated in the corresponding comments below.
 
 ```{r, eval = FALSE}
 delay_atleast <- function(amount, f) {
