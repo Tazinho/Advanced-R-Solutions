@@ -118,26 +118,26 @@ __[A]{.solved}__: Initially the vector `x` has integer type. The replacement cal
 
 ```{r, eval=FALSE}
 # two copies
-x <- 1:3
+x <- c(1L, 2L, 3L)
 tracemem(x)
 #> <0x66a4a70>
 
 x[[3]] <- 4
 #> tracemem[0x55eec7b3af38 -> 0x55eec774cc18]: 
-#> tracemem[0x55eec774cc18 -> 0x55eeca6ed5a8]: 
 ```
 
 We can avoid the copy by sub-assigning an integer instead of a double:
 
 ```{r, eval=FALSE}
 # the same as 
-x <- 1:3
+x <- c(1L, 2L, 3L)
 tracemem(x)
 #> <0x55eec6940ae0>
 
 x[[3]] <- 4L
-#> tracemem[0x55eec7021e10 -> 0x55eecb99e788]: 
 ```
+
+Please be aware that running this code in RStudio will result in additional copies because of the reference from the environment pane.
 
 <!-- code-chunks above were hard-coded to fix knitr output. -->
 

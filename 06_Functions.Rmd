@@ -186,10 +186,9 @@ x_ok(1)
 x_ok(1:3)
 ```
 
-__[A]{.solved}__:
-We expect `x_ok()` to validate its input via certain criteria: it must not be `NULL`, but have length `1` and a value greater than `0`. Meaningful outcomes for this assertion will be `TRUE`, `FALSE` or `NA`. The desired behaviour is reached by combining the assertions through `&&` instead of `&`.
+__[A]{.solved}__: We expect `x_ok()` to validate its input via certain criteria: it must not be `NULL`, but have length `1` and a value greater than `0`. Meaningful outcomes for this assertion will be `TRUE`, `FALSE` or `NA`. The desired behaviour is reached by combining the assertions through `&&` instead of `&`.
 
-`&&` does not perform elementwise comparisons, instead it uses the first element of each value only. It also uses lazy evaluation, in the sense that evaluation "proceeds only until the result is determined" (from `?Logic`). This means that the RHS of `&&` won't be evaluated if the LHS already determines the outcome of the comparision (e.g. evaluate to `FALSE`). This behaviour is also known as 'shortcircuiting'. 
+`&&` does not perform elementwise comparisons, instead it uses the first element of each value only. It also uses lazy evaluation, in the sense that evaluation "proceeds only until the result is determined" (from `?Logic`). This means that the RHS of `&&` won't be evaluated if the LHS already determines the outcome of the comparison (e.g. evaluate to `FALSE`). This behaviour is also known as 'shortcircuiting'. 
 For some situations (`x = 1`) both operators will lead to the same result. But this is not always the case. For `x = NULL`, the `&&`-operator will stop after the `!is.null`-statement and return the result. The following conditions won't even be evaluated! (If the other conditions are also evaluated (by the use of `&`), the outcome would change. `NULL > 0` returns `logical(0)`, which is not helpful in this case.)
 
 We can also see the difference in behaviour, when we set `x = 1:3`. The `&&`-operator returns the result from `length(x) == 1`, which is `FALSE`. Using `&` as the logical operator leads to the (vectorised) `x > 0` condition being be evaluated and also returned.
@@ -346,9 +345,9 @@ in_dir <- function(dir, code) {
 }
 ```
 
-__[A]{.solved}__: `in_dir()` takes *a path* to a working directory as an argument. First the working directory is changed accordingly. `on.exit()` ensures that the modification to the working directory are reset to the initial value when the function exits. `in_dir()` expresses the change of the workig directory very explicitly.
+__[A]{.solved}__: `in_dir()` takes *a path* to a working directory as an argument. First the working directory is changed accordingly. `on.exit()` ensures that the modification to the working directory is reset to the initial value when the function exits. `in_dir()` expresses the change of the working directory very explicitly. It also gives the user full control over the location of the directory to execute the code in.
 
-In `source()` the `chdir` argument specifies if the working directory should be changed during the evaluation of the `file` argument (which in this case has to be a pathname). The default for this *logical value* here is `FALSE`, so you can choose to change the working directory but don't have to provide a value, if you intend to use your current working directory.
+In `source()` the `chdir` argument specifies if the working directory should be changed to the directory containing `file` (which in this case has to be a pathname). The default for this *logical value* is `FALSE`, so you don't have to provide a value but you are also less flexible in choosing the execution working directory.
 
 __[Q4]{.Q}__: Write a function that opens a graphics device, runs the supplied code, and closes the graphics device (always, regardless of whether or not the plotting code worked).
 
@@ -382,10 +381,9 @@ Compare `capture.output()` to `capture.output2()`. How do the functions differ? 
 
 __[A]{.solved}__: Using `body(capture.output)` we inspect the source code of the original `capture.output()` function: The implementation for `capture.output()` is a quite a bit longer (39 lines vs. 7 lines).
 
-The function strives to 'write output as far as possible to file', which is why an error handling is needed. This is achieved by first quoting the expressions (via `substitute()`) and then evaluatating them step-by-step (via `lapply()` and a variant of `eval`), which makes the function more robust.
+The function strives to 'write output as far as possible to file', which is why an error handling is needed. This is achieved by first quoting the expressions (via `substitute()`) and then evaluating them step-by-step (via `lapply()` and a variant of `eval`), which makes the function more robust.
 
 Additionally `capture.output()` also offers a choice between overwriting or appending to a file or a connection.
-
 
 ## Function forms
 
