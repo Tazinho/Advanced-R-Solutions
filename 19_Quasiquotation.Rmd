@@ -316,24 +316,19 @@ __[A]{.solved}__: `exec()` takes a function and its arguments as input, as well 
 
 __[Q2]{.Q}__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`. Compare and contrast the techniques they use for switching between dots and list behaviour.
 
-__[A]{.solved}__:  All three functions capture the dots via `args <- list(...)`. `interaction()` and `expand.grid()` return early in case of `length(args) == 0`.
+__[A]{.solved}__:  All three functions capture the dots via `args <- list(...)`.
 
-As `interaction()` computes factors regarding combinations of `args` elements, `interaction()` iterates over `args` and doesn't differentiate further between list and dots behaviour. Only the case `length(args) == 1 && is.list(args[[1]])` are treated via `args <- args[[1]]`. Consequently lists deeper than 1 level raise errors in other parts of the code.
+`interaction()` computes factors interactions between the captured input factors by iterating over the `args`. When a list is provided this is detected via `length(args) == 1 && is.list(args[[1]])` and one level of the list is stripped through `args <- args[[1]]`. The rest of the function's code doesn't differentiate further between list and dots behaviour.
 
-```{r, error = TRUE}
-# These work and return the same
-identical(
-  interaction(     a = c("a", "b", "c", "d"), b = c("e", "f")),
-  interaction(list(a = c("a", "b", "c", "d"), b = c("e", "f")))
-)
-
-# This doesn't work
-interaction(list(list(a = c("a", "b", "c", "d"), b = c("e", "f"))))
+```{r}
+# both calls create the same output
+interaction(     a = c("a", "b", "c", "d"), b = c("e", "f"))   # dots
+interaction(list(a = c("a", "b", "c", "d"), b = c("e", "f")))  # list
 ```
 
-`expand.grid()` switches in exactly the same way as `interaction()`. I.e. it also assigns `args <- args[[1]]` in case of `length(args) == 1 && is.list(args[[1]])` is `TRUE`.
+`expand.grid()` uses the same strategy and also assigns `args <- args[[1]]` in case of `length(args) == 1 && is.list(args[[1]])`.
 
-`par()` preprocesses `args` the most in order to ensure that it becomes a list (or `NULL`). First, in case no dots were supplied (`length(list(...)) == 0`) `par()` creates a list from an internal character vector (partly depending on `par()`'s `no.readonly` argument). Further, in case all elements of `args` are character vectors (`all(unlist(lapply(args, is.character)))`) `args` is turned into a list via `as.list(unlist(args))`. When `args` is of length one with its first element being a list or `NULL` `args` becomes `args <- args[1]`.
+`par()` does the most preprocessing to ensure a valid structure of the `args` argument. When no dots are provided (`!length(args)`) it will create a list of arguments from an internal character vector (partly depending on it's `no.readonly` argument). Further, given that all elements of `args` are character vectors (`all(unlist(lapply(args, is.character)))`), `args` is turned into a list via `as.list(unlist(args))`, which will flatten nested lists. Similar to the other functions, a level of the list will be stripped via `args <- args[[1L]]`, when `args` is of length one with its first element being a list.
 
 __[Q3]{.Q}__: Explain the problem with this definition of `set_attr()`
 
