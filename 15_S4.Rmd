@@ -304,9 +304,7 @@ __[A]{.solved}__: We will introduce ambiguity, since one class has distance 2 to
 
 __[Q1]{.Q}__: What would a full `setOldClass()` definition look like for an ordered factor (i.e. add `slots` and `prototype` to the definition above)?
 
-<!-- @Hadley: New solution, please review again later. 2020-10-21 -->
-
-__[A]{.solved} The purpose of `setOldClass()` lies in registering an S3 class as a "formally defined class", so that it can be used within the S4 OOP-system. When using it, we can also provide the argument`S4Class`, which will inherit the slots and the default values (prototype) to the registered class.
+__[A]{.solved}__: The purpose of `setOldClass()` lies in registering an S3 class as a "formally defined class", so that it can be used within the S4 OOP-system. When using it, we can also provide the argument`S4Class`, which will inherit the slots and the default values (prototype) to the registered class.
 
 Let's build an S4 ordered factor on top of the S3 factor in such a way.
 ```{r}
@@ -322,7 +320,7 @@ OrderedFactor <- setClass(
   prototype = structure(
     integer(),
     levels = character(),
-    ordered = logical()  # add defaul value
+    ordered = logical()  # add default value
   )
 )
 ```
@@ -342,9 +340,9 @@ str(x)
 
 __[Q2]{.Q}__: Define a `length` method for the `Person` class.
 
-__[A]{.solved}__: We can define it as either as an S3 or S4 method:
+__[A]{.solved}__: We keep things simple and will just return `"180cm"`, when the `length` method is called on a `Person` object. The method can be defined either as an S3 or S4 method.
 
 ```{r}
-length.Person <- function(x) "a"
-setMethod("length", "Person", function(x) "a")
+length.Person <- function(x) "180cm"  # S3
+setMethod("length", "Person", function(x) "180cm")  # S4
 ```

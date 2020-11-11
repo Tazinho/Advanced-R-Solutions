@@ -114,9 +114,7 @@ value <- c("A", 2:10, "J", "Q", "K")
 cards <- paste0(rep(value, 4), suit)
 ```
 
-__[A]{.solved}__:
-
-<!-- HW: the flexibility considerably increased the complexity for no real gain -->
+__[A]{.solved}__: Our new `"ShuffledDeck"` class will use `sample()` and positive integer subsetting to implement the reshuffling and drawing functionality. We also add a check, so you cannot draw more cards then there are left in the deck.
 
 ```{r}
 ShuffledDeck <- R6Class(
@@ -129,9 +127,6 @@ ShuffledDeck <- R6Class(
     reshuffle = function() {
       self$deck <- sample(cards)
       invisible(self)
-    },
-    n = function() {
-      length(self$deck)
     },
     draw = function(n = 1) {
       if (n > self$n()) {
@@ -150,7 +145,7 @@ To test this class we create a deck (initialise an instance), draw all the cards
 ```{r, error = TRUE}
 my_deck <- ShuffledDeck$new()
 my_deck$draw(52)
-my_deck$draw()
+my_deck$draw(10)
 
 my_deck$reshuffle()$draw(5)
 my_deck$reshuffle()$draw(5)

@@ -383,7 +383,7 @@ obj_addr(x[[1]])  # list element contains old memory adress
 
 __[Q2]{.Q}__: Wrap the two methods for subtracting medians into two functions, then use the bench package to carefully compare their speeds. How does performance change as the number of columns increase?
 
-__[A]{.solved}__: First, let’s define a function to create some random data.
+__[A]{.solved}__: First, let's define a function to create some random data.
 
 ```{r}
 create_random_df <- function(nrow, ncol) {
@@ -391,7 +391,7 @@ create_random_df <- function(nrow, ncol) {
   as.data.frame(random_matrix)
 }
 
-create_random_df(2,2)
+create_random_df(2, 2)
 ```
 
 Next, we wrap the two approaches to subtract numerical values (in our case medians) from each column of a data frame in their own function. We name these functions depending on whether the approach operates on a data frame or a list. For a fairer comparison the second function contains also the overhead code to convert between data frame and list objects.
@@ -411,10 +411,10 @@ subtract_list <- function(x, medians){
 }
 ```
 
-We can then profile the performance, via benchmarks on data frames with differening numbers of columns. Therefore, we create a small helper that creates our random data frame and it's medians before it benchmarks the two approaches.
+We can then profile the performance, via benchmarks on data frames with differing numbers of columns. Therefore, we create a small helper that creates our random data frame and its medians before it benchmarks the two approaches.
 
 ```{r}
-benchmark_helper <- function(ncol){
+benchmark_medians <- function(ncol){
   df <- create_random_df(nrow = 1e4, ncol = ncol)
   medians <- vapply(df, median, numeric(1), USE.NAMES = FALSE)
   
@@ -422,7 +422,7 @@ benchmark_helper <- function(ncol){
               list = subtract_list(df, medians))
 }
 
-benchmark_helper(1)
+benchmark_medians(1)
 ```
 
 The `bench::press()` function allows us to run our helper across a grid of parameters easily. We will use it to slowly increase the number of data frame columns in our benchmark.
@@ -430,11 +430,11 @@ The `bench::press()` function allows us to run our helper across a grid of param
 ```{r}
 results <- bench::press(
   ncol = c(1, 10, 50, 100, 250, 300, 400, 500, 750, 1000),
-  benchmark_helper(ncol)
+  benchmark_medians(ncol)
 )
 ```
 
-Finally, we can plot and interprete our results.
+Finally, we can plot and interpret our results.
 
 ```{r}
 library(ggplot2)
@@ -451,7 +451,7 @@ ggplot(results, aes(ncol, median,
 
 When working directly with the data frame, the execution time grows quadratically with the number of columns in the input data. This is because (e.g.) the first column must be copied n times, the second column n-1 times, and so on. When working with a list, the execution time increases only linearly.
 
-Obviously in the long run, linear growth creates shorter run-times, but there is some cost to this strategy - we have to convert between data structures with `as.list()` and `list2DF()`. This means that the improved approach doesn’t pay off in this scenario until we get to a data frame that’s ~300 columns wide.
+Obviously in the long run, linear growth creates shorter run-times, but there is some cost to this strategy - we have to convert between data structures with `as.list()` and `list2DF()`. This means that the improved approach doesn't pay off in this scenario until we get to a data frame that is about 300 columns wide (with the exact value depending on the characteristics of the system running the code).
 
 __[Q3]{.Q}__: What happens if you attempt to use `tracemem()` on an environment?
 
