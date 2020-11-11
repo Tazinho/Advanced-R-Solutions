@@ -117,7 +117,6 @@ x[[3]] <- 4
 __[A]{.solved}__: Initially the vector `x` has integer type. The replacement call assigns a double to the third element of `x`, which triggers copy-on-modify.
 
 ```{r, eval=FALSE}
-# two copies
 x <- c(1L, 2L, 3L)
 tracemem(x)
 #> <0x66a4a70>
@@ -129,7 +128,6 @@ x[[3]] <- 4
 We can avoid the copy by sub-assigning an integer instead of a double:
 
 ```{r, eval=FALSE}
-# the same as 
 x <- c(1L, 2L, 3L)
 tracemem(x)
 #> <0x55eec6940ae0>
