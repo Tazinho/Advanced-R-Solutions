@@ -254,7 +254,49 @@ minC(c(2:4, NA))
 minC(c(2:4, NA), na_rm = TRUE)
 ```
 
-<!-- HW: If you wanted to do more, I'd suggest a variation where you put the `na_rm` check inside the inner loop. You can discuss that's a bit slower but there's less duplicated code -->
+In our new implementation of `anyC()` we use `LogicalVetor` as return type. If we would use `bool` instead, the C++ `NA_LOGICAL` would be converted into R's logical `TRUE`.
+
+```{Rcpp}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+LogicalVector anyC(LogicalVector x, bool na_rm = false) {
+  int n = x.size();
+  LogicalVector out = LogicalVector::create(false);
+
+  if (na_rm == false) {
+    for(int i = 0; i < n; ++i) {
+      if (LogicalVector::is_na(x[i])) {
+        out[0] = NA_LOGICAL;
+        return out;
+      } else {
+        if (x[i]) {
+          out[0] = true;
+        }
+      }
+    }
+  }
+
+  if (na_rm) {
+    for(int i = 0; i < n; ++i) {
+      if (LogicalVector::is_na(x[i])) {
+        continue;
+      }
+      if (x[i]) {
+        out[0] = true;
+        return out;
+      }
+    }
+  }
+  return out;
+}
+```
+
+```{r}
+anyC(c(NA, TRUE))  # any(c(NA, TRUE)) would return TRUE in this case
+anyC(c(NA, TRUE), na_rm = TRUE)
+```
 
 __[Q2]{.Q}__: Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that these functions have slightly more complicated behaviour.
 
