@@ -81,8 +81,8 @@ To change this bahaviour, one can set `rule = 2`. This leads to the result that 
 f_lin <- approxfun(x, y, rule = 2)
 f_con <- approxfun(x, y, method = "constant", rule = 2)
 
-f_lin(0:1)
-f_con(0:1)
+f_lin(-Inf, Inf)
+f_con(-Inf, Inf)
 ```
 
 Another option is to customize the return values as individual constants for each side via `yleft` and/or `yright`.
@@ -91,22 +91,20 @@ Another option is to customize the return values as individual constants for eac
 f_lin <- approxfun(x, y, yleft = 10)
 f_con <- approxfun(x, y, method = "constant", yleft = 10, yright = -10)
 
-f_lin(0:1)
-f_con(0:1)
+f_lin(-Inf, Inf)
+f_con(-Inf, Inf)
 ```
 
 Further, `approxfun()` provides the option to shift the y values for `method = "constant"` between it's left and right value. According to the documentation this indicates a compromise between left- and right-continuous steps.
 
 ```{r}
-plot(x, y, lwd = 10)
-points(x_new, f_lin(x_new), col = "red", pch = 16)
-points(x_new, f_con(x_new), col = "blue", pch = 16)
-
 f_con <- approxfun(x, y, method = "constant", f = .5)
-points(x_new, f_con(x_new), col = "black", pch = 16)
+
+plot(x, y, lwd = 10)
+points(x_new, f_con(x_new), pch = 16)
 ```
 
-Finally, the `ties` argument allows to aggregate y values if multiple ones were provided for the same x. E.g. in the following line we use `mean()` to aggregate these y values before they are used for the interpolation `approxfun(x = c(1,1,2), y = 1:3, ties = mean)`.
+Finally, the `ties` argument allows to aggregate y values if multiple ones were provided for the same x value. E.g. in the following line we use `mean()` to aggregate these y values before they are used for the interpolation `approxfun(x = c(1,1,2), y = 1:3, ties = mean)`.
 
 - `ecdf()` is an acronym for empirical cumulative distribution function. For a numeric vector, `ecdf()` returns the appropriate distribution function (of class “ecdf”, which is inheriting from class “stepfun”). Initially the (x, y) pairs for the nodes of the density function are calculated. Afterwards these pairs are passed to `approxfun()`, which then returns the desired function.
 
