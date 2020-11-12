@@ -57,6 +57,8 @@ When we apply these funcitons to new x values, these are mapped to the lines con
 
 ```{r}
 x_new <- sort(runif(1000))
+
+plot(x, y, lwd = 10)
 points(x_new, f_lin(x_new), col = "red", pch = 16)
 points(x_new, f_con(x_new), col = "blue", pch = 16)
 ```
@@ -96,6 +98,10 @@ f_con(0:1)
 Further, `approxfun()` provides the option to shift the y values for `method = "constant"` between it's left and right value. According to the documentation this indicates a compromise between left- and right-continuous steps.
 
 ```{r}
+plot(x, y, lwd = 10)
+points(x_new, f_lin(x_new), col = "red", pch = 16)
+points(x_new, f_con(x_new), col = "blue", pch = 16)
+
 f_con <- approxfun(x, y, method = "constant", f = .5)
 points(x_new, f_con(x_new), col = "black", pch = 16)
 ```
