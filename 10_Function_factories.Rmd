@@ -81,8 +81,8 @@ To change this bahaviour, one can set `rule = 2`. This leads to the result that 
 f_lin <- approxfun(x, y, rule = 2)
 f_con <- approxfun(x, y, method = "constant", rule = 2)
 
-f_lin(-Inf, Inf)
-f_con(-Inf, Inf)
+f_lin(c(-Inf, Inf))
+f_con(c(-Inf, Inf))
 ```
 
 Another option is to customize the return values as individual constants for each side via `yleft` and/or `yright`.
@@ -91,8 +91,8 @@ Another option is to customize the return values as individual constants for eac
 f_lin <- approxfun(x, y, yleft = 10)
 f_con <- approxfun(x, y, method = "constant", yleft = 10, yright = -10)
 
-f_lin(-Inf, Inf)
-f_con(-Inf, Inf)
+f_lin(c(-Inf, Inf))
+f_con(c(-Inf, Inf))
 ```
 
 Further, `approxfun()` provides the option to shift the y values for `method = "constant"` between it's left and right value. According to the documentation this indicates a compromise between left- and right-continuous steps.
