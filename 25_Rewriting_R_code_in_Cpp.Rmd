@@ -151,6 +151,9 @@ NumericVector diffC(NumericVector x){
 
 NumericVector difflagC(NumericVector x, int lag = 1){
   int n = x.size();
+
+  if (lag >= n) stop("`lag` must be less than `length(x)`.");
+  
   NumericVector out(n - lag);
   
   for(int i = lag; i < n; i++){
@@ -160,15 +163,15 @@ NumericVector difflagC(NumericVector x, int lag = 1){
 }
 ```
 
-<!-- HW: you might need a check here that lag is < length(x) -->
-
 4. `range()`
 
 ```{Rcpp, eval=FALSE}
 NumericVector rangeC(NumericVector x){
   double omin = x[0], omax = x[0];
-  
   int n = x.size();
+
+  if (n == 0) stop("`length(x)` must be greater than 0.");
+  
   for(int i = 1; i < n; i++){
     omin = std::min(x[i], omin);
     omax = std::max(x[i], omax);
@@ -180,9 +183,7 @@ NumericVector rangeC(NumericVector x){
   return out;
 }
 ```
-  
-<!-- this needs a check that n > 0 -->
-    
+
 5. `var()`
 
 ```{Rcpp, eval=FALSE}
@@ -212,7 +213,7 @@ double varC(NumericVector x) {
 
 __[Q1]{.Q}__:  Rewrite any of the functions from the first exercise to deal with missing values. If `na.rm` is true, ignore the missing values. If `na.rm` is false, return a missing value if the input contains any missing values. Some good functions to practice with are `min()`, `max()`, `range()`, `mean()`, and `var()`.
 
-__[A]{.solved}__: In this exercise we choose to extend `minC()` so it can deal with missing values. We introduce an `na_rm` argument to make `minC()` aware of `NA`s. In case `x` contains exclusively `NA` values `minC()` should return `Inf` for `na_rm == TRUE`. For the return values vector data types are used to avoid irregular type conversions.
+__[A]{.solved}__: For this exercise we start with `minC()` and extend it so it can deal with missing values. We introduce an `na_rm` argument to make `minC()` aware of `NA`s. In case `x` contains exclusively `NA` values `minC()` should return `Inf` for `na_rm == TRUE`. For the return values vector data types are used to avoid irregular type conversions.
 
 ```{Rcpp}
 #include <Rcpp.h>
@@ -252,9 +253,10 @@ NumericVector minC(NumericVector x, bool na_rm = false){
 ```{r}
 minC(c(2:4, NA))
 minC(c(2:4, NA), na_rm = TRUE)
+minC(c(NA, NA), na_rm = TRUE)
 ```
 
-In our new implementation of `anyC()` we use `LogicalVetor` as return type. If we would use `bool` instead, the C++ `NA_LOGICAL` would be converted into R's logical `TRUE`.
+We also extend `anyC` so it can deal with missing values. Please note that this introduces some code duplication. This could be avoided by moving the check for missing values to the inner loop at the expense of a slight decrease of performance. Here we use `LogicalVetor` as return type. If we would use `bool` instead, the C++ `NA_LOGICAL` would be converted into R's logical `TRUE`.
 
 ```{Rcpp}
 #include <Rcpp.h>
