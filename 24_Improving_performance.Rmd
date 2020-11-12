@@ -109,15 +109,9 @@ date_ct2 <- rep(date_ct, 10000)
 
 bench::mark(
   date_lt2 - date_lt2, 
-  date_ct2 - date_ct2
+  date_ct2 - date_ct2,
+  date_ct2 - date_lt2
 )
-```
-
-Although both date time classes inherit from POSIXt, many functions only dispatch on the first argument and don't account for the possibility of mixed date time object usage. Therefore, better decide for an appropriate date time class, instead of mixing them.
-
-```{r}
-c(date_lt, date_ct)
-c(date_ct, date_lt)
 ```
 
 `as.POSIXlt()` in turn uses `strptime()` under the hood, which creates a similar date time object.
@@ -184,7 +178,6 @@ __[A]{.solved}__: The appropriate choice highly depends on the type of optimizat
 - `{optimx}` extends the `optim()` function with the same syntax but more 'method' choices.
 - `{RcppNumerical}` wraps several open source libraries for numerical computing (written in C++) and integrates them with R via `{Rcpp}`.
 - `{DEoptim}` provides a global optimizer based on the Differential Evolution algorithm.
-
 
 ## Doing as little as possible
 
