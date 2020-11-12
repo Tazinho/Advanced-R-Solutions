@@ -269,7 +269,11 @@ message2error <- function(code) {
 }
 ```
 
-__[A]{.solved}__: Calling handlers are called in the context of the call that signalled the condition. Exiting handlers are called in the context of the call to `tryCatch()`.
+__[A]{.solved}__: Both functions differ in the way conditions are handled. `withCallingHandlers()` creates a *calling handler*, which is executed from within the signalling function. This makes it possible to record a detailed call stack, which helps us identify the signalling condition.
+
+`tryCatch()` defines an *exiting handlers*, which means that the signalling function is terminated as soon as a condition is raised. It also returns control to the context where `tryCatch()` was called.
+
+In this example the use of `withCallingHandlers()` returns more information than the use of `tryCatch()`. This allows us to determine the exact call that raised the condition.
 
 ```{r, error = TRUE, eval=FALSE}
 message2error1 <- function(code) {
@@ -300,13 +304,11 @@ traceback()
 #>    })
 ```
 
-As seen above, the use of `withCallingHandlers()` returns more information and points us to the exact call in our code:
-
 ```{r, error = TRUE, eval=FALSE}
 message2error2 <- function(code) {
   tryCatch(code, message = function(e) (stop("error")))
 }
-message2error2({1; message("hidden error"); NULL})
+message2error2({1; stop("hidden error"); NULL})
 #> Error in value[[3L]](cond) : error
 traceback()
 #> 6: stop("error") at #2
