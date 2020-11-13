@@ -106,9 +106,24 @@ points(x_new, f_con(x_new), pch = 16)
 
 Finally, the `ties` argument allows to aggregate y values if multiple ones were provided for the same x value. E.g. in the following line we use `mean()` to aggregate these y values before they are used for the interpolation `approxfun(x = c(1,1,2), y = 1:3, ties = mean)`.
 
-- `ecdf()` is an acronym for empirical cumulative distribution function. For a numeric vector, `ecdf()` returns the appropriate distribution function (of class “ecdf”, which is inheriting from class “stepfun”). Initially the (x, y) pairs for the nodes of the density function are calculated. Afterwards these pairs are passed to `approxfun()`, which then returns the desired function.
+Next, we focus on `ecdf`. `ecdf()` is an acronym for empirical cumulative distribution function. For a numeric vector of density values, `ecdf()` initially creates the (x, y) pairs for the nodes of the density function and then passes these pairs to `approxfun()`, which gets called with specifically adapted settings (`approxfun(vals, cumsum(tabulate(match(x, vals)))/n, method = "constant", yleft = 0, yright = 1, f = 0, ties = "ordered")`). 
 
-<!-- HW: I think a couple of examples here would help -->
+```{r}
+x <- runif(10)
+f_ecdf <- ecdf(x)
+class(f_ecdf)
+
+plot(x, f_ecdf(x), lwd = 10, ylim = 0:1)
+```
+
+New values are then mapped on the y value of the next smallest x value from within the initial input.
+
+```{r}
+x_new <- runif(1000)
+
+plot(x, f_ecdf(x), lwd = 10, ylim = 0:1)
+points(x_new, f_ecdf(x_new), ylim = 0:1)
+```
 
 __[Q3]{.Q}__: Create a function `pick()` that takes an index, `i`, as an argument and returns a function with an argument `x` that subsets `x` with `i`.
 
