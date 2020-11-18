@@ -92,7 +92,7 @@ __[A]{.solved}__: Let's port these functions to C++.
 bool allC(LogicalVector x) {
   int n = x.size();
   
-  for(int i = 0; i < n; ++i) {
+  for (int i = 0; i < n; ++i) {
     if (!x[i]) return false;
   }
   return true;
@@ -107,7 +107,7 @@ NumericVector cumprodC(NumericVector x) {
   NumericVector out(n);
   
   out[0] = x[0];
-  for(int i = 1; i < n; ++i) {
+  for (int i = 1; i < n; ++i) {
     out[i]  = out[i - 1] * x[i];
   }
   return out;
@@ -118,7 +118,7 @@ NumericVector cumminC(NumericVector x) {
   NumericVector out(n);
   
   out[0] = x[0];
-  for(int i = 1; i < n; ++i) {
+  for (int i = 1; i < n; ++i) {
     out[i]  = std::min(out[i - 1], x[i]);
   }
   return out;
@@ -129,7 +129,7 @@ NumericVector cummaxC(NumericVector x) {
   NumericVector out(n);
   
   out[0] = x[0];
-  for(int i = 1; i < n; ++i) {
+  for (int i = 1; i < n; ++i) {
     out[i]  = std::max(out[i - 1], x[i]);
   }
   return out;
@@ -143,7 +143,7 @@ NumericVector diffC(NumericVector x){
   int n = x.size();
   NumericVector out(n - 1);
   
-  for(int i = 1; i < n; i++){
+  for (int i = 1; i < n; i++){
     out[i - 1] = x[i] - x[i - 1];
   }
   return out ;
@@ -156,7 +156,7 @@ NumericVector difflagC(NumericVector x, int lag = 1){
   
   NumericVector out(n - lag);
   
-  for(int i = lag; i < n; i++){
+  for (int i = lag; i < n; i++){
     out[i - lag] = x[i] - x[i - lag];
   }
   return out;
@@ -172,7 +172,7 @@ NumericVector rangeC(NumericVector x){
 
   if (n == 0) stop("`length(x)` must be greater than 0.");
   
-  for(int i = 1; i < n; i++){
+  for (int i = 1; i < n; i++){
     omin = std::min(x[i], omin);
     omax = std::max(x[i], omax);
   }
@@ -225,7 +225,7 @@ NumericVector minC(NumericVector x, bool na_rm = false){
   NumericVector out = NumericVector::create(R_PosInf);
   
   if (na_rm) {
-    for(int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; ++i) {
       if (x[i] == NA_REAL) {
         continue;
       }
@@ -234,7 +234,7 @@ NumericVector minC(NumericVector x, bool na_rm = false){
       }
     }
   } else {
-    for(int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; ++i) {
       if (NumericVector::is_na(x[i])) {
         out[0] = NA_REAL;
         return out;
@@ -244,7 +244,6 @@ NumericVector minC(NumericVector x, bool na_rm = false){
       }
     }
   }
-
   
   return out;
 }
@@ -268,7 +267,7 @@ LogicalVector anyC(LogicalVector x, bool na_rm = false) {
   LogicalVector out = LogicalVector::create(false);
 
   if (na_rm == false) {
-    for(int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; ++i) {
       if (LogicalVector::is_na(x[i])) {
         out[0] = NA_LOGICAL;
         return out;
@@ -281,7 +280,7 @@ LogicalVector anyC(LogicalVector x, bool na_rm = false) {
   }
 
   if (na_rm) {
-    for(int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; ++i) {
       if (LogicalVector::is_na(x[i])) {
         continue;
       }
@@ -291,6 +290,7 @@ LogicalVector anyC(LogicalVector x, bool na_rm = false) {
       }
     }
   }
+  
   return out;
 }
 ```
@@ -302,26 +302,41 @@ anyC(c(NA, TRUE), na_rm = TRUE)
 
 __[Q2]{.Q}__: Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that these functions have slightly more complicated behaviour.
 
-__[A]{.solved}__: Our `NA`-aware `cumsumC()` function will return a vector of the same length as `x`. By default (`na_rm = false`) all values following the first `NA` input value will be set to `NA` also, because the cumulative here depends on the unknown missing value. In case of `na_rm = true` the `NA` values the missing input values will be treated like zeros.
-
-<!-- TODO: Implement na_rm-flag with the behavior outlined above -->
+__[A]{.solved}__: Our `NA`-aware `cumsumC()` function will return a vector of the same length as `x`. By default (`na_rm = false`) all values following the first `NA` input value will be set to `NA`, because they depend on the unknown missing value. In case of `na_rm = true` the `NA` values are treated like zeros.
 
 ```{Rcpp}
 #include <Rcpp.h>
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-NumericVector cumsumC(NumericVector x) {
+NumericVector cumsumC(NumericVector x, bool na_rm = false) {
   int n = x.size();
   NumericVector out(n);
   LogicalVector is_missing = is_na(x);
   
-  out[0] = x[0];
-  for(int i = 1; i < n; ++i) {
-    if (is_missing[i - 1]) {
-      out[i] = NA_REAL;
-    } else{
-      out[i] = out[i - 1] + x[i];
+  if (!na_rm) {
+    out[0] = x[0];
+    for (int i = 1; i < n; ++i) {
+      if (is_missing[i - 1]) {
+        out[i] = NA_REAL;
+      } else{
+        out[i] = out[i - 1] + x[i];
+      }
+    }
+  }
+  
+  if (na_rm) {
+    if (is_missing[0]) {
+      out[0] = 0;
+    } else {
+      out[0] = x[0];
+    } 
+    for (int i = 1; i < n; ++i) {
+      if (is_missing[i]) {
+        out[i] = out[i-1] + 0;
+      } else {
+        out[i] = out[i-1] + x[i];
+      } 
     }
   }
   
@@ -331,12 +346,10 @@ NumericVector cumsumC(NumericVector x) {
 
 ```{r}
 cumsumC(c(1, NA, 2, 4))
-# cumsumC(c(1, NA, 2, 4), na_rm = TRUE)
+cumsumC(c(1, NA, 2, 4), na_rm = TRUE)
 ```
 
-The `diffC()` implementation will return a single `NA` value, if the input vector contains a missing value. In case of `na_rm = true`, the function will return an `NA` for every difference with at least one `NA` as input.
-
-<!-- TODO: consider returning a NA vector of length x for na_rm = FALSE, as this is more consistent with the above solution. -->
+The `diffC()` implementation will return an `NA` vector of length `length(x) - lag`, if the input vector contains a missing value. In case of `na_rm = true`, the function will return an `NA` for every difference with at least one `NA` as input.
 
 ```{Rcpp}
 #include <Rcpp.h>
@@ -346,18 +359,23 @@ using namespace Rcpp;
 NumericVector diffC(NumericVector x, int lag = 1,
                     bool na_rm = false){
   int n = x.size();
+  
+  if (lag >= n) stop("`lag` must be less than `length(x)`.");
+  
   NumericVector out(n - lag);
-  for(int i = lag; i < n; i++){
+  
+  for (int i = lag; i < n; i++){
     if (NumericVector::is_na(x[i]) ||
         NumericVector::is_na(x[i - lag])) {
       if (!na_rm) {
-        return NumericVector::create(NA_REAL);
+        return rep(NumericVector::create(NA_REAL), n - lag);
       }
       out[i - lag] = NA_REAL;
       continue;
     }
     out[i - lag] = x[i] - x[i - lag];
   }
+  
   return out;
 }
 ```
@@ -519,7 +537,7 @@ IntegerVector setunion(IntegerVector x, IntegerVector y) {
   );
   
   IntegerVector out;
-  for(IntegerVector::iterator it = tmp.begin();
+  for (IntegerVector::iterator it = tmp.begin();
       it != out_end; ++it) {
     out.push_back(*it);
   }
@@ -542,7 +560,7 @@ IntegerVector intersect(IntegerVector x, IntegerVector y) {
   );
   
   IntegerVector out;
-  for(IntegerVector::iterator it = tmp.begin();
+  for (IntegerVector::iterator it = tmp.begin();
       it != out_end; ++it) {
     out.push_back(*it);
   }
@@ -565,7 +583,7 @@ IntegerVector setdiff(IntegerVector x, IntegerVector y) {
   );
   
   IntegerVector out;
-  for(IntegerVector::iterator it = tmp.begin();
+  for (IntegerVector::iterator it = tmp.begin();
       it != out_end; ++it) {
     out.push_back(*it);
   }
