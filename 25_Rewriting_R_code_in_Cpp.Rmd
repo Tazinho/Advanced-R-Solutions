@@ -356,7 +356,7 @@ The `diffC()` implementation will return an `NA` vector of length `length(x) - l
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-NumericVector diffC(NumericVector x, int lag = 1,
+NumericVector diffC2(NumericVector x, int lag = 1,
                     bool na_rm = false){
   int n = x.size();
   
@@ -381,8 +381,8 @@ NumericVector diffC(NumericVector x, int lag = 1,
 ```
 
 ```{r}
-diffC(c(1, 3, NA, 10))
-diffC(c(1, 3, NA, 10), na_rm = TRUE)
+diffC2(c(1, 3, NA, 10))
+diffC2(c(1, 3, NA, 10), na_rm = TRUE)
 ```
 
 ## Standard Template Library
