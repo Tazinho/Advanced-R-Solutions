@@ -61,6 +61,8 @@ For further speed improvements, you could install a linear algebra library optim
 
 > The functions of class 'speedlm' may speed up the fitting of LMs to large data sets. High performances can be obtained especially if R is linked against an optimized BLAS, such as ATLAS.
 
+(Tip: In case your dataset is stored in a database, you might want to check out the [modeldb](https://github.com/tidymodels/modeldb) package which executes the linear model code in the corresponding database backend.
+
 __[Q2]{.Q}__: What package implements a version of `match()` that's faster for repeated lookups? How much faster is it?
 
 __[A]{.solved}__: A web search points us to the `{fastmatch}`-package. We compare it to `base::match()` and observe an impressive  performance gain (up to 35x faster computation).
@@ -150,7 +152,7 @@ For additional ways to convert characters into date time objects, have a look at
 
 __[Q4]{.Q}__: Which packages provide the ability to compute a rolling mean?
 
-__[A]{.solved}__: A rolling mean is a a useful statistic to smooth time-series, spatial and other types of data. The size of the rolling window usually determines the amount of smoothing and the number of missing values at the boundaries of the data.
+__[A]{.solved}__: A rolling mean is a useful statistic to smooth time-series, spatial and other types of data. The size of the rolling window usually determines the amount of smoothing and the number of missing values at the boundaries of the data.
 
 The general functionality can be found in multiple packages, which vary in speed and flexibility of the computations. Here is a benchmark for several functions that all serve our purpose.
 
@@ -173,9 +175,26 @@ You may also take a look at an extensive example in the [first edition of the te
 
 __[Q5]{.Q}__: What are the alternatives to `optim()`?
 
-__[A]{.solved}__: The appropriate choice highly depends on the type of optimization you intend to do. The [Taskview on Optimization](https://cran.r-project.org/web/views/Optimization.html) can serve as a useful reference. Here a couple of examples:
+__[A]{.solved}__: According to it's' description (see `?optim`) `optim()` implements:
 
-- `{optimx}` extends the `optim()` function with the same syntax but more 'method' choices.
+> General-purpose optimization based on Nelder–Mead, quasi-Newton and conjugate-gradient algorithms. It includes an option for box-constrained optimization and simulated annealing.
+
+`optim()` allows to optimize a function (`fn`) on an interval with a specific method (`method = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", "Brent")`). Many detailed examples are given in the documentation. In the simplest case, we give `optim()` the starting value `par = 0` to calculate the minimum of a quadratic polynomial:
+
+```{r}
+optim(0, function(x) x^2 - 100 * x + 50, method = "Brent",
+      lower = -1e20, upper = 1e20)
+```
+
+Since this solves a one-dimensional optimization task, we could have also used `stats::optimize()`.
+
+```{r}
+optimize(function(x) x^2 - 100 * x + 50, c(-1e20, 1e20))
+```
+
+For more gerneral alternatives, the appropriate choice highly depends on the type of optimization you intend to do. The [Taskview on Optimization](https://cran.r-project.org/web/views/Optimization.html) can serve as a useful reference. Here a couple of examples:
+  
+- `{optimx}` extends the `optim()` function with the same syntax but more `method` choices.
 - `{RcppNumerical}` wraps several open source libraries for numerical computing (written in C++) and integrates them with R via `{Rcpp}`.
 - `{DEoptim}` provides a global optimizer based on the Differential Evolution algorithm.
 
@@ -183,7 +202,7 @@ __[A]{.solved}__: The appropriate choice highly depends on the type of optimizat
 
 __[Q1]{.Q}__: What's the difference between `rowSums()` and `.rowSums()`?
 
-__[A]{.solved}__: When we inspect the source code of the user-facing `rowSums()`, we see that it is designed as a wrapper around `.rowSums()` with some input validation, conversions and handling of a special case (complex numbers).
+__[A]{.solved}__: When we inspect the source code of the user-facing `rowSums()`, we see that it is designed as a wrapper around `.rowSums()` with some input validation, conversions and handling of complex numbers.
 
 ```{r}
 rowSums
