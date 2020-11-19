@@ -345,9 +345,9 @@ in_dir <- function(dir, code) {
 }
 ```
 
-__[A]{.solved}__: `in_dir()` takes as first argument (`dir`) a path for a working directory in which the provided code (`code`) should be executed. Therefore, the current working directory is first changed in `in_dir()` via `setwd()`. Next, `on.exit()` ensures that the working directory is reset after the `code` has been executed (or thrown an error). By passing the path explicitly, the user has full control over the directory to execute the code in.
+__[A]{.solved}__: `in_dir()` takes a path for a working directory (`dir`) as first argument. This is the directory where the provided code (`code`) should be executed. Therefore, the current working directory is changed in `in_dir()` via `setwd()`. Then, `on.exit()` ensures that the modification of the working directory is reset to the initial value when the function exits. By passing the path explicitly, the user has full control over the directory to execute the code in.
 
-In `source()` the code to be executed is passed via the `file` argument. The `chdir` argument allows to execute this code in the same directory where `file` is located (`chdir = TRUE`). The default for `chdir` is `FALSE`, so you don't have to provide a value. However, as you can only provide `TRUE` or `FALSE`, you are also less flexible in choosing the working directory for the code execution.
+In `source()` the code is passed via the `file` argument (a path to a file). The `chdir` argument specifies if the working directory should be changed to the directory containing the file. The default for `chdir` is `FALSE`, so you don't have to provide a value. However, as you can only provide `TRUE` or `FALSE`, you are also less flexible in choosing the working directory for the code execution.
 
 __[Q4]{.Q}__: Write a function that opens a graphics device, runs the supplied code, and closes the graphics device (always, regardless of whether or not the plotting code worked).
 
