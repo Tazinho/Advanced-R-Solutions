@@ -177,7 +177,7 @@ x[[2]] <- x
 
 Draw a picture.
 
-__[A]{.solved}__: The initial reference tree of `x` shows, that the name `x` binds to a list object. This object contains a reference to the integer vector `1:10`.
+__[A]{.solved}__: The initial reference tree of `x` shows that the name `x` binds to a list object. This object contains a reference to the integer vector `1:10`.
 
 ```{r, eval=FALSE}
 x <- list(1:10)
@@ -233,7 +233,8 @@ __[Q2]{.Q}__: Take the following list. Why is its size somewhat misleading?
 x <- list(mean, sd, var)
 obj_size(x)
 ```
-__[A]{.solved}__: It is somewhat misleading, because all three functions are built-in to R as part of the `{base}` and `{stats}` packages and hence always available. Let's look for how many other objects this applies as well.
+
+__[A]{.solved}__: It is somewhat misleading, because all three functions are built-in to R as part of the `{base}` and `{stats}` packages and hence always available. Let us look for how many other objects this applies as well.
 
 The following packages are usually loaded by default.
 
@@ -286,8 +287,6 @@ obj_size(b)
 obj_size(a, b)
 ```
 
-<!-- I think I accidentally made this too hard too - the important thing is the size of b, not of a -->
-
 __[A]{.solved}__: In R (on most platforms) a length-0
 vector has 48 bytes of overhead:
 
@@ -297,21 +296,21 @@ obj_size(double())
 obj_size(character())
 ```
 
-A single double takes up an additional 8 bytes of memory:
+A single double takes up additional 8 bytes of memory:
 
 ```{r}
 obj_size(double(1))
 obj_size(double(2))
 ```
 
-So a 1 million double should take up 8,000,048 bytes: 
+So, a 1 million double should take up 8,000,048 bytes: 
 
 ```{r}
 a <- runif(1e6)
 obj_size(a)
 ```
 
-(If you look carefully at the amount of memory occupied by short vectors, you'll notice that the pattern is actually more complicated. This is to do with how R allocates memory, and is not that important. If you want to know the full details, they're discussed in the 1st edition of Advanced R: http://adv-r.had.co.nz/memory.html#object-size).
+(If you look carefully at the amount of memory occupied by short vectors, you will notice that the pattern is actually more complicated. This is to do with how R allocates memory and is not that important. If you want to know the full details, they're discussed in the 1st edition of Advanced R: http://adv-r.had.co.nz/memory.html#object-size).
 
 For `b <- list(a, a)` both list elements contain references to the same memory address.
 
@@ -320,13 +319,13 @@ b <- list(a, a)
 ref(a, b)
 ```
 
-Therefore, no additional memory is required for the second list element. The list itself requires 64 bytes, 48 bytes for an empty list and 8 bytes for each element (`obj_size(vector("list", 2))`). This let's us predict 8,000,048 B + 64 B = 8,000,112 B:
+Therefore, no additional memory is required for the second list element. The list itself requires 64 bytes, 48 bytes for an empty list and 8 bytes for each element (`obj_size(vector("list", 2))`). This lets us predict 8,000,048 B + 64 B = 8,000,112 B:
 
 ```{r}
 obj_size(b)
 ```
 
-When we modify the first element of `b[[1]]` copy-on-modify occurs. Both elements will still have the same size (8,000,040 bytes), but the first one gets a new address in memory. As `b`'s elements don't share references anymore, its object size adds up to the sum of the elements and the length-2 list: 8,000,048 B + 8,000,048 B + 64 B = 16,000,160 B (16 MB).
+When we modify the first element of `b[[1]]` copy-on-modify occurs. Both elements will still have the same size (8,000,040 B), but the first one gets a new address in memory. As `b`'s elements don't share references anymore, its object size adds up to the sum of the elements and the length-2 list: 8,000,048 B + 8,000,048 B + 64 B = 16,000,160 B (16 MB).
 
 ```{r}
 b[[1]][[1]] <- 10
@@ -340,7 +339,7 @@ obj_size(a, b)
 ref(a, b)
 ```
 
-When we modify the second element of `b`, this element will also point to a new memory address. This doesn't affect the size of the list:
+When we modify the second element of `b`, this element will also point to a new memory address. This does not affect the size of the list:
 
 ```{r}
 b[[2]][[1]] <- 10
@@ -363,7 +362,7 @@ x <- list()
 x[[1]] <- x
 ```
 
-__[A]{.solved}__: In this situation copy-on-modify prevents the creation of a circular list. Let's step through the details as follows:
+__[A]{.solved}__: In this situation copy-on-modify prevents the creation of a circular list. Let us step through the details as follows:
 
 ```{r, eval=FALSE}
 x <- list()  # creates initial object
@@ -377,13 +376,13 @@ x[[1]] <- x  # Copy-on-modify triggers new copy
 
 obj_addr(x)       # copied object has new memory address
 #> [1] "0x55862e8ce028"
-obj_addr(x[[1]])  # list element contains old memory adress
+obj_addr(x[[1]])  # list element contains old memory address
 #> [1] "0x55862f23ab80"
 ```
 
 __[Q2]{.Q}__: Wrap the two methods for subtracting medians into two functions, then use the bench package to carefully compare their speeds. How does performance change as the number of columns increase?
 
-__[A]{.solved}__: First, let's define a function to create some random data.
+__[A]{.solved}__: First, let us define a function to create some random data.
 
 ```{r}
 create_random_df <- function(nrow, ncol) {
@@ -394,7 +393,7 @@ create_random_df <- function(nrow, ncol) {
 create_random_df(2, 2)
 ```
 
-Next, we wrap the two approaches to subtract numerical values (in our case medians) from each column of a data frame in their own function. We name these functions depending on whether the approach operates on a data frame or a list. For a fairer comparison the second function contains also the overhead code to convert between data frame and list objects.
+Next, we wrap the two approaches to subtract numerical values (in our case medians) from each column of a data frame in their own function. We name these functions depending on whether the approach operates on a data frame or a list. For a fairer comparison, the second function also contains the overhead code to convert between data frame and list objects.
 
 ```{r}
 subtract_df <- function(x, medians){

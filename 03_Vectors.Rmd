@@ -135,7 +135,7 @@ attr(foo, which = "comment")
 
 __[Q1]{.Q}__: What sort of object does `table()` return? What is its type? What attributes does it have? How does the dimensionality change as you tabulate more variables?
 
-__[A]{.solved}__: `table()` returns a contingency table of its input variables, which has the class `"table"`. Internally it is represented as an array (implicit class) of integers (type) with the attributes `dim` (dimension of the underlying array) and `dimnames` (one name for each input column). The dimensions correspond to the number of unique values (factor levels) in each input variable.
+__[A]{.solved}__: `table()` returns a contingency table of its input variables, which has the class `table`. Internally it is represented as an array (implicit class) of integers (type) with the attributes `dim` (dimension of the underlying array) and `dimnames` (one name for each input column). The dimensions correspond to the number of unique values (factor levels) in each input variable.
 
 ```{r}
 x <- table(mtcars[c("vs", "cyl", "am")])
@@ -183,31 +183,33 @@ __[A]{.solved}__: For `f2` and `f3` either the order of the factor elements *or*
 __[Q1]{.Q}__: List all the ways that a list differs from an atomic vector.
 
 __[A]{.solved}__: To summarise:
-- Atomic vectors are always homogeneous (all elements must be of the same type). Lists may be heterogeneous (the elements can be of different types) as described in the [introduction of the vectors chapter]{https://adv-r.hadley.nz/vectors-chap.html#introduction}.
-- Atomic vectors point to one address in memory, while lists contain a separate references for each element. (This was described in the list sections of the [vectors](https://adv-r.hadley.nz/vectors-chap.html#lists) and the [names and values](https://adv-r.hadley.nz/names-values.html#list-references) chapters.)
 
-```{r}
-lobstr::ref(1:2)
-lobstr::ref(list(1:2, 2))
-```
+* Atomic vectors are always homogeneous (all elements must be of the same type). Lists may be heterogeneous (the elements can be of different types) as described in the [introduction of the vectors chapter]{https://adv-r.hadley.nz/vectors-chap.html#introduction}.
 
-- Subsetting with out-of-bound and `NA` values leads to different output. E.g. for `[` we get `NA` for atomics and `NULL` for lists. (This will be described in more detail within the [subsetting chapter](https://adv-r.hadley.nz/subsetting.html).)
+* Atomic vectors point to one address in memory, while lists contain a separate reference for each element. (This was described in the list sections of the [vectors](https://adv-r.hadley.nz/vectors-chap.html#lists) and the [names and values](https://adv-r.hadley.nz/names-values.html#list-references) chapters.)
 
-```{r}
-# Subsetting atomic vectors
-(1:2)[3]
-(1:2)[NA]
+    ```{r}
+    lobstr::ref(1:2)
+    lobstr::ref(list(1:2, 2))
+    ```
 
-# Subsetting lists
-as.list(1:2)[3]
-as.list(1:2)[NA]
-```
+* Subsetting with out-of-bound and `NA` values leads to different output. E.g. for `[` we get `NA` for atomics and `NULL` for lists. (This will be described in more detail within the [subsetting chapter](https://adv-r.hadley.nz/subsetting.html).)
+
+    ```{r}
+    # Subsetting atomic vectors
+    (1:2)[3]
+    (1:2)[NA]
+    
+    # Subsetting lists
+    as.list(1:2)[3]
+    as.list(1:2)[NA]
+    ```
 
 __[Q2]{.Q}__: Why do you need to use `unlist()` to convert a list to an atomic vector? Why doesn't `as.vector()` work?
 
 __[A]{.solved}__: A list is already a vector, though not an atomic one!
 
-Note that `as.vector()` and `is.vector()` use different defintions of 
+Note that `as.vector()` and `is.vector()` use different definitions of 
 "vector"!
 
 ```{r}
@@ -223,12 +225,12 @@ date    <- as.Date("1970-01-02")
 dttm_ct <- as.POSIXct("1970-01-01 01:00", tz = "UTC")
 
 
-# Internal representasions
+# Internal representations
 unclass(date)
 unclass(dttm_ct)
 ```
 
-Combining these objects via the `c()` leads to surprising results. This is because the `c()` generic does only dispatch on it's first argument:
+Combining these objects via `c()` leads to surprising results. This is because the `c()` generic does only dispatch on its first argument:
 
 ```{r}
 c(date, dttm_ct)  # equal to c.Date(date, dttm_ct) 
@@ -253,7 +255,7 @@ Let's look at `unlist()`, which operates on list input.
 unlist(list(date, dttm_ct))  
 ```
 
-We see again that dates and date-times are internally stored as doubles. Unfortunately this is all we are left with, when unlist strips the attributes of the list.
+We see again that dates and date-times are internally stored as doubles. Unfortunately, this is all we are left with, when unlist strips the attributes of the list.
 
 To summarise: `c()` coerces types and errors may occur because of inappropriate method dispatch. `unlist()` strips attributes. 
 
@@ -325,11 +327,11 @@ __[A]{.solved}__: The type of the result of `as.matrix` depends on the types of 
 
 > The method for data frames will return a character matrix if there is only atomic columns and any non-(numeric/logical/complex) column, applying as.vector to factors and format to other non-character columns. Otherwise the usual coercion hierarchy (logical < integer < double < complex) will be used, e.g., all-logical data frames will be coerced to a logical matrix, mixed logical-integer will give a integer matrix, etc.
 
-On the other hand `data.matrix` will always return a numeric matrix (see `?data.matrix()`).
+On the other hand, `data.matrix` will always return a numeric matrix (see `?data.matrix()`).
 
 > Return the matrix obtained by converting all the variables in a data frame to numeric mode and then binding them together as the columns of a matrix. Factors and ordered factors are replaced by their internal codes. [...] Character columns are first converted to factors and then to integers.
 
-We can illustrate and compare the mechanics of these functions using a concrete example. `as.matrix()` makes it possible to retrieve most of the original information from the data frame, but leaves us with characters. To retrieve all information from `data.matrix()`'s output, we would need a lookup table for each column.
+We can illustrate and compare the mechanics of these functions using a concrete example. `as.matrix()` makes it possible to retrieve most of the original information from the data frame but leaves us with characters. To retrieve all information from `data.matrix()`'s output, we would need a lookup table for each column.
 
 ```{r}
 df_coltypes <- data.frame(
