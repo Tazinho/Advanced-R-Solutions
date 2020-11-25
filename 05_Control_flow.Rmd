@@ -16,13 +16,11 @@ ifelse(NA, 1, "no")
 
 Read the documentation and write down the rules in your own words.
 
-__[A]{.solved}__: `ifelse()`'s arguments are named `test`, `yes` and `no`. It returns the entry for `yes` when `test` is `TRUE`, the entry for `no` when `test` is `FALSE` and `NA` when `test` is `NA`. Therefore, the expressions above return vectors of type `double` (`1`), `character` (`"no"`) and `logical` (`NA`).
+__[A]{.solved}__: The arguments of `ifelse()` are named `test`, `yes` and `no`. `ifelse()` returns the entry for `yes` when `test` is `TRUE`, the entry for `no` when `test` is `FALSE` and `NA` when `test` is `NA`. This is surprising because it uses the type of `test`. Therefore, the expressions above return vectors of type `double` (`1`), `character` (`"no"`) and `logical` (`NA`).
 
-Additionally, `ifelse()` has some special characteristics. E.g. it's vectorised over all its arguments. If `yes` or `no` are shorter than `test`, they are recycled. Otherwise, their additional elements will be ignored. Further, the documentation says about the output type:
+Additionally, `ifelse()` has some special characteristics. E.g. it is vectorised over all its arguments. If `yes` or `no` are shorter than `test`, they are recycled. Otherwise, their additional elements are ignored. Further, the documentation says about the output type:
 
 > A vector of the same length and attributes (including dimensions and "class") as test and data values from the values of yes or no. The mode of the answer will be coerced from logical to accommodate first any values taken from yes and then any values taken from no.
-
-This is surprising because it uses the type of `test`.
 
 __[Q2]{.Q}__: Why does the following code work?
 
