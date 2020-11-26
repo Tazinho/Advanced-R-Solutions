@@ -313,6 +313,22 @@ nrow(s3_methods_generic("summary"))
 nrow(s3_methods_generic("plot"))
 ```
 
+Let's verify this programmatically.
+
+```{r}
+library(purrr)
+
+ls(all.names = TRUE, env = baseenv()) %>% 
+  mget(envir = baseenv()) %>% 
+  purrr::keep(is_function) %>% 
+  names() %>% 
+  keep(is_s3_generic) %>% 
+  map(~ set_names(nrow(s3_methods_generic(.x)), .x)) %>% 
+  flatten_int() %>% 
+  sort(decreasing = TRUE) %>% 
+  head()
+```
+
 __[Q5]{.Q}__: Carefully read the documentation for `UseMethod()` and explain why the following code returns the results that it does. What two usual rules of function evaluation does `UseMethod()` violate?
 
 ```{r, results = FALSE}
