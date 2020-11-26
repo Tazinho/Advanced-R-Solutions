@@ -368,12 +368,13 @@ library(dplyr)
 
 s3_methods_generic("[") %>% 
   filter(visible) %>% 
-  mutate(method = paste0("[.", class)) %>% 
-  mutate(argnames = purrr::map(method, ~ names(formals(.x)))) %>% 
-  mutate(args = purrr::map(method, ~ formals(.x))) %>% 
-  mutate(args = purrr::map2(argnames, args,
-                            ~ paste(.x, .y, sep = " = "))) %>% 
-  mutate(args = purrr::set_names(args, method)) %>% 
+  mutate(
+    method = paste0("[.", class),
+    argnames = purrr::map(method, ~ names(formals(.x))),
+    args = purrr::map(method, ~ formals(.x)),
+    args = purrr::map2(argnames, args,
+                       ~ paste(.x, .y, sep = " = ")),
+    args = purrr::set_names(args, method)) %>%
   pull(args) %>% 
   head()
 ```
