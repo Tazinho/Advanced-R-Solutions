@@ -361,6 +361,23 @@ names(formals(`[.Date`))
 names(formals(`[.AsIs`))
 ```
 
+Note that we can get a more complete overview if we work with the output of ` s3_methods_generic("[")`.
+
+```{r}
+library(dplyr)
+
+s3_methods_generic("[") %>% 
+  filter(visible) %>% 
+  mutate(method = paste0("[.", class)) %>% 
+  mutate(argnames = purrr::map(method, ~ names(formals(.x)))) %>% 
+  mutate(args = purrr::map(method, ~ formals(.x))) %>% 
+  mutate(args = purrr::map2(argnames, args,
+                            ~ paste(.x, .y, sep = " = "))) %>% 
+  mutate(args = purrr::set_names(args, method)) %>% 
+  pull(args) %>% 
+  head()
+```
+
 ## Object styles
 
 __[Q1]{.Q}__: Categorise the objects returned by `lm()`, `factor()`, `table()`, `as.Date()`, `ecdf()`, `ordered()`, `I()` into the styles described above.
