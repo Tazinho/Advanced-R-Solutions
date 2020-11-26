@@ -179,9 +179,12 @@ walk2(cyls, paths, ~ write.csv(.x, .y))
 __[A]{.solved}__: `iwalk()` allows us to use a single variable, storing the output path in the names.
 
 ```{r, eval = FALSE}
+temp <- tempfile()
+dir.create(temp)
+
 cyls <- split(mtcars, mtcars$cyl)
 names(cyls) <- file.path(temp, paste0("cyl-", names(cyls), ".csv"))
-iwalk(cyls, ~ write.csv(.x, .y)))
+iwalk(cyls, ~ write.csv(.x, .y))
 ```
 
 We could do this in a single pipe by taking advantage of `set_names()`:
