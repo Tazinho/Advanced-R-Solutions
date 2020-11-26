@@ -164,6 +164,10 @@ __[Q1]{.Q}__: Explain the results of `modify(mtcars, 1)`.
 
 __[A]{.solved}__: `modify()` is based on `map()`, and in this case, the extractor interface will be used. It extracts the first element of each column in `mtcars`. `modify()` always returns the same structure as its input: in this case it forces the first row to be recycled 32 times. (Internally `modify()` uses `.x[] <- map(.x, .f, ...)` for assignment.)
 
+```{r}
+head(modify(mtcars, 1))
+```
+
 __[Q2]{.Q}__: Rewrite the following code to use `iwalk()` instead of `walk2()`. What are the advantages and disadvantages?
 
 ```{r, eval = FALSE}
