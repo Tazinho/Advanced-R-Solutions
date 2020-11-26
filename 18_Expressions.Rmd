@@ -277,7 +277,7 @@ When we ignore the braces and compare the trees, we can see, that the first `=` 
 
 __[Q3]{.Q}__: Does `-2^2` yield 4 or -4? Why?
 
-__[A]{.solved}__: It yields `-4`, because `^` has a higher operator precedence than `-`, which we can verify by looking at the AST:
+__[A]{.solved}__: It yields `-4`, because `^` has a higher operator precedence than `-`, which we can verify by looking at the AST (or looking it up under `?"Syntax"`):
 
 ```{r}
 -2^2
@@ -339,6 +339,8 @@ ast(x ^ y %+% z)
 Here `x ^ y` will be calculated first, and the result will be used as first argument to `%+%()`.
 
 We can conclude that custom infix functions have precedence between addition and exponentiation.
+
+The exact precedence of infix functions can be looked up under `?"Syntax"` where we see that it lies directly behind the sequence operator (`:`) and in front of the multiplication and division operators (`*` and `/`).
 
 __[Q7]{.Q}__: What happens if you call `parse_expr()` with a string that generates multiple expressions? e.g. `parse_expr("x + 1; y + 1")`
 
