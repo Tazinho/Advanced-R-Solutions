@@ -374,7 +374,8 @@ s3_methods_generic("[") %>%
     args = purrr::map(method, ~ formals(.x)),
     args = purrr::map2(argnames, args,
                        ~ paste(.x, .y, sep = " = ")),
-    args = purrr::set_names(args, method)) %>%
+    args = purrr::set_names(args, method)
+  ) %>%
   pull(args) %>% 
   head()
 ```
