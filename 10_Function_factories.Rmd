@@ -53,7 +53,7 @@ identical(f_lin(x), y)
 identical(f_con(x), y)
 ```
 
-When we apply these funcitons to new x values, these are mapped to the lines connecting the initial y values (linear case) or to the same y value as for the next smallest initial x value (constant case).
+When we apply these functions to new x values, these are mapped to the lines connecting the initial y values (linear case) or to the same y value as for the next smallest initial x value (constant case).
 
 ```{r}
 x_new <- runif(1000)
@@ -75,7 +75,7 @@ f_lin(c(min(x) - eps, max(x) + eps))
 f_con(c(min(x) - eps, max(x) + eps))
 ```
 
-To change this bahaviour, one can set `rule = 2`. This leads to the result that for values outside of `range(x)` the boundary values of the function are returned.
+To change this behaviour, one can set `rule = 2`. This leads to the result that for values outside of `range(x)` the boundary values of the function are returned.
 
 ```{r}
 f_lin <- approxfun(x, y, rule = 2)
