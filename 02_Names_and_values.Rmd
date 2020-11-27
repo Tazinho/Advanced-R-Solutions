@@ -289,7 +289,7 @@ obj_size(a, b)
 ```
 
 __[A]{.solved}__: In R (on most platforms) a length-0
-vector has 48 bytes of overhead:
+vector has 48 bytes of overhead.
 
 ```{r}
 obj_size(list())
@@ -297,14 +297,14 @@ obj_size(double())
 obj_size(character())
 ```
 
-A single double takes up additional 8 bytes of memory:
+A single double takes up additional 8 bytes of memory.
 
 ```{r}
 obj_size(double(1))
 obj_size(double(2))
 ```
 
-So, a 1 million double should take up 8,000,048 bytes: 
+So, a 1 million double should take up 8,000,048 bytes.
 
 ```{r}
 a <- runif(1e6)
@@ -320,7 +320,7 @@ b <- list(a, a)
 ref(a, b)
 ```
 
-Therefore, no additional memory is required for the second list element. The list itself requires 64 bytes, 48 bytes for an empty list and 8 bytes for each element (`obj_size(vector("list", 2))`). This lets us predict 8,000,048 B + 64 B = 8,000,112 B:
+Therefore, no additional memory is required for the second list element. The list itself requires 64 bytes, 48 bytes for an empty list and 8 bytes for each element (`obj_size(vector("list", 2))`). This lets us predict 8,000,048 B + 64 B = 8,000,112 B.
 
 ```{r}
 obj_size(b)
@@ -333,21 +333,21 @@ b[[1]][[1]] <- 10
 obj_size(b) 
 ```
 
-The second element of `b` still references to the same address as `a`, so the combined size of `a` and `b` is the same as `b`:
+The second element of `b` still references to the same address as `a`, so the combined size of `a` and `b` is the same as `b`.
 
 ```{r}
 obj_size(a, b) 
 ref(a, b)
 ```
 
-When we modify the second element of `b`, this element will also point to a new memory address. This does not affect the size of the list:
+When we modify the second element of `b`, this element will also point to a new memory address. This does not affect the size of the list.
 
 ```{r}
 b[[2]][[1]] <- 10
 obj_size(b) 
 ```
 
-However, as `b` doesn't share references with `a` anymore, the memory usage of the combined objects increases:
+However, as `b` doesn't share references with `a` anymore, the memory usage of the combined objects increases.
 
 ```{r}
 ref(a, b)
@@ -363,7 +363,7 @@ x <- list()
 x[[1]] <- x
 ```
 
-__[A]{.solved}__: In this situation copy-on-modify prevents the creation of a circular list. Let' step through the details:
+__[A]{.solved}__: In this situation copy-on-modify prevents the creation of a circular list. Let us step through the details:
 
 ```{r, eval=FALSE}
 x <- list()  # creates initial object
@@ -383,7 +383,7 @@ obj_addr(x[[1]])  # list element contains old memory address
 
 __[Q2]{.Q}__: Wrap the two methods for subtracting medians into two functions, then use the `{bench}` package to carefully compare their speeds. How does performance change as the number of columns increase?
 
-__[A]{.solved}__: First, let us define a function to create some random data.
+__[A]{.solved}__: First, we define a function to create some random data.
 
 ```{r}
 create_random_df <- function(nrow, ncol) {
@@ -411,7 +411,7 @@ subtract_list <- function(x, medians){
 }
 ```
 
-We can then profile the performance, via benchmarks on data frames with differing numbers of columns. Therefore, we create a small helper that creates our random data frame and its medians before it benchmarks the two approaches.
+This lets us profile the performance, via benchmarks on data frames with differing numbers of columns. Therefore, we create a small helper that creates our random data frame and its medians before it benchmarks the two approaches.
 
 ```{r}
 benchmark_medians <- function(ncol){
@@ -425,7 +425,7 @@ benchmark_medians <- function(ncol){
 benchmark_medians(1)
 ```
 
-The `bench::press()` function allows us to run our helper across a grid of parameters easily. We will use it to slowly increase the number of data frame columns in our benchmark.
+The `bench::press()` function allows us to run our helper across a grid of parameters. We will use it to slowly increase the number of data frame columns in our benchmark.
 
 ```{r}
 results <- bench::press(
