@@ -63,31 +63,31 @@ __[A]{.solved}__: A valid name may contain letters, numbers, dots and underscore
 
 Three main mechanisms ensure syntactically valid names (see `?make.names`):
 
-1. Prepending with `"X"`: Variable names that do not start with a letter or a dot will be prepended by an `"X"`
+1. Names that do not start with a letter or a dot will be prepended with an `"X"`.
 
-```{r}
-make.names("")    # prepending "x"
-```
+    ```{r}
+    make.names("")    # prepending "x"
+    ```
 
-The same holds for variable names that begin with a dot followed by a number 
+   The same holds for names that begin with a dot followed by a number. 
 
-```{r}
-make.names(".1")  # prepending "X"
-```
+    ```{r}
+    make.names(".1")  # prepending "X"
+    ```
 
-2. Additionally, non-valid characters are replaced by a dot
+2. Additionally, non-valid characters are replaced by a dot.
 
-```{r}
-make.names("@")          # prepending "X" + "." replacement 
-make.names("  ")         # prepending "X" + ".." replacement
-make.names("non-valid")  # "." replacement
-```
+    ```{r}
+    make.names("@")          # prepending "X" + "." replacement 
+    make.names("  ")         # prepending "X" + ".." replacement
+    make.names("non-valid")  # "." replacement
+    ```
 
-3. Reserved R keywords (see `?reserved`) are suffixed by a dot
+3. Reserved R keywords (see `?reserved`) are suffixed by a dot.
 
-```{r}
-make.names("if")  # "." suffix
-```
+    ```{r}
+    make.names("if")  # "." suffix
+    ```
 
 Interestingly, some of these transformations are influenced by the current locale. From `?make.names`:
 
@@ -107,7 +107,7 @@ __[A]{.solved}__: When `1:10` is called an object with an address in memory is c
 obj_addr(1:10)  # the object exists, but has no name
 ```
 
-__[Q2]{.Q}__: Explain why `tracemem()` shows two copies when you run this code. Hint: carefully look at the difference between this code and the code show earlier in the section.
+__[Q2]{.Q}__: Explain why `tracemem()` shows two copies when you run this code. Hint: carefully look at the difference between this code and the code shown earlier in the section.
 
 ```{r, results = FALSE}
 x <- c(1L, 2L, 3L)
@@ -250,10 +250,11 @@ To look up all functions from these packages we iterate over `base_pkgs` and app
 
 ```{r}
 library(magrittr)
+
 base_objs <- base_pkgs %>% 
   lapply(as.environment) %>% 
   lapply(function(x) mget(ls(x, all.names = TRUE), x)) %>% 
-  set_names(value = base_pkgs)
+  set_names(base_pkgs)
 ```
 
 This gives us more than 2700 objects which are usually available by default.
@@ -362,7 +363,7 @@ x <- list()
 x[[1]] <- x
 ```
 
-__[A]{.solved}__: In this situation copy-on-modify prevents the creation of a circular list. Let us step through the details as follows:
+__[A]{.solved}__: In this situation copy-on-modify prevents the creation of a circular list. Let' step through the details:
 
 ```{r, eval=FALSE}
 x <- list()  # creates initial object
@@ -380,7 +381,7 @@ obj_addr(x[[1]])  # list element contains old memory address
 #> [1] "0x55862f23ab80"
 ```
 
-__[Q2]{.Q}__: Wrap the two methods for subtracting medians into two functions, then use the bench package to carefully compare their speeds. How does performance change as the number of columns increase?
+__[Q2]{.Q}__: Wrap the two methods for subtracting medians into two functions, then use the `{bench}` package to carefully compare their speeds. How does performance change as the number of columns increase?
 
 __[A]{.solved}__: First, let us define a function to create some random data.
 
@@ -437,15 +438,15 @@ Finally, we can plot and interpret our results.
 
 ```{r}
 library(ggplot2)
+
 ggplot(results, aes(ncol, median,
-                    col = as.character(expression))) +
+                    col = attr(expression, "description"))) +
   geom_point(size = 2) + 
   geom_smooth() +
-  labs(x = "Number of Data Frame Columns",
-       y = "Computation Time",
-       color = "Operating Data Structure",
-       title = "Benchmark: Median Subtraction",
-       subtitle = "For a data frame with 10,000 rows")
+  labs(x = "Number of Columns",
+       y = "Execution Time (s)",
+       color = "Data Structure") +
+  theme(legend.position = "top")
 ```
 
 When working directly with the data frame, the execution time grows quadratically with the number of columns in the input data. This is because (e.g.) the first column must be copied n times, the second column n-1 times, and so on. When working with a list, the execution time increases only linearly.
