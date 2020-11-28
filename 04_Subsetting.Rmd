@@ -53,7 +53,7 @@ x[upper.tri(x)]
 
 __[Q4]{.Q}__: Why does `mtcars[1:20]` return an error? How does it differ from the similar `mtcars[1:20, ]`?
 
-__[A]{.solved}__: When subsetting a data frame  with a single vector, it behaves the same way as subsetting a list of the columns, so `mtcars[1:20]` would return a data frame of the first 20 columns of the dataset. But `mtcars` has only 11 columns, so the index will be out of bounds and an error is thrown. `mtcars[1:20, ]` is subsetted with two vectors, so 2d subsetting kicks in, and the first index refers to rows.
+__[A]{.solved}__: When subsetting a data frame with a single vector, it behaves the same way as subsetting a list of columns. So, `mtcars[1:20]` would return a data frame containing the first 20 columns of the dataset. However, as `mtcars` has only 11 columns, the index will be out of bounds and an error is thrown. `mtcars[1:20, ]` is subsetted with two vectors, so 2d subsetting kicks in, and the first index refers to rows.
 
 __[Q5]{.Q}__: Implement your own function that extracts the diagonal entries from a matrix (it should behave like `diag(x)` where `x` is a matrix).
 
@@ -105,20 +105,18 @@ mtcars[[c(2, 3)]]
 
 __[Q2]{.Q}__: Given a linear model, e.g., `mod <- lm(mpg ~ wt, data = mtcars)`, extract the residual degrees of freedom. Extract the R squared from the model summary (`summary(mod)`).
 
-__[A]{.solved}__: `mod` has the type list, which opens up several possibilities:
+__[A]{.solved}__: `mod` is of type list, which opens up several possibilities. We us `$` or `[[` to extract a single element:
 
 ```{r}
 mod <- lm(mpg ~ wt, data = mtcars)
 
-mod$df.residual       # `$` returns a single the element
-mod$df.res            # `$` allows partial matching
-mod["df.residual"]    # `[` generates list output
-mod[["df.residual"]]  # `[[` returns a single element
+mod$df.residual
+mod[["df.residual"]]
 ```
 
 The same also applies to `summary(mod)`, so we could use e.g.:
 
-```{r, eval = FALSE}
+```{r}
 summary(mod)$r.squared
 ```
 
@@ -128,7 +126,7 @@ summary(mod)$r.squared
 
 __[Q1]{.Q}__: How would you randomly permute the columns of a data frame? (This is an important technique in random forests). Can you simultaneously permute the rows and columns in one step?
 
-__[A]{.solved}__: This can be achieved by combining `` `[` `` and `sample()`:
+__[A]{.solved}__: This can be achieved by combining `[` and `sample()`:
 
 ```{r,eval = FALSE}
 # Permute columns
@@ -144,10 +142,12 @@ __[A]{.solved}__: Selecting `m` random rows from a data frame can be achieved th
 
 ```{r, eval = FALSE}
 m <- 10
-mtcars[sample(nrow(mtcars), m), , drop = FALSE]
+mtcars[sample(nrow(mtcars), m), ]
 ```
 
 Keeping subsequent rows together as a "[blocked sample](https://mlr.mlr-org.com/articles/tutorial/resample.html#stratification-blocking-and-grouping)" requires only some caution to get the start- and end-index correct.
+
+Holding successive lines together as a blocked sample requires only a certain amount of caution in order to correctly obtain the start and end index.
 
 ```{r, eval = FALSE}
 start <- sample(nrow(mtcars) - m + 1, 1)
@@ -157,8 +157,9 @@ mtcars[start:end, , drop = FALSE]
 
 __[Q3]{.Q}__: How could you put the columns in a data frame in alphabetical order?
 
-__[A]{.solved}__: We combine `order()` with `[`:
+__[A]{.solved}__: We combine `[` with `order()` or `sort()`:
 
 ```{r, eval = FALSE}
 mtcars[order(names(mtcars))]
+mtcars[sort(names(mtcars))]
 ```
