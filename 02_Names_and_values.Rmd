@@ -418,8 +418,8 @@ benchmark_medians <- function(ncol){
   df <- create_random_df(nrow = 1e4, ncol = ncol)
   medians <- vapply(df, median, numeric(1), USE.NAMES = FALSE)
   
-  bench::mark(df   = subtract_df(df, medians),
-              list = subtract_list(df, medians))
+  bench::mark("data frame" = subtract_df(df, medians),
+              "list"       = subtract_list(df, medians))
 }
 
 benchmark_medians(1)
