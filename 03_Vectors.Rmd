@@ -31,7 +31,7 @@ c(TRUE, 1L)      # will be coerced to integer   -> 1 1
 
 __[Q3]{.Q}__: Why is `1 == "1"` true? Why is `-1 < FALSE` true? Why is `"one" < 2` false?
 
-__[A]{.solved}__: These comparisons are carried out by operator-functions, which coerce their arguments to a common type. In the examples above these cases will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` turns into `"2"` (and numerals precede letters in the lexicographic order (may depend on locale)).
+__[A]{.solved}__: These comparisons are carried out by operator-functions (`==`, `<`), which coerce their arguments to a common type. In the examples above these types will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` turns into `"2"` (and numbers precede letters in lexicographic order (may depend on locale)).
 
 __[Q4]{.Q}__: Why is the default missing value, `NA`, a logical vector? What's special about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)
 
@@ -40,9 +40,12 @@ __[A]{.solved}__: The presence of missing values shouldn't affect the type of an
 __[Q5]{.Q}__: Precisely what do `is.atomic()`, `is.numeric()`, and `is.vector()` test for?
 
 __[A]{.solved}__: The documentation states that:
+
 - `is.atomic()` tests if an object is an atomic vector (as defined in Advanced R) or is `NULL` (!).
 - `is.numeric()` tests if an object has type integer or double and is not of class `"factor"`, `"Date"`, `"POSIXt"` or `"difftime"`.
-- `is.vector()` tests if an object is vector (as defined in Advanced R) and has no attributes, apart from names.
+- `is.vector()` tests if an object is a vector (as defined in Advanced R) and has no attributes, apart from names or if it is an expression.
+
+Atomic vectors are defined in Advanced R as objects of type `"logical"`, `"integer"`, `"double"`, `"complex"`, `"character"` or `"raw"`. Vectors are defined as atomic vectors or lists.
 
 ## Attributes
 
@@ -83,10 +86,11 @@ __[A]{.solved}__: From `?nrow`:
 
 > `dim()` will return `NULL` when applied to a 1d vector.
 
-One may want to use `NROW()` or `NCOL()` to handle atomic vectors, lists and NULL values in the same way as one column matrices or data frames. For these objects `nrow()` and `ncol()` return `NULL`. 
+One may want to use `NROW()` or `NCOL()` to handle atomic vectors, lists and NULL values in the same way as one column matrices or data frames. For these objects `nrow()` and `ncol()` return `NULL`:
 
 ```{r}
 x <- 1:10
+
 # Return NULL
 nrow(x)
 ncol(x)
@@ -104,7 +108,7 @@ x2 <- array(1:5, c(1, 5, 1))  # 1 row,  5 columns, 1 in third dim.
 x3 <- array(1:5, c(5, 1, 1))  # 5 rows, 1 column,  1 in third dim.
 ```
 
-__[A]{.solved}__: These are all "one dimensional". If you imagine a 3d cube, `x1` is the x-dimension, `x2` is the y-dimension, and `x3` is the z-dimension.
+__[A]{.solved}__: These are all "one dimensional". If you imagine a 3d cube, `x1` is in the x-dimension, `x2` is in the y-dimension, and `x3` is in the z-dimension.
 
 __[Q4]{.Q}__: An early draft used this code to illustrate `structure()`:
 
@@ -151,16 +155,14 @@ f1 <- factor(letters)
 levels(f1) <- rev(levels(f1))
 ```
 
-__[A]{.solved}__: The underlying integer values stay the same, but the levels are changed, making it look like the data as changed.
+__[A]{.solved}__: The underlying integer values stay the same, but the levels are changed, making it look like the data has changed.
 
 ```{r}
-f1 <- factor(letters[1:10])
-levels(f1)
+f1 <- factor(letters)
 f1
 as.integer(f1)
 
 levels(f1) <- rev(levels(f1))
-levels(f1)
 f1
 as.integer(f1)
 ```
@@ -168,15 +170,22 @@ as.integer(f1)
 __[Q3]{.Q}__: What does this code do? How do `f2` and `f3` differ from `f1`?
 
 ```{r, results = "none"}
-# Reverse element order (only)
 f2 <- rev(factor(letters))
 
-# Reverse factor level order (only)
 f3 <- factor(letters, levels = rev(letters))
 ```
 
 __[A]{.solved}__: For `f2` and `f3` either the order of the factor elements *or* its levels are being reversed. For `f1` both transformations are occurring.
 
+```{r}
+# Reverse element order (only)
+(f2 <- rev(factor(letters)))
+as.integer(f2)
+
+# Reverse factor level order (only)
+(f3 <- factor(letters, levels = rev(letters)))
+as.integer(f3)
+```
 
 ## Lists
 
@@ -184,7 +193,7 @@ __[Q1]{.Q}__: List all the ways that a list differs from an atomic vector.
 
 __[A]{.solved}__: To summarise:
 
-* Atomic vectors are always homogeneous (all elements must be of the same type). Lists may be heterogeneous (the elements can be of different types) as described in the [introduction of the vectors chapter]{https://adv-r.hadley.nz/vectors-chap.html#introduction}.
+* Atomic vectors are always homogeneous (all elements must be of the same type). Lists may be heterogeneous (the elements can be of different types) as described in the [introduction of the vectors chapter](https://adv-r.hadley.nz/vectors-chap.html#introduction).
 
 * Atomic vectors point to one address in memory, while lists contain a separate reference for each element. (This was described in the list sections of the [vectors](https://adv-r.hadley.nz/vectors-chap.html#lists) and the [names and values](https://adv-r.hadley.nz/names-values.html#list-references) chapters.)
 
@@ -193,7 +202,7 @@ __[A]{.solved}__: To summarise:
     lobstr::ref(list(1:2, 2))
     ```
 
-* Subsetting with out-of-bound and `NA` values leads to different output. E.g. for `[` we get `NA` for atomics and `NULL` for lists. (This will be described in more detail within the [subsetting chapter](https://adv-r.hadley.nz/subsetting.html).)
+* Subsetting with out-of-bounds and `NA` values leads to different output. E.g. for `[` we get `NA` for atomics and `NULL` for lists. (This will be described in more detail within the [subsetting chapter](https://adv-r.hadley.nz/subsetting.html).)
 
     ```{r}
     # Subsetting atomic vectors
@@ -263,7 +272,19 @@ To summarise: `c()` coerces types and errors may occur because of inappropriate 
 
 __[Q1]{.Q}__: Can you have a data frame with 0 rows? What about 0 columns?
 
-__[A]{.solved}__: Yes, you can create these data frames easily and in many ways. Even both dimensions can be 0. E.g. you might subset the respective dimension with either `0`, `NULL` or a valid 0-length atomic (`logical(0)`, `character(0)`, `integer(0)`, `double(0)`). Negative integer sequences would also work. The following example uses a zero:
+__[A]{.solved}__: Yes, you can create these data frames easily; either during creation or via subsetting. Even both dimensions can be 0. 
+
+Create a 0-row, 0-column or an empty data frame directly:
+
+```{r}
+data.frame(row.names = 1:3)  # or data.frame()[1:3, ]
+
+data.frame(a = integer(), b = logical())
+
+data.frame()
+```
+
+Create similar data frames via subsetting the respective dimension with either `0`, `NULL`, `FALSE` or a valid 0-length atomic (`logical(0)`, `character(0)`, `integer(0)`, `double(0)`). Negative integer sequences would also work. The following example uses a zero:
 
 ```{r}
 mtcars[0, ]
@@ -273,20 +294,16 @@ mtcars[, 0] # or mtcars[0]
 mtcars[0, 0]
 ```
 
-Empty data frames can also be created directly (without subsetting):
-
-```{r}
-data.frame()
-```
-
 __[Q2]{.Q}__: What happens if you attempt to set rownames that are not unique?
 
-__[A]{.solved}__: Matrices can have duplicated row names, so this does now cause problems
+__[A]{.solved}__: Matrices can have duplicated row names, so this does not cause problems.
 
-Data frames, however, require unique rownames and you get different results depending on how you attempt to set them. If you use `row.names()` directly, you 
+Data frames, however, require unique rownames and you get different results depending on how you attempt to set them. If you set them directly or via `row.names()`, you 
 get an error:
 
 ```{r, error = TRUE}
+data.frame(row.names = c("x", "y", "y"))
+
 df <- data.frame(x = 1:3)
 row.names(df) <- c("x", "y", "y")
 ```
