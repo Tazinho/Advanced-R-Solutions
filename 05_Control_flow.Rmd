@@ -22,7 +22,7 @@ To be a little more precise, we will cite the part of the documentation on the r
 
 > A vector of the same length and attributes (including dimensions and "class") as test and data values from the values of yes or no. The mode of the answer will be coerced from logical to accommodate first any values taken from yes and then any values taken from no.
 
-This is surprising because it uses the type of `test`. In practice this means, that if `test` is neither `TRUE` nor `FALSE`, `test` is simply converted to logical.
+This is surprising because it uses the type of `test`. In practice this means, that `test` is first converted to logical and if the result is neither `TRUE` nor `FALSE`, simply `as.logical(test)` is returned.
 
 ```{r}
 ifelse(logical(), 1, "no")
