@@ -16,11 +16,21 @@ ifelse(NA, 1, "no")
 
 Read the documentation and write down the rules in your own words.
 
-__[A]{.solved}__: The arguments of `ifelse()` are named `test`, `yes` and `no`. `ifelse()` returns the entry for `yes` when `test` is `TRUE`, the entry for `no` when `test` is `FALSE` and `NA` when `test` is `NA`. This is surprising because it uses the type of `test`. Therefore, the expressions above return vectors of type `double` (`1`), `character` (`"no"`) and `logical` (`NA`).
+__[A]{.solved}__: The arguments of `ifelse()` are named `test`, `yes` and `no`. In general `ifelse()` returns the entry for `yes` when `test` is `TRUE`, the entry for `no` when `test` is `FALSE` and `NA` when `test` is `NA`. Therefore, the expressions above return vectors of type `double` (`1`), `character` (`"no"`) and `logical` (`NA`).
 
-Additionally, `ifelse()` has some special characteristics. E.g. it is vectorised over all its arguments. If `yes` or `no` are shorter than `test`, they are recycled. Otherwise, their additional elements are ignored. Further, the documentation says about the output type:
+To be a little more precise, we will cite the part of the documentation on the return value of `ifelse()`:
 
 > A vector of the same length and attributes (including dimensions and "class") as test and data values from the values of yes or no. The mode of the answer will be coerced from logical to accommodate first any values taken from yes and then any values taken from no.
+
+This is surprising because it uses the type of `test`. In practice this means, that if `test` is neither `TRUE` nor `FALSE`, `test` is simply converted to logical.
+
+```{r}
+ifelse(logical(), 1, "no")
+ifelse(NaN, 1, "no")
+ifelse(NA_character_, 1, "no")
+ifelse("a", 1, "no")
+ifelse("true", 1, "no")
+```
 
 __[Q2]{.Q}__: Why does the following code work?
 
@@ -69,7 +79,7 @@ for (x in xs) {
 xs
 ```
 
-__[A]{.solved}__: In this loop `x` takes on the values of the initial `xs` (`1`, `2` and `3`), indicating that it is evaluated just once in the beginning of the loop, not after each iteration.
+__[A]{.solved}__: In this loop `x` takes on the values of the initial `xs` (`1`, `2` and `3`), indicating that it is evaluated just once in the beginning of the loop, not after each iteration. (Otherwise we would run into an infinite loop here.)
 
 __[Q3]{.Q}__: What does the following code tell you about when the index is updated?
 
@@ -80,4 +90,4 @@ for (i in 1:3) {
 }
 ```
 
-__[A]{.solved}__: In a `for`-loop the index is updated in the beginning of each iteration. Therefore, reassigning the index symbol during one iteration doesn't affect the following iterations.
+__[A]{.solved}__: In a `for`-loop the index is updated in the beginning of each iteration. Therefore, reassigning the index symbol during one iteration doesn't affect the following iterations. (Again, we would otherwise run into an infinite loop.)
