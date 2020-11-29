@@ -1,0 +1,231 @@
+# Preface
+TODO
+- maybe introduce some bullet points to structure where appropriate the text more
+- shorten "Journey of the book" part and find appropriate place for it
+- rewrite bullet points, reconsider structure, agree on it and start to write it in cohere prose.
+- decide how preface and index.html should go together looking forward.
+
+## Introduction
+- Welcome to our solutions manual for the exercises from Hadley Wickham's
+book Advanced R (2nd edition). Thank you for your interest in this project!
+- this book is a little special
+    - it is not a standalone book
+    - we didn't create the exercises or the structure
+
+### What is this book about and what it intends to be
+- you can it best use it together with Advanced R (as a hardcopy or on the website)
+- This book is first and foremost a **solutions manual**.
+- This book is intended as supplement to Advanced R
+
+- We have worked through the book and the exercises ourselves and the first solutions were the by-product of this process.
+- As the idea of the book matured we strived to solve the exercise in a clean, straightforward, readable and exemplary manner.
+- The written explanations fill in context and motivation, discuss important implementation details or relate to the practical work of being an R programmer.
+- we tried to provide solutions in a clear, concise and consistent way.
+- We tried to use prose to motivate the approaches taken and add useful information where appropriate, but a lot of the solutions consist of mostly code. We tried to write the solutions as clear and expressive as possible.
+
+### About Advanced R
+- We started this book because we like Advanced R so much
+- When we started to read Advanced R, we found that it introduces R as a programming language in a clear and structured way.
+  - also the deeper subject are presented in a accessible way
+- In contrast to many other R books, it is rather directed at programmers from other languages coming to R and at R users who want to become "R programmers". Therefore, it focusses on R programming skills and understanding of the language, rather than data science or statistical applications and workflows.
+
+### How to use Advanced R and Advanced R Solutions
+- Reading about programming is nice. But opening the editor and implementing what you've learned is even more beneficial. Becoming familiar with the more abstract ideas, requires practice.
+- Starting with the parts of Advanced R that are relevant to your work and interest and doing the exercises yourself should give the biggest
+benefit.
+- Many exercises will help you deepen your understanding of the presented
+- You can use our solutions to review your solutions, consider alternative implementations and avoid getting stuck, as some topics or exercises may be quite different than what you typically encounter. :)
+material or explore general programming challenges.
+- don't read our solutions instead of Advanced R. ;-) :-D
+- if you find better solutions we will gratefully accept a pull request. :)
+
+### Our experience/ learnings with the Advanced R chapters
+- the other chapters mostly helped me build confidence after working through them.... :)
+
+#### Foundations
+- The first part of the book ("Foundations") was probably most useful for
+our day to day work in data science, as it helped us sharpen
+the mental model of the code we are writing and the underlying mechanics
+that make it work.
+
+Names and values:
+- experiment a lot with the lobstr package
+- low-level view at R objects
+- learn to distinguish the object and the name of r objects. (the same object can have multiple names)
+- copy-on-modify (which can be a reason of slow code), good to be aware of this mechanism.
+- Modify-in-place (or reference semantics) as a possible
+alternative
+- reference semantics of lists and environments
+
+Vectors
+- learn about atomic vectors and their various data types attributes
+- learn about the inimate details of the date(-time) classes lists &
+dataframes
+
+Subsetting
+- daily work of the data analyst. of course
+data.table or dplyr extend the methods provided by base r, but the
+principles remain the same.
+- distinguish various ways of subsetting vectors
+- learn about the appropriate use of the subsetting operators -
+gives a a few nice applied examples
+
+Control flow
+
+Functions
+- workhorse of R programming
+
+Environments
+- really useful to know about
+- we had implicit knowledge of the subject
+
+Conditions
+- will make the programs you write behave more gracefully
+
+#### Functional Programming
+
+Functionals
+
+Function factories
+
+Function operators
+- so many data science problems are iteration problems (parameter tuning, recursive model fitting)
+- functional operators can make your code much more elegant and provide a useful concept
+
+#### Object Oriented Programming
+S3
+
+R6
+- much closer to e.g. pythons OO system
+
+S4
+- haven't used this much
+
+#### Metaprogramming
+- while the content makes a lot of sense, the content is more "meta" the application of these techniques makes r code often more demanding to reason about need to be aware of the recipies (where can we find the most typical ones again?) <https://dplyr.tidyverse.org/articles/programming.html>
+- makes heavy use of the relatively new rlang package.
+- interesting to learn to understand how a lot of
+- a lot of r tools use non-standard-evaluation (which comes down to a combination of quoting and evaluating). It's good to be able to spot this "in the wild"
+- Metaprogramming is hard, it was the part of the book that took the most effort
+
+Expressions
+
+Quasiquotation
+
+Evaluation
+
+Translating R code
+
+#### Techniques
+- let's face it computers have become really fast.
+- It depends on the kind of programming you do. But in our experience computation speed is rarely the bottleneck in practice. 
+
+
+Measuring performance
+- "you can't manage what you can't count, right?"
+
+Improving performance
+- a few tricks to speed up R code (though speed is less often a problem in applied data science, than I would have thought. Machines have gotten so strong, and it's become easy to offload long running computations to seperate processes (e.g. RStudio jobs or promis/future-package functionality))
+
+Rewriting R code in C++
+- useful if you need to write performant code
+- takes some effort to get used to this lower level language, but this chapter is a good reference to get started and points to good resources to learn more (which I haven't done :D)
+
+## The Journey of the book
+### Our motivation: Why did we start studying Advanced R and write this book
+- Let's reconsider Hadley's intended audience for Advanced R: Experienced Programmers looking to become familiar with R and R Users aspiring to become R Developers. We were definitely in the latter group, experienced with R (and impressed by the abilities it comes with)....
+- the solutions are written from our perspective (intermediate R programmers), so here is a little bit about our background
+  - We were R users first and evolved as programmers in our day jobs and while solving the questions of the book.
+  - Our eductional background: Math and statistics background, not necessarily so much programming experience
+
+### How the process of writing Advanced R Solutions unfolded and what it felt like
+- When we started solving some of the exercises of Advanced the start was
+quick and enthusiastic. We learned a lot quickly.
+
+- The recently released bookdown package made is possible to structure our progress and receive a book with almost no extra effort.
+  - (a formula that has been helped make bookdown such a success (https://bookdown.org/))
+
+- it took a while. :)
+- so good to collaborate
+- this also means, finding common ground and agreeing on schedules etc multiple times.
+- It mean synchronising schedules, strategies and tasks between the two of us for a project actually neither of us really had the time for. :-D
+
+- We therefore started to tackle the exercises and often it took a while to piece the solution together (though luckily at times things were also simpler, than they first seemed. :).
+
+- thanks to Hadley for providing timely reviews (and giving us a good
+    feeling with regard to the correctness of the exercises)
+- About halfway in we became aware that
+Hadley was overhauling the content of Advanced R considerably in the
+second edition. (this was tough, but "practice makes perfect"? :D)
+
+- We are know, that this book is not perfect. We gave it our best shot, we are happy with the result and glad that we made it to the finish line.
+- we are more exerienced R users now.
+- this also lead to rewriting exercises after our understanding had matured or our writing improved (hopefully).
+
+- Got reviews by Hadley.
+  - It wasn't Hadley who provided the exercises and if there should be errors in the book, they are on us...
+  - But of course this gives us an extra level of confidence.
+
+### how we tackled the exercises
+- only a few of the more difficult exercises in the book were solved in one session. It was mostly a mix of re-reading the question, checking up on the related "Advanced R" section and starting to write some first code and consulting the documentation.
+- start reading the book again, look into the documentation or the source code. After a final bit of googling the first idea was often there
+- Reading base R source code can be intimidating (F2 ("Go to Function") in Rstudio was such a treat :-D)
+
+### What other skills may be useful do develop as an R developper
+
+- We don't necessarily need most of the skills taught in Advanced R in our day to day work
+- but the code we write has become more robust, concise and readable (we hope!) (It's quite easy to see the difference, when we look into the early drafts of this book!)
+- refer to iceberg skill model, builds a good foundation
+
+- [Tidyverse Style Guide](https://style.tidyverse.org/) is so helpful
+    in day to day coding. Because it establishes meaningful conventions,
+    your code becomes more standardized (which makes it easier to spot
+    errors) and the process of formatting it becomes also more
+    streamlined (fewer decisions, automated formatting tools such as
+    `{styler}`).
+
+- reading source code is so helpful. just go to github and read the source code of packages you love and developers you admire. you don't have to understand everything, but keeping this a regular practice (for a while) will expose you to many new ideas, patterns and design choices and also expand your r vocabulary.
+
+- we may not really be in a position to provide additional book recommendations to guide your learning (we have to leave this to other people)
+    - we enjoyed the language-agnostic approach presented in "The pragmatic programmer"
+
+## Closing remarks
+- We are happy to be part of the open source community
+- we are quite aware that technology companies may make a lot of profit from levering open source software at scale, but this doesn't necessarily means that open source is funded properly.
+- an open set of tools for an open, welcoming and diverse society
+- would like to donate a part of our royalties to the following good
+    causes
+- R is free software. This model lends itself for an open society
+constituted of free people, but this is not guaranteed.
+- We therefore chose to donate 2/3 to a cause supporting these values. <https://www.r-consortium.org/projects/r-community-diversity-and-inclusion>
+- we hope that this book can be a be a contribution (to start your programming or data science journey)
+- say thank you to our bosses and companies for allowing us some flexibility supporting the completion of this project.
+- thank you Malte, for seeing this through together. I appreciate that we are still friends after this long time of working on this book in our spare time and actually consider this the biggest achievement. :)
+
+advice to young programmers: keep it balanced.
+- you don't need to learn everything in a day.
+- you can have a good career by taking one step at a time
+- was tough on some days (after work) and it did take me away from other things I appreciate more than I would have hoped
+
+### What else
+- mention [Advanced R book club](https://github.com/r4ds/bookclub-Advanced_R)
+
+- thank your Chapman and Hall for the interest in the project and the patience in seeing it through
+
+- Mention first edition of Advanced R and our Solutions manual for it
+  - Advanced R (1st ed) covers base r functionality in more detail. You might be interested and could use our (not entirely complete) 1st ed solutions in a similar way.
+
+## Acknowledgements
+
+- copy from index.hmtl
+
+## Conventions
+
+- reference to Adv R as „textbook"
+- explain chapter enumeration
+- conventions for style of names for objects, functions, classes,
+    packages.
+- adapt similar passage from Adv R
+- explain which packages are loaded, that we try to keep the code self contained
+  - by default: all necessary code should be in the book
+  - if longer code passages weren't included and still need to be copied over from Advanced R, that this should be stated explicitly
