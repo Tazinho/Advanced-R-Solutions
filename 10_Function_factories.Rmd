@@ -7,7 +7,7 @@ source("common.R")
 
 ## Prerequisites
 
-For most of this chapter base R is sufficient. Just a few exercises require the *rlang*, *dplyr*, *purrr* and *ggplot2* packages.
+For most of this chapter base R is sufficient. Just a few exercises require the `{rlang}`, `{dplyr}`, `{purrr}` and `{ggplot2}` packages.
 
 ```{r, message=FALSE}
 library(rlang)
@@ -26,7 +26,7 @@ force
 
 Why is it better to `force(x)` instead of just `x`?
 
-__[A]{.solved}__: As you can see `force(x)` is just syntactic sugar for `x`. As being mentioned in the textbook we prefer this explicit form, because
+__[A]{.solved}__: As you can see `force(x)` is just syntactic sugar for `x`. As being mentioned in Advanced R we prefer this explicit form, because
 
 > using this function clearly indicates that you’re forcing evaluation, not that you’ve accidentally typed `x`."
 
@@ -163,7 +163,7 @@ stopifnot(all.equal(m1(x), 0))
 stopifnot(all.equal(m2(x), var(x) * 99 / 100))
 ```
 
-__[A]{.solved}__: The first moment is closely related to the mean and describes the average deviation from the mean, which is 0 (within numerical margin of error). The second moment describes the variance of the input data. If we want compare it to `var`, we need to undo [Bessel's correction](https://en.wikipedia.org/wiki/Bessel%27s_correction) correction by multiplying with $\frac{N-1}{N}$.
+__[A]{.solved}__: The first moment is closely related to the mean and describes the average deviation from the mean, which is 0 (within numerical margin of error). The second moment describes the variance of the input data. If we want tp compare it to `var`, we need to undo [Bessel's correction](https://en.wikipedia.org/wiki/Bessel%27s_correction) by multiplying with $\frac{N-1}{N}$.
 
 ```{r}
 moment <- function(i){
@@ -239,7 +239,7 @@ __[A]{.solved}__: Both functions will help you in styling your output, e.g. in y
 
 __[Q1]{.Q}__: In `boot_model()`, why don't I need to force the evaluation of `df` or `model`?
 
-__[A]{.solved}__: `boot_model()` ultimately returns a function, and whenever you return a function you need to make sure all the inputs are explicitly evaluated. Here that happens automatically because we use `df` and `formula` in `lm()`.
+__[A]{.solved}__: `boot_model()` ultimately returns a function, and whenever you return a function you need to make sure all the inputs are explicitly evaluated. Here that happens automatically because we use `df` and `formula` in `lm()` before returning the function.
 
 ```{r}
 boot_model <- function(df, formula) {
@@ -281,7 +281,7 @@ plot(boxcox_airpassengers(3))
 
 __[Q3]{.Q}__: Why don't you need to worry that `boot_permute()` stores a copy of the data inside the function that it generates?
 
-__[A]{.solved}__: Because it doesn't actually store a copy; it's just a name that points to the same underlying object in memory.
+__[A]{.solved}__: `boot_permute()` is defined in Advanced R as:
 
 ```{r}
 boot_permute <- function(df, var) {
@@ -293,6 +293,11 @@ boot_permute <- function(df, var) {
     col[sample(n, replace = TRUE)]
   }
 }
+```
+
+We don't need to worry that it stores a copy of the data, because it actually doesn't store one; it's just a name that points to the same underlying object in memory.
+
+```{r}
 boot_mtcars1 <- boot_permute(mtcars, "mpg")
 
 lobstr::obj_size(mtcars)
@@ -335,33 +340,34 @@ bench::mark(
 )
 ```
 
-As the redundant calculations within `ll_poisson1()` become more expensive with growing length of `x1`, we expect even further relative performance improvements for `ll_poisson2()`. The following benchmark reveals a relative performance improvement of factor 20 for `ll_poisson2()` when `x1` is of length 100000:
+As the redundant calculations within `ll_poisson1()` become more expensive with growing length of `x1`, we expect even further relative performance improvements for `ll_poisson2()`. The following benchmark reveals a relative performance improvement of factor 20 for `ll_poisson2()` when `x1` is of length 100,000:
 
 ```{r, message = FALSE, warning = FALSE}
 bench_poisson <- function(x_length){
   x <- rpois(x_length, 100L)
   
-  rel_advantage <- bench::mark(
+  bench::mark(
     llp1 = optimise(ll_poisson1(x), c(0, 100), maximum = TRUE),
-    llp2 = optimise(ll_poisson2(x), c(0, 100), maximum = TRUE),
-    relative = TRUE)$median %>% `[`(1)
-  
-  rel_advantage
+    llp2 = optimise(ll_poisson2(x), c(0, 100), maximum = TRUE)
+  )
 }
 
-bench_df <- tibble(
-  x_length = 10^(1:5),
-  relative_performance = map_dbl(x_length, bench_poisson)
+performances <- map_dfr(10^(1:5), bench_poisson)
+
+df_perf <- tibble(
+  x_length = rep(10^(1:5), 2),
+  method   = rep(attr(performances$expression, "description"), 5),
+  median   = performances$median
 )
 
-bench_df %>% 
-  ggplot(aes(x_length, relative_performance)) +
-  geom_point() +
-  geom_line() +
-  ggtitle(
-    "Relative performance of ll_poisson2() over \nll_poision1() increases with length of x"
-  ) +
-  scale_x_log10()
+ggplot(df_perf, aes(x_length, median, col = method)) +
+  geom_point(size = 2) + 
+  geom_smooth() +
+  scale_x_log10() +
+  labs(x = "Length of x",
+       y = "Execution Time (s)",
+       color = "Method") +
+  theme(legend.position = "top")
 ```
 
 
