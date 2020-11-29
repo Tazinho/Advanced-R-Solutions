@@ -3,6 +3,9 @@ source("common.R")
 ```
 
 # Environments
+## Prerequisites {-}
+
+Just like in Advanced R, we mainly use the `{rlang}` package to work with environments in this chapter.
 
 ```{r setup}
 library(rlang)
@@ -14,10 +17,11 @@ __[Q1]{.Q}__: List three ways in which an environment differs from a list.
 
 __[A]{.solved}__: The most important differences between environments and lists are:
 
-- environments have reference semantics (i.e. they don't copy-on-modify).
+- environments have reference semantics (i.e. they don't copy-on-modify)
 - environments have parents
-- the contents of an environment are not ordered
 - the contents of an environment must have unique names
+- the contents of an environment are not ordered
+- (environments can only be compared via `identical()`; not with `==`)
 - (environments can contain themselves)
 
 __[Q2]{.Q}__: Create an environment as illustrated by this picture.
@@ -33,8 +37,10 @@ __[A]{.solved}__: Let's create an environment, that contains itself.
 e1 <- env()
 e1$loop <- e1
 
-# Print the environment and verify that it contains itself
+# Print the environment
 env_print(e1)
+
+# Verify that it contains itself
 lobstr::ref(e1)
 ```
 
@@ -64,7 +70,18 @@ __[A]{.solved}__: The first option doesn't make sense, because elements of an en
 
 __[Q5]{.Q}__: Create a version of `env_poke()` that will only bind new names, never re-bind old names. Some programming languages only do this, and are known as [single assignment languages](http://en.wikipedia.org/wiki/Assignment_(computer_science)#Single_assignment).
 
-__[A]{.solved}__: We want `env_poke2()` to test, if the supplied name is already present in the given environment. We only allow new names to be assigned to a value, otherwise an (informative) error is thrown.
+__[A]{.solved}__: As described in Advanced R `rlang::env_poke()` takes a name (as string) and a value to assign (or reassign) a binding in an environment.
+
+```{r}
+e3 <- new.env()
+
+env_poke(e3, "a", 100)
+e3$a
+env_poke(e3, "a", 200)
+e3$a
+```
+
+So, we want `env_poke2()` to test, if the supplied name is already present in the given environment. This can be checked via `env_has()`. If this is the case, an (informative) error is thrown.
 
 ```{r, error=TRUE}
 env_poke2 <- function(env, name, value) {
@@ -77,10 +94,9 @@ env_poke2 <- function(env, name, value) {
 }
 
 # Test
-env_1 <- env(a = 1)
-env_poke2(env_1, "b", 2)
-env_names(env_1)
-env_poke2(env_1, "b", 2)
+env_poke2(e3, "b", 100)
+e3$b
+env_poke2(e3, "b", 200)
 ```
 
 __[Q6]{.Q}__: What does this function do? How does it differ from `<<-` and why might you prefer it?
@@ -101,13 +117,32 @@ rebind("a", 10)
 a
 ```
 
-__[A]{.solved}__: The primary differnce between `rebind()` and `<<-` is that `rebind()` will only carry out an assignment when it finds an existing binding; unlike `<<-` it will never create a new one in the global environment. This is usually undesirable, because global variables introduce non-obvious dependencies between functions.
+__[A]{.solved}__: The primary differnce between `rebind()` and `<<-` is that `rebind()` will only carry out an assignment when it finds an existing binding; unlike `<<-` it will never create a new one in the global environment. This behaviour of `<<-` is usually undesirable, because global variables introduce non-obvious dependencies between functions.
 
 ## Recursing over environments
 
 __[Q1]{.Q}__: Modify `where()` to return all environments that contain a binding for `name`. Carefully think through what type of object the function will need to return.
 
-__[A]{.solved}__: The modified version of `where()` will recurse until it reaches the empty environment. Along the way, it will check each environment for a given `name`. Then it will return a list of environments where the binding was found; if no binding was found, the list will be empty.
+__[A]{.solved}__: `where()` searches (recursively) for a given name within a given environment and its ancestors. If `where()` finds the name in one of these environments, it reutrns the environment's name. Otherwise, it throws an error.
+
+The definition of `where()` was given in Advanced R as.
+
+```{r}
+where <- function(name, env = caller_env()) {
+  if (identical(env, empty_env())) {
+    # Base case
+    stop("Can't find ", name, call. = FALSE)
+  } else if (env_has(env, name)) {
+    # Success case
+    env
+  } else {
+    # Recursive case
+    where(name, env_parent(env))
+  }
+}
+```
+
+Our modified version of `where()` will always recurse until it reaches the empty environment. No matter if it has already found the name or not. Along the way, it will check each environment for the given `name`. Finally, it will return a list of environments where the binding was found; if no binding was found, the list will be empty.
 
 Please also note how the list is initialized via the default argument, when the function is called for the first time. This is a bit confusing, which is why it's common to wrap a recursive function inside another, more user friendly, function.
 
