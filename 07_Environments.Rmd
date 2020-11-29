@@ -201,38 +201,16 @@ fget("mean", inherits = TRUE)
 
 __[Q1]{.Q}__: How is `search_envs()` different fo `env_parents(global_env())`?
 
-__[A]{.solved}__: `search_envs()` returns all the environments on the search path. "The search path is a chain of environments containing exported functions of attached packages" (from `?search_envs`). Every time you attach a new package, this search path will grow. The search path ends with the base-environment. The global environment is included, because functions present in the global environment will always be part of the search path.
+__[A]{.solved}__: `search_envs()` returns all the environments on the search path, which is "a chain of environments containing exported functions of attached packages" (from `?search_envs`). Every time you attach a new package, this search path will grow. The search path ends with the base-environment. The global environment is included, because functions present in the global environment will always be part of the search path.
 
-```{r, eval=FALSE}
+```{r}
 search_envs()
-#>  [[1]] $ <env: global>
-#>  [[2]] $ <env: package:rlang>
-#>  [[3]] $ <env: tools:rstudio>
-#>  [[4]] $ <env: package:stats>
-#>  [[5]] $ <env: package:graphics>
-#>  [[6]] $ <env: package:grDevices>
-#>  [[7]] $ <env: package:utils>
-#>  [[8]] $ <env: package:datasets>
-#>  [[9]] $ <env: package:methods>
-#> [[10]] $ <env: Autoloads>
-#> [[11]] $ <env: package:base>
 ```
 
 `env_parents(global_env())` will list all the ancestors of the global environment, therefore the global environment itself is not included. This also includes the "ultimate ancestor", the empty environment. This environment is not considered part of the search path because it contains no objects.
 
-```{r, eval=FALSE}
+```{r}
 env_parents(global_env())
-#>  [[1]] $ <env: package:rlang>
-#>  [[2]] $ <env: tools:rstudio>
-#>  [[3]] $ <env: package:stats>
-#>  [[4]] $ <env: package:graphics>
-#>  [[5]] $ <env: package:grDevices>
-#>  [[6]] $ <env: package:utils>
-#>  [[7]] $ <env: package:datasets>
-#>  [[8]] $ <env: package:methods>
-#>  [[9]] $ <env: Autoloads>
-#> [[10]] $ <env: package:base>
-#> [[11]] $ <env: empty>
 ```
 
 __[Q2]{.Q}__: Draw a diagram that shows the enclosing environments of this function:
@@ -317,6 +295,6 @@ ls2()
 
 # Test in "sandbox" environment
 e1 <- env(a = 1, b = 2)
-invoke(ls, .env = e1)
-invoke(ls2, .env = e1)
+ls(e1)
+ls2(e1)
 ```
