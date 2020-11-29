@@ -5,28 +5,28 @@ source("common.R")
 # (PART) Functional programming {-} 
 
 # Functionals
-
 ## Prerequisites
 
-```{r setup, message=FALSE}
+For the functional programming part of the book we will mainly use functions from the `{purrr}` package.
+
+```{r setup}
 library(purrr)
-library(tibble)
 ```
 
 ## My first functional: `map()`
 
 __[Q1]{.Q}__: Use `as_mapper()` to explore how purrr generates anonymous functions for the integer, character, and list helpers. What helper allows you to extract attributes? Read the documentation to find out.
 
-__[A]{.solved}__: `map()` offers multiple ways (functions, formulas and extractor functions) to specify the function argument (`.f`). Initially, the various inputs have to be transformed into a valid function, which is then applied. The creation of this valid function is the job of `as_mapper()` and it is called every time `map()` is used.
+__[A]{.solved}__: `map()` offers multiple ways (functions, formulas and extractor functions) to specify its function argument (`.f`). Initially, the various inputs have to be transformed into a valid function, which is then applied. The creation of this valid function is the job of `as_mapper()` and it is called every time `map()` is used.
 
 Given character, numeric or list input `as_mapper()` will create an extractor function. Characters select by name, while numeric input selects by positions and a list allows a mix of these two approaches. This extractor interface can be very useful, when working with nested data.
 
 The extractor function is implemented as a call to `purrr::pluck()`, which accepts a list of accessors (accessors "access" some part of your data object).
 
 ```{r}
-as_mapper(c(1, 2))
-as_mapper(c("a", "b"))
-as_mapper(list(1, "b"))
+as_mapper(c(1, 2))       # Equivalent to function(x) x[[1]][[2]]
+as_mapper(c("a", "b"))   #               function(x) x[["a"]][["b]]
+as_mapper(list(1, "b"))  #               function(x) x[[1]][["b]]
 ```
 
 Besides mixing positions and names, it is also possible to pass along an accessor function. This is basically an anonymous function, that gets information about some aspect of the input data. You are free to define your own accessor functions. 
@@ -34,14 +34,13 @@ Besides mixing positions and names, it is also possible to pass along an accesso
 If you need to access certain attributes, the helper `attr_getter(y)` is already predefined and will create the appropriate accessor function for you.
 
 ```{r}
-# define custom accessor function
+# Define custom accessor function
 get_class <- function(x) attr(x, "class")
 pluck(mtcars, get_class)
 
-# use attr_getter() as a helper
+# Use attr_getter() as a helper
 pluck(mtcars, attr_getter("class"))
 ```
-
 
 __[Q2]{.Q}__: `map(1:3, ~ runif(2))` is a useful pattern for generating random numbers, but `map(1:3, runif(2))` is not. Why not? Can you explain why it returns the result that it does?
 
@@ -67,11 +66,11 @@ __[A]{.solved}__: To solve this exercise we take advantage of calling the type s
 ```{r}
 map_dbl(mtcars, sd)
 
-mtcars_numeric <- map_lgl(mtcars, is.numeric)
-map_dbl(mtcars[mtcars_numeric], sd)
+penguins_numeric <- map_lgl(penguins, is.numeric)
+map_dbl(penguins[penguins_numeric], sd, na.rm = TRUE)
 
-mtcars_factor <- map_lgl(mtcars, is.factor)
-map_int(mtcars[mtcars_factor], ~ length(levels(.x)))
+penguins_factor <- map_lgl(penguins, is.factor)
+map_int(penguins[penguins_factor], ~ length(levels(.x)))
 ```
 
 __[Q4]{.Q}__: The following code simulates the performance of a t-test for non-normal data. Extract the p-value from each test, then visualise.
@@ -85,14 +84,14 @@ __[A]{.solved}__: There are many ways to visualise this data. However, since the
 ```{r, message = FALSE}
 library(ggplot2)
 
-trials_df <- tibble(p_value = map_dbl(trials, "p.value"))
+df_trials <- tibble(p_value = map_dbl(trials, "p.value"))
 
-trials_df %>% 
+df_trials %>% 
   ggplot(aes(x = p_value, fill = p_value < 0.05)) + 
   geom_dotplot(binwidth = .01) +  # geom_histogram() as alternative
-  ggtitle("Distribution of p-values for random poisson data.") +
   theme(axis.text.y = element_blank(),
-        axis.ticks.y = element_blank())
+        axis.ticks.y = element_blank(),
+        legend.position = "top")
 ```
 
 __[Q5]{.Q}__: The following code uses a map nested inside another map to apply a function to every element of a nested list. Why does it fail, and what do you need to do to make it work?
@@ -111,7 +110,7 @@ __[A]{.solved}__: This function call fails, because `triple()` is specified as t
 
 There are a number of ways we could resolve the problem. I don't think there's much to choose between them for this simple example, but it's good to know your options for more complicated cases.
 
-```{r, include = FALSE}
+```{r, eval = FALSE}
 # Don't name the argument
 map(x, map, triple)
 
@@ -133,7 +132,7 @@ formulas <- list(
 )
 ```
 
-__[A]{.solved}__: The data (`mtcars`) is constant for all these models and so we iterate over the `formulas` provided. As the formula is the first argument of `lm()`, we don't need to be specify it explicitly.
+__[A]{.solved}__: The data (`mtcars`) is constant for all these models and so we iterate over the `formulas` provided. As the formula is the first argument of `lm()`, we don't need to specify it explicitly.
 
 ```{r}
 models <- map(formulas, lm, data = mtcars)
@@ -149,7 +148,7 @@ bootstrap <- function(df) {
 bootstraps <- map(1:10, ~ bootstrap(mtcars))
 ```
 
-__[A]{.solved}__: To accomplish this task, we take advantage of the "list in, list out"-functionality of `map()`. This allows us to chain multiple transformation together. We start by fitting the models. We then calculate the summaries and extract the $R^2$ values. For the last call we use `map_dbl`, which provides convenient output.
+__[A]{.solved}__: To accomplish this task, we take advantage of the "list in, list out"-functionality of `map()`. This allows us to chain multiple transformation together. We start by fitting the models. We then calculate the summaries and extract the $R^2$ values. For the last call we use `map_dbl()`, which provides convenient output.
 
 ```{r}
 bootstraps %>% 
@@ -214,13 +213,27 @@ Compare and contrast the `map2()` approach to this `map()` approach:
 mtcars[vars] <- map(vars, ~ trans[[.x]](mtcars[[.x]]))
 ```
 
-__[A]{.solved}__: In the first approach the list of functions and the appropriately selected data frame columns are supplied to `map2()`. `map2()` creates an anonymous function `f(var)` which applies the functions to the variables when `map2()` iterates over their (similar) index. On the left hand side the respective elements of `mtcars` are being replaced by their new transformations.
+__[A]{.solved}__: In the first approach
 
-The `map()` variant does basically the same. However, it directly iterates over the names of the transformations. Therefore, the data frame columns are selected during the iteration.
+```{r, eval = FALSE}
+mtcars[vars] <- map2(trans, mtcars[vars], function(f, var) f(var))
+```
+
+the list of the 2 functions (`trans`) and the 2 appropriately selected data frame columns (`mtcars[vars]`) are supplied to `map2()`. `map2()` creates an anonymous function (`f(var)`) which applies the functions to the variables when `map2()` iterates over their (similar) indices. On the left hand side the respective 2 elements of `mtcars` are being replaced by their new transformations.
+
+The `map()` variant
+
+```{r, eval = FALSE}
+mtcars[vars] <- map(vars, ~ trans[[.x]](mtcars[[.x]]))
+```
+
+does basically the same. However, it directly iterates over the names (`vars`) of the transformations. Therefore, the data frame columns are selected during the iteration.
 
 Besides the iteration pattern, the approaches differ in the possibilities for appropriate argument naming in the `.f` argument. In the `map2()` approach we iterate over the elements of `x` and `y`. Therefore, it is possible to choose appropriate placeholders like `f` and `var`. This makes the anonymous function more expressive at the cost of making it longer.  We think using the formula interface in this way is preferable compared to the rather cryptic `mtcars[vars] <- map2(trans, mtcars[vars], ~ .x(.y))`.
 
-In the `map()` approach we map over the variable names. It is therefore not possible to introduce placeholders for the function and variable names. The formula syntax together with the `.x` pronoun is pretty compact. The object names and the brackets indicate clearly the application of transformations to specific columns of `mtcars`. In this case the iteration over the variable names comes in handy, as it highlights the importance of matching between `trans` and `mtcars` element names. Together with the replacement form on the left hand side, this line is relatively easy to inspect. To summarise, in situations where `map()` and `map2()` provide solutions for an iteration problem, several points may be considered before deciding for one or the other approach.
+In the `map()` approach we map over the variable names. It is therefore not possible to introduce placeholders for the function and variable names. The formula syntax together with the `.x` pronoun is pretty compact. The object names and the brackets indicate clearly the application of transformations to specific columns of `mtcars`. In this case the iteration over the variable names comes in handy, as it highlights the importance of matching between `trans` and `mtcars` element names. Together with the replacement form on the left hand side, this line is relatively easy to inspect.
+
+To summarise, in situations where `map()` and `map2()` provide solutions for an iteration problem, several points may be considered before deciding for one or the other approach.
 
 __[Q4]{.Q}__: What does `write.csv()` return? i.e. what happens if you use it with `map2()` instead of `walk2()`?
 
@@ -316,14 +329,14 @@ span_r <- function(x, f) {
 }
 
 # Check that it works
-span_r(mtcars, is.numeric)
-span_r(mtcars, is.factor)
-span_r(mtcars, is.character)
+span_r(c(0,  0,  0,  0,  0), is.na)
+span_r(c(NA, 0,  0,  0,  0), is.na)
+span_r(c(NA, 0, NA, NA, NA), is.na)
 ```
 
 __[Q4]{.Q}__: Implement `arg_max()`. It should take a function and a vector of inputs, and return the elements of the input where the function returns the highest value. For example, `arg_max(-10:5, function(x) x ^ 2)` should return `-10`. `arg_max(-5:5, function(x) x ^ 2)` should return `c(-5, 5)`. Also implement the matching `arg_min()` function.
 
-__[A]{.solved}__: Both functions take a vector of inputs and a function as an argument. The functions output are then used to subset the input accordingly.
+__[A]{.solved}__: Both functions take a vector of inputs and a function as an argument. The function output is then used to subset the input accordingly.
 
 ```{r}
 arg_max <- function(x, f){
@@ -349,7 +362,7 @@ scale01 <- function(x) {
 }
 ```
 
-__[A]{.solved}__: To apply a function to every column of a data frame, we can use `purrr::modify()`, which also conveniently returns a data frame. To limit the application to numeric columns, the scoped version `modify_if()` can be used.
+__[A]{.solved}__: To apply a function to every column of a data frame, we can use `purrr::modify()` (or `purrr::map_dfr()`), which also conveniently returns a data frame. To limit the application to numeric columns, the scoped version `modify_if()` can be used.
 
 ```{r, eval = FALSE}
 modify_if(mtcars, is.numeric, scale01)
