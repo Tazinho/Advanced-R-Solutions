@@ -23,12 +23,13 @@ df_long <- read.csv2("progress_data.csv", stringsAsFactors = FALSE,
          chapter = factor(chapter),
          chapter = fct_reorder(chapter, nr, .desc = TRUE),
          part = case_when(nr < 9 ~ "Foundations",
-                          nr < 12 ~ "FP",
-                          nr < 17 ~ "OOP",
-                          nr < 22 ~ "Metapr.",
-                          TRUE    ~ "Techn."),
-         part = factor(part, levels = c("Foundations", "FP", "OOP",
-                                        "Metapr.", "Techn.")))
+                          nr < 12 ~ "Functional\nProgramming",
+                          nr < 17 ~ "Object Oriented\nProgramming",
+                          nr < 22 ~ "Metaprogramming",
+                          TRUE    ~ "Techniques"),
+         part = factor(part, levels = c("Foundations", "Functional\nProgramming",
+                                        "Object Oriented\nProgramming",
+                                        "Metaprogramming", "Techniques")))
 
 # Intermediate calculations
 percent_solved <- mean(df_long$status %in% c("solved", "reviewed", "finalised"), na.rm = TRUE) * 100
@@ -39,11 +40,10 @@ plot_progress <- df_long %>%
   ggplot(aes(x = chapter, fill = status, group = -id,
              subchapter = subchapter, exercise = exercise,
              credits = credits)) +
-  coord_flip() +
   geom_bar(color = "white") +
   scale_y_continuous(expand = c(0, 0)) +
   theme_bw(base_size = 14) +
-  theme(legend.position = "bottom",
+  theme(legend.position = "top",
         # legend.justification = c(0, 1),
         strip.background = element_rect(fill = "#EFEFEF"),
         strip.placement = "outside",
@@ -59,27 +59,42 @@ plot_progress <- df_long %>%
          fill = guide_legend(nrow = 1)) +
   scale_fill_manual(values = c("#F99992", "#fdcc8a", "#bae4b3", "#74c476", "#238b45"),
                     drop = FALSE) +
-  labs(title = paste0("Solved Exercises: ",
-                     round(percent_solved, 1),
-                     "% (2nd Edition)"),
-       subtitle = paste0("Reviewed: ",
-                     round(percent_reviewed, 1),
-                     "%"),
-       caption = paste0("(Open: ",
-                         sum(df_long$status == "open"),
-                         " | Started: ",
-                         sum(df_long$status == "started"),
-                         " | Solved: ",
-                         sum(df_long$status %in% c("solved", "reviewed", "finalised")),
-                         " | Reviewed: ",
-                         sum(df_long$status %in% c("reviewed", "finalised")),
-                         " | Finalised: ",
-                         sum(df_long$status == "finalised"),
-                        ")"),
+  labs(# title = "",
+       # subtitle = paste0("Reviewed: ",
+       #               round(percent_reviewed, 1),
+       #               "%"),
+       # caption = paste0("(Open: ",
+       #                   sum(df_long$status == "open"),
+       #                   " | Started: ",
+       #                   sum(df_long$status == "started"),
+       #                   " | Solved: ",
+       #                   sum(df_long$status %in% c("solved", "reviewed", "finalised")),
+       #                   " | Reviewed: ",
+       #                   sum(df_long$status %in% c("reviewed", "finalised")),
+       #                   " | Finalised: ",
+       #                   sum(df_long$status == "finalised"),
+       #                  ")"),
        fill = "Status:")
 
 # Create static plot (including facets for parts)
 plot_progress + 
-  facet_grid(part ~ ., scales = "free",
+  facet_grid(. ~ part, scales = "free",
              space = "free", switch = "both")
 ```
+
+TODO
+- drop y axis
+- pad and left align labels in facets
+  - https://stackoverflow.com/questions/34749636/left-justify-text-from-multi-line-facet-labels
+
+Ideas
+- revise color scheme
+- make plot look nice in desired aspect ratio
+- maybe put numbers of exercises in each chapter on top of bar?
+- maybe use waffle chart?
+- use a patch work arrangement of "multiple views on the data" (e.g. our progress over time? :D)
+
+
+? kriegen wir noch ne coolere Visualisierung hin?
+- irgendwas, was die Beziehung zwischen den Aufgaben oder ihre Schwierigkeit deutlich macht?
+  - irgendwas was noch duetliche Eye-Candy ist? :)
