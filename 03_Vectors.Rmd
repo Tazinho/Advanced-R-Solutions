@@ -8,18 +8,22 @@ source("common.R")
 
 __[Q1]{.Q}__: How do you create scalars of type raw and complex? (See `?raw` and `?complex`)
 
-__[A]{.solved}__: In R scalars are represented as vectors of length one. However, there is no way to create a literal raw scalar directly; you have to create a vector first. Then you can easily create one from numeric or character values.
+__[A]{.solved}__: In R scalars are represented as vectors of length one. However, there's no built in syntax like there is for logicals, integers, doubles, and character vectors to create individual raw and complex values. Instead you have to create them by calling a function.
+
+For raw vectors you can use either `as.raw()` or `rawToChar()` to create them from numeric or character values.
 
 ```{r}
 as.raw(42)
 charToRaw("A")
 ```
 
-For complex numbers real and imaginary parts may be provided directly to the `complex()` constructor.
+In the case of complex numbers real and imaginary parts may be provided directly to the `complex()` constructor.
 
 ```{r}
 complex(length.out = 1, real = 1, imaginary = 1)
 ```
+
+You can create purely imaginary numbers (e.g.) `1i`, but there's no way to create complex numbers without `+` (e.g. `1i + 1`).
 
 __[Q2]{.Q}__: Test your knowledge of vector coercion rules by predicting the output of the following uses of `c()`:
 
@@ -139,13 +143,17 @@ attr(foo, which = "comment")
 
 __[Q1]{.Q}__: What sort of object does `table()` return? What is its type? What attributes does it have? How does the dimensionality change as you tabulate more variables?
 
-__[A]{.solved}__: `table()` returns a contingency table of its input variables, which has the class `table`. Internally it is represented as an array (implicit class) of integers (type) with the attributes `dim` (dimension of the underlying array) and `dimnames` (one name for each input column). The dimensions correspond to the number of unique values (factor levels) in each input variable.
+__[A]{.solved}__: `table()` returns a contingency table of its input variables. It is implemented as an integer vector with class `table` and dimensions (which makes it act like an array). Its attributes are `dim` (dimensions) and `dimnames` (one name for each input column). The dimensions correspond to the number of unique values (factor levels) in each input variable.
 
 ```{r}
 x <- table(mtcars[c("vs", "cyl", "am")])
 
 typeof(x)
 attributes(x)
+
+# Subset x like it's an array
+x[ , , 1]
+x[ , , 2]
 ```
 
 __[Q2]{.Q}__: What happens to a factor when you modify its levels?

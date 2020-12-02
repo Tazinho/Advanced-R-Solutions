@@ -234,7 +234,11 @@ x <- list(mean, sd, var)
 obj_size(x)
 ```
 
-__[A]{.solved}__: It is somewhat misleading, because all three functions are built-in to R as part of the `{base}` and `{stats}` packages and hence always available. Let us look for how many other objects this applies as well.
+__[A]{.solved}__: All three functions are built-in to R as part of the `{base}` and `{stats}` packages and hence always available. So, what does it mean to measure the size of something that's already included in R?
+
+(There's typically a more general question about what you want to know when you ask for the size of something — do you want to know how much data you'd need to send to communicate the object to someone else (e.g. serialize it), or do you want to know how much memory you'd free if you deleted it?)
+
+Let us look for how many other objects this applies as well.
 
 The following packages are usually loaded by default.
 
@@ -451,7 +455,7 @@ ggplot(results, aes(ncol, median,
 
 When working directly with the data frame, the execution time grows quadratically with the number of columns in the input data. This is because (e.g.) the first column must be copied n times, the second column n-1 times, and so on. When working with a list, the execution time increases only linearly.
 
-Obviously in the long run, linear growth creates shorter run-times, but there is some cost to this strategy - we have to convert between data structures with `as.list()` and `list2DF()`. This means that the improved approach doesn't pay off in this scenario until we get to a data frame that is about 300 columns wide (with the exact value depending on the characteristics of the system running the code).
+Obviously in the long run, linear growth creates shorter run-times, but there is some cost to this strategy - we have to convert between data structures with `as.list()` and `list2DF()`. Even though this is fast and probably doesn't hurt much, the improved approach doesn't really pay off in this scenario until we get to a data frame that is about 300 columns wide (with the exact value depending on the characteristics of the system running the code).
 
 __[Q3]{.Q}__: What happens if you attempt to use `tracemem()` on an environment?
 

@@ -22,8 +22,7 @@ f <- function(n = 1e5) {
 }
 ```
 
-__[A]{.started}__: We expect `f()` to create a vector (`x`) of length `n`, which is then removed. When we profile this function the function executes very fast, too fast for meaningful profiling even.
-
+__[A]{.started}__: We expect `f()` to create a vector (`x`) of length `n`, which is then removed so that `f()` just returns `NULL`. When we profile this function it executes too fast for meaningful results.
 
 ```{r, error=TRUE}
 profvis::profvis(f())
@@ -35,7 +34,7 @@ Setting `torture = TRUE` triggers garbage collection after every memory allocati
 profvis::profvis(f(), torture = TRUE)
 ```
 
-Surprisingly profiling `f()` like this takes a very long time. What could be the reason?
+Surprisingly profiling `f()` like this also takes a very long time. What could be the reason?
 
 We follow the hint in the question and inspect the source code of `rm()`:
 
@@ -60,9 +59,7 @@ function (..., list = character(), pos = -1,
 }
 ```
 
-<!-- HW: I think this is the reason why, but I can't get profiling to complete :| -->
-
-`rm()` does a surprising amount of work because it relies on non-standard evaluation to get the name of the object to delete.
+`rm()` does a surprising amount of work to get the name of the object to delete because it relies on non-standard evaluation.
 
 We can make the job of `rm()` considerably simpler by using the `list` argument:
 
@@ -73,6 +70,10 @@ f2 <- function(n = 1e5) {
 }
 profvis::profvis(f2(), torture = TRUE)
 ```
+
+Unfortunately this still takes too long and we are literally stuck in profiling.
+
+In conclusion, this question appears to be unanswerable for us, even for Hadley.
 
 ## Microbenchmarking
 
