@@ -8,10 +8,13 @@ source("common.R")
 
 # S3
 
+## Prerequisites {-}
+
+In this chapter we will mainly use the `{sloop}` package, to interact with S3 objects.
+
 ```{r setup}
 library(sloop)
 ```
-
 
 ## Basics
 
@@ -26,7 +29,7 @@ Due to R's S3 dispatch rules, `t.test()` would also get called when `t()` is a a
 
 __[Q2]{.Q}__: Make a list of commonly used base R functions that contain `.` in their name but are not S3 methods.
 
-__[A]{.solved}__: In the recent years "snake_case"-style has become increasingly common when naming functions (and variables) in R. But many functions in base R will continue to be "point.separated", which is why some inconsistency in your R code most likely cannot be avoided.
+__[A]{.solved}__: In recent years "snake_case"-style has become increasingly common when naming functions and variables in R. But many functions in base R will continue to be "point.separated", which is why some inconsistency in your R code most likely cannot be avoided.
 
 ```{r, eval=FALSE}
 # Some base R functions with point.separated names
@@ -48,9 +51,9 @@ on.exit()
 
 __[Q3]{.Q}__: What does the `as.data.frame.data.frame()` method do? Why is it confusing? How could you avoid this confusion in your own code?
 
-__[A]{.solved}__: The function `as.data.frame.data.frame()` implements the `data.frame` *method* for the `as.data.frame()` *generic*, which coerces objects to data frames.
+__[A]{.solved}__: The function `as.data.frame.data.frame()` implements the `data.frame()` *method* for the `as.data.frame()` *generic*, which coerces objects to data frames.
 
-The name is confusing, because it does not clearly communicate the type of the function, which could be a regular function, a generic or a method. Even if we assume a method, the amount of `.`'s makes it difficult to separate the generic- and the class-part of the name. Is it the `data.frame.data.frame` method for the `as` generic? Is it the `frame.data.frame` method for the `as.data` generic? 
+The name is confusing, because it does not clearly communicate the type of the function, which could be a regular function, a generic or a method. Even if we assume a method, the amount of `.`'s makes it difficult to separate the generic- and the class-part of the name. Is it the `data.frame.data.frame()` method for the `as()` generic? Is it the `frame.data.frame()` method for the `as.data()` generic? 
 
 We could avoid this confusion by applying a different naming convention (e.g. "snake_case") for our class and function names.
 
@@ -66,7 +69,7 @@ mean(unclass(some_days))
 
 __[A]{.solved}__: `mean()` is a generic function, which will select the appropriate method based on the class of the input. `some_days` has the class "Date" and `mean.Date(some_days)` will be used to calculate the mean date of `some_days`.
 
-After `unclass()` has removed the class attribute from `some_date`, so that the default method is chosen. `mean.default(unclass(some_days))` then calculates the mean of the underlying double.
+After `unclass()` has removed the class attribute from `some_date`, the default method is chosen. `mean.default(unclass(some_days))` then calculates the mean of the underlying double.
 
 __[Q5]{.Q}__: What class of object does the following code return? What base type is it built on? What attributes does it use?
 
@@ -75,7 +78,7 @@ x <- ecdf(rpois(100, 10))
 x
 ```
 
-__[A]{.solved}__: This code returns an object of the class "ecdf" with the superclasses "stepfun" and "function" and contains an empirical cumulative distribution function of its input. The ecdf object is built on the base type "closure" (a function) and the expression, which was used to create it (`rpois(100, 10)`) is stored in in the `call` attribute.
+__[A]{.solved}__: It returns an object of the class `ecdf` (empirical cumulative distribution function) with the superclasses `stepfun` and `function`. The `ecdf` object is built on the base type `closure` (a function) and the expression, which was used to create it (`rpois(100, 10)`), is stored in in the `call` attribute.
 
 ```{r}
 typeof(x)
@@ -90,7 +93,7 @@ x <- table(rpois(100, 5))
 x
 ```
 
-__[A]{.solved}__: This code returns a "table" object, which is build upon the "integer" type. The attribute "dimnames" is used to name the elements of the integer vector.
+__[A]{.solved}__: This code returns a `table` object, which is build upon the `integer` type. The attribute `dimnames` is used to name the elements of the integer vector.
 
 ```{r}
 typeof(x)
@@ -98,24 +101,27 @@ typeof(x)
 attributes(x)
 ```
 
-
 ## Classes
 
 __[Q1]{.Q}__: Write a constructor for `data.frame` objects. What base type is a data frame built on? What attributes does it use? What are the restrictions placed on the individual elements? What about the names?
 
-__[A]{.solved}__: Data frames are built on named lists of vectors, where every element is the same length. Their only attribute is "row.names" which must be a character vector the same length as the other elements. We need to provide the number of rows as an input to make it possible to create data frames with 0 columns but multiple rows.
+__[A]{.solved}__: Data frames are built on named lists of vectors, which all have the same length. Besides the `class` and the column names (`names`), the `row.names` are their only further attribute. This must be a character vector with the same length as the other vectors.
+
+We need to provide the number of rows as an input to make it possible to create data frames with 0 columns but multiple rows.
 
 This leads to the following constructor:
 
 ```{r, error=TRUE}
 new_data.frame <- function(x, n, row.names = NULL) {
+  # Check if the underlying object is a list
   stopifnot(is.list(x))
   
   # Check all inputs are the same length
+  # (This check also allows that x has length 0)
   stopifnot(all(lengths(x) == n))
   
   if (is.null(row.names)) {
-    # Use special row names helper
+    # Use special row names helper from base R
     row.names <- .set_row_names(n)
   } else {
     # Otherwise check that they're a character vector with the 
@@ -135,16 +141,31 @@ x <- list(a = 1, b = 2)
 new_data.frame(x, n = 1)
 new_data.frame(x, n = 1, row.names = "l1")
 
-# Create a data frame with 0 columns and 2 rows    
+# Create a data frame with 0 columns and 2 rows
 new_data.frame(list(), n = 2)
 ```
 
 There are two additional restrictions we could implement if we were being very strict: both the row names and column names should be unique.
 
-
 __[Q2]{.Q}__: Enhance my `factor()` helper to have better behaviour when one or more `values` is not found in `levels`. What does `base::factor()` do in this situation?
 
-__[A]{.solved}__: `base::factor()` converts these values (silently) into `NA`'s. To improve our `factor()` helper we choose to return an informative error message instead.
+__[A]{.solved}__: `base::factor()` converts these values (silently) into `NA`'s:
+
+```{r}
+factor(c("a", "b", "c"), levels = c("a", "b"))
+```
+
+The `factor()` helper including the constructor (`new_factor()`) and its validator (`validate_factor()`) were given in Advanced R. However, as the goal of this question is to through an early error within the helper, we only repeat the code for the helper:
+
+```{r, eval = FALSE}
+# Simplified version of `factor()` helper from Advanced R
+factor <- function(x = character(), levels = unique(x)) {
+  ind <- match(x, levels)
+  validate_factor(new_factor(ind, levels))
+}
+```
+
+To improve the `factor()` helper we choose to return an informative error message instead.
 
 ```{r, error = TRUE}
 factor2 <- function(x, levels = unique(x)) {
@@ -163,38 +184,57 @@ factor2 <- function(x, levels = unique(x)) {
   validate_factor(new_factor(new_levels, levels))
 }
 
+# Test
 factor2(c("a", "b", "c"), levels = c("a", "b"))
 ```
 
 __[Q3]{.Q}__: Carefully read the source code of `factor()`. What does it do that our constructor does not?
 
-__[A]{.solved}__: The original implementation allows a more flexible specification of input for `x`. The input is coerced to character or replaced by `character(0)` (in case of `NULL`). It also ensures that the factor levels are unique. This is achieved by setting the levels via `base::levels<-`, which fails when duplicate values are supplied.
+__[A]{.solved}__: The original implementation (`base::factor()`) allows more flexible input for `x`. It coerces `x` to character or replaces it with `character(0)` (in case of `NULL`). It also ensures that the `levels` are unique. This is achieved by setting them via `base::levels<-`, which fails when duplicate values are supplied.
 
 __[Q4]{.Q}__: Factors have an optional “contrasts” attribute. Read the help for `C()`, and briefly describe the purpose of the attribute. What type should it have? Rewrite the `new_factor()` constructor to include this attribute.
 
 __[A]{.solved}__: When factor variables (representing nominal or ordinal information) are used in statistical models, they are typically encoded as dummy variables and by default each level is compared with the first factor level. However, many different encodings ("contrasts") are possible, see <https://en.wikipedia.org/wiki/Contrast_(statistics)>.
 
-Within R's formula interface you can wrap a factor in `C` and specify the contrast of your choice. Alternatively you can set the "contrast" attribute of you factor variable, which accepts matrix input. (See `?contr.helmert` or similar for details).
+Within R's formula interface you can wrap a factor in `stats::C()` and specify the contrast of your choice. Alternatively you can set the `contrasts` attribute of your factor variable, which accepts matrix input. (See `?contr.helmert` or similar for details).
+
+The `new_factor()` constructor was given in Advanced R as:
 
 ```{r}
-# Updated factor constructor
+# new_factor() constructor from Advanced R
+new_factor <- function(x = integer(), levels = character()) {
+  stopifnot(is.integer(x))
+  stopifnot(is.character(levels))
+
+  structure(
+    x,
+    levels = levels,
+    class = "factor"
+  )
+}
+```
+
+Our updated `new_factor()` constructor gets a `contrasts` argument, which accepts a numeric matrix or `NULL` (default).
+
+```{r}
+# Updated new_factor() constructor
 new_factor <- function(
   x = integer(),
   levels = character(),
-  contrast = NULL
+  contrasts = NULL
 ) {
   stopifnot(is.integer(x))
   stopifnot(is.character(levels))
-  if (!is.null(constrast)) {
-    # if supplied should be a numeric matrix
-    stopifnot(is.matrix(contrast) && is.numeric(contrast))
+  
+  if (!is.null(constrasts)) {
+    stopifnot(is.matrix(contrasts) && is.numeric(contrasts))
   }
   
   structure(
     x,
     levels = levels,
     class = "factor",
-    contrast = contrast
+    contrasts = contrasts
   )
 }
 ```
@@ -313,14 +353,14 @@ nrow(s3_methods_generic("summary"))
 nrow(s3_methods_generic("plot"))
 ```
 
-Let's verify this programmatically.
+Let's verify this programmatically with the tools we have learned in this and the previous chapters.
 
 ```{r}
 library(purrr)
 
 ls(all.names = TRUE, env = baseenv()) %>% 
   mget(envir = baseenv()) %>% 
-  purrr::keep(is_function) %>% 
+  keep(is_function) %>% 
   names() %>% 
   keep(is_s3_generic) %>% 
   map(~ set_names(nrow(s3_methods_generic(.x)), .x)) %>% 
@@ -331,7 +371,7 @@ ls(all.names = TRUE, env = baseenv()) %>%
 
 __[Q5]{.Q}__: Carefully read the documentation for `UseMethod()` and explain why the following code returns the results that it does. What two usual rules of function evaluation does `UseMethod()` violate?
 
-```{r, results = FALSE}
+```{r}
 g <- function(x) {
   x <- 10
   y <- 10
@@ -344,7 +384,9 @@ y <- 1
 g(x)
 ```
 
-__[A]{.solved}__: Let's take this step by step. If you call `g.default()` directly you get `c(1, 1)` as you might expect. The value bound to `x` comes from the argument, the value from `y` comes from the global environment.
+__[A]{.solved}__: Let's take this step by step. If you call `g.default()` directly you get `c(1, 1)` as you might expect. 
+
+The value bound to `x` comes from the argument, the value from `y` comes from the global environment.
 
 ```{r}
 g.default(x)
@@ -377,7 +419,7 @@ names(formals(`[.Date`))
 names(formals(`[.AsIs`))
 ```
 
-Note that we can get a more complete overview if we work with the output of ` s3_methods_generic("[")`.
+To finally get a better overview, we have to put in a little more effort and also use `s3_methods_generic()` again.
 
 ```{r}
 library(dplyr)
@@ -411,14 +453,25 @@ The object style of `I()` depends on the input, since this function returns a "c
 
 __[Q2]{.Q}__: What would a constructor function for `lm` objects, `new_lm()`, look like? Use `?lm` and experimentation to figure out the required fields and their types.
 
-__[A]{.solved}__: The constructor needs to populate the attributes of an `lm` object and check their type for correctness.
+__[A]{.solved}__: The constructor needs to populate the attributes of an `lm` object and check their types for correctness. Let's start by creating a simple `lm` object and explore it's underlying base type and attributes:
 
 ```{r}
-# Learn about lm-attributes
-?lm
-attributes(lm(cyl ~ ., data = mtcars))
+mod <- lm(cyl ~ ., data = mtcars)
 
-# Define constructor
+typeof(mod)
+
+attributes(mod)
+```
+
+As `mod` is built upon a list, we can simply use `map(mod, typeof)` to find out the base types of its elements. (Additionally, we inspect `?lm`, to learn more about the individual attributes.)
+
+```{r}
+map_chr(mod, typeof)
+```
+
+Now we should have enough information to write a constructor for new `lm` objects.
+
+```{r}
 new_lm <- function(
   coefficients, residuals, effects, rank, fitted.values, assign,
   qr, df.residual, xlevels, call, terms, model
@@ -531,6 +584,18 @@ This is why `generic2.a2()` is called instead.
 generic2(structure(list(), class = c("b", "a2")))
 ```
 
+Let's just double check the statement above and evaluate `.Class` explicitly within the `generic2.b()` method.
+
+```{r}
+generic2.b <- function(x) {
+  class(x) <- "a1"
+  print(.Class)
+  NextMethod()
+}
+
+generic2(structure(list(), class = c("b", "a2")))
+```
+
 ## Dispatch details
 
 __[Q1]{.Q}__: Explain the differences in dispatch below:
@@ -545,14 +610,29 @@ class(x2)
 s3_dispatch(x2[1])
 ```
 
-__[A]{.solved}__: `class()` returns `"integer"` in both cases. But the class of `x1` is created implicitly and inherits from the `"numeric"` class, while the class of `x2` is set explicitly and no parent class is assumed.
+__[A]{.solved}__: `class()` returns `integer` in both cases. But the class of `x1` is created implicitly and inherits from the `numeric` class, while the class of `x2` is set explicitly and no parent class is assumed. This is important because `[` is an internal generic, so when the class is explicitly set, the "implicit" parent class `numeric` is not considered.
+
+An object has no explicit class if `attr(x, "class")` returns `NULL`:
+
+```{r}
+attr(x1, "class")
+attr(x2, "class")
+```
+
+To see the relevant classes for the S3 dispatch, one can use `sloop::s3_class()`:
 
 ```{r}
 s3_class(x1)  # implicit
+
 s3_class(x2)  # explicit
 ```
 
-The output of `s3_dispatch()` shows us, that setting the class explicitly for `x2` avoids considering the implicit parent class `"numeric"` for method dispatch. We can also see that various of the possible methods are not implemented. Rather an internal dispatch (written in C) is used (highlighted via "=>"), which shows that `[` is an internal generic.
+For a better understanding of `s3_dipatch()`'s output we quote from `?sd_dispatch`:
+
+* => method exists and is found by UseMethod().
+* -> method exists and is used by NextMethod().
+* \* method exists but is not used.
+* Nothing (and greyed out in console): method does not exist.
 
 __[Q2]{.Q}__: What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
 
@@ -602,3 +682,18 @@ The original source code of `Math.data.frame()` is a good example on how to invo
 __[Q3]{.Q}__: `Math.difftime()` is more complicated than I described. Why?
 
 __[A]{.solved}__: `Math.difftime()` also excludes cases apart from `abs`, `sign`, `floor`, `ceiling`, `trunc`, `round` and `signif` and needs to return a fitting error message.
+
+For comparison: `Math.difftime()` as defined in Advanced R:
+
+```{r}
+Math.difftime <- function(x, ...) {
+  new_difftime(NextMethod(), units = attr(x, "units"))
+}
+rm(Math.difftime)
+```
+
+`Math.difftime()` as defined in the `{base}` package:
+
+```{r}
+Math.difftime
+```
