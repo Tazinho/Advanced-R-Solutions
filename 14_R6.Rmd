@@ -6,7 +6,7 @@ source("common.R")
 
 ## Prerequisites
 
-To solve the exercises in this chapter we will have to to create R6 objects, which are implemented in the `R6` package.
+To solve the exercises in this chapter we will have to to create R6 objects, which are implemented in the `{R6}` package.
 
 ```{r}
 library(R6)
@@ -16,7 +16,7 @@ library(R6)
 
 __[Q1]{.Q}__: Create a bank account R6 class that stores a balance and allows you to deposit and withdraw money. Create a subclass that throws an error if you attempt to go into overdraft. Create another subclass that allows you to go into overdraft, but charges you a fee.
 
-__[A]{.solved}__: Let's start with a basic bank account, similar to the `Accumulator` class in the text book.
+__[A]{.solved}__: Let's start with a basic bank account, similar to the `Accumulator` class in Advanced R.
 
 ```{r}
 BankAccount <- R6Class(
@@ -50,7 +50,7 @@ Now, we create the first subclass that prevents us from going into overdraft and
 
 ```{r}
 BankAccountStrict <- R6Class(
-  classname = "BankAccount",
+  classname = "BankAccountStrict",
   inherit = BankAccount,
   public = list(
     withdraw = function(draw = 0) {
@@ -76,11 +76,11 @@ my_strict_account$
 my_strict_account$balance
 ```
 
-Finally, we create a class that charges a constant fee of 1 for each withdrawal which leaves the account with a negative balance.
+Finally, we create another subclass that charges a constant fee of 1 for each withdrawal which leaves the account with a negative balance.
 
 ```{r}
 BankAccountCharging <- R6Class(
-  classname = "BankAccount",
+  classname = "BankAccountCharging",
   inherit = BankAccount,
   public = list(
     withdraw = function(draw = 0) {
@@ -128,6 +128,9 @@ ShuffledDeck <- R6Class(
       self$deck <- sample(cards)
       invisible(self)
     },
+    n = function() {
+      length(self$deck)
+    },
     draw = function(n = 1) {
       if (n > self$n()) {
         stop("Only ", self$n(), " cards remaining", call. = FALSE)
@@ -144,6 +147,7 @@ To test this class we create a deck (initialise an instance), draw all the cards
 
 ```{r, error = TRUE}
 my_deck <- ShuffledDeck$new()
+
 my_deck$draw(52)
 my_deck$draw(10)
 
@@ -153,7 +157,7 @@ my_deck$reshuffle()$draw(5)
 
 __[Q3]{.Q}__: Why can't you model a bank account or a deck of cards with an S3 class?
 
-__[A]{.solved}__: Because S3 classes obey R's usual semantics of copy-on-modify: every time you deposties from the bank account or drew a card, you'd get a new copy of the object.
+__[A]{.solved}__: Because S3 classes obey R's usual semantics of copy-on-modify: every time you deposties from the bank account or drew a card from the deck, you'd get a new copy of the object.
 
 It is possible to combine S3 classes with an environment (which is how R6 works), but it is ill-advised to create an object that looks like a regular R object but has reference semantics.
 
@@ -180,7 +184,7 @@ Timezone <- R6Class(
 
 (When setting, we return the old value invisibly because this makes it easy to restore the previous value.)
 
-Now, let us create one instance of this class and test, if we can can set and get the time zone as intended.
+Now, let us create one instance of this class and test, if we can set and get the time zone as intended.
 
 ```{r}
 tz <- Timezone$new()
@@ -367,7 +371,7 @@ We conclude, that subclasses can access private methods from their superclasses,
 ## Reference semantics
 __[Q1]{.Q}__: Create a class that allows you to write a line to a specified file. You should open a connection to the file in `$initialize()`, append a line using `cat()` in `$append_line()`, and close the connection in `$finalize()`.
 
-__[A]{.solved}__: Our `FileWriter` class will create a connection to a file at initialization. Therefore, we open a connection to a user specified file during the initialisation. Note that we need to set `open = "a"` in `file()` to open connection for appending text. Otherwise `cat` would only work when applied to files, but not with connections as explicitly asked for in the exercise. Further, we add the `append_line()` method and a `close()` statement as finalizer.
+__[A]{.solved}__: Our `FileWriter` class will create a connection to a file at initialization. Therefore, we open a connection to a user specified file during the initialisation. Note that we need to set `open = "a"` in `file()` to open connection for appending text. Otherwise `cat()` would only work when applied to files, but not with connections as explicitly asked for in the exercise. Further, we add the `append_line()` method and a `close()` statement as finalizer.
 
 ```{r, eval = TRUE, error = TRUE}
 FileWriter <- R6::R6Class(
