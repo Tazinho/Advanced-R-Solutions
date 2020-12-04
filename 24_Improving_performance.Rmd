@@ -9,12 +9,6 @@ source("common.R")
 
 # Improving performance
 
-In this chapter we will run a few benchmarks.
-
-```{r}
-library(magrittr)
-```
-
 ## Checking for existing solutions
 
 __[Q1]{.Q}__: What are faster alternatives to `lm`? Which are specifically designed to work with larger datasets?
@@ -61,11 +55,11 @@ For further speed improvements, you could install a linear algebra library optim
 
 > The functions of class 'speedlm' may speed up the fitting of LMs to large data sets. High performances can be obtained especially if R is linked against an optimized BLAS, such as ATLAS.
 
-(Tip: In case your dataset is stored in a database, you might want to check out the [modeldb](https://github.com/tidymodels/modeldb) package which executes the linear model code in the corresponding database backend.
+Tip: In case your dataset is stored in a database, you might want to check out the [modeldb](https://github.com/tidymodels/modeldb) package which executes the linear model code in the corresponding database backend.
 
 __[Q2]{.Q}__: What package implements a version of `match()` that's faster for repeated lookups? How much faster is it?
 
-__[A]{.solved}__: A web search points us to the `{fastmatch}`-package. We compare it to `base::match()` and observe an impressive  performance gain (up to 35x faster computation).
+__[A]{.solved}__: A web search points us to the `{fastmatch}`-package. We compare it to `base::match()` and observe an impressive performance gain.
 
 ```{r}
 set.seed(1)
@@ -77,8 +71,6 @@ bench::mark(
   fastmatch = fastmatch::fmatch(x, table)
 ) 
 ```
-
-<!-- HW: I think relative benchmarks are fundamentally dangerous because you don't know what the denominators are - they might be really small and you're just looking at noise -->
 
 __[Q3]{.Q}__: List four functions (not just those in base R) that convert a string into a date time object. What are their strengths and weaknesses?
 
@@ -192,7 +184,7 @@ Since this solves a one-dimensional optimization task, we could have also used `
 optimize(function(x) x^2 - 100 * x + 50, c(-1e20, 1e20))
 ```
 
-For more gerneral alternatives, the appropriate choice highly depends on the type of optimization you intend to do. The [Taskview on Optimization](https://cran.r-project.org/web/views/Optimization.html) can serve as a useful reference. Here a couple of examples:
+For more gerneral alternatives, the appropriate choice highly depends on the type of optimization you intend to do. The [Taskview on Optimization](https://cran.r-project.org/web/views/Optimization.html) can serve as a useful reference. Here are a couple of examples:
   
 - `{optimx}` extends the `optim()` function with the same syntax but more `method` choices.
 - `{RcppNumerical}` wraps several open source libraries for numerical computing (written in C++) and integrates them with R via `{Rcpp}`.
@@ -323,7 +315,7 @@ These functions are vectorised over their numeric arguments, which includes the 
 
 __[Q2]{.Q}__: Compare the speed of `apply(x, 1, sum)` with `rowSums(x)` for varying sizes of `x`.
 
-__[A]{.solved}__: We compare the two functions for square matrices of increasing size
+__[A]{.solved}__: We compare the two functions for square matrices of increasing size:
 
 ```{r, warning=FALSE}
 rowsums <- bench::press(
