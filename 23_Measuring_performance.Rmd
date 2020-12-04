@@ -130,19 +130,17 @@ x ^ (1 / 2)
 exp(log(x) / 2)
 ```
 
-__[A]{.solved}__: To compare these approaches, we'll `bench::mark` the *relative execution time*, with the fastest expression standardized to 1.
+__[A]{.solved}__: To compare these approaches, we'll `bench::mark` them and sort the reult be the median execution time.
 
 ```{r}
 x <- runif(100)
 
-bench::mark(sqrt(x),
-            x ^ 0.5,
-            x ^ (1 / 2),
-            exp(log(x) / 2),
-            relative = TRUE) %>% 
-  dplyr::select(expression, rel_speed = median) %>% 
-  dplyr::mutate(expression = as.character(expression)) %>% 
-  dplyr::arrange(rel_speed)
+bm <- bench::mark(sqrt(x),
+                  x ^ 0.5,
+                  x ^ (1 / 2),
+                  exp(log(x) / 2))
+
+bm[order(bm$median), ]
 ```
 
-As one might expect the idiomatic primitive function `sqrt()` is the fastest. The approach `exp(log(x) / 2)` which builds on two other primitive functions is second, even though already considerably slower. The other calculations are even slower: `x ^ 0.5` is (slightly) faster than `x ^ (1 / 2)`, because `0.5` requires less computation than `(1 / 2)`.
+As one might expect the idiomatic primitive function `sqrt()` is the fastest. The approach `exp(log(x) / 2)` which builds on two other primitive functions is second, even though already considerably slower. The other calculations are even slower: `x ^ 0.5` is faster than `x ^ (1 / 2)`, because `0.5` requires less computation than `(1 / 2)`.
