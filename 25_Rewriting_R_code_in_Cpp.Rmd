@@ -64,7 +64,7 @@ NumericVector f5(NumericVector x, NumericVector y) {
 }
 ```
 
-__[A]{.solved}__:  The code above corresponds to the following R functions:
+__[A]{.solved}__:  The code above corresponds to the following base R functions:
 
 *   f1: `mean()`  
 *   f2: `cumsum()`  
@@ -88,132 +88,132 @@ __[A]{.solved}__: Let's port these functions to C++.
 
 1. `all()`
 
-```{Rcpp, eval=FALSE}
-bool allC(LogicalVector x) {
-  int n = x.size();
-  
-  for (int i = 0; i < n; ++i) {
-    if (!x[i]) return false;
-  }
-  return true;
-}
-```
+    ```{Rcpp, eval=FALSE}
+    bool allC(LogicalVector x) {
+      int n = x.size();
+      
+      for (int i = 0; i < n; ++i) {
+        if (!x[i]) return false;
+      }
+      return true;
+    }
+    ```
 
 2. `cumprod()`, `cummin()`, `cummax()`.
 
-```{Rcpp, eval=FALSE}
-NumericVector cumprodC(NumericVector x) {
-  int n = x.size();
-  NumericVector out(n);
-  
-  out[0] = x[0];
-  for (int i = 1; i < n; ++i) {
-    out[i]  = out[i - 1] * x[i];
-  }
-  return out;
-}
-
-NumericVector cumminC(NumericVector x) {
-  int n = x.size();
-  NumericVector out(n);
-  
-  out[0] = x[0];
-  for (int i = 1; i < n; ++i) {
-    out[i]  = std::min(out[i - 1], x[i]);
-  }
-  return out;
-}
-
-NumericVector cummaxC(NumericVector x) {
-  int n = x.size();
-  NumericVector out(n);
-  
-  out[0] = x[0];
-  for (int i = 1; i < n; ++i) {
-    out[i]  = std::max(out[i - 1], x[i]);
-  }
-  return out;
-}
-```
+    ```{Rcpp, eval=FALSE}
+    NumericVector cumprodC(NumericVector x) {
+      int n = x.size();
+      NumericVector out(n);
+      
+      out[0] = x[0];
+      for (int i = 1; i < n; ++i) {
+        out[i]  = out[i - 1] * x[i];
+      }
+      return out;
+    }
+    
+    NumericVector cumminC(NumericVector x) {
+      int n = x.size();
+      NumericVector out(n);
+      
+      out[0] = x[0];
+      for (int i = 1; i < n; ++i) {
+        out[i]  = std::min(out[i - 1], x[i]);
+      }
+      return out;
+    }
+    
+    NumericVector cummaxC(NumericVector x) {
+      int n = x.size();
+      NumericVector out(n);
+      
+      out[0] = x[0];
+      for (int i = 1; i < n; ++i) {
+        out[i]  = std::max(out[i - 1], x[i]);
+      }
+      return out;
+    }
+    ```
 
 3. `diff()` (Start by assuming lag 1, and then generalise for lag `n`.)
 
-```{Rcpp, eval=FALSE}
-NumericVector diffC(NumericVector x){
-  int n = x.size();
-  NumericVector out(n - 1);
-  
-  for (int i = 1; i < n; i++){
-    out[i - 1] = x[i] - x[i - 1];
-  }
-  return out ;
-}
-
-NumericVector difflagC(NumericVector x, int lag = 1){
-  int n = x.size();
-
-  if (lag >= n) stop("`lag` must be less than `length(x)`.");
-  
-  NumericVector out(n - lag);
-  
-  for (int i = lag; i < n; i++){
-    out[i - lag] = x[i] - x[i - lag];
-  }
-  return out;
-}
-```
+    ```{Rcpp, eval=FALSE}
+    NumericVector diffC(NumericVector x){
+      int n = x.size();
+      NumericVector out(n - 1);
+      
+      for (int i = 1; i < n; i++){
+        out[i - 1] = x[i] - x[i - 1];
+      }
+      return out ;
+    }
+    
+    NumericVector difflagC(NumericVector x, int lag = 1){
+      int n = x.size();
+    
+      if (lag >= n) stop("`lag` must be less than `length(x)`.");
+      
+      NumericVector out(n - lag);
+      
+      for (int i = lag; i < n; i++){
+        out[i - lag] = x[i] - x[i - lag];
+      }
+      return out;
+    }
+    ```
 
 4. `range()`
 
-```{Rcpp, eval=FALSE}
-NumericVector rangeC(NumericVector x){
-  double omin = x[0], omax = x[0];
-  int n = x.size();
-
-  if (n == 0) stop("`length(x)` must be greater than 0.");
-  
-  for (int i = 1; i < n; i++){
-    omin = std::min(x[i], omin);
-    omax = std::max(x[i], omax);
-  }
-  
-  NumericVector out(2);
-  out[0] = omin;
-  out[1] = omax;
-  return out;
-}
-```
+    ```{Rcpp, eval=FALSE}
+    NumericVector rangeC(NumericVector x){
+      double omin = x[0], omax = x[0];
+      int n = x.size();
+    
+      if (n == 0) stop("`length(x)` must be greater than 0.");
+      
+      for (int i = 1; i < n; i++){
+        omin = std::min(x[i], omin);
+        omax = std::max(x[i], omax);
+      }
+      
+      NumericVector out(2);
+      out[0] = omin;
+      out[1] = omax;
+      return out;
+    }
+    ```
 
 5. `var()`
 
-```{Rcpp, eval=FALSE}
-double varC(NumericVector x) {
-  int n = x.size();
-  
-  if (n < 2) {
-    return NA_REAL;
-  }
-  
-  double mx = 0;
-  for (int i = 0; i < n; ++i) {
-    mx += x[i] / n;
-  }
-  
-  double out = 0;
-  for (int i = 0; i < n; ++i) {
-    out += pow(x[i] - mx, 2);
-  }
-  
-  return out / (n - 1);
-}
-```
+    ```{Rcpp, eval=FALSE}
+    double varC(NumericVector x) {
+      int n = x.size();
+      
+      if (n < 2) {
+        return NA_REAL;
+      }
+      
+      double mx = 0;
+      for (int i = 0; i < n; ++i) {
+        mx += x[i] / n;
+      }
+      
+      double out = 0;
+      for (int i = 0; i < n; ++i) {
+        out += pow(x[i] - mx, 2);
+      }
+      
+      return out / (n - 1);
+    }
+    ```
 
 
 ## Missing values
 
 __[Q1]{.Q}__:  Rewrite any of the functions from the first exercise to deal with missing values. If `na.rm` is true, ignore the missing values. If `na.rm` is false, return a missing value if the input contains any missing values. Some good functions to practice with are `min()`, `max()`, `range()`, `mean()`, and `var()`.
 
-__[A]{.solved}__: For this exercise we start with `minC()` and extend it so it can deal with missing values. We introduce an `na_rm` argument to make `minC()` aware of `NA`s. In case `x` contains exclusively `NA` values `minC()` should return `Inf` for `na_rm == TRUE`. For the return values vector data types are used to avoid irregular type conversions.
+__[A]{.solved}__: For this exercise we start with `minC()` and extend it so it can deal with missing values. We introduce an `na_rm` argument to make `minC()` aware of `NA`s. In case `x` contains exclusively `NA` values `minC()` should return `Inf` for `na_rm = TRUE`. For the return values vector data types are used to avoid irregular type conversions.
 
 ```{Rcpp}
 #include <Rcpp.h>
@@ -255,7 +255,7 @@ minC(c(2:4, NA), na_rm = TRUE)
 minC(c(NA, NA), na_rm = TRUE)
 ```
 
-We also extend `anyC` so it can deal with missing values. Please note that this introduces some code duplication. This could be avoided by moving the check for missing values to the inner loop at the expense of a slight decrease of performance. Here we use `LogicalVetor` as return type. If we would use `bool` instead, the C++ `NA_LOGICAL` would be converted into R's logical `TRUE`.
+We also extend `anyC` so it can deal with missing values. Please note that this (again) introduces some code duplication. This could be avoided by moving the check for missing values to the inner loop at the expense of a slight decrease of performance. Here we use `LogicalVetor` as return type. If we would use `bool` instead, the C++ `NA_LOGICAL` would be converted into R's logical `TRUE`.
 
 ```{Rcpp}
 #include <Rcpp.h>
@@ -302,7 +302,7 @@ anyC(c(NA, TRUE), na_rm = TRUE)
 
 __[Q2]{.Q}__: Rewrite `cumsum()` and `diff()` so they can handle missing values. Note that these functions have slightly more complicated behaviour.
 
-__[A]{.solved}__: Our `NA`-aware `cumsumC()` function will return a vector of the same length as `x`. By default (`na_rm = false`) all values following the first `NA` input value will be set to `NA`, because they depend on the unknown missing value. In case of `na_rm = true` the `NA` values are treated like zeros.
+__[A]{.solved}__: Our `NA`-aware `cumsumC()` function will return a vector of the same length as `x`. By default (`na_rm = FALSE`) all values following the first `NA` input value will be set to `NA`, because they depend on the unknown missing value. In case of `na_rm = FALSE` the `NA` values are treated like zeros.
 
 ```{Rcpp}
 #include <Rcpp.h>
@@ -349,7 +349,7 @@ cumsumC(c(1, NA, 2, 4))
 cumsumC(c(1, NA, 2, 4), na_rm = TRUE)
 ```
 
-The `diffC()` implementation will return an `NA` vector of length `length(x) - lag`, if the input vector contains a missing value. In case of `na_rm = true`, the function will return an `NA` for every difference with at least one `NA` as input.
+The `diffC()` implementation will return an `NA` vector of length `length(x) - lag`, if the input vector contains a missing value. In case of `na_rm = TRUE`, the function will return an `NA` for every difference with at least one `NA` as input.
 
 ```{Rcpp}
 #include <Rcpp.h>
