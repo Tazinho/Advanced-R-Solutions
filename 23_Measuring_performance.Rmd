@@ -7,10 +7,6 @@ source("common.R")
 
 # Measuring performance
 
-```{r, include=FALSE}
-library(magrittr)
-```
-
 ## Profiling
 
 __[Q1]{.Q}__: Profile the following function with `torture = TRUE`. What is surprising? Read the source code of `rm()` to figure out what's going on.
@@ -22,7 +18,7 @@ f <- function(n = 1e5) {
 }
 ```
 
-__[A]{.started}__: We expect `f()` to create a vector (`x`) of length `n`, which is then removed so that `f()` just returns `NULL`. When we profile this function it executes too fast for meaningful results.
+__[A]{.solved}__: We expect `f()` to create a vector (`x`) of length `n`, which is then removed so that `f()` just returns `NULL`. When we profile this function it executes too fast for meaningful results.
 
 ```{r, error=TRUE}
 profvis::profvis(f())
@@ -34,7 +30,7 @@ Setting `torture = TRUE` triggers garbage collection after every memory allocati
 profvis::profvis(f(), torture = TRUE)
 ```
 
-Surprisingly profiling `f()` like this also takes a very long time. What could be the reason?
+Surprisingly profiling `f()` like this takes a very long time. What could be the reason?
 
 We follow the hint in the question and inspect the source code of `rm()`:
 
@@ -73,6 +69,8 @@ profvis::profvis(f2(), torture = TRUE)
 
 Unfortunately this still takes too long and we are literally stuck in profiling.
 
+Anecdotally, one of the authors once finished the profiling under an older R version. But the output seemed to be not very meaningful.
+
 In conclusion, this question appears to be unanswerable for us, even for Hadley.
 
 ## Microbenchmarking
@@ -98,6 +96,8 @@ bench_df <- bench::mark(
   x ^ 0.5,
   iterations = n
 )
+
+bench_df
 ```
 
 We need to access the raw data, so we can compare the results of both benchmarking approaches.
@@ -110,7 +110,7 @@ t1_systime <- system.time(for (i in 1:n) sqrt(x)) / n
 t2_systime <- system.time(for (i in 1:n) x ^ 0.5) / n
 ```
 
-We see, that both approaches get the order of magnitude right. We assume, that the `bench`-results may be a little more accurate, because of its high precision timer. There may also be overhead introduced by the for loop in the `system.time`-approach.
+We see, that both approaches get the order of magnitude right. We assume, that the `bench::mark`-results may be a little more accurate, because of its high precision timer. There may also be overhead introduced by the for loop in the `system.time`-approach.
 
 ```{r}
 # Compare the results
@@ -145,4 +145,4 @@ bench::mark(sqrt(x),
   dplyr::arrange(rel_speed)
 ```
 
-As expected we see that the idiomatic primitive function `sqrt()` is the fastest. The approach `exp(log(x) / 2)` which builds on two other primitive functions is second, even though already considerably slower. The other calculations are even slower: `x ^ 0.5` is (slightly) faster than `x ^ (1 / 2)`, because `0.5` requires less computation than `(1 / 2)` and everything else stays the same.
+As one might expect the idiomatic primitive function `sqrt()` is the fastest. The approach `exp(log(x) / 2)` which builds on two other primitive functions is second, even though already considerably slower. The other calculations are even slower: `x ^ 0.5` is (slightly) faster than `x ^ (1 / 2)`, because `0.5` requires less computation than `(1 / 2)`.
