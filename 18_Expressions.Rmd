@@ -9,7 +9,7 @@ source("common.R")
 # Expressions
 ## Prerequisites {-}
 
-To capture and compute on expressions, and to visualise them, we will load the rlang and the lobstr packages.
+To capture and compute on expressions, and to visualise them, we will load the `{rlang}` and the `{lobstr}` packages.
 
 ```{r setup}
 library(rlang)
@@ -28,17 +28,13 @@ ast(1 + 2 + 3)
 ast((x + y) * z)
 ```
 
-__[A]{.solved}__: Let the source (of the code chunks above) be with you and show you how the ASTs were produced. :)
+__[A]{.solved}__: Let the source (of the code chunks above) be with you and show you how the ASTs were produced.
 
 ```{r}
 ast(f(g(h())))
-```
 
-```{r}
 ast(1 + 2 + 3)
-```
 
-```{r}
 ast((x + y) * z)
 ```
 
@@ -50,11 +46,13 @@ f(1, g(2, h(3, i())))
 f(g(1, 2), h(3, i(4, 5)))
 ```
 
-__[A]{.solved}__: Let us delegate the drawing to the lobstr package.
+__[A]{.solved}__: Let us delegate the drawing to the `{lobstr}` package.
 
 ```{r}
 ast(f(g(h(i(1, 2, 3)))))
+
 ast(f(1, g(2, h(3, i()))))
+
 ast(f(g(1, 2), h(3, i(4, 5))))
 ```
 
@@ -69,10 +67,11 @@ ast(1 -> x)
 __[A]{.solved}__: ASTs start function calls with the name of the function. This is why the call in the first expression is translated into its prefix form. In the second case, `**` is translated by R's parser into `^`. In the last AST, the expression is flipped when R parses it:
 
 ```{r}
+str(expr(x ** y))
 str(expr(a -> b))
 ```
 
-__[Q4]{.Q}__: What is special about the AST below? (Hint: re-read Section 6.2.1)
+__[Q4]{.Q}__: What is special about the AST below? (Hint: re-read [Section 6.2.1](https://adv-r.hadley.nz/functions.html#fun-components))
 
 ```{r}
 ast(function(x = 1, y = 2) {})
@@ -110,24 +109,24 @@ ast(
 
 __[Q1]{.Q}__: Which two of the six types of atomic vector can't appear in an expression?  Why? Similarly, why can't you create an expression that contains an atomic vector of length greater than one?
 
-__[A]{.solved}__: It is not possible to create an expression that evaluates to an atomic of length greater than one without using a function (e.g. the `c()` function). But expressions that include a function are calls.
+__[A]{.solved}__: There is no way to create raws and complex atomics without using a function call (this is only possible for imaginary scalars like `i`, `5i` etc.). But expressions that include a function are *calls*. Therefore, both of these vector types can not appear in an expression.
+
+Similarly, it is not possible to create an expression that evaluates to an atomic of length greater than one without using a function (e.g. `c()`).
 
 Let's make this observation concrete via an example:
 
 ```{r}
 # Atomic
 is_atomic(expr(1))
+
 # Not an atomic (although it would evaluate to an atomic)
 is_atomic(expr(c(1, 1)))
-# But a call
 is_call(expr(c(1, 1)))
 ```
 
-As there is no way to create raws and complex atomics without using a function call (this is only possible for imaginary scalars like *i*, *5i* etc.), both of these vector types can not appear in an expression.
-
 __[Q2]{.Q}__: What happens when you subset a call object to remove the first element, e.g. `expr(read.csv("foo.csv", header = TRUE))[-1]` Why?
 
-__[A]{.solved}__: When the first element of a call object is removed, the second element moves to the first position, which is the function to call. Therefore, we get `"foo.csv"(header = TRUE)`
+__[A]{.solved}__: When the first element of a call object is removed, the second element moves to the first position, which is the function to call. Therefore, we get `"foo.csv"(header = TRUE)`.
 
 __[Q3]{.Q}__: Describe the differences between the following call objects.
 
@@ -172,7 +171,7 @@ call_standardise(quote(mean(n = T, 1:10)))
 call_standardise(quote(mean(x = 1:10, , TRUE)))
 ```
 
-__[A]{.solved}__: The reason for this unexpected behaviour is that `mean()` uses the `...` argument and therefore can not standardise the regarding arguments. Since `mean()` uses S3 dispatch (i.e., `UseMethod()`) and the underlying `mean.default()` method specifies some more arguments, `rlang::call_standardise()` can do much better with a specific S3 method.
+__[A]{.solved}__: The reason for this unexpected behaviour is that `mean()` uses the `...` argument and therefore can not standardise the regarding arguments. Since `mean()` uses S3 dispatch (i.e., `UseMethod()`) and the underlying `mean.default()` method specifies some more arguments, `call_standardise()` can do much better with a specific S3 method.
 
 ```{r}
 call_standardise(quote(mean.default(1:10, na.rm = TRUE)))
@@ -194,7 +193,7 @@ __[A]{.solved}__: As stated in the book
 Let's see what happens when we run the code
 
 ```{r}
-x <- rlang::expr(foo(x = 1))
+x <- expr(foo(x = 1))
 x
 
 names(x) <- c("x", "")
@@ -206,7 +205,7 @@ x
 
 So giving the first element a name just adds metadata that R ignores.
 
-__[Q6]{.Q}__: Construct the expression `if(x > 1) "a" else "b"` using multiple calls to `call2()`. How does the structure code reflect the structure of the AST?
+__[Q6]{.Q}__: Construct the expression `if(x > 1) "a" else "b"` using multiple calls to `call2()`. How does the code structure reflect the structure of the AST?
 
 __[A]{.solved}__: Similar to the prefix version we get
 
@@ -266,7 +265,7 @@ ast(b = c(c = 1))
 ```
 We get an error, because `b = ` makes R looking for an argument called `b`. Since `x` is the only argument of `ast()`, we get an error.
 
-The easiest way around this problem is to wrap in `{}`.
+The easiest way around this problem is to wrap this line in `{}`.
 
 ```{r}
 ast({b = c(c = 1)})
@@ -293,7 +292,7 @@ __[A]{.solved}__: The answer is a little surprising:
 !1 + !1
 ```
 
-To answer the "why?", we take a look at the AST.
+To answer the "why?", we take a look at the AST:
 
 ```{r}
 ast(!1 + !1)
@@ -305,7 +304,7 @@ Next `1 + FALSE` is evaluated to `1`, since `FALSE` is coerced to `0`.
 
 Finally `!1` is evaluated to `FALSE`.
 
-Please note that if `!` had a higher precedence, the intermediate result would be `FALSE + FALSE`, which would evalutate to `0`.
+Note that if `!` had a higher precedence, the intermediate result would be `FALSE + FALSE`, which would evalutate to `0`.
 
 __[Q5]{.Q}__: Why does `x1 <- x2 <- x3 <- 0` work? Describe the two reasons.
 
@@ -352,7 +351,7 @@ parse_expr("x + 1; y + 1")
 
 __[Q8]{.Q}__: What happens if you attempt to parse an invalid expression? e.g. `"a +"` or `"f())"`.
 
-__[A]{.solved}__: Invalid expressions will lead to an error from the underlying `parse()` function.
+__[A]{.solved}__: Invalid expressions will lead to an error in the underlying `parse()` function.
 
 ```{r, error = TRUE}
 parse_expr("a +")
@@ -405,17 +404,24 @@ pairwise.t.test(2, d + d + d + d + d + d + d + d +
 #> P value adjustment method: holm 
 ```
 
-In [R 4.0.0](https://cran.r-project.org/doc/manuals/r-release/NEWS.html) `pairwise.t.test()` was updated to use the newly introduces `deparse1()`, which serves as a wrapper around `deparse()`.
+In [R 4.0.0](https://cran.r-project.org/doc/manuals/r-release/NEWS.html) `pairwise.t.test()` was updated to use the newly introduced `deparse1()`, which serves as a wrapper around `deparse()`.
 
 > deparse1() is a simple utility added in R 4.0.0 to ensure a string result (character vector of length one), typically used in name construction, as deparse1(substitute(.)).
+
+```{r}
+# Output since R 4.0.0
+d <- 1
+pairwise.t.test(2, d + d + d + d + d + d + d + d + 
+                  d + d + d + d + d + d + d + d + d)
+```
 
 ## Walking AST with recursive functions {#ast-funs}
 
 __[Q1]{.Q}__: `logical_abbr()` returns `TRUE` for `T(1, 2, 3)`. How could you modify `logical_abbr_rec()` so that it ignores function calls that use `T` or `F`?
 
-__[A]{.solved}__: We can apply a similar logic as in the multiple assignment example from the textbook. We just treat it as a special case handled within a sub function called `find_T_call()`, which finds `T()` calls and "bounces them out":
+__[A]{.solved}__: We can apply a similar logic as in the [assignment example](https://adv-r.hadley.nz/expressions.html#finding-all-variables-created-by-assignment) from Advanced R. We just treat it as a special case handled within a sub function called `find_T_call()`, which finds `T()` calls and "bounces them out". Therefore, we also repeat the `expr_type()` helper which tells us if we are in the base or in the recursive case.
 
-```{r, include = FALSE}
+```{r}
 expr_type <- function(x) {
   if (rlang::is_syntactic_literal(x)) {
     "constant"
