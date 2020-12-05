@@ -6,7 +6,7 @@ source("common.R")
 
 ## Prerequisites {-}
 
-Like in the environments chapter we follow Advanced R and use functions from the `{rlang}` package to handle conditions.
+Like in the environments chapter we use functions from the `{rlang}` package here.
 
 ```{r}
 library(rlang)
@@ -38,11 +38,12 @@ __[Q2]{.Q}__: What does the `appendLF` argument to `message()` do? How is it rel
 
 __[A]{.solved}__: The `appendLF` argument automatically appends a new line to the message. Let's illustrate this behaviour with a small example function:
 
-```{r, eval=TRUE, message=TRUE}
+```{r}
 multiline_msg <- function(appendLF = TRUE) {
   message("first", appendLF = appendLF)
-  cat("second")
+  message("second", appendLF = appendLF)
   cat("third")
+  cat("fourth")
 }
 
 multiline_msg(appendLF = TRUE)
@@ -167,7 +168,7 @@ rlang::catch_cnd
 
 __[Q5]{.Q}__: How could you rewrite `show_condition()` to use a single handler?
 
-__[A]{.solved}__: Let's use the `condition` argument of `tryCatch` as shown in `rlang::catch_cond()` above:
+__[A]{.solved}__: `show_condition()` was defined in one of the previous questions. Let's use the `condition` argument of `tryCatch()` as shown in `rlang::catch_cond()` above for our re-implementation:
 
 ```{r}
 show_condition2 <- function(code) {
@@ -257,7 +258,7 @@ error_obj <- suppressConditions({
   warning("warning")
   abort("error")
 })
-# the messages/ wrarnings/ conditions are suppressed successfully
+# the messages/warnings/conditions are suppressed successfully
 
 error_obj
 ```
@@ -275,7 +276,7 @@ message2error <- function(code) {
 
 __[A]{.solved}__: Both functions differ in the way conditions are handled. `withCallingHandlers()` creates a *calling handler*, which is executed from within the signalling function. This makes it possible to record a detailed call stack, which helps us identify the signalling condition.
 
-`tryCatch()` defines an *exiting handlers*, which means that the signalling function is terminated as soon as a condition is raised. It also returns control to the context where `tryCatch()` was called.
+`tryCatch()` defines an *exiting handler*, which means that the signalling function is terminated as soon as a condition is raised. It also returns control to the context where `tryCatch()` was called.
 
 In this example the use of `withCallingHandlers()` returns more information than the use of `tryCatch()`. This allows us to determine the exact call that raised the condition.
 
@@ -327,7 +328,7 @@ traceback()
 #>    })
 ```
 
-__[Q3]{.Q}__:  How would you modify the `catch_cnds()` defined if you wanted to recreate the original intermingling of warnings and messages?
+__[Q3]{.Q}__:  How would you modify the `catch_cnds()` definition if you wanted to recreate the original intermingling of warnings and messages?
 
 __[A]{.solved}__: To preserve the original order, we have to capture everything into a single list. This makes using this function slightly harder since the caller is responsible for handling the different condition classes.
 
