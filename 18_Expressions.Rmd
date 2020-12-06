@@ -109,7 +109,7 @@ ast(
 
 __[Q1]{.Q}__: Which two of the six types of atomic vector can't appear in an expression?  Why? Similarly, why can't you create an expression that contains an atomic vector of length greater than one?
 
-__[A]{.solved}__: There is no way to create raws and complex atomics without using a function call (this is only possible for imaginary scalars like `i`, `5i` etc.). But expressions that include a function are *calls*. Therefore, both of these vector types can not appear in an expression.
+__[A]{.solved}__: There is no way to create raws and complex atomics without using a function call (this is only possible for imaginary scalars like `i`, `5i` etc.). But expressions that include a function are *calls*. Therefore, both of these vector types cannot appear in an expression.
 
 Similarly, it is not possible to create an expression that evaluates to an atomic of length greater than one without using a function (e.g. `c()`).
 
@@ -171,7 +171,7 @@ call_standardise(quote(mean(n = T, 1:10)))
 call_standardise(quote(mean(x = 1:10, , TRUE)))
 ```
 
-__[A]{.solved}__: The reason for this unexpected behaviour is that `mean()` uses the `...` argument and therefore can not standardise the regarding arguments. Since `mean()` uses S3 dispatch (i.e., `UseMethod()`) and the underlying `mean.default()` method specifies some more arguments, `call_standardise()` can do much better with a specific S3 method.
+__[A]{.solved}__: The reason for this unexpected behaviour is that `mean()` uses the `...` argument and therefore cannot standardise the regarding arguments. Since `mean()` uses S3 dispatch (i.e., `UseMethod()`) and the underlying `mean.default()` method specifies some more arguments, `call_standardise()` can do much better with a specific S3 method.
 
 ```{r}
 call_standardise(quote(mean.default(1:10, na.rm = TRUE)))
@@ -203,7 +203,7 @@ names(x) <- c("", "x")
 x
 ```
 
-So giving the first element a name just adds metadata that R ignores.
+So, giving the first element a name just adds metadata that R ignores.
 
 __[Q6]{.Q}__: Construct the expression `if(x > 1) "a" else "b"` using multiple calls to `call2()`. How does the code structure reflect the structure of the AST?
 
@@ -230,9 +230,9 @@ f((1))
 
 Compare and contrast the two uses by referencing the AST.
 
-__[A]{.solved}__: The trick with these examples lies in the fact, that `(` can be a part of R's general prefix function syntax, but can also represent a call to the `(` function.
+__[A]{.solved}__: The trick with these examples lies in the fact, that `(` can be a part of R's general prefix function syntax but can also represent a call to the `(` function.
 
-So in the AST of the first example, we will not see the outer `(`, since it is prefix function syntax and belongs to `f()`. In contrast, the inner `(` is a function (represented as a symbol in the AST):
+So, in the AST of the first example, we will not see the outer `(` since it is prefix function syntax and belongs to `f()`. In contrast, the inner `(` is a function (represented as a symbol in the AST):
 
 ```{r}
 ast(f((1)))
@@ -258,12 +258,13 @@ __[A]{.solved}__: `=` is used both for assignment, and for naming arguments in f
 b = c(c = 1)
 ```
 
-So when we play with `ast()`, we can directly see that the following is not possible
+So, when we play with `ast()`, we can directly see that the following is not possible
 
 ```{r, error = TRUE}
 ast(b = c(c = 1))
 ```
-We get an error, because `b = ` makes R looking for an argument called `b`. Since `x` is the only argument of `ast()`, we get an error.
+
+We get an error because `b = ` makes R looking for an argument called `b`. Since `x` is the only argument of `ast()`, we get an error.
 
 The easiest way around this problem is to wrap this line in `{}`.
 
@@ -304,7 +305,7 @@ Next `1 + FALSE` is evaluated to `1`, since `FALSE` is coerced to `0`.
 
 Finally `!1` is evaluated to `FALSE`.
 
-Note that if `!` had a higher precedence, the intermediate result would be `FALSE + FALSE`, which would evalutate to `0`.
+Note that if `!` had a higher precedence, the intermediate result would be `FALSE + FALSE`, which would evaluate to `0`.
 
 __[Q5]{.Q}__: Why does `x1 <- x2 <- x3 <- 0` work? Describe the two reasons.
 
@@ -372,7 +373,7 @@ deparse(expr)
 
 What does `expr_text()` do instead?
 
-__[A]{.solved}__: `expr_text()` will paste the results from `deparse(expr)` together and use a linebreak `\n` as separator.
+__[A]{.solved}__: `expr_text()` will paste the results from `deparse(expr)` together and use a linebreak (`\n`) as separator.
 
 ```{r, eval=FALSE}
 expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + 
@@ -387,7 +388,7 @@ expr_text(expr)
 
 __[Q10]{.Q}__: `pairwise.t.test()` assumes that `deparse()` always returns a length one character vector. Can you construct an input that violates this expectation? What happens?
 
-__[A]{.solved}__: The function `pairwise.t.test()` captures its data arguments (`x` and `g`) so it can print the input expressions along the computed p-values. Prior to R 4.0.0 this used to be implemented via `deparse(subsitute(x))` in combination with `paste()`. This could lead to unexpected output, if one of the inputs exceeded the default `width.cutoff` value `deparse()` of 60 characters, because the expression will be split into a character vector of length greater 1.
+__[A]{.solved}__: The function `pairwise.t.test()` captures its data arguments (`x` and `g`) so it can print the input expressions along the computed p-values. Prior to R 4.0.0 this used to be implemented via `deparse(subsitute(x))` in combination with `paste()`. This could lead to unexpected output, if one of the inputs exceeded the default `width.cutoff` value of 60 characters within `deparse()`. In this case, the expression would be split into a character vector of length greater 1.
 
 ```{r, eval=FALSE}
 # Output prior to R 4.0.0
@@ -471,7 +472,7 @@ logical_abbr <- function(x) {
 }
 ```
 
-Now lets test our new `logical_abbr()` function:
+Now let's test our new `logical_abbr()` function:
 
 ```{r}
 logical_abbr(T(1, 2, 3))
@@ -501,7 +502,7 @@ __[A]{.solved}__: Let`s see what the AST of such an assignment looks like:
 ast(names(x) <- x)
 ```
 
-So we need to catch the case where the first two elements are both calls. Further the first call is identical to `<-` and we must return only the second call to see which objects got new values assigned.
+So, we need to catch the case where the first two elements are both calls. Further the first call is identical to `<-` and we must return only the second call to see which objects got new values assigned.
 
 This is why we add the following block within another `else` statement in `find_assign_call()`:
 

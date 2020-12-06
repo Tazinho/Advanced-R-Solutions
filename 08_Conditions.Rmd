@@ -223,13 +223,13 @@ check_installed("ggplot3")
 
 __[Q2]{.Q}__: Inside a package you often need to stop with an error when something is not right. Other packages that depend on your package might be tempted to check these errors in their unit tests. How could you help these packages to avoid relying on the error message which is part of the user interface rather than the API and might change without notice?
 
-__[A]{.solved}__: Instead returning an error it might be preferable to throw a customized condition and place a standardized error message inside the metadata. Then the downstream package could check for the class of the condition, rather than inspecting the message.
+__[A]{.solved}__: Instead of returning an error it might be preferable to throw a customized condition and place a standardized error message inside the metadata. Then the downstream package could check for the class of the condition, rather than inspecting the message.
 
 ## Applications
 
 __[Q1]{.Q}__: Create `suppressConditions()` that works like `suppressMessages()` and `supressWarnings()` but suppresses everything. Think carefully about how you should handle errors.
 
-__[A]{.solved}__: In general we would like to catch errors, since they contain important information for debugging. In order to suppress the error message and hide the returned error object from the console, we handle errors within a `tryCatch()` and return the error object invisibly:
+__[A]{.solved}__: In general we, would like to catch errors, since they contain important information for debugging. In order to suppress the error message and hide the returned error object from the console, we handle errors within a `tryCatch()` and return the error object invisibly:
 
 ```{r}
 suppressErrors <- function(expr) {
@@ -250,7 +250,7 @@ suppressConditions <- function(expr) {
 }
 ```
 
-To test the new function we apply it to a set of conditions and inspect the returned error object.
+To test the new function, we apply it to a set of conditions and inspect the returned error object.
 
 ```{r}
 error_obj <- suppressConditions({
@@ -388,7 +388,7 @@ bottles_of_beer <- function(i = 99) {
 }
 ```
 
-__[A]{.solved}__: When running the `bottles_of_beer()` function in your console, the output should look somehow similar to the following:
+__[A]{.solved}__: When running the `bottles_of_beer()` function in your console, the output should look somehow like the following:
 
 ```{r, eval = FALSE}
 bottles_of_beer()

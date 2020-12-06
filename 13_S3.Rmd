@@ -25,7 +25,7 @@ __[A]{.solved}__: Because of S3's `generic.class()` naming scheme, both function
 - `t.test()` is a *generic* function that performs a t-test. 
 - `t.data.frame()` is a *method* that gets called by the generic `t()` to transpose data frame input.
 
-Due to R's S3 dispatch rules, `t.test()` would also get called when `t()` is a applied to an object of class "test".
+Due to R's S3 dispatch rules, `t.test()` would also get called when `t()` is applied to an object of class `test`.
 
 __[Q2]{.Q}__: Make a list of commonly used base R functions that contain `.` in their name but are not S3 methods.
 
@@ -93,7 +93,7 @@ x <- table(rpois(100, 5))
 x
 ```
 
-__[A]{.solved}__: This code returns a `table` object, which is build upon the `integer` type. The attribute `dimnames` is used to name the elements of the integer vector.
+__[A]{.solved}__: This code returns a `table` object, which is built upon the `integer` type. The attribute `dimnames` is used to name the elements of the integer vector.
 
 ```{r}
 typeof(x)
@@ -196,7 +196,7 @@ __[Q4]{.Q}__: Factors have an optional “contrasts” attribute. Read the help 
 
 __[A]{.solved}__: When factor variables (representing nominal or ordinal information) are used in statistical models, they are typically encoded as dummy variables and by default each level is compared with the first factor level. However, many different encodings ("contrasts") are possible, see <https://en.wikipedia.org/wiki/Contrast_(statistics)>.
 
-Within R's formula interface you can wrap a factor in `stats::C()` and specify the contrast of your choice. Alternatively you can set the `contrasts` attribute of your factor variable, which accepts matrix input. (See `?contr.helmert` or similar for details).
+Within R's formula interface you can wrap a factor in `stats::C()` and specify the contrast of your choice. Alternatively, you can set the `contrasts` attribute of your factor variable, which accepts matrix input. (See `?contr.helmert` or similar for details).
 
 The `new_factor()` constructor was given in Advanced R as:
 
@@ -290,7 +290,7 @@ x <- structure(1:10, class = "test")
 t(x)
 ```
 
-__[A]{.solved}__: We can see that `t.test()` is a generic, because it calls `UseMethod()`
+__[A]{.solved}__: We can see that `t.test()` is a generic because it calls `UseMethod()`
 
 ```{r}
 t.test
@@ -398,7 +398,7 @@ But when we call `g()` we get `c(1, 10)`:
 g(x)
 ```
 
-This is seemingly inconsistent: why does `x` come from the value defined inside of `g()`, and `y` still come from the global environment? It's because `UseMethod()` calls `g.default()` in a special way so that variables defined inside the generic are available to methods. The exception are arguments supplied to the function: they are passed on as is, and cannot be affected by code inside the generic.
+This is seemingly inconsistent: why does `x` come from the value defined inside of `g()`, and `y` still come from the global environment? It's because `UseMethod()` calls `g.default()` in a special way so that variables defined inside the generic are available to methods. The exception are arguments supplied to the function: they are passed on as is and cannot be affected by code inside the generic.
 
 __[Q6]{.Q}__: What are the arguments to `[`? Why is this a hard question to answer?
 
@@ -449,7 +449,7 @@ __[A]{.solved}__: We can categorise the return values into the various object st
 * Data frame object-style: not observed
 * Scalar object-style: `lm()`, `ecdf()`  
 
-The object style of `I()` depends on the input, since this function returns a "copy of the object with class 'AsIs' prepended to the class(es)".
+The object style of `I()` depends on the input since this function returns a "copy of the object with class `AsIs` prepended to the class(es)".
 
 __[Q2]{.Q}__: What would a constructor function for `lm` objects, `new_lm()`, look like? Use `?lm` and experimentation to figure out the required fields and their types.
 
@@ -521,11 +521,11 @@ __[A]{.solved}__: `[.Date` calls `.Date` with the result of calling `[` on the p
 .Date
 ```
 
-So what does `oldClass()` do? It's implemented in C so we can't easily see what it does, and the documentation refers to S-PLUS:
+So, what does `oldClass()` do? It's implemented in C so we can't easily see what it does, and the documentation refers to S-PLUS:
 
 > Functions oldClass and oldClass<- behave in the same way as functions of those names in S-PLUS 5/6, but in R UseMethod dispatches on the class as returned by class (with some interpolated classes: see the link) rather than oldClass. However, group generics dispatch on the oldClass for efficiency, and internal generics only dispatch on objects for which is.object is true.
 
-Instead lets just try it out:
+Instead, let's just try it out:
 
 ```{r}
 oldClass(Sys.Date())
@@ -574,15 +574,15 @@ __[A]{.solved}__: When we execute the code above, this is what is happening:
 
 * we pass an object of classes `b` and `a2` to `generic2()`, which prompts R to look for a method`generic2.b()`
 * the method `generic2.b()` then changes the class to `a1` and calls `NextMethod()`
-* One would think that this will lead R to call `generic2.a1()`, but in fact, as mentioned in the textbook, `NextMethod()` 
+* One would think that this will lead R to call `generic2.a1()`, but in fact, as mentioned in Advanced R, `NextMethod()` 
 
-> doesn’t actually work with the class attribute of the object, but instead uses a special global variable (.Class) to keep track of which method to call next.
-
-This is why `generic2.a2()` is called instead.
-
-```{r}
-generic2(structure(list(), class = c("b", "a2")))
-```
+    > doesn’t actually work with the class attribute of the object, but instead uses a special global variable (.Class) to keep track of which method to call next.
+    
+   This is why `generic2.a2()` is called instead.
+   
+    ```{r}
+    generic2(structure(list(), class = c("b", "a2")))
+    ```
 
 Let's just double check the statement above and evaluate `.Class` explicitly within the `generic2.b()` method.
 
@@ -663,7 +663,7 @@ exp(mtcars)
 lgamma(mtcars)
 ```
 
-Of course different functions should perform different calculations. Here `.Generic` comes into play, which provides us with the calling generic as a string
+Of course, different functions should perform different calculations. Here `.Generic` comes into play, which provides us with the calling generic as a string
 
 ```{r}
 Math.data.frame <- function(x, ...){

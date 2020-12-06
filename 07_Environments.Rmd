@@ -118,13 +118,13 @@ rebind("a", 10)
 a
 ```
 
-__[A]{.solved}__: The primary differnce between `rebind()` and `<<-` is that `rebind()` will only carry out an assignment when it finds an existing binding; unlike `<<-` it will never create a new one in the global environment. This behaviour of `<<-` is usually undesirable, because global variables introduce non-obvious dependencies between functions.
+__[A]{.solved}__: The primary difference between `rebind()` and `<<-` is that `rebind()` will only carry out an assignment when it finds an existing binding; unlike `<<-` it will never create a new one in the global environment. This behaviour of `<<-` is usually undesirable because global variables introduce non-obvious dependencies between functions.
 
 ## Recursing over environments
 
 __[Q1]{.Q}__: Modify `where()` to return all environments that contain a binding for `name`. Carefully think through what type of object the function will need to return.
 
-__[A]{.solved}__: `where()` searches (recursively) for a given name within a given environment and its ancestors. If `where()` finds the name in one of these environments, it reutrns the environment's name. Otherwise, it throws an error.
+__[A]{.solved}__: `where()` searches (recursively) for a given name within a given environment and its ancestors. If `where()` finds the name in one of these environments, it returns the environment's name. Otherwise, it throws an error.
 
 The definition of `where()` was given in Advanced R as.
 
@@ -200,7 +200,7 @@ fget("mean", inherits = TRUE)
 
 ## Special environments
 
-__[Q1]{.Q}__: How is `search_envs()` different fo `env_parents(global_env())`?
+__[Q1]{.Q}__: How is `search_envs()` different to `env_parents(global_env())`?
 
 __[A]{.solved}__: `search_envs()` returns all the environments on the search path, which is "a chain of environments containing exported functions of attached packages" (from `?search_envs`). Every time you attach a new package, this search path will grow. The search path ends with the base-environment. The global environment is included, because functions present in the global environment will always be part of the search path.
 
@@ -277,7 +277,7 @@ fstr <- function(fun_name, env = caller_env()) {
 fstr("mean")
 ```
 
-Once you have learned about tidyeval, you could rewrite `fstr()` to use `enquo()` so that you'd call it more like `str()`, i.e. `fstr(sum)`.
+Once you have learned about tidy evaluation, you could rewrite `fstr()` to use `enquo()` so that you'd call it more like `str()`, i.e. `fstr(sum)`.
 
 ## The call stack
 

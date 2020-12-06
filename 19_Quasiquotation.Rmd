@@ -180,7 +180,7 @@ is_missing(on_missing())
 
 __[Q4]{.Q}__: How are `exprs(a)` and `exprs(a = )` different? Think about both the input and the output.
 
-__[A]{.solved}__: In `exprs(a)` the input `a` is interpreted as a symbol for an unnamed argument. Consequently the output shows an unnamed list with the first element containing the symbol `a`.
+__[A]{.solved}__: In `exprs(a)` the input `a` is interpreted as a symbol for an unnamed argument. Consequently, the output shows an unnamed list with the first element containing the symbol `a`.
 
 ```{r}
 out1 <- exprs(a)
@@ -327,7 +327,7 @@ interaction(list(a = c("a", "b", "c", "d"), b = c("e", "f")))  # list
 
 `expand.grid()` uses the same strategy and also assigns `args <- args[[1]]` in case of `length(args) == 1 && is.list(args[[1]])`.
 
-`par()` does the most preprocessing to ensure a valid structure of the `args` argument. When no dots are provided (`!length(args)`) it will create a list of arguments from an internal character vector (partly depending on it's `no.readonly` argument). Further, given that all elements of `args` are character vectors (`all(unlist(lapply(args, is.character)))`), `args` is turned into a list via `as.list(unlist(args))`, which will flatten nested lists. Similar to the other functions, a level of the list will be stripped via `args <- args[[1L]]`, when `args` is of length one with its first element being a list.
+`par()` does the most pre-processing to ensure a valid structure of the `args` argument. When no dots are provided (`!length(args)`) it will create a list of arguments from an internal character vector (partly depending on it's `no.readonly` argument). Further, given that all elements of `args` are character vectors (`all(unlist(lapply(args, is.character)))`), `args` is turned into a list via `as.list(unlist(args))`, which will flatten nested lists. Similar to the other functions, a level of the list will be stripped via `args <- args[[1L]]`, when `args` is of length one with its first element being a list.
 
 __[Q3]{.Q}__: Explain the problem with this definition of `set_attr()`
 
@@ -359,7 +359,7 @@ set_attr(1:10, x = 10)
 
 __[Q1]{.Q}__: In the linear-model example, we could replace the `expr()` in `reduce(summands, ~ expr(!!.x + !!.y))` with `call2()`: `reduce(summands, call2, "+")`. Compare and contrast the two approaches. Which do you think is easier to read?
 
-__[A]{.solved}__: We would consider the first version to be more readable. There seems to be a little more boilerplate code at first, but the unquoting syntax is very readable. Overall the whole expression seems more explicit and less complex.
+__[A]{.solved}__: We would consider the first version to be more readable. There seems to be a little more boilerplate code at first, but the unquoting syntax is very readable. Overall, the whole expression seems more explicit and less complex.
 
 __[Q2]{.Q}__: Re-implement the Box-Cox transform defined below using unquoting and `new_function()`:
 

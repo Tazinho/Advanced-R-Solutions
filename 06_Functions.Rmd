@@ -22,7 +22,7 @@ f3 <- f1
 
 While the function in the first line is not bound to a name multiple names (`f1`, `f2` and `f3`) point to the second function. So, the main point is that the relation between name and object is only clearly defined in one direction.
 
-Besides that there are obviously ways to search for function names. However, to be sure to find the right one(s), you should not only compare the code (body) but also the arguments (formals) and the creation environment. As `formals()`, `body()` and `environment()` all return `NULL` for primitive functions, the easiest way to check if two functions are exactly equal is just to use `identical()`.
+Besides that, there are obviously ways to search for function names. However, to be sure to find the right one(s), you should not only compare the code (body) but also the arguments (formals) and the creation environment. As `formals()`, `body()` and `environment()` all return `NULL` for primitive functions, the easiest way to check if two functions are exactly equal is just to use `identical()`.
 
 __[Q2]{.Q}__: It’s possible (although typically not useful) to call an anonymous function. Which of the two approaches below is correct? Why?
 
@@ -44,11 +44,11 @@ f()
 
 __[Q3]{.Q}__: A good rule of thumb is that an anonymous function should fit on one line and shouldn't need to use `{}`. Review your code. Where could you have used an anonymous function instead of a named function? Where should you have used a named function instead of an anonymous function?
 
-__[A]{.solved}__: The use of anonymous functions allows concise and elegant code in certain situations. However, they miss a descriptive name and when re-reading the code it can take a while to figure out what they do (even if it's future you reading). That's why it's helpful to give long and complex functions a descriptive name. It may be worthwhile to take a look at your own projects or other peoples code to reflect on this part of your coding style.
+__[A]{.solved}__: The use of anonymous functions allows concise and elegant code in certain situations. However, they miss a descriptive name and when re-reading the code, it can take a while to figure out what they do (even if it's future you reading). That's why it's helpful to give long and complex functions a descriptive name. It may be worthwhile to take a look at your own projects or other people's code to reflect on this part of your coding style.
 
 __[Q4]{.Q}__: What function allows you to tell if an object is a function? What function allows you to tell if a function is a primitive function?
 
-__[A]{.solved}__: Use `is.function()` to test, if an object is a function. Consider using `is.primitive()` to test specifically for primitive functions.
+__[A]{.solved}__: Use `is.function()` to test if an object is a function. Consider using `is.primitive()` to test specifically for primitive functions.
 
 __[Q5]{.Q}__: This code makes a list of all functions in the base package.
 
@@ -115,7 +115,7 @@ __[Q6]{.Q}__: What are the three important components of a function?
 
 __[A]{.solved}__: These components are the function's `body()`, `formals()` and `environment()`. However, as mentioned in the textbook:
 
-> There is one exception to the rule that functions have three components. Primitive functions, like `sum()`, call C code directly with `.Primitive()` and contain no R code. Therefore their `formals()`, `body()`, and `environment()` are all `NULL`.
+> There is one exception to the rule that functions have three components. Primitive functions, like `sum()`, call C code directly with `.Primitive()` and contain no R code. Therefore, their `formals()`, `body()`, and `environment()` are all `NULL`.
 
 __[Q7]{.Q}__: When does printing a function not show what environment it was created in?
 
@@ -184,7 +184,7 @@ x_ok(1)
 x_ok(1:3)
 ```
 
-__[A]{.solved}__: We expect `x_ok()` to validate its input via certain criteria: it must not be `NULL`, but have length `1` and a value greater than `0`. Meaningful outcomes for this assertion will be `TRUE`, `FALSE` or `NA`. The desired behaviour is reached by combining the assertions through `&&` instead of `&`.
+__[A]{.solved}__: We expect `x_ok()` to validate its input via certain criteria: it must not be `NULL` but have length `1` and a value greater than `0`. Meaningful outcomes for this assertion will be `TRUE`, `FALSE` or `NA`. The desired behaviour is reached by combining the assertions through `&&` instead of `&`.
 
 `&&` does not perform elementwise comparisons, instead it uses the first element of each value only. It also uses lazy evaluation, in the sense that evaluation "proceeds only until the result is determined" (from `?Logic`). This means that the RHS of `&&` won't be evaluated if the LHS already determines the outcome of the comparison (e.g. evaluate to `FALSE`). This behaviour is also known as 'shortcircuiting'. 
 For some situations (`x = 1`) both operators will lead to the same result. But this is not always the case. For `x = NULL`, the `&&`-operator will stop after the `!is.null`-statement and return the result. The following conditions won't even be evaluated! (If the other conditions are also evaluated (by the use of `&`), the outcome would change. `NULL > 0` returns `logical(0)`, which is not helpful in this case.)
@@ -224,7 +224,7 @@ range("Sturges")
 
 Explain how `hist()` works to get a correct `xlim` value.
 
-__[A]{.solved}__: The `xlim` argument of `hist()` defines the range of the histogram's x-axis. In order to provide a valid axis `xlim` must contain a numeric vector of exactly two unique values. Consequently for the default `xlim = range(breaks)`), `breaks` must evaluate to a vector with at least two unique values.
+__[A]{.solved}__: The `xlim` argument of `hist()` defines the range of the histogram's x-axis. In order to provide a valid axis `xlim` must contain a numeric vector of exactly two unique values. Consequently, for the default `xlim = range(breaks)`), `breaks` must evaluate to a vector with at least two unique values.
 
 During execution `hist()` overwrites the `breaks` argument. The `breaks` argument is quite flexible and allows the users to provide the breakpoints directly or compute them in several ways. Therefore, the specific behaviour depends highly on the input. But `hist` ensures that `breaks` evaluates to a numeric vector containing at least two unique elements before `xlim` is computed.
 
@@ -240,7 +240,7 @@ show_time()
 
 __[A]{.solved}__: Before `show_time()` accesses `x` (default `stop("Error")`), the `stop()` function is masked by `function(...) Sys.time()`. As default arguments are evaluated in the function environment, `print(x)` will be evaluated as `print(Sys.time())`.
 
-This function is confusing, because its behaviour changes when `x`'s value is supplied directly. Now the value from the calling environment will be used and the overwriting of `stop()` won't affect `x` any more.
+This function is confusing because its behaviour changes when `x`'s value is supplied directly. Now the value from the calling environment will be used and the overwriting of `stop()` won't affect `x` anymore.
 
 ```{r, error = TRUE}
 show_time(x = stop("Error!"))
@@ -300,11 +300,11 @@ __[A]{.solved}__: First we type `?plot` in the console and check the "Usage" sec
 plot(x, y, ...)
 ```
 
-The arguments we want to learn more about (`col`, `pch`, `xlab`, `col.lab`) are part of the `...` argument. There we can find information for the `xlab` argument and a recommendation to visit `?par` for the other arguments. Under `?par` we type "col" into the search bar, which leads us the section "Color Specification". We also search for the `pch` argument, which leads to the recommendation to check `?points`. Finally, `col.lab` is also directly documented within `?par`.
+The arguments we want to learn more about (`col`, `pch`, `xlab`, `col.lab`) are part of the `...` argument. There we can find information for the `xlab` argument and a recommendation to visit `?par` for the other arguments. Under `?par` we type "col" into the search bar, which leads us to the section "Color Specification". We also search for the `pch` argument, which leads to the recommendation to check `?points`. Finally, `col.lab` is also directly documented within `?par`.
 
 __[Q3]{.Q}__: Why does `plot(1:10, col = "red")` only colour the points, not the axes or labels? Read the source code of `plot.default()` to find out.
 
-__[A]{.solved}__: To learn about the internals of `plot.default()` we add `browser()` to the first line of the code and interactively run `plot(1:10, col = "red")`. This way we can see how the plot is build and learn where the axis are added.
+__[A]{.solved}__: To learn about the internals of `plot.default()` we add `browser()` to the first line of the code and interactively run `plot(1:10, col = "red")`. This way we can see how the plot is build and learn where the axes are added.
 
 This leads us to the function call
 
@@ -412,7 +412,7 @@ y <- runif(min = 0, max = 1, 20)
 cor(m = "k", y = y, u = "p", x = x)
 ```
 
-__[A]{.solved}__: None of these functions provides a `...` argument. Therefore the function arguments are first matched exactly, then via partial matching and finally by position. This leads us to the following explicit function calls:
+__[A]{.solved}__: None of these functions provides a `...` argument. Therefore, the function arguments are first matched exactly, then via partial matching and finally by position. This leads us to the following explicit function calls:
 
 ```{r, eval = FALSE}
 x <- sample(c(1:10, NA), size = 20, replace = TRUE)
@@ -446,7 +446,7 @@ get("x") <- `modify<-`(get("x"), 1, 10)
 #>   target of assignment expands to non-language object
 ```
 
-The error occurs during the assignment, because no corresponding replacement function, i.e. `get<-`, exists for `get()`. To confirm this we reproduce the error via the following simplified example.
+The error occurs during the assignment because no corresponding replacement function, i.e. `get<-`, exists for `get()`. To confirm this, we reproduce the error via the following simplified example.
 
 ```{r, eval = FALSE}
 get("x") <- 2
@@ -542,7 +542,7 @@ TRUE %xor% TRUE
 FALSE %xor% TRUE
 ```
 
-__[Q9]{.Q}__: Create infix versions of the set functions `intersect()`, `union()`, and`setdiff()`. You might call them `%n%`, `%u%`, and `%/%` to match conventions from mathematics.
+__[Q9]{.Q}__: Create infix versions of the set functions `intersect()`, `union()`, and `setdiff()`. You might call them `%n%`, `%u%`, and `%/%` to match conventions from mathematics.
 
 __[A]{.solved}__: These infix operators could be defined in the following way. (`%/%` is chosen instead of `%\%`, because `\` serves as an escape character.)
 

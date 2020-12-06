@@ -49,7 +49,7 @@ __[A]{.solved}__: Let's look at a quote from the [first edition of Advanced R](h
 
 > "`expr()` and `eval()` are opposites. [...] each `eval()` peels off one layer of `expr()`'s".
 
-In general `eval(expr(x))` evaluates to  `x`. Therefore, (1) evaluates to $2 + 2 = 4$. Adding another `eval()` doesn't have impact here. So, also (2) evaluates to `4`. However, when wrapping (1) into `expr()` the whole expression will be quoted. 
+In general, `eval(expr(x))` evaluates to  `x`. Therefore, (1) evaluates to $2 + 2 = 4$. Adding another `eval()` doesn't have impact here. So, also (2) evaluates to `4`. However, when wrapping (1) into `expr()` the whole expression will be quoted. 
 
 ```{r}
 eval(expr(eval(expr(eval(expr(2 + 2))))))        # (1)
@@ -65,7 +65,7 @@ get2 <- function(name, env) {}
 assign2 <- function(name, value, env) {}
 ```
 
-__[A]{.solved}__: We reimplement these two functions using tidy evaluation. We turn the string `name` into a symbol, then evalute it:
+__[A]{.solved}__: We reimplement these two functions using tidy evaluation. We turn the string `name` into a symbol, then evaluate it:
 
 ```{r}
 get2 <- function(name, env = caller_env()) {
@@ -288,7 +288,7 @@ With `subset3()` both of these steps occur in a single line (which is probably c
 eval_tidy(expr(df[x == 1, , drop = FALSE]), df)
 ```
 
-This is shorter (but probably also less readable), because the evaluation and the subsetting take place in the same expression. However, it may introduce unwanted errors, if the data mask contains an element named "data", as the objects from the data mask take precedence over arguments of the function.
+This is shorter (but probably also less readable) because the evaluation and the subsetting take place in the same expression. However, it may introduce unwanted errors, if the data mask contains an element named "data", as the objects from the data mask take precedence over arguments of the function.
 
 ```{r, error=TRUE}
 df <- data.frame(x = 1:3, data = 1)
@@ -333,9 +333,9 @@ arrange2 <- function(.df, ..., .na.last = TRUE) {
 }
 ```
 
-By using `!!.na.last` the `.na.last` argument is unquoted, when the `order()` call is built. This way, the `na.last` argument is already correctly specified (typically `TRUE`, `FALSE` or `NA`).
+By using `!!.na.last` the `.na.last` argument is unquoted when the `order()` call is built. This way, the `na.last` argument is already correctly specified (typically `TRUE`, `FALSE` or `NA`).
 
-Without the unquoting, the expression would read `na.last = .na.last` and the value for `.na.last` would still need to be looked up and found. Because these computations take place inside of the functions execution environment (which contains `.na.last`), this is unlikely to cause problems.
+Without the unquoting, the expression would read `na.last = .na.last` and the value for `.na.last` would still need to be looked up and found. Because these computations take place inside of the function's execution environment (which contains `.na.last`), this is unlikely to cause problems.
 
 ```{r}
 # The effect of unquoting .na.last
@@ -356,7 +356,7 @@ threshold_var2 <- function(df, var, val) {
 }
 ```
 
-__[A]{.solved}__: Lets compare this approach to the original implementation:
+__[A]{.solved}__: Let's compare this approach to the original implementation:
 
 ```{r}
 threshold_var <- function(df, var, val) {
@@ -365,7 +365,7 @@ threshold_var <- function(df, var, val) {
 }
 ```
 
-We can see, that `threshold_var2()` no longer coerces the symbol to a string. Therefore `$` instead of `[[` can be used for subsetting. Initially we suspected partial matching would be introduced by `$`, but `.data` deliberately avoids this problem.
+We can see that `threshold_var2()` no longer coerces the symbol to a string. Therefore `$` instead of `[[` can be used for subsetting. Initially we suspected partial matching would be introduced by `$`, but `.data` deliberately avoids this problem.
 
 The prefix call to `$()` is less common than infix-subsetting using `[[`, but ultimately both functions behave the same.
 
@@ -389,7 +389,7 @@ lm3a <- function(formula, data) {
 lm3a(mpg ~ disp, mtcars)$call
 ```
 
-__[A]{.solved}__: In this function, `lm_call` is evaluated in the caller environment, which happens to be the global environment. In this environment, the name `data` is bound to `utils::data`. To fix the error, we can either set the evaluation environment to the functions execution environment or unquote the `data` argument when building the call to `lm()`.
+__[A]{.solved}__: In this function, `lm_call` is evaluated in the caller environment, which happens to be the global environment. In this environment, the name `data` is bound to `utils::data`. To fix the error, we can either set the evaluation environment to the function's execution environment or unquote the `data` argument when building the call to `lm()`.
 
 ```{r, error = TRUE}
 # Change evaluation environment
@@ -404,7 +404,7 @@ lm3b(mpg ~ disp, mtcars)$call
 lm3b(mpg ~ disp, data)$call  #reproduces original error
 ```
 
-When we want to unquote an argument within a function, we first need to capture the user-input (by `enenxpr()`).
+When we want to unquote an argument within a function, we first need to capture the user-input (by `enexpr()`).
 
 ```{r, error = TRUE}
 # Unquoting data-argument
@@ -455,7 +455,7 @@ __[A]{.solved}__: Different versions of `resample_lm()`  were given in Advanced 
 
 Different versions of `resample_lm()` (`resample_lm0()`, `resample_lm1()`, `resample_lm2()`) were specified in Advanced R. However, in none of these versions the resampling step was implemented in any of the arguments.
 
-This approach takes advantate of R's lazy evaluation of function arguments, by moving the resampling step into the argument definition. The user passes the data to the function, but only a permutation of this data (`resample_data`) will be used.
+This approach takes advantage of R's lazy evaluation of function arguments, by moving the resampling step into the argument definition. The user passes the data to the function, but only a permutation of this data (`resample_data`) will be used.
 
 ```{r}
 resample_lm <- function(
@@ -476,6 +476,6 @@ df <- data.frame(x = 1:10, y = 5 + 3 * (1:10) + round(rnorm(10), 2))
 lm_1$call
 ```
 
-With this approach the evaluation needs to take place within the functions environment, because the resampled dataset (defined as a default argument) will only be available in the function environment.
+With this approach the evaluation needs to take place within the function's environment, because the resampled dataset (defined as a default argument) will only be available in the function environment.
 
-Overall, putting an essential part of the preprocessing outside of the functions body is not common practice in R. Compared to the unquoting-implementation (`resample_lm1()` in Advanced R), this approach captures the model-call in a more meaningful way. This approach will also lead to a new resample every time you `update()` the model.
+Overall, putting an essential part of the pre-processing outside of the functions body is not common practice in R. Compared to the unquoting-implementation (`resample_lm1()` in Advanced R), this approach captures the model-call in a more meaningful way. This approach will also lead to a new resample every time you `update()` the model.

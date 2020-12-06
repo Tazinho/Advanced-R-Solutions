@@ -8,7 +8,7 @@ source("common.R")
 
 __[Q1]{.Q}__: How do you create scalars of type raw and complex? (See `?raw` and `?complex`)
 
-__[A]{.solved}__: In R scalars are represented as vectors of length one. However, there's no built in syntax like there is for logicals, integers, doubles, and character vectors to create individual raw and complex values. Instead you have to create them by calling a function.
+__[A]{.solved}__: In R scalars are represented as vectors of length one. However, there's no built-in syntax like there is for logicals, integers, doubles, and character vectors to create individual raw and complex values. Instead you have to create them by calling a function.
 
 For raw vectors you can use either `as.raw()` or `rawToChar()` to create them from numeric or character values.
 
@@ -23,7 +23,7 @@ In the case of complex numbers real and imaginary parts may be provided directly
 complex(length.out = 1, real = 1, imaginary = 1)
 ```
 
-You can create purely imaginary numbers (e.g.) `1i`, but there's no way to create complex numbers without `+` (e.g. `1i + 1`).
+You can create purely imaginary numbers (e.g.) `1i`, but there is no way to create complex numbers without `+` (e.g. `1i + 1`).
 
 __[Q2]{.Q}__: Test your knowledge of vector coercion rules by predicting the output of the following uses of `c()`:
 
@@ -39,7 +39,7 @@ __[A]{.solved}__: These comparisons are carried out by operator-functions (`==`,
 
 __[Q4]{.Q}__: Why is the default missing value, `NA`, a logical vector? What's special about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)
 
-__[A]{.solved}__: The presence of missing values shouldn't affect the type of an object. Recall that there is a type-hierarchy for coercion from character → double → integer → logical. When combining `NA`s  with other atomic types, the `NA`s will be coerced to integer (`NA_integer_`), double (`NA_real_`) or character (`NA_character_`) and not the other way round.  If `NA` was a character and added to a set of other values all of these would be coerced to character as well.
+__[A]{.solved}__: The presence of missing values shouldn't affect the type of an object. Recall that there is a type-hierarchy for coercion from character → double → integer → logical. When combining `NA`s  with other atomic types, the `NA`s will be coerced to integer (`NA_integer_`), double (`NA_real_`) or character (`NA_character_`) and not the other way round.  If `NA` were a character and added to a set of other values all of these would be coerced to character as well.
 
 __[Q5]{.Q}__: Precisely what do `is.atomic()`, `is.numeric()`, and `is.vector()` test for?
 

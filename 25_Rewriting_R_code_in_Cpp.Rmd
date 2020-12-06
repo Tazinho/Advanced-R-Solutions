@@ -255,7 +255,7 @@ minC(c(2:4, NA), na_rm = TRUE)
 minC(c(NA, NA), na_rm = TRUE)
 ```
 
-We also extend `anyC` so it can deal with missing values. Please note that this (again) introduces some code duplication. This could be avoided by moving the check for missing values to the inner loop at the expense of a slight decrease of performance. Here we use `LogicalVetor` as return type. If we would use `bool` instead, the C++ `NA_LOGICAL` would be converted into R's logical `TRUE`.
+We also extend `anyC()` so it can deal with missing values. Please note that this (again) introduces some code duplication. This could be avoided by moving the check for missing values to the inner loop at the expense of a slight decrease of performance. Here we use `LogicalVetor` as return type. If we would use `bool` instead, the C++ `NA_LOGICAL` would be converted into R's logical `TRUE`.
 
 ```{Rcpp}
 #include <Rcpp.h>
@@ -438,7 +438,7 @@ LogicalVector inC(CharacterVector x, CharacterVector table) {
 
 __[Q3]{.Q}__: `unique()` using an `unordered_set` (challenge: do it in one line!).
 
-__[A]{.solved}__: The `insert()`-method will return if an equivalent element already existed. If a new element is inserted, we will add it to the (unique) return vector of our function.
+__[A]{.solved}__: The `insert()`-method will return if an equivalent element already exists. If a new element is inserted, we will add it to the (unique) return vector of our function.
 
 ```{Rcpp, eval=FALSE}
 #include <Rcpp.h>
@@ -489,7 +489,7 @@ double minC(NumericVector x){
 
 __[Q5]{.Q}__: `which.min()` using `min_element`, or `which.max()` using `max_element`.
 
-__[A]{.solved}__: To implement `which.min()`, we will first locate the `min_element()` and then compute the `distance()` to it (from the beginning of the vector).
+__[A]{.solved}__: To implement `which.min()`, we will first locate the `min_element` and then compute the `distance()` to it (starting from the beginning of the vector).
 
 ```{Rcpp}
 #include <Rcpp.h>
@@ -511,9 +511,9 @@ __[Q6]{.Q}__: `setdiff()`, `union()`, and `intersect()` for integers using sorte
 
 __[A]{.solved}__: The structure of the three functions will be very similar.
 
-We first sort both input vectors. Then we apply the respective `set_union`, `set_intersection` or `set_difference` function. After that, the result will be between the iterators `tmp.begin()` and `out_end`. To retrieve the result we loop once through the range between `tmp.begin()` and `out_end` in the last part of each function.
+We first sort both input vectors. Then we apply the respective `set_union`, `set_intersection` or `set_difference` function. After that, the result will be between the iterators `tmp.begin()` and `out_end`. To retrieve the result, we loop once through the range between `tmp.begin()` and `out_end` in the last part of each function.
 
-One note on the naming of the functions: `union` is a special class in cpp so we may not use it for our function definition and rather use `setunion`.
+One note on the naming of the functions: `union` is a special class in C++ so we may not use it for our function definition and rather use `setunion`.
 
 ```{Rcpp}
 #include <Rcpp.h>

@@ -28,7 +28,7 @@ But
 
 Adapt the `escape()` to follow these rules when a new argument `script` is set to `TRUE`.
 
-__[A]{.solved}__: We are asked to implement a special case of escaping for the `<script>` tag. At first we will revisit the relevant functions provided in Advanced R and confirm that our code reliably escapes for tags like `<p>` and `<b>`, but doesn't escape correctly for the `<script>` tag. Then we modify the `escape()` and `tag()` functions to redefine the `<script>` tag and confirm that all defined tags now escape correctly.
+__[A]{.solved}__: We are asked to implement a special case of escaping for the `<script>` tag. At first we will revisit the relevant functions provided in Advanced R and confirm that our code reliably escapes for tags like `<p>` and `<b>` but doesn't escape correctly for the `<script>` tag. Then we modify the `escape()` and `tag()` functions to redefine the `<script>` tag and confirm that all defined tags now escape correctly.
 
 Note that the `<style>` tag, which contains styling information in CSS, follows the same escaping rules as the `<script>` tag. We therefore implement the desired escaping for the `<style>` tag function also.
 
@@ -185,7 +185,7 @@ tag <- function(tag, script = FALSE) {
 }
 ```
 
-Finally we create new `<p>`, `<b>` and `<script>` tag functions, which now pass their escaping tests.
+Finally, we create new `<p>`, `<b>` and `<script>` tag functions, which now pass their escaping tests.
 
 ```{r}
 p <- tag("p")
@@ -430,7 +430,7 @@ What kind of formatting would we prefer instead? The [Google HTML style guide](h
 </body>
 ```
 
-First we adjust the `print.advr_html` method, removing `strwrap()` function, because this will re-wrap the HTML, making it harder to understand what's happening.
+First we adjust the `print.advr_html()` method, removing `strwrap()` function, because this will re-wrap the HTML, making it harder to understand what's happening.
 
 ```{r}
 html <- function(x) structure(x, class = "advr_html")
@@ -440,7 +440,7 @@ print.advr_html <- function(x, ...) {
 }
 ```
 
-In our desired output we can see that the content of the `body`-function requires different formatting than the other tag-functions. We will therefore create a new `format_code()` function, that allows for optional indentation and linebreaks. 
+In our desired output we can see that the content of the `body`-function requires different formatting than the other tag-functions. We will therefore create a new `format_code()` function, that allows for optional indentation and line breaks. 
 
 ```{r}
 indent <- function(x) {
@@ -487,7 +487,7 @@ with_html(
 
 ## LaTeX
 
-__[Q1]{.Q}__: Add escaping. The special symbols that should be escaped by adding a backslash in front of them are `\`, `$`, and `%`. Just as with HTML, you'll need to make sure you don't end up double-escaping. So you'll need to create a small S3 class and then use that in function operators. That will also allow you to embed arbitrary LaTeX if needed.
+__[Q1]{.Q}__: Add escaping. The special symbols that should be escaped by adding a backslash in front of them are `\`, `$`, and `%`. Just as with HTML, you'll need to make sure you don't end up double-escaping. So, you'll need to create a small S3 class and then use that in function operators. That will also allow you to embed arbitrary LaTeX if needed.
 
 __[A]{.solved}__: Currently our `to_math()` function generates the following output:
 
@@ -779,7 +779,7 @@ to_math(`%`)
 
 __[Q2]{.Q}__: Complete the DSL to support all the functions that `plotmath` supports.
 
-__[A]{.started}__: Through `?plotmath` we can lookup all supported functions by `plotmath`. Let's use it to see what `to_math()` is supposed to do. Comments with a star (`*`) are used in the following output to mark that the current `to_math()` implementation doesn't support the respective conversion yet. In these cases we added a short comment describing how the LaTeX conversion should look like.
+__[A]{.started}__: Through `?plotmath` we can look up all supported functions by `plotmath`. Let's use it to see what `to_math()` is supposed to do. Comments with a star (`*`) are used in the following output to mark that the current `to_math()` implementation doesn't support the respective conversion yet. In these cases, we added a short comment describing how the LaTeX conversion should look like.
 
 ```{r, eval=FALSE}
 to_math(x+y)             #   x plus y 

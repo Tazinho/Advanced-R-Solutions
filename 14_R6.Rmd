@@ -34,7 +34,7 @@ BankAccount <- R6Class(
   ))
 ```
 
-To test this class we create one instance and leave it with a negative balance.
+To test this class, we create one instance and leave it with a negative balance.
 
 ```{r}
 my_account <- BankAccount$new()
@@ -114,7 +114,7 @@ value <- c("A", 2:10, "J", "Q", "K")
 cards <- paste0(rep(value, 4), suit)
 ```
 
-__[A]{.solved}__: Our new `"ShuffledDeck"` class will use `sample()` and positive integer subsetting to implement the reshuffling and drawing functionality. We also add a check, so you cannot draw more cards then there are left in the deck.
+__[A]{.solved}__: Our new `ShuffledDeck` class will use `sample()` and positive integer subsetting to implement the reshuffling and drawing functionality. We also add a check, so you cannot draw more cards then there are left in the deck.
 
 ```{r}
 ShuffledDeck <- R6Class(
@@ -143,7 +143,7 @@ ShuffledDeck <- R6Class(
   ))
 ```
 
-To test this class we create a deck (initialise an instance), draw all the cards, then reshuffle, checking we get different cards each time.
+To test this class, we create a deck (initialise an instance), draw all the cards, then reshuffle, checking we get different cards each time.
 
 ```{r, error = TRUE}
 my_deck <- ShuffledDeck$new()
@@ -157,7 +157,7 @@ my_deck$reshuffle()$draw(5)
 
 __[Q3]{.Q}__: Why can't you model a bank account or a deck of cards with an S3 class?
 
-__[A]{.solved}__: Because S3 classes obey R's usual semantics of copy-on-modify: every time you deposties from the bank account or drew a card from the deck, you'd get a new copy of the object.
+__[A]{.solved}__: Because S3 classes obey R's usual semantics of copy-on-modify: every time you deposit money onto your bank account or drew a card from the deck, you'd get a new copy of the object.
 
 It is possible to combine S3 classes with an environment (which is how R6 works), but it is ill-advised to create an object that looks like a regular R object but has reference semantics.
 
@@ -302,7 +302,7 @@ my_pw$check("snuffles")
 
 __[Q3]{.Q}__: Extend the `Rando` class with another active binding that allows you to access the previous random value. Ensure that active binding is the only way to access the value.
 
-__[A]{.solved}__: To access the previous random value from an instance, we add a private `$last_random` field to our class, and we modify `$random()` to write to this field, whenever it is called. To access the `last_random` field we provide `$previous()`.
+__[A]{.solved}__: To access the previous random value from an instance, we add a private `$last_random` field to our class, and we modify `$random()` to write to this field, whenever it is called. To access the `$last_random` field we provide `$previous()`.
 
 ```{r}
 Rando <- R6::R6Class(
@@ -328,7 +328,7 @@ Rando <- R6::R6Class(
 )
 ```
 
-Now, we initiate a new `Rando` object and see, if it behaves as expected.
+Now, we initiate a new `Rando` object and see if it behaves as expected.
 
 ```{r}
 x <- Rando$new()
@@ -366,7 +366,7 @@ B <- R6Class(
 B$new()$test()
 ```
 
-We conclude, that subclasses can access private methods from their superclasses, but not private fields.
+We conclude that subclasses can access private methods from their superclasses, but not private fields.
 
 ## Reference semantics
 __[Q1]{.Q}__: Create a class that allows you to write a line to a specified file. You should open a connection to the file in `$initialize()`, append a line using `cat()` in `$append_line()`, and close the connection in `$finalize()`.

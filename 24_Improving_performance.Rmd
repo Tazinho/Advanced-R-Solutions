@@ -140,7 +140,7 @@ bench::mark(
 )[1:3]
 ```
 
-For additional ways to convert characters into date time objects, have a look at the `{chron}`, the `{anytime}` and the `{fasttime}` packages. The `{chron}` package introduces new classes and stores times as fractions of days in the underlying double type, while it doesn't deal with timezones and daylight savings. The `{anytime}` package aims to convert "Anything to POSIXct or Date". The `{fasttime}` package contains only one function (`fastPOSIXct()`).
+For additional ways to convert characters into date time objects, have a look at the `{chron}`, the `{anytime}` and the `{fasttime}` packages. The `{chron}` package introduces new classes and stores times as fractions of days in the underlying double type, while it doesn't deal with time zones and daylight savings. The `{anytime}` package aims to convert "Anything to POSIXct or Date". The `{fasttime}` package contains only one function (`fastPOSIXct()`).
 
 __[Q4]{.Q}__: Which packages provide the ability to compute a rolling mean?
 
@@ -184,7 +184,7 @@ Since this solves a one-dimensional optimization task, we could have also used `
 optimize(function(x) x^2 - 100 * x + 50, c(-1e20, 1e20))
 ```
 
-For more gerneral alternatives, the appropriate choice highly depends on the type of optimization you intend to do. The [Taskview on Optimization](https://cran.r-project.org/web/views/Optimization.html) can serve as a useful reference. Here are a couple of examples:
+For more general alternatives, the appropriate choice highly depends on the type of optimization you intend to do. The [Taskview on Optimization](https://cran.r-project.org/web/views/Optimization.html) can serve as a useful reference. Here are a couple of examples:
   
 - `{optimx}` extends the `optim()` function with the same syntax but more `method` choices.
 - `{RcppNumerical}` wraps several open source libraries for numerical computing (written in C++) and integrates them with R via `{Rcpp}`.
@@ -200,7 +200,7 @@ __[A]{.solved}__: When we inspect the source code of the user-facing `rowSums()`
 rowSums
 ```
 
-`.rowSums()` calls an internal function, which is build into the R interpreter. These compiled functions can be very fast.
+`.rowSums()` calls an internal function, which is built into the R interpreter. These compiled functions can be very fast.
 
 ```{r}
 .rowSums
@@ -256,9 +256,9 @@ bench::mark(
 
 __[Q3]{.Q}__: Can you make a faster version of `table()` for the case of an input of two integer vectors with no missing values? Can you use it to speed up your chi-square test?
 
-__[A]{.solved}__: When analysing the source code of `table()` we aim to omit everything unnecessary and extract the main building blocks. We observe that `table()` is powered by `tabulate()` which is a very fast counting function. This leaves us with the the challenge to compute the preprocessing as performant as possible.
+__[A]{.solved}__: When analysing the source code of `table()` we aim to omit everything unnecessary and extract the main building blocks. We observe that `table()` is powered by `tabulate()` which is a very fast counting function. This leaves us with the challenge to compute the pre-processing as performant as possible.
 
-First, we calculate the dimensions and names of the output table. Then we use `fastmatch::fmatch()` to map the elements of each vector to their position within the vector itself (i.e. the smallest value is mapped to `1L`, the second smallest value to `2L`, etc.). Following the logic within `table()` we combine and shift these values to create a mapping of the integer pairs in our data to the index of the output table. After applying these lookups `tabulate()` counts the values and returns an integer vector with counts for each position in our the table. As a last step, we reuse the code from `table()` to assign the correct dimension and class.
+First, we calculate the dimensions and names of the output table. Then we use `fastmatch::fmatch()` to map the elements of each vector to their position within the vector itself (i.e. the smallest value is mapped to `1L`, the second smallest value to `2L`, etc.). Following the logic within `table()` we combine and shift these values to create a mapping of the integer pairs in our data to the index of the output table. After applying these lookups `tabulate()` counts the values and returns an integer vector with counts for each position in the table. As a last step, we reuse the code from `table()` to assign the correct dimension and class.
 
 ```{r}
 table2 <- function(a, b){
@@ -339,7 +339,7 @@ rowsums %>%
   theme(legend.position = "bottom")
 ```
 
-We can see, that the difference in performance is negligible for small matrices, but becomes more and more relevant as the size of the data increases. `apply()` is a very versatile tool, but it's not "vectorised for performance" and not as optimized as `rowSums()`.
+We can see that the difference in performance is negligible for small matrices but becomes more and more relevant as the size of the data increases. `apply()` is a very versatile tool, but it's not "vectorised for performance" and not as optimized as `rowSums()`.
 
 __[Q3]{.Q}__: How can you use `crossprod()` to compute a weighted sum? How much faster is it than the naive `sum(x * w)`?
 

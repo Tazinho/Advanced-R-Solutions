@@ -80,7 +80,7 @@ __[Q4]{.Q}__: The following code simulates the performance of a t-test for non-n
 trials <- map(1:100, ~ t.test(rpois(10, 10), rpois(10, 7)))
 ```
 
-__[A]{.solved}__: There are many ways to visualise this data. However, since there are only 100 data points, we choose a dot plot to visualize the distribution. (Unfortunately `ggplot2`s `geom_dotplot()` doesn't compute proper counts as it was created to visualize distribution densities instead of frequencies, so a histogram would be a suitable alternative).
+__[A]{.solved}__: There are many ways to visualise this data. However, since there are only 100 data points, we choose a dot plot to visualize the distribution. (Unfortunately, `ggplot2`s `geom_dotplot()` doesn't compute proper counts as it was created to visualize distribution densities instead of frequencies, so a histogram would be a suitable alternative).
 
 ```{r, message = FALSE}
 library(ggplot2)
@@ -109,7 +109,7 @@ map(x, map, .f = triple)
 
 __[A]{.solved}__: This function call fails, because `triple()` is specified as the `.f` argument and consequently belongs to the outer `map()`. The unnamed argument `map` is treated as an argument of `triple()`, which causes the error.
 
-There are a number of ways we could resolve the problem. I don't think there's much to choose between them for this simple example, but it's good to know your options for more complicated cases.
+There are a number of ways we could resolve the problem. However, there is not much to choose between them for this simple example, although it is good to know your options for more complicated cases.
 
 ```{r, eval = FALSE}
 # Don't name the argument
@@ -232,7 +232,7 @@ does basically the same. However, it directly iterates over the names (`vars`) o
 
 Besides the iteration pattern, the approaches differ in the possibilities for appropriate argument naming in the `.f` argument. In the `map2()` approach we iterate over the elements of `x` and `y`. Therefore, it is possible to choose appropriate placeholders like `f` and `var`. This makes the anonymous function more expressive at the cost of making it longer.  We think using the formula interface in this way is preferable compared to the rather cryptic `mtcars[vars] <- map2(trans, mtcars[vars], ~ .x(.y))`.
 
-In the `map()` approach we map over the variable names. It is therefore not possible to introduce placeholders for the function and variable names. The formula syntax together with the `.x` pronoun is pretty compact. The object names and the brackets indicate clearly the application of transformations to specific columns of `mtcars`. In this case the iteration over the variable names comes in handy, as it highlights the importance of matching between `trans` and `mtcars` element names. Together with the replacement form on the left hand side, this line is relatively easy to inspect.
+In the `map()` approach we map over the variable names. It is therefore not possible to introduce placeholders for the function and variable names. The formula syntax together with the `.x` pronoun is pretty compact. The object names and the brackets clearly indicate the application of transformations to specific columns of `mtcars`. In this case the iteration over the variable names comes in handy, as it highlights the importance of matching between `trans` and `mtcars` element names. Together with the replacement form on the left hand side, this line is relatively easy to inspect.
 
 To summarise, in situations where `map()` and `map2()` provide solutions for an iteration problem, several points may be considered before deciding for one or the other approach.
 
@@ -289,7 +289,7 @@ simple_reduce <- function(x, f, default) {
 }
 ```
 
-Our new new `simple_reduce()` now works as intended:
+Our new `simple_reduce()` now works as intended:
 
 ```{r, error = TRUE}
 simple_reduce(integer(0), `+`)
@@ -373,7 +373,7 @@ modify_if(mtcars, is.numeric, scale01)
 
 __[Q1]{.Q}__: How does `apply()` arrange the output? Read the documentation and perform some experiments.
 
-__[A]{.solved}__: Basically `apply()` applies a function over the margins of an array. In the two dimensional case, the margins are just the rows and columns of a matrix. Let's make this concrete.
+__[A]{.solved}__: Basically `apply()` applies a function over the margins of an array. In the two-dimensional case, the margins are just the rows and columns of a matrix. Let's make this concrete.
 
 ```{r}
 arr2 <- array(1:12, dim = c(3, 4))
@@ -400,11 +400,11 @@ __[Q2]{.Q}__: What do `eapply()` and `rapply()` do? Does purrr have equivalents?
 
 __[A]{.solved}__: `eapply()` is a variant of `lapply()`, which iterates over the (named) elements of an environment. In purrr there is no equivalent for `eapply()` as purrr mainly provides functions that operate on vectors and functions, but not on environments.
 
-`rapply()` applies a function to all elements of a list recursively. This function makes it possible to limit the application of the function to specified classes (default `classes = ANY`). One may also specify how elements of other classes should remain: i.e. as their identity (`how = replace`) or another value (`deflt = NULL`). The closest equivalent in purrr is `modify_depth()`, which allows you to modify elements at a specified depth in a nested list.
+`rapply()` applies a function to all elements of a list recursively. This function makes it possible to limit the application of the function to specified classes (default `classes = ANY`). One may also specify how elements of other classes should remain: i.e. as their identity (`how = replace`) or another value (`default = NULL`). The closest equivalent in purrr is `modify_depth()`, which allows you to modify elements at a specified depth in a nested list.
 
 __[Q3]{.Q}__: Challenge: read about the [fixed point algorithm](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-12.html#%25_idx_1096). Complete the exercises using R.
 
-__[A]{.solved}__: A number $x$ is called a fixed point of a function $f$ if it satisfies the equation $f(x) = x$. For some functions we may find a fixed point by beginning with a starting value and applying $f$ repeatedly. Here `fixed_point()` acts as a functional, because it takes a function as an argument.
+__[A]{.solved}__: A number $x$ is called a fixed point of a function $f$ if it satisfies the equation $f(x) = x$. For some functions we may find a fixed point by beginning with a starting value and applying $f$ repeatedly. Here `fixed_point()` acts as a functional because it takes a function as an argument.
 
 ```{r, error = TRUE}
 fixed_point <- function(f, x_init, n_max = 10000, tol = 0.0001) {
