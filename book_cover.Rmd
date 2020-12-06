@@ -3,7 +3,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r, echo = FALSE, cache=FALSE, warning = FALSE, message=FALSE, fig.width = 8, fig.height=10}
+```{r, echo = FALSE, cache=FALSE, warning = FALSE, message=FALSE}
 library(tibble)
 library(dplyr)
 library(purrr)
@@ -15,13 +15,14 @@ library(ggplot2)
 df_long <- read.csv2("progress_data.csv", stringsAsFactors = FALSE, 
                       header = TRUE) %>% 
   as_tibble() %>% 
+  mutate(status = "finalised") %>% 
   modify_at("status", factor,
             levels = c("open", "started", "solved", "reviewed", "finalised")) %>% 
   tibble::rowid_to_column("id") %>% 
   separate(chapter, "nr", sep = " ", remove = FALSE, extra = "drop") %>% 
   mutate(nr = as.integer(nr), 
          chapter = factor(chapter),
-         chapter = fct_reorder(chapter, nr, .desc = TRUE),
+         chapter = fct_reorder(chapter, nr, .desc = FALSE),
          part = case_when(nr < 9 ~ "Foundations",
                           nr < 12 ~ "Functional\nProgramming",
                           nr < 17 ~ "Object Oriented\nProgramming",
@@ -29,37 +30,53 @@ df_long <- read.csv2("progress_data.csv", stringsAsFactors = FALSE,
                           TRUE    ~ "Techniques"),
          part = factor(part, levels = c("Foundations", "Functional\nProgramming",
                                         "Object Oriented\nProgramming",
-                                        "Metaprogramming", "Techniques")))
+                                        "Metaprogramming", "Techniques"))) %>% 
+  add_count(chapter)
+
 
 # Intermediate calculations
 percent_solved <- mean(df_long$status %in% c("solved", "reviewed", "finalised"), na.rm = TRUE) * 100
 percent_reviewed <- mean(df_long$status %in% c("reviewed", "finalised"), na.rm = TRUE) * 100
+```
 
+## Bar Chart
+```{r, echo = FALSE, cache=FALSE, warning = FALSE, message=FALSE, fig.width = 8, fig.height=10}
 # Create Plot
 plot_progress <- df_long %>% 
+  group_by(chapter) %>% 
+  mutate(exercise_in_chapter_id = row_number()) %>% 
+  ungroup() %>% 
   ggplot(aes(x = chapter, fill = status, group = -id,
              subchapter = subchapter, exercise = exercise,
-             credits = credits)) +
-  geom_bar(color = "white") +
+             credits = credits, alpha = -exercise_in_chapter_id^2)) +
+  geom_bar(color = "#FFFFFF", alpha = 0.8, aes(fill = chapter)) +
+  # geom_label(aes(y = n, label = n, color = chapter), fill = "white", 
+  #            nudge_y = 1.2, label.size = 0) +
+  # geom_text(aes(label = chapter), y = 40,
+  #           color = "#555555", angle = 90, hjust = 1) +
   scale_y_continuous(expand = c(0, 0)) +
-  theme_bw(base_size = 14) +
-  theme(legend.position = "top",
+  theme_bw(base_size = 14, base_family= "sans") +
+  theme(legend.position = "none",
         # legend.justification = c(0, 1),
-        strip.background = element_rect(fill = "#EFEFEF"),
+        # strip.background = element_rect(fill = "white"),
         strip.placement = "outside",
-        axis.text.x = element_blank(),
-        axis.text.y = element_text(),
+        strip.background = element_blank(),
+        strip.text = element_blank(),
+        axis.text.x = element_blank(),  
+        axis.text.y = element_blank(),
         axis.title = element_blank(),
         axis.ticks = element_blank(),
         # plot.title = element_text(hjust = 2.5),
+        # panel.spacing = unit(1, "lines"),
         panel.grid = element_blank(),
         panel.border = element_blank(),
         panel.background = element_blank()) +
+  coord_cartesian(ylim = c(0, 35)) +
   guides(color = FALSE,
          fill = guide_legend(nrow = 1)) +
-  scale_fill_manual(values = c("#F99992", "#fdcc8a", "#bae4b3", "#74c476", "#238b45"),
-                    drop = FALSE) +
-  labs(# title = "",
+  viridis::scale_fill_viridis(discrete = TRUE, direction = 1, end = 0.95, option = "D") +
+  viridis::scale_color_viridis(discrete = TRUE, direction = 1, end = 0.95, option = "D") +
+  labs(#title = "Chapters and Exercises in Advanced R",
        # subtitle = paste0("Reviewed: ",
        #               round(percent_reviewed, 1),
        #               "%"),
@@ -74,27 +91,67 @@ plot_progress <- df_long %>%
        #                   " | Finalised: ",
        #                   sum(df_long$status == "finalised"),
        #                  ")"),
-       fill = "Status:")
-
-# Create static plot (including facets for parts)
-plot_progress + 
+       fill = "Status:") + 
   facet_grid(. ~ part, scales = "free",
-             space = "free", switch = "both")
+             space = "free", switch = "x")
+
+plot_progress
 ```
 
-TODO
-- drop y axis
-- pad and left align labels in facets
-  - https://stackoverflow.com/questions/34749636/left-justify-text-from-multi-line-facet-labels
 
 Ideas
-- revise color scheme
+- tree map?
 - make plot look nice in desired aspect ratio
 - maybe put numbers of exercises in each chapter on top of bar?
 - maybe use waffle chart?
 - use a patch work arrangement of "multiple views on the data" (e.g. our progress over time? :D)
 
+## Circle Packing
+```{r}
+library(ggraph)
+library(igraph)
+library(tidyverse)
+library(viridis)
+library(data.tree)
 
-? kriegen wir noch ne coolere Visualisierung hin?
-- irgendwas, was die Beziehung zwischen den Aufgaben oder ihre Schwierigkeit deutlich macht?
-  - irgendwas was noch duetliche Eye-Candy ist? :)
+# Preprocess
+df_nodes <- df_long %>% 
+  select(part, chapter, subchapter, id) #%>%
+  # modify_if(is.factor, as.character) %>% 
+  # add_count(part, name = "n_part") %>%
+  # add_count(part, chapter, name = "n_chapter") %>%
+  # add_count(part, chapter, subchapter, id, name = "n_subchapter")
+
+df_nodes$pathString <- paste("Book", 
+                            df_nodes$part, 
+                            df_nodes$chapter, 
+                            df_nodes$subchapter, 
+                            df_nodes$id,
+                            sep = "/")
+
+# sum_n_recursively <- function(node) {
+#   node$n <- 
+#     sum(c(node$n_subchapter, purrr::map_dbl(node$children, sum_n_recursively)), na.rm = TRUE)
+# }
+
+node_tree <- df_nodes %>% 
+  as.Node()
+
+# sum_n_recursively(node_tree)
+
+mygraph <- node_tree %>% 
+  as.igraph.Node(directed = TRUE)
+
+# Make the graph
+ggraph(mygraph, layout = 'circlepack') +
+  geom_node_circle(aes(fill = as.factor(depth), color = as.factor(depth)), alpha = .9) +  # 
+  scale_fill_manual(values=c("0" = "white", "1" = viridis(4)[1], "2" = viridis(4)[2], "3" = viridis(4)[3], "4"=viridis(4)[4])) +
+  scale_color_manual(values=c("0" = "white", "1" = viridis(4)[1], "2" = viridis(4)[2], "3" = viridis(4)[3], "4"=viridis(4)[4])) +
+  scale_color_manual(values=c("0" = "white", "1" = "black", "2" = "black", "3" = "black", "4"= "black")) +
+  theme_void() + 
+  theme(legend.position="FALSE", plot.margin = unit(rep(0,4), "cm"))
+# geom_node_label( aes(label = part_label), color = "white", size = 5, fill = alpha(c("white"), 0), label.size = 0) +
+# geom_node_label( aes(label = chapter_label, color = as.factor(depth)), size = 5, fill = alpha(c("white"), 0), label.size = 0)
+```
+  
+  
