@@ -3,35 +3,35 @@ source("common.R")
 ```
 
 # Evaluation
-
 ## Prerequisites
 
-```{r setup, message=FALSE}
+On our journey through R's metaprogramming we continue to use the functions from the `{rlang}` package.
+
+```{r setup}
 library(rlang)
-library(purrr)
 ```
 
 ## Evaluation basics
 
 __[Q1]{.Q}__: Carefully read the documentation for `source()`. What environment does it use by default? What if you supply `local = TRUE`? How do you provide a custom environment?
 
-__[A]{.solved}__: By default, `source()` uses the global environment. A specific evaluation environment may be chosen, by passing it to the `local` argument. To use current environment (i.e. the calling environment of `source()`) set `local = TRUE`.
+__[A]{.solved}__: By default, `source()` uses the global environment (`local = FALSE`). A specific evaluation environment may be chosen, by passing it explicitly to the `local` argument. To use current environment (i.e. the calling environment of `source()`) set `local = TRUE`.
 
 ```{r}
-# Create temporary, sourcable R script
+# Create a temporary, sourcable R script that prints `x`
 tmp_file <- tempfile()
 writeLines("print(x)", tmp_file)
 
-# Set x globally
+# Set `x` globally
 x <- "global environment"
-env2 <- rlang::env(x = "specified environment")
+env2 <- env(x = "specified environment")
 
 locate_evaluation <- function(file, local){
   x <- "local environment"
   source(file, local = local)
 }
 
-# Where will source() be evaluated?
+# Where will source() evaluate the code?
 locate_evaluation(tmp_file, local = FALSE)  # default
 locate_evaluation(tmp_file, local = env2)
 locate_evaluation(tmp_file, local = TRUE)
@@ -45,7 +45,7 @@ eval(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (2)
 expr(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (3)
 ```
 
-__[A]{.solved}__: Let's look at a quote from the first edition of Advanced R:
+__[A]{.solved}__: Let's look at a quote from the [first edition of Advanced R](http://adv-r.had.co.nz/Computing-on-the-language.html#subset):
 
 > "`expr()` and `eval()` are opposites. [...] each `eval()` peels off one layer of `expr()`'s".
 
@@ -92,7 +92,23 @@ x
 
 __[Q4]{.Q}__: Modify `source2()` so it returns the result of _every_ expression, not just the last one. Can you eliminate the for loop?
 
-__[A]{.solved}__: In order to highlight the modifications, we've preserved the code from the former `source2()`-function in a comment.
+__[A]{.solved}__: The code for `source2()` was given in Advanced R as:
+
+```{r}
+source2 <- function(path, env = caller_env()) {
+  file <- paste(readLines(path, warn = FALSE), collapse = "\n")
+  exprs <- parse_exprs(file)
+
+  res <- NULL
+  for (i in seq_along(exprs)) {
+    res <- eval(exprs[[i]], env)
+  }
+
+  invisible(res)
+}
+```
+
+In order to highlight the modifications in our new `source2()` function, we've preserved the differing code from the former `source2()` in a comment.
 
 ```{r}
 source2 <- function(path, env = caller_env()) {
@@ -101,13 +117,10 @@ source2 <- function(path, env = caller_env()) {
   
   # res <- NULL
   # for (i in seq_along(exprs)) {
-  #   res <- eval(exprs[[i]], env)
+  #   res[[i]] <- eval(exprs[[i]], env)
   # }
   
-  res <- vector(mode = "list", length = length(exprs))      
-  for (i in seq_along(exprs)) {
-    res[[i]] <- eval(exprs[[i]], env)
-  }
+  res <- purrr::map(exprs, eval, env)
   
   invisible(res)
 }
@@ -126,17 +139,6 @@ writeLines(
 )
 
 (source2(tmp_file))
-```
-
-To eliminate the for loop, we may also use `map()`:
-
-```{r}
-source2 <- function(path, env = caller_env()) {
-  file <- paste(readLines(path, warn = FALSE), collapse = "\n")
-  exprs <- parse_exprs(file)
-  
-  invisible(map(exprs, eval, env))
-}
 ```
 
 __[Q5]{.Q}__: We can make `base::local()` slightly easier to understand by spreading it over multiple lines:
@@ -160,7 +162,7 @@ local3 <- function(expr, envir = new.env()) {
 }
 ```
 
-The first line generates a call to `eval()`. Because  `substitute()` operates in the current evaluation argument. However, this doesn't matter here, as both, `expr` and `envir` are promises and therefore "the expression slots of the promises replace the symbols", from `?substitute`.
+The first line generates a call to `eval()`, because  `substitute()` operates in the current evaluation argument. However, this doesn't matter here, as both, `expr` and `envir` are promises and therefore "the expression slots of the promises replace the symbols", from `?substitute`.
 
 ```{r}
 local3({
@@ -185,8 +187,6 @@ exists("x")
 __[Q1]{.Q}__: Predict what evaluating each of the following quosures will return if evaluated.
 
 ```{r}
-library(rlang)
-
 q1 <- new_quosure(expr(x), env(x = 1))
 q1
 
@@ -197,7 +197,7 @@ q3 <- new_quosure(expr(x + !!q2), env(x = 100))
 q3
 ```
 
-__[A]{.solved}__: Each quosure will be evaluated in its own environment so each `x` is bound to a different value. This leads us to:
+__[A]{.solved}__: Each quosure is evaluated in its own environment, so `x` is bound to a different value for each time. This leads us to:
 
 ```{r}
 eval_tidy(q1)
@@ -215,19 +215,37 @@ enenv <- function(x){
 }
 
 # Test
+enenv(x)
+
+# Test if it also works within functions
 capture_env <- function(x){
   enenv(x)
 }
-
-enenv(x)
-capture_env(x)  # functions execution environment is captured
+capture_env(x)
 ```
 
 ## Data masks
 
 __[Q1]{.Q}__: Why did I use a for loop in `transform2()` instead of `map()`? Consider `transform2(df, x = x * 2, x = x * 2)`.
 
-__[A]{.solved}__: A for loop applies the processing steps regarding `.data` iteratively. This includes updating `.data` and reusing the same variable names. This makes it possible to apply transformations sequentially, so that subsequent transformations can refer to columns that were just created.
+__[A]{.solved}__: `transform2()` was defined in Advanced R as:
+
+```{r}
+transform2 <- function(.data, ...) {
+  dots <- enquos(...)
+
+  for (i in seq_along(dots)) {
+    name <- names(dots)[[i]]
+    dot <- dots[[i]]
+
+    .data[[name]] <- eval_tidy(dot, .data)
+  }
+
+  .data
+}
+```
+
+A for loop applies the processing steps regarding `.data` iteratively. This includes updating `.data` and reusing the same variable names. This makes it possible to apply transformations sequentially, so that subsequent transformations can refer to columns that were just created.
 
 __[Q2]{.Q}__: Here's an alternative implementation of `subset2()`:
 
@@ -255,7 +273,7 @@ subset2 <- function(data, rows) {
 }
 ```
 
-`subset2()` provides an additional logical check, which is missing from `subset3()`. Here, `rows` is evaluated in the context of `data`, which results in a logical vector. Afterwards only `[()` needs to be used for subsetting.
+`subset2()` provides an additional logical check, which is missing from `subset3()`. Here, `rows` is evaluated in the context of `data`, which results in a logical vector. Afterwards only `[` needs to be used for subsetting.
 
 ```{r}
 # subset2() evaluation
@@ -433,10 +451,14 @@ identical(
 
 __[Q3]{.Q}__: Another way to write `resample_lm()` would be to include the resample expression `(data[sample(nrow(data), replace = TRUE), , drop = FALSE])` in the data argument. Implement that approach. What are the advantages? What are the disadvantages?
 
-__[A]{.solved}__: We can take advantage of the lazy evaluation of function arguments, by moving the resampling step into the argument definition. The uses passes the data to the function, but only a permutation of this data (`resample_data`) will be used.
+__[A]{.solved}__: Different versions of `resample_lm()`  were given in Advanced R. However, none of them implemented the resampling within the function argument.
+
+Different versions of `resample_lm()` (`resample_lm0()`, `resample_lm1()`, `resample_lm2()`) were specified in Advanced R. However, in none of these versions the resampling step was implemented in any of the arguments.
+
+This approach takes advantate of R's lazy evaluation of function arguments, by moving the resampling step into the argument definition. The user passes the data to the function, but only a permutation of this data (`resample_data`) will be used.
 
 ```{r}
-resample_lm0 <- function(
+resample_lm <- function(
   formula, data,
   resample_data = data[sample(nrow(data), replace = TRUE), ,
                        drop = FALSE],
@@ -450,10 +472,10 @@ resample_lm0 <- function(
 }
 
 df <- data.frame(x = 1:10, y = 5 + 3 * (1:10) + round(rnorm(10), 2))
-(resamp_lm1 <- resample_lm0(y ~ x, data = df))
-resamp_lm1$call
+(lm_1 <- resample_lm(y ~ x, data = df))
+lm_1$call
 ```
 
-With this approach the evaluation needs to take place within the functions environments, because the resampled dataset (defined as a default argument) will only be available in the function environment.
+With this approach the evaluation needs to take place within the functions environment, because the resampled dataset (defined as a default argument) will only be available in the function environment.
 
-Overall, putting an essential part of the preprocessing outside of the functions body is not common practice in R. Compared to the unquoting-implementation (`resample_lm1()`), this approach captures the model-call in a more meaningful way. This approach will also lead to a new resample every time you `update()` the model.
+Overall, putting an essential part of the preprocessing outside of the functions body is not common practice in R. Compared to the unquoting-implementation (`resample_lm1()` in Advanced R), this approach captures the model-call in a more meaningful way. This approach will also lead to a new resample every time you `update()` the model.
