@@ -6,7 +6,7 @@ source("common.R")
 
 ## Atomic vectors
 
-__[Q1]{.Q}__: How do you create scalars of type raw and complex? (See `?raw` and `?complex`)
+__[Q1]{.Q}__: How do you create raw and complex scalars? (See `?raw` and `?complex`.)
 
 __[A]{.solved}__: In R scalars are represented as vectors of length one. However, there's no built-in syntax like there is for logicals, integers, doubles, and character vectors to create individual raw and complex values. Instead you have to create them by calling a function.
 
@@ -84,7 +84,7 @@ unname <- function (obj, force = FALSE){
 
 `unname()` removes existing names (or dimnames) by setting them to `NULL`.
 
-__[Q2]{.Q}__: What does `dim()` return when applied to a 1d vector? When might you use `NROW()` or `NCOL()`?
+__[Q2]{.Q}__: What does `dim()` return when applied to a 1-dimensional vector? When might you use `NROW()` or `NCOL()`?
 
 __[A]{.solved}__: From `?nrow`:
 
@@ -278,16 +278,16 @@ To summarise: `c()` coerces types and errors may occur because of inappropriate 
 
 ## Data frames and tibbles
 
-__[Q1]{.Q}__: Can you have a data frame with 0 rows? What about 0 columns?
+__[Q1]{.Q}__: Can you have a data frame with zero rows? What about zero columns?
 
-__[A]{.solved}__: Yes, you can create these data frames easily; either during creation or via subsetting. Even both dimensions can be 0. 
+__[A]{.solved}__: Yes, you can create these data frames easily; either during creation or via subsetting. Even both dimensions can be zero.
 
 Create a 0-row, 0-column or an empty data frame directly:
 
 ```{r}
-data.frame(row.names = 1:3)  # or data.frame()[1:3, ]
-
 data.frame(a = integer(), b = logical())
+
+data.frame(row.names = 1:3)  # or data.frame()[1:3, ]
 
 data.frame()
 ```
