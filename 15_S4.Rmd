@@ -215,7 +215,7 @@ __[Q2]{.Q}__: In the definition of the generic, why is it necessary to repeat th
 
 __[A]{.solved}__: Within `setGeneric()` the `name` (1st argument) is needed as the name of the generic. Then, the name also explicitly incorporates method dispatch via `standardGeneric()` within the generic's body (`def` parameter of `setGeneric()`). This behaviour is similar to `UseMethod()` in S3.
 
-__[Q3]{.Q}__: Why does the `show()` method defined in Section [15.4.3](https://adv-r.hadley.nz/s4.html#show-method) use `is(object)[[1]]`? (Hint: try printing the employee subclass.)
+__[Q3]{.Q}__: Why does the `show()` method defined in section [15.4.3](https://adv-r.hadley.nz/s4.html#show-method) use `is(object)[[1]]`? (Hint: try printing the employee subclass.)
 
 __[A]{.solved}__: `is(object)` returns the class of the object. `is(object)` also contains the superclass, for subclasses like `Employee`. In order to always return the most specific class (the subclass), `show()` returns the first element of `is(object)`.
 
