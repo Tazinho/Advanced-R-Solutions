@@ -32,7 +32,7 @@ list_of_names <- list(a, b, c, d)
 obj_addrs(list_of_names)
 ```
 
-__[Q2]{.Q}__: The following code accesses the mean function in multiple ways. Do they all point to the same underlying function object? Verify with `lobstr::obj_addr()`.
+__[Q2]{.Q}__: The following code accesses the mean function in multiple ways. Do they all point to the same underlying function object? Verify this with `lobstr::obj_addr()`.
 
 ```{r, eval = FALSE}
 mean
@@ -54,11 +54,11 @@ mean_functions <- list(mean,
 unique(obj_addrs(mean_functions))
 ```
 
-__[Q3]{.Q}__: By default, base R data import functions, like `read.csv()`, will automatically convert non-syntactic names to syntactic names. Why might this be problematic? What option allows you to suppress this behaviour?
+__[Q3]{.Q}__: By default, base R data import functions, like `read.csv()`, will automatically convert non-syntactic names to syntactic ones. Why might this be problematic? What option allows you to suppress this behaviour?
 
 __[A]{.solved}__: Column names are often data, and the underlying `make.names()` transformation is non-invertible, so the default behaviour corrupts data. To avoid this, set `check.names = FALSE`.
 
-__[Q4]{.Q}__: What rules does `make.names()` use to convert non-syntactic names into syntactic names?
+__[Q4]{.Q}__: What rules does `make.names()` use to convert non-syntactic names into syntactic ones?
 
 __[A]{.solved}__: A valid name may contain letters, numbers, dots and underscores (`"_"` are allowed since R version 1.9.0). It must start with a letter or a dot. If it starts with a dot, it must not be followed by a number.
 
@@ -119,7 +119,7 @@ x[[3]] <- 4
 
 __[A]{.solved}__: Initially the vector `x` has integer type. The replacement call assigns a double to the third element of `x`, which triggers copy-on-modify.
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 x <- c(1L, 2L, 3L)
 tracemem(x)
 #> <0x66a4a70>
@@ -130,7 +130,7 @@ x[[3]] <- 4
 
 We can avoid the copy by sub-assigning an integer instead of a double:
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 x <- c(1L, 2L, 3L)
 tracemem(x)
 #> <0x55eec6940ae0>
@@ -161,6 +161,7 @@ We can confirm these relationships by inspecting the reference tree in R.
 
 ```{r, eval = FALSE}
 ref(c)
+
 #> █ [1:0x55erc93cbdd8] <list>    # c
 #> ├─█ [2:0x55efcb8246e8] <list>  # - b
 #> │ ├─[3:0x55eac7df4e98] <int>   # -- a
@@ -180,8 +181,9 @@ Draw a picture.
 
 __[A]{.solved}__: The initial reference tree of `x` shows that the name `x` binds to a list object. This object contains a reference to the integer vector `1:10`.
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 x <- list(1:10)
+
 ref(x)
 #> █ [1:0x55853b74ff40] <list> 
 #> └─[2:0x534t3abffad8] <int> 
@@ -194,7 +196,7 @@ knitr::include_graphics("images/copy_on_modify_fig1.png",
 
 When `x` is assigned to an element of itself copy-on-modify takes place and the list is copied to a new address in memory.
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 tracemem(x)
 x[[2]] <- x
 #> tracemem[0x55853b74ff40 -> 0x5d553bacdcd8]:
@@ -210,7 +212,7 @@ ref(x)
 #>   └─[2:0x534t3abffad8] 
 ```
 
-```{r, echo = FALSE, out.width='150pt'}
+```{r, echo = FALSE, out.width = '150pt'}
 knitr::include_graphics("images/copy_on_modify_fig2.png",
                         dpi = 300)
 ```
@@ -230,9 +232,9 @@ __[A]{.solved}__: `object.size()` doesn't account for shared elements within lis
 
 __[Q2]{.Q}__: Take the following list. Why is its size somewhat misleading?
 
-```{r, return = FALSE}
-x <- list(mean, sd, var)
-obj_size(x)
+```{r}
+funs <- list(mean, sd, var)
+obj_size(funs)
 ```
 
 __[A]{.solved}__: All three functions are built-in to R as part of the `{base}` and `{stats}` packages and hence always available. So, what does it mean to measure the size of something that's already included in R?
@@ -323,6 +325,12 @@ For `b <- list(a, a)` both list elements contain references to the same memory a
 ```{r}
 b <- list(a, a)
 ref(a, b)
+
+#> [1:0xde8be40] <dbl> 
+#>  
+#> █ [2:0x7249738] <list> 
+#> ├─[1:0xde8be40] 
+#> └─[1:0xde8be40]
 ```
 
 Therefore, no additional memory is required for the second list element. The list itself requires 64 bytes, 48 bytes for an empty list and 8 bytes for each element (`obj_size(vector("list", 2))`). This lets us predict 8,000,048 B + 64 B = 8,000,112 B.
@@ -370,7 +378,7 @@ x[[1]] <- x
 
 __[A]{.solved}__: In this situation copy-on-modify prevents the creation of a circular list. Let us step through the details:
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 x <- list()  # creates initial object
 obj_addr(x)
 #> [1] "0x55862f23ab80"
@@ -462,7 +470,7 @@ __[Q3]{.Q}__: What happens if you attempt to use `tracemem()` on an environment?
 
 __[A]{.solved}__: `tracemem()` cannot be used to mark and trace environments.
 
-```{r, error=TRUE}
+```{r, error = TRUE}
 x <- new.env()
 tracemem(x)
 ```
