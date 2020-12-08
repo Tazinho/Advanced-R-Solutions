@@ -122,7 +122,7 @@ map(x, . %>% map(triple))
 map(x, ~ map(.x, triple))
 ```
 
-__[Q6]{.Q}__: Use `map()` to fit linear models to the `mtcars` using the formulas stored in this list:
+__[Q6]{.Q}__: Use `map()` to fit linear models to the `mtcars` dataset using the formulas stored in this list:
 
 ```{r}
 formulas <- list(
@@ -173,7 +173,7 @@ __[Q2]{.Q}__: Rewrite the following code to use `iwalk()` instead of `walk2()`. 
 ```{r, eval = FALSE}
 cyls <- split(mtcars, mtcars$cyl)
 paths <- file.path(temp, paste0("cyl-", names(cyls), ".csv"))
-walk2(cyls, paths, ~ write.csv(.x, .y))
+walk2(cyls, paths, write.csv)
 ```
 
 __[A]{.solved}__: `iwalk()` allows us to use a single variable, storing the output path in the names.
@@ -236,7 +236,7 @@ In the `map()` approach we map over the variable names. It is therefore not poss
 
 To summarise, in situations where `map()` and `map2()` provide solutions for an iteration problem, several points may be considered before deciding for one or the other approach.
 
-__[Q4]{.Q}__: What does `write.csv()` return? i.e. what happens if you use it with `map2()` instead of `walk2()`?
+__[Q4]{.Q}__: What does `write.csv()` return, i.e. what happens if you use it with `map2()` instead of `walk2()`?
 
 __[A]{.solved}__: `write.csv()` returns `NULL`. As we call the function for its side effect (creating a CSV file), `walk2()` would be appropriate here. Otherwise we receive a rather uninformative list of `NULL`s.
 

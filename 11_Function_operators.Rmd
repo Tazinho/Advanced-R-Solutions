@@ -12,7 +12,6 @@ Also in the third chapter on functional programming we make relatively frequent 
 library(purrr)
 ```
 
-
 ## Existing function operators
 
 __[Q1]{.Q}__: Base R provides a function operator in the form of `Vectorize()`. What does it do? When might you use it?
@@ -61,7 +60,7 @@ Take a look at Advanced R or the documentation of `safely()` to see how you can 
 
 ## Case study: Creating your own function operators
 
-__[Q1]{.Q}__: Weigh the pros and cons of `download.file %>% dot_every(10) %>% delay_by(0.1)` vs `download.file %>% delay_by(0.1) %>% dot_every(10)`.
+__[Q1]{.Q}__: Weigh the pros and cons of `download.file %>% dot_every(10) %>% delay_by(0.1)` versus `download.file %>% delay_by(0.1) %>% dot_every(10)`.
 
 __[A]{.solved}__: Both commands will print a dot every 10 downloads and will take the same amount of time to run, so the differences may seem quite subtle.
 
@@ -69,7 +68,7 @@ In the first case, first the dot functionality is added to `download.file()`. Th
 
 In the latter case the delay is added first and the dot-functionality is wrapped around it. This order will print the first dot immediately after the 9th download is finished, then the short delay occurs before the 10th download actually starts.
 
-__[Q2]{.Q}__: Should you memoise `file.download()`? Why/why not?
+__[Q2]{.Q}__: Should you memoise `file.download()`? Why or why not?
 
 __[A]{.solved}__: Memoising `file.download()` will only work if the files are immutable, i.e. if the file at a given URL is always same. There's no point memoising unless this is true. Even if this is true, however, memoise has to store the results in memory, and large files will potentially take up a lot of memory.
 

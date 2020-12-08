@@ -124,7 +124,7 @@ is_atomic(expr(c(1, 1)))
 is_call(expr(c(1, 1)))
 ```
 
-__[Q2]{.Q}__: What happens when you subset a call object to remove the first element, e.g. `expr(read.csv("foo.csv", header = TRUE))[-1]` Why?
+__[Q2]{.Q}__: What happens when you subset a call object to remove the first element, e.g. `expr(read.csv("foo.csv", header = TRUE))[-1]`. Why?
 
 __[A]{.solved}__: When the first element of a call object is removed, the second element moves to the first position, which is the function to call. Therefore, we get `"foo.csv"(header = TRUE)`.
 
@@ -164,8 +164,6 @@ __[Q4]{.Q}__: `rlang::call_standardise()` doesn't work so well for the following
 Why? What makes `mean()` special?
 
 ```{r}
-library(rlang)
-
 call_standardise(quote(mean(1:10, na.rm = TRUE)))
 call_standardise(quote(mean(n = T, 1:10)))
 call_standardise(quote(mean(x = 1:10, , TRUE)))
@@ -342,7 +340,7 @@ We can conclude that custom infix functions have precedence between addition and
 
 The exact precedence of infix functions can be looked up under `?"Syntax"` where we see that it lies directly behind the sequence operator (`:`) and in front of the multiplication and division operators (`*` and `/`).
 
-__[Q7]{.Q}__: What happens if you call `parse_expr()` with a string that generates multiple expressions? e.g. `parse_expr("x + 1; y + 1")`
+__[Q7]{.Q}__: What happens if you call `parse_expr()` with a string that generates multiple expressions, e.g. `parse_expr("x + 1; y + 1")`?
 
 __[A]{.solved}__: In this case `parse_expr()` notices that more than one expression would have to be generated and throws an error.
 
@@ -350,7 +348,7 @@ __[A]{.solved}__: In this case `parse_expr()` notices that more than one express
 parse_expr("x + 1; y + 1")
 ```
 
-__[Q8]{.Q}__: What happens if you attempt to parse an invalid expression? e.g. `"a +"` or `"f())"`.
+__[Q8]{.Q}__: What happens if you attempt to parse an invalid expression, e.g. `"a +"` or `"f())"`?
 
 __[A]{.solved}__: Invalid expressions will lead to an error in the underlying `parse()` function.
 
@@ -483,7 +481,7 @@ logical_abbr()
 logical_abbr(c(T, T, T))
 ```
 
-__[Q2]{.Q}__: `logical_abbr()` works with expressions. It currently fails when you give it a function. Why not? How could you modify `logical_abbr()` to make it work? What components of a function will you need to recurse over?
+__[Q2]{.Q}__: `logical_abbr()` works with expressions. It currently fails when you give it a function. Why? How could you modify `logical_abbr()` to make it work? What components of a function will you need to recurse over?
 
 ```{r, eval = FALSE}
 f <- function(x = TRUE) {

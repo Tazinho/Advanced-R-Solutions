@@ -146,10 +146,10 @@ __[Q3]{.Q}__: What does the following function return? Make a prediction before 
 ```{r, eval = FALSE}
 f <- function(x) {
   f <- function(x) {
-    f <- function(x) {
+    f <- function() {
       x ^ 2
     }
-    f(x) + 1
+    f() + 1
   }
   f(x) * 2
 }
@@ -330,12 +330,12 @@ __[Q2]{.Q}__: What does `write.table()` return? What would be more useful?
 
 __[A]{.solved}__: `write.table()` writes an object, usually a data frame or a matrix, to disk. The function invisibly returns `NULL`. It would be more useful if `write.table()` would (invisibly) return the input data, `x`. This would allow to save intermediate results and directly take on further processing steps without breaking the flow of the code (i.e. breaking it into different lines). One package which uses this pattern is the `{readr}` package, which is part of the [tidyverse](https://www.tidyverse.org/)-ecosystem.
 
-__[Q3]{.Q}__: How does the `chdir` parameter of `source()` compare to `in_dir()`? Why might you prefer one approach to the other?
+__[Q3]{.Q}__: How does the `chdir` parameter of `source()` compare to `with_dir()`? Why might you prefer one to the other?
 
-The `in_dir()` approach was given in the book as
+__[A]{.solved}__: The `with_dir()` approach was given in the book as
 
 ```{r, eval = FALSE}
-in_dir <- function(dir, code) {
+with_dir <- function(dir, code) {
   old <- setwd(dir)
   on.exit(setwd(old))
   
@@ -343,11 +343,11 @@ in_dir <- function(dir, code) {
 }
 ```
 
-__[A]{.solved}__: `in_dir()` takes a path for a working directory (`dir`) as its first argument. This is the directory where the provided code (`code`) should be executed. Therefore, the current working directory is changed in `in_dir()` via `setwd()`. Then, `on.exit()` ensures that the modification of the working directory is reset to the initial value when the function exits. By passing the path explicitly, the user has full control over the directory to execute the code in.
+`with_dir()` takes a path for a working directory (`dir`) as its first argument. This is the directory where the provided code (`code`) should be executed. Therefore, the current working directory is changed in `with_dir()` via `setwd()`. Then, `on.exit()` ensures that the modification of the working directory is reset to the initial value when the function exits. By passing the path explicitly, the user has full control over the directory to execute the code in.
 
 In `source()` the code is passed via the `file` argument (a path to a file). The `chdir` argument specifies if the working directory should be changed to the directory containing the file. The default for `chdir` is `FALSE`, so you don't have to provide a value. However, as you can only provide `TRUE` or `FALSE`, you are also less flexible in choosing the working directory for the code execution.
 
-__[Q4]{.Q}__: Write a function that opens a graphics device, runs the supplied code, and closes the graphics device (always, regardless of whether or not the plotting code worked).
+__[Q4]{.Q}__: Write a function that opens a graphics device, runs the supplied code, and closes the graphics device (always, regardless of whether or not the plotting code works).
 
 __[A]{.solved}__: To control the graphics device we use `pdf()` and `dev.off()`. To ensure a clean termination `on.exit()` is used.
 
@@ -364,10 +364,10 @@ __[Q5]{.Q}__: We can use `on.exit()` to implement a simple version of `capture.o
 ```{r}
 capture.output2 <- function(code) {
   temp <- tempfile()
-  on.exit(file.remove(temp), add = TRUE)
+  on.exit(file.remove(temp), add = TRUE, after = TRUE)
   
   sink(temp)
-  on.exit(sink(), add = TRUE)
+  on.exit(sink(), add = TRUE, after = TRUE)
   
   force(code)
   readLines(temp)
@@ -466,7 +466,7 @@ __[A]{.solved}__: Lets define `random<-` like this:
 }
 ```
 
-__[Q5]{.Q}__: Write your own version of `+` that will paste its inputs together if they are character vectors but behaves as usual otherwise. In other words, make this code work:
+__[Q5]{.Q}__: Write your own version of `+` that pastes its inputs together if they are character vectors but behaves as usual otherwise. In other words, make this code work:
 
 ```{r, eval = FALSE}
 1 + 2
