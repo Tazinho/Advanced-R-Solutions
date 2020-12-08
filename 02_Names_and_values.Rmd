@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -161,7 +161,6 @@ We can confirm these relationships by inspecting the reference tree in R.
 
 ```{r, eval = FALSE}
 ref(c)
-
 #> █ [1:0x55erc93cbdd8] <list>    # c
 #> ├─█ [2:0x55efcb8246e8] <list>  # - b
 #> │ ├─[3:0x55eac7df4e98] <int>   # -- a
@@ -204,7 +203,7 @@ x[[2]] <- x
 
 The list object previously bound to `x` is now referenced in the newly created list object. It is no longer bound to a name. The integer vector is referenced twice.
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 ref(x)
 #> █ [1:0x5d553bacdcd8] <list> 
 #> ├─[2:0x534t3abffad8] <int> 
@@ -325,12 +324,6 @@ For `b <- list(a, a)` both list elements contain references to the same memory a
 ```{r}
 b <- list(a, a)
 ref(a, b)
-
-#> [1:0xde8be40] <dbl> 
-#>  
-#> █ [2:0x7249738] <list> 
-#> ├─[1:0xde8be40] 
-#> └─[1:0xde8be40]
 ```
 
 Therefore, no additional memory is required for the second list element. The list itself requires 64 bytes, 48 bytes for an empty list and 8 bytes for each element (`obj_size(vector("list", 2))`). This lets us predict 8,000,048 B + 64 B = 8,000,112 B.
