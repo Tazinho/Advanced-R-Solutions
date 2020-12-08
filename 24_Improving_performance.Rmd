@@ -1,8 +1,3 @@
----
-output: html_document
-editor_options: 
-  chunk_output_type: console
----
 ```{r, include=FALSE}
 source("common.R")
 ```
@@ -74,7 +69,7 @@ bench::mark(
 
 __[Q3]{.Q}__: List four functions (not just those in base R) that convert a string into a date time object. What are their strengths and weaknesses?
 
-__[A]{.solved}__: The usual base R way is to use the `as.POSIXct()` generic and create a date time object of class `POSIXct` and type `integer`.
+__[A]{.solved}__: The usual base R way is to use the `as.POSIXct()` generic and create a date time object of class `POSIXct` and type integer.
 
 ```{r}
 date_ct <- as.POSIXct("2020-01-01 12:30:25")
@@ -95,7 +90,7 @@ attributes(date_lt)
 date_lt$sec
 ```
 
-However, while `lists` may be practical basic calculations are often faster and require less memory for objects with underlying `integer` type.
+However, while `lists` may be practical basic calculations are often faster and require less memory for objects with underlying integer type.
 
 ```{r}
 date_lt2 <- rep(date_lt, 10000)
