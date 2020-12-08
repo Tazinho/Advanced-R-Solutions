@@ -823,10 +823,12 @@ bc <- function(lambda) {
 __[A]{.solved}__: It is the logarithm, when lambda equals zero and `x ^ lambda - 1 / lambda` otherwise. A better name might be `box_cox_transformation` (one parametric), you can read about it (here)[https://en.wikipedia.org/wiki/Power_transform].
 
 __[Q3]{.Q}__: What does `approxfun()` do? What does it return?
+
 __[A]{.solved}__: `approxfun` basically takes a combination of 2-dimensional data points + some extra specifications as arguments and returns a stepwise linear or constant interpolation function (defined on the range of given x-values, by default).
 
 __[Q4]{.Q}__: What does `ecdf()` do? What does it return?
-__[A]{.solved}__: "ecdf" means empirical density function. For a numeric vector, `ecdf()` returns the appropriate density function (of class "ecdf", which is inheriting from class "stepfun"). You can describe it's behaviour in 2 steps. In the first part of it's body, the `(x,y)` pairs for the nodes of the density function are calculated. In the second part these pairs are given to `approxfun`.
+
+__[A]{.solved}__: "ecdf" means empirical density function. For a numeric vector, `ecdf()` returns the appropriate density function (of class `ecdf`, which is inheriting from class `stepfun`). You can describe it's behaviour in 2 steps. In the first part of it's body, the `(x,y)` pairs for the nodes of the density function are calculated. In the second part these pairs are given to `approxfun`.
 
 __[Q5]{.Q}__: Create a function that creates functions that compute the ith [central moment](http://en.wikipedia.org/wiki/Central_moment) of a numeric vector. You can test it by running the following code:
 
@@ -939,7 +941,7 @@ identical(POSIXlt_build, POSIXlt_classic)
 
 1.  __[Q]{.Q}__: Draw a Venn diagram illustrating the relationships between functions, generics, and methods.
 
-__[A]{.started}__: Funtions don't have to be generics or methods, but both the latter are functions. It is also possible that a function is both, a method and a generic, at the same time, which seems to be relatively awkward, so that also the author of the textbook doesn't recommend it, see `?pryr::ftype`
+__[A]{.started}__: Funtions don't have to be generics or methods, but both the latter are functions. It is also possible that a function is both, a method and a generic, at the same time, which seems to be relatively awkward and is definitely not recommended; see also `?pryr::ftype`:
 
 > This function figures out whether the input function is a regular/primitive/internal function, a internal/S3/S4 generic, or a S3/S4/RC method. This is function is slightly simplified as it's possible for a method from one class to be a generic for another class, but that seems like such a bad idea that hopefully no one has done it.
 
