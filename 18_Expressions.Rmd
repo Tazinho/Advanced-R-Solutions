@@ -7,6 +7,7 @@ source("common.R")
 \stepcounter{chapter}
 
 # Expressions
+
 ## Prerequisites {-}
 
 To capture and compute on expressions, and to visualise them, we will load the `{rlang}` and the `{lobstr}` packages.
@@ -256,7 +257,7 @@ __[A]{.solved}__: `=` is used both for assignment, and for naming arguments in f
 b = c(c = 1)
 ```
 
-So, when we play with `ast()`, we can directly see that the following is not possible
+So, when we play with `ast()`, we can directly see that the following is not possible:
 
 ```{r, error = TRUE}
 ast(b = c(c = 1))
@@ -271,7 +272,6 @@ ast({b = c(c = 1)})
 ```
 
 When we ignore the braces and compare the trees, we can see, that the first `=` is used for assignment and the second `=` is part of the syntax of function calls.
-
 
 __[Q3]{.Q}__: Does `-2^2` yield 4 or -4? Why?
 
@@ -318,7 +318,6 @@ The other reason is that `<-` invisibly returns the value on the right hand side
 ```{r}
 (x3 <- 0)
 ```
-
 
 __[Q6]{.Q}__: Compare the ASTs of `x + y %+% z` and `x ^ y %+% z`. What have you learned about the precedence of custom infix functions?
 
