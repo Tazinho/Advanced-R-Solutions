@@ -114,7 +114,7 @@ value <- c("A", 2:10, "J", "Q", "K")
 cards <- paste0(rep(value, 4), suit)
 ```
 
-__[A]{.solved}__: Our new `ShuffledDeck` class will use `sample()` and positive integer subsetting to implement the reshuffling and drawing functionality. We also add a check, so you cannot draw more cards then there are left in the deck.
+__[A]{.solved}__: Our new `ShuffledDeck` class will use `sample()` and positive integer subsetting to implement the reshuffling and drawing functionality. We also add a check, so you cannot draw more cards than there are left in the deck.
 
 ```{r}
 ShuffledDeck <- R6Class(
@@ -371,7 +371,7 @@ We conclude that subclasses can access private methods from their superclasses, 
 ## Reference semantics
 __[Q1]{.Q}__: Create a class that allows you to write a line to a specified file. You should open a connection to the file in `$initialize()`, append a line using `cat()` in `$append_line()`, and close the connection in `$finalize()`.
 
-__[A]{.solved}__: Our `FileWriter` class will create a connection to a file at initialization. Therefore, we open a connection to a user specified file during the initialisation. Note that we need to set `open = "a"` in `file()` to open connection for appending text. Otherwise `cat()` would only work when applied to files, but not with connections as explicitly asked for in the exercise. Further, we add the `append_line()` method and a `close()` statement as finalizer.
+__[A]{.solved}__: Our `FileWriter` class will create a connection to a file at initialization. Therefore, we open a connection to a user specified file during the initialisation. Note that we need to set `open = "a"` in `file()` to open connection for appending text. Otherwise, `cat()` would only work when applied to files, but not with connections as explicitly asked for in the exercise. Further, we add the `append_line()` method and a `close()` statement as finalizer.
 
 ```{r, eval = TRUE, error = TRUE}
 FileWriter <- R6::R6Class(

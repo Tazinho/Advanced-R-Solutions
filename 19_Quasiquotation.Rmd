@@ -325,7 +325,7 @@ interaction(list(a = c("a", "b", "c", "d"), b = c("e", "f")))  # list
 
 `expand.grid()` uses the same strategy and also assigns `args <- args[[1]]` in case of `length(args) == 1 && is.list(args[[1]])`.
 
-`par()` does the most pre-processing to ensure a valid structure of the `args` argument. When no dots are provided (`!length(args)`) it will create a list of arguments from an internal character vector (partly depending on it's `no.readonly` argument). Further, given that all elements of `args` are character vectors (`all(unlist(lapply(args, is.character)))`), `args` is turned into a list via `as.list(unlist(args))`, which will flatten nested lists. Similar to the other functions, a level of the list will be stripped via `args <- args[[1L]]`, when `args` is of length one with its first element being a list.
+`par()` does the most pre-processing to ensure a valid structure of the `args` argument. When no dots are provided (`!length(args)`) it will create a list of arguments from an internal character vector (partly depending on its `no.readonly` argument). Further, given that all elements of `args` are character vectors (`all(unlist(lapply(args, is.character)))`), `args` is turned into a list via `as.list(unlist(args))`, which will flatten nested lists. Similar to the other functions, a level of the list will be stripped via `args <- args[[1L]]`, when `args` is of length one with its first element being a list.
 
 __[Q3]{.Q}__: Explain the problem with this definition of `set_attr()`
 

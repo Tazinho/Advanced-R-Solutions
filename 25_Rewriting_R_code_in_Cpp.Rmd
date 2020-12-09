@@ -254,7 +254,7 @@ minC(c(2:4, NA), na_rm = TRUE)
 minC(c(NA, NA), na_rm = TRUE)
 ```
 
-We also extend `anyC()` so it can deal with missing values. Please note that this (again) introduces some code duplication. This could be avoided by moving the check for missing values to the inner loop at the expense of a slight decrease of performance. Here we use `LogicalVetor` as return type. If we would use `bool` instead, the C++ `NA_LOGICAL` would be converted into R's logical `TRUE`.
+We also extend `anyC()` so it can deal with missing values. Please note that this (again) introduces some code duplication. This could be avoided by moving the check for missing values to the inner loop at the expense of a slight decrease of performance. Here we use `LogicalVector` as return type. If we would use `bool` instead, the C++ `NA_LOGICAL` would be converted into R's logical `TRUE`.
 
 ```{Rcpp}
 #include <Rcpp.h>

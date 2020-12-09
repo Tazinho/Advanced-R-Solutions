@@ -43,7 +43,7 @@ f()
 
 __[Q3]{.Q}__: A good rule of thumb is that an anonymous function should fit on one line and shouldn't need to use `{}`. Review your code. Where could you have used an anonymous function instead of a named function? Where should you have used a named function instead of an anonymous function?
 
-__[A]{.solved}__: The use of anonymous functions allows concise and elegant code in certain situations. However, they miss a descriptive name and when re-reading the code, it can take a while to figure out what they do (even if it's future you reading). That's why it's helpful to give long and complex functions a descriptive name. It may be worthwhile to take a look at your own projects or other people's code to reflect on this part of your coding style.
+__[A]{.solved}__: The use of anonymous functions allows concise and elegant code in certain situations. However, they miss a descriptive name and when re-reading the code, it can take a while to figure out what they do. That's why it's helpful to give long and complex functions a descriptive name. It may be worthwhile to take a look at your own projects or other people's code to reflect on this part of your coding style.
 
 __[Q4]{.Q}__: What function allows you to tell if an object is a function? What function allows you to tell if a function is a primitive function?
 
@@ -188,7 +188,7 @@ __[A]{.solved}__: We expect `x_ok()` to validate its input via certain criteria:
 `&&` does not perform elementwise comparisons, instead it uses the first element of each value only. It also uses lazy evaluation, in the sense that evaluation "proceeds only until the result is determined" (from `?Logic`). This means that the RHS of `&&` won't be evaluated if the LHS already determines the outcome of the comparison (e.g. evaluate to `FALSE`). This behaviour is also known as 'shortcircuiting'. 
 For some situations (`x = 1`) both operators will lead to the same result. But this is not always the case. For `x = NULL`, the `&&`-operator will stop after the `!is.null` statement and return the result. The following conditions won't even be evaluated! (If the other conditions are also evaluated (by the use of `&`), the outcome would change. `NULL > 0` returns `logical(0)`, which is not helpful in this case.)
 
-We can also see the difference in behaviour, when we set `x = 1:3`. The `&&`-operator returns the result from `length(x) == 1`, which is `FALSE`. Using `&` as the logical operator leads to the (vectorised) `x > 0` condition being be evaluated and also returned.
+We can also see the difference in behaviour, when we set `x = 1:3`. The `&&`-operator returns the result from `length(x) == 1`, which is `FALSE`. Using `&` as the logical operator leads to the (vectorised) `x > 0` condition being evaluated and also returned.
 
 __[Q2]{.Q}__: What does this function return? Why? Which principle does it illustrate?
 
@@ -277,7 +277,7 @@ __[A]{.solved}__: Let's inspect the arguments and their order for both functions
 str(sum)
 ```
 
-For the `...` argument `sum()` expects numeric, complex or logical vector input (see `?sum`). Unfortunately, when `...` is used, misspelled arguments (!) like `na.omit` won't raise an error (in case of no further input checks). So instead, `na.omit` is treated as a logical and becomes part of the `...` argument. It will be coerced to `1` and be part of the sum. All other arguments are left unchanged. Therefore `sum(1, 2, 3)` returns `6` and `sum(1, 2, 3, na.omit = TRUE)` returns `7`.
+For the `...` argument `sum()` expects numeric, complex, or logical vector input (see `?sum`). Unfortunately, when `...` is used, misspelled arguments (!) like `na.omit` won't raise an error (in case of no further input checks). So instead, `na.omit` is treated as a logical and becomes part of the `...` argument. It will be coerced to `1` and be part of the sum. All other arguments are left unchanged. Therefore `sum(1, 2, 3)` returns `6` and `sum(1, 2, 3, na.omit = TRUE)` returns `7`.
 
 In contrast, the generic function `mean()` expects `x`, `trim`, `na.rm` and `...` for its default method.
 
@@ -285,7 +285,7 @@ In contrast, the generic function `mean()` expects `x`, `trim`, `na.rm` and `...
 str(mean.default)
 ```
 
-As `na.omit` is not one of `mean()`'s named arguments (`x`; and also not a candidate for partial matching), `na.omit` again becomes part of the `...` argument. However, in contrast to `sum()` the elements of `...` are not "part" of the mean. The other supplied arguments are matched by their order, i.e. `x = 1`, `trim = 2` and `na.rm = 3`. As `x` is of length 1 and not `NA`, the settings of `trim` and `na.rm` do not affect the calculation of the mean. Both calls (`mean(1, 2, 3)` and `mean(1, 2, 3, na.omit = TRUE)`) return `1`.
+As `na.omit` is not one of `mean()`'s named arguments (`x`; and no candidate for partial matching), `na.omit` again becomes part of the `...` argument. However, in contrast to `sum()` the elements of `...` are not "part" of the mean. The other supplied arguments are matched by their order, i.e. `x = 1`, `trim = 2` and `na.rm = 3`. As `x` is of length 1 and not `NA`, the settings of `trim` and `na.rm` do not affect the calculation of the mean. Both calls (`mean(1, 2, 3)` and `mean(1, 2, 3, na.omit = TRUE)`) return `1`.
 
 __[Q2]{.Q}__: Explain how to find the documentation for the named arguments in the following function call:
 
@@ -317,7 +317,7 @@ The `localTitle()` function was defined in the first lines of `plot.default()` a
 localTitle <- function(..., col, bg, pch, cex, lty, lwd) title(...)
 ```
 
-The call to `localTitle()` passes the `col` parameter as part of `...` argument to `title()`. `?title` tells us that the `title()` function specifies four parts of the plot: Main (title of the plot), sub (sub-title of the plot) and both axis labels. Therefore, it would introduce ambiguity inside `title()` to use `col` directly. Instead one has the option to supply `col` via the `...` argument, via `col.lab` or as part of `xlab` in the form `xlab = list(c("index"), col = "red")` (similar for `ylab`).
+The call to `localTitle()` passes the `col` parameter as part of `...` argument to `title()`. `?title` tells us that the `title()` function specifies four parts of the plot: Main (title of the plot), sub (sub-title of the plot) and both axis labels. Therefore, it would introduce ambiguity inside `title()` to use `col` directly. Instead, one has the option to supply `col` via the `...` argument, via `col.lab` or as part of `xlab` in the form `xlab = list(c("index"), col = "red")` (similar for `ylab`).
 
 ## Exiting a function
 
@@ -378,7 +378,7 @@ Compare `capture.output()` to `capture.output2()`. How do the functions differ? 
 
 __[A]{.solved}__: Using `body(capture.output)` we inspect the source code of the original `capture.output()` function: The implementation for `capture.output()` is a quite a bit longer (39 lines vs. 7 lines).
 
-`capture_output()` strives to "write output as far as possible to a file", which is why an error handling is needed. This is achieved by first quoting the expressions (via `substitute()`) and then evaluating them step-by-step (via `lapply()` and a variant of `eval()`), which makes the function more robust. In `capture_output2()` the code is simply forced and the output is caught via `sink()` in a temporary file. An additional feature of `capture_output()` is that one can also capture messages by setting `type = "message"`. As this is internally forwarded to `sink()`, this behaviour (and also `sink`'s `split` argument) could be easily introduced within `capture_output2` as well.
+`capture_output()` strives to "write output as far as possible to a file", which is why an error handling is needed. This is achieved by first quoting the expressions (via `substitute()`) and then evaluating them step-by-step (via `lapply()` and a variant of `eval()`), which makes the function more robust. In `capture_output2()` the code is simply forced, and the output is caught via `sink()` in a temporary file. An additional feature of `capture_output()` is that one can also capture messages by setting `type = "message"`. As this is internally forwarded to `sink()`, this behaviour (and also `sink()`'s `split` argument) could be easily introduced within `capture_output2()` as well.
 
 ## Function forms
 
@@ -437,7 +437,7 @@ x <- 1:3
 }
 ```
 
-R internally transforms the code and the transformed code reproduces the error above:
+R internally transforms the code, and the transformed code reproduces the error above:
 
 ```{r, eval = FALSE}
 get("x") <- `modify<-`(get("x"), 1, 10)

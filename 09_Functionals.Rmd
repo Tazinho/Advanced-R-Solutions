@@ -8,7 +8,7 @@ source("common.R")
 
 ## Prerequisites
 
-For the functional programming part of the book we will mainly use functions from the `{purrr}` package.
+For the functional programming part of the book, we will mainly use functions from the `{purrr}` package.
 
 ```{r setup}
 library(purrr)
@@ -18,7 +18,7 @@ library(purrr)
 
 __[Q1]{.Q}__: Use `as_mapper()` to explore how purrr generates anonymous functions for the integer, character, and list helpers. What helper allows you to extract attributes? Read the documentation to find out.
 
-__[A]{.solved}__: `map()` offers multiple ways (functions, formulas and extractor functions) to specify its function argument (`.f`). Initially, the various inputs have to be transformed into a valid function, which is then applied. The creation of this valid function is the job of `as_mapper()` and it is called every time `map()` is used.
+__[A]{.solved}__: `map()` offers multiple ways (functions, formulas, and extractor functions) to specify its function argument (`.f`). Initially, the various inputs have to be transformed into a valid function, which is then applied. The creation of this valid function is the job of `as_mapper()` and it is called every time `map()` is used.
 
 Given character, numeric or list input `as_mapper()` will create an extractor function. Characters select by name, while numeric input selects by positions and a list allows a mix of these two approaches. This extractor interface can be very useful, when working with nested data.
 
@@ -222,7 +222,7 @@ __[A]{.solved}__: In the first approach
 mtcars[vars] <- map2(trans, mtcars[vars], function(f, var) f(var))
 ```
 
-the list of the 2 functions (`trans`) and the 2 appropriately selected data frame columns (`mtcars[vars]`) are supplied to `map2()`. `map2()` creates an anonymous function (`f(var)`) which applies the functions to the variables when `map2()` iterates over their (similar) indices. On the left hand side the respective 2 elements of `mtcars` are being replaced by their new transformations.
+the list of the 2 functions (`trans`) and the 2 appropriately selected data frame columns (`mtcars[vars]`) are supplied to `map2()`. `map2()` creates an anonymous function (`f(var)`) which applies the functions to the variables when `map2()` iterates over their (similar) indices. On the left hand side, the respective 2 elements of `mtcars` are being replaced by their new transformations.
 
 The `map()` variant
 
@@ -240,7 +240,7 @@ To summarise, in situations where `map()` and `map2()` provide solutions for an 
 
 __[Q4]{.Q}__: What does `write.csv()` return, i.e. what happens if you use it with `map2()` instead of `walk2()`?
 
-__[A]{.solved}__: `write.csv()` returns `NULL`. As we call the function for its side effect (creating a CSV file), `walk2()` would be appropriate here. Otherwise we receive a rather uninformative list of `NULL`s.
+__[A]{.solved}__: `write.csv()` returns `NULL`. As we call the function for its side effect (creating a CSV file), `walk2()` would be appropriate here. Otherwise, we receive a rather uninformative list of `NULL`s.
 
 ```{r}
 cyls <- split(mtcars, mtcars$cyl)

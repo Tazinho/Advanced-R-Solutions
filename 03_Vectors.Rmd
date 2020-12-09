@@ -8,9 +8,9 @@ source("common.R")
 
 __[Q1]{.Q}__: How do you create raw and complex scalars? (See `?raw` and `?complex`.)
 
-__[A]{.solved}__: In R scalars are represented as vectors of length one. However, there's no built-in syntax like there is for logicals, integers, doubles, and character vectors to create individual raw and complex values. Instead you have to create them by calling a function.
+__[A]{.solved}__: In R scalars are represented as vectors of length one. However, there's no built-in syntax like there is for logicals, integers, doubles, and character vectors to create individual raw and complex values. Instead, you have to create them by calling a function.
 
-For raw vectors you can use either `as.raw()` or `rawToChar()` to create them from numeric or character values.
+For raw vectors you can use either `as.raw()` or `charToRaw()` to create them from numeric or character values.
 
 ```{r}
 as.raw(42)
@@ -210,7 +210,7 @@ __[A]{.solved}__: To summarise:
     lobstr::ref(list(1:2, 2))
     ```
 
-* Subsetting with out-of-bounds and `NA` values leads to different output. E.g. for `[` we get `NA` for atomics and `NULL` for lists. (This is described in more detail within the [subsetting chapter](https://adv-r.hadley.nz/subsetting.html).)
+* Subsetting with out-of-bounds and `NA` values leads to different output. E.g., `[` returns `NA` for atomics and `NULL` for lists. (This is described in more detail within the [subsetting chapter](https://adv-r.hadley.nz/subsetting.html).)
 
     ```{r}
     # Subsetting atomic vectors
@@ -282,7 +282,7 @@ __[Q1]{.Q}__: Can you have a data frame with zero rows? What about zero columns?
 
 __[A]{.solved}__: Yes, you can create these data frames easily; either during creation or via subsetting. Even both dimensions can be zero.
 
-Create a 0-row, 0-column or an empty data frame directly:
+Create a 0-row, 0-column, or an empty data frame directly:
 
 ```{r}
 data.frame(a = integer(), b = logical())

@@ -78,7 +78,7 @@ __[Q4]{.Q}__: What is special about the AST below? (Hint: re-read section [6.2.1
 ast(function(x = 1, y = 2) {})
 ```
 
-__[A]{.solved}__: The last leaf of the AST is not explicitly specified in the expression. Instead the `srcref` attribute, which points to the functions source code, is automatically created by base R.
+__[A]{.solved}__: The last leaf of the AST is not explicitly specified in the expression. Instead, the `srcref` attribute, which points to the functions source code, is automatically created by base R.
 
 __[Q5]{.Q}__: What does the call tree of an `if` statement with multiple `else if` conditions look like? Why?
 
@@ -170,7 +170,7 @@ call_standardise(quote(mean(n = T, 1:10)))
 call_standardise(quote(mean(x = 1:10, , TRUE)))
 ```
 
-__[A]{.solved}__: The reason for this unexpected behaviour is that `mean()` uses the `...` argument and therefore cannot standardise the regarding arguments. Since `mean()` uses S3 dispatch (i.e., `UseMethod()`) and the underlying `mean.default()` method specifies some more arguments, `call_standardise()` can do much better with a specific S3 method.
+__[A]{.solved}__: The reason for this unexpected behaviour is that `mean()` uses the `...` argument and therefore cannot standardise the regarding arguments. Since `mean()` uses S3 dispatch (i.e. `UseMethod()`) and the underlying `mean.default()` method specifies some more arguments, `call_standardise()` can do much better with a specific S3 method.
 
 ```{r}
 call_standardise(quote(mean.default(1:10, na.rm = TRUE)))
