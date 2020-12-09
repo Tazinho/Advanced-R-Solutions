@@ -3,8 +3,10 @@ source("common.R")
 ```
 
 # Improving performance
+<!-- 24 -->
 
 ## Checking for existing solutions
+<!-- 24.3 -->
 
 __[Q1]{.Q}__: What are faster alternatives to `lm`? Which are specifically designed to work with larger datasets?
 
@@ -59,7 +61,6 @@ __[Q2]{.Q}__: What package implements a version of `match()` that's faster for r
 __[A]{.solved}__: A web search points us to the `{fastmatch}`-package. We compare it to `base::match()` and observe an impressive performance gain.
 
 ```{r}
-set.seed(1)
 table <- 1:100000
 x <- sample(table, 10000, replace = TRUE)
 
@@ -188,6 +189,7 @@ For more general alternatives, the appropriate choice highly depends on the type
 - `{DEoptim}` provides a global optimiser based on the Differential Evolution algorithm.
 
 ## Doing as little as possible
+<!-- 24.4 -->
 
 __[Q1]{.Q}__: What's the difference between `rowSums()` and `.rowSums()`?
 
@@ -294,6 +296,7 @@ bench::mark(
 Since we didn't use `table()` in our `chisq.test2()`-implementation, we cannot benefit from the slight performance gain from `table2()`.
 
 ## Vectorise
+<!-- 24.5 -->
 
 __[Q1]{.Q}__: The density functions, e.g. `dnorm()`, have a common interface. Which arguments are vectorised over? What does `rnorm(10, mean = 10:1)` do?
 

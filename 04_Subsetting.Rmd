@@ -3,8 +3,10 @@ source("common.R")
 ```
 
 # Subsetting 
+<!-- 4 -->
 
 ## Selecting multiple elements
+<!-- 4.2 -->
 
 __[Q1]{.Q}__: Fix each of the following common data frame subsetting errors:
 
@@ -80,6 +82,7 @@ __[Q6]{.Q}__: What does `df[is.na(df)] <- 0` do? How does it work?
 __[A]{.solved}__: This expression replaces the `NA`s in `df` with `0`. Here `is.na(df)` returns a logical matrix that encodes the position of the missing values in `df`. Subsetting and assignment are then combined to replace only the missing values.
 
 ## Selecting a single element
+<!-- 4.3 -->
 
 __[Q1]{.Q}__: Brainstorm as many ways as possible to extract the third value from the `cyl` variable in the `mtcars` dataset.
 
@@ -103,7 +106,7 @@ mtcars[3, 2]
 mtcars[[c(2, 3)]]
 ```
 
-__[Q2]{.Q}__: Given a linear model, e.g., `mod <- lm(mpg ~ wt, data = mtcars)`, extract the residual degrees of freedom. Extract the R squared from the model summary (`summary(mod)`).
+__[Q2]{.Q}__: Given a linear model, e.g. `mod <- lm(mpg ~ wt, data = mtcars)`, extract the residual degrees of freedom. Extract the R squared from the model summary (`summary(mod)`).
 
 __[A]{.solved}__: `mod` is of type list, which opens up several possibilities. We us `$` or `[[` to extract a single element:
 
@@ -123,6 +126,7 @@ summary(mod)$r.squared
 (Tip: The [broom](https://github.com/tidymodels/broom) package provides a very useful approach to work with models in a tidy way.)
 
 ## Applications
+<!-- 4.5 -->
 
 __[Q1]{.Q}__: How would you randomly permute the columns of a data frame? (This is an important technique in random forests.) Can you simultaneously permute the rows and columns in one step?
 

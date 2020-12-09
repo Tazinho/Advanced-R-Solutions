@@ -3,8 +3,10 @@ source("common.R")
 ```
 
 # R6
+<!-- 14 -->
 
 ## Prerequisites
+<!-- 14.0 -->
 
 To solve the exercises in this chapter we will have to create R6 objects, which are implemented in the `{R6}` package.
 
@@ -13,6 +15,7 @@ library(R6)
 ```
 
 ## Classes and methods
+<!-- 14.2 -->
 
 __[Q1]{.Q}__: Create a bank account R6 class that stores a balance and allows you to deposit and withdraw money. Create a subclass that throws an error if you attempt to go into overdraft. Create another subclass that allows you to go into overdraft, but charges you a fee.
 
@@ -224,6 +227,7 @@ __[Q7]{.Q}__: What base type are R6 objects built on top of? What attributes do 
 __[A]{.solved}__: R6 objects are built on top of environments. They have a `class` attribute, which is a character vector containing the class name, the name of any super classes (if existent) and the string `"R6"` as the last element.
 
 ## Controlling access
+<!-- 14.3 -->
 
 __[Q1]{.Q}__: Create a bank account class that prevents you from directly setting the account balance, but you can still withdraw from and deposit to. Throw an error if you attempt to go into overdraft.
 
@@ -369,6 +373,8 @@ B$new()$test()
 We conclude that subclasses can access private methods from their superclasses, but not private fields.
 
 ## Reference semantics
+<!-- 14.4 -->
+
 __[Q1]{.Q}__: Create a class that allows you to write a line to a specified file. You should open a connection to the file in `$initialize()`, append a line using `cat()` in `$append_line()`, and close the connection in `$finalize()`.
 
 __[A]{.solved}__: Our `FileWriter` class will create a connection to a file at initialization. Therefore, we open a connection to a user specified file during the initialisation. Note that we need to set `open = "a"` in `file()` to open connection for appending text. Otherwise, `cat()` would only work when applied to files, but not with connections as explicitly asked for in the exercise. Further, we add the `append_line()` method and a `close()` statement as finalizer.

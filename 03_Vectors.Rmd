@@ -3,8 +3,10 @@ source("common.R")
 ```
 
 # Vectors
+<!-- 3 -->
 
 ## Atomic vectors
+<!-- 3.2 -->
 
 __[Q1]{.Q}__: How do you create raw and complex scalars? (See `?raw` and `?complex`.)
 
@@ -52,6 +54,7 @@ __[A]{.solved}__: The documentation states that:
 Atomic vectors are defined in Advanced R as objects of type logical, integer, double, complex, character or raw. Vectors are defined as atomic vectors or lists.
 
 ## Attributes
+<!-- 3.3 -->
 
 __[Q1]{.Q}__: How is `setNames()` implemented? How is `unname()` implemented? Read the source code.
 
@@ -140,6 +143,7 @@ attr(foo, which = "comment")
 ```
 
 ## S3 atomic vectors
+<!-- 3.4 -->
 
 __[Q1]{.Q}__: What sort of object does `table()` return? What is its type? What attributes does it have? How does the dimensionality change as you tabulate more variables?
 
@@ -196,6 +200,7 @@ as.integer(f3)
 ```
 
 ## Lists
+<!-- 3.5 -->
 
 __[Q1]{.Q}__: List all the ways that a list differs from an atomic vector.
 
@@ -210,7 +215,7 @@ __[A]{.solved}__: To summarise:
     lobstr::ref(list(1:2, 2))
     ```
 
-* Subsetting with out-of-bounds and `NA` values leads to different output. E.g., `[` returns `NA` for atomics and `NULL` for lists. (This is described in more detail within the [subsetting chapter](https://adv-r.hadley.nz/subsetting.html).)
+* Subsetting with out-of-bounds and `NA` values leads to different output. E.g. `[` returns `NA` for atomics and `NULL` for lists. (This is described in more detail within the [subsetting chapter](https://adv-r.hadley.nz/subsetting.html).)
 
     ```{r}
     # Subsetting atomic vectors
@@ -277,6 +282,7 @@ We see again that dates and date-times are internally stored as doubles. Unfortu
 To summarise: `c()` coerces types and errors may occur because of inappropriate method dispatch. `unlist()` strips attributes. 
 
 ## Data frames and tibbles
+<!-- 3.6 -->
 
 __[Q1]{.Q}__: Can you have a data frame with zero rows? What about zero columns?
 

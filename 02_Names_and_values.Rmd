@@ -5,8 +5,10 @@ source("common.R")
 # (PART) Foundations {-} 
 
 # Names and values
+<!-- 2 -->
 
 ## Prerequisites {-}
+<!-- 2.0 -->
 
 We will use the `{lobstr}` package to help answer questions regarding the internal representation of R objects.
 
@@ -15,6 +17,7 @@ library(lobstr)
 ```
 
 ## Binding basics
+<!-- 2.2 -->
 
 __[Q1]{.Q}__: Explain the relationship between `a`, `b`, `c`, and `d` in the following code:
 
@@ -99,6 +102,7 @@ __[Q5]{.Q}__: I slightly simplified the rules that govern syntactic names. Why i
 __[A]{.solved}__: `.123e1` is not a syntactic name, because it starts with one dot which is followed by a number. This makes it a double, `1.23`.
 
 ## Copy-on-modify
+<!-- 2.3 -->
 
 __[Q1]{.Q}__: Why is `tracemem(1:10)` not useful?
 
@@ -215,6 +219,7 @@ knitr::include_graphics("images/copy_on_modify_fig2.png",
 ```
 
 ## Object size
+<!-- 2.4 -->
 
 __[Q1]{.Q}__: In the following example, why are `object.size(y)` and `obj_size(y)` so radically different? Consult the documentation of `object.size()`.
 
@@ -236,7 +241,7 @@ obj_size(funs)
 
 __[A]{.solved}__: All three functions are built-in to R as part of the `{base}` and `{stats}` packages and hence always available. So, what does it mean to measure the size of something that's already included in R?
 
-(There's typically a more general question about what you want to know when you ask for the size of something — do you want to know how much data you'd need to send to communicate the object to someone else (e.g., serialise it), or do you want to know how much memory you'd free if you deleted it?)
+(There's typically a more general question about what you want to know when you ask for the size of something — do you want to know how much data you'd need to send to communicate the object to someone else (e.g. serialise it), or do you want to know how much memory you'd free if you deleted it?)
 
 Let us look for how many other objects this applies as well.
 
@@ -359,6 +364,7 @@ obj_size(a, b)
 ```
 
 ## Modify-in-place
+<!-- 2.5 -->
 
 __[Q1]{.Q}__: Explain why the following code doesn't create a circular list.
 

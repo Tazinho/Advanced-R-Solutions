@@ -3,8 +3,10 @@ source("common.R")
 ```
 
 # S4
+<!-- 15 -->
 
 ## Prerequisites
+<!-- 15.0 -->
 
 We load the methods package as it contains the S4 object-oriented programming system.
 
@@ -13,6 +15,7 @@ library(methods)
 ```
 
 ## Basics
+<!-- 15.2 -->
 
 __[Q1]{.Q}__: `lubridate::period()` returns an S4 class. What slots does it have? What class is each slot? What accessors does it provide?
 
@@ -48,6 +51,7 @@ __[A]{.solved}__: Besides adding `?` in front of a function call (i.e. `?method(
 * documentation for a specific method via `ClassName?methodName`.
 
 ## Classes
+<!-- 15.3 -->
 
 __[Q1]{.Q}__: Extend the Person class with fields to match `utils::person()`. Think about what slots you will need, what class each slot should have, and what you’ll need to check in your validity method.
 
@@ -194,6 +198,7 @@ new("DataFrame", data = list(a = 1, b = 2))
 ```
 
 ## Generics and methods
+<!-- 15.4 -->
 
 __[Q1]{.Q}__: Add `age()` accessors for the `Person` class.
 
@@ -276,6 +281,7 @@ setMethod("show", "Person", function(object, y) {
 ```
 
 ## Method dispatch 
+<!-- 15.5 -->
 
 __[Q1]{.Q}__: Draw the method graph for `f(😅, 😽)`.
 
@@ -299,7 +305,8 @@ __[A]{.solved}__: We will introduce ambiguity, since one class has distance 2 to
 
 ## S4 and S3
 
-__[Q1]{.Q}__: What would a full `setOldClass()` definition look like for an ordered factor (i.e. add `slots` and `prototype` to the definition above)?
+__[Q<!-- 15.6 -->
+1]{.Q}__: What would a full `setOldClass()` definition look like for an ordered factor (i.e. add `slots` and `prototype` to the definition above)?
 
 __[A]{.solved}__: The purpose of `setOldClass()` lies in registering an S3 class as a "formally defined class", so that it can be used within the S4 object-oriented programming system. When using it, we may provide the argument `S4Class`, which will inherit the slots and their default values (prototype) to the registered class.
 

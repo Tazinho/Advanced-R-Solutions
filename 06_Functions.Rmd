@@ -3,8 +3,10 @@ source("common.R")
 ```
 
 # Functions
+<!-- 6 -->
 
 ## Function fundamentals
+<!-- 6.2 -->
 
 __[Q1]{.Q}__: Given a name, like `"mean"`, `match.fun()` lets you find a function. Given a function, can you find its name? Why doesn't that make sense in R?
 
@@ -121,6 +123,7 @@ __[Q7]{.Q}__: When does printing a function not show what environment it was cre
 __[A]{.solved}__: Primitive functions and functions created in the global environment do not print their environment.
 
 ## Lexical Scoping
+<!-- 6.4 -->
 
 __[Q1]{.Q}__: What does the following code return? Why? Describe how each of the three `c`’s is interpreted.
 
@@ -158,6 +161,7 @@ f(10)
 __[A]{.solved}__: Within this nested function two more functions also named `f()` are defined and called. Because the functions are each executed in their own environment R will look up and use the functions defined last in these environments. The innermost `f()` is called last, though it is the first function to return a value. Because of this the order of the calculation passes "from the inside to the outside" and the function returns `((10 ^ 2) + 1) * 2`, i.e. 202.
 
 ## Lazy evaluation
+<!-- 6.5 -->
 
 __[Q1]{.Q}__: What important property of `&&` makes `x_ok()` work?
 
@@ -260,6 +264,7 @@ str(formals(library))
 ```
 
 ## `...` (dot-dot-dot)
+<!-- 6.6 -->
 
 __[Q1]{.Q}__: Explain the following results:
 
@@ -320,6 +325,7 @@ localTitle <- function(..., col, bg, pch, cex, lty, lwd) title(...)
 The call to `localTitle()` passes the `col` parameter as part of `...` argument to `title()`. `?title` tells us that the `title()` function specifies four parts of the plot: Main (title of the plot), sub (sub-title of the plot) and both axis labels. Therefore, it would introduce ambiguity inside `title()` to use `col` directly. Instead, one has the option to supply `col` via the `...` argument, via `col.lab` or as part of `xlab` in the form `xlab = list(c("index"), col = "red")` (similar for `ylab`).
 
 ## Exiting a function
+<!-- 6.7 -->
 
 __[Q1]{.Q}__: What does `load()` return? Why don’t you normally see these values?
 
@@ -381,6 +387,7 @@ __[A]{.solved}__: Using `body(capture.output)` we inspect the source code of the
 `capture_output()` strives to "write output as far as possible to a file", which is why an error handling is needed. This is achieved by first quoting the expressions (via `substitute()`) and then evaluating them step-by-step (via `lapply()` and a variant of `eval()`), which makes the function more robust. In `capture_output2()` the code is simply forced, and the output is caught via `sink()` in a temporary file. An additional feature of `capture_output()` is that one can also capture messages by setting `type = "message"`. As this is internally forwarded to `sink()`, this behaviour (and also `sink()`'s `split` argument) could be easily introduced within `capture_output2()` as well.
 
 ## Function forms
+<!-- 6.8 -->
 
 __[Q1]{.Q}__: Rewrite the following code snippets into prefix form:
 

@@ -3,8 +3,10 @@ source("common.R")
 ```
 
 # Environments
+<!-- 7 -->
 
 ## Prerequisites {-}
+<!-- 7.0 -->
 
 Just like in Advanced R, we mainly use the `{rlang}` package to work with environments in this chapter.
 
@@ -13,6 +15,7 @@ library(rlang)
 ```
 
 ## Environment basics
+<!-- 7.2 -->
 
 __[Q1]{.Q}__: List three ways in which an environment differs from a list.
 
@@ -121,6 +124,7 @@ a
 __[A]{.solved}__: The primary difference between `rebind()` and `<<-` is that `rebind()` will only carry out an assignment when it finds an existing binding; unlike `<<-` it will never create a new one in the global environment. This behaviour of `<<-` is usually undesirable because global variables introduce non-obvious dependencies between functions.
 
 ## Recursing over environments
+<!-- 7.3 -->
 
 __[Q1]{.Q}__: Modify `where()` to return _all_ environments that contain a binding for `name`. Carefully think through what type of object the function will need to return.
 
@@ -199,6 +203,7 @@ fget("mean", inherits = TRUE)
 ```
 
 ## Special environments
+<!-- 7.4 -->
 
 __[Q1]{.Q}__: How is `search_envs()` different to `env_parents(global_env())`?
 
@@ -280,6 +285,7 @@ fstr("mean")
 Once you have learned about tidy evaluation, you could rewrite `fstr()` to use `enquo()` so that you'd call it more like `str()`, i.e. `fstr(sum)`.
 
 ## Call stacks
+<!-- 7.5 -->
 
 __[Q1]{.Q}__: Write a function that lists all the variables defined in the environment in which it was called. It should return the same results as `ls()`.
 

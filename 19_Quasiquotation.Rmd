@@ -3,8 +3,10 @@ source("common.R")
 ```
 
 # Quasiquotation
+<!-- 19 -->
 
 ## Prerequisites {-}
+<!-- 19.0 -->
 
 To continue computing on the language, we keep using the `{rlang}` package in this chapter.
 
@@ -13,6 +15,7 @@ library(rlang)
 ```
 
 ## Motivation
+<!-- 19.2 -->
 
 __[Q1]{.Q}__: For each function in the following base R code, identify which arguments are quoted and which are evaluated.
 
@@ -125,6 +128,7 @@ ggplot2::aes
 ```
 
 ## Quoting
+<!-- 19.3 -->
 
 __[Q1]{.Q}__: How is `expr()` implemented? Look at its source code.
 
@@ -234,6 +238,7 @@ substitute(x, .GlobalEnv)
 ```
 
 ## Unquoting
+<!-- 19.4 -->
 
 __[Q1]{.Q}__: Given the following components:
 
@@ -299,6 +304,7 @@ In the expression `mean(!!(1:10))` the call `1:10` is evaluated to an integer ve
 The first version (`mean(1:10)`) seems more natural. It captures lazy evaluation, with a promise that is evaluated when the function is called. The second version (`mean(!!(1:10))`) inlines a vector directly into a call.
 
 ## `...` (dot-dot-dot)
+<!-- 19.6 -->
 
 __[Q1]{.Q}__: One way to implement `exec()` is shown below. Describe how it works. What are the key ideas?
 
@@ -354,6 +360,7 @@ set_attr(1:10, x = 10)
 ```
 
 ## Case studies {#expr-case-studies}
+<!-- 19.7 -->
 
 __[Q1]{.Q}__: In the linear-model example, we could replace the `expr()` in `reduce(summands, ~ expr(!!.x + !!.y))` with `call2()`: `reduce(summands, call2, "+")`. Compare and contrast the two approaches. Which do you think is easier to read?
 

@@ -7,8 +7,10 @@ source("common.R")
 \stepcounter{chapter}
 
 # S3
+<!-- 13 -->
 
 ## Prerequisites {-}
+<!-- 13.0 -->
 
 In this chapter we will mainly use the `{sloop}` package, to interact with S3 objects.
 
@@ -17,6 +19,7 @@ library(sloop)
 ```
 
 ## Basics
+<!-- 13.2 -->
 
 __[Q1]{.Q}__: Describe the difference between `t.test()` and `t.data.frame()`? When is each function called?
 
@@ -60,7 +63,6 @@ We could avoid this confusion by applying a different naming convention (e.g. "s
 __[Q4]{.Q}__: Describe the difference in behaviour in these two calls.
 
 ```{r}
-set.seed(1014)
 some_days <- as.Date("2017-01-31") + sample(10, 5)
 
 mean(some_days)
@@ -102,6 +104,7 @@ attributes(x)
 ```
 
 ## Classes
+<!-- 13.3 -->
 
 __[Q1]{.Q}__: Write a constructor for `data.frame` objects. What base type is a data frame built on? What attributes does it use? What are the restrictions placed on the individual elements? What about the names?
 
@@ -282,6 +285,7 @@ roman(0)
 ```
 
 ## Generics and methods
+<!-- 13.4 -->
 
 __[Q1]{.Q}__: Read the source code for `t()` and `t.test()` and confirm that `t.test()` is an S3 generic and not an S3 method. What happens if you create an object with class `test` and call `t()` with it? Why?
 
@@ -438,6 +442,7 @@ s3_methods_generic("[") %>%
 ```
 
 ## Object styles
+<!-- 13.5 -->
 
 __[Q1]{.Q}__: Categorise the objects returned by `lm()`, `factor()`, `table()`, `as.Date()`, `as.POSIXct()`, `ecdf()`, `ordered()`, `I()` into the styles described above.
 
@@ -505,6 +510,7 @@ new_lm <- function(
 ```
 
 ## Inheritance
+<!-- 13.6 -->
 
 __[Q1]{.Q}__: How does `[.Date` support subclasses? How does it fail to support subclasses?
 
@@ -596,6 +602,7 @@ generic2(structure(list(), class = c("b", "a2")))
 ```
 
 ## Dispatch details
+<!-- 13.7 -->
 
 __[Q1]{.Q}__: Explain the differences in dispatch below:
 
