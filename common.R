@@ -3,7 +3,6 @@ Sys.setenv(LANGUAGE = "en")
 
 # load a few common packages
 library(magrittr)
-library(palmerpenguins)
 
 # Experiment with options output
 # options(width = 50)

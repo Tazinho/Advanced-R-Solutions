@@ -13,6 +13,8 @@ __[A]{.solved}__: The [CRAN task view for high-performance computing](https://cr
 For small datasets, we observe only minor performance gains (or even a small cost):
 
 ```{r}
+penguins <- palmerpenguins::penguins
+
 bench::mark(
   "lm" = lm(
     body_mass_g ~ bill_length_mm + species, data = penguins
