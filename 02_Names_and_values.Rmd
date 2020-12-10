@@ -258,8 +258,6 @@ base_pkgs <- c(
 To look up all functions from these packages we iterate over `base_pkgs` and apply `ls()` and `mget()` within each iteration.
 
 ```{r}
-library(magrittr)
-
 base_objs <- base_pkgs %>% 
   lapply(as.environment) %>% 
   lapply(function(x) mget(ls(x, all.names = TRUE), x)) %>% 
