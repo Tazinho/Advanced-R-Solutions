@@ -2,7 +2,7 @@
 Sys.setenv(LANGUAGE = "en")
 
 # load a few common packages
-library(magrittr)
+`%>%` <- magrittr::`%>%`
 
 # Experiment with options output
 # options(width = 50)
@@ -43,8 +43,8 @@ options(
 )
 
 if (knitr::is_latex_output()) {
-  knitr::opts_chunk$set(width = 65)  # CHANGED (because of indenting)
-  options(width = 65)                # CHANGED
+  knitr::opts_chunk$set(width = 69)
+  options(width = 69)
   options(crayon.enabled = FALSE)
   options(cli.unicode = TRUE)
 }
