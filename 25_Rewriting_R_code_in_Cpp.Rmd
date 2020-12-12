@@ -522,7 +522,7 @@ __[A]{.solved}__: The structure of the three functions will be very similar.
 
 We first sort both input vectors. Then we apply the respective `set_union`, `set_intersection` or `set_difference` function. After that, the result will be between the iterators `tmp.begin()` and `out_end`. To retrieve the result, we loop once through the range between `tmp.begin()` and `out_end` in the last part of each function.
 
-One note on the naming of the functions: `union` is a special class in C++ so we may not use it for our function definition and rather use `setunion`.
+The set operations in base R will discard duplicated values in the arguments. We achieve a similar behaviour by introducing a deduplication step, which omits values that match their predecessor. For the symmetric set functions `unionC` and `intersectC` this step is implemented for the output vector. For `setdiffC` the deduplication is applied to the first input vector.
 
 ```{Rcpp}
 #include <Rcpp.h>
@@ -532,30 +532,35 @@ using namespace Rcpp;
 
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::export]]
-IntegerVector setunion(IntegerVector x, IntegerVector y) {
+IntegerVector unionC(IntegerVector x, IntegerVector y) {
   int nx = x.size();
   int ny = y.size();
   
   IntegerVector tmp(nx + ny);
   
-  std::sort(x.begin(), x.end());
+  std::sort(x.begin(), x.end()); // unique
   std::sort(y.begin(), y.end());
   
   IntegerVector::iterator out_end = std::set_union(
     x.begin(), x.end(), y.begin(), y.end(), tmp.begin()
   );
   
+  int prev_value = 0;
   IntegerVector out;
   for (IntegerVector::iterator it = tmp.begin();
-      it != out_end; ++it) {
+       it != out_end; ++it) {
+    if ((it != tmp.begin())  && (prev_value == *it)) continue;
+    
     out.push_back(*it);
+    
+    prev_value = *it;
   }
   
   return out;
 }
 
 // [[Rcpp::export]]
-IntegerVector intersect(IntegerVector x, IntegerVector y) {
+IntegerVector intersectC(IntegerVector x, IntegerVector y) {
   int nx = x.size();
   int ny = y.size();
   
@@ -568,32 +573,49 @@ IntegerVector intersect(IntegerVector x, IntegerVector y) {
     x.begin(), x.end(), y.begin(), y.end(), tmp.begin()
   );
   
+  int prev_value = 0;  
   IntegerVector out;
   for (IntegerVector::iterator it = tmp.begin();
-      it != out_end; ++it) {
+       it != out_end; ++it) {
+    if ((it != tmp.begin())  && (prev_value == *it)) continue;
+    
     out.push_back(*it);
+    
+    prev_value = *it;
   }
   
   return out;
 }
 
 // [[Rcpp::export]]
-IntegerVector setdiff(IntegerVector x, IntegerVector y) {
+IntegerVector setdiffC(IntegerVector x, IntegerVector y) {
   int nx = x.size();
   int ny = y.size();
   
   IntegerVector tmp(nx);
   
   std::sort(x.begin(), x.end());
+  
+  int prev_value = 0;
+  IntegerVector x_dedup;
+  for (IntegerVector::iterator it = x.begin();
+       it != x.end(); ++it) {
+    if ((it != x.begin()) && (prev_value == *it)) continue;
+    
+    x_dedup.push_back(*it);
+    
+    prev_value = *it;
+  }
+  
   std::sort(y.begin(), y.end());
   
   IntegerVector::iterator out_end = std::set_difference(
-    x.begin(), x.end(), y.begin(), y.end(), tmp.begin()
+    x_dedup.begin(), x_dedup.end(), y.begin(), y.end(), tmp.begin()
   );
   
   IntegerVector out;
   for (IntegerVector::iterator it = tmp.begin();
-      it != out_end; ++it) {
+       it != out_end; ++it) {
     out.push_back(*it);
   }
   
@@ -604,12 +626,16 @@ IntegerVector setdiff(IntegerVector x, IntegerVector y) {
 Let's verify, that these functions work as intended.
 
 ```{r}
-x <- c(1, 2, 3, 3)
-y <- c(3, 2, 5)
+# input vectors include duplicates
+x <- c(1, 2, 3, 3, 3)
+y <- c(3, 3, 2, 5)
 
-setunion(x, y)
+union(x, y)
+unionC(x, y)
+
 intersect(x, y)
-setdiff(x, y)
+intersectC(x, y)
 
-typeof(setdiff(x, y))
+setdiff(x, y)
+setdiffC(x, y)
 ```
