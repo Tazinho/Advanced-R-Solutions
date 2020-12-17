@@ -452,9 +452,9 @@ __[Q1]{.Q}__: Categorise the objects returned by `lm()`, `factor()`, `table()`, 
 __[A]{.solved}__: We can categorise the return values into the various object styles by observing how the [number of observations](https://vctrs.r-lib.org/articles/type-size.html#size) is calculated.
 
 * Vector object-style: `factor()`, `table()`, `as.Date()`, `ordered()`
-* Record object-style: not observed
-* Data frame object-style: not observed
-* Scalar object-style: `lm()`, `ecdf()`  
+- Record object-style: not observed
+- Data frame object-style: not observed
+- Scalar object-style: `lm()`, `ecdf()`  
 
 The object style of `I()` depends on the input since this function returns a "copy of the object with class `AsIs` prepended to the class(es)".
 
@@ -580,9 +580,9 @@ generic2(structure(list(), class = c("b", "a2")))
 
 __[A]{.solved}__: When we execute the code above, this is what is happening:
 
-* we pass an object of classes `b` and `a2` to `generic2()`, which prompts R to look for a method`generic2.b()`
-* the method `generic2.b()` then changes the class to `a1` and calls `NextMethod()`
-* One would think that this will lead R to call `generic2.a1()`, but in fact, as mentioned in Advanced R, `NextMethod()` 
+- we pass an object of classes `b` and `a2` to `generic2()`, which prompts R to look for a method`generic2.b()`
+- the method `generic2.b()` then changes the class to `a1` and calls `NextMethod()`
+- One would think that this will lead R to call `generic2.a1()`, but in fact, as mentioned in Advanced R, `NextMethod()` 
 
     > doesn’t actually work with the class attribute of the object, but instead uses a special global variable (.Class) to keep track of which method to call next.
     
@@ -638,19 +638,19 @@ s3_class(x2)  # explicit
 
 For a better understanding of `s3_dipatch()`'s output we quote from `?s3_dispatch`:
 
-* => method exists and is found by UseMethod().
-* -> method exists and is used by NextMethod().
-* \* method exists but is not used.
-* Nothing (and greyed out in console): method does not exist.
+- => method exists and is found by UseMethod().
+- -> method exists and is used by NextMethod().
+- \* method exists but is not used.
+- Nothing (and greyed out in console): method does not exist.
 
 __[Q2]{.Q}__: What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
 
 __[A]{.solved}__: The following functions belong to this group (see ?`Math`):
 
-* `abs`, `sign`, `sqrt`, `floor`, `ceiling`, `trunc`, `round`, `signif`
-* `exp`, `log`, `expm1`, `log1p`, `cos`, `sin`, `tan`, `cospi`, `sinpi`, `tanpi`, `acos`, `asin`, `atan`, `cosh`, `sinh`, `tanh`, `acosh`, `asinh`, `atanh`
-* `lgamma`, `gamma`, `digamma`, `trigamma`
-* `cumsum`, `cumprod`, `cummax`, `cummin`
+- `abs`, `sign`, `sqrt`, `floor`, `ceiling`, `trunc`, `round`, `signif`
+- `exp`, `log`, `expm1`, `log1p`, `cos`, `sin`, `tan`, `cospi`, `sinpi`, `tanpi`, `acos`, `asin`, `atan`, `cosh`, `sinh`, `tanh`, `acosh`, `asinh`, `atanh`
+- `lgamma`, `gamma`, `digamma`, `trigamma`
+- `cumsum`, `cumprod`, `cummax`, `cummin`
 
 The following classes have a method for this group generic:
 

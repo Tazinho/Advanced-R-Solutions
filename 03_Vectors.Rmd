@@ -207,16 +207,16 @@ __[Q1]{.Q}__: List all the ways that a list differs from an atomic vector.
 
 __[A]{.solved}__: To summarise:
 
-* Atomic vectors are always homogeneous (all elements must be of the same type). Lists may be heterogeneous (the elements can be of different types) as described in the [introduction of the vectors chapter](https://adv-r.hadley.nz/vectors-chap.html#introduction).
+- Atomic vectors are always homogeneous (all elements must be of the same type). Lists may be heterogeneous (the elements can be of different types) as described in the [introduction of the vectors chapter](https://adv-r.hadley.nz/vectors-chap.html#introduction).
 
-* Atomic vectors point to one address in memory, while lists contain a separate reference for each element. (This was described in the list sections of the [vectors](https://adv-r.hadley.nz/vectors-chap.html#lists) and the [names and values](https://adv-r.hadley.nz/names-values.html#list-references) chapters.)
+- Atomic vectors point to one address in memory, while lists contain a separate reference for each element. (This was described in the list sections of the [vectors](https://adv-r.hadley.nz/vectors-chap.html#lists) and the [names and values](https://adv-r.hadley.nz/names-values.html#list-references) chapters.)
 
     ```{r}
     lobstr::ref(1:2)
     lobstr::ref(list(1:2, 2))
     ```
 
-* Subsetting with out-of-bounds and `NA` values leads to different output. E.g. `[` returns `NA` for atomics and `NULL` for lists. (This is described in more detail within the [subsetting chapter](https://adv-r.hadley.nz/subsetting.html).)
+- Subsetting with out-of-bounds and `NA` values leads to different output. E.g. `[` returns `NA` for atomics and `NULL` for lists. (This is described in more detail within the [subsetting chapter](https://adv-r.hadley.nz/subsetting.html).)
 
     ```{r}
     # Subsetting atomic vectors

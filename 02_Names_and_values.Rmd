@@ -468,7 +468,7 @@ ggplot(
 
 When working directly with the data frame, the execution time grows quadratically with the number of columns in the input data. This is because (e.g.) the first column must be copied n times, the second column n-1 times, and so on. When working with a list, the execution time increases only linearly.
 
-Obviously in the long run, linear growth creates shorter run-times, but there is some cost to this strategy - we have to convert between data structures with `as.list()` and `list2DF()`. Even though this is fast and probably doesn't hurt much, the improved approach doesn't really pay off in this scenario until we get to a data frame that is about 300 columns wide (with the exact value depending on the characteristics of the system running the code).
+Obviously in the long run, linear growth creates shorter run-times, but there is some cost to this strategy — we have to convert between data structures with `as.list()` and `list2DF()`. Even though this is fast and probably doesn't hurt much, the improved approach doesn't really pay off in this scenario until we get to a data frame that is about 300 columns wide (with the exact value depending on the characteristics of the system running the code).
 
 __[Q3]{.Q}__: What happens if you attempt to use `tracemem()` on an environment?
 
