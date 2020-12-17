@@ -139,10 +139,12 @@ __[A]{.solved}__: To compare these approaches, we'll `bench::mark()` them and so
 ```{r}
 x <- runif(100)
 
-bm <- bench::mark(sqrt(x),
-                  x ^ 0.5,
-                  x ^ (1 / 2),
-                  exp(log(x) / 2))
+bm <- bench::mark(
+  sqrt(x),
+  x^0.5,
+  x^(1 / 2),
+  exp(log(x) / 2)
+)
 
 bm[order(bm$median), ]
 ```

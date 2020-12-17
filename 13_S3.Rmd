@@ -248,7 +248,7 @@ __[Q5]{.Q}__: Read the documentation for `utils::as.roman()`. How would you writ
 __[A]{.solved}__: This function transforms numeric input into Roman numbers. It is built on the integer type, which results in the following constructor.
 
 ```{r}
-new_roman <- function(x = integer()){
+new_roman <- function(x = integer()) {
   stopifnot(is.integer(x))
   structure(x, class = "roman")
 }
@@ -428,17 +428,19 @@ To finally get a better overview, we have to put in a little more effort and als
 ```{r}
 library(dplyr)
 
-s3_methods_generic("[") %>% 
-  filter(visible) %>% 
+s3_methods_generic("[") %>%
+  filter(visible) %>%
   mutate(
     method = paste0("[.", class),
     argnames = purrr::map(method, ~ names(formals(.x))),
     args = purrr::map(method, ~ formals(.x)),
-    args = purrr::map2(argnames, args,
-                       ~ paste(.x, .y, sep = " = ")),
+    args = purrr::map2(
+      argnames, args,
+      ~ paste(.x, .y, sep = " = ")
+    ),
     args = purrr::set_names(args, method)
   ) %>%
-  pull(args) %>% 
+  pull(args) %>%
   head()
 ```
 
@@ -673,7 +675,7 @@ lgamma(mtcars)
 Of course, different functions should perform different calculations. Here `.Generic` comes into play, which provides us with the calling generic as a string
 
 ```{r}
-Math.data.frame <- function(x, ...){
+Math.data.frame <- function(x, ...) {
   .Generic
 }
 

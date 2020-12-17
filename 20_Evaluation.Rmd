@@ -31,7 +31,7 @@ writeLines("print(x)", tmp_file)
 x <- "global environment"
 env2 <- env(x = "specified environment")
 
-locate_evaluation <- function(file, local){
+locate_evaluation <- function(file, local) {
   x <- "local environment"
   source(file, local = local)
 }
@@ -216,7 +216,7 @@ __[Q2]{.Q}__: Write an `enenv()` function that captures the environment associat
 __[A]{.solved}__: A quosure captures both the expression and the environment. From a quosure, we can access the environment with the help of `get_env()`.
 
 ```{r}
-enenv <- function(x){
+enenv <- function(x) {
   get_env(enquo(x))
 }
 
@@ -224,7 +224,7 @@ enenv <- function(x){
 enenv(x)
 
 # Test if it also works within functions
-capture_env <- function(x){
+capture_env <- function(x) {
   enenv(x)
 }
 capture_env(x)
@@ -471,8 +471,8 @@ resample_lm <- function(
   formula, data,
   resample_data = data[sample(nrow(data), replace = TRUE), ,
                        drop = FALSE],
-  env = current_env()
-) {
+  env = current_env()) {
+  
   formula <- enexpr(formula)
   
   lm_call <- expr(lm(!!formula, data = resample_data))

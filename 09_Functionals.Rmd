@@ -93,12 +93,14 @@ library(ggplot2)
 
 df_trials <- tibble(p_value = map_dbl(trials, "p.value"))
 
-df_trials %>% 
-  ggplot(aes(x = p_value, fill = p_value < 0.05)) + 
+df_trials %>%
+  ggplot(aes(x = p_value, fill = p_value < 0.05)) +
   geom_dotplot(binwidth = .01) +  # geom_histogram() as alternative
-  theme(axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        legend.position = "top")
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    legend.position = "top"
+  )
 ```
 
 __[Q5]{.Q}__: The following code uses a map nested inside another map to apply a function to every element of a nested list. Why does it fail, and what do you need to do to make it work?
@@ -158,9 +160,9 @@ bootstraps <- map(1:10, ~ bootstrap(mtcars))
 __[A]{.solved}__: To accomplish this task, we take advantage of the "list in, list out"-functionality of `map()`. This allows us to chain multiple transformation together. We start by fitting the models. We then calculate the summaries and extract the $R^2$ values. For the last call we use `map_dbl()`, which provides convenient output.
 
 ```{r}
-bootstraps %>% 
-  map(~ lm(mpg ~ disp, data = .x)) %>% 
-  map(summary) %>% 
+bootstraps %>%
+  map(~ lm(mpg ~ disp, data = .x)) %>%
+  map(summary) %>%
   map_dbl("r.squared")
 ```
 
@@ -198,9 +200,9 @@ iwalk(cyls, ~ write.csv(.x, .y))
 We could do this in a single pipe by taking advantage of `set_names()`:
 
 ```{r, eval = FALSE}
-mtcars %>% 
-  split(mtcars$cyl) %>% 
-  set_names(~ file.path(temp, paste0("cyl-", .x, ".csv"))) %>% 
+mtcars %>%
+  split(mtcars$cyl) %>%
+  set_names(~ file.path(temp, paste0("cyl-", .x, ".csv"))) %>%
   iwalk(~ write.csv(.x, .y))
 ```
 
@@ -350,12 +352,12 @@ __[Q4]{.Q}__: Implement `arg_max()`. It should take a function and a vector of i
 __[A]{.solved}__: Both functions take a vector of inputs and a function as an argument. The function output is then used to subset the input accordingly.
 
 ```{r}
-arg_max <- function(x, f){
+arg_max <- function(x, f) {
   y <- map_dbl(x, f)
   x[y == max(y)]
 }
 
-arg_min <- function(x, f){
+arg_min <- function(x, f) {
   y <- map_dbl(x, f)
   x[y == min(y)]
 }

@@ -121,9 +121,11 @@ identical(date_lt, date_str)
 bench::mark(
   as.POSIXct = as.POSIXct("2020-01-01 12:30:25"),
   as.POSIXct_format = as.POSIXct("2020-01-01 12:30:25",
-                                 format = "%Y-%m-%d %H:%M:%S"),
+    format = "%Y-%m-%d %H:%M:%S"
+  ),
   strptime_fomat = strptime("2020-01-01 12:30:25",
-                            format = "%Y-%m-%d %H:%M:%S")
+    format = "%Y-%m-%d %H:%M:%S"
+  )
 )[1:3]
 ```
 
@@ -173,8 +175,10 @@ __[A]{.solved}__: According to its description (see `?optim`) `optim()` implemen
 `optim()` allows to optimise a function (`fn`) on an interval with a specific method (`method = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", "Brent")`). Many detailed examples are given in the documentation. In the simplest case, we give `optim()` the starting value `par = 0` to calculate the minimum of a quadratic polynomial:
 
 ```{r}
-optim(0, function(x) x^2 - 100 * x + 50, method = "Brent",
-      lower = -1e20, upper = 1e20)
+optim(0, function(x) x^2 - 100 * x + 50,
+  method = "Brent",
+  lower = -1e20, upper = 1e20
+)
 ```
 
 Since this solves a one-dimensional optimization task, we could have also used `stats::optimize()`.
@@ -222,17 +226,17 @@ __[Q2]{.Q}__: Make a faster version of `chisq.test()` that only computes the chi
 __[A]{.solved}__: We aim to speed up our reimplementation of `chisq.test()` by *doing less*.
 
 ```{r}
-chisq.test2 <- function(x, y){
+chisq.test2 <- function(x, y) {
   m <- rbind(x, y)
   margin1 <- rowSums(m)
   margin2 <- colSums(m)
   n <- sum(m)
   me <- tcrossprod(margin1, margin2) / n
-  
-  x_stat = sum((m - me)^2 / me)
+
+  x_stat <- sum((m - me)^2 / me)
   df <- (length(margin1) - 1) * (length(margin2) - 1)
   p.value <- pchisq(x_stat, df = df, lower.tail = FALSE)
-  
+
   list(x_stat = x_stat, df = df, p.value = p.value)
 }
 ```
@@ -331,12 +335,12 @@ rowsums <- bench::press(
 )
 
 library(ggplot2)
-rowsums %>% 
-  summary() %>% 
-  dplyr::mutate(expression = as.character(expression)) %>% 
+rowsums %>%
+  summary() %>%
+  dplyr::mutate(expression = as.character(expression)) %>%
   ggplot(aes(p, median, color = expression, group = expression)) +
   geom_point() +
-  geom_line() + 
+  geom_line() +
   theme(legend.position = "bottom")
 ```
 
@@ -366,12 +370,12 @@ weightedsum <- bench::press(
   }
 )
 
-weightedsum %>% 
-  summary() %>% 
-  dplyr::mutate(expression = as.character(expression)) %>% 
+weightedsum %>%
+  summary() %>%
+  dplyr::mutate(expression = as.character(expression)) %>%
   ggplot(aes(n, median, color = expression, group = expression)) +
   geom_point() +
-  geom_line() + 
-  labs(x = "n (millions)") + 
+  geom_line() +
+  labs(x = "n (millions)") +
   theme(legend.position = "bottom")
 ```

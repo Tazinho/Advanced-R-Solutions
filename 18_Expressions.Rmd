@@ -587,14 +587,15 @@ find_assign_call <- function(x) {
 }
 
 find_assign_rec <- function(x) {
-  switch_expr(x,
-              # Base cases
-              constant = ,
-              symbol = character(),
-              
-              # Recursive cases
-              pairlist = flat_map_chr(x, find_assign_rec),
-              call = find_assign_call(x)
+  switch_expr(
+    x,
+    # Base cases
+    constant = ,
+    symbol = character(),
+
+    # Recursive cases
+    pairlist = flat_map_chr(x, find_assign_rec),
+    call = find_assign_call(x)
   )
 }
 

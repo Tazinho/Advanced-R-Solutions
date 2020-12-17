@@ -28,14 +28,15 @@ BankAccount <- R6Class(
   public = list(
     balance = 0,
     deposit = function(dep = 0) {
-      self$balance = self$balance + dep
+      self$balance <- self$balance + dep
       invisible(self)
     },
     withdraw = function(draw) {
-      self$balance = self$balance - draw
+      self$balance <- self$balance - draw
       invisible(self)
     }
-  ))
+  )
+)
 ```
 
 To test this class, we create one instance and leave it with a negative balance.
@@ -60,11 +61,14 @@ BankAccountStrict <- R6Class(
     withdraw = function(draw = 0) {
       if (self$balance - draw < 0) {
         stop("Your `withdraw` must be smaller ",
-             "than your `balance`.", call. = FALSE)
+          "than your `balance`.",
+          call. = FALSE
+        )
       }
       super$withdraw(draw = draw)
     }
-  ))
+  )
+)
 ```
 
 This time our test should throw an error.
@@ -93,7 +97,8 @@ BankAccountCharging <- R6Class(
       }
       super$withdraw(draw = draw)
     }
-  ))
+  )
+)
 ```
 
 Let's take a look at the implemented functionality. We expect a final balance of -12,  because we pay the fee twice.
@@ -122,7 +127,7 @@ __[A]{.solved}__: Our new `ShuffledDeck` class will use `sample()` and positive 
 
 ```{r}
 ShuffledDeck <- R6Class(
-  classname = "ShuffledDeck", 
+  classname = "ShuffledDeck",
   public = list(
     deck = NULL,
     initialize = function(deck = cards) {
@@ -139,12 +144,13 @@ ShuffledDeck <- R6Class(
       if (n > self$n()) {
         stop("Only ", self$n(), " cards remaining", call. = FALSE)
       }
-      
+
       output <- self$deck[seq_len(n)]
       self$deck <- self$deck[-seq_len(n)]
       output
     }
-  ))
+  )
+)
 ```
 
 To test this class, we create a deck (initialise an instance), draw all the cards, then reshuffle, checking we get different cards each time.
@@ -171,18 +177,19 @@ __[A]{.solved}__: To create an R6 class that allows us to get and set the time z
 
 ```{r}
 Timezone <- R6Class(
-  classname = "Timezone", 
+  classname = "Timezone",
   public = list(
     get = function() {
       Sys.timezone()
     },
     set = function(value) {
       stopifnot(value %in% OlsonNames())
-      
+
       old <- self$get()
       Sys.setenv(TZ = value)
       invisible(old)
-    })
+    }
+  )
 )
 ```
 
@@ -206,7 +213,7 @@ __[A]{.solved}__: Take a look at the following implementation, which is quite mi
 
 ```{r}
 WorkingDirectory <- R6Class(
-  classname = "WorkingDirectory", 
+  classname = "WorkingDirectory",
   public = list(
     get = function() {
       getwd()
@@ -214,7 +221,8 @@ WorkingDirectory <- R6Class(
     set = function(value) {
       setwd(value)
     }
-  ))
+  )
+)
 ```
 
 <!-- HW: You should never do get = getwd() etc because in packages, that inlines the function definition at package build time, creating a subtle dependency that will cause bugs that are extremely difficult to track down -->
@@ -388,11 +396,11 @@ FileWriter <- R6::R6Class(
     initialize = function(filename) {
       self$con <- file(filename, open = "a")
     },
-    
+
     finalize = function() {
       close(self$con)
     },
-    
+
     append_line = function(x) {
       cat(x, "\n", sep = "", file = self$con)
     }

@@ -62,40 +62,40 @@ All slots from `utils::person()` besides `role` must be of type character and le
 
 ```{r}
 # Definition of the Person class
-setClass("Person", 
-         slots = c(
-           age = "numeric",
-           given = "character",
-           family = "character",
-           role = "character",
-           email = "character",
-           comment = "character"
-         ),
-         prototype = list(
-           age = NA_real_,
-           given = NA_character_,
-           family = NA_character_,
-           role = NA_character_,
-           email = NA_character_,
-           comment = NA_character_
-         )
+setClass("Person",
+  slots = c(
+    age = "numeric",
+    given = "character",
+    family = "character",
+    role = "character",
+    email = "character",
+    comment = "character"
+  ),
+  prototype = list(
+    age = NA_real_,
+    given = NA_character_,
+    family = NA_character_,
+    role = NA_character_,
+    email = NA_character_,
+    comment = NA_character_
+  )
 )
 
 # Helper to create instances of the Person class
-Person <- function(given, family, 
-                   age = NA_real_, 
+Person <- function(given, family,
+                   age = NA_real_,
                    role = NA_character_,
                    email = NA_character_,
                    comment = NA_character_) {
   age <- as.double(age)
-  
-  new("Person", 
-      age = age, 
-      given = given, 
-      family = family, 
-      role = role, 
-      email = email,
-      comment = comment
+
+  new("Person",
+    age = age,
+    given = given,
+    family = family,
+    role = role,
+    email = email,
+    comment = comment
   )
 }
 
@@ -122,6 +122,7 @@ setValidity("Person", function(object) {
       paste(known_roles, collapse = ", ")
     )
   }
+  
   if (length(invalids)) return(invalids)  
   TRUE
 })
@@ -149,17 +150,17 @@ __[A]{.solved}__: For all these classes we need one slot for the data and one sl
 For simplicity we don't introduce an explicit subclass for ordered factors. Instead, we introduce `ordered` as a slot.
 
 ```{r}
-setClass("Factor", 
-         slots = c(
-           data = "integer",
-           levels = "character",
-           ordered = "logical"
-         ),
-         prototype = list(
-           data = integer(),
-           levels = character(),
-           ordered = FALSE
-         )
+setClass("Factor",
+  slots = c(
+    data = "integer",
+    levels = "character",
+    ordered = "logical"
+  ),
+  prototype = list(
+    data = integer(),
+    levels = character(),
+    ordered = FALSE
+  )
 )
 
 
@@ -170,12 +171,12 @@ The `Date2` class stores its dates as integers, similarly to base R which uses d
 
 ```{r}
 setClass("Date2",
-         slots = list(
-           data = "integer"
-         ),
-         prototype = list(
-           data = integer()
-         )
+  slots = list(
+    data = "integer"
+  ),
+  prototype = list(
+    data = integer()
+  )
 )
 
 new("Date2", data = 1L)
@@ -185,14 +186,14 @@ Our `DataFrame` class consists of a list and a slot for `row.names`. Most of the
 
 ```{r}
 setClass("DataFrame",
-         slots = c(
-           data = "list", 
-           row.names = "character"
-         ),
-         prototype = list(
-           data = list(),
-           row.names = character(0)
-         )
+  slots = c(
+    data = "list",
+    row.names = "character"
+  ),
+  prototype = list(
+    data = list(),
+    row.names = character(0)
+  )
 )
 
 new("DataFrame", data = list(a = 1, b = 2))
@@ -231,7 +232,7 @@ __[A]{.solved}__: It depends. We first create the object `hadley` of class `Pers
 
 ```{r}
 .Person <- setClass(
-  "Person", 
+  "Person",
   slots = c(name = "character", age = "numeric")
 )
 
@@ -314,11 +315,11 @@ __[A]{.solved}__: The purpose of `setOldClass()` lies in registering an S3 class
 Let's build an S4 `OrderedFactor` on top of the S3 factor in such a way.
 
 ```{r}
-setOldClass("factor")  # using build-in definition for brevity
+setOldClass("factor")    # use build-in definition for brevity
 
 OrderedFactor <- setClass(
   "OrderedFactor",
-  contains = "factor",  # inherit from registered S3 class
+  contains = "factor",   # inherit from registered S3 class
   slots = c(
     levels = "character",
     ordered = "logical"  # add logical order slot

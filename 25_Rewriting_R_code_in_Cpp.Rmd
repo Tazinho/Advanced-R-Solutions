@@ -142,24 +142,24 @@ __[A]{.solved}__: Let's port these functions to C++.
 3. `diff()` (Start by assuming lag 1, and then generalise for lag `n`.)
 
     ```{Rcpp, eval=FALSE}
-    NumericVector diffC(NumericVector x){
+    NumericVector diffC(NumericVector x) {
       int n = x.size();
       NumericVector out(n - 1);
       
-      for (int i = 1; i < n; i++){
+      for (int i = 1; i < n; i++) {
         out[i - 1] = x[i] - x[i - 1];
       }
       return out ;
     }
     
-    NumericVector difflagC(NumericVector x, int lag = 1){
+    NumericVector difflagC(NumericVector x, int lag = 1) {
       int n = x.size();
     
       if (lag >= n) stop("`lag` must be less than `length(x)`.");
       
       NumericVector out(n - lag);
       
-      for (int i = lag; i < n; i++){
+      for (int i = lag; i < n; i++) {
         out[i - lag] = x[i] - x[i - lag];
       }
       return out;
@@ -169,13 +169,13 @@ __[A]{.solved}__: Let's port these functions to C++.
 4. `range()`
 
     ```{Rcpp, eval=FALSE}
-    NumericVector rangeC(NumericVector x){
+    NumericVector rangeC(NumericVector x) {
       double omin = x[0], omax = x[0];
       int n = x.size();
     
       if (n == 0) stop("`length(x)` must be greater than 0.");
       
-      for (int i = 1; i < n; i++){
+      for (int i = 1; i < n; i++) {
         omin = std::min(x[i], omin);
         omax = std::max(x[i], omax);
       }
@@ -224,7 +224,7 @@ __[A]{.solved}__: For this exercise we start with `minC()` and extend it so it c
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-NumericVector minC(NumericVector x, bool na_rm = false){
+NumericVector minC(NumericVector x, bool na_rm = false) {
   int n = x.size();
   NumericVector out = NumericVector::create(R_PosInf);
   
@@ -361,14 +361,14 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 NumericVector diffC(NumericVector x, int lag = 1,
-                    bool na_rm = false){
+                    bool na_rm = false) {
   int n = x.size();
   
   if (lag >= n) stop("`lag` must be less than `length(x)`.");
   
   NumericVector out(n - lag);
   
-  for (int i = lag; i < n; i++){
+  for (int i = lag; i < n; i++) {
     if (NumericVector::is_na(x[i]) ||
         NumericVector::is_na(x[i - lag])) {
       if (!na_rm) {
@@ -411,7 +411,7 @@ using namespace Rcpp;
 double medianC(NumericVector x) {
   int n = x.size();
 
-  if (n % 2 == 0){
+  if (n % 2 == 0) {
     std::partial_sort (x.begin(), x.begin() + n / 2 + 1, x.end());
     return (x[n / 2 - 1] + x[n / 2]) / 2;
   } else {
@@ -484,11 +484,11 @@ __[A]{.solved}__: We will implement `min()` by iterating over the vector and rec
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-double minC(NumericVector x){
+double minC(NumericVector x) {
   int n = x.size();
   double out = x[0];
   
-  for (int i = 0; i < n; i++){
+  for (int i = 0; i < n; i++) {
     out = std::min(out, x[i]);
   }
   
@@ -507,7 +507,7 @@ __[A]{.solved}__: To implement `which.min()`, we will first locate the `min_elem
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-double which_minC(NumericVector x){
+double which_minC(NumericVector x) {
   int out = std::distance(
     x.begin(), std::min_element(x.begin(), x.end())
   );

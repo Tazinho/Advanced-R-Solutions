@@ -26,11 +26,11 @@ __[A]{.solved}__: We prefer the following solution for its clarity and simplicit
 file_remove_strict <- function(path) {
   if (!file.exists(path)) {
     stop("Can't delete the file '", path, "' because it doesn't exist.",
-         call. = FALSE)
+      call. = FALSE
+    )
   }
   file.remove(path)
 }
-
 
 # Test
 saveRDS(mtcars, "mtcars.rds")
@@ -136,9 +136,9 @@ show_condition({
 __[Q3]{.Q}__: Explain the results of running this code:
 
 ```{r}
-withCallingHandlers( # (1)
+withCallingHandlers(  # (1)
   message = function(cnd) message("b"),
-  withCallingHandlers( # (2)
+  withCallingHandlers(  # (2)
     message = function(cnd) message("a"),
     message("c")
   )
@@ -211,7 +211,7 @@ __[Q1]{.Q}__: Inside a package, it’s occasionally useful to check that a packa
 __[A]{.solved}__: We use `rlang::abort()` to supply error metadata:
 
 ```{r, error = TRUE}
-check_installed <- function(package)  {
+check_installed <- function(package) {
   if (!requireNamespace(package, quietly = FALSE)) {
     abort(
       "error_pkg_not_found",
@@ -219,7 +219,7 @@ check_installed <- function(package)  {
       package = package
     )
   }
-  
+
   TRUE
 }
 
@@ -242,8 +242,11 @@ __[A]{.solved}__: In general, we would like to catch errors, since they contain 
 suppressErrors <- function(expr) {
   tryCatch(
     error = function(cnd) invisible(cnd),
-    interrupt = function(cnd) stop("Terminated by the user",
-                                   call. = FALSE),
+    interrupt = function(cnd) {
+      stop("Terminated by the user",
+        call. = FALSE
+      )
+    },
     expr
   )
 }
@@ -265,7 +268,7 @@ error_obj <- suppressConditions({
   warning("warning")
   abort("error")
 })
-# the messages/warnings/conditions are suppressed successfully
+# The messages/warnings/conditions are suppressed successfully
 
 error_obj
 ```
@@ -320,6 +323,7 @@ traceback()
 message2error2 <- function(code) {
   tryCatch(code, message = function(e) (stop("error")))
 }
+
 message2error2({1; stop("hidden error"); NULL})
 #> Error in value[[3L]](cond) : error
 traceback()
@@ -346,7 +350,7 @@ catch_cnds <- function(expr) {
     conds <<- append(conds, list(cnd))
     cnd_muffle(cnd)
   }
-  
+
   tryCatch(
     error = function(cnd) {
       conds <<- append(conds, list(cnd))
@@ -357,7 +361,7 @@ catch_cnds <- function(expr) {
       expr
     )
   )
-  
+
   conds
 }
 
@@ -373,25 +377,29 @@ __[Q4]{.Q}__:  Why is catching interrupts dangerous? Run this code to find out.
 
 ```{r, eval = FALSE}
 bottles_of_beer <- function(i = 99) {
-  message("There are ", i,
-          " bottles of beer on the wall, ", i,
-          " bottles of beer.")
-  while(i > 0) {
+  message(
+    "There are ", i,
+    " bottles of beer on the wall, ", i,
+    " bottles of beer."
+  )
+  while (i > 0) {
     tryCatch(
       Sys.sleep(1),
       interrupt = function(err) {
         i <<- i - 1
         if (i > 0) {
           message(
-            "Take one down, pass it around, ", i, 
+            "Take one down, pass it around, ", i,
             " bottle", if (i > 1) "s", " of beer on the wall."
           )
         }
       }
     )
   }
-  message("No more bottles of beer on the wall, ",
-          "no more bottles of beer.")
+  message(
+    "No more bottles of beer on the wall, ",
+    "no more bottles of beer."
+  )
 }
 ```
 
