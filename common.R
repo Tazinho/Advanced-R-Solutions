@@ -1,7 +1,7 @@
 # Specific for this project -------------------------------------
 Sys.setenv(LANGUAGE = "en")
 
-# load a few common packages
+# Load a few common packages
 `%>%` <- magrittr::`%>%`
 
 # Experiment with options output

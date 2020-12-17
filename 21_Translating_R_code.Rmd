@@ -87,7 +87,7 @@ html_attributes <- function(list) {
 }
 
 html_attribute <- function(name, value = NULL) {
-  if (length(value) == 0) return(name) # for attributes with no value
+  if (length(value) == 0) return(name)  # for attributes with no value
   if (length(value) != 1) stop("`value` must be NULL or length 1")
   if (is.logical(value)) {
     # Convert T and F to true and false
@@ -498,13 +498,13 @@ __[A]{.solved}__: Currently our `to_math()` function generates the following out
 
 ```{r, eval=FALSE}
 to_math(`$`)
-#> <LATEX> \mathrm{f}($)  # instead of <LATEX> \$  
+#> <LATEX> \mathrm{f}($)    # instead of <LATEX> \$  
 to_math(a$b)
-#> <LATEX> \mathrm{$}(a b) # instead of <LATEX> \mathrm{\$}(a b)
+#> <LATEX> \mathrm{$}(a b)  # instead of <LATEX> \mathrm{\$}(a b)
 to_math(`\\`)
-#> <LATEX> \mathrm{f}(\)  # instead of <LATEX> \\  
+#> <LATEX> \mathrm{f}(\)    # instead of <LATEX> \\  
 to_math(`%`)
-#> <LATEX> \mathrm{f}(%)  # instead of <LATEX> \%
+#> <LATEX> \mathrm{f}(%)    # instead of <LATEX> \%
 ```
 
 ```{r include=FALSE}
