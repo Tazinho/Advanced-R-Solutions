@@ -487,11 +487,11 @@ __[Q5]{.Q}__: Write your own version of `+` that pastes its inputs together if t
 __[A]{.solved}__: To achieve this behaviour, we need to override the `+` operator. We need to take care to not use the `+` operator itself inside of the function definition, as this would lead to an undesired infinite recursion. We also add `b = 0L` as a default value to keep the behaviour of `+` as a unary operator, i.e. to keep `+ 1` working and not throwing an error
 
 ```{r}
-`+` <- function(a, b = 0L){
+`+` <- function(a, b = 0L) {
   if (is.character(a) && is.character(b)) {
     paste0(a, b)
   } else {
-    base::`+`(a, b)  
+    base::`+`(a, b)
   }
 }
 
