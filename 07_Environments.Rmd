@@ -93,7 +93,7 @@ env_poke2 <- function(env, name, value) {
   if (env_has(env, name)) {
     abort(paste0("\"", name, "\" is already assigned to a value."))
   }
-  
+
   env_poke(env, name, value)
   invisible(env)
 }
@@ -183,17 +183,18 @@ fget <- function(name, env = caller_env(), inherits = TRUE) {
   # Base case
   if (env_has(env, name)) {
     obj <- env_get(env, name)
-    
+
     if (is.function(obj)) {
       return(obj)
     }
   }
-  
+
   if (identical(env, emptyenv()) || !inherits) {
     stop("Could not find function called \"", name, "\"",
-         call. = FALSE)
+      call. = FALSE
+    )
   }
-  
+
   # Recursive Case
   fget(name, env_parent(env))
 }
@@ -252,17 +253,18 @@ fget2 <- function(name, env = caller_env()) {
   # Base case
   if (env_has(env, name)) {
     obj <- env_get(env, name)
-    
+
     if (is.function(obj)) {
       return(list(fun = obj, env = env))
     }
   }
-  
+
   if (identical(env, emptyenv())) {
     stop("Could not find function called \"", name, "\"",
-         call. = FALSE)
+      call. = FALSE
+    )
   }
-  
+
   # Recursive Case
   fget2(name, env_parent(env))
 }
@@ -272,7 +274,7 @@ fstr <- function(fun_name, env = caller_env()) {
     stop("`fun_name` must be a string", call. = FALSE)
   }
   fun_env <- fget2(fun_name, env)
-  
+
   list(
     where = fun_env$env,
     enclosing = fn_env(fun_env$fun)
