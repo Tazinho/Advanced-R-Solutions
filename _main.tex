@@ -291,7 +291,7 @@ A brief overview of conventions we followed and decisions we made.
 \item
   Some chapters and sections in Advanced R do not contain exercises. In our book you will see that we skipped these chapters and sections. This decision introduces some gaps in the numbering, but we feel that keeping the numbers in sync with those of Advanced R will provide the most practical value.
 \item
-  We strived to follow the \href{https://style.tidyverse.org/}{tidyverse style guide} as much as possible (using the \texttt{\{styler\}} package made this a lot easier).
+  We strived to follow mostly the \href{https://style.tidyverse.org/}{tidyverse style guide} (using the \texttt{\{styler\}} package made this a bit easier).
 \item
   Each chapter of this book was rendered in a separate R session via the \texttt{\{bookdown\}} package. We configured this process to initially
 
@@ -395,14 +395,16 @@ We will use the \texttt{\{lobstr\}} package to help answer questions regarding t
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{mean_functions <-}\StringTok{ }\KeywordTok{list}\NormalTok{(mean,}
-\NormalTok{                       base}\OperatorTok{::}\NormalTok{mean,}
-                       \KeywordTok{get}\NormalTok{(}\StringTok{"mean"}\NormalTok{),}
-                       \KeywordTok{evalq}\NormalTok{(mean),}
-                       \KeywordTok{match.fun}\NormalTok{(}\StringTok{"mean"}\NormalTok{))}
+\NormalTok{mean_functions <-}\StringTok{ }\KeywordTok{list}\NormalTok{(}
+\NormalTok{  mean,}
+\NormalTok{  base}\OperatorTok{::}\NormalTok{mean,}
+  \KeywordTok{get}\NormalTok{(}\StringTok{"mean"}\NormalTok{),}
+  \KeywordTok{evalq}\NormalTok{(mean),}
+  \KeywordTok{match.fun}\NormalTok{(}\StringTok{"mean"}\NormalTok{)}
+\NormalTok{)}
 
 \KeywordTok{unique}\NormalTok{(}\KeywordTok{obj_addrs}\NormalTok{(mean_functions))}
-\CommentTok{#> [1] "0x13844620"}
+\CommentTok{#> [1] "0x138446f0"}
 \end{Highlighting}
 \end{Shaded}
 
@@ -649,9 +651,9 @@ To look up all functions from these packages we iterate over \texttt{base\_pkgs}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{base_objs <-}\StringTok{ }\NormalTok{base_pkgs }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{lapply}\NormalTok{(as.environment) }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{lapply}\NormalTok{(}\ControlFlowTok{function}\NormalTok{(x) }\KeywordTok{mget}\NormalTok{(}\KeywordTok{ls}\NormalTok{(x, }\DataTypeTok{all.names =} \OtherTok{TRUE}\NormalTok{), x)) }\OperatorTok{%>%}\StringTok{ }
+\NormalTok{base_objs <-}\StringTok{ }\NormalTok{base_pkgs }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{lapply}\NormalTok{(as.environment) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{lapply}\NormalTok{(}\ControlFlowTok{function}\NormalTok{(x) }\KeywordTok{mget}\NormalTok{(}\KeywordTok{ls}\NormalTok{(x, }\DataTypeTok{all.names =} \OtherTok{TRUE}\NormalTok{), x)) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{set_names}\NormalTok{(base_pkgs)}
 \end{Highlighting}
 \end{Shaded}
@@ -764,7 +766,7 @@ When we modify the first element of \texttt{b{[}{[}1{]}{]}} copy-on-modify occur
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{b[[}\DecValTok{1}\NormalTok{]][[}\DecValTok{1}\NormalTok{]] <-}\StringTok{ }\DecValTok{10}
-\KeywordTok{obj_size}\NormalTok{(b) }
+\KeywordTok{obj_size}\NormalTok{(b)}
 \CommentTok{#> 16,000,160 B}
 \end{Highlighting}
 \end{Shaded}
@@ -863,14 +865,14 @@ Next, we wrap the two approaches to subtract numerical values (in our case media
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{subtract_df <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, medians)\{}
+\NormalTok{subtract_df <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, medians) \{}
   \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \KeywordTok{seq_along}\NormalTok{(medians)) \{}
 \NormalTok{    x[[i]] <-}\StringTok{ }\NormalTok{x[[i]] }\OperatorTok{-}\StringTok{ }\NormalTok{medians[[i]]}
 \NormalTok{  \}}
 \NormalTok{  x}
 \NormalTok{\}}
 
-\NormalTok{subtract_list <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, medians)\{}
+\NormalTok{subtract_list <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, medians) \{}
 \NormalTok{  x <-}\StringTok{ }\KeywordTok{as.list}\NormalTok{(x)}
 \NormalTok{  x <-}\StringTok{ }\KeywordTok{subtract_df}\NormalTok{(x, medians)}
   \KeywordTok{list2DF}\NormalTok{(x)}
@@ -882,20 +884,22 @@ This lets us profile the performance, via benchmarks on data frames with differi
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{benchmark_medians <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(ncol)\{}
+\NormalTok{benchmark_medians <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(ncol) \{}
 \NormalTok{  df <-}\StringTok{ }\KeywordTok{create_random_df}\NormalTok{(}\DataTypeTok{nrow =} \FloatTok{1e4}\NormalTok{, }\DataTypeTok{ncol =}\NormalTok{ ncol)}
 \NormalTok{  medians <-}\StringTok{ }\KeywordTok{vapply}\NormalTok{(df, median, }\KeywordTok{numeric}\NormalTok{(}\DecValTok{1}\NormalTok{), }\DataTypeTok{USE.NAMES =} \OtherTok{FALSE}\NormalTok{)}
-  
-\NormalTok{  bench}\OperatorTok{::}\KeywordTok{mark}\NormalTok{(}\StringTok{"data frame"}\NormalTok{ =}\StringTok{ }\KeywordTok{subtract_df}\NormalTok{(df, medians),}
-              \StringTok{"list"}\NormalTok{       =}\StringTok{ }\KeywordTok{subtract_list}\NormalTok{(df, medians))}
+
+\NormalTok{  bench}\OperatorTok{::}\KeywordTok{mark}\NormalTok{(}
+    \StringTok{"data frame"}\NormalTok{ =}\StringTok{ }\KeywordTok{subtract_df}\NormalTok{(df, medians),}
+    \StringTok{"list"}\NormalTok{ =}\StringTok{ }\KeywordTok{subtract_list}\NormalTok{(df, medians)}
+\NormalTok{  )}
 \NormalTok{\}}
 
 \KeywordTok{benchmark_medians}\NormalTok{(}\DecValTok{1}\NormalTok{)}
 \CommentTok{#> # A tibble: 2 x 6}
 \CommentTok{#>   expression      min   median `itr/sec` mem_alloc `gc/sec`}
 \CommentTok{#>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>}
-\CommentTok{#> 1 data frame   31.9µs   66.4µs    12660.     123KB     13.1}
-\CommentTok{#> 2 list         56.1µs  117.6µs     7740.     156KB     15.7}
+\CommentTok{#> 1 data frame   20.1µs   24.2µs    29673.     123KB     53.5}
+\CommentTok{#> 2 list         33.1µs   37.2µs    20571.     156KB     57.6}
 \end{Highlighting}
 \end{Shaded}
 
@@ -928,13 +932,17 @@ Finally, we can plot and interpret our results.
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(ggplot2)}
 
-\KeywordTok{ggplot}\NormalTok{(results, }\KeywordTok{aes}\NormalTok{(ncol, median,}
-                    \DataTypeTok{col =} \KeywordTok{attr}\NormalTok{(expression, }\StringTok{"description"}\NormalTok{))) }\OperatorTok{+}
-\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{size =} \DecValTok{2}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\KeywordTok{ggplot}\NormalTok{(}
+\NormalTok{  results,}
+  \KeywordTok{aes}\NormalTok{(ncol, median, }\DataTypeTok{col =} \KeywordTok{attr}\NormalTok{(expression, }\StringTok{"description"}\NormalTok{))}
+\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{size =} \DecValTok{2}\NormalTok{) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_smooth}\NormalTok{() }\OperatorTok{+}
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{x =} \StringTok{"Number of Columns"}\NormalTok{,}
-       \DataTypeTok{y =} \StringTok{"Execution Time (s)"}\NormalTok{,}
-       \DataTypeTok{colour =} \StringTok{"Data Structure"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}
+    \DataTypeTok{x =} \StringTok{"Number of Columns"}\NormalTok{,}
+    \DataTypeTok{y =} \StringTok{"Execution Time (s)"}\NormalTok{,}
+    \DataTypeTok{colour =} \StringTok{"Data Structure"}
+\NormalTok{  ) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.position =} \StringTok{"top"}\NormalTok{)}
 \CommentTok{#> `geom_smooth()` using method = 'loess' and formula 'y ~ x'}
 \end{Highlighting}
@@ -944,7 +952,7 @@ Finally, we can plot and interpret our results.
 
 When working directly with the data frame, the execution time grows quadratically with the number of columns in the input data. This is because (e.g.) the first column must be copied n times, the second column n-1 times, and so on. When working with a list, the execution time increases only linearly.
 
-Obviously in the long run, linear growth creates shorter run-times, but there is some cost to this strategy - we have to convert between data structures with \texttt{as.list()} and \texttt{list2DF()}. Even though this is fast and probably doesn't hurt much, the improved approach doesn't really pay off in this scenario until we get to a data frame that is about 300 columns wide (with the exact value depending on the characteristics of the system running the code).
+Obviously in the long run, linear growth creates shorter run-times, but there is some cost to this strategy --- we have to convert between data structures with \texttt{as.list()} and \texttt{list2DF()}. Even though this is fast and probably doesn't hurt much, the improved approach doesn't really pay off in this scenario until we get to a data frame that is about 300 columns wide (with the exact value depending on the characteristics of the system running the code).
 
 \textbf{{Q3}}: What happens if you attempt to use \texttt{tracemem()} on an environment?
 
@@ -1038,7 +1046,7 @@ Atomic vectors are defined in Advanced R as objects of type logical, integer, do
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{setNames <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{ (}\DataTypeTok{object =}\NormalTok{ nm, nm)\{}
+\NormalTok{setNames <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(}\DataTypeTok{object =}\NormalTok{ nm, nm) \{}
   \KeywordTok{names}\NormalTok{(object) <-}\StringTok{ }\NormalTok{nm}
 \NormalTok{  object}
 \NormalTok{\}}
@@ -1059,7 +1067,7 @@ Because the data argument comes first \texttt{setNames()} also works well with t
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{unname <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{ (obj, }\DataTypeTok{force =} \OtherTok{FALSE}\NormalTok{)\{}
+\NormalTok{unname <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(obj, }\DataTypeTok{force =} \OtherTok{FALSE}\NormalTok{) \{}
   \ControlFlowTok{if}\NormalTok{ (}\OperatorTok{!}\KeywordTok{is.null}\NormalTok{(}\KeywordTok{names}\NormalTok{(obj))) }
     \KeywordTok{names}\NormalTok{(obj) <-}\StringTok{ }\OtherTok{NULL}
   \ControlFlowTok{if}\NormalTok{ (}\OperatorTok{!}\KeywordTok{is.null}\NormalTok{(}\KeywordTok{dimnames}\NormalTok{(obj)) }\OperatorTok{&&}\StringTok{ }\NormalTok{(force }\OperatorTok{||}\StringTok{ }\OperatorTok{!}\KeywordTok{is.data.frame}\NormalTok{(obj))) }
@@ -1409,7 +1417,7 @@ Create similar data frames via subsetting the respective dimension with either \
 \CommentTok{#>  [1] mpg  cyl  disp hp   drat wt   qsec vs   am   gear carb}
 \CommentTok{#> <0 rows> (or 0-length row.names)}
 
-\NormalTok{mtcars[, }\DecValTok{0}\NormalTok{] }\CommentTok{# or mtcars[0]}
+\NormalTok{mtcars[ , }\DecValTok{0}\NormalTok{]  }\CommentTok{# or mtcars[0]}
 \CommentTok{#> data frame with 0 columns and 32 rows}
 
 \NormalTok{mtcars[}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{]}
@@ -1602,7 +1610,7 @@ We can illustrate and compare the mechanics of these functions using a concrete 
 \end{Highlighting}
 \end{Shaded}
 
-When subsetting with logical matrices, all elements that correspond to \texttt{TRUE} will be selected. Matrices extend vectors with a dimension attribute, so the vector forms of subsetting can be used (including logical subsetting). We should take care, that the dimensions of the subsetting matrix match the object of interest - otherwise unintended selections due to vector recycling may occur. Please also note, that this form of subsetting returns a vector instead of a matrix, as the subsetting alters the dimensions of the object.
+When subsetting with logical matrices, all elements that correspond to \texttt{TRUE} will be selected. Matrices extend vectors with a dimension attribute, so the vector forms of subsetting can be used (including logical subsetting). We should take care, that the dimensions of the subsetting matrix match the object of interest --- otherwise unintended selections due to vector recycling may occur. Please also note, that this form of subsetting returns a vector instead of a matrix, as the subsetting alters the dimensions of the object.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1621,10 +1629,10 @@ When subsetting with logical matrices, all elements that correspond to \texttt{T
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{diag2 <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x)\{}
+\NormalTok{diag2 <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x) \{}
 \NormalTok{  n <-}\StringTok{ }\KeywordTok{min}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(x), }\KeywordTok{ncol}\NormalTok{(x))}
 \NormalTok{  idx <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(}\KeywordTok{seq_len}\NormalTok{(n), }\KeywordTok{seq_len}\NormalTok{(n))}
-  
+
 \NormalTok{  x[idx]}
 \NormalTok{\}}
 
@@ -2058,7 +2066,7 @@ There is one exception to the rule that functions have three components. Primiti
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{{A}}: This code returns a named numeric vector of length one - with one element of the value \texttt{10} and the name \texttt{"c"}. The first \texttt{c} represents the \texttt{c()} function, the second \texttt{c} is interpreted as a (quoted) name and the third \texttt{c} as a value.
+\textbf{{A}}: This code returns a named numeric vector of length one --- with one element of the value \texttt{10} and the name \texttt{"c"}. The first \texttt{c} represents the \texttt{c()} function, the second \texttt{c} is interpreted as a (quoted) name and the third \texttt{c} as a value.
 
 \textbf{{Q2}}: What are the four principles that govern how R looks for values?
 
@@ -2512,11 +2520,11 @@ The error occurs during the assignment because no corresponding replacement func
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\StringTok{`}\DataTypeTok{+}\StringTok{`}\NormalTok{ <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(a, }\DataTypeTok{b =}\NormalTok{ 0L)\{}
+\StringTok{`}\DataTypeTok{+}\StringTok{`}\NormalTok{ <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(a, }\DataTypeTok{b =}\NormalTok{ 0L) \{}
   \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{is.character}\NormalTok{(a) }\OperatorTok{&&}\StringTok{ }\KeywordTok{is.character}\NormalTok{(b)) \{}
     \KeywordTok{paste0}\NormalTok{(a, b)}
 \NormalTok{  \} }\ControlFlowTok{else}\NormalTok{ \{}
-\NormalTok{    base}\OperatorTok{::}\StringTok{`}\DataTypeTok{+}\StringTok{`}\NormalTok{(a, b)  }
+\NormalTok{    base}\OperatorTok{::}\StringTok{`}\DataTypeTok{+}\StringTok{`}\NormalTok{(a, b)}
 \NormalTok{  \}}
 \NormalTok{\}}
 
@@ -2828,7 +2836,7 @@ So, we want \texttt{env\_poke2()} to test, if the supplied name is already prese
   \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{env_has}\NormalTok{(env, name)) \{}
     \KeywordTok{abort}\NormalTok{(}\KeywordTok{paste0}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}"}\StringTok{"}\NormalTok{, name, }\StringTok{"}\CharTok{\textbackslash{}"}\StringTok{ is already assigned to a value."}\NormalTok{))}
 \NormalTok{  \}}
-  
+
   \KeywordTok{env_poke}\NormalTok{(env, name, value)}
   \KeywordTok{invisible}\NormalTok{(env)}
 \NormalTok{\}}
@@ -2935,17 +2943,18 @@ Please also note how the list is initialised via the default argument, when the 
   \CommentTok{# Base case}
   \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{env_has}\NormalTok{(env, name)) \{}
 \NormalTok{    obj <-}\StringTok{ }\KeywordTok{env_get}\NormalTok{(env, name)}
-    
+
     \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{is.function}\NormalTok{(obj)) \{}
       \KeywordTok{return}\NormalTok{(obj)}
 \NormalTok{    \}}
 \NormalTok{  \}}
-  
+
   \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{identical}\NormalTok{(env, }\KeywordTok{emptyenv}\NormalTok{()) }\OperatorTok{||}\StringTok{ }\OperatorTok{!}\NormalTok{inherits) \{}
     \KeywordTok{stop}\NormalTok{(}\StringTok{"Could not find function called }\CharTok{\textbackslash{}"}\StringTok{"}\NormalTok{, name, }\StringTok{"}\CharTok{\textbackslash{}"}\StringTok{"}\NormalTok{,}
-         \DataTypeTok{call. =} \OtherTok{FALSE}\NormalTok{)}
+      \DataTypeTok{call. =} \OtherTok{FALSE}
+\NormalTok{    )}
 \NormalTok{  \}}
-  
+
   \CommentTok{# Recursive Case}
   \KeywordTok{fget}\NormalTok{(name, }\KeywordTok{env_parent}\NormalTok{(env))}
 \NormalTok{\}}
@@ -2955,7 +2964,7 @@ Please also note how the list is initialised via the default argument, when the 
 \KeywordTok{fget}\NormalTok{(}\StringTok{"mean"}\NormalTok{, }\DataTypeTok{inherits =} \OtherTok{TRUE}\NormalTok{)}
 \CommentTok{#> function (x, ...) }
 \CommentTok{#> UseMethod("mean")}
-\CommentTok{#> <bytecode: 0x00000000138445b8>}
+\CommentTok{#> <bytecode: 0x0000000013844700>}
 \CommentTok{#> <environment: namespace:base>}
 \end{Highlighting}
 \end{Shaded}
@@ -3036,17 +3045,18 @@ Please also note how the list is initialised via the default argument, when the 
   \CommentTok{# Base case}
   \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{env_has}\NormalTok{(env, name)) \{}
 \NormalTok{    obj <-}\StringTok{ }\KeywordTok{env_get}\NormalTok{(env, name)}
-    
+
     \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{is.function}\NormalTok{(obj)) \{}
       \KeywordTok{return}\NormalTok{(}\KeywordTok{list}\NormalTok{(}\DataTypeTok{fun =}\NormalTok{ obj, }\DataTypeTok{env =}\NormalTok{ env))}
 \NormalTok{    \}}
 \NormalTok{  \}}
-  
+
   \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{identical}\NormalTok{(env, }\KeywordTok{emptyenv}\NormalTok{())) \{}
     \KeywordTok{stop}\NormalTok{(}\StringTok{"Could not find function called }\CharTok{\textbackslash{}"}\StringTok{"}\NormalTok{, name, }\StringTok{"}\CharTok{\textbackslash{}"}\StringTok{"}\NormalTok{,}
-         \DataTypeTok{call. =} \OtherTok{FALSE}\NormalTok{)}
+      \DataTypeTok{call. =} \OtherTok{FALSE}
+\NormalTok{    )}
 \NormalTok{  \}}
-  
+
   \CommentTok{# Recursive Case}
   \KeywordTok{fget2}\NormalTok{(name, }\KeywordTok{env_parent}\NormalTok{(env))}
 \NormalTok{\}}
@@ -3056,7 +3066,7 @@ Please also note how the list is initialised via the default argument, when the 
     \KeywordTok{stop}\NormalTok{(}\StringTok{"`fun_name` must be a string"}\NormalTok{, }\DataTypeTok{call. =} \OtherTok{FALSE}\NormalTok{)}
 \NormalTok{  \}}
 \NormalTok{  fun_env <-}\StringTok{ }\KeywordTok{fget2}\NormalTok{(fun_name, env)}
-  
+
   \KeywordTok{list}\NormalTok{(}
     \DataTypeTok{where =}\NormalTok{ fun_env}\OperatorTok{$}\NormalTok{env,}
     \DataTypeTok{enclosing =} \KeywordTok{fn_env}\NormalTok{(fun_env}\OperatorTok{$}\NormalTok{fun)}
@@ -3140,11 +3150,11 @@ Like in the environments chapter we use functions from the \texttt{\{rlang\}} pa
 \NormalTok{file_remove_strict <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(path) \{}
   \ControlFlowTok{if}\NormalTok{ (}\OperatorTok{!}\KeywordTok{file.exists}\NormalTok{(path)) \{}
     \KeywordTok{stop}\NormalTok{(}\StringTok{"Can't delete the file '"}\NormalTok{, path, }\StringTok{"' because it doesn't exist."}\NormalTok{,}
-         \DataTypeTok{call. =} \OtherTok{FALSE}\NormalTok{)}
+      \DataTypeTok{call. =} \OtherTok{FALSE}
+\NormalTok{    )}
 \NormalTok{  \}}
   \KeywordTok{file.remove}\NormalTok{(path)}
 \NormalTok{\}}
-
 
 \CommentTok{# Test}
 \KeywordTok{saveRDS}\NormalTok{(mtcars, }\StringTok{"mtcars.rds"}\NormalTok{)}
@@ -3285,9 +3295,9 @@ The last example is the most interesting and makes us aware of the exiting quali
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{withCallingHandlers}\NormalTok{( }\CommentTok{# (1)}
+\KeywordTok{withCallingHandlers}\NormalTok{(  }\CommentTok{# (1)}
   \DataTypeTok{message =} \ControlFlowTok{function}\NormalTok{(cnd) }\KeywordTok{message}\NormalTok{(}\StringTok{"b"}\NormalTok{),}
-  \KeywordTok{withCallingHandlers}\NormalTok{( }\CommentTok{# (2)}
+  \KeywordTok{withCallingHandlers}\NormalTok{(  }\CommentTok{# (2)}
     \DataTypeTok{message =} \ControlFlowTok{function}\NormalTok{(cnd) }\KeywordTok{message}\NormalTok{(}\StringTok{"a"}\NormalTok{),}
     \KeywordTok{message}\NormalTok{(}\StringTok{"c"}\NormalTok{)}
 \NormalTok{  )}
@@ -3387,7 +3397,7 @@ The current version of \texttt{catch\_cnd()} is a little more complex because it
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{check_installed <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(package)  \{}
+\NormalTok{check_installed <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(package) \{}
   \ControlFlowTok{if}\NormalTok{ (}\OperatorTok{!}\KeywordTok{requireNamespace}\NormalTok{(package, }\DataTypeTok{quietly =} \OtherTok{FALSE}\NormalTok{)) \{}
     \KeywordTok{abort}\NormalTok{(}
       \StringTok{"error_pkg_not_found"}\NormalTok{,}
@@ -3395,7 +3405,7 @@ The current version of \texttt{catch\_cnd()} is a little more complex because it
       \DataTypeTok{package =}\NormalTok{ package}
 \NormalTok{    )}
 \NormalTok{  \}}
-  
+
   \OtherTok{TRUE}
 \NormalTok{\}}
 
@@ -3423,8 +3433,11 @@ The current version of \texttt{catch\_cnd()} is a little more complex because it
 \NormalTok{suppressErrors <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(expr) \{}
   \KeywordTok{tryCatch}\NormalTok{(}
     \DataTypeTok{error =} \ControlFlowTok{function}\NormalTok{(cnd) }\KeywordTok{invisible}\NormalTok{(cnd),}
-    \DataTypeTok{interrupt =} \ControlFlowTok{function}\NormalTok{(cnd) }\KeywordTok{stop}\NormalTok{(}\StringTok{"Terminated by the user"}\NormalTok{,}
-                                   \DataTypeTok{call. =} \OtherTok{FALSE}\NormalTok{),}
+    \DataTypeTok{interrupt =} \ControlFlowTok{function}\NormalTok{(cnd) \{}
+      \KeywordTok{stop}\NormalTok{(}\StringTok{"Terminated by the user"}\NormalTok{,}
+        \DataTypeTok{call. =} \OtherTok{FALSE}
+\NormalTok{      )}
+\NormalTok{    \},}
 \NormalTok{    expr}
 \NormalTok{  )}
 \NormalTok{\}}
@@ -3450,7 +3463,7 @@ To test the new function, we apply it to a set of conditions and inspect the ret
   \KeywordTok{warning}\NormalTok{(}\StringTok{"warning"}\NormalTok{)}
   \KeywordTok{abort}\NormalTok{(}\StringTok{"error"}\NormalTok{)}
 \NormalTok{\})}
-\CommentTok{# the messages/warnings/conditions are suppressed successfully}
+\CommentTok{# The messages/warnings/conditions are suppressed successfully}
 
 \NormalTok{error_obj}
 \CommentTok{#> <error/rlang_error>}
@@ -3517,6 +3530,7 @@ In this example the use of \texttt{withCallingHandlers()} returns more informati
 \NormalTok{message2error2 <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(code) \{}
   \KeywordTok{tryCatch}\NormalTok{(code, }\DataTypeTok{message =} \ControlFlowTok{function}\NormalTok{(e) (}\KeywordTok{stop}\NormalTok{(}\StringTok{"error"}\NormalTok{)))}
 \NormalTok{\}}
+
 \KeywordTok{message2error2}\NormalTok{(\{}\DecValTok{1}\NormalTok{; }\KeywordTok{stop}\NormalTok{(}\StringTok{"hidden error"}\NormalTok{); }\OtherTok{NULL}\NormalTok{\})}
 \CommentTok{#> Error in value[[3L]](cond) : error}
 \KeywordTok{traceback}\NormalTok{()}
@@ -3545,7 +3559,7 @@ In this example the use of \texttt{withCallingHandlers()} returns more informati
 \NormalTok{    conds <<-}\StringTok{ }\KeywordTok{append}\NormalTok{(conds, }\KeywordTok{list}\NormalTok{(cnd))}
     \KeywordTok{cnd_muffle}\NormalTok{(cnd)}
 \NormalTok{  \}}
-  
+
   \KeywordTok{tryCatch}\NormalTok{(}
     \DataTypeTok{error =} \ControlFlowTok{function}\NormalTok{(cnd) \{}
 \NormalTok{      conds <<-}\StringTok{ }\KeywordTok{append}\NormalTok{(conds, }\KeywordTok{list}\NormalTok{(cnd))}
@@ -3556,7 +3570,7 @@ In this example the use of \texttt{withCallingHandlers()} returns more informati
 \NormalTok{      expr}
 \NormalTok{    )}
 \NormalTok{  )}
-  
+
 \NormalTok{  conds}
 \NormalTok{\}}
 
@@ -3584,25 +3598,29 @@ In this example the use of \texttt{withCallingHandlers()} returns more informati
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{bottles_of_beer <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(}\DataTypeTok{i =} \DecValTok{99}\NormalTok{) \{}
-  \KeywordTok{message}\NormalTok{(}\StringTok{"There are "}\NormalTok{, i,}
-          \StringTok{" bottles of beer on the wall, "}\NormalTok{, i,}
-          \StringTok{" bottles of beer."}\NormalTok{)}
-  \ControlFlowTok{while}\NormalTok{(i }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{) \{}
+  \KeywordTok{message}\NormalTok{(}
+    \StringTok{"There are "}\NormalTok{, i,}
+    \StringTok{" bottles of beer on the wall, "}\NormalTok{, i,}
+    \StringTok{" bottles of beer."}
+\NormalTok{  )}
+  \ControlFlowTok{while}\NormalTok{ (i }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{) \{}
     \KeywordTok{tryCatch}\NormalTok{(}
       \KeywordTok{Sys.sleep}\NormalTok{(}\DecValTok{1}\NormalTok{),}
       \DataTypeTok{interrupt =} \ControlFlowTok{function}\NormalTok{(err) \{}
 \NormalTok{        i <<-}\StringTok{ }\NormalTok{i }\OperatorTok{-}\StringTok{ }\DecValTok{1}
         \ControlFlowTok{if}\NormalTok{ (i }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{) \{}
           \KeywordTok{message}\NormalTok{(}
-            \StringTok{"Take one down, pass it around, "}\NormalTok{, i, }
+            \StringTok{"Take one down, pass it around, "}\NormalTok{, i,}
             \StringTok{" bottle"}\NormalTok{, }\ControlFlowTok{if}\NormalTok{ (i }\OperatorTok{>}\StringTok{ }\DecValTok{1}\NormalTok{) }\StringTok{"s"}\NormalTok{, }\StringTok{" of beer on the wall."}
 \NormalTok{          )}
 \NormalTok{        \}}
 \NormalTok{      \}}
 \NormalTok{    )}
 \NormalTok{  \}}
-  \KeywordTok{message}\NormalTok{(}\StringTok{"No more bottles of beer on the wall, "}\NormalTok{,}
-          \StringTok{"no more bottles of beer."}\NormalTok{)}
+  \KeywordTok{message}\NormalTok{(}
+    \StringTok{"No more bottles of beer on the wall, "}\NormalTok{,}
+    \StringTok{"no more bottles of beer."}
+\NormalTok{  )}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
@@ -3656,18 +3674,18 @@ The extractor function is implemented as a call to \texttt{purrr::pluck()}, whic
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{as_mapper}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))  }\CommentTok{# Equivalent to function(x) x[[1]][[2]]}
+\KeywordTok{as_mapper}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))  }\CommentTok{# equivalent to function(x) x[[1]][[2]]}
 \CommentTok{#> function (x, ...) }
 \CommentTok{#> pluck(x, 1, 2, .default = NULL)}
-\CommentTok{#> <environment: 0x00000000186b9118>}
-\KeywordTok{as_mapper}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"a"}\NormalTok{, }\StringTok{"b"}\NormalTok{))  }\CommentTok{# Equivalent to function(x) x[["a"]][["b]]}
+\CommentTok{#> <environment: 0x00000000156ec898>}
+\KeywordTok{as_mapper}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"a"}\NormalTok{, }\StringTok{"b"}\NormalTok{))  }\CommentTok{# equivalent to function(x) x[["a"]][["b]]}
 \CommentTok{#> function (x, ...) }
 \CommentTok{#> pluck(x, "a", "b", .default = NULL)}
-\CommentTok{#> <environment: 0x000000001888d1b8>}
-\KeywordTok{as_mapper}\NormalTok{(}\KeywordTok{list}\NormalTok{(}\DecValTok{1}\NormalTok{, }\StringTok{"b"}\NormalTok{))  }\CommentTok{# Equivalent to function(x) x[[1]][["b]]}
+\CommentTok{#> <environment: 0x0000000015667988>}
+\KeywordTok{as_mapper}\NormalTok{(}\KeywordTok{list}\NormalTok{(}\DecValTok{1}\NormalTok{, }\StringTok{"b"}\NormalTok{))  }\CommentTok{# equivalent to function(x) x[[1]][["b]]}
 \CommentTok{#> function (x, ...) }
 \CommentTok{#> pluck(x, 1, "b", .default = NULL)}
-\CommentTok{#> <environment: 0x00000000188e0460>}
+\CommentTok{#> <environment: 0x0000000015605f70>}
 \end{Highlighting}
 \end{Shaded}
 
@@ -3763,12 +3781,14 @@ In the second pattern \texttt{runif(2)} is evaluated once, then the results are 
 
 \NormalTok{df_trials <-}\StringTok{ }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{p_value =} \KeywordTok{map_dbl}\NormalTok{(trials, }\StringTok{"p.value"}\NormalTok{))}
 
-\NormalTok{df_trials }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ p_value, }\DataTypeTok{fill =}\NormalTok{ p_value }\OperatorTok{<}\StringTok{ }\FloatTok{0.05}\NormalTok{)) }\OperatorTok{+}\StringTok{ }
+\NormalTok{df_trials }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ p_value, }\DataTypeTok{fill =}\NormalTok{ p_value }\OperatorTok{<}\StringTok{ }\FloatTok{0.05}\NormalTok{)) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_dotplot}\NormalTok{(}\DataTypeTok{binwidth =} \FloatTok{.01}\NormalTok{) }\OperatorTok{+}\StringTok{  }\CommentTok{# geom_histogram() as alternative}
-\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.y =} \KeywordTok{element_blank}\NormalTok{(),}
-        \DataTypeTok{axis.ticks.y =} \KeywordTok{element_blank}\NormalTok{(),}
-        \DataTypeTok{legend.position =} \StringTok{"top"}\NormalTok{)}
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}
+    \DataTypeTok{axis.text.y =} \KeywordTok{element_blank}\NormalTok{(),}
+    \DataTypeTok{axis.ticks.y =} \KeywordTok{element_blank}\NormalTok{(),}
+    \DataTypeTok{legend.position =} \StringTok{"top"}
+\NormalTok{  )}
 \end{Highlighting}
 \end{Shaded}
 
@@ -3847,9 +3867,9 @@ There are a number of ways we could resolve the problem. However, there is not m
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{bootstraps }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{map}\NormalTok{(}\OperatorTok{~}\StringTok{ }\KeywordTok{lm}\NormalTok{(mpg }\OperatorTok{~}\StringTok{ }\NormalTok{disp, }\DataTypeTok{data =}\NormalTok{ .x)) }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{map}\NormalTok{(summary) }\OperatorTok{%>%}\StringTok{ }
+\NormalTok{bootstraps }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{map}\NormalTok{(}\OperatorTok{~}\StringTok{ }\KeywordTok{lm}\NormalTok{(mpg }\OperatorTok{~}\StringTok{ }\NormalTok{disp, }\DataTypeTok{data =}\NormalTok{ .x)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{map}\NormalTok{(summary) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{map_dbl}\NormalTok{(}\StringTok{"r.squared"}\NormalTok{)}
 \CommentTok{#>  [1] 0.588 0.822 0.745 0.746 0.784 0.749 0.613 0.792 0.653 0.726}
 \end{Highlighting}
@@ -3904,9 +3924,9 @@ We could do this in a single pipe by taking advantage of \texttt{set\_names()}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{mtcars }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{split}\NormalTok{(mtcars}\OperatorTok{$}\NormalTok{cyl) }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{set_names}\NormalTok{(}\OperatorTok{~}\StringTok{ }\KeywordTok{file.path}\NormalTok{(temp, }\KeywordTok{paste0}\NormalTok{(}\StringTok{"cyl-"}\NormalTok{, .x, }\StringTok{".csv"}\NormalTok{))) }\OperatorTok{%>%}\StringTok{ }
+\NormalTok{mtcars }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{split}\NormalTok{(mtcars}\OperatorTok{$}\NormalTok{cyl) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{set_names}\NormalTok{(}\OperatorTok{~}\StringTok{ }\KeywordTok{file.path}\NormalTok{(temp, }\KeywordTok{paste0}\NormalTok{(}\StringTok{"cyl-"}\NormalTok{, .x, }\StringTok{".csv"}\NormalTok{))) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{iwalk}\NormalTok{(}\OperatorTok{~}\StringTok{ }\KeywordTok{write.csv}\NormalTok{(.x, .y))}
 \end{Highlighting}
 \end{Shaded}
@@ -4093,12 +4113,12 @@ Our new \texttt{simple\_reduce()} now works as intended:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{arg_max <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, f)\{}
+\NormalTok{arg_max <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, f) \{}
 \NormalTok{  y <-}\StringTok{ }\KeywordTok{map_dbl}\NormalTok{(x, f)}
 \NormalTok{  x[y }\OperatorTok{==}\StringTok{ }\KeywordTok{max}\NormalTok{(y)]}
 \NormalTok{\}}
 
-\NormalTok{arg_min <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, f)\{}
+\NormalTok{arg_min <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, f) \{}
 \NormalTok{  y <-}\StringTok{ }\KeywordTok{map_dbl}\NormalTok{(x, f)}
 \NormalTok{  x[y }\OperatorTok{==}\StringTok{ }\KeywordTok{min}\NormalTok{(y)]}
 \NormalTok{\}}
@@ -4427,8 +4447,10 @@ New values are then mapped on the y value of the next smallest x value from with
 \NormalTok{x <-}\StringTok{ }\DecValTok{1}\OperatorTok{:}\DecValTok{3}
 \KeywordTok{identical}\NormalTok{(x[[}\DecValTok{1}\NormalTok{]], }\KeywordTok{pick}\NormalTok{(}\DecValTok{1}\NormalTok{)(x))}
 \CommentTok{#> [1] TRUE}
-\KeywordTok{identical}\NormalTok{(}\KeywordTok{lapply}\NormalTok{(mtcars, }\ControlFlowTok{function}\NormalTok{(x) x[[}\DecValTok{5}\NormalTok{]]),}
-          \KeywordTok{lapply}\NormalTok{(mtcars, }\KeywordTok{pick}\NormalTok{(}\DecValTok{5}\NormalTok{)))}
+\KeywordTok{identical}\NormalTok{(}
+  \KeywordTok{lapply}\NormalTok{(mtcars, }\ControlFlowTok{function}\NormalTok{(x) x[[}\DecValTok{5}\NormalTok{]]),}
+  \KeywordTok{lapply}\NormalTok{(mtcars, }\KeywordTok{pick}\NormalTok{(}\DecValTok{5}\NormalTok{))}
+\NormalTok{)}
 \CommentTok{#> [1] TRUE}
 \end{Highlighting}
 \end{Shaded}
@@ -4450,7 +4472,7 @@ New values are then mapped on the y value of the next smallest x value from with
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{moment <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(i)\{}
+\NormalTok{moment <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(i) \{}
   \KeywordTok{force}\NormalTok{(i)}
   
   \ControlFlowTok{function}\NormalTok{(x) }\KeywordTok{sum}\NormalTok{((x }\OperatorTok{-}\StringTok{ }\KeywordTok{mean}\NormalTok{(x)) }\OperatorTok{^}\StringTok{ }\NormalTok{i) }\OperatorTok{/}\StringTok{ }\KeywordTok{length}\NormalTok{(x)}
@@ -4673,7 +4695,7 @@ As the redundant calculations within \texttt{ll\_poisson1()} become more expensi
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{bench_poisson <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x_length)\{}
+\NormalTok{bench_poisson <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x_length) \{}
 \NormalTok{  x <-}\StringTok{ }\KeywordTok{rpois}\NormalTok{(x_length, 100L)}
   
 \NormalTok{  bench}\OperatorTok{::}\KeywordTok{mark}\NormalTok{(}
@@ -4691,12 +4713,14 @@ As the redundant calculations within \texttt{ll\_poisson1()} become more expensi
 \NormalTok{)}
 
 \KeywordTok{ggplot}\NormalTok{(df_perf, }\KeywordTok{aes}\NormalTok{(x_length, median, }\DataTypeTok{col =}\NormalTok{ method)) }\OperatorTok{+}
-\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{size =} \DecValTok{2}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{size =} \DecValTok{2}\NormalTok{) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_smooth}\NormalTok{() }\OperatorTok{+}
 \StringTok{  }\KeywordTok{scale_x_log10}\NormalTok{() }\OperatorTok{+}
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{x =} \StringTok{"Length of x"}\NormalTok{,}
-       \DataTypeTok{y =} \StringTok{"Execution Time (s)"}\NormalTok{,}
-       \DataTypeTok{color =} \StringTok{"Method"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}
+    \DataTypeTok{x =} \StringTok{"Length of x"}\NormalTok{,}
+    \DataTypeTok{y =} \StringTok{"Execution Time (s)"}\NormalTok{,}
+    \DataTypeTok{color =} \StringTok{"Method"}
+\NormalTok{  ) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.position =} \StringTok{"top"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -5421,7 +5445,7 @@ Our updated \texttt{new\_factor()} constructor gets a \texttt{contrasts} argumen
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{new_roman <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(}\DataTypeTok{x =} \KeywordTok{integer}\NormalTok{())\{}
+\NormalTok{new_roman <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(}\DataTypeTok{x =} \KeywordTok{integer}\NormalTok{()) \{}
   \KeywordTok{stopifnot}\NormalTok{(}\KeywordTok{is.integer}\NormalTok{(x))}
   \KeywordTok{structure}\NormalTok{(x, }\DataTypeTok{class =} \StringTok{"roman"}\NormalTok{)}
 \NormalTok{\}}
@@ -5691,17 +5715,19 @@ To finally get a better overview, we have to put in a little more effort and als
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(dplyr)}
 
-\KeywordTok{s3_methods_generic}\NormalTok{(}\StringTok{"["}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{filter}\NormalTok{(visible) }\OperatorTok{%>%}\StringTok{ }
+\KeywordTok{s3_methods_generic}\NormalTok{(}\StringTok{"["}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(visible) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}
     \DataTypeTok{method =} \KeywordTok{paste0}\NormalTok{(}\StringTok{"[."}\NormalTok{, class),}
     \DataTypeTok{argnames =}\NormalTok{ purrr}\OperatorTok{::}\KeywordTok{map}\NormalTok{(method, }\OperatorTok{~}\StringTok{ }\KeywordTok{names}\NormalTok{(}\KeywordTok{formals}\NormalTok{(.x))),}
     \DataTypeTok{args =}\NormalTok{ purrr}\OperatorTok{::}\KeywordTok{map}\NormalTok{(method, }\OperatorTok{~}\StringTok{ }\KeywordTok{formals}\NormalTok{(.x)),}
-    \DataTypeTok{args =}\NormalTok{ purrr}\OperatorTok{::}\KeywordTok{map2}\NormalTok{(argnames, args,}
-                       \OperatorTok{~}\StringTok{ }\KeywordTok{paste}\NormalTok{(.x, .y, }\DataTypeTok{sep =} \StringTok{" = "}\NormalTok{)),}
+    \DataTypeTok{args =}\NormalTok{ purrr}\OperatorTok{::}\KeywordTok{map2}\NormalTok{(}
+\NormalTok{      argnames, args,}
+      \OperatorTok{~}\StringTok{ }\KeywordTok{paste}\NormalTok{(.x, .y, }\DataTypeTok{sep =} \StringTok{" = "}\NormalTok{)}
+\NormalTok{    ),}
     \DataTypeTok{args =}\NormalTok{ purrr}\OperatorTok{::}\KeywordTok{set_names}\NormalTok{(args, method)}
 \NormalTok{  ) }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{pull}\NormalTok{(args) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{pull}\NormalTok{(args) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{head}\NormalTok{()}
 \CommentTok{#> $`[.AsIs`}
 \CommentTok{#> [1] "x = "   "i = "   "... = "}
@@ -6094,7 +6120,7 @@ Of course, different functions should perform different calculations. Here \text
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{Math.data.frame <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, ...)\{}
+\NormalTok{Math.data.frame <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, ...) \{}
 \NormalTok{  .Generic}
 \NormalTok{\}}
 
@@ -6176,14 +6202,15 @@ To solve the exercises in this chapter we will have to create R6 objects, which 
   \DataTypeTok{public =} \KeywordTok{list}\NormalTok{(}
     \DataTypeTok{balance =} \DecValTok{0}\NormalTok{,}
     \DataTypeTok{deposit =} \ControlFlowTok{function}\NormalTok{(}\DataTypeTok{dep =} \DecValTok{0}\NormalTok{) \{}
-\NormalTok{      self}\OperatorTok{$}\NormalTok{balance =}\StringTok{ }\NormalTok{self}\OperatorTok{$}\NormalTok{balance }\OperatorTok{+}\StringTok{ }\NormalTok{dep}
+\NormalTok{      self}\OperatorTok{$}\NormalTok{balance <-}\StringTok{ }\NormalTok{self}\OperatorTok{$}\NormalTok{balance }\OperatorTok{+}\StringTok{ }\NormalTok{dep}
       \KeywordTok{invisible}\NormalTok{(self)}
 \NormalTok{    \},}
     \DataTypeTok{withdraw =} \ControlFlowTok{function}\NormalTok{(draw) \{}
-\NormalTok{      self}\OperatorTok{$}\NormalTok{balance =}\StringTok{ }\NormalTok{self}\OperatorTok{$}\NormalTok{balance }\OperatorTok{-}\StringTok{ }\NormalTok{draw}
+\NormalTok{      self}\OperatorTok{$}\NormalTok{balance <-}\StringTok{ }\NormalTok{self}\OperatorTok{$}\NormalTok{balance }\OperatorTok{-}\StringTok{ }\NormalTok{draw}
       \KeywordTok{invisible}\NormalTok{(self)}
 \NormalTok{    \}}
-\NormalTok{  ))}
+\NormalTok{  )}
+\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6214,11 +6241,14 @@ Now, we create the first subclass that prevents us from going into overdraft and
     \DataTypeTok{withdraw =} \ControlFlowTok{function}\NormalTok{(}\DataTypeTok{draw =} \DecValTok{0}\NormalTok{) \{}
       \ControlFlowTok{if}\NormalTok{ (self}\OperatorTok{$}\NormalTok{balance }\OperatorTok{-}\StringTok{ }\NormalTok{draw }\OperatorTok{<}\StringTok{ }\DecValTok{0}\NormalTok{) \{}
         \KeywordTok{stop}\NormalTok{(}\StringTok{"Your `withdraw` must be smaller "}\NormalTok{,}
-             \StringTok{"than your `balance`."}\NormalTok{, }\DataTypeTok{call. =} \OtherTok{FALSE}\NormalTok{)}
+          \StringTok{"than your `balance`."}\NormalTok{,}
+          \DataTypeTok{call. =} \OtherTok{FALSE}
+\NormalTok{        )}
 \NormalTok{      \}}
 \NormalTok{      super}\OperatorTok{$}\KeywordTok{withdraw}\NormalTok{(}\DataTypeTok{draw =}\NormalTok{ draw)}
 \NormalTok{    \}}
-\NormalTok{  ))}
+\NormalTok{  )}
+\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6254,7 +6284,8 @@ Finally, we create another subclass that charges a constant fee of 1 for each wi
 \NormalTok{      \}}
 \NormalTok{      super}\OperatorTok{$}\KeywordTok{withdraw}\NormalTok{(}\DataTypeTok{draw =}\NormalTok{ draw)}
 \NormalTok{    \}}
-\NormalTok{  ))}
+\NormalTok{  )}
+\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6291,7 +6322,7 @@ Let's take a look at the implemented functionality. We expect a final balance of
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{ShuffledDeck <-}\StringTok{ }\KeywordTok{R6Class}\NormalTok{(}
-  \DataTypeTok{classname =} \StringTok{"ShuffledDeck"}\NormalTok{, }
+  \DataTypeTok{classname =} \StringTok{"ShuffledDeck"}\NormalTok{,}
   \DataTypeTok{public =} \KeywordTok{list}\NormalTok{(}
     \DataTypeTok{deck =} \OtherTok{NULL}\NormalTok{,}
     \DataTypeTok{initialize =} \ControlFlowTok{function}\NormalTok{(}\DataTypeTok{deck =}\NormalTok{ cards) \{}
@@ -6308,12 +6339,13 @@ Let's take a look at the implemented functionality. We expect a final balance of
       \ControlFlowTok{if}\NormalTok{ (n }\OperatorTok{>}\StringTok{ }\NormalTok{self}\OperatorTok{$}\KeywordTok{n}\NormalTok{()) \{}
         \KeywordTok{stop}\NormalTok{(}\StringTok{"Only "}\NormalTok{, self}\OperatorTok{$}\KeywordTok{n}\NormalTok{(), }\StringTok{" cards remaining"}\NormalTok{, }\DataTypeTok{call. =} \OtherTok{FALSE}\NormalTok{)}
 \NormalTok{      \}}
-      
+
 \NormalTok{      output <-}\StringTok{ }\NormalTok{self}\OperatorTok{$}\NormalTok{deck[}\KeywordTok{seq_len}\NormalTok{(n)]}
 \NormalTok{      self}\OperatorTok{$}\NormalTok{deck <-}\StringTok{ }\NormalTok{self}\OperatorTok{$}\NormalTok{deck[}\OperatorTok{-}\KeywordTok{seq_len}\NormalTok{(n)]}
 \NormalTok{      output}
 \NormalTok{    \}}
-\NormalTok{  ))}
+\NormalTok{  )}
+\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6358,18 +6390,19 @@ It is possible to combine S3 classes with an environment (which is how R6 works)
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{Timezone <-}\StringTok{ }\KeywordTok{R6Class}\NormalTok{(}
-  \DataTypeTok{classname =} \StringTok{"Timezone"}\NormalTok{, }
+  \DataTypeTok{classname =} \StringTok{"Timezone"}\NormalTok{,}
   \DataTypeTok{public =} \KeywordTok{list}\NormalTok{(}
     \DataTypeTok{get =} \ControlFlowTok{function}\NormalTok{() \{}
       \KeywordTok{Sys.timezone}\NormalTok{()}
 \NormalTok{    \},}
     \DataTypeTok{set =} \ControlFlowTok{function}\NormalTok{(value) \{}
       \KeywordTok{stopifnot}\NormalTok{(value }\OperatorTok{%in%}\StringTok{ }\KeywordTok{OlsonNames}\NormalTok{())}
-      
+
 \NormalTok{      old <-}\StringTok{ }\NormalTok{self}\OperatorTok{$}\KeywordTok{get}\NormalTok{()}
       \KeywordTok{Sys.setenv}\NormalTok{(}\DataTypeTok{TZ =}\NormalTok{ value)}
       \KeywordTok{invisible}\NormalTok{(old)}
-\NormalTok{    \})}
+\NormalTok{    \}}
+\NormalTok{  )}
 \NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -6399,7 +6432,7 @@ Now, let us create one instance of this class and test, if we can set and get th
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{WorkingDirectory <-}\StringTok{ }\KeywordTok{R6Class}\NormalTok{(}
-  \DataTypeTok{classname =} \StringTok{"WorkingDirectory"}\NormalTok{, }
+  \DataTypeTok{classname =} \StringTok{"WorkingDirectory"}\NormalTok{,}
   \DataTypeTok{public =} \KeywordTok{list}\NormalTok{(}
     \DataTypeTok{get =} \ControlFlowTok{function}\NormalTok{() \{}
       \KeywordTok{getwd}\NormalTok{()}
@@ -6407,7 +6440,8 @@ Now, let us create one instance of this class and test, if we can set and get th
     \DataTypeTok{set =} \ControlFlowTok{function}\NormalTok{(value) \{}
       \KeywordTok{setwd}\NormalTok{(value)}
 \NormalTok{    \}}
-\NormalTok{  ))}
+\NormalTok{  )}
+\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6605,11 +6639,11 @@ We conclude that subclasses can access private methods from their superclasses, 
     \DataTypeTok{initialize =} \ControlFlowTok{function}\NormalTok{(filename) \{}
 \NormalTok{      self}\OperatorTok{$}\NormalTok{con <-}\StringTok{ }\KeywordTok{file}\NormalTok{(filename, }\DataTypeTok{open =} \StringTok{"a"}\NormalTok{)}
 \NormalTok{    \},}
-    
+
     \DataTypeTok{finalize =} \ControlFlowTok{function}\NormalTok{() \{}
       \KeywordTok{close}\NormalTok{(self}\OperatorTok{$}\NormalTok{con)}
 \NormalTok{    \},}
-    
+
     \DataTypeTok{append_line =} \ControlFlowTok{function}\NormalTok{(x) \{}
       \KeywordTok{cat}\NormalTok{(x, }\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{, }\DataTypeTok{file =}\NormalTok{ self}\OperatorTok{$}\NormalTok{con)}
 \NormalTok{    \}}
@@ -6719,40 +6753,40 @@ All slots from \texttt{utils::person()} besides \texttt{role} must be of type ch
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# Definition of the Person class}
-\KeywordTok{setClass}\NormalTok{(}\StringTok{"Person"}\NormalTok{, }
-         \DataTypeTok{slots =} \KeywordTok{c}\NormalTok{(}
-           \DataTypeTok{age =} \StringTok{"numeric"}\NormalTok{,}
-           \DataTypeTok{given =} \StringTok{"character"}\NormalTok{,}
-           \DataTypeTok{family =} \StringTok{"character"}\NormalTok{,}
-           \DataTypeTok{role =} \StringTok{"character"}\NormalTok{,}
-           \DataTypeTok{email =} \StringTok{"character"}\NormalTok{,}
-           \DataTypeTok{comment =} \StringTok{"character"}
-\NormalTok{         ),}
-         \DataTypeTok{prototype =} \KeywordTok{list}\NormalTok{(}
-           \DataTypeTok{age =} \OtherTok{NA_real_}\NormalTok{,}
-           \DataTypeTok{given =} \OtherTok{NA_character_}\NormalTok{,}
-           \DataTypeTok{family =} \OtherTok{NA_character_}\NormalTok{,}
-           \DataTypeTok{role =} \OtherTok{NA_character_}\NormalTok{,}
-           \DataTypeTok{email =} \OtherTok{NA_character_}\NormalTok{,}
-           \DataTypeTok{comment =} \OtherTok{NA_character_}
-\NormalTok{         )}
+\KeywordTok{setClass}\NormalTok{(}\StringTok{"Person"}\NormalTok{,}
+  \DataTypeTok{slots =} \KeywordTok{c}\NormalTok{(}
+    \DataTypeTok{age =} \StringTok{"numeric"}\NormalTok{,}
+    \DataTypeTok{given =} \StringTok{"character"}\NormalTok{,}
+    \DataTypeTok{family =} \StringTok{"character"}\NormalTok{,}
+    \DataTypeTok{role =} \StringTok{"character"}\NormalTok{,}
+    \DataTypeTok{email =} \StringTok{"character"}\NormalTok{,}
+    \DataTypeTok{comment =} \StringTok{"character"}
+\NormalTok{  ),}
+  \DataTypeTok{prototype =} \KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{age =} \OtherTok{NA_real_}\NormalTok{,}
+    \DataTypeTok{given =} \OtherTok{NA_character_}\NormalTok{,}
+    \DataTypeTok{family =} \OtherTok{NA_character_}\NormalTok{,}
+    \DataTypeTok{role =} \OtherTok{NA_character_}\NormalTok{,}
+    \DataTypeTok{email =} \OtherTok{NA_character_}\NormalTok{,}
+    \DataTypeTok{comment =} \OtherTok{NA_character_}
+\NormalTok{  )}
 \NormalTok{)}
 
 \CommentTok{# Helper to create instances of the Person class}
-\NormalTok{Person <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(given, family, }
-                   \DataTypeTok{age =} \OtherTok{NA_real_}\NormalTok{, }
+\NormalTok{Person <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(given, family,}
+                   \DataTypeTok{age =} \OtherTok{NA_real_}\NormalTok{,}
                    \DataTypeTok{role =} \OtherTok{NA_character_}\NormalTok{,}
                    \DataTypeTok{email =} \OtherTok{NA_character_}\NormalTok{,}
                    \DataTypeTok{comment =} \OtherTok{NA_character_}\NormalTok{) \{}
 \NormalTok{  age <-}\StringTok{ }\KeywordTok{as.double}\NormalTok{(age)}
-  
-  \KeywordTok{new}\NormalTok{(}\StringTok{"Person"}\NormalTok{, }
-      \DataTypeTok{age =}\NormalTok{ age, }
-      \DataTypeTok{given =}\NormalTok{ given, }
-      \DataTypeTok{family =}\NormalTok{ family, }
-      \DataTypeTok{role =}\NormalTok{ role, }
-      \DataTypeTok{email =}\NormalTok{ email,}
-      \DataTypeTok{comment =}\NormalTok{ comment}
+
+  \KeywordTok{new}\NormalTok{(}\StringTok{"Person"}\NormalTok{,}
+    \DataTypeTok{age =}\NormalTok{ age,}
+    \DataTypeTok{given =}\NormalTok{ given,}
+    \DataTypeTok{family =}\NormalTok{ family,}
+    \DataTypeTok{role =}\NormalTok{ role,}
+    \DataTypeTok{email =}\NormalTok{ email,}
+    \DataTypeTok{comment =}\NormalTok{ comment}
 \NormalTok{  )}
 \NormalTok{\}}
 
@@ -6779,6 +6813,7 @@ All slots from \texttt{utils::person()} besides \texttt{role} must be of type ch
       \KeywordTok{paste}\NormalTok{(known_roles, }\DataTypeTok{collapse =} \StringTok{", "}\NormalTok{)}
 \NormalTok{    )}
 \NormalTok{  \}}
+  
   \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{length}\NormalTok{(invalids)) }\KeywordTok{return}\NormalTok{(invalids)  }
   \OtherTok{TRUE}
 \NormalTok{\})}
@@ -6820,17 +6855,17 @@ For simplicity we don't introduce an explicit subclass for ordered factors. Inst
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{setClass}\NormalTok{(}\StringTok{"Factor"}\NormalTok{, }
-         \DataTypeTok{slots =} \KeywordTok{c}\NormalTok{(}
-           \DataTypeTok{data =} \StringTok{"integer"}\NormalTok{,}
-           \DataTypeTok{levels =} \StringTok{"character"}\NormalTok{,}
-           \DataTypeTok{ordered =} \StringTok{"logical"}
-\NormalTok{         ),}
-         \DataTypeTok{prototype =} \KeywordTok{list}\NormalTok{(}
-           \DataTypeTok{data =} \KeywordTok{integer}\NormalTok{(),}
-           \DataTypeTok{levels =} \KeywordTok{character}\NormalTok{(),}
-           \DataTypeTok{ordered =} \OtherTok{FALSE}
-\NormalTok{         )}
+\KeywordTok{setClass}\NormalTok{(}\StringTok{"Factor"}\NormalTok{,}
+  \DataTypeTok{slots =} \KeywordTok{c}\NormalTok{(}
+    \DataTypeTok{data =} \StringTok{"integer"}\NormalTok{,}
+    \DataTypeTok{levels =} \StringTok{"character"}\NormalTok{,}
+    \DataTypeTok{ordered =} \StringTok{"logical"}
+\NormalTok{  ),}
+  \DataTypeTok{prototype =} \KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{data =} \KeywordTok{integer}\NormalTok{(),}
+    \DataTypeTok{levels =} \KeywordTok{character}\NormalTok{(),}
+    \DataTypeTok{ordered =} \OtherTok{FALSE}
+\NormalTok{  )}
 \NormalTok{)}
 
 
@@ -6852,12 +6887,12 @@ The \texttt{Date2} class stores its dates as integers, similarly to base R which
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{setClass}\NormalTok{(}\StringTok{"Date2"}\NormalTok{,}
-         \DataTypeTok{slots =} \KeywordTok{list}\NormalTok{(}
-           \DataTypeTok{data =} \StringTok{"integer"}
-\NormalTok{         ),}
-         \DataTypeTok{prototype =} \KeywordTok{list}\NormalTok{(}
-           \DataTypeTok{data =} \KeywordTok{integer}\NormalTok{()}
-\NormalTok{         )}
+  \DataTypeTok{slots =} \KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{data =} \StringTok{"integer"}
+\NormalTok{  ),}
+  \DataTypeTok{prototype =} \KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{data =} \KeywordTok{integer}\NormalTok{()}
+\NormalTok{  )}
 \NormalTok{)}
 
 \KeywordTok{new}\NormalTok{(}\StringTok{"Date2"}\NormalTok{, }\DataTypeTok{data =}\NormalTok{ 1L)}
@@ -6872,14 +6907,14 @@ Our \texttt{DataFrame} class consists of a list and a slot for \texttt{row.names
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{setClass}\NormalTok{(}\StringTok{"DataFrame"}\NormalTok{,}
-         \DataTypeTok{slots =} \KeywordTok{c}\NormalTok{(}
-           \DataTypeTok{data =} \StringTok{"list"}\NormalTok{, }
-           \DataTypeTok{row.names =} \StringTok{"character"}
-\NormalTok{         ),}
-         \DataTypeTok{prototype =} \KeywordTok{list}\NormalTok{(}
-           \DataTypeTok{data =} \KeywordTok{list}\NormalTok{(),}
-           \DataTypeTok{row.names =} \KeywordTok{character}\NormalTok{(}\DecValTok{0}\NormalTok{)}
-\NormalTok{         )}
+  \DataTypeTok{slots =} \KeywordTok{c}\NormalTok{(}
+    \DataTypeTok{data =} \StringTok{"list"}\NormalTok{,}
+    \DataTypeTok{row.names =} \StringTok{"character"}
+\NormalTok{  ),}
+  \DataTypeTok{prototype =} \KeywordTok{list}\NormalTok{(}
+    \DataTypeTok{data =} \KeywordTok{list}\NormalTok{(),}
+    \DataTypeTok{row.names =} \KeywordTok{character}\NormalTok{(}\DecValTok{0}\NormalTok{)}
+\NormalTok{  )}
 \NormalTok{)}
 
 \KeywordTok{new}\NormalTok{(}\StringTok{"DataFrame"}\NormalTok{, }\DataTypeTok{data =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{a =} \DecValTok{1}\NormalTok{, }\DataTypeTok{b =} \DecValTok{2}\NormalTok{))}
@@ -6935,7 +6970,7 @@ Our \texttt{DataFrame} class consists of a list and a slot for \texttt{row.names
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{.Person <-}\StringTok{ }\KeywordTok{setClass}\NormalTok{(}
-  \StringTok{"Person"}\NormalTok{, }
+  \StringTok{"Person"}\NormalTok{,}
   \DataTypeTok{slots =} \KeywordTok{c}\NormalTok{(}\DataTypeTok{name =} \StringTok{"character"}\NormalTok{, }\DataTypeTok{age =} \StringTok{"numeric"}\NormalTok{)}
 \NormalTok{)}
 
@@ -7044,11 +7079,11 @@ Let's build an S4 \texttt{OrderedFactor} on top of the S3 factor in such a way.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{setOldClass}\NormalTok{(}\StringTok{"factor"}\NormalTok{)  }\CommentTok{# using build-in definition for brevity}
+\KeywordTok{setOldClass}\NormalTok{(}\StringTok{"factor"}\NormalTok{)    }\CommentTok{# use build-in definition for brevity}
 
 \NormalTok{OrderedFactor <-}\StringTok{ }\KeywordTok{setClass}\NormalTok{(}
   \StringTok{"OrderedFactor"}\NormalTok{,}
-  \DataTypeTok{contains =} \StringTok{"factor"}\NormalTok{,  }\CommentTok{# inherit from registered S3 class}
+  \DataTypeTok{contains =} \StringTok{"factor"}\NormalTok{,   }\CommentTok{# inherit from registered S3 class}
   \DataTypeTok{slots =} \KeywordTok{c}\NormalTok{(}
     \DataTypeTok{levels =} \StringTok{"character"}\NormalTok{,}
     \DataTypeTok{ordered =} \StringTok{"logical"}  \CommentTok{# add logical order slot}
@@ -7139,7 +7174,7 @@ To capture and compute on expressions, and to visualise them, we will load the \
 #> \-z
 \end{verbatim}
 
-\textbf{{A}}: Let the source (of the code chunks above) be with you and show you how the ASTs were produced.
+\textbf{{A}}: Let the source (of the code chunks above) be with you and show you how the ASTs (abstract syntax trees) were produced.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7957,14 +7992,15 @@ Let us finish with the whole code, followed by some tests for our new function:
 \NormalTok{\}}
 
 \NormalTok{find_assign_rec <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x) \{}
-  \KeywordTok{switch_expr}\NormalTok{(x,}
-              \CommentTok{# Base cases}
-              \DataTypeTok{constant =}\NormalTok{ ,}
-              \DataTypeTok{symbol =} \KeywordTok{character}\NormalTok{(),}
-              
-              \CommentTok{# Recursive cases}
-              \DataTypeTok{pairlist =} \KeywordTok{flat_map_chr}\NormalTok{(x, find_assign_rec),}
-              \DataTypeTok{call =} \KeywordTok{find_assign_call}\NormalTok{(x)}
+  \KeywordTok{switch_expr}\NormalTok{(}
+\NormalTok{    x,}
+    \CommentTok{# Base cases}
+    \DataTypeTok{constant =}\NormalTok{ ,}
+    \DataTypeTok{symbol =} \KeywordTok{character}\NormalTok{(),}
+
+    \CommentTok{# Recursive cases}
+    \DataTypeTok{pairlist =} \KeywordTok{flat_map_chr}\NormalTok{(x, find_assign_rec),}
+    \DataTypeTok{call =} \KeywordTok{find_assign_call}\NormalTok{(x)}
 \NormalTok{  )}
 \NormalTok{\}}
 
@@ -8516,7 +8552,7 @@ However, we may name the first argument \texttt{.x}, which seems clearer and les
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{bc2 <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(lambda)\{}
+\NormalTok{bc2 <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(lambda) \{}
 \NormalTok{  lambda <-}\StringTok{ }\KeywordTok{enexpr}\NormalTok{(lambda)}
   
   \ControlFlowTok{if}\NormalTok{ (}\OperatorTok{!!}\NormalTok{lambda }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{) \{}
@@ -8529,11 +8565,11 @@ However, we may name the first argument \texttt{.x}, which seems clearer and les
 \KeywordTok{bc2}\NormalTok{(}\DecValTok{0}\NormalTok{)}
 \CommentTok{#> function (x) }
 \CommentTok{#> log(x)}
-\CommentTok{#> <environment: 0x0000000019b7d8b0>}
+\CommentTok{#> <environment: 0x00000000194ecbf0>}
 \KeywordTok{bc2}\NormalTok{(}\DecValTok{2}\NormalTok{)}
 \CommentTok{#> function (x) }
 \CommentTok{#> (x^2 - 1)/2}
-\CommentTok{#> <environment: 0x0000000019bd5f88>}
+\CommentTok{#> <environment: 0x0000000019546e50>}
 \KeywordTok{bc2}\NormalTok{(}\DecValTok{2}\NormalTok{)(}\DecValTok{2}\NormalTok{)}
 \CommentTok{#> [1] 1.5}
 \end{Highlighting}
@@ -8553,7 +8589,7 @@ However, we may name the first argument \texttt{.x}, which seems clearer and les
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{compose2 <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(f, g)\{}
+\NormalTok{compose2 <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(f, g) \{}
 \NormalTok{  f <-}\StringTok{ }\KeywordTok{enexpr}\NormalTok{(f)}
 \NormalTok{  g <-}\StringTok{ }\KeywordTok{enexpr}\NormalTok{(g)}
   
@@ -8562,14 +8598,14 @@ However, we may name the first argument \texttt{.x}, which seems clearer and les
 
 \KeywordTok{compose}\NormalTok{(sin, cos)}
 \CommentTok{#> function(...) f(g(...))}
-\CommentTok{#> <environment: 0x0000000018a840a0>}
+\CommentTok{#> <environment: 0x0000000015a953d8>}
 \KeywordTok{compose}\NormalTok{(sin, cos)(pi)}
 \CommentTok{#> [1] -0.841}
 
 \KeywordTok{compose2}\NormalTok{(sin, cos)}
 \CommentTok{#> function (...) }
 \CommentTok{#> sin(cos(...))}
-\CommentTok{#> <environment: 0x0000000018c76c48>}
+\CommentTok{#> <environment: 0x00000000151ea5d8>}
 \KeywordTok{compose2}\NormalTok{(sin, cos)(pi)}
 \CommentTok{#> [1] -0.841}
 \end{Highlighting}
@@ -8609,7 +8645,7 @@ On our journey through R's metaprogramming, we continue to use the functions fro
 \NormalTok{x <-}\StringTok{ "global environment"}
 \NormalTok{env2 <-}\StringTok{ }\KeywordTok{env}\NormalTok{(}\DataTypeTok{x =} \StringTok{"specified environment"}\NormalTok{)}
 
-\NormalTok{locate_evaluation <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(file, local)\{}
+\NormalTok{locate_evaluation <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(file, local) \{}
 \NormalTok{  x <-}\StringTok{ "local environment"}
   \KeywordTok{source}\NormalTok{(file, }\DataTypeTok{local =}\NormalTok{ local)}
 \NormalTok{\}}
@@ -8863,7 +8899,7 @@ Next, \texttt{call} will be evaluated in the caller environment (aka the parent 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{enenv <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x)\{}
+\NormalTok{enenv <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x) \{}
   \KeywordTok{get_env}\NormalTok{(}\KeywordTok{enquo}\NormalTok{(x))}
 \NormalTok{\}}
 
@@ -8872,11 +8908,11 @@ Next, \texttt{call} will be evaluated in the caller environment (aka the parent 
 \CommentTok{#> <environment: R_GlobalEnv>}
 
 \CommentTok{# Test if it also works within functions}
-\NormalTok{capture_env <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x)\{}
+\NormalTok{capture_env <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x) \{}
   \KeywordTok{enenv}\NormalTok{(x)}
 \NormalTok{\}}
 \KeywordTok{capture_env}\NormalTok{(x)}
-\CommentTok{#> <environment: 0x0000000013ae55d8>}
+\CommentTok{#> <environment: 0x000000001960b760>}
 \end{Highlighting}
 \end{Shaded}
 
@@ -9191,8 +9227,8 @@ This approach takes advantage of R's lazy evaluation of function arguments, by m
 \NormalTok{  formula, data,}
   \DataTypeTok{resample_data =}\NormalTok{ data[}\KeywordTok{sample}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(data), }\DataTypeTok{replace =} \OtherTok{TRUE}\NormalTok{), ,}
                        \DataTypeTok{drop =} \OtherTok{FALSE}\NormalTok{],}
-  \DataTypeTok{env =} \KeywordTok{current_env}\NormalTok{()}
-\NormalTok{) \{}
+  \DataTypeTok{env =} \KeywordTok{current_env}\NormalTok{()) \{}
+  
 \NormalTok{  formula <-}\StringTok{ }\KeywordTok{enexpr}\NormalTok{(formula)}
   
 \NormalTok{  lm_call <-}\StringTok{ }\KeywordTok{expr}\NormalTok{(}\KeywordTok{lm}\NormalTok{(}\OperatorTok{!!}\NormalTok{formula, }\DataTypeTok{data =}\NormalTok{ resample_data))}
@@ -9313,7 +9349,7 @@ Let's start by loading the relevant code from Advanced R first.
 \NormalTok{\}}
 
 \NormalTok{html_attribute <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(name, }\DataTypeTok{value =} \OtherTok{NULL}\NormalTok{) \{}
-  \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{length}\NormalTok{(value) }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{) }\KeywordTok{return}\NormalTok{(name) }\CommentTok{# for attributes with no value}
+  \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{length}\NormalTok{(value) }\OperatorTok{==}\StringTok{ }\DecValTok{0}\NormalTok{) }\KeywordTok{return}\NormalTok{(name)  }\CommentTok{# for attributes with no value}
   \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{length}\NormalTok{(value) }\OperatorTok{!=}\StringTok{ }\DecValTok{1}\NormalTok{) }\KeywordTok{stop}\NormalTok{(}\StringTok{"`value` must be NULL or length 1"}\NormalTok{)}
   \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{is.logical}\NormalTok{(value)) \{}
     \CommentTok{# Convert T and F to true and false}
@@ -9779,13 +9815,13 @@ The resulting output is much more satisfying.
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{to_math}\NormalTok{(}\StringTok{`}\DataTypeTok{$}\StringTok{`}\NormalTok{)}
-\CommentTok{#> <LATEX> \textbackslash{}mathrm\{f\}($)  # instead of <LATEX> \textbackslash{}$  }
+\CommentTok{#> <LATEX> \textbackslash{}mathrm\{f\}($)    # instead of <LATEX> \textbackslash{}$  }
 \KeywordTok{to_math}\NormalTok{(a}\OperatorTok{$}\NormalTok{b)}
-\CommentTok{#> <LATEX> \textbackslash{}mathrm\{$\}(a b) # instead of <LATEX> \textbackslash{}mathrm\{\textbackslash{}$\}(a b)}
+\CommentTok{#> <LATEX> \textbackslash{}mathrm\{$\}(a b)  # instead of <LATEX> \textbackslash{}mathrm\{\textbackslash{}$\}(a b)}
 \KeywordTok{to_math}\NormalTok{(}\StringTok{`}\CharTok{\textbackslash{}\textbackslash{}}\StringTok{`}\NormalTok{)}
-\CommentTok{#> <LATEX> \textbackslash{}mathrm\{f\}(\textbackslash{})  # instead of <LATEX> \textbackslash{}\textbackslash{}  }
+\CommentTok{#> <LATEX> \textbackslash{}mathrm\{f\}(\textbackslash{})    # instead of <LATEX> \textbackslash{}\textbackslash{}  }
 \KeywordTok{to_math}\NormalTok{(}\StringTok{`}\DataTypeTok{%}\StringTok{`}\NormalTok{)}
-\CommentTok{#> <LATEX> \textbackslash{}mathrm\{f\}(%)  # instead of <LATEX> \textbackslash{}%}
+\CommentTok{#> <LATEX> \textbackslash{}mathrm\{f\}(%)    # instead of <LATEX> \textbackslash{}%}
 \end{Highlighting}
 \end{Shaded}
 
@@ -10141,19 +10177,21 @@ Side Note: take a look at \texttt{?proc.time} if you want to learn about the dif
 \begin{Highlighting}[]
 \NormalTok{x <-}\StringTok{ }\KeywordTok{runif}\NormalTok{(}\DecValTok{100}\NormalTok{)}
 
-\NormalTok{bm <-}\StringTok{ }\NormalTok{bench}\OperatorTok{::}\KeywordTok{mark}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(x),}
-\NormalTok{                  x }\OperatorTok{^}\StringTok{ }\FloatTok{0.5}\NormalTok{,}
-\NormalTok{                  x }\OperatorTok{^}\StringTok{ }\NormalTok{(}\DecValTok{1} \OperatorTok{/}\StringTok{ }\DecValTok{2}\NormalTok{),}
-                  \KeywordTok{exp}\NormalTok{(}\KeywordTok{log}\NormalTok{(x) }\OperatorTok{/}\StringTok{ }\DecValTok{2}\NormalTok{))}
+\NormalTok{bm <-}\StringTok{ }\NormalTok{bench}\OperatorTok{::}\KeywordTok{mark}\NormalTok{(}
+  \KeywordTok{sqrt}\NormalTok{(x),}
+\NormalTok{  x}\OperatorTok{^}\FloatTok{0.5}\NormalTok{,}
+\NormalTok{  x}\OperatorTok{^}\NormalTok{(}\DecValTok{1} \OperatorTok{/}\StringTok{ }\DecValTok{2}\NormalTok{),}
+  \KeywordTok{exp}\NormalTok{(}\KeywordTok{log}\NormalTok{(x) }\OperatorTok{/}\StringTok{ }\DecValTok{2}\NormalTok{)}
+\NormalTok{)}
 
 \NormalTok{bm[}\KeywordTok{order}\NormalTok{(bm}\OperatorTok{$}\NormalTok{median), ]}
 \CommentTok{#> # A tibble: 4 x 6}
 \CommentTok{#>   expression         min   median `itr/sec` mem_alloc `gc/sec`}
 \CommentTok{#>   <bch:expr>    <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>}
-\CommentTok{#> 1 sqrt(x)          1.3µs    1.6µs   444571.      848B        0}
-\CommentTok{#> 2 x^0.5            7.3µs    7.6µs   109116.      848B        0}
-\CommentTok{#> 3 x^(1/2)          7.6µs    8.1µs    98873.      848B        0}
-\CommentTok{#> 4 exp(log(x)/2)   19.4µs   23.7µs    40142.      848B        0}
+\CommentTok{#> 1 sqrt(x)          500ns    600ns  1011941.      848B      0  }
+\CommentTok{#> 2 x^0.5            3.2µs    3.4µs   260817.      848B      0  }
+\CommentTok{#> 3 x^(1/2)          3.4µs    3.7µs   248376.      848B      0  }
+\CommentTok{#> 4 exp(log(x)/2)    8.5µs    8.7µs   109440.      848B     10.9}
 \end{Highlighting}
 \end{Shaded}
 
@@ -10333,16 +10371,18 @@ However, while \texttt{lists} may be practical basic calculations are often fast
 \NormalTok{bench}\OperatorTok{::}\KeywordTok{mark}\NormalTok{(}
   \DataTypeTok{as.POSIXct =} \KeywordTok{as.POSIXct}\NormalTok{(}\StringTok{"2020-01-01 12:30:25"}\NormalTok{),}
   \DataTypeTok{as.POSIXct_format =} \KeywordTok{as.POSIXct}\NormalTok{(}\StringTok{"2020-01-01 12:30:25"}\NormalTok{,}
-                                 \DataTypeTok{format =} \StringTok{"%Y-%m-%d %H:%M:%S"}\NormalTok{),}
+    \DataTypeTok{format =} \StringTok{"%Y-%m-%d %H:%M:%S"}
+\NormalTok{  ),}
   \DataTypeTok{strptime_fomat =} \KeywordTok{strptime}\NormalTok{(}\StringTok{"2020-01-01 12:30:25"}\NormalTok{,}
-                            \DataTypeTok{format =} \StringTok{"%Y-%m-%d %H:%M:%S"}\NormalTok{)}
+    \DataTypeTok{format =} \StringTok{"%Y-%m-%d %H:%M:%S"}
+\NormalTok{  )}
 \NormalTok{)[}\DecValTok{1}\OperatorTok{:}\DecValTok{3}\NormalTok{]}
 \CommentTok{#> # A tibble: 3 x 3}
 \CommentTok{#>   expression             min   median}
 \CommentTok{#>   <bch:expr>        <bch:tm> <bch:tm>}
-\CommentTok{#> 1 as.POSIXct         146.3µs  161.9µs}
-\CommentTok{#> 2 as.POSIXct_format   66.6µs   74.6µs}
-\CommentTok{#> 3 strptime_fomat      25.5µs   26.4µs}
+\CommentTok{#> 1 as.POSIXct          67.7µs   70.8µs}
+\CommentTok{#> 2 as.POSIXct_format   34.1µs   36.4µs}
+\CommentTok{#> 3 strptime_fomat      12.9µs   13.8µs}
 \end{Highlighting}
 \end{Shaded}
 
@@ -10418,8 +10458,10 @@ General-purpose optimization based on Nelder--Mead, quasi-Newton and conjugate-g
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{optim}\NormalTok{(}\DecValTok{0}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(x) x}\OperatorTok{^}\DecValTok{2} \OperatorTok{-}\StringTok{ }\DecValTok{100} \OperatorTok{*}\StringTok{ }\NormalTok{x }\OperatorTok{+}\StringTok{ }\DecValTok{50}\NormalTok{, }\DataTypeTok{method =} \StringTok{"Brent"}\NormalTok{,}
-      \DataTypeTok{lower =} \FloatTok{-1e20}\NormalTok{, }\DataTypeTok{upper =} \FloatTok{1e20}\NormalTok{)}
+\KeywordTok{optim}\NormalTok{(}\DecValTok{0}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(x) x}\OperatorTok{^}\DecValTok{2} \OperatorTok{-}\StringTok{ }\DecValTok{100} \OperatorTok{*}\StringTok{ }\NormalTok{x }\OperatorTok{+}\StringTok{ }\DecValTok{50}\NormalTok{,}
+  \DataTypeTok{method =} \StringTok{"Brent"}\NormalTok{,}
+  \DataTypeTok{lower =} \FloatTok{-1e20}\NormalTok{, }\DataTypeTok{upper =} \FloatTok{1e20}
+\NormalTok{)}
 \CommentTok{#> $par}
 \CommentTok{#> [1] 50}
 \CommentTok{#> }
@@ -10535,17 +10577,17 @@ However, as our benchmark reveals almost identical computing times, we prefer th
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{chisq.test2 <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, y)\{}
+\NormalTok{chisq.test2 <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, y) \{}
 \NormalTok{  m <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(x, y)}
 \NormalTok{  margin1 <-}\StringTok{ }\KeywordTok{rowSums}\NormalTok{(m)}
 \NormalTok{  margin2 <-}\StringTok{ }\KeywordTok{colSums}\NormalTok{(m)}
 \NormalTok{  n <-}\StringTok{ }\KeywordTok{sum}\NormalTok{(m)}
 \NormalTok{  me <-}\StringTok{ }\KeywordTok{tcrossprod}\NormalTok{(margin1, margin2) }\OperatorTok{/}\StringTok{ }\NormalTok{n}
-  
-\NormalTok{  x_stat =}\StringTok{ }\KeywordTok{sum}\NormalTok{((m }\OperatorTok{-}\StringTok{ }\NormalTok{me)}\OperatorTok{^}\DecValTok{2} \OperatorTok{/}\StringTok{ }\NormalTok{me)}
+
+\NormalTok{  x_stat <-}\StringTok{ }\KeywordTok{sum}\NormalTok{((m }\OperatorTok{-}\StringTok{ }\NormalTok{me)}\OperatorTok{^}\DecValTok{2} \OperatorTok{/}\StringTok{ }\NormalTok{me)}
 \NormalTok{  df <-}\StringTok{ }\NormalTok{(}\KeywordTok{length}\NormalTok{(margin1) }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{) }\OperatorTok{*}\StringTok{ }\NormalTok{(}\KeywordTok{length}\NormalTok{(margin2) }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{)}
 \NormalTok{  p.value <-}\StringTok{ }\KeywordTok{pchisq}\NormalTok{(x_stat, }\DataTypeTok{df =}\NormalTok{ df, }\DataTypeTok{lower.tail =} \OtherTok{FALSE}\NormalTok{)}
-  
+
   \KeywordTok{list}\NormalTok{(}\DataTypeTok{x_stat =}\NormalTok{ x_stat, }\DataTypeTok{df =}\NormalTok{ df, }\DataTypeTok{p.value =}\NormalTok{ p.value)}
 \NormalTok{\}}
 \end{Highlighting}
@@ -10685,12 +10727,12 @@ These functions are vectorised over their numeric arguments, which includes the 
 \CommentTok{#> 10  5000}
 
 \KeywordTok{library}\NormalTok{(ggplot2)}
-\NormalTok{rowsums }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{summary}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{expression =} \KeywordTok{as.character}\NormalTok{(expression)) }\OperatorTok{%>%}\StringTok{ }
+\NormalTok{rowsums }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summary}\NormalTok{() }\OperatorTok{%>%}
+\StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{expression =} \KeywordTok{as.character}\NormalTok{(expression)) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(p, median, }\DataTypeTok{color =}\NormalTok{ expression, }\DataTypeTok{group =}\NormalTok{ expression)) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}
-\StringTok{  }\KeywordTok{geom_line}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{() }\OperatorTok{+}
 \StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.position =} \StringTok{"bottom"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -10739,13 +10781,13 @@ A benchmark of both approaches for different vector lengths indicates that the \
 \CommentTok{#>  9     9}
 \CommentTok{#> 10    10}
 
-\NormalTok{weightedsum }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{summary}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{expression =} \KeywordTok{as.character}\NormalTok{(expression)) }\OperatorTok{%>%}\StringTok{ }
+\NormalTok{weightedsum }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summary}\NormalTok{() }\OperatorTok{%>%}
+\StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{expression =} \KeywordTok{as.character}\NormalTok{(expression)) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(n, median, }\DataTypeTok{color =}\NormalTok{ expression, }\DataTypeTok{group =}\NormalTok{ expression)) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}
-\StringTok{  }\KeywordTok{geom_line}\NormalTok{() }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{x =} \StringTok{"n (millions)"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{x =} \StringTok{"n (millions)"}\NormalTok{) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.position =} \StringTok{"bottom"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -10915,24 +10957,24 @@ A benchmark of both approaches for different vector lengths indicates that the \
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{NumericVector diffC(NumericVector x)\{}
+\NormalTok{NumericVector diffC(NumericVector x) \{}
   \DataTypeTok{int}\NormalTok{ n = x.size();}
 \NormalTok{  NumericVector out(n - }\DecValTok{1}\NormalTok{);}
 
-  \ControlFlowTok{for}\NormalTok{ (}\DataTypeTok{int}\NormalTok{ i = }\DecValTok{1}\NormalTok{; i < n; i++)\{}
+  \ControlFlowTok{for}\NormalTok{ (}\DataTypeTok{int}\NormalTok{ i = }\DecValTok{1}\NormalTok{; i < n; i++) \{}
 \NormalTok{    out[i - }\DecValTok{1}\NormalTok{] = x[i] - x[i - }\DecValTok{1}\NormalTok{];}
 \NormalTok{  \}}
   \ControlFlowTok{return}\NormalTok{ out ;}
 \NormalTok{\}}
 
-\NormalTok{NumericVector difflagC(NumericVector x, }\DataTypeTok{int}\NormalTok{ lag = }\DecValTok{1}\NormalTok{)\{}
+\NormalTok{NumericVector difflagC(NumericVector x, }\DataTypeTok{int}\NormalTok{ lag = }\DecValTok{1}\NormalTok{) \{}
   \DataTypeTok{int}\NormalTok{ n = x.size();}
 
   \ControlFlowTok{if}\NormalTok{ (lag >= n) stop(}\StringTok{"`lag` must be less than `length(x)`."}\NormalTok{);}
 
 \NormalTok{  NumericVector out(n - lag);}
 
-  \ControlFlowTok{for}\NormalTok{ (}\DataTypeTok{int}\NormalTok{ i = lag; i < n; i++)\{}
+  \ControlFlowTok{for}\NormalTok{ (}\DataTypeTok{int}\NormalTok{ i = lag; i < n; i++) \{}
 \NormalTok{    out[i - lag] = x[i] - x[i - lag];}
 \NormalTok{  \}}
   \ControlFlowTok{return}\NormalTok{ out;}
@@ -10944,13 +10986,13 @@ A benchmark of both approaches for different vector lengths indicates that the \
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{NumericVector rangeC(NumericVector x)\{}
+\NormalTok{NumericVector rangeC(NumericVector x) \{}
   \DataTypeTok{double}\NormalTok{ omin = x[}\DecValTok{0}\NormalTok{], omax = x[}\DecValTok{0}\NormalTok{];}
   \DataTypeTok{int}\NormalTok{ n = x.size();}
 
   \ControlFlowTok{if}\NormalTok{ (n == }\DecValTok{0}\NormalTok{) stop(}\StringTok{"`length(x)` must be greater than 0."}\NormalTok{);}
 
-  \ControlFlowTok{for}\NormalTok{ (}\DataTypeTok{int}\NormalTok{ i = }\DecValTok{1}\NormalTok{; i < n; i++)\{}
+  \ControlFlowTok{for}\NormalTok{ (}\DataTypeTok{int}\NormalTok{ i = }\DecValTok{1}\NormalTok{; i < n; i++) \{}
 \NormalTok{    omin = }\BuiltInTok{std::}\NormalTok{min(x[i], omin);}
 \NormalTok{    omax = }\BuiltInTok{std::}\NormalTok{max(x[i], omax);}
 \NormalTok{  \}}
@@ -11005,7 +11047,7 @@ A benchmark of both approaches for different vector lengths indicates that the \
 \KeywordTok{using} \KeywordTok{namespace}\NormalTok{ Rcpp;}
 
 \CommentTok{// [[Rcpp::export]]}
-\NormalTok{NumericVector minC(NumericVector x, }\DataTypeTok{bool}\NormalTok{ na_rm = }\KeywordTok{false}\NormalTok{)\{}
+\NormalTok{NumericVector minC(NumericVector x, }\DataTypeTok{bool}\NormalTok{ na_rm = }\KeywordTok{false}\NormalTok{) \{}
   \DataTypeTok{int}\NormalTok{ n = x.size();}
 \NormalTok{  NumericVector out = NumericVector::create(R_PosInf);}
   
@@ -11161,14 +11203,14 @@ The \texttt{diffC()} implementation will return an \texttt{NA} vector of length 
 
 \CommentTok{// [[Rcpp::export]]}
 \NormalTok{NumericVector diffC(NumericVector x, }\DataTypeTok{int}\NormalTok{ lag = }\DecValTok{1}\NormalTok{,}
-                    \DataTypeTok{bool}\NormalTok{ na_rm = }\KeywordTok{false}\NormalTok{)\{}
+                    \DataTypeTok{bool}\NormalTok{ na_rm = }\KeywordTok{false}\NormalTok{) \{}
   \DataTypeTok{int}\NormalTok{ n = x.size();}
   
   \ControlFlowTok{if}\NormalTok{ (lag >= n) stop(}\StringTok{"`lag` must be less than `length(x)`."}\NormalTok{);}
   
 \NormalTok{  NumericVector out(n - lag);}
   
-  \ControlFlowTok{for}\NormalTok{ (}\DataTypeTok{int}\NormalTok{ i = lag; i < n; i++)\{}
+  \ControlFlowTok{for}\NormalTok{ (}\DataTypeTok{int}\NormalTok{ i = lag; i < n; i++) \{}
     \ControlFlowTok{if}\NormalTok{ (NumericVector::is_na(x[i]) ||}
 \NormalTok{        NumericVector::is_na(x[i - lag])) \{}
       \ControlFlowTok{if}\NormalTok{ (!na_rm) \{}
@@ -11213,7 +11255,7 @@ To practice using the STL algorithms and data structures, implement the followin
 \DataTypeTok{double}\NormalTok{ medianC(NumericVector x) \{}
   \DataTypeTok{int}\NormalTok{ n = x.size();}
 
-  \ControlFlowTok{if}\NormalTok{ (n % }\DecValTok{2}\NormalTok{ == }\DecValTok{0}\NormalTok{)\{}
+  \ControlFlowTok{if}\NormalTok{ (n % }\DecValTok{2}\NormalTok{ == }\DecValTok{0}\NormalTok{) \{}
     \BuiltInTok{std::}\NormalTok{partial_sort (x.begin(), x.begin() + n / }\DecValTok{2}\NormalTok{ + }\DecValTok{1}\NormalTok{, x.end());}
     \ControlFlowTok{return}\NormalTok{ (x[n / }\DecValTok{2}\NormalTok{ - }\DecValTok{1}\NormalTok{] + x[n / }\DecValTok{2}\NormalTok{]) / }\DecValTok{2}\NormalTok{;}
 \NormalTok{  \} }\ControlFlowTok{else}\NormalTok{ \{}
@@ -11292,11 +11334,11 @@ To practice using the STL algorithms and data structures, implement the followin
 \KeywordTok{using} \KeywordTok{namespace}\NormalTok{ Rcpp;}
 
 \CommentTok{// [[Rcpp::export]]}
-\DataTypeTok{double}\NormalTok{ minC(NumericVector x)\{}
+\DataTypeTok{double}\NormalTok{ minC(NumericVector x) \{}
   \DataTypeTok{int}\NormalTok{ n = x.size();}
   \DataTypeTok{double}\NormalTok{ out = x[}\DecValTok{0}\NormalTok{];}
   
-  \ControlFlowTok{for}\NormalTok{ (}\DataTypeTok{int}\NormalTok{ i = }\DecValTok{0}\NormalTok{; i < n; i++)\{}
+  \ControlFlowTok{for}\NormalTok{ (}\DataTypeTok{int}\NormalTok{ i = }\DecValTok{0}\NormalTok{; i < n; i++) \{}
 \NormalTok{    out = }\BuiltInTok{std::}\NormalTok{min(out, x[i]);}
 \NormalTok{  \}}
   
@@ -11317,7 +11359,7 @@ To practice using the STL algorithms and data structures, implement the followin
 \KeywordTok{using} \KeywordTok{namespace}\NormalTok{ Rcpp;}
 
 \CommentTok{// [[Rcpp::export]]}
-\DataTypeTok{double}\NormalTok{ which_minC(NumericVector x)\{}
+\DataTypeTok{double}\NormalTok{ which_minC(NumericVector x) \{}
   \DataTypeTok{int}\NormalTok{ out = }\BuiltInTok{std::}\NormalTok{distance(}
 \NormalTok{    x.begin(), }\BuiltInTok{std::}\NormalTok{min_element(x.begin(), x.end())}
 \NormalTok{  );}
