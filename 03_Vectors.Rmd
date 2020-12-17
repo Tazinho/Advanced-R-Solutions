@@ -62,7 +62,7 @@ __[Q1]{.Q}__: How is `setNames()` implemented? How is `unname()` implemented? Re
 __[A]{.solved}__: `setNames()` is implemented as:
 
 ```{r, eval = FALSE}
-setNames <- function (object = nm, nm){
+setNames <- function(object = nm, nm) {
   names(object) <- nm
   object
 }
@@ -77,7 +77,7 @@ setNames( , c("a", "b", "c"))
 `unname()` is implemented in the following way:
 
 ```{r, eval = FALSE}
-unname <- function (obj, force = FALSE){
+unname <- function(obj, force = FALSE) {
   if (!is.null(names(obj))) 
     names(obj) <- NULL
   if (!is.null(dimnames(obj)) && (force || !is.data.frame(obj))) 
@@ -304,7 +304,7 @@ Create similar data frames via subsetting the respective dimension with either `
 ```{r}
 mtcars[0, ]
 
-mtcars[, 0] # or mtcars[0]
+mtcars[ , 0]  # or mtcars[0]
 
 mtcars[0, 0]
 ```
