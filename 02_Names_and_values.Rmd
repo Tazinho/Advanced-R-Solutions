@@ -49,11 +49,13 @@ match.fun("mean")
 __[A]{.solved}__: Yes, they point to the same object. We confirm this by inspecting the address of the underlying function object.
 
 ```{r}
-mean_functions <- list(mean,
-                       base::mean,
-                       get("mean"),
-                       evalq(mean),
-                       match.fun("mean"))
+mean_functions <- list(
+  mean,
+  base::mean,
+  get("mean"),
+  evalq(mean),
+  match.fun("mean")
+)
 
 unique(obj_addrs(mean_functions))
 ```
@@ -259,9 +261,9 @@ base_pkgs <- c(
 To look up all functions from these packages we iterate over `base_pkgs` and apply `ls()` and `mget()` within each iteration.
 
 ```{r}
-base_objs <- base_pkgs %>% 
-  lapply(as.environment) %>% 
-  lapply(function(x) mget(ls(x, all.names = TRUE), x)) %>% 
+base_objs <- base_pkgs %>%
+  lapply(as.environment) %>%
+  lapply(function(x) mget(ls(x, all.names = TRUE), x)) %>%
   set_names(base_pkgs)
 ```
 
@@ -338,7 +340,7 @@ When we modify the first element of `b[[1]]` copy-on-modify occurs. Both element
 
 ```{r}
 b[[1]][[1]] <- 10
-obj_size(b) 
+obj_size(b)
 ```
 
 The second element of `b` still references to the same address as `a`, so the combined size of `a` and `b` is the same as `b`.
@@ -406,14 +408,14 @@ create_random_df(2, 2)
 Next, we wrap the two approaches to subtract numerical values (in our case medians) from each column of a data frame in their own function. We name these functions depending on whether the approach operates on a data frame or a list. For a fairer comparison, the second function also contains the overhead code to convert between data frame and list objects.
 
 ```{r}
-subtract_df <- function(x, medians){
+subtract_df <- function(x, medians) {
   for (i in seq_along(medians)) {
     x[[i]] <- x[[i]] - medians[[i]]
   }
   x
 }
 
-subtract_list <- function(x, medians){
+subtract_list <- function(x, medians) {
   x <- as.list(x)
   x <- subtract_df(x, medians)
   list2DF(x)
@@ -423,12 +425,14 @@ subtract_list <- function(x, medians){
 This lets us profile the performance, via benchmarks on data frames with differing numbers of columns. Therefore, we create a small helper that creates our random data frame and its medians before it benchmarks the two approaches.
 
 ```{r}
-benchmark_medians <- function(ncol){
+benchmark_medians <- function(ncol) {
   df <- create_random_df(nrow = 1e4, ncol = ncol)
   medians <- vapply(df, median, numeric(1), USE.NAMES = FALSE)
-  
-  bench::mark("data frame" = subtract_df(df, medians),
-              "list"       = subtract_list(df, medians))
+
+  bench::mark(
+    "data frame" = subtract_df(df, medians),
+    "list" = subtract_list(df, medians)
+  )
 }
 
 benchmark_medians(1)
@@ -448,13 +452,17 @@ Finally, we can plot and interpret our results.
 ```{r}
 library(ggplot2)
 
-ggplot(results, aes(ncol, median,
-                    col = attr(expression, "description"))) +
-  geom_point(size = 2) + 
+ggplot(
+  results,
+  aes(ncol, median, col = attr(expression, "description"))
+) +
+  geom_point(size = 2) +
   geom_smooth() +
-  labs(x = "Number of Columns",
-       y = "Execution Time (s)",
-       colour = "Data Structure") +
+  labs(
+    x = "Number of Columns",
+    y = "Execution Time (s)",
+    colour = "Data Structure"
+  ) +
   theme(legend.position = "top")
 ```
 
