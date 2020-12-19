@@ -44,12 +44,56 @@ We don't necessarily apply many of the concepts taught in Advanced R in daily pr
 
 Many open source projects are the result of the work of a lot of people; so is this. We would like to explicitly mention and thank everybody who contributed solutions, raised questions, or helped to fix spelling and grammar to improve this work.
 
-```{r echo=FALSE, results='asis'}
-contributors <- paste0(
-  "`@", sort(unique(read.csv("contributors.csv")$username)), "`"
+```{r, eval = FALSE, echo = FALSE}
+library(tidyverse)
+contribs_new_json <- gh::gh("/repos/:owner/:repo/contributors",
+  owner = "Tazinho",
+  repo = "Advanced-R-Solutions",
+  .limit = Inf
 )
+contribs_new <- tibble(
+  login = contribs_new_json %>% map_chr("login"),
+  n = contribs_new_json %>% map_int("contributions")
+)
+# contribs_first_edition_json <- gh::gh("/repos/:owner/:repo/contributors",
+#   owner = "Tazinho",
+#   repo = "Advanced-R-Solutions-Ed1",
+#   .limit = Inf
+# )
+# contribs_first_edition <- tibble(
+#   login = contribs_first_edition_json %>% map_chr("login"),
+#   n = contribs_first_edition_json %>% map_int("contributions")
+# )
+contribs_old <- read_csv("contributors.csv", col_types = list())
+contribs_old <- contribs_old %>% select(login)
+contribs_all <- contribs_new %>% full_join(contribs_old, by = "login")
+# Get info for all contributors
+needed_json <- map(
+  contribs_all$login, 
+  ~ gh::gh("/users/:username", username = .x)
+)
+info_all <- tibble(
+  login = contribs_all$login,
+  n = contribs_all$n,
+  name = map_chr(needed_json, "name", .default = NA),
+  blog = map_chr(needed_json, "blog", .default = NA)
+) %>% arrange(login)
+write_csv(info_all, "contributors.csv")
+```
 
-cat(paste0(contributors, collapse = ", "))
+```{r echo=FALSE, results='asis', message = FALSE}
+library(dplyr)
+contributors <- read.csv("contributors.csv", encoding = "UTF-8")
+
+contributors <- contributors %>% 
+  filter(!login %in% c("hadley", "henningsway", "Tazinho")) %>% 
+  mutate(
+    login = paste0("\\@", login),
+    desc = ifelse(is.na(name), login, paste0(name, " (", login, ")"))
+  ) %>% 
+  arrange(login)
+
+cat(paste0(contributors$desc, collapse = ", "))
 ```
 
 Thanks to CRC Press for the interest in the project and our editors Rob Calver and Vaishali Singh for their patience and support in making this book a reality.
