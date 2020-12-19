@@ -296,8 +296,6 @@ bench::mark(
 )
 ```
 
-<!-- HW: are you sure you need fastmatch here? I think you should be able to work out the bin with a little algebra -->
-
 Since we didn't use `table()` in our `chisq.test2()`-implementation, we cannot benefit from the slight performance gain from `table2()`.
 
 ## Vectorise
@@ -335,6 +333,7 @@ rowsums <- bench::press(
 )
 
 library(ggplot2)
+
 rowsums %>%
   summary() %>%
   dplyr::mutate(expression = as.character(expression)) %>%
