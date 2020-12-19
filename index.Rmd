@@ -39,13 +39,20 @@ The code for this book can be found on [GitHub](https://github.com/Tazinho/Advan
 We would also like to thank everybody else who contributed to this project by fixing typos, grammar or revising exercises:
 
 ```{r echo=FALSE, results='asis'}
-contributors <- paste0("`@",
-                       sort(
-                         unique(read.csv("contributors.csv")$username)
-                         ),
-                       "`")
+library(dplyr)
+contributors <- read.csv("contributors.csv", encoding = "UTF-8")
 
-cat(paste0(contributors, collapse = ", "))
+contributors <- contributors %>% 
+  filter(!login %in% c("hadley", "henningsway", "Tazinho")) %>% 
+  mutate(
+    login = paste0("\\@", login),
+    desc = ifelse(is.na(name), login, paste0(name, " (", login, ")"))
+  ) %>% 
+  arrange(login)
+
+cat(paste0(contributors$desc, collapse = ", ")) 
+cat(paste0(contributors$desc, collapse = ", "))
+cat(".\n")
 ```
 
 ## Current Progress {-}
