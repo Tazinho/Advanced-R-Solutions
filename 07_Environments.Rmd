@@ -137,7 +137,7 @@ The definition of `where()` was given in Advanced R as:
 where <- function(name, env = caller_env()) {
   if (identical(env, empty_env())) {
     # Base case
-    stop("Can't find ", name, call. = FALSE)
+    stop("Can't find `", name, "`.", call. = FALSE)
   } else if (env_has(env, name)) {
     # Success case
     env
@@ -190,7 +190,7 @@ fget <- function(name, env = caller_env(), inherits = TRUE) {
   }
 
   if (identical(env, emptyenv()) || !inherits) {
-    stop("Could not find function called \"", name, "\"",
+    stop("Could not find a function called \"", name, "\".",
       call. = FALSE
     )
   }
@@ -260,7 +260,7 @@ fget2 <- function(name, env = caller_env()) {
   }
 
   if (identical(env, emptyenv())) {
-    stop("Could not find function called \"", name, "\"",
+    stop("Could not find a function called \"", name, "\"",
       call. = FALSE
     )
   }
@@ -271,7 +271,7 @@ fget2 <- function(name, env = caller_env()) {
 
 fstr <- function(fun_name, env = caller_env()) {
   if (!is.character(fun_name) && length(fun_name) == 1) {
-    stop("`fun_name` must be a string", call. = FALSE)
+    stop("`fun_name` must be a string.", call. = FALSE)
   }
   fun_env <- fget2(fun_name, env)
 

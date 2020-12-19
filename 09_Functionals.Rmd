@@ -88,7 +88,7 @@ trials <- map(1:100, ~ t.test(rpois(10, 10), rpois(10, 7)))
 
 __[A]{.solved}__: There are many ways to visualise this data. However, since there are only 100 data points, we choose a dot plot to visualise the distribution. (Unfortunately, `ggplot2`s `geom_dotplot()` doesn't compute proper counts as it was created to visualise distribution densities instead of frequencies, so a histogram would be a suitable alternative).
 
-```{r, message = FALSE}
+```{r}
 library(ggplot2)
 
 df_trials <- tibble(p_value = map_dbl(trials, "p.value"))
@@ -436,7 +436,7 @@ fixed_point <- function(f, x_init, n_max = 10000, tol = 0.0001) {
     # Make sure we eventually stop
     n <- n + 1
     if (n > n_max) {
-      stop("Failed to converge", call. = FALSE)
+      stop("Failed to converge.", call. = FALSE)
     }
   }
   
