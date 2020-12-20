@@ -784,9 +784,9 @@ to_math(`%`)
 
 __[Q2]{.Q}__: Complete the DSL to support all the functions that `plotmath` supports.
 
-__[A]{.solved}__: You can look up all supported functions of `plotmath` via `?plotmath`. In our solution, we will only add support for a small subset of `plotmath` functions to `to_math()`. In case we wanted to do more, we would basically just need to differentiate, if we convert a symbol or a function and insert the correct conversion in our workflow below. (Most conversions can be found under [Wikipedia](https://en.wikipedia.org/wiki/Help:Displaying_a_formula).)
+__[A]{.solved}__: We can look up all functions supported by `plotmath` via `?plotmath`. Here we chose to implement a representative subset of `plotmath` functionality within the `to_math()`-DSL. If we wanted to implement more, we have to observe different conversion patterns for symbols and functions and insert the correct conversion in the workflow presented below. Most relevant LaTeX code can be looked up on  [Wikipedia](https://en.wikipedia.org/wiki/Help:Displaying_a_formula).
 
-Here we will add support for the following for the following hand full of functions:
+We will add support for the following functions:
 
 ```{r, eval = FALSE}
 to_math(x %+-% y)
@@ -814,9 +814,9 @@ print.advr_latex <- function(x) {
 }
 ```
 
-One specific property in this setting is that the environment where `to_math()` evaluates the expression is not constant but depends on what we already know about the expression.
+One specific property in this setting is that the environment where `to_math()` evaluates the expression is not constant, but depends on what we already know about the expression.
 
-Thus, we start building up `latex_env()`, which contains a chain of all the necessary environments where `to_math()` checks to evaluate our expression in.
+Thus, we start building up `latex_env()`, which contains a chain of all the necessary environments which `to_math()` checks to evaluate our expression in.
 
 The first environment is the one for Greek letters.
 
@@ -901,16 +901,9 @@ latex_env <- function(expr) {
 }
 ```
 
-In this way, `to_math()` will first convert all known Greek letters (found in `greek_env`) and then any other symbols, which are (in this case) left as is, but get the `advr_latex` class.
+In this way, `to_math()` will first convert all known Greek letters (found in `greek_env`) and then any other symbols. In this case these symbols are left as is, but converted to the `advr_latex` class.
 
-Let's just look up the definitions of `to_math()` and `latex()`, to refresh our memory a bit.
-
-```{r}
-to_math
-latex
-```
-
-Now, we get closer to the point, where we need to make some changes. We'll add support for functions. This will give us the opportunity to insert some specific support for `plotmath` functions.
+We also have to add support for functions. This will give us the opportunity to insert some specific support for `plotmath` functions.
 
 To support a whole bunch of unary and binary functions within the function environment (`f_env`), which will be added next to `latex_env`, Hadley defines the following two helpers in the textbook.
 
@@ -1012,7 +1005,7 @@ to_math(sin(sin))
 
 If we wanted, we could include further `plotmath` functions in this step. If this collides with other functions at some point, we could just create an own `f_plotmath_env` to support more `plotmath` functions. In that case we would need to add this environment also to `latex_env()` (as child environment of the function environment `f_env`).
 
-To formally finish this answer, we need to add the support for unknown functions. Similarly as for the unknown symbols, we use the trick to recursively run the AST and just copy the part from the textbook ...
+To complete this answer, we will also add the support for unknown functions. Similarly as for the unknown symbols, we use the trick to recursively run the AST and just reuse the code from the textbook.
 
 ```{r}
 all_calls_rec <- function(x) {
@@ -1026,6 +1019,7 @@ all_calls_rec <- function(x) {
               }
   )
 }
+
 all_calls <- function(x) {
   unique(all_calls_rec(x))
 }
@@ -1043,7 +1037,7 @@ unknown_op <- function(op) {
 }
 ```
 
-Of course, we need to add the new `call_env` also to `latex_env()` and we continue the copying...
+Of course, we need to add the new `call_env` also to `latex_env()`.
 
 ```{r}
 latex_env <- function(expr) {
@@ -1064,7 +1058,7 @@ latex_env <- function(expr) {
 }
 ```
 
-Finally, we run once more our tests from above and double check the newly supported `plotmath` operators.
+Finally, we rerun our tests and double check the newly supported `plotmath` operators.
 
 ```{r}
 # New plotmath functionality
@@ -1079,3 +1073,5 @@ to_math(sin(x + pi))
 to_math(log(x[i]^2))
 to_math(sin(sin))
 ```
+
+<!-- Do we need to show, that unknown functions are now supported? -->
