@@ -786,6 +786,42 @@ __[Q2]{.Q}__: Complete the DSL to support all the functions that `plotmath` supp
 
 __[A]{.started}__: Through `?plotmath` we can look up all supported functions by `plotmath`. Let's use it to see what `to_math()` is supposed to do. Comments with a star (`*`) are used in the following output to mark that the current `to_math()` implementation doesn't support the respective conversion yet. In these cases, we added a short comment describing how the LaTeX conversion should look like.
 
+```{r}
+to_math(x + y)
+#> OUTPUT: <LATEX> x + y
+#> EXPECT: <LATEX> x + y
+
+to_math(x %*% y)
+#> OUTPUT: <LATEX> \mathrm{%*%}(x y)
+#> EXPECT: <LATEX> ???
+
+to_math(bold(x))
+#> OUTPUT: <LATEX> \mathrm{bold}(x)
+#> EXPECT: <LATEX> \textbf{x}  #\mathrm?
+
+to_math(sum(x[i], i==1, n))
+#> OUTPUT: <LATEX> \mathrm{sum}(x_i \mathrm{==}(i 1) n)
+#> EXPECT: <LATEX> \sum_{i=1}^{n} x_i  #\mathrm?
+
+```
+
+`x %*% y`
+- wie sieht der entsprechende ziel-latex befehl eigentlich aus?
+  - http://www.malinc.se/math/latex/basiccodeen.php
+
+`to_math(bold(x))`
+- reicht textbf wirklich?
+  - Zweifel: textbf funktioniert in typischen latex dokumenten, unklar ob es auch für die Math-Umgebung geeignet ist
+
+? Wie testen wir eigentlich output von plotmath? Wir ruft man es auf?
+
+
+
+```{r}
+?plotmath
+```
+
+
 ```{r, eval=FALSE}
 to_math(x+y)             #   x plus y 
 to_math(x - y)           #   x minus y 
