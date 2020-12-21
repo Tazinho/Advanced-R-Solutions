@@ -1,0 +1,314 @@
+---
+title: "workspace_coverplot_ad_R_solutions"
+author: "Tobias Stalder"
+date: "17 12 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+```
+
+## 1 Document Purpose
+This document shows the workflow of creating cover plots for the new book of Henning Bumann and Malte Grosser "Advanced R Solutions - a bookdown projects".
+I show all code needed for the different plot designs as well as the underlying desicion making. Plot ideas that did not make it to the second iteration are not part of this documentation.
+
+**Load libraries and set working dir (and install with dependencies if needed)**
+```{r, message = FALSE, warning = FALSE}
+setwd(r"(C:\Users\tobia\OneDrive\Desktop\ownprojects\cover_advanced_R)")
+
+packages <- c("tidyverse", "Cairo", "ggpubr", "ggalt", "ggbump", "scales", "prismatic", "treemapify","GGally",
+              "intergraph", "ggraph", "visNetwork", "threejs", "networkD3", "ndtv", "igraph")
+
+package.check <- lapply(
+  packages,
+  FUN = function(x) {
+    if (!require(x, character.only = TRUE)) {
+      install.packages(x, dependencies = TRUE)
+      library(x, character.only = TRUE)
+    }
+  }
+)
+
+
+```
+
+**Load data from local dir and direct cleaning to long format**.
+
+The following snippet was copied from the book repo (originally written by Henning Bumann)
+```{r}
+df_long <- read.csv2(r"(progress_data.csv)", stringsAsFactors = FALSE, 
+                     header = TRUE) %>% 
+  as_tibble() %>% 
+  mutate(status = "finalised") %>% 
+  modify_at("status", factor,
+            levels = c("open", "started", "solved", "reviewed", "finalised")) %>% 
+  tibble::rowid_to_column("id") %>% 
+  separate(chapter, "nr", sep = " ", remove = FALSE, extra = "drop") %>% 
+  mutate(nr = as.integer(nr), 
+         chapter = factor(chapter),
+         chapter = fct_reorder(chapter, nr, .desc = FALSE),
+         part = case_when(nr < 9 ~ "Foundations",
+                          nr < 12 ~ "Functional\nProgramming",
+                          nr < 17 ~ "Object Oriented\nProgramming",
+                          nr < 22 ~ "Metaprogramming",
+                          TRUE    ~ "Techniques"),
+         part = factor(part, levels = c("Foundations", "Functional\nProgramming",
+                                        "Object Oriented\nProgramming",
+                                        "Metaprogramming", "Techniques"))) %>% 
+  add_count(chapter)
+df_long$subchapter = factor(df_long$subchapter)
+head(df_long)
+```
+
+
+**data summaries for later plotting**
+
+For some vizualisations I need more summarised data. Thus, I create 2 new dfs with different summary variables of n exercises.
+
+```{r, message=FALSE}
+df_long %>%
+  group_by(chapter) %>%
+  count(subchapter, part) -> amounts
+head(amounts)
+
+df_long %>%
+  group_by(part, chapter) %>%
+  count() -> parts
+head(parts)
+```
+
+## 2 Requirement Catalogue
+The vizualisation for a book cover has special requirements since it transports the very first message of the book. In alignment with the authors, I defined some requirements which shall guide through the creation process.
+
+1:  viz should show some kind of "structure" in the design since it's plotted out of very well structured data of the exercises.
+
+2: I'd like the viz to transport "structure" and "progress" as a message.
+
+3: the viz should  invite the reader to read and engage, not push the reader away by transporting a message of complexity.
+
+5: the viz should not be too creative since the book is about advanced R programming and not  information design.
+
+6: potential readers should be able to relate with the viz in a sense of  ("ah, I see this is geom_point or geom_rect", "I could do that", "this speaks to my abilities")
+
+
+
+
+## 3 Plot Ideas
+The following section shows the plot ideas we had along the process.
+
+1. **Bar chart** showing exercises per chapter and colored parts.
+2. **Layered plains** showing area of exercises per part and chapter, colored by parts.
+3. **Treemap** showing exercises (shading) per chapter and subchapter
+4. **Classic network** showing chapters and subchapters as nodes, amount of exercises and part identifier as edges.
+5. **Radial network** showing shapers and subchapters as nodes, amount of networks as stroke strength.
+
+**1. Bar chart**
+```{r, echo=TRUE, message=FALSE}
+df_long %>% 
+  group_by(chapter) %>% 
+  mutate(exercise_in_chapter_id = row_number()) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = chapter, fill = part, group = -id)) +
+  geom_bar(color = "#2a0829", alpha = 0.8, aes(fill = part)) +
+  # scale_y_continuous(expand = c(.05, 0)) +
+  # scale_x_discrete(expand = c(.2,0)) +
+
+  scale_fill_viridis_d(begin = .1, end = .8)+
+  facet_grid(. ~ part, scales = "free",
+             space = "free", switch = "x")+
+  theme_void()+
+  theme(legend.position = "none",
+        plot.background = element_rect(fill = "transparent", color = "transparent"),
+        panel.background = element_rect(fill = "transparent", color = "transparent"),
+        strip.background = element_rect(fill = "transparent", color = "transparent"),
+        strip.text = element_blank()) +
+  
+  coord_cartesian(ylim = c(0, 35)) -> bar_chart
+
+bar_chart
+
+ggsave(plot = bar_chart, filename = "plots/bars_henning_2.png", units = "cm", width = 16, height = 8, dpi = 600, type = "cairo-png", bg = "transparent")
+```
+
+**2. Layered Plains** With scatter scaled in size proportional to amount of exercises
+```{r, echo=TRUE, message=FALSE}
+ggplot(df_long) +
+    # geom_point(aes(x = part, y = chapter, color = part, size = n))+
+  geom_encircle(aes(x = part, y = chapter, color = part, fill = part), expand =.003,s_shape = .5,  show.legend = FALSE, alpha = .3) +
+
+  
+  scale_color_viridis_d(0, end = .9) +
+  scale_fill_viridis_d(begin = .2, end = .8) +
+  scale_size_continuous(range = c(1, 4))+
+  scale_y_discrete(expand = c(.15, 0)) +
+  theme_void() +
+  theme(legend.position = "none",
+        plot.background = element_rect(fill = "transparent", color = "transparent"),
+        panel.background = element_rect(fill = "transparent", color = "transparent"),
+        strip.background = element_rect(fill = "transparent", color = "transparent"),) -> plains
+
+plains
+
+ggsave(plot = plains, filename = "plots/plains_chapters_blank.png", width = 16, height = 8, units = "cm", dpi = 600, type = "cairo-png", bg = "transparent")
+```
+**2.1 Layered Plains** With jitter scaled in size proportional to amount of exercises
+```{r, echo=TRUE, message=FALSE}
+ggplot(df_long) +
+
+geom_encircle(aes(x = part, y = subchapter, color = part, fill = part, alpha = n), expand =0,s_shape = .4,  show.legend = FALSE) +
+
+
+  
+  scale_color_viridis_d(0, end = .9) +
+  scale_fill_viridis_d(begin = .2, end = .8) +
+  scale_size_continuous(range = c(.5, .6))+
+  scale_y_discrete(expand = c(.15, 1)) +
+    scale_x_discrete(expand = c(.13, 0)) +
+  scale_alpha_continuous(range = c(0.1, .5))+
+
+  theme_void() +
+  theme(legend.position = "none",
+        plot.background = element_rect(fill = "transparent", color = "transparent"),
+        panel.background = element_rect(fill = "transparent", color = "transparent"),
+        strip.background = element_rect(fill = "transparent", color = "transparent")) -> plains
+
+plains
+
+ggsave(plot = plains, filename = "plots/plains_subchapters.png", width = 16, height = 8, units = "cm", dpi = 600, type = "cairo-png", bg = "transparent")
+
+```
+
+
+**3. Tree map**
+```{r , echo=TRUE, message=FALSE}
+ggplot(amounts, aes(area = n, fill = chapter, subgroup = chapter)) +
+  geom_treemap(fill = "black") +
+  geom_treemap(aes(alpha = n) , color = "#2a0829") +
+  geom_treemap_subgroup_border(colour="#2a0829", size = 10) +
+  scale_fill_viridis_d(begin = .1, end = .8) +
+  scale_color_viridis_c()+
+  scale_alpha_continuous(range = c(0.4, 1))+
+  theme_void() +
+  theme(legend.position = "none",
+        plot.background = element_rect(fill = "#2a0829", color = "#2a0829")) -> tree_map
+tree_map
+
+  ggsave(plot = tree_map, filename = "plots/treemap.png", width = 16, height = 8, units = "cm", dpi = 600, type = "cairo-png", bg = "transparent")
+```
+**4. Classic Network**
+First we create two network objects:
+```{r}
+
+net3 <- df_long %>%
+  select(chapter, subchapter, part, n) %>%
+  graph_from_data_frame(directed = T)
+
+net4 <- df_long %>%
+  group_by(chapter, subchapter) %>%
+
+  count() %>%
+  graph_from_data_frame(directed = FALSE)
+is_weighted(net4)
+
+#TODO on the Network plots: make the normal network plot with net4 fancier and look below comment for the new ID
+
+
+#make a new network: Goal is to have excercises to chapters as as vertices/notes with part as a variable, and then as edges the link between the exercises and the chapters with subchapter as edge variable.
+
+edges <-
+  df_long %>%
+  mutate(exercise_name = factor(paste0(id,"_exercise"))) %>%
+  select(chapter, exercise_name, subchapter, part) %>%
+  relocate(exercise_name, .after = chapter)
+
+nodes <-
+  df_long %>%
+  mutate(exercise_name = factor(paste0(id,"_exercise"))) %>%
+  pivot_longer(cols = c(chapter, exercise_name)) %>%
+  group_by(value) %>%
+  summarise(subchapter = first(subchapter),
+            part = first(part))
+
+graph_from_data_frame(d =edges, vertices = nodes) -> net_ex
+```
+
+```{r , echo=TRUE, message=FALSE }
+# igraph_layouts <- c('star', 'circle', 'gem', 'dh', 'graphopt', 'grid', 'mds', 
+#                     'randomly', 'fr', 'kk', 'drl', 'lgl')
+ggraph(net4, 'kk') + 
+  geom_edge_link(width = .1, color = "lightgrey", check_overlap = TRUE) +
+  geom_node_tile(aes(color = name, fill = name), width = .5, height = .5, alpha =  1)+
+  scale_color_viridis_d(end = .8)+
+  scale_fill_viridis_d(end = .7)+
+  scale_edge_color_viridis()+
+  theme_void()+
+  theme(legend.position = "none",
+        plot.background = element_rect(fill = "transparent", color = "transparent")) -> classic_net
+
+
+
+classic_net
+
+ggsave(plot = classic_net, filename = "plots/tile_net.png", width = 8, height = 4, units = "cm", dpi = 600, type = "cairo-png", bg = "transparent")
+```
+
+
+
+**5. Radial Network**
+```{r , echo=TRUE, message=FALSE }
+# igraph_layouts <- c('star', 'circle', 'gem', 'dh', 'graphopt', 'grid', 'mds', 
+#                     'randomly', 'fr', 'kk', 'drl', 'lgl')
+
+
+show_col(viridis_pal(end = .8, begin = .1)(5))
+
+ggraph(net_ex, "dendrogram") + 
+  geom_edge_diagonal(width =.1, aes(color = part, alpha = subchapter)) +
+  geom_node_point(aes(color = part), size = .05, alpha = .8) +
+  scale_edge_color_manual(values = c("#482576", "#38598c", "#25848e", "#274d81", "#7ad151"))+
+  scale_color_viridis_d(end = .8, begin = .1) +
+  scale_alpha_continuous(range = c(.5,1))+
+  theme_void()+
+  theme(legend.position = "none",
+        plot.background = element_rect(fill = "transparent", color = "transparent")) -> radial_net
+
+radial_net
+
+  ggsave(plot = radial_net, filename = "plots/dendro_net_ex.png", width = 8, height = 4, units = "cm", dpi = 600, type = "cairo-png", bg = "transparent")
+
+```
+
+**6. Extensive Exercise network**
+
+```{r , echo=TRUE, message=FALSE }
+# igraph_layouts <- c('star', 'circle', 'gem', 'dh', 'graphopt', 'grid', 'mds', 
+#                     'randomly', 'fr', 'kk', 'drl', 'lgl')
+ggraph(net_ex, layout = "gem", maxiter = 1000) +
+  geom_edge_elbow(aes(color = part), alpha = .5) +
+  geom_node_point(aes(color = part)) +
+  scale_edge_color_manual(values = c("#482576", "#38598c", "#25848e", "#274d81", "#7ad151"))+
+  scale_color_viridis_d(end = .8) +
+  scale_alpha_continuous(range = c(.5,1))+
+  theme_void()+
+  theme(legend.position = "none",
+        plot.background = element_rect(fill = "transparent", color = "transparent")) -> mesh_net
+mesh_net
+ggsave(plot = mesh_net, filename = "plots/mesh_net_ex.png", width = 16, height = 8, units = "cm", dpi = 600, type = "cairo-png", bg = "transparent")
+```
+<!-- # Book cover drafts -->
+<!-- In this section you see how the different plots would look roughly on a book cover in the c&c publisher design (made customly in inkscape) -->
+
+<!-- 1. Bar Chart -->
+<!-- ![Bar Chart](covers/publisher_design_barchart.png) -->
+
+<!-- 2. Plains -->
+<!-- ![Plains Chart](covers/publisher_design_plains.png) -->
+
+<!-- 3. Treemap -->
+<!-- ![Treemap](covers/publisher_design_treemap.png) -->
+
+<!-- 4. Network Classic -->
+<!-- ![Network Classic](covers/publisher_design_network_classic.png) -->
+<!-- 5. Network Radial -->
+<!-- ![Network Radial](covers/publisher_design_network_radial.png) -->
+
