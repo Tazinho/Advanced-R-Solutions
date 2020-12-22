@@ -326,7 +326,7 @@ __[A]{.solved}__:  All three functions capture the dots via `args <- list(...)`.
 `interaction()` computes factors interactions between the captured input factors by iterating over the `args`. When a list is provided this is detected via `length(args) == 1 && is.list(args[[1]])` and one level of the list is stripped through `args <- args[[1]]`. The rest of the function's code doesn't differentiate further between list and dots behaviour.
 
 ```{r}
-# both calls create the same output
+# Both calls create the same output
 interaction(     a = c("a", "b", "c", "d"), b = c("e", "f"))   # dots
 interaction(list(a = c("a", "b", "c", "d"), b = c("e", "f")))  # list
 ```

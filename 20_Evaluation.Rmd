@@ -438,7 +438,8 @@ lm(mpg ~ disp * cyl, data = mtcars)
 __[A]{.solved}__: In our wrapper `lm_wrap()`, we provide `mpg` and `mtcars` as default response and data. This seems to give us a good mix of usability and flexibility.
 
 ```{r}
-lm_wrap <- function(pred, resp = mpg, data = mtcars, env = caller_env()) {
+lm_wrap <- function(pred, resp = mpg, data = mtcars, 
+                    env = caller_env()) {
   pred <- enexpr(pred)
   resp <- enexpr(resp)
   data <- enexpr(data)

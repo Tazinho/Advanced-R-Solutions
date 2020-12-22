@@ -368,8 +368,8 @@ parse(text = "f())")
 __[Q9]{.Q}__: `deparse()` produces vectors when the input is long. For example, the following call produces a vector of length two:
 
 ```{r, eval = FALSE}
-expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + 
-                 m + n + o + p + q + r + s + t + u + v + w + x + y + z))
+expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + m + 
+                 n + o + p + q + r + s + t + u + v + w + x + y + z))
 
 deparse(expr)
 ```
@@ -379,14 +379,14 @@ What does `expr_text()` do instead?
 __[A]{.solved}__: `expr_text()` will paste the results from `deparse(expr)` together and use a linebreak (`\n`) as separator.
 
 ```{r, eval=FALSE}
-expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + 
-                 m + n + o + p + q + r + s + t + u + v + w + x + y + z))
+expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + m + 
+                 n + o + p + q + r + s + t + u + v + w + x + y + z))
 deparse(expr)
-#> [1] "g(a + b + c + d + e + f + g + h + i + j + k + l + m + n + o + "
-#> [2] "p + q + r + s + t + u + v + w + x + y + z)"
+#> [1] "g(a + b + c + d + e + f + g + h + i + j + k + l + m + n + "
+#> [2] "o + p + q + r + s + t + u + v + w + x + y + z)"
 expr_text(expr)
-#> [1] "g(a + b + c + d + e + f + g + h + i + j + k + l + m + n + o 
-#> + \n    p + q + r + s + t + u + v + w + x + y + z)"
+#> [1] "g(a + b + c + d + e + f + g + h + i + j + k + l + m + n 
+#> + \n    o + p + q + r + s + t + u + v + w + x + y + z)"
 ```
 
 __[Q10]{.Q}__: `pairwise.t.test()` assumes that `deparse()` always returns a length one character vector. Can you construct an input that violates this expectation? What happens?
@@ -452,7 +452,8 @@ expr_type <- function(x) {
 switch_expr <- function(x, ...) {
   switch(expr_type(x),
          ...,
-         stop("Don't know how to handle type ", typeof(x), call. = FALSE))
+         stop("Don't know how to handle type ", 
+              typeof(x), call. = FALSE))
 }
 ```
 
