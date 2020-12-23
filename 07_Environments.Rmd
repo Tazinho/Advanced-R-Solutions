@@ -236,39 +236,40 @@ f1 <- function(x1) {
 f1(1)
 ```
 
-__[A]{.solved}__: At creation time each function binds its parent environment: `f1` binds the global environment, `f2` binds the environment of `f1` and so on. The function environments contain functions and the values provided in the function call.
+__[A]{.solved}__: This exercises urges us to think carefully about the function environment at creation time and its execution environment.
 
-We can also inspect the binding of the environments, by printing their function environments (as well as the parent environments).
+When `f1` is defined it binds its parent environment, which is the global environment. But `f2` will only be created at runtime of `f1` and will therefore bind its execution environment. The value `1` will also bin to the name `x1` at execution time. The same holds true for `x2`, `f3` and `x3`.
+
+The following diagram omits the distinction between these two environment types and shows the general binding order of the environments.
+
+<!-- TODO: change this diagram after confirmation from Hadley -->
+
+```{r, echo = FALSE, out.width='300pt'}
+knitr::include_graphics(
+  "diagrams/environments/function_environments.png", dpi = 300
+)
+```
+
+We can also inspect the binding of the environments, adding print statements to the function definition. Please note that these print statements will be evaluated at execution time.
 
 ```{r}
 f1 <- function(x1) {
   f2 <- function(x2) {
     f3 <- function(x3) {
       x1 + x2 + x3
-      print("F3 (env/parent env)")
-      print(current_env())
-      print(env_parent())
+      print("f3")
+      print(env_print())
     }
     f3(3)
-    print("F2")
-    print(current_env())
-    print(env_parent())
+    print("f2")
+    print(env_print())
   }
   f2(2)
-  print("F1")
-  print(current_env())
-  print(env_parent())
+  print("f1")
+  print(env_print())
 }
 
 f1(1)
-```
-
-We can visualize these relations in the following diagram.
-
-```{r, echo = FALSE, out.width='300pt'}
-knitr::include_graphics(
-  "diagrams/environments/function_environments.png", dpi = 300
-)
 ```
 
 __[Q3]{.Q}__: Write an enhanced version of `str()` that provides more information about functions. Show where the function was found and what environment it was defined in.
