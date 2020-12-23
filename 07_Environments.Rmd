@@ -238,6 +238,27 @@ f1(1)
 
 __[A]{.solved}__: At creation time each function binds its parent environment: `f1` binds the global environment, `f2` binds the environment of `f1` and so on. The function environments contain functions and the values provided in the function call.
 
+We can also inspect the binding of the environments, by printing their function environments (as well as the parent environments).
+
+```{r}
+f1 <- function(x1) {
+  f2 <- function(x2) {
+    f3 <- function(x3) {
+      x1 + x2 + x3
+      print(env_print())
+    }
+    f3(3)
+    print(env_print())
+  }
+  f2(2)
+  print(env_print())
+}
+
+f1(1)
+```
+
+We can visualize these relations in the following diagram.
+
 ```{r, echo = FALSE, out.width='300pt'}
 knitr::include_graphics(
   "diagrams/environments/function_environments.png", dpi = 300
