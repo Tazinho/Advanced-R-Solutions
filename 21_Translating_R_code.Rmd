@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -326,7 +326,7 @@ Now, let us briefly repeat, that `with_html()` was introduced to evaluate tag fu
 
 Therefore, `p()` refers to the tag function from `html_tags` within both examples from the exercise. However, as `address` is not only a string within the global environment, but also a tag function within `html_tags` (the `<address>` HTML tag may be used to provide contact information on an HTML page), `p()` operates on `address()` in the second example. This correctly leads to an error as we haven't implemented an `escape.function()` method.
 
-```{r, error=TRUE}
+```{r, error = TRUE}
 greeting <- "Hello!"
 with_html(p(greeting))
 
@@ -413,7 +413,7 @@ with_html <- function(code) {
 
 Now, let's look at the example from above:
 
-```{r, error=TRUE}
+```{r, error = TRUE}
 with_html(
   body(
     h1("A heading", id = "first"),
@@ -427,7 +427,7 @@ The formatting consists of only one long line of code. This output makes it diff
 
 What kind of formatting would we prefer instead? [Google's HTML style guide](https://google.github.io/styleguide/htmlcssguide.html#HTML_Formatting_Rules) suggests *indentation* by 2 spaces and *new lines* for every block, list, or table element. There are other recommendations, but we will keep things simple and will be satisfied with the following output.
 
-```{html, eval=FALSE}
+```{html, eval = FALSE}
 <body>
   <h1 id='first'>A heading</h1>
   <p>Some text &amp;<b>some bold text.</b></p>
@@ -479,7 +479,7 @@ html_tags$body <- function(...) {
 
 The resulting output is much more satisfying.
 
-```{r, error=TRUE}
+```{r, error = TRUE}
 with_html(
   body(
     h1("A heading", id = "first"),
@@ -496,7 +496,7 @@ __[Q1]{.Q}__: Add escaping. The special symbols that should be escaped by adding
 
 __[A]{.solved}__: Currently our `to_math()` function generates the following output:
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 to_math(`$`)
 #> <LATEX> \mathrm{f}($)    # instead of <LATEX> \$  
 to_math(a$b)
@@ -507,7 +507,7 @@ to_math(`%`)
 #> <LATEX> \mathrm{f}(%)    # instead of <LATEX> \%
 ```
 
-```{r include=FALSE}
+```{r include = FALSE}
 ## 3.3 to_math()
 to_math <- function(x) {
   expr <- enexpr(x)

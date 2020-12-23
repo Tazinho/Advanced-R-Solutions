@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -36,7 +36,7 @@ bench::mark(
 
 For larger datasets the selection of the appropriate method is of greater relevance:
 
-```{r,collapse = TRUE, warning=FALSE}
+```{r, collapse = TRUE, warning = FALSE}
 eps <- rnorm(100000)
 x1 <- rnorm(100000, 5, 3)
 x2 <- rep(c("a", "b"), 50000)
@@ -320,7 +320,7 @@ __[Q2]{.Q}__: Compare the speed of `apply(x, 1, sum)` with `rowSums(x)` for vary
 
 __[A]{.solved}__: We compare the two functions for square matrices of increasing size:
 
-```{r, warning=FALSE}
+```{r, warning = FALSE}
 rowsums <- bench::press(
   p = seq(500, 5000, length.out = 10),
   {

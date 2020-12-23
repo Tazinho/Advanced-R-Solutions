@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -290,7 +290,7 @@ __[A]{.solved}__: Both functions differ in the way conditions are handled. `with
 
 In this example the use of `withCallingHandlers()` returns more information than the use of `tryCatch()`. This allows us to determine the exact call that raised the condition.
 
-```{r, error = TRUE, eval=FALSE}
+```{r, error = TRUE, eval = FALSE}
 message2error1 <- function(code) {
   withCallingHandlers(code, message = function(e) stop("error"))
 }
@@ -319,7 +319,7 @@ traceback()
 #>    })
 ```
 
-```{r, error = TRUE, eval=FALSE}
+```{r, error = TRUE, eval = FALSE}
 message2error2 <- function(code) {
   tryCatch(code, message = function(e) (stop("error")))
 }

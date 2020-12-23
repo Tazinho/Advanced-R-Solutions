@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -23,13 +23,13 @@ f <- function(n = 1e5) {
 
 __[A]{.solved}__: We expect `f()` to create a vector (`x`) of length `n`, which is then removed so that `f()` just returns `NULL`. When we profile this function, it executes too fast for meaningful results.
 
-```{r, error=TRUE}
+```{r, error = TRUE}
 profvis::profvis(f())
 ```
 
 Setting `torture = TRUE` triggers garbage collection after every memory allocation call, which may be useful for more exact memory profiling.
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 profvis::profvis(f(), torture = TRUE)
 ```
 
@@ -37,7 +37,7 @@ Surprisingly, profiling `f()` like this takes a very long time. What could be th
 
 We follow the hint in the question and inspect the source code of `rm()`:
 
-```{r,eval=FALSE}
+```{r,eval = FALSE}
 function (..., list = character(), pos = -1,
           envir = as.environment(pos), 
           inherits = FALSE) 
@@ -62,7 +62,7 @@ function (..., list = character(), pos = -1,
 
 We can make the job of `rm()` considerably simpler by using the `list` argument:
 
-```{r,eval=FALSE}
+```{r,eval = FALSE}
 f2 <- function(n = 1e5) {
   x <- rep(1, n)
   rm(list = "x")

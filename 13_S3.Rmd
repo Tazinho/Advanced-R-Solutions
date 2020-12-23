@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -35,7 +35,7 @@ __[Q2]{.Q}__: Make a list of commonly used base R functions that contain `.` in 
 
 __[A]{.solved}__: In recent years "snake_case"-style has become increasingly common when naming functions and variables in R. But many functions in base R will continue to be "point.separated", which is why some inconsistency in your R code most likely cannot be avoided.
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 # Some base R functions with point.separated names
 install.packages()
 read.csv()
@@ -115,7 +115,7 @@ We need to provide the number of rows as an input to make it possible to create 
 
 This leads to the following constructor:
 
-```{r, error=TRUE}
+```{r, error = TRUE}
 new_data.frame <- function(x, n, row.names = NULL) {
   # Check if the underlying object is a list
   stopifnot(is.list(x))
@@ -290,7 +290,7 @@ roman(0)
 
 __[Q1]{.Q}__: Read the source code for `t()` and `t.test()` and confirm that `t.test()` is an S3 generic and not an S3 method. What happens if you create an object with class `test` and call `t()` with it? Why?
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 x <- structure(1:10, class = "test")
 t(x)
 ```
@@ -314,7 +314,7 @@ When we create an object with class `test`, `t()`, will dispatch to `t.test()`. 
 
 Consequently `t.test()` is erroneously treated as a method of `t()`. Because `t.test()` is a generic itself and doesn't find a method called `t.test.test()`, it dispatches to `t.test.default()`. We can define  `t.test.test()` to demonstrate that this is really what is happening internally.
 
-```{r, error=TRUE}
+```{r, error = TRUE}
 x <- structure(1:10, class = "test")
 t(x)
 
