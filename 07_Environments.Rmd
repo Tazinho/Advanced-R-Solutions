@@ -245,19 +245,19 @@ f1 <- function(x1) {
   f2 <- function(x2) {
     f3 <- function(x3) {
       x1 + x2 + x3
-      print("F3")
+      print("F3 (env/parent env)")
       print(current_env())
-      print(caller_env())
+      print(env_parent())
     }
     f3(3)
     print("F2")
     print(current_env())
-    print(caller_env())
+    print(env_parent())
   }
   f2(2)
   print("F1")
   print(current_env())
-  print(caller_env())
+  print(env_parent())
 }
 
 f1(1)
