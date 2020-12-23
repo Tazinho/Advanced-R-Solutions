@@ -797,9 +797,9 @@ to_math(bold(x))
 to_math(x != y)
 ```
 
-To do this, we follow the LaTeX section from the textbook straight from the beginning. This makes it easier to keep an overview, as we just need to insert the specific changes at the relevant parts.
+To do this, we follow the LaTeX section from Advanced R straight from the beginning. This makes it easier to keep an overview, as we just need to insert the specific changes at the relevant parts.
 
-Let's start and repeat our converter function `to_math()` from the textbook.
+Let's start and repeat the converter function `to_math()` from the textbook.
 
 ```{r}
 to_math <- function(x) {
@@ -838,7 +838,7 @@ latex_env <- function(expr) {
 }
 ```
 
-We already know from the textbook that e.g. `to_math(pi)` now correctly converts to `\\pi`. So, let's move on to the next one.
+We already know from Advanced R that e.g. `to_math(pi)` now correctly converts to `\\pi`. So, let's move on to the next one.
 
 Here, it'll become a bit more technical. Not every symbol is Greek (and not every part of an expression is a symbol). To find out which symbols are present within the expression, first, we use an approach from [section 5 of the expressions chapter](https://adv-r.hadley.nz/expressions.html#ast-funs) (walking the AST to find all symbols) where Hadley recursively walks the AST to distinguish between different expression element types.
 
@@ -907,7 +907,7 @@ In this way, `to_math()` will first convert all known Greek letters (found in `g
 
 We also have to add support for functions. This will give us the opportunity to insert some specific support for `plotmath` functions.
 
-To support a whole bunch of unary and binary functions within the function environment (`f_env`), which will be added next to `latex_env`, Hadley defines the following two helpers in the textbook.
+To support a whole bunch of unary and binary functions within the function environment (`f_env`), which will be added next to `latex_env`, Hadley defines the following two helpers in Advanced R.
 
 ```{r}
 unary_op <- function(left, right) {
@@ -931,7 +931,7 @@ binary_op <- function(sep) {
 }
 ```
 
-While defining the function environment, `f_env`, we mostly continue to copy the exact code from the textbook. However, at the bottom we add a short section where we define some extra conversions which are part of `plotmath` (and selected above in our intro to this solution).
+While defining the function environment, `f_env`, we mostly continue to copy the exact code from Advanced R. However, at the bottom we add a short section where we define some extra conversions which are part of `plotmath` (and selected above in our intro to this solution).
 
 ```{r}
 f_env <- child_env(
@@ -999,7 +999,7 @@ to_math(x %->% y)
 to_math(bold(x))
 to_math(x != y)
 
-# Other examples from the textbooks
+# Other examples from Advanced R
 to_math(sin(x + pi))
 to_math(log(x[i]^2))
 to_math(sin(sin))
@@ -1007,7 +1007,7 @@ to_math(sin(sin))
 
 If we wanted, we could include further `plotmath` functions in this step. If this collides with other functions at some point, we could just create an own `f_plotmath_env` to support more `plotmath` functions. In that case we would need to add this environment also to `latex_env()` (as child environment of the function environment `f_env`).
 
-To complete this answer, we will also add the support for unknown functions. Similarly as for the unknown symbols, we use the trick to recursively run the AST and just reuse the code from the textbook.
+To complete this answer, we will also add the support for unknown functions. Similarly as for the unknown symbols, we use the trick to recursively run the AST and just reuse the code from Advanced R.
 
 ```{r}
 all_calls_rec <- function(x) {
@@ -1070,7 +1070,7 @@ to_math(x %->% y)
 to_math(bold(x))
 to_math(x != y)
 
-# Other examples from the textbook
+# Other examples from Advanced R
 to_math(sin(x + pi))
 to_math(log(x[i]^2))
 to_math(sin(sin))
