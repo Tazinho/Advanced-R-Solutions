@@ -240,17 +240,15 @@ __[A]{.solved}__: This exercise urges us to think carefully about the function e
 
 When `f1` is defined it binds its parent environment, which is the global environment. But `f2` will only be created at runtime of `f1` and will therefore bind `f1`'s execution environment. The value `1` will also bind to the name `x1` at execution time. The same holds true for `x2`, `f3` and `x3`.
 
-The following diagram omits the distinction between these two environment types and shows the general binding order of the environments.
-
-<!-- TODO: change this diagram after confirmation from Hadley -->
+The following diagram visualizes the relations between the function environments.
 
 ```{r, echo = FALSE, out.width='300pt'}
 knitr::include_graphics(
-  "diagrams/environments/function_environments.png", dpi = 300
+  "diagrams/environments/function_environments_corrected.png", dpi = 300
 )
 ```
 
-We can also inspect the binding of the environments, adding print statements to the function definition. Please note that these print statements will be evaluated at execution time. Therefore, the execution of `f1(1)` will print different results each time.
+We can also inspect the binding of the environments, adding print statements to the function definition. Please note that these print statements will be evaluated at execution time. Therefore, the execution of `f1(1)` will print different results each time we run it.
 
 ```{r}
 f1 <- function(x1) {
