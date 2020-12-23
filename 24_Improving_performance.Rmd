@@ -336,11 +336,14 @@ library(ggplot2)
 
 rowsums %>%
   summary() %>%
-  dplyr::mutate(expression = as.character(expression)) %>%
-  ggplot(aes(p, median, color = expression, group = expression)) +
+  dplyr::mutate(Approach = as.character(expression)) %>%
+  ggplot(
+    aes(p, median, color = Approach, group = Approach)) +
   geom_point() +
   geom_line() +
-  theme(legend.position = "bottom")
+  labs(x = "Number of Rows and Columns",
+       y = "Median (s)") +
+  theme(legend.position = "top")
 ```
 
 We can see that the difference in performance is negligible for small matrices but becomes more and more relevant as the size of the data increases. `apply()` is a very versatile tool, but it's not "vectorised for performance" and not as optimised as `rowSums()`.
@@ -371,10 +374,11 @@ weightedsum <- bench::press(
 
 weightedsum %>%
   summary() %>%
-  dplyr::mutate(expression = as.character(expression)) %>%
-  ggplot(aes(n, median, color = expression, group = expression)) +
+  dplyr::mutate(Approach = as.character(expression)) %>%
+  ggplot(aes(n, median, color = Approach, group = Approach)) +
   geom_point() +
   geom_line() +
-  labs(x = "n (millions)") +
-  theme(legend.position = "bottom")
+  labs(x = "Vector length (millions)",
+       y = "Median (s)") +
+  theme(legend.position = "top")
 ```
