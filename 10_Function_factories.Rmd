@@ -236,7 +236,7 @@ __[Q1]{.Q}__: Compare and contrast `ggplot2::label_bquote()` with `scales::numbe
 
 __[A]{.solved}__: Both functions will help you in styling your output, e.g. in your plots and they do this by returning the desired formatting function to you.
 
-`ggplot2::label_bquote()` takes relatively straightforward [plotmath](https://stat.ethz.ch/R-manual/R-patched/library/grDevices/html/plotmath.html) expressions and uses them for faceting labels in ggplot2. Because this function is used in ggplot2 it needs to return a function of `class = "labeller"`.
+`ggplot2::label_bquote()` takes relatively straightforward [plotmath](https://stat.ethz.ch/R-manual/R-patched/library/grDevices/html/plotmath.html) expressions and uses them for faceting labels in `{ggplot2}`. Because this function is used in `{ggplot2}` it needs to return a function of `class = "labeller"`.
 
 `scales::number_format()` initially `force()`s the computation of all parameters. It's essentially a parametrised wrapper around `scales::number()` and will help you format numbers appropriately. It will return a simple function.
 
@@ -419,7 +419,7 @@ mean <- function(x) stop("Hi!")
 env_unbind(globalenv(), names(funs))
 ```
 
-__[A]{.solved}__: `attach()` adds `funs` to the search path. Therefore, the provided functions are found before their respective versions from the base package. Further, they cannot get accidently overwritten by similar named functions in the global environment. One annoying downside of using `attach()` is the possibility to attach the same object multiple times, making it necessary to call `detach()` equally often.
+__[A]{.solved}__: `attach()` adds `funs` to the search path. Therefore, the provided functions are found before their respective versions from the `{base}` package. Further, they cannot get accidently overwritten by similar named functions in the global environment. One annoying downside of using `attach()` is the possibility to attach the same object multiple times, making it necessary to call `detach()` equally often.
 
 ```{r}
 attach(funs)

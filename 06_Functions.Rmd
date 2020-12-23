@@ -52,7 +52,7 @@ __[Q4]{.Q}__: What function allows you to tell if an object is a function? What 
 
 __[A]{.solved}__: Use `is.function()` to test if an object is a function. Consider using `is.primitive()` to test specifically for primitive functions.
 
-__[Q5]{.Q}__: This code makes a list of all functions in the base package.
+__[Q5]{.Q}__: This code makes a list of all functions in the `{base}` package.
 
 ```{r}
 objs <- mget(ls("package:base", all = TRUE), inherits = TRUE)
@@ -504,7 +504,7 @@ __[A]{.solved}__: To achieve this behaviour, we need to override the `+` operato
 rm(`+`)
 ```
 
-__[Q6]{.Q}__: Create a list of all the replacement functions found in the base package. Which ones are primitive functions? (Hint use `apropos()`)
+__[Q6]{.Q}__: Create a list of all the replacement functions found in the `{base}` package. Which ones are primitive functions? (Hint use `apropos()`)
 
 __[A]{.solved}__: The hint suggests to look for functions with a specific naming pattern: Replacement functions conventionally end on "<-". We can search for these objects by supplying the regular expression `"<-$"` to `apropos()`. `apropos()` also allows to return the position on the search path (`search()`) for each of its matches via setting `where = TRUE`. Finally, we can set `mode = function` to narrow down our search to relevant objects only. This gives us the following statement to begin with:
 
@@ -513,7 +513,7 @@ repls <- apropos("<-", where = TRUE, mode = "function")
 head(repls, 30)
 ```
 
-To restrict `repl` to names of replacement functions from the base package, we select only matches containing the relevant position on the search path.
+To restrict `repl` to names of replacement functions from the `{base}` package, we select only matches containing the relevant position on the search path.
 
 ```{r}
 repls_base <- repls[names(repls) == length(search())]
@@ -530,7 +530,7 @@ repls_base_prim <- mget(repls_base, envir = baseenv()) %>%
 repls_base_prim
 ```
 
-Overall base R contains `r length(repls_base)` replacement functions of which `r (length(repls_base_prim))` are primitive functions.
+Overall the `{base}` package contains `r length(repls_base)` replacement functions of which `r (length(repls_base_prim))` are primitive functions.
 
 __[Q7]{.Q}__: What are valid names for user-created infix functions?
 
