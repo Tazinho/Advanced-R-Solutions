@@ -750,7 +750,9 @@ unknown_op <- function(op) {
     exprs(... = ),
     expr({
       contents <- paste(..., collapse = ", ")
-      paste0(!!paste0("\\mathrm{", escape_latex(op), "}("), contents, ")")
+      paste0(
+        !!paste0("\\mathrm{", escape_latex(op), "}("), contents, ")"
+      )
     })
   )
 }
