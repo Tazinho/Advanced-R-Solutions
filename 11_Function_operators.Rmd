@@ -26,10 +26,31 @@ However, despite what the function's name implies, `Vectorize()` is not able to 
 
 Let's take a look at an example from the documentation:
 
-```{r}
+```{r, eval=FALSE}
 vrep <- Vectorize(rep.int)
 vrep
+#> function (x, times) 
+#> {
+#>   args <- lapply(as.list(match.call())[-1L], eval, parent.frame())
+#>   names <- if (is.null(names(args))) 
+#>     character(length(args))
+#>   else names(args)
+#>   dovec <- names %in% vectorize.args
+#>   do.call("mapply", c(FUN = FUN, args[dovec],
+#>                       MoreArgs = list(args[!dovec]), 
+#>                       SIMPLIFY = SIMPLIFY, USE.NAMES = USE.NAMES))
+#> }
+#> <environment: 0x558902db65d0>
+```
 
+<!-- output above hardcoded to avoid margin-overflow in pdf -->
+
+```{r, include=FALSE}
+vrep <- Vectorize(rep.int)
+vrep
+```
+
+```{r}
 # Application
 vrep(1:2, 3:4)
 ```
