@@ -154,13 +154,14 @@ x <- 1:10
 slider::slide_dbl(x, mean, .before = 1, .complete = TRUE)
 
 bench::mark(
-  caTools::runmean(x, k = 2, endrule = "NA"),
-  data.table::frollmean(x, 2),
-  RcppRoll::roll_mean(x, n = 2, fill = NA, align = "right"),
-  slider::slide_dbl(x, mean, .before = 1, .complete = TRUE),
-  TTR::SMA(x, 2),
-  zoo::rollapply(x, 2, mean, fill = NA, align = "right"),
-  zoo::rollmean(x, 2, fill = NA, align = "right")
+  caTools = caTools::runmean(x, k = 2, endrule = "NA"),
+  data.table = data.table::frollmean(x, 2),
+  RcppRoll = RcppRoll::roll_mean(x, n = 2, fill = NA, 
+                                 align = "right"),
+  slicer = slider::slide_dbl(x, mean, .before = 1, .complete = TRUE),
+  TTR = TTR::SMA(x, 2),
+  zoo_apply = zoo::rollapply(x, 2, mean, fill = NA, align = "right"),
+  zoo_rollmean = zoo::rollmean(x, 2, fill = NA, align = "right")
 )
 ```
 
