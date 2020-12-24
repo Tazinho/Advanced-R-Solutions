@@ -42,7 +42,7 @@ __[A]{.solved}__: Let's begin with `approxfun()` as it is used within `ecdf()` a
 ```{r}
 x <- runif(10)
 y <- runif(10)
-plot(x, y, lwd = 10)
+plot(x, y, pch = 16,  cex = 1.9)
 ```
 
 Next, we use `approxfun()` to construct the linear and constant interpolation functions for our `x` and `y` values.
@@ -59,11 +59,11 @@ identical(f_con(x), y)
 When we apply these functions to new x values, these are mapped to the lines connecting the initial y values (linear case) or to the same y value as for the next smallest initial x value (constant case).
 
 ```{r}
-x_new <- runif(1000)
+x_new <- runif(10000)
 
 plot(x, y, lwd = 10)
-points(x_new, f_lin(x_new), col = "red", pch = 16)
-points(x_new, f_con(x_new), col = "blue", pch = 16)
+points(x_new, f_lin(x_new), col = "cornflowerblue", pch = 16)
+points(x_new, f_con(x_new), col = "firebrick", pch = 16)
 ```
 
 However, both functions are only defined within `range(x)`.
