@@ -431,7 +431,8 @@ benchmark_medians <- function(ncol) {
 
   bench::mark(
     "data frame" = subtract_df(df, medians),
-    "list" = subtract_list(df, medians)
+    "list" = subtract_list(df, medians),
+    time_unit = "ms"
   )
 }
 
@@ -460,7 +461,7 @@ ggplot(
   geom_smooth() +
   labs(
     x = "Number of Columns",
-    y = "Execution Time (s)",
+    y = "Execution Time (ms)",
     colour = "Data Structure"
   ) +
   theme(legend.position = "top")
