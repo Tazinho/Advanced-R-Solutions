@@ -726,7 +726,9 @@ latex_env <- function(expr) {
 to_math(sin(pi) + f(a))
 ```
 
-Therefore, we need an escape function with methods for the `character` and `advr_latex` classes. 
+To adjust this behaviour, we need an escape function with methods for the `character` and `advr_latex` classes. 
+
+(Note that we must first repeat the underlying code from Advanced R. However, since this would be a bit verbose, and not very meaningful, we will not show this step here.)
 
 ```{r}
 escape_latex <- function(x) UseMethod("escape_latex")
@@ -742,7 +744,7 @@ escape_latex.character <- function(x) {
 escape_latex.advr_latex <- function(x) x
 ```
 
-We apply this function within `latex_env()` when creating environments for unknown symbols and unknown functions. For the unknown function, we need to modify `unknown_op()` first.
+We apply `escape_latex()` within `latex_env()` when creating environments for unknown symbols and unknown functions. For the unknown function, we need to modify `unknown_op()` first.
 
 ```{r}
 unknown_op <- function(op) {
