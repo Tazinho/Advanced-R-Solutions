@@ -285,7 +285,12 @@ setMethod("show", "Person", function(object, y) {
 ## Method dispatch 
 <!-- 15.5 -->
 
-__[Q1]{.Q}__: Draw the method graph for `f(😅, 😽)`.
+```{r, include=FALSE}
+source("emoji.R")
+code <- function(...) paste0("`", ..., "`")
+```
+
+__[Q1]{.Q}__: Draw the method graph for `r paste0(code("f("), emoji("sweat_smile"), ", ", emoji("kissing_cat"), code(")"))`.
 
 __[A]{.solved}__: Look at the graph and repeat after me: "I will keep my class structure simple and use multiple inheritance sparingly".
 
@@ -293,7 +298,7 @@ __[A]{.solved}__: Look at the graph and repeat after me: "I will keep my class s
 knitr::include_graphics("images/s4/method_dispatch1.png", dpi = 300)
 ```
 
-__[Q2]{.Q}__: Draw the method graph for `f(😃, 😉, 😙)`.
+__[Q2]{.Q}__: Draw the method graph for `r paste0(code("f("), emoji("smiley"), ", ", emoji("wink"), ", ", emoji("kissing_smiling_eyes"), code(")"))`.
 
 __[A]{.solved}__: We see that the method graph below looks simpler than the one above. Relatively speaking, multiple dispatch seems to introduce less complexity than multiple inheritance. Use it with care, though!
 
