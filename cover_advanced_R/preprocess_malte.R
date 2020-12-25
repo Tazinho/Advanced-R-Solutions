@@ -28,7 +28,7 @@ df_help <- bind_rows(
   df_nodes %>% count(part, chapter, name = "node_size") %>% 
     mutate(node_type = "chapter"),
   df_nodes %>% count(part, chapter, subchapter, name = "node_size") %>%
-    mutate(node_type = "subachapter")
+    mutate(node_type = "subchapter")
 )
 
 df_nodes <- bind_rows(
@@ -42,11 +42,22 @@ df_edges <- tidyr::crossing(from = df_nodes$id,
                             to   = df_nodes$id) %>%
   mutate(from_type = df_nodes %>% slice(from) %>% pull(node_type),
          to_type   = df_nodes %>% slice(to)   %>% pull(node_type)) %>% 
+  mutate(from_part       = df_nodes %>% slice(from) %>% pull(part      ),
+         from_chapter    = df_nodes %>% slice(from) %>% pull(chapter   ),
+         from_subchapter = df_nodes %>% slice(from) %>% pull(subchapter),
+         from_exercise   = df_nodes %>% slice(from) %>% pull(exercise  )) %>% 
+  mutate(to_part       = df_nodes %>% slice(to) %>% pull(part      ),
+         to_chapter    = df_nodes %>% slice(to) %>% pull(chapter   ),
+         to_subchapter = df_nodes %>% slice(to) %>% pull(subchapter),
+         to_exercise   = df_nodes %>% slice(to) %>% pull(exercise  )) %>% 
   filter(from != to) %>% 
-  filter(from_type == "part"       & to_type %in% c("part", "chapter") |
-         from_type == "chapter"    & to_type %in% c("chapter", "subchapter") |
-         from_type == "subchapter" & to_type %in% c("subchapter", "exercise") |
-         from_type == "exercise"   & to_type %in% c("exercise"))
+  filter(from_type == "part"       & to_type %in% c("part") |
+         from_type == "part"       & to_type %in% c("chapter") & from_part == to_part |
+         from_type == "chapter"    & to_type %in% c("chapter") & from_part == to_part |
+         from_type == "chapter"    & to_type %in% c("subchapter") & from_part == to_part & from_chapter == to_chapter |
+         from_type == "subchapter" & to_type %in% c("subchapter") & from_part == to_part & from_chapter == to_chapter |
+         from_type == "subchapter" & to_type %in% c("exercise") & from_part == to_part & from_chapter == to_chapter & from_subchapter == to_subchapter |
+         from_type == "exercise"   & to_type %in% c("exercise") & from_part == to_part & from_chapter == to_chapter & from_subchapter == to_subchapter)
 
 # distinct
 df_edges <- df_edges %>% 
@@ -54,6 +65,15 @@ df_edges <- df_edges %>%
   mutate(key = paste(sort(c(from, to)), collapse = "_")) %>% 
   ungroup() %>% 
   filter(!duplicated(key)) 
+
+tbl_graph(nodes = df_nodes, edges = df_edges, directed = FALSE) %>% 
+  ggraph(layout = "kk") + 
+  geom_edge_link(color = "grey") +
+  geom_node_point(aes(color = node_type, size = factor(node_type)))
+
+ggraph(net_ex, layout = "kk") +
+  geom_edge_link(color = "grey") +
+  geom_node_point(size = 3) 
 
 # 1. DIES ist bereits die Version "Jeder mit Jedem auf einer Ebene"
 # 2. Version als Ring
@@ -74,5 +94,3 @@ df_ring_ex <- df_nodes %>%
   select(key) %>% 
   distinct()
 
-df_ring_ex
-df_edges %>% filter(key %in% df_ring_ex$key)
