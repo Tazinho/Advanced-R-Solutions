@@ -169,7 +169,7 @@ __[Q1]{.Q}__: What important property of `&&` makes `x_ok()` work?
 
 ```{r}
 x_ok <- function(x) {
-  !is.null(x) && length(x) == 1 && x > 0
+  length(x) == 1 && x > 0
 }
 
 x_ok(NULL)
@@ -189,9 +189,11 @@ x_ok(1)
 x_ok(1:3)
 ```
 
-__[A]{.solved}__: We expect `x_ok()` to validate its input via certain criteria: it must not be `NULL` but have length `1` and a value greater than `0`. Meaningful outcomes for this assertion will be `TRUE`, `FALSE` or `NA`. The desired behaviour is reached by combining the assertions through `&&` instead of `&`.
+__[A]{.solved}__: In summary: `&&` short-circuits which means that if the left-hand side is `FALSE` it doesn't evaluate the right-hand side (because it doesn't matter). Similarly, if the left-hand side of `||` is `TRUE` it doesn't evaluate the right-hand side.
 
-`&&` does not perform elementwise comparisons, instead it uses the first element of each value only. It also uses lazy evaluation, in the sense that evaluation "proceeds only until the result is determined" (from `?Logic`). This means that the RHS of `&&` won't be evaluated if the LHS already determines the outcome of the comparison (e.g. evaluate to `FALSE`). This behaviour is also known as 'shortcircuiting'. 
+We expect `x_ok()` to validate its input via certain criteria: it must not be `NULL`, have length `1` and be greater than `0`. Meaningful outcomes for this assertion will be `TRUE`, `FALSE` or `NA`. The desired behaviour is reached by combining the assertions through `&&` instead of `&`.
+
+`&&` does not perform elementwise comparisons, instead it uses the first element of each value only. It also uses lazy evaluation, in the sense that evaluation "proceeds only until the result is determined" (from `?Logic`). This means that the RHS of `&&` won't be evaluated if the LHS already determines the outcome of the comparison (e.g. evaluate to `FALSE`). This behaviour is also known as "short-circuiting". 
 For some situations (`x = 1`) both operators will lead to the same result. But this is not always the case. For `x = NULL`, the `&&`-operator will stop after the `!is.null` statement and return the result. The following conditions won't even be evaluated! (If the other conditions are also evaluated (by the use of `&`), the outcome would change. `NULL > 0` returns `logical(0)`, which is not helpful in this case.)
 
 We can also see the difference in behaviour, when we set `x = 1:3`. The `&&`-operator returns the result from `length(x) == 1`, which is `FALSE`. Using `&` as the logical operator leads to the (vectorised) `x > 0` condition being evaluated and also returned.
