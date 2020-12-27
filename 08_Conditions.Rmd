@@ -43,7 +43,7 @@ __[Q2]{.Q}__: What does the `appendLF` argument to `message()` do? How is it rel
 
 __[A]{.solved}__: The `appendLF` argument automatically appends a new line to the message. Let's illustrate this behaviour with a small example function:
 
-```{r}
+```{r, eval=FALSE}
 multiline_msg <- function(appendLF = TRUE) {
   message("first", appendLF = appendLF)
   message("second", appendLF = appendLF)
@@ -52,7 +52,11 @@ multiline_msg <- function(appendLF = TRUE) {
 }
 
 multiline_msg(appendLF = TRUE)
+#> first
+#> second
+#> thirdfourth
 multiline_msg(appendLF = FALSE)
+#> firstsecondthirdfourth
 ```
 
 Comparable behaviour regarding line breaks for `cat()` can be achieved via setting its `sep` argument to `"\n"`.

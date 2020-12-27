@@ -262,7 +262,9 @@ c(dttm_ct, date)  # equal to c.POSIXct(date, dttm_ct)
 #> [1] "1970-01-01 02:00:00 CET" "1970-01-01 01:00:01 CET"
 ```
 
-In the first line above `c.Date()` gets executed which mistakenly interpreted `dttm_ct` as the underlying double (3600 seconds!) before it converted it to a date. Conversely, when `c.POSIXct()` gets called on a date, one day counted as one second only, as illustrated by the following line:
+In the first statement above `c.Date()` is executed, which incorrectly treats the underlying double of `dttm_ct` (3600) as days instead of seconds. Conversely, when `c.POSIXct()` is called on a date, one day is counted as one second only. 
+
+We can highlight these mechanics by the following code:
 
 ```{r, eval = FALSE}
 # Output in R 3.6.2
