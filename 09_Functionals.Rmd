@@ -230,7 +230,7 @@ __[A]{.solved}__: In the first approach
 mtcars[vars] <- map2(trans, mtcars[vars], function(f, var) f(var))
 ```
 
-the list of the 2 functions (`trans`) and the 2 appropriately selected data frame columns (`mtcars[vars]`) are supplied to `map2()`. `map2()` creates an anonymous function (`f(var)`) which applies the functions to the variables when `map2()` iterates over their (similar) indices. On the left hand side, the respective 2 elements of `mtcars` are being replaced by their new transformations.
+the list of the 2 functions (`trans`) and the 2 appropriately selected data frame columns (`mtcars[vars]`) are supplied to `map2()`. `map2()` creates an anonymous function (`f(var)`) which applies the functions to the variables when `map2()` iterates over their (similar) indices. On the left-hand side, the respective 2 elements of `mtcars` are being replaced by their new transformations.
 
 The `map()` variant
 
@@ -242,7 +242,7 @@ does basically the same. However, it directly iterates over the names (`vars`) o
 
 Besides the iteration pattern, the approaches differ in the possibilities for appropriate argument naming in the `.f` argument. In the `map2()` approach we iterate over the elements of `x` and `y`. Therefore, it is possible to choose appropriate placeholders like `f` and `var`. This makes the anonymous function more expressive at the cost of making it longer.  We think using the formula interface in this way is preferable compared to the rather cryptic `mtcars[vars] <- map2(trans, mtcars[vars], ~ .x(.y))`.
 
-In the `map()` approach we map over the variable names. It is therefore not possible to introduce placeholders for the function and variable names. The formula syntax together with the `.x` pronoun is pretty compact. The object names and the brackets clearly indicate the application of transformations to specific columns of `mtcars`. In this case the iteration over the variable names comes in handy, as it highlights the importance of matching between `trans` and `mtcars` element names. Together with the replacement form on the left hand side, this line is relatively easy to inspect.
+In the `map()` approach we map over the variable names. It is therefore not possible to introduce placeholders for the function and variable names. The formula syntax together with the `.x` pronoun is pretty compact. The object names and the brackets clearly indicate the application of transformations to specific columns of `mtcars`. In this case the iteration over the variable names comes in handy, as it highlights the importance of matching between `trans` and `mtcars` element names. Together with the replacement form on the left-hand side, this line is relatively easy to inspect.
 
 To summarise, in situations where `map()` and `map2()` provide solutions for an iteration problem, several points may be considered before deciding for one or the other approach.
 

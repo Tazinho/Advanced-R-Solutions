@@ -200,7 +200,7 @@ is_missing(out2$a)
 
 __[Q5]{.Q}__: What are other differences between `exprs()` and `alist()`? Read the documentation for the named arguments of `exprs()` to find out.
 
-__[A]{.solved}__: `exprs()` provides the additional arguments `.named` (`= FALSE`), `.ignore_empty` (`c("trailing", "none", "all")`) and `.unquote_names` (`TRUE`). `.named` allows to ensure that all dots are named. `ignore_empty` allows to specify how empty arguments should be handled for dots (`"trailing"`) or all arguments (`"none"` and `"all"`). Further via `.unquote_names` one can specify if `:=` should be treated like `=`. `:=` can be useful as it supports unquoting (`!!`) on the left-hand-side.
+__[A]{.solved}__: `exprs()` provides the additional arguments `.named` (`= FALSE`), `.ignore_empty` (`c("trailing", "none", "all")`) and `.unquote_names` (`TRUE`). `.named` allows to ensure that all dots are named. `ignore_empty` allows to specify how empty arguments should be handled for dots (`"trailing"`) or all arguments (`"none"` and `"all"`). Further via `.unquote_names` one can specify if `:=` should be treated like `=`. `:=` can be useful as it supports unquoting (`!!`) on the left-hand side.
 
 __[Q6]{.Q}__: The documentation for `substitute()` says:
 
@@ -317,7 +317,7 @@ exec <- function(f, ..., .env = caller_env()) {
 }
 ```
 
-__[A]{.solved}__: `exec()` takes a function (`f`), its arguments (`...`) and an environment (`.env`) as input. This allows to construct a call from `f` and `...` and evaluate this call in the supplied environment. As the `...` argument is handled via `list2()`, `exec()` supports tidy dots (quasiquotation), which means that arguments and names (on the left-hand-side of `:=`) can be unquoted via `!!` and `!!!`.
+__[A]{.solved}__: `exec()` takes a function (`f`), its arguments (`...`) and an environment (`.env`) as input. This allows to construct a call from `f` and `...` and evaluate this call in the supplied environment. As the `...` argument is handled via `list2()`, `exec()` supports tidy dots (quasiquotation), which means that arguments and names (on the left-hand side of `:=`) can be unquoted via `!!` and `!!!`.
 
 __[Q2]{.Q}__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`. Compare and contrast the techniques they use for switching between dots and list behaviour.
 
