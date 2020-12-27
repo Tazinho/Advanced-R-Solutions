@@ -91,7 +91,7 @@ __[A]{.solved}__: There are many ways to visualise this data. However, since the
 ```{r}
 library(ggplot2)
 
-df_trials <- tibble(p_value = map_dbl(trials, "p.value"))
+df_trials <- tibble::tibble(p_value = map_dbl(trials, "p.value"))
 
 df_trials %>%
   ggplot(aes(x = p_value, fill = p_value < 0.05)) +

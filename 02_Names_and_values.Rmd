@@ -264,7 +264,7 @@ To look up all functions from these packages we iterate over `base_pkgs` and app
 base_objs <- base_pkgs %>%
   lapply(as.environment) %>%
   lapply(function(x) mget(ls(x, all.names = TRUE), x)) %>%
-  set_names(base_pkgs)
+  magrittr::set_names(base_pkgs)
 ```
 
 This gives us more than 2700 objects which are usually available by default.
