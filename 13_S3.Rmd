@@ -449,9 +449,11 @@ s3_methods_generic("[") %>%
 
 __[Q1]{.Q}__: Categorise the objects returned by `lm()`, `factor()`, `table()`, `as.Date()`, `as.POSIXct()`, `ecdf()`, `ordered()`, `I()` into the styles described above.
 
-__[A]{.solved}__: We can categorise the return values into the various object styles by observing how the [number of observations](https://vctrs.r-lib.org/articles/type-size.html#size) is calculated.
+__[A]{.solved}__: We can categorise the return values into the various object styles by observing how the [number of observations](https://vctrs.r-lib.org/articles/type-size.html#size) is calculated: For vector style classes, `length(x)` represents the number of observations. Record style objects use a list of equal length elements to represent individual components. For data frames and matrices, the observations are represented by the rows. Scalar style objects use a list to represent a single thing.
 
-- Vector object-style: `factor()`, `table()`, `as.Date()`, `ordered()`
+This leads us to:
+
+- Vector object-style: `factor()`, `table()`, `as.Date()`, `as.POSIXct()`, `ordered()`
 - Record object-style: not observed
 - Data frame object-style: not observed
 - Scalar object-style: `lm()`, `ecdf()`  
