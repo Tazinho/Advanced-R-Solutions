@@ -529,20 +529,24 @@ __[A]{.solved}__: `[.Date` calls `.Date` with the result of calling `[` on the p
 .Date
 ```
 
-So, what does `oldClass()` do? It's implemented in C so we can't easily see what it does, and the documentation refers to S-PLUS:
+`oldClass()` is basically the same as `class()`, except that it doesn't return implicit classes, i.e. it's basically `attr(x, "class")` (looking at the C code that's exactly what it does, except that it also handles S4 objects).
 
-> Functions oldClass and oldClass<- behave in the same way as functions of those names in S-PLUS 5/6, but in R UseMethod dispatches on the class as returned by class (with some interpolated classes: see the link) rather than oldClass. However, group generics dispatch on the oldClass for efficiency, and internal generics only dispatch on objects for which is.object is true.
+As `oldClass()` is "basically" `class()`, we can rewrite `[.Date` to make the implementation more clear:
 
-Instead, let's just try it out:
+```{r}                                                            
+`[.Date` <- function(x, ..., drop = TRUE) {
+  out <- .Date(NextMethod("["), oldClass(x))
+  class(out) <- class(x)
+  out
+}
+```
+                                                        
+So, `[.Date` ensures that the output has the same class as in the input. But what about other attributes that a subclass might possess? They get lost:
 
 ```{r}
-oldClass(Sys.Date())
-oldClass(numeric())
-oldClass(data.frame())
-oldClass(integer())
+x <- structure(1:4, test = "test", class = c("myDate", "Date"))
+attributes(x[1])
 ```
-
-It seems similar to `class()`, but it returns `NULL` for base types. Together this means that `[.Date` effectively calls `mean()` on the underlying numeric data, then resets the class of the result to the input. This ignores the fact that a subclass might have additional attributes.
 
 __[Q2]{.Q}__: R has two classes for representing date time data, `POSIXct` and `POSIXlt`, which both inherit from `POSIXt`. Which generics have different behaviours for the two classes? Which generics share the same behaviour?
 
