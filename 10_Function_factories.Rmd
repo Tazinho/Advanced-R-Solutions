@@ -42,7 +42,7 @@ __[A]{.solved}__: Let's begin with `approxfun()` as it is used within `ecdf()` a
 ```{r}
 x <- runif(10)
 y <- runif(10)
-plot(x, y, pch = 16,  cex = 1.9)
+plot(x, y, lwd = 10)
 ```
 
 Next, we use `approxfun()` to construct the linear and constant interpolation functions for our `x` and `y` values.
@@ -59,7 +59,7 @@ identical(f_con(x), y)
 When we apply these functions to new x values, these are mapped to the lines connecting the initial y values (linear case) or to the same y value as for the next smallest initial x value (constant case).
 
 ```{r}
-x_new <- runif(10000)
+x_new <- runif(1000)
 
 plot(x, y, lwd = 10)
 points(x_new, f_lin(x_new), col = "cornflowerblue", pch = 16)
@@ -348,7 +348,7 @@ bench::mark(
 
 As the redundant calculations within `ll_poisson1()` become more expensive with growing length of `x1`, we expect even further relative performance improvements for `ll_poisson2()`. The following benchmark reveals a relative performance improvement of factor 20 for `ll_poisson2()` when `x1` is of length 100,000:
 
-```{r message=FALSE, warning=FALSE}
+```{r, message = FALSE, warning = FALSE}
 bench_poisson <- function(x_length) {
   x <- rpois(x_length, 100L)
   
@@ -369,7 +369,7 @@ df_perf <- tibble(
 
 ggplot(df_perf, aes(x_length, median, col = method)) +
   geom_point(size = 2) +
-  geom_line() +
+  geom_line(linetype = 2) +
   scale_x_log10() +
   labs(
     x = "Length of x",
