@@ -94,7 +94,7 @@ attributes(date_lt)
 date_lt$sec
 ```
 
-However, while `lists` may be practical basic calculations are often faster and require less memory for objects with underlying integer type.
+However, while lists may be practical basic calculations are often faster and require less memory for objects with underlying integer type.
 
 ```{r}
 date_lt2 <- rep(date_lt, 10000)
@@ -115,7 +115,7 @@ date_str <- strptime("2020-01-01 12:30:25",
 identical(date_lt, date_str)
 ```
 
-`as.POSIXct()` and `as.POSIXlt()` accept different character inputs by default (e.g. "2001-01-01 12:30", "2001/1/1 12:30"). `strptime()` requires the format argument to be set explicitly, and in returns offers an increase in performance.
+`as.POSIXct()` and `as.POSIXlt()` accept different character inputs by default (e.g. `"2001-01-01 12:30"` or `"2001/1/1 12:30"`). `strptime()` requires the format argument to be set explicitly, and provides a performance improvement in return.
 
 ```{r}
 bench::mark(
