@@ -10,7 +10,7 @@ source("common.R")
 ## Prerequisites {-}
 <!-- 2.0 -->
 
-We will use the `{lobstr}` package [@lobstr] to help answer questions regarding the internal representation of R objects.
+In this chapter we will use the `{lobstr}` package [@lobstr] to help answer questions regarding the internal representation of R objects.
 
 ```{r setup, message = FALSE}
 library(lobstr) 
@@ -66,7 +66,7 @@ __[A]{.solved}__: Column names are often data, and the underlying `make.names()`
 
 __[Q4]{.Q}__: What rules does `make.names()` use to convert non-syntactic names into syntactic ones?
 
-__[A]{.solved}__: A valid name must start with a letter or a dot (not followed by a number) and may further contain numbers and underscores (`"_"` are allowed since R version 1.9.0).
+__[A]{.solved}__: A valid name must start with a letter or a dot (not followed by a number) and may further contain numbers and underscores (`"_"`s are allowed since R version 1.9.0).
 
 Three main mechanisms ensure syntactically valid names (see `?make.names`):
 
@@ -85,9 +85,9 @@ Three main mechanisms ensure syntactically valid names (see `?make.names`):
 2. Additionally, non-valid characters are replaced by a dot.
 
     ```{r}
-    make.names("@")          # prepending "X" + "." replacement 
-    make.names("  ")         # prepending "X" + ".." replacement
     make.names("non-valid")  # "." replacement
+    make.names("@")          # prepending "X" + "." replacement 
+    make.names("  R")        # prepending "X" + ".." replacement
     ```
 
 3. Reserved R keywords (see `?reserved`) are suffixed by a dot.
