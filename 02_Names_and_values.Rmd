@@ -10,7 +10,7 @@ source("common.R")
 ## Prerequisites {-}
 <!-- 2.0 -->
 
-We will use the `{lobstr}` package to help answer questions regarding the internal representation of R objects.
+We will use the `{lobstr}` package [@lobstr] to help answer questions regarding the internal representation of R objects.
 
 ```{r setup}
 library(lobstr) 
@@ -264,7 +264,7 @@ To look up all functions from these packages we iterate over `base_pkgs` and app
 base_objs <- base_pkgs %>%
   lapply(as.environment) %>%
   lapply(function(x) mget(ls(x, all.names = TRUE), x)) %>%
-  magrittr::set_names(base_pkgs)
+  setNames(base_pkgs)
 ```
 
 This gives us more than 2700 objects which are usually available by default.
@@ -422,7 +422,7 @@ subtract_list <- function(x, medians) {
 }
 ```
 
-This lets us profile the performance, via benchmarks on data frames with differing numbers of columns. Therefore, we create a small helper that creates our random data frame and its medians before it benchmarks the two approaches.
+This lets us profile the performance, via benchmarks on data frames with differing numbers of columns. Therefore, we create a small helper that creates our random data frame and its medians before it benchmarks the two approaches by employing the `{bench}` package [@bench].
 
 ```{r}
 benchmark_medians <- function(ncol) {

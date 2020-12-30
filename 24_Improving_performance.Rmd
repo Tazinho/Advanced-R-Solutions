@@ -11,7 +11,7 @@ source("common.R")
 
 __[Q1]{.Q}__: What are faster alternatives to `lm`? Which are specifically designed to work with larger datasets?
 
-__[A]{.solved}__: The [CRAN task view for high-performance computing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) provides many recommendations. For this question, we are most interested in the section on "Large memory and out-of-memory data". We could for example give `biglm::biglm()`, `speedglm::speedlm()` or `RcppEigen::fastLm()` a try.
+__[A]{.solved}__: The [CRAN task view for high-performance computing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) provides many recommendations. For this question, we are most interested in the section on "Large memory and out-of-memory data". We could for example give `biglm::biglm()` [@biglm], `speedglm::speedlm()` [@speedglm] or `RcppEigen::fastLm()` [@RcppEigen] a try.
 
 For small datasets, we observe only minor performance gains (or even a small cost):
 
@@ -55,11 +55,11 @@ For further speed improvements, you could install a linear algebra library optim
 
 > The functions of class 'speedlm' may speed up the fitting of LMs to large data sets. High performances can be obtained especially if R is linked against an optimized BLAS, such as ATLAS.
 
-Tip: In case your dataset is stored in a database, you might want to check out the [`{modeldb}` package](https://github.com/tidymodels/modeldb) which executes the linear model code in the corresponding database backend.
+Tip: In case your dataset is stored in a database, you might want to check out the [`{modeldb}` package](https://github.com/tidymodels/modeldb) [@modeldb] which executes the linear model code in the corresponding database backend.
 
 __[Q2]{.Q}__: What package implements a version of `match()` that's faster for repeated lookups? How much faster is it?
 
-__[A]{.solved}__: A web search points us to the `{fastmatch}`-package. We compare it to `base::match()` and observe an impressive performance gain.
+__[A]{.solved}__: A web search points us to the `{fastmatch}` package [@fastmatch]. We compare it to `base::match()` and observe an impressive performance gain.
 
 ```{r}
 table <- 1:100000
@@ -129,7 +129,7 @@ bench::mark(
 )[1:3]
 ```
 
-A fourth way is to use the converter functions from the `{lubridate}` package, which contains wrapper functions (for the POSIXct approach) with an intuitive syntax. (There is a slight decrease in performance though.)
+A fourth way is to use the converter functions from the `{lubridate}` package [@lubridate], which contains wrapper functions (for the POSIXct approach) with an intuitive syntax. (There is a slight decrease in performance though.)
 
 ```{r}
 library(lubridate)
@@ -141,7 +141,7 @@ bench::mark(
 )[1:3]
 ```
 
-For additional ways to convert characters into date time objects, have a look at the `{chron}`, the `{anytime}` and the `{fasttime}` packages. The `{chron}` package introduces new classes and stores times as fractions of days in the underlying double type, while it doesn't deal with time zones and daylight savings. The `{anytime}` package aims to convert "Anything to POSIXct or Date". The `{fasttime}` package contains only one function (`fastPOSIXct()`).
+For additional ways to convert characters into date time objects, have a look at the `{chron}`, the `{anytime}` and the `{fasttime}` packages. The `{chron}` package [@chron] introduces new classes and stores times as fractions of days in the underlying double type, while it doesn't deal with time zones and daylight savings. The `{anytime}` package [@anytime] aims to convert "Anything to POSIXct or Date". The `{fasttime}` package [@fasttime] contains only one function, `fastPOSIXct()`.
 
 __[Q4]{.Q}__: Which packages provide the ability to compute a rolling mean?
 
@@ -158,7 +158,7 @@ bench::mark(
   data.table = data.table::frollmean(x, 2),
   RcppRoll = RcppRoll::roll_mean(x, n = 2, fill = NA, 
                                  align = "right"),
-  slicer = slider::slide_dbl(x, mean, .before = 1, .complete = TRUE),
+  slider = slider::slide_dbl(x, mean, .before = 1, .complete = TRUE),
   TTR = TTR::SMA(x, 2),
   zoo_apply = zoo::rollapply(x, 2, mean, fill = NA, align = "right"),
   zoo_rollmean = zoo::rollmean(x, 2, fill = NA, align = "right")

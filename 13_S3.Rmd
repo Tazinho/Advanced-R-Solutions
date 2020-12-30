@@ -11,7 +11,7 @@ source("common.R")
 ## Prerequisites {-}
 <!-- 13.0 -->
 
-In this chapter we will mainly use the `{sloop}` package, to interact with S3 objects.
+In this chapter we will mainly use the `{sloop}` package [@sloop], to interact with S3 objects.
 
 ```{r setup}
 library(sloop)
@@ -33,7 +33,7 @@ Due to R's S3 dispatch rules, `t.test()` would also get called when `t()` is app
 
 __[Q2]{.Q}__: Make a list of commonly used base R functions that contain `.` in their name but are not S3 methods.
 
-__[A]{.solved}__: In recent years "snake_case"-style has become increasingly common when naming functions and variables in R. But many functions in base R will continue to be "point.separated", which is why some inconsistency in your R code most likely cannot be avoided.
+__[A]{.solved}__: In recent years "snake_case"-style has become increasingly common when naming functions and variables in R. But many functions in base R will continue to be "point.separated", which is why some inconsistency in your R code most likely cannot be avoided.[@RJ-2012-018]
 
 ```{r, eval = FALSE}
 # Some base R functions with point.separated names
@@ -425,7 +425,7 @@ names(formals(`[.AsIs`))
 
 To finally get a better overview, we have to put in a little more effort and also use `s3_methods_generic()` again.
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 library(dplyr)
 
 s3_methods_generic("[") %>%
