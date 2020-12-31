@@ -255,7 +255,7 @@ unclass(dttm_ct)
 As the `c()` generic only dispatches on its first argument, combining date and date-time objects via `c()` could lead to surprising results in older R versions (pre R 4.0.0):
 
 ```{r, eval = FALSE}
-# Output in R 3.6.2
+# Output in R version 3.6.2
 c(date, dttm_ct)  # equal to c.Date(date, dttm_ct) 
 #> [1] "1970-01-02" "1979-11-10"
 c(dttm_ct, date)  # equal to c.POSIXct(date, dttm_ct)
@@ -267,7 +267,7 @@ In the first statement above `c.Date()` is executed, which incorrectly treats th
 We can highlight these mechanics by the following code:
 
 ```{r, eval = FALSE}
-# Output in R 3.6.2
+# Output in R version 3.6.2
 unclass(c(date, dttm_ct))  # internal representation
 #> [1] 1 3600
 date + 3599
