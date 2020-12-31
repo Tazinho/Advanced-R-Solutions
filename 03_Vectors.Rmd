@@ -168,7 +168,7 @@ f1 <- factor(letters)
 levels(f1) <- rev(levels(f1))
 ```
 
-__[A]{.solved}__: The underlying integer values stay the same, but the levels are changed, making it look like the data has changed.
+__[A]{.solved}__: When the levels of a factor ar modified the underlying integer values will remain unchanged. But when you print the factor, its order will be the changed because the mapping of the integers to their levels has been altered.
 
 ```{r}
 f1 <- factor(letters)
@@ -188,14 +188,16 @@ f2 <- rev(factor(letters))
 f3 <- factor(letters, levels = rev(letters))
 ```
 
-__[A]{.solved}__: For `f2` and `f3` either the order of the factor elements *or* its levels are being reversed. For `f1` both transformations are occurring.
+__[A]{.solved}__: Both `f1` and `f2` show an inverted order of `factor(letters)`. For `f2` this has been achieved by reversing the entire factor. This step alters the order of the elements, but leaves the order of the levels untouched.
+
+For `f3` the factor-levels are explicitly reversed, when the factor is created. This leaves the order of the elements intact and just changes the factor levels. The underlying integers are created in the appropriate order.
 
 ```{r}
-# Reverse element order (only)
+# Reverse element order
 (f2 <- rev(factor(letters)))
 as.integer(f2)
 
-# Reverse factor level order (only)
+# Reverse factor levels when creating factor
 (f3 <- factor(letters, levels = rev(letters)))
 as.integer(f3)
 ```
