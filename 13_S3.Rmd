@@ -295,13 +295,16 @@ x <- structure(1:10, class = "test")
 t(x)
 ```
 
-__[A]{.solved}__: We can see that `t.test()` is a generic because it calls `UseMethod()`
+__[A]{.solved}__: We can see that `t.test()` is a generic because it calls `UseMethod()`:
 
 ```{r}
 t.test
 
 # or simply call
-sloop::ftype(t.test)
+ftype(t.test)
+
+# The same holds for t()
+t
 ```
 
 Interestingly, R also provides helpers, which list functions that look like methods, but in fact are not:
@@ -310,16 +313,35 @@ Interestingly, R also provides helpers, which list functions that look like meth
 tools::nonS3methods("stats")
 ```
 
-When we create an object with class `test`, `t()`, will dispatch to `t.test()`. This happens, because `UseMethod()` simply searches for functions named `paste0("generic", ".", c(class(x), "default"))`.
-
-Consequently `t.test()` is erroneously treated as a method of `t()`. Because `t.test()` is a generic itself and doesn't find a method called `t.test.test()`, it dispatches to `t.test.default()`. We can define  `t.test.test()` to demonstrate that this is really what is happening internally.
+When we create an object with class `test`, `t()` dispatches to the `t.default()` method. This happens, because `UseMethod()` simply searches for functions named `paste0("generic", ".", c(class(x), "default"))`.
 
 ```{r, error = TRUE}
 x <- structure(1:10, class = "test")
+
+t(x)
+```
+
+However, in older versions of R (pre R 4.0.0; when Advanced R was written) this behaviour was slightly different. Instead of dispatching to the `t.test()` method, the `t.test()` generic was erroneously treated as a method of `t()` which then dispatched to `t.test.default()` or (when defined) to `t.test.test()`.
+
+```{r, eval = FALSE}
+# Output in R version 3.6.2
+x <- structure(1:10, class = "test")
 t(x)
 
+#>	One Sample t-test
+#>
+#> data:  x
+#> t = 5.7446, df = 9, p-value = 0.0002782
+#> alternative hypothesis: true mean is not equal to 0
+#> 95 percent confidence interval:
+#>  3.334149 7.665851
+#> sample estimates:
+#> mean of x 
+#>       5.5 
+
 t.test.test <- function(x) "Hi!"
-t.test(x)
+t(x)
+#>[1] "Hi!"
 ```
 
 __[Q2]{.Q}__: What generics does the `table` class have methods for?
