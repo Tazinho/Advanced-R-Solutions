@@ -392,7 +392,14 @@ Compare `capture.output()` to `capture.output2()`. How do the functions differ? 
 
 __[A]{.solved}__: Using `body(capture.output)` we inspect the source code of the original `capture.output()` function: The implementation for `capture.output()` is a quite a bit longer (39 lines vs. 7 lines).
 
-`capture_output()` strives to "write output as far as possible to a file", which is why an error handling is needed. This is achieved by first quoting the expressions (via `substitute()`) and then evaluating them step-by-step (via `lapply()` and a variant of `eval()`), which makes the function more robust. In `capture_output2()` the code is simply forced, and the output is caught via `sink()` in a temporary file. An additional feature of `capture_output()` is that one can also capture messages by setting `type = "message"`. As this is internally forwarded to `sink()`, this behaviour (and also `sink()`'s `split` argument) could be easily introduced within `capture_output2()` as well.
+In `capture_output2()` the code is simply forced, and the output is caught via `sink()` in a temporary file. An additional feature of `capture_output()` is that one can also capture messages by setting `type = "message"`. As this is internally forwarded to `sink()`, this behaviour (and also `sink()`'s `split` argument) could be easily introduced within `capture_output2()` as well.
+
+The main difference is that `capture.output()` calls print, i.e. compare the output of these two calls:
+
+```{r, warning = FALSE}
+capture.output({1})
+capture.output2({1})
+```
 
 ## Function forms
 <!-- 6.8 -->
