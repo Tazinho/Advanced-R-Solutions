@@ -616,16 +616,18 @@ generic2(structure(list(), class = c("b", "a2")))
 __[Q1]{.Q}__: Explain the differences in dispatch below:
 
 ```{r}
+length.integer <- function(x) 10
+
 x1 <- 1:5
 class(x1)
-s3_dispatch(x1[1])
+s3_dispatch(length(x1))
 
 x2 <- structure(x1, class = "integer")
 class(x2)
-s3_dispatch(x2[1])
+s3_dispatch(length(x2))
 ```
 
-__[A]{.solved}__: `class()` returns `integer` in both cases. But the class of `x1` is created implicitly and inherits from the `numeric` class, while the class of `x2` is set explicitly and no parent class is assumed. This is important because `[` is an internal generic, so when the class is explicitly set, the "implicit" parent class `numeric` is not considered.
+__[A]{.solved}__: `class()` returns `integer` in both cases. However, while the class of `x1` is created implicitly and inherits from the `numeric` class, the class of `x2` is set explicitly. This is important because `length()` is an internal generic and internal generics only dispatch to methods when the class attribute has been set, i.e. internal generics do not us implicit classes.
 
 An object has no explicit class if `attr(x, "class")` returns `NULL`:
 
