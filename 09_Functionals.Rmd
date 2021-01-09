@@ -214,33 +214,33 @@ trans <- list(
   am = function(x) factor(x, labels = c("auto", "manual"))
 )
 
-vars <- names(trans)
-mtcars[vars] <- map2(trans, mtcars[vars], function(f, var) f(var))
+nm <- names(trans)
+mtcars[nm] <- map2(trans, mtcars[nm], function(f, var) f(var))
 ```
 
 Compare and contrast the `map2()` approach to this `map()` approach:
 
 ```{r, eval = FALSE}
-mtcars[vars] <- map(vars, ~ trans[[.x]](mtcars[[.x]]))
+mtcars[nm] <- map(nm, ~ trans[[.x]](mtcars[[.x]]))
 ```
 
 __[A]{.solved}__: In the first approach
 
 ```{r, eval = FALSE}
-mtcars[vars] <- map2(trans, mtcars[vars], function(f, var) f(var))
+mtcars[nm] <- map2(trans, mtcars[nm], function(f, var) f(var))
 ```
 
-the list of the 2 functions (`trans`) and the 2 appropriately selected data frame columns (`mtcars[vars]`) are supplied to `map2()`. `map2()` creates an anonymous function (`f(var)`) which applies the functions to the variables when `map2()` iterates over their (similar) indices. On the left-hand side, the respective 2 elements of `mtcars` are being replaced by their new transformations.
+the list of the 2 functions (`trans`) and the 2 appropriately selected data frame columns (`mtcars[nm]`) are supplied to `map2()`. `map2()` creates an anonymous function (`f(var)`) which applies the functions to the variables when `map2()` iterates over their (similar) indices. On the left-hand side, the respective 2 elements of `mtcars` are being replaced by their new transformations.
 
 The `map()` variant
 
 ```{r, eval = FALSE}
-mtcars[vars] <- map(vars, ~ trans[[.x]](mtcars[[.x]]))
+mtcars[nm] <- map(nm, ~ trans[[.x]](mtcars[[.x]]))
 ```
 
-does basically the same. However, it directly iterates over the names (`vars`) of the transformations. Therefore, the data frame columns are selected during the iteration.
+does basically the same. However, it directly iterates over the names (`nm`) of the transformations. Therefore, the data frame columns are selected during the iteration.
 
-Besides the iteration pattern, the approaches differ in the possibilities for appropriate argument naming in the `.f` argument. In the `map2()` approach we iterate over the elements of `x` and `y`. Therefore, it is possible to choose appropriate placeholders like `f` and `var`. This makes the anonymous function more expressive at the cost of making it longer.  We think using the formula interface in this way is preferable compared to the rather cryptic `mtcars[vars] <- map2(trans, mtcars[vars], ~ .x(.y))`.
+Besides the iteration pattern, the approaches differ in the possibilities for appropriate argument naming in the `.f` argument. In the `map2()` approach we iterate over the elements of `x` and `y`. Therefore, it is possible to choose appropriate placeholders like `f` and `var`. This makes the anonymous function more expressive at the cost of making it longer. We think using the formula interface in this way is preferable compared to the rather cryptic `mtcars[nm] <- map2(trans, mtcars[nm], ~ .x(.y))`.
 
 In the `map()` approach we map over the variable names. It is therefore not possible to introduce placeholders for the function and variable names. The formula syntax together with the `.x` pronoun is pretty compact. The object names and the brackets clearly indicate the application of transformations to specific columns of `mtcars`. In this case the iteration over the variable names comes in handy, as it highlights the importance of matching between `trans` and `mtcars` element names. Together with the replacement form on the left-hand side, this line is relatively easy to inspect.
 
