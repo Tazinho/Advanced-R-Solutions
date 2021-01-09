@@ -559,7 +559,7 @@ As `oldClass()` is "basically" `class()`, we can rewrite `[.Date` to make the im
 
 ```{r}                                                            
 `[.Date` <- function(x, ..., drop = TRUE) {
-  out <- .Date(NextMethod("["), oldClass(x))
+  out <- .NextMethod("[")
   class(out) <- class(x)
   out
 }
