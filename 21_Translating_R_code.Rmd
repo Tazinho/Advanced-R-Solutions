@@ -789,9 +789,7 @@ to_math(`%`)
 
 __[Q2]{.Q}__: Complete the DSL to support all the functions that `plotmath` supports.
 
-__[A]{.solved}__: We can look up all functions supported by `plotmath` via `?plotmath`. Here we chose to implement a representative subset of `plotmath` functionality within the `to_math()`-DSL. If we wanted to implement more, we would need to be aware of different conversion patterns for symbols and functions and insert the correct conversion in the workflow presented below. Most relevant LaTeX code can be looked up on [Wikipedia](https://en.wikipedia.org/wiki/Help:Displaying_a_formula).
-
-We will add support for the following hand full of functions:
+__[A]{.solved}__: You can see all supported functions in `?plotmath`. There are a lot (!) so here we choose to implement a representative sample:
 
 ```{r, eval = FALSE}
 to_math(x %+-% y)
@@ -801,7 +799,9 @@ to_math(bold(x))
 to_math(x != y)
 ```
 
-To do this, we follow the LaTeX section from Advanced R straight from the beginning. This makes it easier to keep an overview, as we just need to insert the specific changes at the relevant parts.
+Implementing the rest is just a mechanical application of the same principles with more LaTex expressions, which can be found on [Wikipedia](https://en.wikipedia.org/wiki/Help:Displaying_a_formula).
+
+To provide these translations, we'll follow the LaTeX section from Advanced R from the beginning. This makes it easier to keep an overview, as we just need to insert the specific changes at the relevant parts.
 
 Let's start and repeat the converter function `to_math()` from the textbook.
 
@@ -821,7 +821,7 @@ print.advr_latex <- function(x) {
 
 One specific property in this setting is that the environment where `to_math()` evaluates the expression is not constant, but depends on what we already know about the expression.
 
-Thus, we start building up `latex_env()`, which contains a chain of all the necessary environments which `to_math()` checks to evaluate the expression in.
+Next, we start building up `latex_env()`, which contains a chain of all the necessary environments which `to_math()` checks to evaluate the expression in.
 
 The first environment is the one for Greek letters.
 
