@@ -18,43 +18,15 @@ The second chapter explains the distinction between an object and its name. This
 
 In section "Binding basics", we introduce the distinction between names and values, and how bindings, or references, between a name and a value are created. Then, in "Copy-on-modify", we learn when R makes a copy and how to use tracemem to figure out when a copy actually occurs. We also learn about the implications for different R objects. In "Object size" we explore how much memory an object occupies. "Modify-in-place" describes two exceptions to copy-on-modify: environments and values with a single name are actually modified in place. Lastly, we conclude this chapter with a discussion of the garbage collector, in "Unbinding and the garbage collector".
 
-## 3. Vectors
+## 3. Vectors (perfect)
 The third chapter discusses the most important family of data types in base R: vectors. It won’t cover individual vector types in too much detail, but it will show how all the types fit together as a whole.
 
-Vectors come in two flavours: atomic vectors and lists. They differ in terms of their elements’ types: for atomic vectors, all elements must have the same type; for lists, elements can have different types. While not a vector, NULL is closely related to vectors and often serves the role of a generic zero length vector.
+Vectors come in two flavours: atomic vectors and lists. We start with "Atomic vectors", which are R’s simplest data structures. For atomic vectors, all elements must have the same type. Then, we take a small detour to discuss "Attributes", R’s flexible metadata specification. "S3 atomic vectors" discusses the important vector types that are built by combining atomic vectors with special attributes. These include factors, dates, date-times, and durations. Next, we dive into "Lists". Lists are very similar to atomic vectors. However, an element of a list can be any data type, including another list. This makes them suitable for representing hierarchical data. "Data frames and tibbles" teaches you about data frames and tibbles, which are used to represent rectangular data. They combine the behaviour of lists and matrices to make a structure ideally suited for the needs of statistical data. To finish up this chapter, we briefly talk about one final important data structure that’s closely related to vectors: "NULL".
 
-Every vector can also have attributes, which you can think of as a named list of arbitrary metadata. Two attributes are particularly important. The dimension attribute turns vectors into matrices and arrays and the class attribute powers the S3 object system. While you’ll learn how to use S3 in Chapter 13, here you’ll learn about some of the most important S3 vectors: factors, date and times, data frames, and tibbles. And while 2D structures like matrices and data frames are not necessarily what come to mind when you think of vectors, you’ll also learn why R considers them to be vectors.
+## 4. Subsetting (perfect)
+In chapter 4 we discuss R's fast and powerful subsetting operators. Mastering them allows you to succinctly perform complex operations in a way that few other languages can match. Subsetting in R is easy to learn but hard to master because you need to internalise a number of interrelated concepts. 
 
-    3 Vectors
-    3.1 Introduction
-    3.2 Atomic vectors
-    3.3 Attributes
-    3.4 S3 atomic vectors
-    3.5 Lists
-    3.6 Data frames and tibbles
-    3.7 NULL
-    3.8 Quiz answers
-
-
-Outline
-
-    Section 3.2 introduces you to the atomic vectors: logical, integer, double, and character. These are R’s simplest data structures.
-
-    Section 3.3 takes a small detour to discuss attributes, R’s flexible metadata specification. The most important attributes are names, dimensions, and class.
-
-    Section 3.4 discusses the important vector types that are built by combining atomic vectors with special attributes. These include factors, dates, date-times, and durations.
-
-    Section 3.5 dives into lists. Lists are very similar to atomic vectors, but have one key difference: an element of a list can be any data type, including another list. This makes them suitable for representing hierarchical data.
-
-    Section 3.6 teaches you about data frames and tibbles, which are used to represent rectangular data. They combine the behaviour of lists and matrices to make a structure ideally suited for the needs of statistical data.
-
-## 4. Subsetting
-R’s subsetting operators are fast and powerful. Mastering them allows you to succinctly perform complex operations in a way that few other languages can match. Subsetting in R is easy to learn but hard to master because you need to internalise a number of interrelated concepts:
-  
-* There are six ways to subset atomic vectors.
-* There are three subsetting operators, [[, [, and $.
-* Subsetting operators interact differently with different vector types (e.g., atomic vectors, lists, factors, matrices, and data frames).
-* Subsetting can be combined with assignment.
+"Selecting multiple elements" starts by teaching you about [. You’ll learn the six ways to subset atomic vectors. You’ll then learn how those six ways act when used to subset lists, matrices, and data frames. "Selecting a single element" expands your knowledge of subsetting operators to include [[ and $ and focuses on the important principles of simplifying versus preserving. In "Subsetting and assignment" you’ll learn the art of subassignment, which combines subsetting and assignment to modify parts of an object. "Applications" leads you through eight important, but not obvious, applications of subsetting to solve problems that you often encounter in data analysis.
 
 ## 5. Control Flow
 There are two primary tools of control flow: choices and loops. Choices, like if statements and switch() calls, allow you to run different code depending on the input. Loops, like for and while, allow you to repeatedly run code, typically with changing options. I’d expect that you’re already familiar with the basics of these functions so I’ll briefly cover some technical details and then introduce some useful, but lesser known, features.
