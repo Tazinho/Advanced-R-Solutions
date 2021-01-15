@@ -100,181 +100,38 @@ An important new component of S4 is the slot, a named component of the object th
 
 “Basics” gives a quick overview of the main components of S4: classes, generics, and methods. “Classes” dives into the details of S4 classes, including prototypes, constructors, helpers, and validators. “Generics and methods” shows you how to create new S4 generics, and how to supply those generics with methods. You’ll also learn about accessor functions which are designed to allow users to safely inspect and modify object slots. “Method dispatch” dives into the full details of method dispatch in S4. The basic idea is simple, then it rapidly gets more complex once multiple inheritance and multiple dispatch are combined. “S4 and S3” discusses the interaction between S4 and S3, showing you how to use them together.
 
-## 16. Trade-offs
-You now know about the three most important OOP toolkits available in R. Now that you understand their basic operation and the principles that underlie them, we can start to compare and contrast the systems in order to understand their strengths and weaknesses. This will help you pick the system that is most likely to solve new problems.
+## 16. Trade-offs (perfect)
+By the time you get to Chapter 16, you should now know about the three most important OOP toolkits available in R and understand their basic operation and the principles that underlie them.
 
-Overall, when picking an OO system, I recommend that you default to S3. S3 is simple, and widely used throughout base R and CRAN. While it’s far from perfect, its idiosyncrasies are well understood and there are known approaches to overcome most shortcomings. If you have an existing background in programming you are likely to lean towards R6, because it will feel familiar. I think you should resist this tendency for two reasons. Firstly, if you use R6 it’s very easy to create a non-idiomatic API that will feel very odd to native R users, and will have surprising pain points because of the reference semantics. Secondly, if you stick to R6, you’ll lose out on learning a new way of thinking about OOP that gives you a new set of tools for solving problems.
-Outline
+Overall, when picking an OO system, choosing S3 is usually a good default. S3 is simple, and widely used throughout base R and CRAN. While it’s far from perfect, its idiosyncrasies are well understood and there are known approaches to overcome most shortcomings. If you have an existing background in programming you are likely to lean towards R6, because it will feel familiar. There are two good reasons why to resist this tendency. Firstly, if you use R6 it’s very easy to create a non-idiomatic API that will feel very odd to native R users, and will have surprising pain points because of the reference semantics. Secondly, if you stick to R6, you’ll lose out on learning a new way of thinking about OOP that gives you a new set of tools for solving problems.
 
-    Section 16.2 compares S3 and S4. In brief, S4 is more formal and tends to require more upfront planning. That makes it more suitable for big projects developed by teams, not individuals.
+ “S4 versus S3” compares S3 and S4. In brief, S4 is more formal and tends to require more upfront planning. That makes it more suitable for big projects developed by teams, not individuals. “R6 versus S3” compares S3 and R6. This section is quite long because these two systems are fundamentally different and there are a number of tradeoffs that you need to consider.
 
-    Section 16.3 compares S3 and R6. This section is quite long because these two systems are fundamentally different and there are a number of tradeoffs that you need to consider.
+## 17. Big picture (perfect)
+Chapter 17 describes the big picture on metaprogramming. Metaprogramming brings together many formerly unrelated topics and forces you grapple with issues that you probably haven’t thought about before. You’ll also need to learn a lot of new vocabulary, and even if you’re an experienced programmer in another language, your existing skills are unlikely to be much help as few modern popular languages expose the level of metaprogramming that R provides. So don’t be surprised if you’re frustrated or confused at first; this is a natural part of the process that happens to everyone!
 
-     
+Each section in this chapter introduces one big new idea: “Code is data” shows that code is data and teaches you how to create and modify expressions by capturing code. “Code is a tree” describes the tree-like structure of code, called an abstract syntax tree. “Code can generate code” shows how to create new expressions programmatically. “Evaluation runs code” shows how to execute expressions by evaluating them in an environment. “Customising evaluation with functions” illustrates how to customise evaluation by supplying custom functions in a new environment.  “Customising evaluation with data” extends that customisation to data masks, which blur the line between environments and data frames. “Quosures” introduces a new data structure called the quosure that makes all this simpler and more correct.
 
-16.2 S4 versus S3
-16.3 R6 versus S3
+## 18. Expressions (perfect)
+The focus of chapter 18 chapter are the data structures that underlie expressions. Mastering this knowledge will allow you to inspect and modify captured code, and to generate code with code. We’ll come back to expr() in Chapter 19 (“Quasiquotation”), and to eval() in Chapter 20 (“Evaluation”).
 
-## 17. Big picture
-Metaprogramming is the hardest topic in this book because it brings together many formerly unrelated topics and forces you grapple with issues that you probably haven’t thought about before. You’ll also need to learn a lot of new vocabulary, and at first it will seem like every new term is defined by three other terms that you haven’t heard of. Even if you’re an experienced programmer in another language, your existing skills are unlikely to be much help as few modern popular languages expose the level of metaprogramming that R provides. So don’t be surprised if you’re frustrated or confused at first; this is a natural part of the process that happens to everyone!
+“Abstract syntax trees” introduces the idea of the abstract syntax tree (AST), and reveals the tree like structure that underlies all R code. “Expressions” dives into the details of the data structures that underpin the AST: constants, symbols, and calls, which are collectively known as expressions. “Parsing and grammar” covers parsing, the act of converting the linear sequence of character in code into the AST, and uses that idea to explore some details of R’s grammar. “Walking AST with recursive functions” shows you how you can use recursive functions to compute on the language, writing functions that compute with expressions. “Specialised data structures” circles back to three more specialised data structures: pairlists, missing arguments, and expression vectors.
 
-But I think it’s easier to learn metaprogramming now than ever before. Over the last few years, the theory and practice have matured substantially, providing a strong foundation paired with tools that allow you to solve common problems. In this chapter, you’ll get the big picture of all the main pieces and how they fit together.
-Outline
+## 19. Quasiquotation (perfect)
+In chapter 19 you will learn about quasiquotation. Quasiquotation is one of the three pillars of tidy evaluation. You’ll learn about the other two (quosures and the data mask) in Chapter 20 (“Evaluation”). When used alone, quasiquotation is most useful for programming, particularly for generating code. But when it’s combined with the other techniques, tidy evaluation becomes a powerful tool for data analysis.
 
-Each section in this chapter introduces one big new idea:
+“Motivation” motivates the development of quasiquotation with a function, cement(), that works like paste() but automatically quotes its arguments so that you don’t have to. “Quoting” gives you the tools to quote expressions, whether they come from you or the user, or whether you use rlang or base R tools. “Unquoting” introduces the biggest difference between rlang quoting functions and base quoting function: unquoting with !! and !!!. “Non-quoting” discusses the three main non-quoting techniques that base R functions uses to disable quoting behaviour. “... (dot-dot-dot)” explores another place that you can use !!!, functions that take .... It also introduces the special := operator, which allows you to dynamically change argument names. “Case studies” shows a few practical uses of quoting to solve problems that naturally require some code generation. “History” finishes up with a little history of quasiquotation for those who are interested.
 
-    Section 17.2 shows that code is data and teaches you how to create and modify expressions by capturing code.
+## 20. Evaluation (perfect)
+Chapter 20 discusses the topic evaluation. The user-facing inverse of quotation is unquotation: it gives the user the ability to selectively evaluate parts of an otherwise quoted argument. The developer-facing complement of quotation is evaluation: this gives the developer the ability to evaluate quoted expressions in custom environments to achieve specific goals.
 
-    Section 17.3 describes the tree-like structure of code, called an abstract syntax tree.
+“Evaluation basics” discusses the basics of evaluation using eval(), and shows how you can use it to implement key functions like local() and source(). “Quosures” introduces a new data structure, the quosure, which combines an expression with an environment. You’ll learn how to capture quosures from promises, and evaluate them using rlang::eval_tidy(). “Data masks” extends evaluation with the data mask, which makes it trivial to intermingle symbols bound in an environment with variables found in a data frame. “Using tidy evaluation” shows how to use tidy evaluation in practice, focussing on the common pattern of quoting and unquoting, and how to handle ambiguity with pronouns. “Base evaluation” circles back to evaluation in base R, discusses some of the downsides, and shows how to use quasiquotation and evaluation to wrap functions that use NSE.
 
-    Section 17.4 shows how to create new expressions programmatically.
-
-    Section 17.5 shows how to execute expressions by evaluating them in an environment.
-
-    Section 17.6 illustrates how to customise evaluation by supplying custom functions in a new environment.
-
-    Section 17.7 extends that customisation to data masks, which blur the line between environments and data frames.
-
-    Section 17.8 introduces a new data structure called the quosure that makes all this simpler and more correct.
-
-     
-
-17.2 Code is data
-17.3 Code is a tree
-17.4 Code can generate code
-17.5 Evaluation runs code
-17.6 Customising evaluation with functions
-17.7 Customising evaluation with data
-17.8 Quosures
-
-## 18. Expressions
-To compute on the language, we first need to understand its structure. That requires some new vocabulary, some new tools, and some new ways of thinking about R code. The first of these is the distinction between an operation and its result. Take the following code, which multiplies a variable x by 10 and saves the result to a new variable called y. It doesn’t work because we haven’t defined a variable called x:
-
-y <- x * 10
-#> Error in eval(expr, envir, enclos): object 'x' not found
-
-It would be nice if we could capture the intent of the code without executing it. In other words, how can we separate our description of the action from the action itself?
-
-One way is to use rlang::expr():
-
-z <- rlang::expr(y <- x * 10)
-z
-#> y <- x * 10
-
-expr() returns an expression, an object that captures the structure of the code without evaluating it (i.e. running it). If you have an expression, you can evaluate it with base::eval():
-
-x <- 4
-eval(z)
-y
-#> [1] 40
-
-The focus of this chapter is the data structures that underlie expressions. Mastering this knowledge will allow you to inspect and modify captured code, and to generate code with code. We’ll come back to expr() in Chapter 19, and to eval() in Chapter 20.
-Outline
-
-    Section 18.2 introduces the idea of the abstract syntax tree (AST), and reveals the tree like structure that underlies all R code.
-
-    Section 18.3 dives into the details of the data structures that underpin the AST: constants, symbols, and calls, which are collectively known as expressions.
-
-    Section 18.4 covers parsing, the act of converting the linear sequence of character in code into the AST, and uses that idea to explore some details of R’s grammar.
-
-    Section 18.5 shows you how you can use recursive functions to compute on the language, writing functions that compute with expressions.
-
-    Section 18.6 circles back to three more specialised data structures: pairlists, missing arguments, and expression vectors.
-
-     
-
-18.2 Abstract syntax trees
-18.3 Expressions
-18.4 Parsing and grammar
-18.5 Walking AST with recursive functions
-18.6 Specialised data structures
-
-## 19. Quasiquotation
-Now that you understand the tree structure of R code, it’s time to return to one of the fundamental ideas that make expr() and ast() work: quotation. In tidy evaluation, all quoting functions are actually quasiquoting functions because they also support unquoting. Where quotation is the act of capturing an unevaluated expression, unquotation is the ability to selectively evaluate parts of an otherwise quoted expression. Together, this is called quasiquotation. Quasiquotation makes it easy to create functions that combine code written by the function’s author with code written by the function’s user. This helps to solve a wide variety of challenging problems.
-
-Quasiquotation is one of the three pillars of tidy evaluation. You’ll learn about the other two (quosures and the data mask) in Chapter 20. When used alone, quasiquotation is most useful for programming, particularly for generating code. But when it’s combined with the other techniques, tidy evaluation becomes a powerful tool for data analysis.
-Outline
-
-    Section 19.2 motivates the development of quasiquotation with a function, cement(), that works like paste() but automatically quotes its arguments so that you don’t have to.
-
-    Section 19.3 gives you the tools to quote expressions, whether they come from you or the user, or whether you use rlang or base R tools.
-
-    Section 19.4 introduces the biggest difference between rlang quoting functions and base quoting function: unquoting with !! and !!!.
-
-    Section 19.5 discusses the three main non-quoting techniques that base R functions uses to disable quoting behaviour.
-
-    Section 19.6 explores another place that you can use !!!, functions that take .... It also introduces the special := operator, which allows you to dynamically change argument names.
-
-    Section 19.7 shows a few practical uses of quoting to solve problems that naturally require some code generation.
-
-    Section 19.8 finishes up with a little history of quasiquotation for those who are interested.
-
-     
-
-19.2 Motivation
-19.3 Quoting
-19.4 Unquoting
-19.5 Non-quoting
-19.6 ... (dot-dot-dot)
-19.7 Case studies
-19.8 History
-
-## 20. Evaluation
-The user-facing inverse of quotation is unquotation: it gives the user the ability to selectively evaluate parts of an otherwise quoted argument. The developer-facing complement of quotation is evaluation: this gives the developer the ability to evaluate quoted expressions in custom environments to achieve specific goals.
-
-This chapter begins with a discussion of evaluation in its purest form. You’ll learn how eval() evaluates an expression in an environment, and then how it can be used to implement a number of important base R functions. Once you have the basics under your belt, you’ll learn extensions to evaluation that are needed for robustness. There are two big new ideas:
-
-    The quosure: a data structure that captures an expression along with its associated environment, as found in function arguments.
-
-    The data mask, which makes it easier to evaluate an expression in the context of a data frame. This introduces potential evaluation ambiguity which we’ll then resolve with data pronouns.
-
-Together, quasiquotation, quosures, and data masks form what we call tidy evaluation, or tidy eval for short. Tidy eval provides a principled approach to non-standard evaluation that makes it possible to use such functions both interactively and embedded with other functions. Tidy evaluation is the most important practical implication of all this theory so we’ll spend a little time exploring the implications. The chapter finishes off with a discussion of the closest related approaches in base R, and how you can program around their drawbacks.
-Outline
-
-    Section 20.2 discusses the basics of evaluation using eval(), and shows how you can use it to implement key functions like local() and source().
-
-    Section 20.3 introduces a new data structure, the quosure, which combines an expression with an environment. You’ll learn how to capture quosures from promises, and evaluate them using rlang::eval_tidy().
-
-    Section 20.4 extends evaluation with the data mask, which makes it trivial to intermingle symbols bound in an environment with variables found in a data frame.
-
-    Section 20.5 shows how to use tidy evaluation in practice, focussing on the common pattern of quoting and unquoting, and how to handle ambiguity with pronouns.
-
-    Section 20.6 circles back to evaluation in base R, discusses some of the downsides, and shows how to use quasiquotation and evaluation to wrap functions that use NSE.
-
-     
-
-20.2 Evaluation basics
-20.3 Quosures
-20.4 Data masks
-20.5 Using tidy evaluation
-20.6 Base evaluation
-
-## 21. Translating R code
-The combination of first-class environments, lexical scoping, and metaprogramming gives us a powerful toolkit for translating R code into other languages. One fully-fledged example of this idea is dbplyr, which powers the database backends for dplyr, allowing you to express data manipulation in R and automatically translate it into SQL. You can see the key idea in translate_sql() which takes R code and returns the equivalent SQL:
-
-library(dbplyr)
-translate_sql(x ^ 2)
-#> <SQL> POWER(`x`, 2.0)
-translate_sql(x < 5 & !is.na(x))
-#> <SQL> `x` < 5.0 AND NOT(((`x`) IS NULL))
-translate_sql(!first %in% c("John", "Roger", "Robert"))
-#> <SQL> NOT(`first` IN ('John', 'Roger', 'Robert'))
-translate_sql(select == 7)
-#> <SQL> `select` = 7.0
+## 21. Translating R code (perfect)
+Chapter 20 discusses the creation of domain specific languages. The combination of first-class environments, lexical scoping, and metaprogramming gives us a powerful toolkit for translating R code into other languages. One fully-fledged example of this idea is dbplyr, which powers the database backends for dplyr, allowing you to express data manipulation in R and automatically translate it into SQL. You can see the key idea in translate_sql() which takes R code and returns the equivalent SQL.
 
 Translating R to SQL is complex because of the many idiosyncrasies of SQL dialects, so here I’ll develop two simple, but useful, domain specific languages (DSL): one to generate HTML, and the other to generate mathematical equations in LaTeX.
-
-If you’re interested in learning more about domain specific languages in general, I highly recommend Domain Specific Languages.106 It discusses many options for creating a DSL and provides many examples of different languages.
-Outline
-
-    Section 21.2 creates a DSL for generating HTML, using quasiquotation and purrr to generate a function for each HTML tag, then tidy evaluation to easily access them.
-
-    Section 21.3 transforms mathematically R code into its LaTeX equivalent using a combination of tidy evaluation and expression walking.
-
-     
-
-21.2 HTML
-21.3 LaTeX
+In “HTML” we create a DSL for generating HTML, using quasiquotation and purrr to generate a function for each HTML tag, then tidy evaluation to easily access them. In “LaTeX” we transform mathematically R code into its LaTeX equivalent using a combination of tidy evaluation and expression walking.
 
 ## 22. Debugging
 What do you do when R code throws an unexpected error? What tools do you have to find and fix the problem? This chapter will teach you the art and science of debugging, starting with a general strategy, then following up with specific tools.
