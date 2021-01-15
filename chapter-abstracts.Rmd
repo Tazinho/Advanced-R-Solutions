@@ -4,8 +4,8 @@
 
 # Template:
 # * Start with in chapter <no> we discuss <take sth from prerequisites>.
-# * <Then use a bit more from prerequsites. Why it's important. What's the goal>
-# * Then use the subsection names and the stuff from the outline to sequentially refer to what is done in the chapter
+# * <Then use a bit more from the introsection of a chapter, e.g. why it's important. What's the goal>
+# * Then use the subsection names and the stuff from the "Outline" to sequentially refer to what is done in the chapter
 # * 150-200 words per chapter
 # * Don't use R code within the abstracts
 
@@ -29,85 +29,41 @@ In chapter 4 we discuss R's fast and powerful subsetting operators. Mastering th
 "Selecting multiple elements" starts by teaching you about [. You’ll learn the six ways to subset atomic vectors. You’ll then learn how those six ways act when used to subset lists, matrices, and data frames. "Selecting a single element" expands your knowledge of subsetting operators to include [[ and $ and focuses on the important principles of simplifying versus preserving. In "Subsetting and assignment" you’ll learn the art of subassignment, which combines subsetting and assignment to modify parts of an object. "Applications" leads you through eight important, but not obvious, applications of subsetting to solve problems that you often encounter in data analysis.
 
 ## 5. Control Flow (perfect)
-There are two primary tools of control flow: choices and loops. Choices, like if statements and switch() calls, allow you to run different code depending on the input. Loops, like for and while, allow you to repeatedly run code, typically with changing options.
+In chapter 5 you'll learn about the two primary tools of control flow: choices and loops. Choices, like if statements and switch() calls, allow you to run different code depending on the input. Loops, like for and while, allow you to repeatedly run code, typically with changing options.
 
 We’d expect that you’re already familiar with the basics of these functions so we’ll briefly cover some technical details and then introduce some useful, but lesser known, features. The condition system (messages, warnings, and errors), which you’ll learn about in Chapter 8, also provides non-local control flow.
 
 In "Choices" we dive into the details of the if statement, and then discuss the close relatives ifelse() and switch(). "Loops" starts off by reminding you of the basic structure of the for loop in R, discusses some common pitfalls, and then talks about the related while and repeat statements.
 
-## 6. Functions
-If you’re reading this book, you’ve probably already created many R functions and know how to use them to reduce duplication in your code. In this chapter, you’ll learn how to turn that informal, working knowledge into more rigorous, theoretical understanding. And while you’ll see some interesting tricks and techniques along the way, keep in mind that what you’ll learn here will be important for understanding the more advanced topics discussed later in the book.
+## 6. Functions (perfect)
+In chapter 6, you’ll learn how to turn your informal, working knowledge about functions into more rigorous, theoretical understanding. The tricks and techniques you will learn along the way will be important for understanding the more advanced topics discussed later in the book.
 
-## 7. Environments
-The environment is the data structure that powers scoping. This chapter dives deep into environments, describing their structure in depth, and using them to improve your understanding of the four scoping rules described in Section 6.4. Understanding environments is not necessary for day-to-day use of R. But they are important to understand because they power many important R features like lexical scoping, namespaces, and R6 classes, and interact with evaluation to give you powerful tools for making domain specific languages, like dplyr and ggplot2.
+"Function fundamentals" describes the basics of creating a function, the three main components of a function, and the exception to many function rules: primitive functions (which are implemented in C, not R). "Function composition" discusses the strengths and weaknesses of the three forms of function composition commonly used in R code. "Lexical scoping" shows you how R finds the value associated with a given name, i.e. the rules of lexical scoping. "Lazy evaluation" is devoted to an important property of function arguments: they are only evaluated when used for the first time. "... (dot-dot-dot)" discusses the special ... argument, which allows you to pass on extra arguments to another function. "Exiting a function" discusses the two primary ways that a function can exit, and how to define an exit handler, code that is run on exit, regardless of what triggers it. "Function forms" shows you the various ways in which R disguises ordinary function calls, and how you can use the standard prefix form to better understand what’s going on.
 
-## 8. Conditions
-The condition system provides a paired set of tools that allow the author of a function to indicate that something unusual is happening, and the user of that function to deal with it. The function author signals conditions with functions like stop() (for errors), warning() (for warnings), and message() (for messages), then the function user can handle them with functions like tryCatch() and withCallingHandlers(). Understanding the condition system is important because you’ll often need to play both roles: signalling conditions from the functions you create, and handle conditions signalled by the functions you call.
+## 7. Environments (perfect)
+In chapter 7 you will learn about environments, the data structure that powers scoping. This chapter dives deep into environments, describing their structure in depth, and using them to improve your understanding of the four scoping rules described in the “Lexical scoping” section of the functions chapter. Understanding environments is not necessary for day-to-day use of R. But they are important to understand because they power many important R features like lexical scoping, namespaces, and R6 classes, and interact with evaluation to give you powerful tools for making domain specific languages, like dplyr and ggplot2.
 
-R offers a very powerful condition system based on ideas from Common Lisp. Like R’s approach to object-oriented programming, it is rather different to currently popular programming languages so it is easy to misunderstand, and there has been relatively little written about how to use it effectively. Historically, this has meant that few people (myself included) have taken full advantage of its power. The goal of this chapter is to remedy that situation. Here you will learn about the big ideas of R’s condition system, as well as learning a bunch of practical tools that will make your code stronger.
+"Environment basics" introduces you to the basic properties of an environment and shows you how to create your own. "Recursing over environments" provides a function template for computing with environments, illustrating the idea with a useful function. "Special environments" describes environments used for special purposes: for packages, within functions, for namespaces, and for function execution. "Call stacks" explains the last important environment: the caller environment. This requires you to learn about the call stack, that describes how a function was called. You’ll have seen the call stack if you’ve ever called traceback() to aid debugging. “As data structures" briefly discusses three places where environments are useful data structures for solving other problems.
 
-I found two resources particularly useful when writing this chapter. You may also want to read them if you want to learn more about the inspirations and motivations for the system:
-  
-  A prototype of a condition system for R by Robert Gentleman and Luke Tierney. This describes an early version of R’s condition system. While the implementation has changed somewhat since this document was written, it provides a good overview of how the pieces fit together, and some motivation for its design.
+## 8. Conditions (perfect)
+In chapter 8 we will discuss R’s condition system, which provides a paired set of tools that allow the author of a function to indicate that something unusual is happening, and the user of that function to deal with it. The function author signals conditions with functions like stop(), warning(), and message(), then the function user can handle them with functions like tryCatch() and withCallingHandlers(). Understanding the condition system is important because you’ll often need to play both roles: signalling conditions from the functions you create, and handle conditions signalled by the functions you call.
 
-Beyond exception handling: conditions and restarts by Peter Seibel. This describes exception handling in Lisp, which happens to be very similar to R’s approach. It provides useful motivation and more sophisticated examples. I have provided an R translation of the chapter at http://adv-r.had.co.nz/beyond-exception-handling.html.
+R’s condition system is based on ideas from Common Lisp. Like R’s approach to object-oriented programming, it is rather different to currently popular programming languages so it is easy to misunderstand, and there has been relatively little written about how to use it effectively. Historically, this has meant that few people have taken full advantage of its power. The goal of this chapter is to remedy that situation. Here you will learn about the big ideas of R’s condition system, as well as learning a bunch of practical tools that will make your code stronger.
 
-I also found it helpful to work through the underlying C code that implements these ideas. If you’re interested in understanding how it all works, you might find my notes to be useful.
+“Signalling conditions” introduces the basic tools for signalling conditions, and discusses when it is appropriate to use each type. “Ignoring conditions” teaches you about the simplest tools for handling conditions: functions like try() and supressMessages() that swallow conditions and prevent them from getting to the top level. “Handling conditions” introduces the condition object, and the two fundamental tools of condition handling: tryCatch() for error conditions, and withCallingHandlers() for everything else. “Custom conditions” shows you how to extend the built-in condition objects to store useful data that condition handlers can use to make more informed decisions. “Applications” closes out the chapter with a grab bag of practical applications based on the low-level tools found in earlier sections.
 
-## 9. Functionals
+## 9. Functionals (perfect)
+In chapter 9 we'll learn about functionals. A functional is a function that takes a function as an input and returns a vector as output. A common use of functionals is as an alternative to for loops. As Loops do not convey what should be done with the results, it’s better to use a functional. Each functional is tailored for a specific task, so when you recognise the functional you immediately know why it’s being used.
 
-A functional is a function that takes a function as an input and returns a vector as output. Here’s a simple functional: it calls the function provided as input with 1000 random uniform numbers.
+"My first functional: map()" introduces your first functional: purrr::map(). "Purrr style" demonstrates how you can combine multiple simple functionals to solve a more complex problem and discusses how purrr style differs from other approaches. "Map variants" teaches you about 18 (!!) important variants of purrr::map(). Fortunately, their orthogonal design makes them easy to learn, remember, and master. "Reduce family" introduces a new style of functional: purrr::reduce(). reduce() systematically reduces a vector to a single result by applying a function that takes two inputs. "Predicate functionals" teaches you about predicates: functions that return a single TRUE or FALSE, and the family of functionals that use them to solve common problems. "Base functionals" reviews some functionals in base R that are not members of the map, reduce, or predicate families.
 
-randomise <- function(f) f(runif(1e3))
-randomise(mean)
-#> [1] 0.506
-randomise(mean)
-#> [1] 0.501
-randomise(sum)
-#> [1] 489
+## 10. Function factories (perfect)
+In chapter 10 we’ll discuss function factories. A function factory is a function that makes functions. 
 
-The chances are that you’ve already used a functional. You might have used for-loop replacements like base R’s lapply(), apply(), and tapply(); or purrr’s map(); or maybe you’ve used a mathematical functional like integrate() or optim().
+Of the three main functional programming tools (functionals, function factories, and function operators), function factories are the least used. Generally, they don’t tend to reduce overall code complexity but instead partition complexity into more easily digested chunks. Function factories are also an important building block for the very useful function operators, which you’ll learn about in Chapter 11 (“Function operators”).
 
-A common use of functionals is as an alternative to for loops. For loops have a bad rap in R because many people believe they are slow51, but the real downside of for loops is that they’re very flexible: a loop conveys that you’re iterating, but not what should be done with the results. Just as it’s better to use while than repeat, and it’s better to use for than while (Section 5.3.2), it’s better to use a functional than for. Each functional is tailored for a specific task, so when you recognise the functional you immediately know why it’s being used.
+"Factory fundamentals" begins the chapter with an explanation of how function factories work, pulling together ideas from scoping and environments. You’ll also see how function factories can be used to implement a memory for functions, allowing data to persist across calls. "Graphical factories" illustrates the use of function factories with examples from ggplot2. You’ll see two examples of how ggplot2 works with user supplied function factories, and one example of where ggplot2 uses a function factory internally. "Statistical factories" uses function factories to tackle three challenges from statistics: understanding the Box-Cox transform, solving maximum likelihood problems, and drawing bootstrap resamples. "Function factories + functionals" shows how you can combine function factories and functionals to rapidly generate a family of functions from data.
 
-If you’re an experienced for loop user, switching to functionals is typically a pattern matching exercise. You look at the for loop and find a functional that matches the basic form. If one doesn’t exist, don’t try and torture an existing functional to fit the form you need. Instead, just leave it as a for loop! (Or once you’ve repeated the same loop two or more times, maybe think about writing your own functional).
-Outline
-
-This chapter will focus on functionals provided by the purrr package.52 These functions have a consistent interface that makes it easier to understand the key ideas than their base equivalents, which have grown organically over many years. I’ll compare and contrast base R functions as we go, and then wrap up the chapter with a discussion of base functionals that don’t have purrr equivalents.
-
-## 10. Function factories
-
-A function factory is a function that makes functions. Here’s a very simple example: we use a function factory (power1()) to make two child functions (square() and cube()):
-  
-  power1 <- function(exp) {
-    function(x) {
-      x ^ exp
-    }
-  }
-
-square <- power1(2)
-cube <- power1(3)
-
-Don’t worry if this doesn’t make sense yet, it should by the end of the chapter!
-  
-I’ll call square() and cube() manufactured functions, but this is just a term to ease communication with other humans: from R’s perspective they are no different to functions created any other way.
-
-square(3)
-#> [1] 9
-cube(3)
-#> [1] 27
-
-You have already learned about the individual components that make function factories possible:
-  
-  In Section 6.2.3, you learned about R’s first-class functions. In R, you bind a function to a name in the same way as you bind any object to a name: with <-.
-
-In Section 7.4.2, you learned that a function captures (encloses) the environment in which it is created.
-
-In Section 7.4.4, you learned that a function creates a new execution environment every time it is run. This environment is usually ephemeral, but here it becomes the enclosing environment of the manufactured function.
-
-In this chapter, you’ll learn how the non-obvious combination of these three features leads to the function factory. You’ll also see examples of their usage in visualisation and statistics.
-
-Of the three main functional programming tools (functionals, function factories, and function operators), function factories are the least used. Generally, they don’t tend to reduce overall code complexity but instead partition complexity into more easily digested chunks. Function factories are also an important building block for the very useful function operators, which you’ll learn about in Chapter 11.
 
 ## 11. Function operators
 In this chapter, you’ll learn about function operators. A function operator is a function that takes one (or more) functions as input and returns a function as output. The following code shows a simple function operator, chatty(). It wraps a function, making a new function that prints out its first argument. You might create a function like this because it gives you a window to see how functionals, like map_int(), work.
