@@ -64,119 +64,195 @@ Of the three main functional programming tools (functionals, function factories,
 
 "Factory fundamentals" begins the chapter with an explanation of how function factories work, pulling together ideas from scoping and environments. You’ll also see how function factories can be used to implement a memory for functions, allowing data to persist across calls. "Graphical factories" illustrates the use of function factories with examples from ggplot2. You’ll see two examples of how ggplot2 works with user supplied function factories, and one example of where ggplot2 uses a function factory internally. "Statistical factories" uses function factories to tackle three challenges from statistics: understanding the Box-Cox transform, solving maximum likelihood problems, and drawing bootstrap resamples. "Function factories + functionals" shows how you can combine function factories and functionals to rapidly generate a family of functions from data.
 
+## 11. Function operators (perfect)
+In chapter 11, you’ll learn about function operators. A function operator is a function that takes one (or more) functions as input and returns a function as output. 
 
-## 11. Function operators
-In this chapter, you’ll learn about function operators. A function operator is a function that takes one (or more) functions as input and returns a function as output. The following code shows a simple function operator, chatty(). It wraps a function, making a new function that prints out its first argument. You might create a function like this because it gives you a window to see how functionals, like map_int(), work.
+Function operators are closely related to function factories; indeed they’re just a function factory that takes a function as input. Like factories, there’s nothing you can’t do without them, but they often allow you to factor out complexity in order to make your code more readable and reusable. Function operators are typically paired with functionals. If you’re using a for-loop, there’s rarely a reason to use a function operator, as it will make your code more complex for little gain. If you’re familiar with Python, decorators is just another name for function operators.
 
-chatty <- function(f) {
-  force(f)
-  
-  function(x, ...) {
-    res <- f(x, ...)
-    cat("Processing ", x, "\n", sep = "")
-    res
-  }
-}
-f <- function(x) x ^ 2
-s <- c(3, 2, 1)
+"Existing function operators" introduces you to two extremely useful existing function operators, and shows you how to use them to solve real problems. "Case study: Creating your own function operators" works through a problem amenable to solution with function operators: downloading many web pages.
 
-purrr::map_dbl(s, chatty(f))
-#> Processing 3
-#> Processing 2
-#> Processing 1
-#> [1] 9 4 1
-
-Function operators are closely related to function factories; indeed they’re just a function factory that takes a function as input. Like factories, there’s nothing you can’t do without them, but they often allow you to factor out complexity in order to make your code more readable and reusable.
-
-Function operators are typically paired with functionals. If you’re using a for-loop, there’s rarely a reason to use a function operator, as it will make your code more complex for little gain.
-
-If you’re familiar with Python, decorators is just another name for function operators.
-
-## 12. Base types
+## 12. Base types (perfect)
+In chapter 12 we will learn about base types.
 
 To talk about objects and OOP in R we first need to clear up a fundamental confusion about two uses of the word “object”. So far in this book, we’ve used the word in the general sense captured by John Chambers’ pithy quote: “Everything that exists in R is an object”. However, while everything is an object, not everything is object-oriented. This confusion arises because the base objects come from S, and were developed before anyone thought that S might need an OOP system. The tools and nomenclature evolved organically over many years without a single guiding principle.
 
 Most of the time, the distinction between objects and object-oriented objects is not important. But here we need to get into the nitty gritty details so we’ll use the terms base objects and OO objects to distinguish them.
-Outline
 
-## 13. S3
-S3 is R’s first and simplest OO system. S3 is informal and ad hoc, but there is a certain elegance in its minimalism: you can’t take away any part of it and still have a useful OO system. For these reasons, you should use it, unless you have a compelling reason to do otherwise. S3 is the only OO system used in the base and stats packages, and it’s the most commonly used system in CRAN packages.
+"Base versus OO objects" shows you how to identify base and OO objects.
+"Base types" gives a complete set of the base types used to build all objects.
 
-S3 is very flexible, which means it allows you to do things that are quite ill-advised. If you’re coming from a strict environment like Java this will seem pretty frightening, but it gives R programmers a tremendous amount of freedom. It may be very difficult to prevent people from doing something you don’t want them to do, but your users will never be held back because there is something you haven’t implemented yet. Since S3 has few built-in constraints, the key to its successful use is applying the constraints yourself. This chapter will therefore teach you the conventions you should (almost) always follow.
+## 13. S3 (perfect)
+In chapter 13 we’ll learn about R’s first and simplest OO system: S3. S3 is informal and ad hoc, but there is a certain elegance in its minimalism: you can’t take away any part of it and still have a useful OO system. For these reasons, you should use it, unless you have a compelling reason to do otherwise. S3 is the only OO system used in the base and stats packages, and it’s the most commonly used system in CRAN packages.
 
-The goal of this chapter is to show you how the S3 system works, not how to use it effectively to create new classes and generics. I’d recommend coupling the theoretical knowledge from this chapter with the practical knowledge encoded in the vctrs package.
+"Basics" gives a rapid overview of all the main components of S3: classes, generics, and methods. You’ll also learn about sloop::s3_dispatch(), which we’ll use throughout the chapter to explore how S3 works. Then, "Classes" goes into the details of creating a new S3 class, including the three functions that should accompany most classes: a constructor, a helper, and a validator. Further, "Generics and methods" describes how S3 generics and methods work, including the basics of method dispatch. "Object styles" discusses the four main styles of S3 objects: vector, record, data frame, and scalar. "Inheritance" demonstrates how inheritance works in S3, and shows you what you need to make a class “subclassable”. "Dispatch details" concludes the chapter with a discussion of the finer details of method dispatch including base types, internal generics, group generics, and double dispatch.
 
-## 14. R6
+## 14. R6 (perfect)
+Chapter 14 describes the R6 OOP system which is more like OOP in other languages. It uses the encapsulated OOP paradigm, which means that methods belong to objects, not generics, and you call them like object$method(). Also, R6 objects are mutable, which means that they are modified in place, and hence have reference semantics.
 
-This chapter describes the R6 OOP system. R6 has two special properties:
-  
-It uses the encapsulated OOP paradigm, which means that methods belong to objects, not generics, and you call them like object$method().
+If you’ve learned OOP in another programming language, it’s likely that R6 will feel very natural, and you’ll be inclined to prefer it over S3. Resist the temptation to follow the path of least resistance: in most cases R6 will lead you to non-idiomatic R code.
 
-R6 objects are mutable, which means that they are modified in place, and hence have reference semantics.
+"Classes and methods" introduces R6::R6Class(), the one function that you need to know to create R6 classes. You’ll learn about the constructor method, $new(), which allows you to create R6 objects, as well as other important methods like $initialize() and $print(). "Controlling access" discusses the access mechanisms of R6: private and active fields. Together, these allow you to hide data from the user, or expose private data for reading but not writing. "Reference semantics" explores the consequences of R6’s reference semantics. You’ll learn about the use of finalizers to automatically clean up any operations performed in the initializer, and a common gotcha if you use an R6 object as a field in another R6 object. "Why R6?" describes why we cover R6, rather than the base RC system.
 
-If you’ve learned OOP in another programming language, it’s likely that R6 will feel very natural, and you’ll be inclined to prefer it over S3. Resist the temptation to follow the path of least resistance: in most cases R6 will lead you to non-idiomatic R code. We’ll come back to this theme in Section 16.3.
-
-R6 is very similar to a base OOP system called reference classes, or RC for short. I describe why I teach R6 and not RC in Section 14.5.
-
-## 15. S4
-
-S4 provides a formal approach to functional OOP. The underlying ideas are similar to S3 (the topic of Chapter 13), but implementation is much stricter and makes use of specialised functions for creating classes (setClass()), generics (setGeneric()), and methods (setMethod()). Additionally, S4 provides both multiple inheritance (i.e. a class can have multiple parents) and multiple dispatch (i.e. method dispatch can use the class of multiple arguments).
+## 15. S4 (perfect)
+In chapter 15 we’ll learn about the S4 OO system, which provides a formal approach to functional OOP. The underlying ideas are similar to S3, but the implementation is much stricter and makes use of specialised functions for creating classes (setClass()), generics (setGeneric()), and methods (setMethod()). Additionally, S4 provides both multiple inheritance (i.e. a class can have multiple parents) and multiple dispatch (i.e. method dispatch can use the class of multiple arguments).
 
 An important new component of S4 is the slot, a named component of the object that is accessed using the specialised subsetting operator @ (pronounced at). The set of slots, and their classes, forms an important part of the definition of an S4 class.
+
+“Basics” gives a quick overview of the main components of S4: classes, generics, and methods. “Classes” dives into the details of S4 classes, including prototypes, constructors, helpers, and validators. “Generics and methods” shows you how to create new S4 generics, and how to supply those generics with methods. You’ll also learn about accessor functions which are designed to allow users to safely inspect and modify object slots. “Method dispatch” dives into the full details of method dispatch in S4. The basic idea is simple, then it rapidly gets more complex once multiple inheritance and multiple dispatch are combined. “S4 and S3” discusses the interaction between S4 and S3, showing you how to use them together.
 
 ## 16. Trade-offs
 You now know about the three most important OOP toolkits available in R. Now that you understand their basic operation and the principles that underlie them, we can start to compare and contrast the systems in order to understand their strengths and weaknesses. This will help you pick the system that is most likely to solve new problems.
 
 Overall, when picking an OO system, I recommend that you default to S3. S3 is simple, and widely used throughout base R and CRAN. While it’s far from perfect, its idiosyncrasies are well understood and there are known approaches to overcome most shortcomings. If you have an existing background in programming you are likely to lean towards R6, because it will feel familiar. I think you should resist this tendency for two reasons. Firstly, if you use R6 it’s very easy to create a non-idiomatic API that will feel very odd to native R users, and will have surprising pain points because of the reference semantics. Secondly, if you stick to R6, you’ll lose out on learning a new way of thinking about OOP that gives you a new set of tools for solving problems.
+Outline
+
+    Section 16.2 compares S3 and S4. In brief, S4 is more formal and tends to require more upfront planning. That makes it more suitable for big projects developed by teams, not individuals.
+
+    Section 16.3 compares S3 and R6. This section is quite long because these two systems are fundamentally different and there are a number of tradeoffs that you need to consider.
+
+     
+
+16.2 S4 versus S3
+16.3 R6 versus S3
 
 ## 17. Big picture
 Metaprogramming is the hardest topic in this book because it brings together many formerly unrelated topics and forces you grapple with issues that you probably haven’t thought about before. You’ll also need to learn a lot of new vocabulary, and at first it will seem like every new term is defined by three other terms that you haven’t heard of. Even if you’re an experienced programmer in another language, your existing skills are unlikely to be much help as few modern popular languages expose the level of metaprogramming that R provides. So don’t be surprised if you’re frustrated or confused at first; this is a natural part of the process that happens to everyone!
-  
+
 But I think it’s easier to learn metaprogramming now than ever before. Over the last few years, the theory and practice have matured substantially, providing a strong foundation paired with tools that allow you to solve common problems. In this chapter, you’ll get the big picture of all the main pieces and how they fit together.
+Outline
+
+Each section in this chapter introduces one big new idea:
+
+    Section 17.2 shows that code is data and teaches you how to create and modify expressions by capturing code.
+
+    Section 17.3 describes the tree-like structure of code, called an abstract syntax tree.
+
+    Section 17.4 shows how to create new expressions programmatically.
+
+    Section 17.5 shows how to execute expressions by evaluating them in an environment.
+
+    Section 17.6 illustrates how to customise evaluation by supplying custom functions in a new environment.
+
+    Section 17.7 extends that customisation to data masks, which blur the line between environments and data frames.
+
+    Section 17.8 introduces a new data structure called the quosure that makes all this simpler and more correct.
+
+     
+
+17.2 Code is data
+17.3 Code is a tree
+17.4 Code can generate code
+17.5 Evaluation runs code
+17.6 Customising evaluation with functions
+17.7 Customising evaluation with data
+17.8 Quosures
 
 ## 18. Expressions
 To compute on the language, we first need to understand its structure. That requires some new vocabulary, some new tools, and some new ways of thinking about R code. The first of these is the distinction between an operation and its result. Take the following code, which multiplies a variable x by 10 and saves the result to a new variable called y. It doesn’t work because we haven’t defined a variable called x:
-  
-  y <- x * 10
+
+y <- x * 10
 #> Error in eval(expr, envir, enclos): object 'x' not found
 
 It would be nice if we could capture the intent of the code without executing it. In other words, how can we separate our description of the action from the action itself?
-  
-  One way is to use rlang::expr():
-  
-  z <- rlang::expr(y <- x * 10)
+
+One way is to use rlang::expr():
+
+z <- rlang::expr(y <- x * 10)
 z
 #> y <- x * 10
 
 expr() returns an expression, an object that captures the structure of the code without evaluating it (i.e. running it). If you have an expression, you can evaluate it with base::eval():
-  
-  x <- 4
+
+x <- 4
 eval(z)
 y
 #> [1] 40
 
 The focus of this chapter is the data structures that underlie expressions. Mastering this knowledge will allow you to inspect and modify captured code, and to generate code with code. We’ll come back to expr() in Chapter 19, and to eval() in Chapter 20.
+Outline
+
+    Section 18.2 introduces the idea of the abstract syntax tree (AST), and reveals the tree like structure that underlies all R code.
+
+    Section 18.3 dives into the details of the data structures that underpin the AST: constants, symbols, and calls, which are collectively known as expressions.
+
+    Section 18.4 covers parsing, the act of converting the linear sequence of character in code into the AST, and uses that idea to explore some details of R’s grammar.
+
+    Section 18.5 shows you how you can use recursive functions to compute on the language, writing functions that compute with expressions.
+
+    Section 18.6 circles back to three more specialised data structures: pairlists, missing arguments, and expression vectors.
+
+     
+
+18.2 Abstract syntax trees
+18.3 Expressions
+18.4 Parsing and grammar
+18.5 Walking AST with recursive functions
+18.6 Specialised data structures
 
 ## 19. Quasiquotation
 Now that you understand the tree structure of R code, it’s time to return to one of the fundamental ideas that make expr() and ast() work: quotation. In tidy evaluation, all quoting functions are actually quasiquoting functions because they also support unquoting. Where quotation is the act of capturing an unevaluated expression, unquotation is the ability to selectively evaluate parts of an otherwise quoted expression. Together, this is called quasiquotation. Quasiquotation makes it easy to create functions that combine code written by the function’s author with code written by the function’s user. This helps to solve a wide variety of challenging problems.
 
 Quasiquotation is one of the three pillars of tidy evaluation. You’ll learn about the other two (quosures and the data mask) in Chapter 20. When used alone, quasiquotation is most useful for programming, particularly for generating code. But when it’s combined with the other techniques, tidy evaluation becomes a powerful tool for data analysis.
+Outline
+
+    Section 19.2 motivates the development of quasiquotation with a function, cement(), that works like paste() but automatically quotes its arguments so that you don’t have to.
+
+    Section 19.3 gives you the tools to quote expressions, whether they come from you or the user, or whether you use rlang or base R tools.
+
+    Section 19.4 introduces the biggest difference between rlang quoting functions and base quoting function: unquoting with !! and !!!.
+
+    Section 19.5 discusses the three main non-quoting techniques that base R functions uses to disable quoting behaviour.
+
+    Section 19.6 explores another place that you can use !!!, functions that take .... It also introduces the special := operator, which allows you to dynamically change argument names.
+
+    Section 19.7 shows a few practical uses of quoting to solve problems that naturally require some code generation.
+
+    Section 19.8 finishes up with a little history of quasiquotation for those who are interested.
+
+     
+
+19.2 Motivation
+19.3 Quoting
+19.4 Unquoting
+19.5 Non-quoting
+19.6 ... (dot-dot-dot)
+19.7 Case studies
+19.8 History
 
 ## 20. Evaluation
 The user-facing inverse of quotation is unquotation: it gives the user the ability to selectively evaluate parts of an otherwise quoted argument. The developer-facing complement of quotation is evaluation: this gives the developer the ability to evaluate quoted expressions in custom environments to achieve specific goals.
 
 This chapter begins with a discussion of evaluation in its purest form. You’ll learn how eval() evaluates an expression in an environment, and then how it can be used to implement a number of important base R functions. Once you have the basics under your belt, you’ll learn extensions to evaluation that are needed for robustness. There are two big new ideas:
-  
-  The quosure: a data structure that captures an expression along with its associated environment, as found in function arguments.
 
-The data mask, which makes it easier to evaluate an expression in the context of a data frame. This introduces potential evaluation ambiguity which we’ll then resolve with data pronouns.
+    The quosure: a data structure that captures an expression along with its associated environment, as found in function arguments.
+
+    The data mask, which makes it easier to evaluate an expression in the context of a data frame. This introduces potential evaluation ambiguity which we’ll then resolve with data pronouns.
 
 Together, quasiquotation, quosures, and data masks form what we call tidy evaluation, or tidy eval for short. Tidy eval provides a principled approach to non-standard evaluation that makes it possible to use such functions both interactively and embedded with other functions. Tidy evaluation is the most important practical implication of all this theory so we’ll spend a little time exploring the implications. The chapter finishes off with a discussion of the closest related approaches in base R, and how you can program around their drawbacks.
+Outline
+
+    Section 20.2 discusses the basics of evaluation using eval(), and shows how you can use it to implement key functions like local() and source().
+
+    Section 20.3 introduces a new data structure, the quosure, which combines an expression with an environment. You’ll learn how to capture quosures from promises, and evaluate them using rlang::eval_tidy().
+
+    Section 20.4 extends evaluation with the data mask, which makes it trivial to intermingle symbols bound in an environment with variables found in a data frame.
+
+    Section 20.5 shows how to use tidy evaluation in practice, focussing on the common pattern of quoting and unquoting, and how to handle ambiguity with pronouns.
+
+    Section 20.6 circles back to evaluation in base R, discusses some of the downsides, and shows how to use quasiquotation and evaluation to wrap functions that use NSE.
+
+     
+
+20.2 Evaluation basics
+20.3 Quosures
+20.4 Data masks
+20.5 Using tidy evaluation
+20.6 Base evaluation
 
 ## 21. Translating R code
 The combination of first-class environments, lexical scoping, and metaprogramming gives us a powerful toolkit for translating R code into other languages. One fully-fledged example of this idea is dbplyr, which powers the database backends for dplyr, allowing you to express data manipulation in R and automatically translate it into SQL. You can see the key idea in translate_sql() which takes R code and returns the equivalent SQL:
-  
-  library(dbplyr)
+
+library(dbplyr)
 translate_sql(x ^ 2)
 #> <SQL> POWER(`x`, 2.0)
 translate_sql(x < 5 & !is.na(x))
@@ -189,6 +265,16 @@ translate_sql(select == 7)
 Translating R to SQL is complex because of the many idiosyncrasies of SQL dialects, so here I’ll develop two simple, but useful, domain specific languages (DSL): one to generate HTML, and the other to generate mathematical equations in LaTeX.
 
 If you’re interested in learning more about domain specific languages in general, I highly recommend Domain Specific Languages.106 It discusses many options for creating a DSL and provides many examples of different languages.
+Outline
+
+    Section 21.2 creates a DSL for generating HTML, using quasiquotation and purrr to generate a function for each HTML tag, then tidy evaluation to easily access them.
+
+    Section 21.3 transforms mathematically R code into its LaTeX equivalent using a combination of tidy evaluation and expression walking.
+
+     
+
+21.2 HTML
+21.3 LaTeX
 
 ## 22. Debugging
 What do you do when R code throws an unexpected error? What tools do you have to find and fix the problem? This chapter will teach you the art and science of debugging, starting with a general strategy, then following up with specific tools.
@@ -196,18 +282,82 @@ What do you do when R code throws an unexpected error? What tools do you have to
 I’ll show the tools provided by both R and the RStudio IDE. I recommend using RStudio’s tools if possible, but I’ll also show you the equivalents that work everywhere. You may also want to refer to the official RStudio debugging documentation which always reflects the latest version of RStudio.
 
 NB: You shouldn’t need to use these tools when writing new functions. If you find yourself using them frequently with new code, reconsider your approach. Instead of trying to write one big function all at once, work interactively on small pieces. If you start small, you can quickly identify why something doesn’t work, and don’t need sophisticated debugging tools.
+Outline
+
+    Section 22.2 outlines a general strategy for finding and fixing errors.
+
+    Section 22.3 introduces you to the traceback() function which helps you locate exactly where an error occurred.
+
+    Section 22.4 shows you how to pause the execution of a function and launch environment where you can interactively explore what’s happening.
+
+    Section 22.5 discusses the challenging problem of debugging when you’re running code non-interactively.
+
+    Section 22.6 discusses a handful of non-error problems that occassionally also need debugging.
+
+
+22.2 Overall approach
+22.3 Locating errors
+22.4 Interactive debugger
+22.5 Non-interactive debugging
+22.6 Non-error failures
 
 ## 23. Measuring performance
+ 23.1 Introduction
+
+    Programmers waste enormous amounts of time thinking about, or worrying about, the speed of noncritical parts of their programs, and these attempts at efficiency actually have a strong negative impact when debugging and maintenance are considered.
+
+    — Donald Knuth.
+
 Before you can make your code faster, you first need to figure out what’s making it slow. This sounds easy, but it’s not. Even experienced programmers have a hard time identifying bottlenecks in their code. So instead of relying on your intuition, you should profile your code: measure the run-time of each line of code using realistic inputs.
 
 Once you’ve identified bottlenecks you’ll need to carefully experiment with alternatives to find faster code that is still equivalent. In Chapter 24 you’ll learn a bunch of ways to speed up code, but first you need to learn how to microbenchmark so that you can precisely measure the difference in performance.
+Outline
+
+    Section 23.2 shows you how to use profiling tools to dig into exactly what is making code slow.
+
+    Section 23.3 shows how to use microbenchmarking to explore alternative implementations and figure out exactly which one is fastest.
+
+     
+
+23.2 Profiling
+23.3 Microbenchmarking
 
 ## 24. Improving performance
+
+
+    We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil. Yet we should not pass up our opportunities in that critical 3%. A good programmer will not be lulled into complacency by such reasoning, he will be wise to look carefully at the critical code; but only after that code has been identified.
+
+    — Donald Knuth
+
 Once you’ve used profiling to identify a bottleneck, you need to make it faster. It’s difficult to provide general advice on improving performance, but I try my best with four techniques that can be applied in many situations. I’ll also suggest a general strategy for performance optimisation that helps ensure that your faster code is still correct.
 
 It’s easy to get caught up in trying to remove all bottlenecks. Don’t! Your time is valuable and is better spent analysing your data, not eliminating possible inefficiencies in your code. Be pragmatic: don’t spend hours of your time to save seconds of computer time. To enforce this advice, you should set a goal time for your code and optimise only up to that goal. This means you will not eliminate all bottlenecks. Some you will not get to because you’ve met your goal. Others you may need to pass over and accept either because there is no quick and easy solution or because the code is already well optimised and no significant improvement is possible. Accept these possibilities and move on to the next candidate.
 
 If you’d like to learn more about the performance characteristics of the R language, I’d highly recommend Evaluating the Design of the R Language.111 It draws conclusions by combining a modified R interpreter with a wide set of code found in the wild.
+Outline
+
+    Section 24.2 teaches you how to organise your code to make optimisation as easy, and bug free, as possible.
+
+    Section 24.3 reminds you to look for existing solutions.
+
+    Section 24.4 emphasises the importance of being lazy: often the easiest way to make a function faster is to let it to do less work.
+
+    Section 24.5 concisely defines vectorisation, and shows you how to make the most of built-in functions.
+
+    Section 24.6 discusses the performance perils of copying data.
+
+    Section 24.7 pulls all the pieces together into a case study showing how to speed up repeated t-tests by about a thousand times.
+
+    Section 24.8 finishes the chapter with pointers to more resources that will help you write fast code.
+     
+
+24.2 Code organisation
+24.3 Checking for existing solutions
+24.4 Doing as little as possible
+24.5 Vectorise
+24.6 Avoiding copies
+24.7 Case study: t-test
+24.8 Other techniques
 
 ## 25. Rewriting R code in C++
 Sometimes R code just isn’t fast enough. You’ve used profiling to figure out where your bottlenecks are, and you’ve done everything you can in R, but your code still isn’t fast enough. In this chapter you’ll learn how to improve performance by rewriting key functions in C++. This magic comes by way of the Rcpp package117 (with key contributions by Doug Bates, John Chambers, and JJ Allaire).
@@ -215,12 +365,38 @@ Sometimes R code just isn’t fast enough. You’ve used profiling to figure out
 Rcpp makes it very simple to connect C++ to R. While it is possible to write C or Fortran code for use in R, it will be painful by comparison. Rcpp provides a clean, approachable API that lets you write high-performance code, insulated from R’s complex C API.
 
 Typical bottlenecks that C++ can address include:
-  
-  Loops that can’t be easily vectorised because subsequent iterations depend on previous ones.
 
-Recursive functions, or problems which involve calling functions millions of times. The overhead of calling a function in C++ is much lower than in R.
+    Loops that can’t be easily vectorised because subsequent iterations depend on previous ones.
 
-Problems that require advanced data structures and algorithms that R doesn’t provide. Through the standard template library (STL), C++ has efficient implementations of many important data structures, from ordered maps to double-ended queues.
+    Recursive functions, or problems which involve calling functions millions of times. The overhead of calling a function in C++ is much lower than in R.
+
+    Problems that require advanced data structures and algorithms that R doesn’t provide. Through the standard template library (STL), C++ has efficient implementations of many important data structures, from ordered maps to double-ended queues.
 
 The aim of this chapter is to discuss only those aspects of C++ and Rcpp that are absolutely necessary to help you eliminate bottlenecks in your code. We won’t spend much time on advanced features like object-oriented programming or templates because the focus is on writing small, self-contained functions, not big programs. A working knowledge of C++ is helpful, but not essential. Many good tutorials and references are freely available, including http://www.learncpp.com/ and https://en.cppreference.com/w/cpp. For more advanced topics, the Effective C++ series by Scott Meyers is a popular choice.
+Outline
 
+    Section 25.2 teaches you how to write C++ by converting simple R functions to their C++ equivalents. You’ll learn how C++ differs from R, and what the key scalar, vector, and matrix classes are called.
+
+    Section 25.2.5 shows you how to use sourceCpp() to load a C++ file from disk in the same way you use source() to load a file of R code.
+
+    Section 25.3 discusses how to modify attributes from Rcpp, and mentions some of the other important classes.
+
+    Section 25.4 teaches you how to work with R’s missing values in C++.
+
+    Section 25.5 shows you how to use some of the most important data structures and algorithms from the standard template library, or STL, built-in to C++.
+
+    Section 25.6 shows two real case studies where Rcpp was used to get considerable performance improvements.
+
+    Section 25.7 teaches you how to add C++ code to a package.
+
+    Section 25.8 concludes the chapter with pointers to more resources to help you learn Rcpp and C++.
+
+     
+
+25.2 Getting started with C++
+25.3 Other classes
+25.4 Missing values
+25.5 Standard Template Library
+25.6 Case studies
+25.7 Using Rcpp in a package
+25.8 Learning more
