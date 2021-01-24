@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -8,9 +8,9 @@ source("common.R")
 ## Prerequisites {-}
 <!-- 8.0 -->
 
-Like in the environments chapter we use functions from the `{rlang}` package here.
+Similar to the environments chapter, we also use functions from the `{rlang}` package to work with conditions.
 
-```{r}
+```{r, message = FALSE}
 library(rlang)
 ```
 
@@ -25,8 +25,9 @@ __[A]{.solved}__: We prefer the following solution for its clarity and simplicit
 ```{r, error = TRUE}
 file_remove_strict <- function(path) {
   if (!file.exists(path)) {
-    stop("Can't delete the file \"", path, "\" because it doesn't exist.",
-      call. = FALSE
+    stop("Can't delete the file \"", path, 
+         "\" because it doesn't exist.",
+         call. = FALSE
     )
   }
   file.remove(path)
@@ -42,7 +43,7 @@ __[Q2]{.Q}__: What does the `appendLF` argument to `message()` do? How is it rel
 
 __[A]{.solved}__: The `appendLF` argument automatically appends a new line to the message. Let's illustrate this behaviour with a small example function:
 
-```{r}
+```{r, eval=FALSE}
 multiline_msg <- function(appendLF = TRUE) {
   message("first", appendLF = appendLF)
   message("second", appendLF = appendLF)
@@ -51,7 +52,11 @@ multiline_msg <- function(appendLF = TRUE) {
 }
 
 multiline_msg(appendLF = TRUE)
+#> first
+#> second
+#> thirdfourth
 multiline_msg(appendLF = FALSE)
+#> firstsecondthirdfourth
 ```
 
 Comparable behaviour regarding line breaks for `cat()` can be achieved via setting its `sep` argument to `"\n"`.
@@ -263,12 +268,12 @@ suppressConditions <- function(expr) {
 To test the new function, we apply it to a set of conditions and inspect the returned error object.
 
 ```{r}
+# The messages/warnings/conditions are suppressed successfully
 error_obj <- suppressConditions({
   message("message")
   warning("warning")
   abort("error")
 })
-# The messages/warnings/conditions are suppressed successfully
 
 error_obj
 ```
@@ -290,7 +295,7 @@ __[A]{.solved}__: Both functions differ in the way conditions are handled. `with
 
 In this example the use of `withCallingHandlers()` returns more information than the use of `tryCatch()`. This allows us to determine the exact call that raised the condition.
 
-```{r, error = TRUE, eval=FALSE}
+```{r, error = TRUE, eval = FALSE}
 message2error1 <- function(code) {
   withCallingHandlers(code, message = function(e) stop("error"))
 }
@@ -319,7 +324,7 @@ traceback()
 #>    })
 ```
 
-```{r, error = TRUE, eval=FALSE}
+```{r, error = TRUE, eval = FALSE}
 message2error2 <- function(code) {
   tryCatch(code, message = function(e) (stop("error")))
 }
@@ -341,7 +346,7 @@ traceback()
 
 __[Q3]{.Q}__:  How would you modify the `catch_cnds()` definition if you wanted to recreate the original intermingling of warnings and messages?
 
-__[A]{.solved}__: To preserve the original order, we have to capture everything into a single list. This makes using this function slightly harder since the caller is responsible for handling the different condition classes.
+__[A]{.solved}__: It looks like Hadley wrote a part of the chapter after the exercises, as the `catch_cnds()` function defined in the chapter already solves this problem by storing all messages and warnings in their original order within a list.
 
 ```{r}
 catch_cnds <- function(expr) {

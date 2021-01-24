@@ -1,28 +1,25 @@
 ---
-knit: "bookdown::render_book"
 title: "Advanced R Solutions"
 author: "Malte Grosser, Henning Bumann & Hadley Wickham"
 description: "Solutions to the Exercises in Hadley Wickham's book 'Advanced R'."
-date: "(updated on `r Sys.Date()`)"
-url: 'https\://advanced-r-solutions.rbind.io/'
-github-repo: Tazinho/Advanced-R-Solutions
-cover-image: images/advrs_cover.png
 site: bookdown::bookdown_site
+
 documentclass: krantz
-bibliography: packages.bib
-biblio-style: apalike
-link-citations: yes
+bibliography: book.bib
+csl: chicago-fullnote-bibliography.csl
+suppress-bibliography: true
+nocite: '@*'
 ---
 
 `r if (knitr::is_latex_output()) '<!--'` 
 
 # Welcome {-}
 
-```{r global_options, include=FALSE}
+```{r global_options, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE)  
 ```
 
-<img src="images/advrs_cover.png" width="250" height="366" align="right" alt="Cover image" />
+<img src="images/cover/advrs_cover.png" width="250" height="366" align="right" alt="Cover image" />
 
 This book offers solutions to the exercises from Hadley Wickham's book [Advanced R](https://adv-r.hadley.nz/) (Edition 2). It is work in progress and under active development. The 2nd edition of Advanced R has been published and we are currently working towards completion.
 
@@ -56,7 +53,7 @@ cat(".\n")
 
 ## Current Progress {-}
 
-```{r, echo = FALSE, cache=FALSE, warning = FALSE, message=FALSE, fig.width = 8, fig.height=10}
+```{r, echo = FALSE, cache = FALSE, warning = FALSE, message=FALSE, fig.width = 8, fig.height=10}
 library(tibble)
 library(dplyr)
 library(purrr)
@@ -137,11 +134,10 @@ plot_progress +
              space = "free", switch = "both")
 ```
 
-
-```{r include=FALSE, eval = FALSE}
+```{r include = FALSE, eval = FALSE}
 # automatically create a bib database for R packages
 knitr::write_bib(c(.packages(), 'bookdown', 'knitr', 'rmarkdown'),
                  'packages.bib')
 ```
 
-<!-- `r if (knitr::is_latex_output()) '-->'` -->
+`r if (knitr::is_latex_output()) '-->'`

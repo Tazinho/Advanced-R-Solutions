@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -23,7 +23,7 @@ __[Q1]{.Q}__: Carefully read the documentation for `source()`. What environment 
 __[A]{.solved}__: By default, `source()` uses the global environment (`local = FALSE`). A specific evaluation environment may be chosen, by passing it explicitly to the `local` argument. To use current environment (i.e. the calling environment of `source()`) set `local = TRUE`.
 
 ```{r}
-# Create a temporary, sourcable R script that prints `x`
+# Create a temporary, sourcable R script that prints x
 tmp_file <- tempfile()
 writeLines("print(x)", tmp_file)
 
@@ -297,7 +297,7 @@ eval_tidy(expr(df[x == 1, , drop = FALSE]), df)
 
 This is shorter (but probably also less readable) because the evaluation and the subsetting take place in the same expression. However, it may introduce unwanted errors, if the data mask contains an element named "data", as the objects from the data mask take precedence over arguments of the function.
 
-```{r, error=TRUE}
+```{r, error = TRUE}
 df <- data.frame(x = 1:3, data = 1)
 subset2(df, x == 1)
 subset3(df, x == 1)
@@ -438,7 +438,8 @@ lm(mpg ~ disp * cyl, data = mtcars)
 __[A]{.solved}__: In our wrapper `lm_wrap()`, we provide `mpg` and `mtcars` as default response and data. This seems to give us a good mix of usability and flexibility.
 
 ```{r}
-lm_wrap <- function(pred, resp = mpg, data = mtcars, env = caller_env()) {
+lm_wrap <- function(pred, resp = mpg, data = mtcars, 
+                    env = caller_env()) {
   pred <- enexpr(pred)
   resp <- enexpr(resp)
   data <- enexpr(data)

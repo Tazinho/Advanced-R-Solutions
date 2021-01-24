@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -11,9 +11,9 @@ source("common.R")
 ## Prerequisites {-}
 <!-- 13.0 -->
 
-In this chapter we will mainly use the `{sloop}` package, to interact with S3 objects.
+To interact with S3 objects, we will mainly use the `{sloop}` package [@sloop].
 
-```{r setup}
+```{r setup, message = FALSE}
 library(sloop)
 ```
 
@@ -33,9 +33,9 @@ Due to R's S3 dispatch rules, `t.test()` would also get called when `t()` is app
 
 __[Q2]{.Q}__: Make a list of commonly used base R functions that contain `.` in their name but are not S3 methods.
 
-__[A]{.solved}__: In recent years "snake_case"-style has become increasingly common when naming functions and variables in R. But many functions in base R will continue to be "point.separated", which is why some inconsistency in your R code most likely cannot be avoided.
+__[A]{.solved}__: In recent years "snake_case"-style has become increasingly common when naming functions and variables in R. But many functions in base R will continue to be "point.separated", which is why some inconsistency in your R code most likely cannot be avoided.[@RJ-2012-018]
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 # Some base R functions with point.separated names
 install.packages()
 read.csv()
@@ -81,7 +81,7 @@ x <- ecdf(rpois(100, 10))
 x
 ```
 
-__[A]{.solved}__: It returns an object of the class `ecdf` (empirical cumulative distribution function) with the superclasses `stepfun` and `function`. The `ecdf` object is built on the base type `closure` (a function) and the expression, which was used to create it (`rpois(100, 10)`), is stored in in the `call` attribute.
+__[A]{.solved}__: It returns an object of the class `ecdf` (empirical cumulative distribution function) with the superclasses `stepfun` and `function`. The `ecdf` object is built on the base type `closure` (a function). The expression, which was used to create it (`rpois(100, 10)`), is stored in in the `call` attribute.
 
 ```{r}
 typeof(x)
@@ -115,7 +115,7 @@ We need to provide the number of rows as an input to make it possible to create 
 
 This leads to the following constructor:
 
-```{r, error=TRUE}
+```{r, error = TRUE}
 new_data.frame <- function(x, n, row.names = NULL) {
   # Check if the underlying object is a list
   stopifnot(is.list(x))
@@ -153,7 +153,7 @@ There are two additional restrictions we could implement if we were being very s
 
 __[Q2]{.Q}__: Enhance my `factor()` helper to have better behaviour when one or more `values` is not found in `levels`. What does `base::factor()` do in this situation?
 
-__[A]{.solved}__: `base::factor()` converts these values (silently) into `NA`'s:
+__[A]{.solved}__: `base::factor()` converts these values (silently) into `NA`s:
 
 ```{r}
 factor(c("a", "b", "c"), levels = c("a", "b"))
@@ -162,7 +162,7 @@ factor(c("a", "b", "c"), levels = c("a", "b"))
 The `factor()` helper including the constructor (`new_factor()`) and its validator (`validate_factor()`) were given in Advanced R. However, as the goal of this question is to throw an early error within the helper, we only repeat the code for the helper:
 
 ```{r, eval = FALSE}
-# Simplified version of `factor()` helper from Advanced R
+# Simplified version of the factor() helper, as defined in Advanced R
 factor <- function(x = character(), levels = unique(x)) {
   ind <- match(x, levels)
   validate_factor(new_factor(ind, levels))
@@ -290,36 +290,58 @@ roman(0)
 
 __[Q1]{.Q}__: Read the source code for `t()` and `t.test()` and confirm that `t.test()` is an S3 generic and not an S3 method. What happens if you create an object with class `test` and call `t()` with it? Why?
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 x <- structure(1:10, class = "test")
 t(x)
 ```
 
-__[A]{.solved}__: We can see that `t.test()` is a generic because it calls `UseMethod()`
+__[A]{.solved}__: We can see that `t.test()` is a generic because it calls `UseMethod()`:
 
 ```{r}
 t.test
 
 # or simply call
-sloop::ftype(t.test)
+ftype(t.test)
+
+# The same holds for t()
+t
 ```
 
-Interestingly R also provides helpers, which list functions that look like methods, but in fact are not:
+Interestingly, R also provides helpers, which list functions that look like methods, but in fact are not:
 
 ```{r}
 tools::nonS3methods("stats")
 ```
 
-When we create an object with class `test`, `t()`, will dispatch to `t.test()`. This happens, because `UseMethod()` simply searches for functions named `paste0("generic", ".", c(class(x), "default"))`.
+When we create an object with class `test`, `t()` dispatches to the `t.default()` method. This happens, because `UseMethod()` simply searches for functions named `paste0("generic", ".", c(class(x), "default"))`.
 
-Consequently `t.test()` is erroneously treated as a method of `t()`. Because `t.test()` is a generic itself and doesn't find a method called `t.test.test()`, it dispatches to `t.test.default()`. We can define  `t.test.test()` to demonstrate that this is really what is happening internally.
+```{r, error = TRUE}
+x <- structure(1:10, class = "test")
 
-```{r, error=TRUE}
+t(x)
+```
+
+However, in older versions of R (pre R 4.0.0; when Advanced R was written) this behaviour was slightly different. Instead of dispatching to the `t.default()` method, the `t.test()` generic was erroneously treated as a method of `t()` which then dispatched to `t.test.default()` or (when defined) to `t.test.test()`.
+
+```{r, eval = FALSE}
+# Output in R version 3.6.2
 x <- structure(1:10, class = "test")
 t(x)
+#>
+#>	One Sample t-test
+#>
+#> data:  x
+#> t = 5.7446, df = 9, p-value = 0.0002782
+#> alternative hypothesis: true mean is not equal to 0
+#> 95 percent confidence interval:
+#>  3.334149 7.665851
+#> sample estimates:
+#> mean of x 
+#>       5.5 
 
 t.test.test <- function(x) "Hi!"
-t.test(x)
+t(x)
+#>[1] "Hi!"
 ```
 
 __[Q2]{.Q}__: What generics does the `table` class have methods for?
@@ -359,7 +381,7 @@ nrow(s3_methods_generic("plot"))
 
 Let's verify this programmatically with the tools we have learned in this and the previous chapters.
 
-```{r}
+```{r, message = FALSE}
 library(purrr)
 
 ls(all.names = TRUE, env = baseenv()) %>% 
@@ -388,7 +410,7 @@ y <- 1
 g(x)
 ```
 
-__[A]{.solved}__: Let's take this step by step. If you call `g.default()` directly you get `c(1, 1)` as you might expect. 
+__[A]{.solved}__: Let's take this step by step. If you call `g.default(x)` directly you get `c(1, 1)` as you might expect. 
 
 The value bound to `x` comes from the argument, the value from `y` comes from the global environment.
 
@@ -396,7 +418,7 @@ The value bound to `x` comes from the argument, the value from `y` comes from th
 g.default(x)
 ```
 
-But when we call `g()` we get `c(1, 10)`:
+But when we call `g(x)` we get `c(1, 10)`:
 
 ```{r}
 g(x)
@@ -425,7 +447,7 @@ names(formals(`[.AsIs`))
 
 To finally get a better overview, we have to put in a little more effort and also use `s3_methods_generic()` again.
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 library(dplyr)
 
 s3_methods_generic("[") %>%
@@ -449,9 +471,11 @@ s3_methods_generic("[") %>%
 
 __[Q1]{.Q}__: Categorise the objects returned by `lm()`, `factor()`, `table()`, `as.Date()`, `as.POSIXct()`, `ecdf()`, `ordered()`, `I()` into the styles described above.
 
-__[A]{.solved}__: We can categorise the return values into the various object styles by observing how the [number of observations](https://vctrs.r-lib.org/articles/type-size.html#size) is calculated.
+__[A]{.solved}__: We can categorise the return values into the various object styles by observing how the [number of observations](https://vctrs.r-lib.org/articles/type-size.html#size) is calculated: For vector style classes, `length(x)` represents the number of observations. Record style objects use a list of equal length elements to represent individual components. For data frames and matrices, the observations are represented by the rows. Scalar style objects use a list to represent a single thing.
 
-- Vector object-style: `factor()`, `table()`, `as.Date()`, `ordered()`
+This leads us to:
+
+- Vector object-style: `factor()`, `table()`, `as.Date()`, `as.POSIXct()`, `ordered()`
 - Record object-style: not observed
 - Data frame object-style: not observed
 - Scalar object-style: `lm()`, `ecdf()`  
@@ -529,20 +553,24 @@ __[A]{.solved}__: `[.Date` calls `.Date` with the result of calling `[` on the p
 .Date
 ```
 
-So, what does `oldClass()` do? It's implemented in C so we can't easily see what it does, and the documentation refers to S-PLUS:
+`oldClass()` is basically the same as `class()`, except that it doesn't return implicit classes, i.e. it's basically `attr(x, "class")` (looking at the C code that's exactly what it does, except that it also handles S4 objects).
 
-> Functions oldClass and oldClass<- behave in the same way as functions of those names in S-PLUS 5/6, but in R UseMethod dispatches on the class as returned by class (with some interpolated classes: see the link) rather than oldClass. However, group generics dispatch on the oldClass for efficiency, and internal generics only dispatch on objects for which is.object is true.
+As `oldClass()` is "basically" `class()`, we can rewrite `[.Date` to make the implementation more clear:
 
-Instead, let's just try it out:
+```{r}                                                            
+`[.Date` <- function(x, ..., drop = TRUE) {
+  out <- .NextMethod("[")
+  class(out) <- class(x)
+  out
+}
+```
+                                                        
+So, `[.Date` ensures that the output has the same class as in the input. But what about other attributes that a subclass might possess? They get lost:
 
 ```{r}
-oldClass(Sys.Date())
-oldClass(numeric())
-oldClass(data.frame())
-oldClass(integer())
+x <- structure(1:4, test = "test", class = c("myDate", "Date"))
+attributes(x[1])
 ```
-
-It seems similar to `class()`, but it returns `NULL` for base types. Together this means that `[.Date` effectively calls `mean()` on the underlying numeric data, then resets the class of the result to the input. This ignores the fact that a subclass might have additional attributes.
 
 __[Q2]{.Q}__: R has two classes for representing date time data, `POSIXct` and `POSIXlt`, which both inherit from `POSIXt`. Which generics have different behaviours for the two classes? Which generics share the same behaviour?
 
@@ -554,7 +582,7 @@ generics_ct <- s3_methods_class("POSIXct")$generic
 generics_lt <- s3_methods_class("POSIXlt")$generic
 ```
 
-The generics in `generics_t` with a method for the superclass POSIXt potentially share the same behaviour for both subclasses. However, if a generic has a specific method for one of the subclasses, it has to be subtracted:
+The generics in `generics_t` with a method for the superclass `POSIXt` potentially share the same behaviour for both subclasses. However, if a generic has a specific method for one of the subclasses, it has to be subtracted:
 
 ```{r}
 # These generics provide subclass-specific methods
@@ -610,16 +638,18 @@ generic2(structure(list(), class = c("b", "a2")))
 __[Q1]{.Q}__: Explain the differences in dispatch below:
 
 ```{r}
+length.integer <- function(x) 10
+
 x1 <- 1:5
 class(x1)
-s3_dispatch(x1[1])
+s3_dispatch(length(x1))
 
 x2 <- structure(x1, class = "integer")
 class(x2)
-s3_dispatch(x2[1])
+s3_dispatch(length(x2))
 ```
 
-__[A]{.solved}__: `class()` returns `integer` in both cases. But the class of `x1` is created implicitly and inherits from the `numeric` class, while the class of `x2` is set explicitly and no parent class is assumed. This is important because `[` is an internal generic, so when the class is explicitly set, the "implicit" parent class `numeric` is not considered.
+__[A]{.solved}__: `class()` returns `integer` in both cases. However, while the class of `x1` is created implicitly and inherits from the `numeric` class, the class of `x2` is set explicitly. This is important because `length()` is an internal generic and internal generics only dispatch to methods when the class attribute has been set, i.e. internal generics do not use implicit classes.
 
 An object has no explicit class if `attr(x, "class")` returns `NULL`:
 
@@ -643,7 +673,7 @@ For a better understanding of `s3_dipatch()`'s output we quote from `?s3_dispatc
 - \* method exists but is not used.
 - Nothing (and greyed out in console): method does not exist.
 
-__[Q2]{.Q}__: What classes have a method for the `Math` group generic in base R? Read the source code. How do the methods work?
+__[Q2]{.Q}__: What classes have a method for the `Math()` group generic in base R? Read the source code. How do the methods work?
 
 __[A]{.solved}__: The following functions belong to this group (see ?`Math`):
 

@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -11,7 +11,7 @@ source("common.R")
 
 __[Q1]{.Q}__: With the basics of C++ in hand, it's now a great time to practice by reading and writing some simple C++ functions. For each of the following functions, read the code and figure out what the corresponding base R function is. You might not understand every part of the code yet, but you should be able to figure out the basics of what the function does.
 
-```{Rcpp, eval=FALSE}
+```{Rcpp, eval = FALSE}
 double f1(NumericVector x) {
   int n = x.size();
   double y = 0;
@@ -69,8 +69,8 @@ NumericVector f5(NumericVector x, NumericVector y) {
 
 __[A]{.solved}__:  The code above corresponds to the following base R functions:
 
-- f1: `mean()`  
-- f2: `cumsum()`  
+- f1: `mean()`
+- f2: `cumsum()`
 - f3: `any()`
 - f4: `Position()`
 - f5: `pmin()`
@@ -91,7 +91,7 @@ __[A]{.solved}__: Let's port these functions to C++.
 
 1. `all()`
 
-    ```{Rcpp, eval=FALSE}
+    ```{Rcpp, eval = FALSE}
     bool allC(LogicalVector x) {
       int n = x.size();
       
@@ -104,7 +104,7 @@ __[A]{.solved}__: Let's port these functions to C++.
 
 2. `cumprod()`, `cummin()`, `cummax()`.
 
-    ```{Rcpp, eval=FALSE}
+    ```{Rcpp, eval = FALSE}
     NumericVector cumprodC(NumericVector x) {
       int n = x.size();
       NumericVector out(n);
@@ -141,7 +141,7 @@ __[A]{.solved}__: Let's port these functions to C++.
 
 3. `diff()` (Start by assuming lag 1, and then generalise for lag `n`.)
 
-    ```{Rcpp, eval=FALSE}
+    ```{Rcpp, eval = FALSE}
     NumericVector diffC(NumericVector x) {
       int n = x.size();
       NumericVector out(n - 1);
@@ -168,7 +168,7 @@ __[A]{.solved}__: Let's port these functions to C++.
 
 4. `range()`
 
-    ```{Rcpp, eval=FALSE}
+    ```{Rcpp, eval = FALSE}
     NumericVector rangeC(NumericVector x) {
       double omin = x[0], omax = x[0];
       int n = x.size();
@@ -189,7 +189,7 @@ __[A]{.solved}__: Let's port these functions to C++.
 
 5. `var()`
 
-    ```{Rcpp, eval=FALSE}
+    ```{Rcpp, eval = FALSE}
     double varC(NumericVector x) {
       int n = x.size();
       
@@ -386,7 +386,7 @@ NumericVector diffC(NumericVector x, int lag = 1,
 
 <!-- output in the code chunk below is hardcoded due to unexpected output in html-book, likely related to travis cpp-internals and the interpretation of the `rep` function. attempts to fix the remote output via tweaking the makevar arguments (see previous commits) was not successful. -->
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 diffC(c(1, 3, NA, 10))
 #> [1] NA NA NA
 diffC(c(1, 3, NA, 10), na_rm = TRUE)
@@ -425,7 +425,7 @@ __[Q2]{.Q}__: `%in%` using `unordered_set` and the `find()` or `count()` methods
 
 __[A]{.solved}__: We use the `find()` method and loop through the `unordered_set` until we find a match or have scanned the entire set.
 
-```{Rcpp, eval=FALSE}
+```{Rcpp, eval = FALSE}
 #include <Rcpp.h>
 #include <unordered_set>
 using namespace Rcpp;
@@ -449,7 +449,7 @@ __[Q3]{.Q}__: `unique()` using an `unordered_set` (challenge: do it in one line!
 
 __[A]{.solved}__: The `insert()`-method will return if an equivalent element already exists. If a new element is inserted, we will add it to the (unique) return vector of our function.
 
-```{Rcpp, eval=FALSE}
+```{Rcpp, eval = FALSE}
 #include <Rcpp.h>
 #include <unordered_set>
 using namespace Rcpp;

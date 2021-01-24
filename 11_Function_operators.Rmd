@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -8,9 +8,9 @@ source("common.R")
 ## Prerequisites {-}
 <!-- 11.0 -->
 
-Also, in the third chapter on functional programming we make relatively frequent use of the purrr package.
+Also in the third chapter on functional programming, we make relatively frequent use of the {purrr} package.
 
-```{r setup}
+```{r setup, message = FALSE}
 library(purrr)
 ```
 
@@ -26,10 +26,31 @@ However, despite what the function's name implies, `Vectorize()` is not able to 
 
 Let's take a look at an example from the documentation:
 
-```{r}
+```{r, eval=FALSE}
 vrep <- Vectorize(rep.int)
 vrep
+#> function (x, times) 
+#> {
+#>   args <- lapply(as.list(match.call())[-1L], eval, parent.frame())
+#>   names <- if (is.null(names(args))) 
+#>     character(length(args))
+#>   else names(args)
+#>   dovec <- names %in% vectorize.args
+#>   do.call("mapply", c(FUN = FUN, args[dovec],
+#>                       MoreArgs = list(args[!dovec]), 
+#>                       SIMPLIFY = SIMPLIFY, USE.NAMES = USE.NAMES))
+#> }
+#> <environment: 0x558902db65d0>
+```
 
+<!-- output above hardcoded to avoid margin-overflow in pdf -->
+
+```{r, include=FALSE}
+vrep <- Vectorize(rep.int)
+vrep
+```
+
+```{r}
 # Application
 vrep(1:2, 3:4)
 ```
@@ -50,7 +71,7 @@ The main functionality of `possibly()` is provided by `base::tryCatch()`. In thi
 
 __[Q3]{.Q}__: Read the source code for `safely()`. How does it work?
 
-__[A]{.solved}__: `safely()` modifies functions to return a list, containing the elements "result" and "error". It works in a similar fashion as `possibly()` and besides using `as_mapper()`, `safely()` also provides the `otherwise` and `quiet` arguments. However, in order to provide the result and the error in a consistent way, the `tryCatch()` part of the implementation returns a list with similar structure for both cases. In the case of successful evaluation "error" equals to `NULL` and in case of an error "result" equals to `otherwise`, which is `NULL` by default.
+__[A]{.solved}__: `safely()` modifies functions to return a list, containing the elements `result` and `error`. It works in a similar fashion as `possibly()` and besides using `as_mapper()`, `safely()` also provides the `otherwise` and `quiet` arguments. However, in order to provide the result and the error in a consistent way, the `tryCatch()` part of the implementation returns a list with similar structure for both cases. In the case of successful evaluation `error` equals to `NULL` and in case of an error `result` equals to `otherwise`, which is `NULL` by default.
 
 As the `tryCatch()` part is hidden in the internal `purrr:::capture_output()` function, we provide it here in addition to `safely()`:
 

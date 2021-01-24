@@ -1,18 +1,21 @@
+\mainmatter
+
 ```{r, include = FALSE}
 source("common.R")
 ```
 
 # (PART) Foundations {-} 
 
+\stepcounter{chapter}
 # Names and values
 <!-- 2 -->
 
 ## Prerequisites {-}
 <!-- 2.0 -->
 
-We will use the `{lobstr}` package to help answer questions regarding the internal representation of R objects.
+In this chapter we will use the `{lobstr}` package [@lobstr] to help answer questions regarding the internal representation of R objects.
 
-```{r setup}
+```{r setup, message = FALSE}
 library(lobstr) 
 ```
 
@@ -66,7 +69,7 @@ __[A]{.solved}__: Column names are often data, and the underlying `make.names()`
 
 __[Q4]{.Q}__: What rules does `make.names()` use to convert non-syntactic names into syntactic ones?
 
-__[A]{.solved}__: A valid name may contain letters, numbers, dots, and underscores (`"_"` are allowed since R version 1.9.0). It must start with a letter or a dot. If it starts with a dot, it must not be followed by a number.
+__[A]{.solved}__: A valid name must start with a letter or a dot (not followed by a number) and may further contain numbers and underscores (`"_"`s are allowed since R version 1.9.0).
 
 Three main mechanisms ensure syntactically valid names (see `?make.names`):
 
@@ -85,9 +88,9 @@ Three main mechanisms ensure syntactically valid names (see `?make.names`):
 2. Additionally, non-valid characters are replaced by a dot.
 
     ```{r}
-    make.names("@")          # prepending "X" + "." replacement 
-    make.names("  ")         # prepending "X" + ".." replacement
     make.names("non-valid")  # "." replacement
+    make.names("@")          # prepending "X" + "." replacement 
+    make.names("  R")        # prepending "X" + ".." replacement
     ```
 
 3. Reserved R keywords (see `?reserved`) are suffixed by a dot.
@@ -157,8 +160,8 @@ c <- list(b, a, 1:10)
 
 __[A]{.solved}__: `a` contains a reference to an address with the value `1:10`. `b` contains a list of two references to the same address as `a`. `c` contains a list of `b` (containing two references to `a`), `a` (containing the same reference again) and a reference pointing to a different address containing the same value (`1:10`).
 
-```{r, echo = FALSE, out.width='200pt'}
-knitr::include_graphics("images/copy_on_modify_fig3.png",
+```{r, echo = FALSE, out.width='180pt'}
+knitr::include_graphics("images/names_values/copy_on_modify_fig3.png",
                         dpi = 300)
 ```
 
@@ -193,8 +196,8 @@ ref(x)
 #> └─[2:0x534t3abffad8] <int> 
 ```
 
-```{r, echo = FALSE, out.width='150pt'}
-knitr::include_graphics("images/copy_on_modify_fig1.png",
+```{r, echo = FALSE, out.width='135pt'}
+knitr::include_graphics("images/names_values/copy_on_modify_fig1.png",
                         dpi = 300)
 ```
 
@@ -217,7 +220,7 @@ ref(x)
 ```
 
 ```{r, echo = FALSE, out.width = '150pt'}
-knitr::include_graphics("images/copy_on_modify_fig2.png",
+knitr::include_graphics("images/names_values/copy_on_modify_fig2.png",
                         dpi = 300)
 ```
 
@@ -264,7 +267,7 @@ To look up all functions from these packages we iterate over `base_pkgs` and app
 base_objs <- base_pkgs %>%
   lapply(as.environment) %>%
   lapply(function(x) mget(ls(x, all.names = TRUE), x)) %>%
-  set_names(base_pkgs)
+  setNames(base_pkgs)
 ```
 
 This gives us more than 2700 objects which are usually available by default.
@@ -422,7 +425,7 @@ subtract_list <- function(x, medians) {
 }
 ```
 
-This lets us profile the performance, via benchmarks on data frames with differing numbers of columns. Therefore, we create a small helper that creates our random data frame and its medians before it benchmarks the two approaches.
+This lets us profile the performance, via benchmarks on data frames with differing numbers of columns. Therefore, we create a small helper that creates our random data frame and its medians before it benchmarks the two approaches by employing the `{bench}` package [@bench].
 
 ```{r}
 benchmark_medians <- function(ncol) {
@@ -431,7 +434,8 @@ benchmark_medians <- function(ncol) {
 
   bench::mark(
     "data frame" = subtract_df(df, medians),
-    "list" = subtract_list(df, medians)
+    "list" = subtract_list(df, medians),
+    time_unit = "ms"
   )
 }
 
@@ -460,7 +464,7 @@ ggplot(
   geom_smooth() +
   labs(
     x = "Number of Columns",
-    y = "Execution Time (s)",
+    y = "Execution Time (ms)",
     colour = "Data Structure"
   ) +
   theme(legend.position = "top")

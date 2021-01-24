@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -12,9 +12,9 @@ source("common.R")
 ## Prerequisites {-}
 <!-- 18.0 -->
 
-To capture and compute on expressions, and to visualise them, we will load the `{rlang}` and the `{lobstr}` packages.
+To capture and compute on expressions, and to visualise them, we will load the `{rlang}` [@rlang] and the `{lobstr}` [@lobstr] packages.
 
-```{r setup}
+```{r setup, message = FALSE}
 library(rlang)
 library(lobstr)
 ```
@@ -319,7 +319,7 @@ __[A]{.solved}__: One reason is that `<-` is right-associative, i.e. evaluation 
 x1 <- (x2 <- (x3 <- 0))
 ```
 
-The other reason is that `<-` invisibly returns the value on the right hand side.
+The other reason is that `<-` invisibly returns the value on the right-hand side.
 
 ```{r}
 (x3 <- 0)
@@ -368,8 +368,8 @@ parse(text = "f())")
 __[Q9]{.Q}__: `deparse()` produces vectors when the input is long. For example, the following call produces a vector of length two:
 
 ```{r, eval = FALSE}
-expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + 
-                 m + n + o + p + q + r + s + t + u + v + w + x + y + z))
+expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + m + 
+                 n + o + p + q + r + s + t + u + v + w + x + y + z))
 
 deparse(expr)
 ```
@@ -378,23 +378,23 @@ What does `expr_text()` do instead?
 
 __[A]{.solved}__: `expr_text()` will paste the results from `deparse(expr)` together and use a linebreak (`\n`) as separator.
 
-```{r, eval=FALSE}
-expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + 
-                 m + n + o + p + q + r + s + t + u + v + w + x + y + z))
+```{r, eval = FALSE}
+expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + m + 
+                 n + o + p + q + r + s + t + u + v + w + x + y + z))
 deparse(expr)
-#> [1] "g(a + b + c + d + e + f + g + h + i + j + k + l + m + n + o + "
-#> [2] "p + q + r + s + t + u + v + w + x + y + z)"
+#> [1] "g(a + b + c + d + e + f + g + h + i + j + k + l + m + n + "
+#> [2] "o + p + q + r + s + t + u + v + w + x + y + z)"
 expr_text(expr)
-#> [1] "g(a + b + c + d + e + f + g + h + i + j + k + l + m + n + o 
-#> + \n    p + q + r + s + t + u + v + w + x + y + z)"
+#> [1] "g(a + b + c + d + e + f + g + h + i + j + k + l + m + n 
+#> + \n    o + p + q + r + s + t + u + v + w + x + y + z)"
 ```
 
 __[Q10]{.Q}__: `pairwise.t.test()` assumes that `deparse()` always returns a length one character vector. Can you construct an input that violates this expectation? What happens?
 
 __[A]{.solved}__: The function `pairwise.t.test()` captures its data arguments (`x` and `g`) so it can print the input expressions along the computed p-values. Prior to R 4.0.0 this used to be implemented via `deparse(subsitute(x))` in combination with `paste()`. This could lead to unexpected output, if one of the inputs exceeded the default `width.cutoff` value of 60 characters within `deparse()`. In this case, the expression would be split into a character vector of length greater 1.
 
-```{r, eval=FALSE}
-# Output prior to R 4.0.0
+```{r, eval = FALSE}
+# Output in R version 3.6.2
 d <- 1
 pairwise.t.test(2, d + d + d + d + d + d + d + d + 
                   d + d + d + d + d + d + d + d + d)
@@ -412,7 +412,7 @@ In [R 4.0.0](https://cran.r-project.org/doc/manuals/r-release/NEWS.html) `pairwi
 
 > deparse1() is a simple utility added in R 4.0.0 to ensure a string result (character vector of length one), typically used in name construction, as deparse1(substitute(.)).
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 # Output since R 4.0.0
 d <- 1
 pairwise.t.test(2, d + d + d + d + d + d + d + d + 
@@ -452,7 +452,8 @@ expr_type <- function(x) {
 switch_expr <- function(x, ...) {
   switch(expr_type(x),
          ...,
-         stop("Don't know how to handle type ", typeof(x), call. = FALSE))
+         stop("Don't know how to handle type ", 
+              typeof(x), call. = FALSE))
 }
 ```
 
@@ -497,14 +498,19 @@ logical_abbr(c(T, T, T))
 
 __[Q2]{.Q}__: `logical_abbr()` works with expressions. It currently fails when you give it a function. Why? How could you modify `logical_abbr()` to make it work? What components of a function will you need to recurse over?
 
-```{r, eval = FALSE}
+```{r, eval = TRUE}
 f <- function(x = TRUE) {
   g(x + T)
 }
+```
+
+__[A]{.solved}__: The function currently fails, because `"closure"` is not handled in `switch_expr()` within `logical_abbr_rec()`. 
+
+```{r, error = TRUE}
 logical_abbr(!!f)
 ```
 
-__[A]{.solved}__: The function currently fails, because `"closure"` is not handled in `switch_expr()` within `logical_abbr_rec()`. If we want to make it work, we have to write a function to also iterate over the formals and the body of the input function.
+If we want to make it work, we have to write a function to also iterate over the formals and the body of the input function.
 
 __[Q3]{.Q}__: Modify `find_assign` to also detect assignment using replacement functions, i.e. `names(x) <- y`.
 

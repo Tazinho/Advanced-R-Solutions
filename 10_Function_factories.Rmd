@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -8,9 +8,9 @@ source("common.R")
 ## Prerequisites {-}
 <!-- 10.0 -->
 
-For most of this chapter base R is sufficient. Just a few exercises require the `{rlang}`, `{dplyr}`, `{purrr}` and `{ggplot2}` packages.
+For most of this chapter base R [@RLanguage] is sufficient. Just a few exercises require the `{rlang}` [@rlang], `{dplyr}` [@dplyr], `{purrr}`  [@purrr] and `{ggplot2}` [@ggplot2] packages.
 
-```{r, message=FALSE}
+```{r, message = FALSE}
 library(rlang)
 library(dplyr)
 library(purrr)
@@ -62,8 +62,8 @@ When we apply these functions to new x values, these are mapped to the lines con
 x_new <- runif(1000)
 
 plot(x, y, lwd = 10)
-points(x_new, f_lin(x_new), col = "red", pch = 16)
-points(x_new, f_con(x_new), col = "blue", pch = 16)
+points(x_new, f_lin(x_new), col = "cornflowerblue", pch = 16)
+points(x_new, f_con(x_new), col = "firebrick", pch = 16)
 ```
 
 However, both functions are only defined within `range(x)`.
@@ -91,8 +91,8 @@ f_con(c(-Inf, Inf))
 Another option is to customise the return values as individual constants for each side via `yleft` and/or `yright`.
 
 ```{r}
-f_lin <- approxfun(x, y, yleft = 10)
-f_con <- approxfun(x, y, method = "constant", yleft = 10, yright = -10)
+f_lin <- approxfun(x, y, yleft = 5)
+f_con <- approxfun(x, y, method = "constant", yleft = 5, yright = -5)
 
 f_lin(c(-Inf, Inf))
 f_con(c(-Inf, Inf))
@@ -236,7 +236,7 @@ __[Q1]{.Q}__: Compare and contrast `ggplot2::label_bquote()` with `scales::numbe
 
 __[A]{.solved}__: Both functions will help you in styling your output, e.g. in your plots and they do this by returning the desired formatting function to you.
 
-`ggplot2::label_bquote()` takes relatively straightforward [plotmath](https://stat.ethz.ch/R-manual/R-patched/library/grDevices/html/plotmath.html) expressions and uses them for faceting labels in ggplot2. Because this function is used in ggplot2 it needs to return a function of `class = "labeller"`.
+`ggplot2::label_bquote()` takes relatively straightforward [plotmath](https://stat.ethz.ch/R-manual/R-patched/library/grDevices/html/plotmath.html) expressions and uses them for faceting labels in `{ggplot2}`. Because this function is used in `{ggplot2}` it needs to return a function of `class = "labeller"`.
 
 `scales::number_format()` initially `force()`s the computation of all parameters. It's essentially a parametrised wrapper around `scales::number()` and will help you format numbers appropriately. It will return a simple function.
 
@@ -354,25 +354,26 @@ bench_poisson <- function(x_length) {
   
   bench::mark(
     llp1 = optimise(ll_poisson1(x), c(0, 100), maximum = TRUE),
-    llp2 = optimise(ll_poisson2(x), c(0, 100), maximum = TRUE)
+    llp2 = optimise(ll_poisson2(x), c(0, 100), maximum = TRUE),
+    time_unit = "ms"
   )
 }
 
 performances <- map_dfr(10^(1:5), bench_poisson)
 
 df_perf <- tibble(
-  x_length = rep(10^(1:5), 2),
+  x_length = rep(10^(1:5), each = 2),
   method   = rep(attr(performances$expression, "description"), 5),
   median   = performances$median
 )
 
 ggplot(df_perf, aes(x_length, median, col = method)) +
   geom_point(size = 2) +
-  geom_smooth() +
+  geom_line(linetype = 2) +
   scale_x_log10() +
   labs(
     x = "Length of x",
-    y = "Execution Time (s)",
+    y = "Execution Time (ms)",
     color = "Method"
   ) +
   theme(legend.position = "top")
@@ -419,7 +420,7 @@ mean <- function(x) stop("Hi!")
 env_unbind(globalenv(), names(funs))
 ```
 
-__[A]{.solved}__: `attach()` adds `funs` to the search path. Therefore, the provided functions are found before their respective versions from the base package. Further, they cannot get accidently overwritten by similar named functions in the global environment. One annoying downside of using `attach()` is the possibility to attach the same object multiple times, making it necessary to call `detach()` equally often.
+__[A]{.solved}__: `attach()` adds `funs` to the search path. Therefore, the provided functions are found before their respective versions from the `{base}` package. Further, they cannot get accidently overwritten by similar named functions in the global environment. One annoying downside of using `attach()` is the possibility to attach the same object multiple times, making it necessary to call `detach()` equally often.
 
 ```{r}
 attach(funs)

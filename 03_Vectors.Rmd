@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -30,7 +30,7 @@ You can create purely imaginary numbers (e.g.) `1i`, but there is no way to crea
 
 __[Q2]{.Q}__: Test your knowledge of vector coercion rules by predicting the output of the following uses of `c()`:
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 c(1, FALSE)      # will be coerced to double    -> 1 0
 c("a", 1)        # will be coerced to character -> "a" "1"
 c(TRUE, 1L)      # will be coerced to integer   -> 1 1
@@ -116,7 +116,7 @@ x2 <- array(1:5, c(1, 5, 1))  # 1 row,  5 columns, 1 in third dim.
 x3 <- array(1:5, c(5, 1, 1))  # 5 rows, 1 column,  1 in third dim.
 ```
 
-__[A]{.solved}__: These are all "one dimensional". If you imagine a 3d cube, `x1` is in the x-dimension, `x2` is in the y-dimension, and `x3` is in the z-dimension.
+__[A]{.solved}__: These are all "one dimensional". If you imagine a 3d cube, `x1` is in the x-dimension, `x2` is in the y-dimension, and `x3` is in the z-dimension. In contrast to `1:5`, `x1`, `x2` and `x3` have a `dim` attribute.
 
 __[Q4]{.Q}__: An early draft used this code to illustrate `structure()`:
 
@@ -191,11 +191,11 @@ f3 <- factor(letters, levels = rev(letters))
 __[A]{.solved}__: For `f2` and `f3` either the order of the factor elements *or* its levels are being reversed. For `f1` both transformations are occurring.
 
 ```{r}
-# Reverse element order (only)
+# Reverse element order
 (f2 <- rev(factor(letters)))
 as.integer(f2)
 
-# Reverse factor level order (only)
+# Reverse factor levels (when creating factor)
 (f3 <- factor(letters, levels = rev(letters)))
 as.integer(f3)
 ```
@@ -241,35 +241,57 @@ is.vector(as.vector(mtcars))
 
 __[Q3]{.Q}__: Compare and contrast `c()` and `unlist()` when combining a date and date-time into a single vector.
 
-__[A]{.solved}__: Date and date-time objects are both built upon doubles. While dates store the number of days since the reference date 1970-01-01 (also known as “The Epoch”) in days, date-time-objects (POSIXct) store the time difference to this date in seconds.
+__[A]{.solved}__: Date and date-time objects are both built upon doubles. While dates store the number of days since the reference date 1970-01-01 (also known as “the Epoch”) in days, date-time-objects (POSIXct) store the time difference to this date in seconds.
 
 ```{r}
 date    <- as.Date("1970-01-02")
 dttm_ct <- as.POSIXct("1970-01-01 01:00", tz = "UTC")
-
 
 # Internal representations
 unclass(date)
 unclass(dttm_ct)
 ```
 
-Combining these objects via `c()` leads to surprising results. This is because the `c()` generic does only dispatch on its first argument:
+As the `c()` generic only dispatches on its first argument, combining date and date-time objects via `c()` could lead to surprising results in older R versions (pre R 4.0.0):
 
-```{r}
+```{r, eval = FALSE}
+# Output in R version 3.6.2
 c(date, dttm_ct)  # equal to c.Date(date, dttm_ct) 
+#> [1] "1970-01-02" "1979-11-10"
 c(dttm_ct, date)  # equal to c.POSIXct(date, dttm_ct)
+#> [1] "1970-01-01 02:00:00 CET" "1970-01-01 01:00:01 CET"
 ```
 
-In the first line above `c.Date()` is executed and `dttm_ct` is converted into a date. However, the 3600 seconds are mistakenly interpreted as 3600 days! In contrast, when `c.POSIXct()` is called on date, one day counts as one second only, as illustrated by the following line:
+In the first statement above `c.Date()` is executed, which incorrectly treats the underlying double of `dttm_ct` (3600) as days instead of seconds. Conversely, when `c.POSIXct()` is called on a date, one day is counted as one second only. 
+
+We can highlight these mechanics by the following code:
+
+```{r, eval = FALSE}
+# Output in R version 3.6.2
+unclass(c(date, dttm_ct))  # internal representation
+#> [1] 1 3600
+date + 3599
+#> "1979-11-10"
+```
+
+As of R 4.0.0 these issues have been resolved and both methods now convert their input first into `POSIXct` and `Date` respectively.
 
 ```{r}
-unclass(c(date, dttm_ct))  # internal representation
-date + 3599
+c(dttm_ct, date)
+unclass(c(dttm_ct, date))
+
+c(date, dttm_ct)
+unclass(c(date, dttm_ct))
 ```
 
-Some of these problems may be avoided via explicit conversion of the classes, i.e. `c(as.Date(dttm_ct, tz = "UTC"), date)`.
+However, as `c()` strips the time zone (and other attributes) of `POSIXct` objects, some caution is still recommended.
 
-A package that deals with these kind of problems in more depth and provides a structural solution for them is the [vctrs](https://github.com/r-lib/vctrs) package which is also used throughout the tidyverse.
+```{r}
+(dttm_ct <- as.POSIXct("1970-01-01 01:00", tz = "HST"))
+attributes(c(dttm_ct))
+```
+
+A package that deals with these kind of problems in more depth and provides a structural solution for them is the [`{vctrs}` package](https://github.com/r-lib/vctrs) [@vctrs] which is also used throughout the tidyverse [@tidyverse].
 
 Let's look at `unlist()`, which operates on list input.
 
@@ -280,7 +302,7 @@ unlist(list(date, dttm_ct))
 
 We see again that dates and date-times are internally stored as doubles. Unfortunately, this is all we are left with, when unlist strips the attributes of the list.
 
-To summarise: `c()` coerces types and errors may occur because of inappropriate method dispatch. `unlist()` strips attributes. 
+To summarise: `c()` coerces types and strips time zones. Errors may have occurred in older R versions because of inappropriate method dispatch/immature methods. `unlist()` strips attributes. 
 
 ## Data frames and tibbles
 <!-- 3.6 -->

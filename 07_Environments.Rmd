@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -8,9 +8,9 @@ source("common.R")
 ## Prerequisites {-}
 <!-- 7.0 -->
 
-Just like in Advanced R, we mainly use the `{rlang}` package to work with environments in this chapter.
+Just like in Advanced R, we mainly use the `{rlang}` package [@rlang] to work with environments.
 
-```{r setup}
+```{r setup, message = FALSE}
 library(rlang)
 ```
 
@@ -31,8 +31,8 @@ __[A]{.solved}__: The most important differences between environments and lists 
 
 __[Q2]{.Q}__: Create an environment as illustrated by this picture.
 
-```{r echo=FALSE, out.width = NULL}
-knitr::include_graphics("diagrams/environments/recursive-1.png",
+```{r echo = FALSE, out.width = '200pt'}
+knitr::include_graphics("images/environments/recursive-1.png",
                         dpi = 300)
 ```
 
@@ -51,8 +51,8 @@ lobstr::ref(e1)
 
 __[Q3]{.Q}__: Create a pair of environments as illustrated by this picture.
 
-```{r, echo = FALSE, out.width = NULL}
-knitr::include_graphics("diagrams/environments/recursive-2.png",
+```{r, echo = FALSE, out.width = '200pt'}
+knitr::include_graphics("images/environments/recursive-2.png",
                         dpi = 300)
 ```
 
@@ -88,7 +88,7 @@ e3$a
 
 So, we want `env_poke2()` to test, if the supplied name is already present in the given environment. This can be checked via `env_has()`. If this is the case, an (informative) error is thrown.
 
-```{r, error=TRUE}
+```{r, error = TRUE}
 env_poke2 <- function(env, name, value) {
   if (env_has(env, name)) {
     abort(paste0("\"", name, "\" is already assigned to a value."))
@@ -236,12 +236,38 @@ f1 <- function(x1) {
 f1(1)
 ```
 
-__[A]{.solved}__: At creation time each function binds its parent environment: `f1` binds the global environment, `f2` binds the environment of `f1` and so on. The function environments contain functions and the values provided in the function call.
+__[A]{.solved}__: This exercise urges us to think carefully about the function environment at creation time.
 
-```{r, echo = FALSE, out.width='300pt'}
+When `f1` is defined it binds its parent environment, which is the global environment. But `f2` will only be created at runtime of `f1` and will therefore bind `f1`'s execution environment. The value `1` will also bind to the name `x1` at execution time. The same holds true for `x2`, `f3` and `x3`.
+
+The following diagram visualizes the relations between the function environments.
+
+```{r, echo = FALSE, out.width='350pt'}
 knitr::include_graphics(
-  "diagrams/environments/function_environments.png", dpi = 300
+  "images/environments/function_environments_corrected.png", dpi = 300
 )
+```
+
+We can also inspect the binding of the environments, adding print statements to the function definition. Please note that these print statements will be evaluated at execution time. Therefore, the execution of `f1(1)` will print different results each time we run it.
+
+```{r}
+f1 <- function(x1) {
+  f2 <- function(x2) {
+    f3 <- function(x3) {
+      x1 + x2 + x3
+      print("f3")
+      print(env_print())
+    }
+    f3(3)
+    print("f2")
+    print(env_print())
+  }
+  f2(2)
+  print("f1")
+  print(env_print())
+}
+
+f1(1)
 ```
 
 __[Q3]{.Q}__: Write an enhanced version of `str()` that provides more information about functions. Show where the function was found and what environment it was defined in.

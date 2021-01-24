@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -94,7 +94,7 @@ dplyr::summarise
 dplyr:::summarise.data.frame
 ```
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 dplyr:::summarise_cols
 #> function (.data, ...) 
 #> {
@@ -113,7 +113,7 @@ dplyr:::summarise_cols
 #> <environment: namespace:dplyr>
 ```
 
-In the following ggplot2 expression the `cyl`- and `mean`-objects are quoted.
+In the following `{ggplot2}` expression the `cyl`- and `mean`-objects are quoted.
 
 ```{r, eval = FALSE}
 ggplot(by_cyl,            # by_cyl -> evaluated
@@ -200,7 +200,7 @@ is_missing(out2$a)
 
 __[Q5]{.Q}__: What are other differences between `exprs()` and `alist()`? Read the documentation for the named arguments of `exprs()` to find out.
 
-__[A]{.solved}__: `exprs()` provides the additional arguments `.named` (`= FALSE`), `.ignore_empty` (`c("trailing", "none", "all")`) and `.unquote_names` (`TRUE`). `.named` allows to ensure that all dots are named. `ignore_empty` allows to specify how empty arguments should be handled for dots (`"trailing"`) or all arguments (`"none"` and `"all"`). Further via `.unquote_names` one can specify if `:=` should be treated like `=`. `:=` can be useful as it supports unquoting (`!!`) on the left-hand-side.
+__[A]{.solved}__: `exprs()` provides the additional arguments `.named` (`= FALSE`), `.ignore_empty` (`c("trailing", "none", "all")`) and `.unquote_names` (`TRUE`). `.named` allows to ensure that all dots are named. `ignore_empty` allows to specify how empty arguments should be handled for dots (`"trailing"`) or all arguments (`"none"` and `"all"`). Further via `.unquote_names` one can specify if `:=` should be treated like `=`. `:=` can be useful as it supports unquoting (`!!`) on the left-hand side.
 
 __[Q6]{.Q}__: The documentation for `substitute()` says:
 
@@ -317,23 +317,23 @@ exec <- function(f, ..., .env = caller_env()) {
 }
 ```
 
-__[A]{.solved}__: `exec()` takes a function (`f`), its arguments (`...`) and an environment (`.env`) as input. This allows to construct a call from `f` and `...` and evaluate this call in the supplied environment. As the `...` argument is handled via `list2()`, `exec()` supports tidy dots (quasiquotation), which means that arguments and names (on the left-hand-side of `:=`) can be unquoted via `!!` and `!!!`.
+__[A]{.solved}__: `exec()` takes a function (`f`), its arguments (`...`) and an environment (`.env`) as input. This allows to construct a call from `f` and `...` and evaluate this call in the supplied environment. As the `...` argument is handled via `list2()`, `exec()` supports tidy dots (quasiquotation), which means that arguments and names (on the left-hand side of `:=`) can be unquoted via `!!` and `!!!`.
 
 __[Q2]{.Q}__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`. Compare and contrast the techniques they use for switching between dots and list behaviour.
 
 __[A]{.solved}__:  All three functions capture the dots via `args <- list(...)`.
 
-`interaction()` computes factors interactions between the captured input factors by iterating over the `args`. When a list is provided this is detected via `length(args) == 1 && is.list(args[[1]])` and one level of the list is stripped through `args <- args[[1]]`. The rest of the function's code doesn't differentiate further between list and dots behaviour.
+`interaction()` computes factor interactions between the captured input factors by iterating over the `args`. When a list is provided this is detected via `length(args) == 1 && is.list(args[[1]])` and one level of the list is stripped through `args <- args[[1]]`. The rest of the function's code doesn't differentiate further between list and dots behaviour.
 
 ```{r}
-# both calls create the same output
+# Both calls create the same output
 interaction(     a = c("a", "b", "c", "d"), b = c("e", "f"))   # dots
 interaction(list(a = c("a", "b", "c", "d"), b = c("e", "f")))  # list
 ```
 
 `expand.grid()` uses the same strategy and also assigns `args <- args[[1]]` in case of `length(args) == 1 && is.list(args[[1]])`.
 
-`par()` does the most pre-processing to ensure a valid structure of the `args` argument. When no dots are provided (`!length(args)`) it will create a list of arguments from an internal character vector (partly depending on its `no.readonly` argument). Further, given that all elements of `args` are character vectors (`all(unlist(lapply(args, is.character)))`), `args` is turned into a list via `as.list(unlist(args))`, which will flatten nested lists. Similar to the other functions, a level of the list will be stripped via `args <- args[[1L]]`, when `args` is of length one with its first element being a list.
+`par()` does the most pre-processing to ensure a valid structure of the `args` argument. When no dots are provided (`!length(args)`) it creates a list of arguments from an internal character vector (partly depending on its `no.readonly` argument). Further, given that all elements of `args` are character vectors (`all(unlist(lapply(args, is.character)))`), `args` is turned into a list via `as.list(unlist(args))` (this flattens nested lists). Similar to the other functions, one level of `args` gets stripped via `args <- args[[1L]]`, when `args` is of length one and its first element is a list.
 
 __[Q3]{.Q}__: Explain the problem with this definition of `set_attr()`
 

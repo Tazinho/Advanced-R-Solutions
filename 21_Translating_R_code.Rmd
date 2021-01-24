@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -10,7 +10,7 @@ source("common.R")
 
 In this chapter we combine R's metaprogramming and functional programming capabilities and therefore load both the `{rlang}` and the `{purrr}` package.
 
-```{r setup}
+```{r setup, message = FALSE}
 library(rlang)
 library(purrr)
 ```
@@ -87,7 +87,7 @@ html_attributes <- function(list) {
 }
 
 html_attribute <- function(name, value = NULL) {
-  if (length(value) == 0) return(name)  # for attributes with no value
+  if (length(value) == 0) return(name) # for attributes with no value
   if (length(value) != 1) stop("`value` must be NULL or length 1")
   if (is.logical(value)) {
     # Convert T and F to true and false
@@ -326,7 +326,7 @@ Now, let us briefly repeat, that `with_html()` was introduced to evaluate tag fu
 
 Therefore, `p()` refers to the tag function from `html_tags` within both examples from the exercise. However, as `address` is not only a string within the global environment, but also a tag function within `html_tags` (the `<address>` HTML tag may be used to provide contact information on an HTML page), `p()` operates on `address()` in the second example. This correctly leads to an error as we haven't implemented an `escape.function()` method.
 
-```{r, error=TRUE}
+```{r, error = TRUE}
 greeting <- "Hello!"
 with_html(p(greeting))
 
@@ -413,7 +413,7 @@ with_html <- function(code) {
 
 Now, let's look at the example from above:
 
-```{r, error=TRUE}
+```{r, error = TRUE}
 with_html(
   body(
     h1("A heading", id = "first"),
@@ -427,7 +427,7 @@ The formatting consists of only one long line of code. This output makes it diff
 
 What kind of formatting would we prefer instead? [Google's HTML style guide](https://google.github.io/styleguide/htmlcssguide.html#HTML_Formatting_Rules) suggests *indentation* by 2 spaces and *new lines* for every block, list, or table element. There are other recommendations, but we will keep things simple and will be satisfied with the following output.
 
-```{html, eval=FALSE}
+```{html, eval = FALSE}
 <body>
   <h1 id='first'>A heading</h1>
   <p>Some text &amp;<b>some bold text.</b></p>
@@ -479,7 +479,7 @@ html_tags$body <- function(...) {
 
 The resulting output is much more satisfying.
 
-```{r, error=TRUE}
+```{r, error = TRUE}
 with_html(
   body(
     h1("A heading", id = "first"),
@@ -496,7 +496,7 @@ __[Q1]{.Q}__: Add escaping. The special symbols that should be escaped by adding
 
 __[A]{.solved}__: Currently our `to_math()` function generates the following output:
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 to_math(`$`)
 #> <LATEX> \mathrm{f}($)    # instead of <LATEX> \$  
 to_math(a$b)
@@ -507,7 +507,7 @@ to_math(`%`)
 #> <LATEX> \mathrm{f}(%)    # instead of <LATEX> \%
 ```
 
-```{r include=FALSE}
+```{r include = FALSE}
 ## 3.3 to_math()
 to_math <- function(x) {
   expr <- enexpr(x)
@@ -559,7 +559,8 @@ expr_type <- function(x) {
 switch_expr <- function(x, ...) {
   switch(expr_type(x),
          ...,
-         stop("Don't know how to handle type ", typeof(x), call. = FALSE)
+         stop("Don't know how to handle type ", 
+              typeof(x), call. = FALSE)
   )
 }
 
@@ -725,7 +726,9 @@ latex_env <- function(expr) {
 to_math(sin(pi) + f(a))
 ```
 
-Therefore, we need an escape function with methods for the `character` and `advr_latex` classes. 
+To adjust this behaviour, we need an escape function with methods for the `character` and `advr_latex` classes. 
+
+(Note that we must first repeat the underlying code from Advanced R. However, since this would be a bit verbose, and not very meaningful, we will not show this step here.)
 
 ```{r}
 escape_latex <- function(x) UseMethod("escape_latex")
@@ -741,7 +744,7 @@ escape_latex.character <- function(x) {
 escape_latex.advr_latex <- function(x) x
 ```
 
-We apply this function within `latex_env()` when creating environments for unknown symbols and unknown functions. For the unknown function, we need to modify `unknown_op()` first.
+We apply `escape_latex()` within `latex_env()` when creating environments for unknown symbols and unknown functions. For the unknown function, we need to modify `unknown_op()` first.
 
 ```{r}
 unknown_op <- function(op) {
@@ -749,7 +752,9 @@ unknown_op <- function(op) {
     exprs(... = ),
     expr({
       contents <- paste(..., collapse = ", ")
-      paste0(!!paste0("\\mathrm{", escape_latex(op), "}("), contents, ")")
+      paste0(
+        !!paste0("\\mathrm{", escape_latex(op), "}("), contents, ")"
+      )
     })
   )
 }
@@ -784,9 +789,7 @@ to_math(`%`)
 
 __[Q2]{.Q}__: Complete the DSL to support all the functions that `plotmath` supports.
 
-__[A]{.solved}__: We can look up all functions supported by `plotmath` via `?plotmath`. Here we chose to implement a representative subset of `plotmath` functionality within the `to_math()`-DSL. If we wanted to implement more, we have to observe different conversion patterns for symbols and functions and insert the correct conversion in the workflow presented below. Most relevant LaTeX code can be looked up on  [Wikipedia](https://en.wikipedia.org/wiki/Help:Displaying_a_formula).
-
-We will add support for the following functions:
+__[A]{.solved}__: You can see all supported functions in `?plotmath`. There are a lot (!) so here we choose to implement a representative sample:
 
 ```{r, eval = FALSE}
 to_math(x %+-% y)
@@ -796,9 +799,11 @@ to_math(bold(x))
 to_math(x != y)
 ```
 
-To do this, we follow the LaTeX section from the textbook straight from the beginning. This makes it easier to keep an overview, as we just need to insert the specific changes at the relevant parts.
+Implementing the rest is just a mechanical application of the same principles with more LaTex expressions, which can be found on [Wikipedia](https://en.wikipedia.org/wiki/Help:Displaying_a_formula).
 
-Let's start and repeat our converter function `to_math()` from the textbook.
+To provide these translations, we'll follow the LaTeX section from Advanced R from the beginning. This makes it easier to keep an overview, as we just need to insert the specific changes at the relevant parts.
+
+Let's start and repeat the converter function `to_math()` from the textbook.
 
 ```{r}
 to_math <- function(x) {
@@ -816,7 +821,7 @@ print.advr_latex <- function(x) {
 
 One specific property in this setting is that the environment where `to_math()` evaluates the expression is not constant, but depends on what we already know about the expression.
 
-Thus, we start building up `latex_env()`, which contains a chain of all the necessary environments which `to_math()` checks to evaluate our expression in.
+Next, we start building up `latex_env()`, which contains a chain of all the necessary environments which `to_math()` checks to evaluate the expression in.
 
 The first environment is the one for Greek letters.
 
@@ -837,9 +842,9 @@ latex_env <- function(expr) {
 }
 ```
 
-We already know from the textbook that e.g. `to_math(pi)` now correctly converts to `\\pi`. So, let's move on to the next one.
+We already know from Advanced R that e.g. `to_math(pi)` now correctly converts to `\\pi`. So, let's move on to the next one.
 
-Here, it'll become a bit more technical. Not every symbol is Greek (and not every part of an expression is a symbol). To find out, which symbols are present within the expression, first, we use an approach from section [18.5](https://adv-r.hadley.nz/expressions.html#ast-funs)(walking the AST to find all symbols) where Hadley recursively walks the AST to distinguish between different expression element types.
+Here, it'll become a bit more technical. Not every symbol is Greek (and not every part of an expression is a symbol). To find out which symbols are present within the expression, first, we use an approach from [section 5 of the expressions chapter](https://adv-r.hadley.nz/expressions.html#ast-funs) (walking the AST to find all symbols) where Hadley recursively walks the AST to distinguish between different expression element types.
 
 Let's shortly repeat the helpers defined in that section:
 
@@ -861,7 +866,8 @@ expr_type <- function(x) {
 switch_expr <- function(x, ...) {
   switch(expr_type(x),
          ...,
-         stop("Don't know how to handle type ", typeof(x), call. = FALSE)
+         stop("Don't know how to handle type ",
+              typeof(x), call. = FALSE)
   )
 }
 
@@ -888,7 +894,7 @@ all_names <- function(x) {
 all_names(expr(x + y + f(a, b, c, 10)))
 ```
 
-We use `all_names()` now within `latex_env()` to create an environment of symbols which were found within the expression. This environment will be set as the parent environment of `greek_env`.
+We use `all_names()` now within `latex_env()` to create an environment of the symbols which were found within the expression. This environment will be set as the parent environment of `greek_env`.
 
 ```{r}
 latex_env <- function(expr) {
@@ -901,11 +907,11 @@ latex_env <- function(expr) {
 }
 ```
 
-In this way, `to_math()` will first convert all known Greek letters (found in `greek_env`) and then any other symbols. In this case these symbols are left as is, but converted to the `advr_latex` class.
+In this way, `to_math()` will first convert all known Greek letters (found in `greek_env`) and then any other symbols, which are left as is (in this implementation).
 
 We also have to add support for functions. This will give us the opportunity to insert some specific support for `plotmath` functions.
 
-To support a whole bunch of unary and binary functions within the function environment (`f_env`), which will be added next to `latex_env`, Hadley defines the following two helpers in the textbook.
+To support a whole bunch of unary and binary functions within the function environment (`f_env`), which will be added next to `latex_env`, Hadley defines the following two helpers in Advanced R.
 
 ```{r}
 unary_op <- function(left, right) {
@@ -929,7 +935,7 @@ binary_op <- function(sep) {
 }
 ```
 
-While defining the function environment, `f_env`, we mostly continue to copy the exact code from the textbook. However, at the bottom we add a short section where we define some extra conversions which are part of `plotmath` (and selected above in our intro to this solution).
+While defining the function environment, `f_env`, we mostly continue to copy the exact code from Advanced R. However, at the bottom we add a short section where we define some extra conversions which are part of `plotmath` (and selected above in our intro to this solution).
 
 ```{r}
 f_env <- child_env(
@@ -997,7 +1003,7 @@ to_math(x %->% y)
 to_math(bold(x))
 to_math(x != y)
 
-# Other examples from the textbooks
+# Other examples from Advanced R
 to_math(sin(x + pi))
 to_math(log(x[i]^2))
 to_math(sin(sin))
@@ -1005,7 +1011,7 @@ to_math(sin(sin))
 
 If we wanted, we could include further `plotmath` functions in this step. If this collides with other functions at some point, we could just create an own `f_plotmath_env` to support more `plotmath` functions. In that case we would need to add this environment also to `latex_env()` (as child environment of the function environment `f_env`).
 
-To complete this answer, we will also add the support for unknown functions. Similarly as for the unknown symbols, we use the trick to recursively run the AST and just reuse the code from the textbook.
+To complete this answer, we will also add the support for unknown functions. Similarly as for the unknown symbols, we use the trick to recursively run the AST and just reuse the code from Advanced R.
 
 ```{r}
 all_calls_rec <- function(x) {
@@ -1068,10 +1074,11 @@ to_math(x %->% y)
 to_math(bold(x))
 to_math(x != y)
 
-# Other examples from the textbooks
+# Other examples from Advanced R
 to_math(sin(x + pi))
 to_math(log(x[i]^2))
 to_math(sin(sin))
-```
 
-<!-- Do we need to show, that unknown functions are now supported? -->
+# Unknown functions
+to_math(f(g(x)))
+```

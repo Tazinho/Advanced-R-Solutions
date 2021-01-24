@@ -1,4 +1,4 @@
-```{r, include=FALSE}
+```{r, include = FALSE}
 source("common.R")
 ```
 
@@ -8,7 +8,7 @@ source("common.R")
 ## Prerequisites {-}
 <!-- 14.0 -->
 
-To solve the exercises in this chapter we will have to create R6 objects, which are implemented in the `{R6}` package.
+To solve the exercises in this chapter we will have to create R6 objects, which are implemented in the `{R6}` package [@R6].
 
 ```{r}
 library(R6)
@@ -118,10 +118,12 @@ my_charging_account$balance
 __[Q2]{.Q}__: Create an R6 class that represents a shuffled deck of cards. You should be able to draw cards from the deck with `$draw(n)`, and return all cards to the deck and reshuffle with `$reshuffle()`. Use the following code to make a vector of cards.
 
 ```{r}
-suit <- c("♠", "♥", "♦", "♣")
+suit <- c("SPADE", "HEARTS", "DIAMOND", "CLUB")
 value <- c("A", 2:10, "J", "Q", "K")
-cards <- paste0(rep(value, 4), suit)
+cards <- paste(rep(value, 4), suit)
 ```
+
+*(This question was altered slightly to avoid the unicode characters.)*
 
 __[A]{.solved}__: Our new `ShuffledDeck` class will use `sample()` and positive integer subsetting to implement the reshuffling and drawing functionality. We also add a check, so you cannot draw more cards than there are left in the deck.
 
