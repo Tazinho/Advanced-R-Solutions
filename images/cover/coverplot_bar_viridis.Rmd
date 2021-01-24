@@ -1,0 +1,111 @@
+---
+title: "Cover Plot Bars Viridis"
+author: "Tobias Stalder"
+date: "17 12 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+```
+
+## 1 Document Purpose
+This document shows the code for creating the final cover plot for the new book of Henning Bumann and Malte Grosser "Advanced R Solutions".
+
+**Load libraries and set working dir (and install with dependencies if needed)**
+```{r, message = FALSE, warning = FALSE}
+
+packages <- c("tidyverse", "Cairo", "ggpubr", "ggalt", "ggbump", "scales", "prismatic", "treemapify","GGally",
+              "intergraph", "ggraph", "visNetwork", "threejs", "networkD3", "ndtv", "here", "igraph")
+
+package.check <- lapply(
+  packages,
+  FUN = function(x) {
+    if (!require(x, character.only = TRUE)) {
+      install.packages(x, dependencies = TRUE)
+      library(x, character.only = TRUE)
+    }
+  }
+)
+
+here()
+
+```
+
+**Load data from local dir and direct cleaning to long format**
+
+The following snippet was copied from the book repo (originally written by Henning Bumann)
+```{r}
+df_long <- read.csv2(r"(progress_data.csv)", stringsAsFactors = FALSE, 
+                     header = TRUE) %>% 
+  as_tibble() %>% 
+  mutate(status = "finalised") %>% 
+  modify_at("status", factor,
+            levels = c("open", "started", "solved", "reviewed", "finalised")) %>% 
+  tibble::rowid_to_column("id") %>% 
+  separate(chapter, "nr", sep = " ", remove = FALSE, extra = "drop") %>% 
+  mutate(nr = as.integer(nr), 
+         chapter = factor(chapter),
+         chapter = fct_reorder(chapter, nr, .desc = FALSE),
+         part = case_when(nr < 9 ~ "Foundations",
+                          nr < 12 ~ "Functional\nProgramming",
+                          nr < 17 ~ "Object Oriented\nProgramming",
+                          nr < 22 ~ "Metaprogramming",
+                          TRUE    ~ "Techniques"),
+         part = factor(part, levels = c("Foundations", "Functional\nProgramming",
+                                        "Object Oriented\nProgramming",
+                                        "Metaprogramming", "Techniques"))) %>% 
+  add_count(chapter)
+df_long$subchapter = factor(df_long$subchapter)
+head(df_long)
+```
+
+
+
+## 2 Requirement Catalogue
+The vizualisation for a book cover has special requirements since it transports the very first message of the book. In alignment with the authors, I defined some requirements which shall guide through the creation process.
+
+1: Viz should show some kind of "structure" in the design since it's plotted out of very well structured data of the exercises.
+
+2: I'd like the viz to transport "structure" and "progress" as a message.
+
+3: The viz should  invite the reader to read and engage, not push the reader away by transporting a message of complexity.
+
+5: The viz should not be too creative since the book is about advanced R programming and not information design.
+
+6: Potential readers should be able to relate with the viz in a sense of  ("I could do that", "This speaks to my abilities")
+
+
+**1. Bar chart**
+```{r, echo=TRUE, message=FALSE}
+df_long %>% 
+  group_by(chapter) %>% 
+  mutate(exercise_in_chapter_id = row_number()) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = chapter, fill = part, group = -id)) +
+  geom_bar(color = "#2a0829", alpha = 0.8, aes(fill = part)) +
+  # scale_y_continuous(expand = c(.05, 0)) +
+  # scale_x_discrete(expand = c(.2,0)) +
+
+  scale_fill_viridis_d(begin = .1, end = .8)+
+  facet_grid(. ~ part, scales = "free",
+             space = "free", switch = "x")+
+  theme_void()+
+  theme(legend.position = "none",
+        plot.background = element_rect(fill = "transparent", color = "transparent"),
+        panel.background = element_rect(fill = "transparent", color = "transparent"),
+        strip.background = element_rect(fill = "transparent", color = "transparent"),
+        strip.text = element_blank()) +
+  
+  coord_cartesian(ylim = c(0, 35)) -> bar_chart_viridis
+
+bar_chart_viridis
+
+ggsave(plot = bar_chart_viridis, filename = paste0(here(),"/bars_viridis.png"), units = "cm", width = 16, height = 8, dpi = 600, type = "cairo-png", bg = "transparent")
+# ggsave(plot = bar_chart_viridis, filename = "plots/bars_viridis.svg", units = "cm", width = 16, height = 8, dpi = 600, bg = "transparent")
+
+
+```
+
+
+
+
