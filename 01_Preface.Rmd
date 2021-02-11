@@ -65,6 +65,10 @@ contribs_new <- tibble(
 contribs_old <- read_csv("contributors.csv", col_types = list())
 contribs_old <- contribs_old %>% select(login)
 contribs_all <- contribs_new %>% full_join(contribs_old, by = "login")
+# Add some manually (e.g. contributions via E-Mail)
+contribs_all <- contribs_all %>%
+  bind_rows(tibble(login = "emilyriederer"))
+
 # Get info for all contributors
 needed_json <- map(
   contribs_all$login, 
@@ -84,7 +88,7 @@ library(dplyr)
 contributors <- read.csv("contributors.csv", encoding = "UTF-8")
 
 contributors <- contributors %>% 
-  filter(!login %in% c("hadley", "henningsway", "Tazinho")) %>% 
+  filter(!login %in% c("hadley", "henningsway", "Tazinho", "toebR")) %>% 
   mutate(
     login = paste0("\\@", login),
     desc = ifelse(is.na(name), login, paste0(name, " (", login, ")"))
