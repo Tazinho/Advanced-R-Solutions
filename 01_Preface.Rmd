@@ -67,7 +67,8 @@ contribs_old <- contribs_old %>% select(login)
 contribs_all <- contribs_new %>% full_join(contribs_old, by = "login")
 # Add some manually (e.g. contributions via E-Mail)
 contribs_all <- contribs_all %>%
-  bind_rows(tibble(login = "emilyriederer"))
+  bind_rows(tibble(login = "robinsones"))
+contribs_all <- contribs_all %>% unique()
 
 # Get info for all contributors
 needed_json <- map(
