@@ -94,7 +94,7 @@ attributes(date_lt)
 date_lt$sec
 ```
 
-However, while lists may be practical basic calculations are often faster and require less memory for objects with underlying integer type.
+However, while lists may be practical, basic calculations are often faster and require less memory for objects with underlying integer type.
 
 ```{r}
 date_lt2 <- rep(date_lt, 10000)
@@ -182,13 +182,13 @@ optim(0, function(x) x^2 - 100 * x + 50,
 )
 ```
 
-Since this solves a one-dimensional optimization task, we could have also used `stats::optimize()`.
+Since this solves a one-dimensional optimisation task, we could have also used `stats::optimize()`.
 
 ```{r}
 optimize(function(x) x^2 - 100 * x + 50, c(-1e20, 1e20))
 ```
 
-For more general alternatives, the appropriate choice highly depends on the type of optimization you intend to do. The [CRAN task view on optimization and mathematical modelling](https://cran.r-project.org/web/views/Optimization.html) can serve as a useful reference. Here are a couple of examples:
+For more general alternatives, the appropriate choice highly depends on the type of optimisation you intend to do. The [CRAN task view on optimisation and mathematical modelling](https://cran.r-project.org/web/views/Optimization.html) can serve as a useful reference. Here are a couple of examples:
   
 - `{optimx}` [@optimx1; @optimx2] extends the `optim()` function with the same syntax but more `method` choices.
 - `{RcppNumerical}` [@RcppNumerical] wraps several open source libraries for numerical computing (written in C++) and integrates them with R via `{Rcpp}`.
