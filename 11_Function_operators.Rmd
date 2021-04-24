@@ -71,7 +71,7 @@ The main functionality of `possibly()` is provided by `base::tryCatch()`. In thi
 
 __[Q3]{.Q}__: Read the source code for `safely()`. How does it work?
 
-__[A]{.solved}__: `safely()` modifies functions to return a list, containing the elements `result` and `error`. It works in a similar fashion as `possibly()` and besides using `as_mapper()`, `safely()` also provides the `otherwise` and `quiet` arguments. However, in order to provide the result and the error in a consistent way, the `tryCatch()` part of the implementation returns a list with similar structure for both cases. In the case of successful evaluation `error` equals to `NULL` and in case of an error `result` equals to `otherwise`, which is `NULL` by default.
+__[A]{.solved}__: `safely()` modifies functions to return a list, containing the elements `result` and `error`. It works in a similar fashion as `possibly()` and besides using `as_mapper()`, `safely()` also provides the `otherwise` and `quiet` arguments. However, in order to provide the result and the error in a consistent way, the `tryCatch()` part of the implementation returns a list with similar structure for both cases. In the case of successful evaluation `error` equals `NULL` and in case of an error `result` equals `otherwise`, which is `NULL` by default.
 
 As the `tryCatch()` part is hidden in the internal `purrr:::capture_output()` function, we provide it here in addition to `safely()`:
 
@@ -208,7 +208,7 @@ delay_by <- function(f, amount) {
 }
 ```
 
-To ensure that the function created by `delay_by()` waits that a certain amount of time has passed since it's last execution, we incorporate three little changes into our new `delay_atleast()` as indicated in the corresponding comments below.
+To ensure that the function created by `delay_by()` waits that a certain amount of time has passed since its last execution, we incorporate three little changes into our new `delay_atleast()` as indicated in the corresponding comments below.
 
 ```{r, eval = FALSE}
 delay_atleast <- function(amount, f) {
