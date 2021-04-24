@@ -96,7 +96,7 @@ In the latter case the delay is added first and the dot-functionality is wrapped
 
 __[Q2]{.Q}__: Should you memoise `file.download()`? Why or why not?
 
-__[A]{.solved}__: Memoising `file.download()` will only work if the files are immutable, i.e. if the file at a given URL is always same. There's no point memoising unless this is true. Even if this is true, however, memoise has to store the results in memory, and large files will potentially take up a lot of memory.
+__[A]{.solved}__: Memoising `file.download()` will only work if the files are immutable, i.e. if the file at a given URL is always the same. There's no point memoising unless this is true. Even if this is true, however, memoise has to store the results in memory, and large files will potentially take up a lot of memory.
 
 This implies that it's probably not beneficial to memoise `file.download()` in most cases. The only exception is if you are downloading small files many times, and the file at a given URL is guaranteed not to change.
 
