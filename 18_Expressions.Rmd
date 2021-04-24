@@ -158,7 +158,7 @@ call2(expr(median), x, na.rm = TRUE)
 call2(median, expr(x), na.rm = TRUE)
 ```
 
-In the final call neither `x` nor `median()` are evaluated.
+In the final call neither `x` nor `median()` is evaluated.
 
 ```{r}
 call2(expr(median), expr(x), na.rm = TRUE)
@@ -514,7 +514,7 @@ If we want to make it work, we have to write a function to also iterate over the
 
 __[Q3]{.Q}__: Modify `find_assign` to also detect assignment using replacement functions, i.e. `names(x) <- y`.
 
-__[A]{.solved}__: Let`s see what the AST of such an assignment looks like:
+__[A]{.solved}__: Let's see what the AST of such an assignment looks like:
 
 ```{r}
 ast(names(x) <- x)
