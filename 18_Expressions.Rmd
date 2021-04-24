@@ -235,7 +235,7 @@ f((1))
 
 Compare and contrast the two uses by referencing the AST.
 
-__[A]{.solved}__: The trick with these examples lies in the fact, that `(` can be a part of R's general prefix function syntax but can also represent a call to the `(` function.
+__[A]{.solved}__: The trick with these examples lies in the fact that `(` can be a part of R's general prefix function syntax but can also represent a call to the `(` function.
 
 So, in the AST of the first example, we will not see the outer `(` since it is prefix function syntax and belongs to `f()`. In contrast, the inner `(` is a function (represented as a symbol in the AST):
 
@@ -277,7 +277,7 @@ The easiest way around this problem is to wrap this line in `{}`.
 ast({b = c(c = 1)})
 ```
 
-When we ignore the braces and compare the trees, we can see, that the first `=` is used for assignment and the second `=` is part of the syntax of function calls.
+When we ignore the braces and compare the trees, we can see that the first `=` is used for assignment and the second `=` is part of the syntax of function calls.
 
 __[Q3]{.Q}__: Does `-2^2` yield 4 or -4? Why?
 
@@ -391,7 +391,7 @@ expr_text(expr)
 
 __[Q10]{.Q}__: `pairwise.t.test()` assumes that `deparse()` always returns a length one character vector. Can you construct an input that violates this expectation? What happens?
 
-__[A]{.solved}__: The function `pairwise.t.test()` captures its data arguments (`x` and `g`) so it can print the input expressions along the computed p-values. Prior to R 4.0.0 this used to be implemented via `deparse(subsitute(x))` in combination with `paste()`. This could lead to unexpected output, if one of the inputs exceeded the default `width.cutoff` value of 60 characters within `deparse()`. In this case, the expression would be split into a character vector of length greater 1.
+__[A]{.solved}__: The function `pairwise.t.test()` captures its data arguments (`x` and `g`) so it can print the input expressions along the computed p-values. Prior to R 4.0.0 this used to be implemented via `deparse(substitute(x))` in combination with `paste()`. This could lead to unexpected output, if one of the inputs exceeded the default `width.cutoff` value of 60 characters within `deparse()`. In this case, the expression would be split into a character vector of length greater 1.
 
 ```{r, eval = FALSE}
 # Output in R version 3.6.2
