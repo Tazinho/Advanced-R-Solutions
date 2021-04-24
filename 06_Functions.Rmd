@@ -197,7 +197,7 @@ __[A]{.solved}__: In summary: `&&` short-circuits which means that if the left-h
 
 We expect `x_ok()` to validate its input via certain criteria: it must not be `NULL`, have length `1` and be greater than `0`. Meaningful outcomes for this assertion will be `TRUE`, `FALSE` or `NA`. The desired behaviour is reached by combining the assertions through `&&` instead of `&`.
 
-`&&` does not perform elementwise comparisons, instead it uses the first element of each value only. It also uses lazy evaluation, in the sense that evaluation "proceeds only until the result is determined" (from `?Logic`). This means that the RHS of `&&` won't be evaluated if the LHS already determines the outcome of the comparison (e.g. evaluate to `FALSE`). This behaviour is also known as "short-circuiting". 
+`&&` does not perform elementwise comparisons; instead it uses the first element of each value only. It also uses lazy evaluation, in the sense that evaluation "proceeds only until the result is determined" (from `?Logic`). This means that the RHS of `&&` won't be evaluated if the LHS already determines the outcome of the comparison (e.g. evaluate to `FALSE`). This behaviour is also known as "short-circuiting". 
 For some situations (`x = 1`) both operators will lead to the same result. But this is not always the case. For `x = NULL`, the `&&`-operator will stop after the `!is.null` statement and return the result. The following conditions won't even be evaluated! (If the other conditions are also evaluated (by the use of `&`), the outcome would change. `NULL > 0` returns `logical(0)`, which is not helpful in this case.)
 
 We can also see the difference in behaviour, when we set `x = 1:3`. The `&&`-operator returns the result from `length(x) == 1`, which is `FALSE`. Using `&` as the logical operator leads to the (vectorised) `x > 0` condition being evaluated and also returned.
@@ -390,7 +390,7 @@ capture.output2(cat("a", "b", "c", sep = "\n"))
 
 Compare `capture.output()` to `capture.output2()`. How do the functions differ? What features have I removed to make the key ideas easier to see? How have I rewritten the key ideas to be easier to understand?
 
-__[A]{.solved}__: Using `body(capture.output)` we inspect the source code of the original `capture.output()` function: The implementation for `capture.output()` is a quite a bit longer (39 lines vs. 7 lines).
+__[A]{.solved}__: Using `body(capture.output)` we inspect the source code of the original `capture.output()` function: The implementation for `capture.output()` is quite a bit longer (39 lines vs. 7 lines).
 
 In `capture_output2()` the code is simply forced, and the output is caught via `sink()` in a temporary file. An additional feature of `capture_output()` is that one can also capture messages by setting `type = "message"`. As this is internally forwarded to `sink()`, this behaviour (and also `sink()`'s `split` argument) could be easily introduced within `capture_output2()` as well.
 
