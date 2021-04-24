@@ -11,7 +11,7 @@ source("common.R")
 
 __[Q1]{.Q}__: How do you create raw and complex scalars? (See `?raw` and `?complex`.)
 
-__[A]{.solved}__: In R scalars are represented as vectors of length one. However, there's no built-in syntax like there is for logicals, integers, doubles, and character vectors to create individual raw and complex values. Instead, you have to create them by calling a function.
+__[A]{.solved}__: In R, scalars are represented as vectors of length one. However, there's no built-in syntax like there is for logicals, integers, doubles, and character vectors to create individual raw and complex values. Instead, you have to create them by calling a function.
 
 For raw vectors you can use either `as.raw()` or `charToRaw()` to create them from numeric or character values.
 
@@ -20,7 +20,7 @@ as.raw(42)
 charToRaw("A")
 ```
 
-In the case of complex numbers real and imaginary parts may be provided directly to the `complex()` constructor.
+In the case of complex numbers, real and imaginary parts may be provided directly to the `complex()` constructor.
 
 ```{r}
 complex(length.out = 1, real = 1, imaginary = 1)
@@ -38,7 +38,7 @@ c(TRUE, 1L)      # will be coerced to integer   -> 1 1
 
 __[Q3]{.Q}__: Why is `1 == "1"` true? Why is `-1 < FALSE` true? Why is `"one" < 2` false?
 
-__[A]{.solved}__: These comparisons are carried out by operator-functions (`==`, `<`), which coerce their arguments to a common type. In the examples above these types will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` turns into `"2"` (and numbers precede letters in lexicographic order (may depend on locale)).
+__[A]{.solved}__: These comparisons are carried out by operator-functions (`==`, `<`), which coerce their arguments to a common type. In the examples above, these types will be character, double and character: `1` will be coerced to `"1"`, `FALSE` is represented as `0` and `2` turns into `"2"` (and numbers precede letters in lexicographic order (may depend on locale)).
 
 __[Q4]{.Q}__: Why is the default missing value, `NA`, a logical vector? What's special about logical vectors? (Hint: think about `c(FALSE, NA_character_)`.)
 
@@ -68,7 +68,7 @@ setNames <- function(object = nm, nm) {
 }
 ```
 
-Because the data argument comes first `setNames()` also works well with the magrittr-pipe operator. When no first argument is given, the result is a named vector (this is rather untypical as required arguments usually come first):
+Because the data argument comes first, `setNames()` also works well with the magrittr-pipe operator. When no first argument is given, the result is a named vector (this is rather untypical as required arguments usually come first):
 
 ```{r}
 setNames( , c("a", "b", "c"))
@@ -216,7 +216,7 @@ __[A]{.solved}__: To summarise:
     lobstr::ref(list(1:2, 2))
     ```
 
-- Subsetting with out-of-bounds and `NA` values leads to different output. E.g. `[` returns `NA` for atomics and `NULL` for lists. (This is described in more detail within the [subsetting chapter](https://adv-r.hadley.nz/subsetting.html).)
+- Subsetting with out-of-bounds and `NA` values leads to different output. For example, `[` returns `NA` for atomics and `NULL` for lists. (This is described in more detail within the [subsetting chapter](https://adv-r.hadley.nz/subsetting.html).)
 
     ```{r}
     # Subsetting atomic vectors
@@ -274,7 +274,7 @@ date + 3599
 #> "1979-11-10"
 ```
 
-As of R 4.0.0 these issues have been resolved and both methods now convert their input first into `POSIXct` and `Date` respectively.
+As of R 4.0.0 these issues have been resolved and both methods now convert their input first into `POSIXct` and `Date`, respectively.
 
 ```{r}
 c(dttm_ct, date)
@@ -291,7 +291,7 @@ However, as `c()` strips the time zone (and other attributes) of `POSIXct` objec
 attributes(c(dttm_ct))
 ```
 
-A package that deals with these kind of problems in more depth and provides a structural solution for them is the [`{vctrs}` package](https://github.com/r-lib/vctrs) [@vctrs] which is also used throughout the tidyverse [@tidyverse].
+A package that deals with these kinds of problems in more depth and provides a structural solution for them is the [`{vctrs}` package](https://github.com/r-lib/vctrs) [@vctrs] which is also used throughout the tidyverse [@tidyverse].
 
 Let's look at `unlist()`, which operates on list input.
 
@@ -382,7 +382,7 @@ __[Q4]{.Q}__: What does `as.matrix()` do when applied to a data frame with colum
 
 __[A]{.solved}__: The type of the result of `as.matrix` depends on the types of the input columns (see `?as.matrix`):
 
-> The method for data frames will return a character matrix if there is only atomic columns and any non-(numeric/logical/complex) column, applying as.vector to factors and format to other non-character columns. Otherwise the usual coercion hierarchy (logical < integer < double < complex) will be used, e.g., all-logical data frames will be coerced to a logical matrix, mixed logical-integer will give a integer matrix, etc.
+> The method for data frames will return a character matrix if there is only atomic columns and any non-(numeric/logical/complex) column, applying as.vector to factors and format to other non-character columns. Otherwise the usual coercion hierarchy (logical < integer < double < complex) will be used, e.g., all-logical data frames will be coerced to a logical matrix, mixed logical-integer will give an integer matrix, etc.
 
 On the other hand, `data.matrix` will always return a numeric matrix (see `?data.matrix()`).
 
