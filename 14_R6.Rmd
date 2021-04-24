@@ -169,7 +169,7 @@ my_deck$reshuffle()$draw(5)
 
 __[Q3]{.Q}__: Why can't you model a bank account or a deck of cards with an S3 class?
 
-__[A]{.solved}__: Because S3 classes obey R's usual semantics of copy-on-modify: every time you deposit money onto your bank account or drew a card from the deck, you'd get a new copy of the object.
+__[A]{.solved}__: Because S3 classes obey R's usual semantics of copy-on-modify: every time you deposit money into your bank account or draw a card from the deck, you'd get a new copy of the object.
 
 It is possible to combine S3 classes with an environment (which is how R6 works), but it is ill-advised to create an object that looks like a regular R object but has reference semantics.
 
@@ -231,7 +231,7 @@ WorkingDirectory <- R6Class(
 
 __[Q6]{.Q}__: Why can't you model the time zone or current working directory with an S3 class?
 
-__[A]{.solved}__: Because S3 classes are not suitable for modelling state that changes over time. S3 methods should (almost) always return the same result when called with the same inputs.
+__[A]{.solved}__: Because S3 classes are not suitable for modelling a state that changes over time. S3 methods should (almost) always return the same result when called with the same inputs.
 
 __[Q7]{.Q}__: What base type are R6 objects built on top of? What attributes do they have?
 
@@ -240,7 +240,7 @@ __[A]{.solved}__: R6 objects are built on top of environments. They have a `clas
 ## Controlling access
 <!-- 14.3 -->
 
-__[Q1]{.Q}__: Create a bank account class that prevents you from directly setting the account balance, but you can still withdraw from and deposit to. Throw an error if you attempt to go into overdraft.
+__[Q1]{.Q}__: Create a bank account class that prevents you from directly setting the account balance, but that you can still withdraw from and deposit to. Throw an error if you attempt to go into overdraft.
 
 __[A]{.solved}__: To fulfil this requirement, we make balance a private field. The user has to use the `$deposit()` and `$withdraw()` methods which have access to the balance field.
 
