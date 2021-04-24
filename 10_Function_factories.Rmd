@@ -29,7 +29,7 @@ force
 
 Why is it better to `force(x)` instead of just `x`?
 
-__[A]{.solved}__: As you can see `force(x)` is similar to `x`. As being mentioned in Advanced R we prefer this explicit form, because
+__[A]{.solved}__: As you can see `force(x)` is similar to `x`. As mentioned in Advanced R, we prefer this explicit form, because
 
 > using this function clearly indicates that you’re forcing evaluation, not that you’ve accidentally typed `x`."
 
@@ -107,7 +107,7 @@ plot(x, y, lwd = 10)
 points(x_new, f_con(x_new), pch = 16)
 ```
 
-Finally, the `ties` argument allows to aggregate y values if multiple ones were provided for the same x value. E.g. in the following line we use `mean()` to aggregate these y values before they are used for the interpolation `approxfun(x = c(1,1,2), y = 1:3, ties = mean)`.
+Finally, the `ties` argument allows to aggregate y values if multiple ones were provided for the same x value. For example, in the following line we use `mean()` to aggregate these y values before they are used for the interpolation `approxfun(x = c(1,1,2), y = 1:3, ties = mean)`.
 
 Next, we focus on `ecdf()`. "ecdf" is an acronym for empirical cumulative distribution function. For a numeric vector of density values, `ecdf()` initially creates the (x, y) pairs for the nodes of the density function and then passes these pairs to `approxfun()`, which gets called with specifically adapted settings (`approxfun(vals, cumsum(tabulate(match(x, vals)))/n, method = "constant", yleft = 0, yright = 1, f = 0, ties = "ordered")`). 
 
@@ -420,7 +420,7 @@ mean <- function(x) stop("Hi!")
 env_unbind(globalenv(), names(funs))
 ```
 
-__[A]{.solved}__: `attach()` adds `funs` to the search path. Therefore, the provided functions are found before their respective versions from the `{base}` package. Further, they cannot get accidently overwritten by similar named functions in the global environment. One annoying downside of using `attach()` is the possibility to attach the same object multiple times, making it necessary to call `detach()` equally often.
+__[A]{.solved}__: `attach()` adds `funs` to the search path. Therefore, the provided functions are found before their respective versions from the `{base}` package. Further, they cannot get accidentally overwritten by similar named functions in the global environment. One annoying downside of using `attach()` is the possibility to attach the same object multiple times, making it necessary to call `detach()` equally often.
 
 ```{r}
 attach(funs)
