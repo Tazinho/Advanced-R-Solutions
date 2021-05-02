@@ -173,7 +173,7 @@ __[Q1]{.Q}__: What important property of `&&` makes `x_ok()` work?
 
 ```{r}
 x_ok <- function(x) {
-  length(x) == 1 && x > 0
+  !is.null(x) && length(x) == 1 && x > 0
 }
 
 x_ok(NULL)
