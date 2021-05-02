@@ -159,7 +159,7 @@ __[A]{.solved}__: `base::factor()` converts these values (silently) into `NA`s:
 factor(c("a", "b", "c"), levels = c("a", "b"))
 ```
 
-The `factor()` helper including the constructor (`new_factor()`) and its validator (`validate_factor()`) were given in Advanced R. However, as the goal of this question is to throw an early error within the helper, we only repeat the code for the helper:
+The `factor()` helper including the constructor (`new_factor()`) and its validator (`validate_factor()`) were given in *Advanced R*. However, as the goal of this question is to throw an early error within the helper, we only repeat the code for the helper:
 
 ```{r, eval = FALSE}
 # Simplified version of the factor() helper, as defined in Advanced R
@@ -202,7 +202,7 @@ __[A]{.solved}__: When factor variables (representing nominal or ordinal informa
 
 Within R's formula interface you can wrap a factor in `stats::C()` and specify the contrast of your choice. Alternatively, you can set the `contrasts` attribute of your factor variable, which accepts matrix input. (See `?contr.helmert` or similar for details.)
 
-The `new_factor()` constructor was given in Advanced R as:
+The `new_factor()` constructor was given in *Advanced R* as:
 
 ```{r}
 # new_factor() constructor from Advanced R
@@ -321,7 +321,7 @@ x <- structure(1:10, class = "test")
 t(x)
 ```
 
-However, in older versions of R (pre R 4.0.0; when Advanced R was written) this behaviour was slightly different. Instead of dispatching to the `t.default()` method, the `t.test()` generic was erroneously treated as a method of `t()` which then dispatched to `t.test.default()` or (when defined) to `t.test.test()`.
+However, in older versions of R (pre R 4.0.0; when *Advanced R* was written) this behaviour was slightly different. Instead of dispatching to the `t.default()` method, the `t.test()` generic was erroneously treated as a method of `t()` which then dispatched to `t.test.default()` or (when defined) to `t.test.test()`.
 
 ```{r, eval = FALSE}
 # Output in R version 3.6.2
@@ -610,7 +610,7 @@ __[A]{.solved}__: When we execute the code above, this is what is happening:
 
 - we pass an object of classes `b` and `a2` to `generic2()`, which prompts R to look for a method`generic2.b()`
 - the method `generic2.b()` then changes the class to `a1` and calls `NextMethod()`
-- One would think that this will lead R to call `generic2.a1()`, but in fact, as mentioned in Advanced R, `NextMethod()` 
+- One would think that this will lead R to call `generic2.a1()`, but in fact, as mentioned in *Advanced R*, `NextMethod()` 
 
     > doesn’t actually work with the class attribute of the object, but instead uses a special global variable (.Class) to keep track of which method to call next.
     
@@ -722,7 +722,7 @@ __[Q3]{.Q}__: `Math.difftime()` is more complicated than I described. Why?
 
 __[A]{.solved}__: `Math.difftime()` also excludes cases apart from `abs`, `sign`, `floor`, `ceiling`, `trunc`, `round` and `signif` and needs to return a fitting error message.
 
-For comparison: `Math.difftime()` as defined in Advanced R:
+For comparison: `Math.difftime()` as defined in *Advanced R*:
 
 ```{r}
 Math.difftime <- function(x, ...) {

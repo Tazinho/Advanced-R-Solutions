@@ -50,7 +50,7 @@ eval(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (2)
 expr(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (3)
 ```
 
-__[A]{.solved}__: Let's look at a quote from the [first edition of Advanced R](http://adv-r.had.co.nz/Computing-on-the-language.html#subset):
+__[A]{.solved}__: Let's look at a quote from the [first edition of *Advanced R*](http://adv-r.had.co.nz/Computing-on-the-language.html#subset):
 
 > "`expr()` and `eval()` are opposites. [...] each `eval()` peels off one layer of `expr()`'s".
 
@@ -97,7 +97,7 @@ x
 
 __[Q4]{.Q}__: Modify `source2()` so it returns the result of _every_ expression, not just the last one. Can you eliminate the for loop?
 
-__[A]{.solved}__: The code for `source2()` was given in Advanced R as:
+__[A]{.solved}__: The code for `source2()` was given in *Advanced R* as:
 
 ```{r}
 source2 <- function(path, env = caller_env()) {
@@ -235,7 +235,7 @@ capture_env(x)
 
 __[Q1]{.Q}__: Why did I use a for loop in `transform2()` instead of `map()`? Consider `transform2(df, x = x * 2, x = x * 2)`.
 
-__[A]{.solved}__: `transform2()` was defined in Advanced R as:
+__[A]{.solved}__: `transform2()` was defined in *Advanced R* as:
 
 ```{r}
 transform2 <- function(.data, ...) {
@@ -461,9 +461,9 @@ identical(
 
 __[Q3]{.Q}__: Another way to write `resample_lm()` would be to include the resample expression `(data[sample(nrow(data), replace = TRUE), , drop = FALSE])` in the data argument. Implement that approach. What are the advantages? What are the disadvantages?
 
-__[A]{.solved}__: Different versions of `resample_lm()`  were given in Advanced R. However, none of them implemented the resampling within the function argument.
+__[A]{.solved}__: Different versions of `resample_lm()`  were given in *Advanced R*. However, none of them implemented the resampling within the function argument.
 
-Different versions of `resample_lm()` (`resample_lm0()`, `resample_lm1()`, `resample_lm2()`) were specified in Advanced R. However, in none of these versions was the resampling step implemented in any of the arguments.
+Different versions of `resample_lm()` (`resample_lm0()`, `resample_lm1()`, `resample_lm2()`) were specified in *Advanced R*. However, in none of these versions was the resampling step implemented in any of the arguments.
 
 This approach takes advantage of R's lazy evaluation of function arguments, by moving the resampling step into the argument definition. The user passes the data to the function, but only a permutation of this data (`resample_data`) will be used.
 
@@ -488,4 +488,4 @@ lm_1$call
 
 With this approach the evaluation needs to take place within the function's environment, because the resampled dataset (defined as a default argument) will only be available in the function environment.
 
-Overall, putting an essential part of the pre-processing outside of the functions body is not common practice in R. Compared to the unquoting-implementation (`resample_lm1()` in Advanced R), this approach captures the model-call in a more meaningful way. This approach will also lead to a new resample every time you `update()` the model.
+Overall, putting an essential part of the pre-processing outside of the functions body is not common practice in R. Compared to the unquoting-implementation (`resample_lm1()` in *Advanced R*), this approach captures the model-call in a more meaningful way. This approach will also lead to a new resample every time you `update()` the model.

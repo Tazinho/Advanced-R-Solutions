@@ -190,7 +190,7 @@ x <- expr(foo(x = 1))
 names(x) <- c("x", "")
 ```
 
-__[A]{.solved}__: As stated in Advanced R
+__[A]{.solved}__: As stated in *Advanced R*
 
 > The first element of a call is always the function that gets called.
 
@@ -432,7 +432,7 @@ pairwise.t.test(2, d + d + d + d + d + d + d + d +
 
 __[Q1]{.Q}__: `logical_abbr()` returns `TRUE` for `T(1, 2, 3)`. How could you modify `logical_abbr_rec()` so that it ignores function calls that use `T` or `F`?
 
-__[A]{.solved}__: We can apply a similar logic as in the [assignment example](https://adv-r.hadley.nz/expressions.html#finding-all-variables-created-by-assignment) from Advanced R. We just treat it as a special case handled within a sub function called `find_T_call()`, which finds `T()` calls and "bounces them out". Therefore, we also repeat the `expr_type()` helper which tells us if we are in the base or in the recursive case.
+__[A]{.solved}__: We can apply a similar logic as in the [assignment example](https://adv-r.hadley.nz/expressions.html#finding-all-variables-created-by-assignment) from *Advanced R*. We just treat it as a special case handled within a sub function called `find_T_call()`, which finds `T()` calls and "bounces them out". Therefore, we also repeat the `expr_type()` helper which tells us if we are in the base or in the recursive case.
 
 ```{r}
 expr_type <- function(x) {

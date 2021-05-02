@@ -33,11 +33,11 @@ But
 
 Adapt the `escape()` to follow these rules when a new argument `script` is set to `TRUE`.
 
-__[A]{.solved}__: We are asked to implement a special case of escaping for the `<script>` tag. At first we will revisit the relevant functions provided in Advanced R and confirm that our code reliably escapes for tags like `<p>` and `<b>` but doesn't escape correctly for the `<script>` tag. Then we modify the `escape()` and `tag()` functions to redefine the `<script>` tag and confirm that all defined tags now escape correctly.
+__[A]{.solved}__: We are asked to implement a special case of escaping for the `<script>` tag. At first we will revisit the relevant functions provided in *Advanced R* and confirm that our code reliably escapes for tags like `<p>` and `<b>` but doesn't escape correctly for the `<script>` tag. Then we modify the `escape()` and `tag()` functions to redefine the `<script>` tag and confirm that all defined tags now escape correctly.
 
 Note that the `<style>` tag, which contains styling information in CSS, follows the same escaping rules as the `<script>` tag. We therefore implement the desired escaping for the `<style>` tag function also.
 
-Let's start by loading the relevant code from Advanced R first.
+Let's start by loading the relevant code from *Advanced R* first.
 
 ```{r required code from advr}
 # Escaping
@@ -258,7 +258,7 @@ tag_factory <- function(tag, tag_attrs) {
 }
 ```
 
-To validate our new function factory, we modify the `with_html()` example from Advanced R to work with our newly created `a()` and `img()` tag functions.
+To validate our new function factory, we modify the `with_html()` example from *Advanced R* to work with our newly created `a()` and `img()` tag functions.
 
 ```{r}
 tag_list <- list(
@@ -294,7 +294,7 @@ address <- "123 anywhere street"
 with_html(p(address))
 ```
 
-__[A]{.solved}__: First, we rerun the relevant code from Advanced R to define `with_html()`. Note that we skip the code for void tags, as none of them appear in the code chunk from this exercise.
+__[A]{.solved}__: First, we rerun the relevant code from *Advanced R* to define `with_html()`. Note that we skip the code for void tags, as none of them appear in the code chunk from this exercise.
 
 ```{r}
 tags <- c(
@@ -337,7 +337,7 @@ with_html(p(address))
 
 __[Q4]{.Q}__: Currently the HTML doesn't look terribly pretty, and it's hard to see the structure. How could you adapt `tag()` to do indenting and formatting? (You may need to do some research into block and inline tags.)
 
-__[A]{.solved}__: First, let us load all relevant functions from Advanced R:
+__[A]{.solved}__: First, let us load all relevant functions from *Advanced R*:
 
 ```{r required code from book}
 tag <- function(tag) {
@@ -728,7 +728,7 @@ to_math(sin(pi) + f(a))
 
 To adjust this behaviour, we need an escape function with methods for the `character` and `advr_latex` classes. 
 
-(Note that we must first repeat the underlying code from Advanced R. However, since this would be a bit verbose, and not very meaningful, we will not show this step here.)
+(Note that we must first repeat the underlying code from *Advanced R*. However, since this would be a bit verbose, and not very meaningful, we will not show this step here.)
 
 ```{r}
 escape_latex <- function(x) UseMethod("escape_latex")
@@ -801,7 +801,7 @@ to_math(x != y)
 
 Implementing the rest is just a mechanical application of the same principles with more LaTex expressions, which can be found on [Wikipedia](https://en.wikipedia.org/wiki/Help:Displaying_a_formula).
 
-To provide these translations, we'll follow the LaTeX section from Advanced R from the beginning. This makes it easier to keep an overview, as we just need to insert the specific changes at the relevant parts.
+To provide these translations, we'll follow the LaTeX section from *Advanced R* from the beginning. This makes it easier to keep an overview, as we just need to insert the specific changes at the relevant parts.
 
 Let's start and repeat the converter function `to_math()` from the textbook.
 
@@ -842,7 +842,7 @@ latex_env <- function(expr) {
 }
 ```
 
-We already know from Advanced R that e.g. `to_math(pi)` now correctly converts to `\\pi`. So, let's move on to the next one.
+We already know from *Advanced R* that e.g. `to_math(pi)` now correctly converts to `\\pi`. So, let's move on to the next one.
 
 Here, it'll become a bit more technical. Not every symbol is Greek (and not every part of an expression is a symbol). To find out which symbols are present within the expression, first, we use an approach from [section 5 of the expressions chapter](https://adv-r.hadley.nz/expressions.html#ast-funs) (walking the AST to find all symbols) where Hadley recursively walks the AST to distinguish between different expression element types.
 
@@ -911,7 +911,7 @@ In this way, `to_math()` will first convert all known Greek letters (found in `g
 
 We also have to add support for functions. This will give us the opportunity to insert some specific support for `plotmath` functions.
 
-To support a whole bunch of unary and binary functions within the function environment (`f_env`), which will be added next to `latex_env`, Hadley defines the following two helpers in Advanced R.
+To support a whole bunch of unary and binary functions within the function environment (`f_env`), which will be added next to `latex_env`, Hadley defines the following two helpers in *Advanced R*.
 
 ```{r}
 unary_op <- function(left, right) {
@@ -935,7 +935,7 @@ binary_op <- function(sep) {
 }
 ```
 
-While defining the function environment, `f_env`, we mostly continue to copy the exact code from Advanced R. However, at the bottom we add a short section where we define some extra conversions which are part of `plotmath` (and selected above in our intro to this solution).
+While defining the function environment, `f_env`, we mostly continue to copy the exact code from *Advanced R*. However, at the bottom we add a short section where we define some extra conversions which are part of `plotmath` (and selected above in our intro to this solution).
 
 ```{r}
 f_env <- child_env(
@@ -1011,7 +1011,7 @@ to_math(sin(sin))
 
 If we wanted, we could include further `plotmath` functions in this step. If this collides with other functions at some point, we could just create our own `f_plotmath_env` to support more `plotmath` functions. In that case we would need to add this environment also to `latex_env()` (as child environment of the function environment `f_env`).
 
-To complete this answer, we will also add the support for unknown functions. Similarly as for the unknown symbols, we use the trick to recursively run the AST and just reuse the code from Advanced R.
+To complete this answer, we will also add the support for unknown functions. Similarly as for the unknown symbols, we use the trick to recursively run the AST and just reuse the code from *Advanced R*.
 
 ```{r}
 all_calls_rec <- function(x) {

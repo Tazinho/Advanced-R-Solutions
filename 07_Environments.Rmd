@@ -8,7 +8,7 @@ source("common.R")
 ## Prerequisites {-}
 <!-- 7.0 -->
 
-Just like in Advanced R, we mainly use the `{rlang}` package [@rlang] to work with environments.
+Just like in *Advanced R*, we mainly use the `{rlang}` package [@rlang] to work with environments.
 
 ```{r setup, message = FALSE}
 library(rlang)
@@ -75,7 +75,7 @@ __[A]{.solved}__: The first option doesn't make sense, because elements of an en
 
 __[Q5]{.Q}__: Create a version of `env_poke()` that will only bind new names, never re-bind old names. Some programming languages only do this, and are known as [single assignment languages](http://en.wikipedia.org/wiki/Assignment_(computer_science)#Single_assignment).
 
-__[A]{.solved}__: As described in Advanced R `rlang::env_poke()` takes a name (as string) and a value to assign (or reassign) a binding in an environment.
+__[A]{.solved}__: As described in *Advanced R* `rlang::env_poke()` takes a name (as string) and a value to assign (or reassign) a binding in an environment.
 
 ```{r}
 e3 <- new.env()
@@ -131,7 +131,7 @@ __[Q1]{.Q}__: Modify `where()` to return _all_ environments that contain a bindi
 
 __[A]{.solved}__: `where()` searches (recursively) for a given name within a given environment and its ancestors. If `where()` finds the name in one of these environments, it returns the environment's name. Otherwise, it throws an error.
 
-The definition of `where()` was given in Advanced R as:
+The definition of `where()` was given in *Advanced R* as:
 
 ```{r}
 where <- function(name, env = caller_env()) {
