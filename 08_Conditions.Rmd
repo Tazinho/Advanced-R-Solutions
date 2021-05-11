@@ -47,19 +47,29 @@ __[A]{.solved}__: The `appendLF` argument automatically appends a new line to th
 multiline_msg <- function(appendLF = TRUE) {
   message("first", appendLF = appendLF)
   message("second", appendLF = appendLF)
-  cat("third")
-  cat("fourth")
 }
 
 multiline_msg(appendLF = TRUE)
 #> first
 #> second
-#> thirdfourth
 multiline_msg(appendLF = FALSE)
-#> firstsecondthirdfourth
+#> firstsecond
 ```
 
-Comparable behaviour regarding line breaks for `cat()` can be achieved via setting its `sep` argument to `"\n"`.
+Comparable behaviour regarding line breaks for `cat()` can be achieved via setting its `sep` argument to `"\n"`:
+
+```{r, eval=FALSE}
+multiline_cat <- function(sep = "\n") {
+  cat("first", sep = sep)
+  cat("second", sep = sep)
+}
+
+multiline_cat(sep = "\n")
+#> first
+#> second
+multiline_cat(sep = "")
+#> firstsecond
+```
 
 \stepcounter{section}
 ## Handling conditions
