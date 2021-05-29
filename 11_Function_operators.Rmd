@@ -94,11 +94,11 @@ In the first case, first the dot functionality is added to `download.file()`. Th
 
 In the latter case the delay is added first and the dot-functionality is wrapped around it. This order will print the first dot immediately after the 9th download is finished, then the short delay occurs before the 10th download actually starts.
 
-__[Q2]{.Q}__: Should you memoise `file.download()`? Why or why not?
+__[Q2]{.Q}__: Should you memoise `download.file()`? Why or why not?
 
-__[A]{.solved}__: Memoising `file.download()` will only work if the files are immutable, i.e. if the file at a given URL is always the same. There's no point memoising unless this is true. Even if this is true, however, memoise has to store the results in memory, and large files will potentially take up a lot of memory.
+__[A]{.solved}__: Memoising `download.file()` will only work if the files are immutable, i.e. if the file at a given URL is always the same. There's no point memoising unless this is true. Even if this is true, however, memoise has to store the results in memory, and large files will potentially take up a lot of memory.
 
-This implies that it's probably not beneficial to memoise `file.download()` in most cases. The only exception is if you are downloading small files many times, and the file at a given URL is guaranteed not to change.
+This implies that it's probably not beneficial to memoise `download.file()` in most cases. The only exception is if you are downloading small files many times, and the file at a given URL is guaranteed not to change.
 
 __[Q3]{.Q}__: Create a function operator that reports whenever a file is created or deleted in the working directory, using `dir()` and `setdiff()`. What other global function effects might you want to track?
 
