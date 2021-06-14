@@ -270,11 +270,12 @@ BankAccountStrict2 <- R6Class(
 )
 ```
 
-To test our new class, we create an instance and try to go into overdraft.
+To test our new class, we create an instance and try to directly set the account balance and try to go into overdraft.
 
 ```{r, error = TRUE}
 my_account_strict_2 <- BankAccountStrict2$new()
 
+my_account_strict_2$balance <- 10
 my_account_strict_2$deposit(5)
 my_account_strict_2$withdraw(10)
 ```
