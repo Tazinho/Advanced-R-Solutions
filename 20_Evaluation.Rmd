@@ -461,11 +461,7 @@ identical(
 
 __[Q3]{.Q}__: Another way to write `resample_lm()` would be to include the resample expression `(data[sample(nrow(data), replace = TRUE), , drop = FALSE])` in the data argument. Implement that approach. What are the advantages? What are the disadvantages?
 
-__[A]{.solved}__: Different versions of `resample_lm()`  were given in *Advanced R*. However, none of them implemented the resampling within the function argument.
-
-Different versions of `resample_lm()` (`resample_lm0()`, `resample_lm1()`, `resample_lm2()`) were specified in *Advanced R*. However, in none of these versions was the resampling step implemented in any of the arguments.
-
-This approach takes advantage of R's lazy evaluation of function arguments, by moving the resampling step into the argument definition. The user passes the data to the function, but only a permutation of this data (`resample_data`) will be used.
+__[A]{.solved}__: Different versions of `resample_lm()` (`resample_lm0()`, `resample_lm1()`, `resample_lm2()`)  were specified in *Advanced R*. However, none of them implemented the resampling within the function argument. The asked approach takes advantage of R's lazy evaluation of function arguments, by moving the resampling step into the argument definition. The user passes the data to the function, but only a permutation of this data (`resample_data`) will be used.
 
 ```{r}
 resample_lm <- function(
