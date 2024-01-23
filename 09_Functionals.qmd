@@ -1,14 +1,14 @@
+---
+bibliography: references.bib
+---
+
 ```{r, include = FALSE}
 source("common.R")
 ```
 
-# (PART) Functional programming {-} 
-
 # Functionals
-<!-- 9 -->
 
 ## Prerequisites {-}
-<!-- 9.0 -->
 
 For the functional programming part of the book, we will mainly use functions from the `{purrr}` package [@purrr].
 
@@ -16,9 +16,7 @@ For the functional programming part of the book, we will mainly use functions fr
 library(purrr)
 ```
 
-\stepcounter{section}
 ## My first functional: `map()`
-<!-- 9.2 -->
 
 __[Q1]{.Q}__: Use `as_mapper()` to explore how `{purrr}` generates anonymous functions for the integer, character, and list helpers. What helper allows you to extract attributes? Read the documentation to find out.
 
@@ -29,9 +27,9 @@ Given character, numeric or list input `as_mapper()` will create an extractor fu
 The extractor function is implemented as a call to `purrr::pluck()`, which accepts a list of accessors (accessors "access" some part of your data object).
 
 ```{r}
-as_mapper(c(1, 2))  # equivalent to function(x) x[[1]][[2]]
-as_mapper(c("a", "b"))  # equivalent to function(x) x[["a"]][["b]]
-as_mapper(list(1, "b"))  # equivalent to function(x) x[[1]][["b]]
+as_mapper(c(1, 2)) # equivalent to function(x) x[[1]][[2]]
+as_mapper(c("a", "b")) # equivalent to function(x) x[["a"]][["b]]
+as_mapper(list(1, "b")) # equivalent to function(x) x[[1]][["b]]
 ```
 
 Besides mixing positions and names, it is also possible to pass along an accessor function. This is basically an anonymous function that gets information about some aspect of the input data. You are free to define your own accessor functions. 
@@ -95,7 +93,7 @@ df_trials <- tibble::tibble(p_value = map_dbl(trials, "p.value"))
 
 df_trials %>%
   ggplot(aes(x = p_value, fill = p_value < 0.05)) +
-  geom_dotplot(binwidth = .01) +  # geom_histogram() as alternative
+  geom_dotplot(binwidth = .01) + # geom_histogram() as alternative
   theme(
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank(),
@@ -166,9 +164,7 @@ bootstraps %>%
   map_dbl("r.squared")
 ```
 
-\stepcounter{section}
 ## Map variants
-<!-- 9.4 -->
 
 __[Q1]{.Q}__: Explain the results of `modify(mtcars, 1)`.
 
@@ -257,9 +253,7 @@ paths <- file.path(tempdir(), paste0("cyl-", names(cyls), ".csv"))
 map2(cyls, paths, write.csv)
 ```
 
-\stepcounter{section}
 ## Predicate functionals
-<!-- 9.6 -->
 
 __[Q1]{.Q}__: Why isn't `is.na()` a predicate function? What base R function is closest to being a predicate version of `is.na()`?
 
@@ -290,9 +284,13 @@ Therefore, subsetting length-0 and length-1 vectors via `[[` will lead to a *sub
 
 ```{r}
 simple_reduce <- function(x, f, default) {
-  if (length(x) == 0L) return(default)
-  if (length(x) == 1L) return(x[[1L]])
-  
+  if (length(x) == 0L) {
+    return(default)
+  }
+  if (length(x) == 1L) {
+    return(x[[1L]])
+  }
+
   out <- x[[1]]
   for (i in seq(2, length(x))) {
     out <- f(out, x[[i]])
@@ -321,29 +319,29 @@ data(mtcars)
 ```{r}
 span_r <- function(x, f) {
   idx <- unname(map_lgl(x, ~ f(.x)))
-  rle <- rle(idx) 
-  
+  rle <- rle(idx)
+
   # Check if the predicate is never true
   if (!any(rle$values)) {
     return(integer(0))
   }
-  
+
   # Find the length of the longest sequence of true values
   longest <- max(rle$lengths[rle$values])
   # Find the positition of the (first) longest run in rle
   longest_idx <- which(rle$values & rle$lengths == longest)[1]
-  
+
   # Add up all lengths in rle before the longest run
   ind_before_longest <- sum(rle$lengths[seq_len(longest_idx - 1)])
-  
+
   out_start <- ind_before_longest + 1L
   out_end <- ind_before_longest + longest
   out_start:out_end
 }
 
 # Check that it works
-span_r(c(0,  0,  0,  0,  0), is.na)
-span_r(c(NA, 0,  0,  0,  0), is.na)
+span_r(c(0, 0, 0, 0, 0), is.na)
+span_r(c(NA, 0, 0, 0, 0), is.na)
 span_r(c(NA, 0, NA, NA, NA), is.na)
 ```
 
@@ -362,8 +360,8 @@ arg_min <- function(x, f) {
   x[y == min(y)]
 }
 
-arg_max(-10:5, function(x) x ^ 2)
-arg_min(-10:5, function(x) x ^ 2)
+arg_max(-10:5, function(x) x^2)
+arg_min(-10:5, function(x) x^2)
 ```
 
 __[Q5]{.Q}__: The function below scales a vector so it falls in the range [0, 1]. How would you apply it to every column of a data frame? How would you apply it to every numeric column in a data frame?
@@ -382,7 +380,6 @@ modify_if(mtcars, is.numeric, scale01)
 ```
 
 ## Base functionals
-<!-- 9.7 -->
 
 __[Q1]{.Q}__: How does `apply()` arrange the output? Read the documentation and perform some experiments.
 
@@ -424,22 +421,22 @@ fixed_point <- function(f, x_init, n_max = 10000, tol = 0.0001) {
   n <- 0
   x <- x_init
   y <- f(x)
-  
+
   is_fixed_point <- function(x, y) {
     abs(x - y) < tol
   }
-  
+
   while (!is_fixed_point(x, y)) {
     x <- y
     y <- f(y)
-    
+
     # Make sure we eventually stop
     n <- n + 1
     if (n > n_max) {
       stop("Failed to converge.", call. = FALSE)
     }
   }
-  
+
   x
 }
 

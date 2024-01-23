@@ -1,12 +1,14 @@
+---
+bibliography: references.bib
+---
+
 ```{r, include = FALSE}
 source("common.R")
 ```
 
 # R6
-<!-- 14 -->
 
 ## Prerequisites {-}
-<!-- 14.0 -->
 
 To solve the exercises in this chapter we will have to create R6 objects, which are implemented in the `{R6}` package [@R6].
 
@@ -14,9 +16,7 @@ To solve the exercises in this chapter we will have to create R6 objects, which 
 library(R6)
 ```
 
-\stepcounter{section}
 ## Classes and methods
-<!-- 14.2 -->
 
 __[Q1]{.Q}__: Create a bank account R6 class that stores a balance and allows you to deposit and withdraw money. Create a subclass that throws an error if you attempt to go into overdraft. Create another subclass that allows you to go into overdraft, but charges you a fee.
 
@@ -24,7 +24,7 @@ __[A]{.solved}__: Let's start with a basic bank account, similar to the `Accumul
 
 ```{r}
 BankAccount <- R6Class(
-  classname = "BankAccount", 
+  classname = "BankAccount",
   public = list(
     balance = 0,
     deposit = function(dep = 0) {
@@ -238,7 +238,6 @@ __[Q7]{.Q}__: What base type are R6 objects built on top of? What attributes do 
 __[A]{.solved}__: R6 objects are built on top of environments. They have a `class` attribute, which is a character vector containing the class name, the name of any super classes (if existent) and the string `"R6"` as the last element.
 
 ## Controlling access
-<!-- 14.3 -->
 
 __[Q1]{.Q}__: Create a bank account class that prevents you from directly setting the account balance, but that you can still withdraw from and deposit to. Throw an error if you attempt to go into overdraft.
 
@@ -384,7 +383,6 @@ B$new()$test()
 We conclude that subclasses can access private methods from their superclasses, but not private fields.
 
 ## Reference semantics
-<!-- 14.4 -->
 
 __[Q1]{.Q}__: Create a class that allows you to write a line to a specified file. You should open a connection to the file in `$initialize()`, append a line using `cat()` in `$append_line()`, and close the connection in `$finalize()`.
 
@@ -398,11 +396,9 @@ FileWriter <- R6::R6Class(
     initialize = function(filename) {
       self$con <- file(filename, open = "a")
     },
-
     finalize = function() {
       close(self$con)
     },
-
     append_line = function(x) {
       cat(x, "\n", sep = "", file = self$con)
     }

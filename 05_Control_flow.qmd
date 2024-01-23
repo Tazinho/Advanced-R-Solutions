@@ -1,12 +1,14 @@
+---
+bibliography: references.bib
+---
+
 ```{r, include = FALSE}
 source("common.R")
 ```
 
 # Control flow
-<!-- 5 -->
-\stepcounter{section}
+
 ## Choices
-<!-- 5.2 -->
 
 __[Q1]{.Q}__: What type of vector does each of the following calls to `ifelse()` return?
 
@@ -47,7 +49,6 @@ if (length(x)) "not empty" else "empty"
 __[A]{.solved}__: `if()` expects a logical condition, but also accepts a numeric vector where `0` is treated as `FALSE` and all other numbers are treated as `TRUE`. Numerical missing values (including `NaN`) lead to an error in the same way that a logical missing, `NA`, does.
 
 ## Loops
-<!-- 5.3 -->
 
 __[Q1]{.Q}__: Why does this code succeed without errors or warnings?
 
@@ -55,7 +56,7 @@ __[Q1]{.Q}__: Why does this code succeed without errors or warnings?
 x <- numeric()
 out <- vector("list", length(x))
 for (i in 1:length(x)) {
-  out[i] <- x[i] ^ 2
+  out[i] <- x[i]^2
 }
 out
 ```
@@ -89,7 +90,7 @@ __[Q3]{.Q}__: What does the following code tell you about when the index is upda
 ```{r}
 for (i in 1:3) {
   i <- i * 2
-  print(i) 
+  print(i)
 }
 ```
 

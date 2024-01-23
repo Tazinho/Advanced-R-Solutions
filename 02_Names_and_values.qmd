@@ -1,27 +1,22 @@
-\mainmatter
+---
+bibliography: references.bib
+---
 
 ```{r, include = FALSE}
 source("common.R")
 ```
 
-# (PART) Foundations {-} 
-
-\stepcounter{chapter}
 # Names and values
-<!-- 2 -->
 
 ## Prerequisites {-}
-<!-- 2.0 -->
 
 In this chapter we will use the `{lobstr}` package [@lobstr] to help answer questions regarding the internal representation of R objects.
 
 ```{r setup, message = FALSE}
-library(lobstr) 
+library(lobstr)
 ```
 
-\stepcounter{section}
 ## Binding basics
-<!-- 2.2 -->
 
 __[Q1]{.Q}__: Explain the relationship between `a`, `b`, `c`, and `d` in the following code:
 
@@ -76,27 +71,27 @@ Three main mechanisms ensure syntactically valid names (see `?make.names`):
 1. Names that do not start with a letter or a dot will be prepended with an `"X"`.
 
     ```{r}
-    make.names("")    # prepending "x"
+make.names("") # prepending "x"
     ```
 
    The same holds for names that begin with a dot followed by a number. 
 
     ```{r}
-    make.names(".1")  # prepending "X"
+make.names(".1") # prepending "X"
     ```
 
 2. Additionally, non-valid characters are replaced by a dot.
 
     ```{r}
-    make.names("non-valid")  # "." replacement
-    make.names("@")          # prepending "X" + "." replacement 
-    make.names("  R")        # prepending "X" + ".." replacement
+make.names("non-valid") # "." replacement
+make.names("@") # prepending "X" + "." replacement
+make.names("  R") # prepending "X" + ".." replacement
     ```
 
 3. Reserved R keywords (see `?reserved`) are suffixed by a dot.
 
     ```{r}
-    make.names("if")  # "." suffix
+make.names("if") # "." suffix
     ```
 
 Interestingly, some of these transformations are influenced by the current locale. From `?make.names`:
@@ -108,14 +103,13 @@ __[Q5]{.Q}__: I slightly simplified the rules that govern syntactic names. Why i
 __[A]{.solved}__: `.123e1` is not a syntactic name, because it starts with one dot which is followed by a number. This makes it a double, `1.23`.
 
 ## Copy-on-modify
-<!-- 2.3 -->
 
 __[Q1]{.Q}__: Why is `tracemem(1:10)` not useful?
 
 __[A]{.solved}__: When `1:10` is called an object with an address in memory is created, but it is not bound to a name. Therefore, the object cannot be called or manipulated from R. As no copies will be made, it is not useful to track the object for copying.
 
 ```{r}
-obj_addr(1:10)  # the object exists, but has no name
+obj_addr(1:10) # the object exists, but has no name
 ```
 
 __[Q2]{.Q}__: Explain why `tracemem()` shows two copies when you run this code. Hint: carefully look at the difference between this code and the code shown earlier in the section.
@@ -135,7 +129,7 @@ tracemem(x)
 #> <0x66a4a70>
 
 x[[3]] <- 4
-#> tracemem[0x55eec7b3af38 -> 0x55eec774cc18]: 
+#> tracemem[0x55eec7b3af38 -> 0x55eec774cc18]:
 ```
 
 We can avoid the copy by sub-assigning an integer instead of a double:
@@ -162,7 +156,8 @@ __[A]{.solved}__: `a` contains a reference to an address with the value `1:10`. 
 
 ```{r, echo = FALSE, out.width='180pt'}
 knitr::include_graphics("images/names_values/copy_on_modify_fig3.png",
-                        dpi = 300)
+  dpi = 300
+)
 ```
 
 We can confirm these relationships by inspecting the reference tree in R.
@@ -192,13 +187,14 @@ __[A]{.solved}__: The initial reference tree of `x` shows that the name `x` bind
 x <- list(1:10)
 
 ref(x)
-#> █ [1:0x55853b74ff40] <list> 
-#> └─[2:0x534t3abffad8] <int> 
+#> █ [1:0x55853b74ff40] <list>
+#> └─[2:0x534t3abffad8] <int>
 ```
 
 ```{r, echo = FALSE, out.width='135pt'}
 knitr::include_graphics("images/names_values/copy_on_modify_fig1.png",
-                        dpi = 300)
+  dpi = 300
+)
 ```
 
 When `x` is assigned to an element of itself, copy-on-modify takes place and the list is copied to a new address in memory.
@@ -213,15 +209,16 @@ The list object previously bound to `x` is now referenced in the newly created l
 
 ```{r, eval = FALSE}
 ref(x)
-#> █ [1:0x5d553bacdcd8] <list> 
-#> ├─[2:0x534t3abffad8] <int> 
-#> └─█ [3:0x55853b74ff40] <list> 
-#>   └─[2:0x534t3abffad8] 
+#> █ [1:0x5d553bacdcd8] <list>
+#> ├─[2:0x534t3abffad8] <int>
+#> └─█ [3:0x55853b74ff40] <list>
+#>   └─[2:0x534t3abffad8]
 ```
 
 ```{r, echo = FALSE, out.width = '150pt'}
 knitr::include_graphics("images/names_values/copy_on_modify_fig2.png",
-                        dpi = 300)
+  dpi = 300
+)
 ```
 
 ## Object size
@@ -349,7 +346,7 @@ obj_size(b)
 The second element of `b` still references the same address as `a`, so the combined size of `a` and `b` is the same as `b`.
 
 ```{r}
-obj_size(a, b) 
+obj_size(a, b)
 ref(a, b)
 ```
 
@@ -357,14 +354,14 @@ When we modify the second element of `b`, this element will also point to a new 
 
 ```{r}
 b[[2]][[1]] <- 10
-obj_size(b) 
+obj_size(b)
 ```
 
 However, as `b` doesn't share references with `a` anymore, the memory usage of the combined objects increases.
 
 ```{r}
 ref(a, b)
-obj_size(a, b) 
+obj_size(a, b)
 ```
 
 ## Modify-in-place
@@ -380,18 +377,18 @@ x[[1]] <- x
 __[A]{.solved}__: In this situation copy-on-modify prevents the creation of a circular list. Let us step through the details:
 
 ```{r, eval = FALSE}
-x <- list()  # creates initial object
+x <- list() # creates initial object
 obj_addr(x)
 #> [1] "0x55862f23ab80"
 
 tracemem(x)
 #> [1] "<0x55862f23ab80>"
-x[[1]] <- x  # Copy-on-modify triggers new copy
+x[[1]] <- x # Copy-on-modify triggers new copy
 #> tracemem[0x55862f23ab80 -> 0x55862e8ce028]:
 
-obj_addr(x)       # copied object has new memory address
+obj_addr(x) # copied object has new memory address
 #> [1] "0x55862e8ce028"
-obj_addr(x[[1]])  # list element contains old memory address
+obj_addr(x[[1]]) # list element contains old memory address
 #> [1] "0x55862f23ab80"
 ```
 

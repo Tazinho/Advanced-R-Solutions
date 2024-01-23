@@ -1,3 +1,7 @@
+---
+bibliography: references.bib
+---
+
 # Preface {-}
 
 Welcome to *Advanced R Solutions*!
@@ -72,7 +76,7 @@ contribs_all <- contribs_all %>% unique()
 
 # Get info for all contributors
 needed_json <- map(
-  contribs_all$login, 
+  contribs_all$login,
   ~ gh::gh("/users/:username", username = .x)
 )
 info_all <- tibble(
@@ -88,15 +92,15 @@ write_csv(info_all, "contributors.csv")
 library(dplyr)
 contributors <- read.csv("contributors.csv", encoding = "UTF-8")
 
-contributors <- contributors %>% 
-  filter(!login %in% c("hadley", "henningsway", "Tazinho", "toebR")) %>% 
+contributors <- contributors %>%
+  filter(!login %in% c("hadley", "henningsway", "Tazinho", "toebR")) %>%
   mutate(
     login = paste0("\\@", login),
     desc = ifelse(is.na(name), login, paste0(name, " (", login, ")"))
-  ) %>% 
+  ) %>%
   arrange(login)
 
-cat(glue::glue_collapse(contributors$desc, sep = ", ", last = ", and ")) 
+cat(glue::glue_collapse(contributors$desc, sep = ", ", last = ", and "))
 cat(".\n")
 ```
 
@@ -140,3 +144,5 @@ See you around!
 Malte Grosser [`@malte_grosser`](https://twitter.com/malte_grosser)
 
 Henning Bumann [`@henningsway`](https://twitter.com/henningsway)
+
+Mauricio Vargas Sepulveda `m.sepulveda@mail.utoronto.ca`

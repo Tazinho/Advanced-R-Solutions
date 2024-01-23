@@ -1,12 +1,14 @@
+---
+bibliography: references.bib
+---
+
 ```{r, include = FALSE}
 source("common.R")
 ```
 
 # Function operators
-<!-- 11 -->
 
 ## Prerequisites {-}
-<!-- 11.0 -->
 
 Also in the third chapter on functional programming, we make relatively frequent use of the {purrr} package.
 
@@ -14,9 +16,7 @@ Also in the third chapter on functional programming, we make relatively frequent
 library(purrr)
 ```
 
-\stepcounter{section}
 ## Existing function operators
-<!-- 11.2 -->
 
 __[Q1]{.Q}__: Base R provides a function operator in the form of `Vectorize()`. What does it do? When might you use it?
 
@@ -29,15 +29,15 @@ Let's take a look at an example from the documentation:
 ```{r, eval=FALSE}
 vrep <- Vectorize(rep.int)
 vrep
-#> function (x, times) 
+#> function (x, times)
 #> {
 #>   args <- lapply(as.list(match.call())[-1L], eval, parent.frame())
-#>   names <- if (is.null(names(args))) 
+#>   names <- if (is.null(names(args)))
 #>     character(length(args))
 #>   else names(args)
 #>   dovec <- names %in% vectorize.args
 #>   do.call("mapply", c(FUN = FUN, args[dovec],
-#>                       MoreArgs = list(args[!dovec]), 
+#>                       MoreArgs = list(args[!dovec]),
 #>                       SIMPLIFY = SIMPLIFY, USE.NAMES = USE.NAMES))
 #> }
 #> <environment: 0x558902db65d0>
@@ -84,7 +84,6 @@ purrr:::capture_error
 Take a look at *Advanced R* or the documentation of `safely()` to see how you can take advantage of this behaviour, e.g. when fitting many models.
 
 ## Case study: Creating your own function operators
-<!-- 11.3 -->
 
 __[Q1]{.Q}__: Weigh the pros and cons of `download.file %>% dot_every(10) %>% delay_by(0.1)` versus `download.file %>% delay_by(0.1) %>% dot_every(10)`.
 
@@ -109,14 +108,18 @@ dir_compare <- function(old, new) {
   if (setequal(old, new)) {
     return()
   }
-  
+
   added <- setdiff(new, old)
   removed <- setdiff(old, new)
-  
+
   changes <- c(
     if (length(added) > 0) paste0(" * '", added, "' was added"),
-    if (length(removed) > 0) paste0(" * '", removed ,
-                                    "' was removed")
+    if (length(removed) > 0) {
+      paste0(
+        " * '", removed,
+        "' was removed"
+      )
+    }
   )
   message(paste(changes, collapse = "\n"))
 }
@@ -133,7 +136,7 @@ track_dir <- function(f) {
   function(...) {
     dir_old <- dir()
     on.exit(dir_compare(dir_old, dir()), add = TRUE)
-    
+
     f(...)
   }
 }
@@ -163,14 +166,14 @@ __[Q4]{.Q}__: Write a function operator that logs a timestamp and message to a f
 __[A]{.solved}__: Our `logger()` function operator takes a function and a file path as input. One timestamp is written to the file under `log_path` when we call `logger()` and another timestamp is written to the same file each time the new function gets called.
 
 ```{r}
-append_line <- function(path, ...) { 
+append_line <- function(path, ...) {
   cat(..., "\n", sep = "", file = path, append = TRUE)
 }
 
 logger <- function(f, log_path) {
   force(f)
   force(log_path)
-  
+
   append_line(log_path, "created at: ", as.character(Sys.time()))
   function(...) {
     append_line(log_path, "called at: ", as.character(Sys.time()))
@@ -185,7 +188,7 @@ Now, let's check if our `logger()` works as intended and apply it to the `mean()
 log_path <- tempfile()
 mean2 <- logger(mean, log_path)
 Sys.sleep(5)
-mean2(1:4) 
+mean2(1:4)
 Sys.sleep(1)
 mean2(1:4)
 
@@ -200,7 +203,7 @@ __[A]{.solved}__: `delay_by()` was defined in *Advanced R* as:
 delay_by <- function(f, amount) {
   force(f)
   force(amount)
-  
+
   function(...) {
     Sys.sleep(amount)
     f(...)
@@ -214,10 +217,10 @@ To ensure that the function created by `delay_by()` waits that a certain amount 
 delay_atleast <- function(amount, f) {
   force(f)
   force(amount)
-  
+
   # Store the last time the function was run
   last_time <- NULL
-  
+
   # Return modified "delay-aware" function
   function(...) {
     if (!is.null(last_time)) {
@@ -226,10 +229,10 @@ delay_atleast <- function(amount, f) {
         Sys.sleep(wait)
       }
     }
-    
+
     # Update the time after the function has finished
-    on.exit(last_time <<- Sys.time()) 
-    
+    on.exit(last_time <<- Sys.time())
+
     f(...)
   }
 }

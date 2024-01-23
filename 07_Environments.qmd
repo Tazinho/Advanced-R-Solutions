@@ -1,12 +1,14 @@
+---
+bibliography: references.bib
+---
+
 ```{r, include = FALSE}
 source("common.R")
 ```
 
 # Environments
-<!-- 7 -->
 
 ## Prerequisites {-}
-<!-- 7.0 -->
 
 Just like in *Advanced R*, we mainly use the `{rlang}` package [@rlang] to work with environments.
 
@@ -16,7 +18,6 @@ library(rlang)
 
 \stepcounter{section}
 ## Environment basics
-<!-- 7.2 -->
 
 __[Q1]{.Q}__: List three ways in which an environment differs from a list.
 
@@ -33,7 +34,8 @@ __[Q2]{.Q}__: Create an environment as illustrated by this picture.
 
 ```{r echo = FALSE, out.width = '200pt'}
 knitr::include_graphics("images/environments/recursive-1.png",
-                        dpi = 300)
+  dpi = 300
+)
 ```
 
 __[A]{.solved}__: Let's create an environment that contains itself.
@@ -53,7 +55,8 @@ __[Q3]{.Q}__: Create a pair of environments as illustrated by this picture.
 
 ```{r, echo = FALSE, out.width = '200pt'}
 knitr::include_graphics("images/environments/recursive-2.png",
-                        dpi = 300)
+  dpi = 300
+)
 ```
 
 __[A]{.solved}__: These two environments contain each other:
@@ -62,7 +65,7 @@ __[A]{.solved}__: These two environments contain each other:
 e1 <- env()
 e2 <- env()
 
-e1$loop   <- e2
+e1$loop <- e2
 e2$dedoop <- e1
 
 lobstr::ref(e1)
@@ -125,7 +128,6 @@ a
 __[A]{.solved}__: The primary difference between `rebind()` and `<<-` is that `rebind()` will only carry out an assignment when it finds an existing binding; unlike `<<-` it will never create a new one in the global environment. This behaviour of `<<-` is usually undesirable because global variables introduce non-obvious dependencies between functions.
 
 ## Recursing over environments
-<!-- 7.3 -->
 
 __[Q1]{.Q}__: Modify `where()` to return _all_ environments that contain a binding for `name`. Carefully think through what type of object the function will need to return.
 
@@ -205,7 +207,6 @@ fget("mean", inherits = TRUE)
 ```
 
 ## Special environments
-<!-- 7.4 -->
 
 __[Q1]{.Q}__: How is `search_envs()` different to `env_parents(global_env())`?
 
@@ -244,7 +245,8 @@ The following diagram visualises the relations between the function environments
 
 ```{r, echo = FALSE, out.width='350pt'}
 knitr::include_graphics(
-  "images/environments/function_environments_corrected.png", dpi = 300
+  "images/environments/function_environments_corrected.png",
+  dpi = 300
 )
 ```
 
@@ -314,7 +316,6 @@ fstr("mean")
 Once you have learned about tidy evaluation, you could rewrite `fstr()` to use `enquo()` so that you'd call it more like `str()`, i.e. `fstr(sum)`.
 
 ## Call stacks
-<!-- 7.5 -->
 
 __[Q1]{.Q}__: Write a function that lists all the variables defined in the environment in which it was called. It should return the same results as `ls()`.
 

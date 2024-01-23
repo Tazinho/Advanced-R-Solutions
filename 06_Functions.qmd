@@ -1,13 +1,14 @@
+---
+bibliography: references.bib
+---
+
 ```{r, include = FALSE}
 source("common.R")
 ```
 
 # Functions
-<!-- 6 -->
 
-\stepcounter{section}
 ## Function fundamentals
-<!-- 6.2 -->
 
 __[Q1]{.Q}__: Given a name, like `"mean"`, `match.fun()` lets you find a function. Given a function, can you find its name? Why doesn't that make sense in R?
 
@@ -72,40 +73,40 @@ __[A]{.solved}__: Let's look at each sub-question separately:
 a. To find the function with the most arguments, we first compute the length of `formals()`.
 
     ```{r, message = FALSE}
-    library(purrr)
-    
-    n_args <- funs %>% 
-      map(formals) %>%
-      map_int(length)
+library(purrr)
+
+n_args <- funs %>%
+  map(formals) %>%
+  map_int(length)
     ```
 
    Then we sort `n_args` in decreasing order and look at its first entries.
 
     ```{r, eval = FALSE}
-    n_args %>% 
-      sort(decreasing = TRUE) %>%
-      head()
-    #> scan format.default source
-    #> 22 16 16
-    #> formatC library merge.data.frame
-    #> 15 13 13
+n_args %>%
+  sort(decreasing = TRUE) %>%
+  head()
+#> scan format.default source
+#> 22 16 16
+#> formatC library merge.data.frame
+#> 15 13 13
     ```
 
 b. We can further use `n_args` to find the number of functions with no arguments:
 
     ```{r}
-    sum(n_args == 0)
+sum(n_args == 0)
     ```
 
    However, this over counts because `formals()` returns `NULL` for primitive functions, and `length(NULL)` is 0. To fix this, we can first remove the primitive functions:
 
     ```{r}
-    n_args2 <- funs %>% 
-      discard(is.primitive) %>% 
-      map(formals) %>%
-      map_int(length)
-    
-    sum(n_args2 == 0)
+n_args2 <- funs %>%
+  discard(is.primitive) %>%
+  map(formals) %>%
+  map_int(length)
+
+sum(n_args2 == 0)
     ```
 
    Indeed, most of the functions with no arguments are actually primitive functions.
@@ -113,8 +114,8 @@ b. We can further use `n_args` to find the number of functions with no arguments
 c. To find all primitive functions, we can change the predicate in `Filter()` from `is.function()` to `is.primitive()`:
 
     ```{r}
-    funs <- Filter(is.primitive, objs)
-    length(funs)
+funs <- Filter(is.primitive, objs)
+length(funs)
     ```
 
 __[Q6]{.Q}__: What are the three important components of a function?
@@ -127,9 +128,7 @@ __[Q7]{.Q}__: When does printing a function not show what environment it was cre
 
 __[A]{.solved}__: Primitive functions and functions created in the global environment do not print their environment.
 
-\stepcounter{section}
 ## Lexical scoping
-<!-- 6.4 -->
 
 __[Q1]{.Q}__: What does the following code return? Why? Describe how each of the three `c`’s is interpreted.
 
@@ -155,7 +154,7 @@ __[Q3]{.Q}__: What does the following function return? Make a prediction before 
 f <- function(x) {
   f <- function(x) {
     f <- function() {
-      x ^ 2
+      x^2
     }
     f() + 1
   }
@@ -167,7 +166,6 @@ f(10)
 __[A]{.solved}__: Within this nested function two more functions also named `f` are defined and called. Because the functions are each executed in their own environment R will look up and use the functions defined last in these environments. The innermost `f()` is called last, though it is the first function to return a value. Therefore, the order of the calculation passes "from the inside to the outside" and the function returns `((10 ^ 2) + 1) * 2`, i.e. 202.
 
 ## Lazy evaluation
-<!-- 6.5 -->
 
 __[Q1]{.Q}__: What important property of `&&` makes `x_ok()` work?
 
@@ -218,7 +216,10 @@ __[Q3]{.Q}__: What does this function return? Why? Which principle does it illus
 
 ```{r, eval = FALSE}
 y <- 10
-f1 <- function(x = {y <- 1; 2}, y = 0) {
+f1 <- function(x = {
+                 y <- 1
+                 2
+               }, y = 0) {
   c(x, y)
 }
 f1()
@@ -272,7 +273,6 @@ str(formals(library))
 ```
 
 ## `...` (dot-dot-dot)
-<!-- 6.6 -->
 
 __[Q1]{.Q}__: Explain the following results:
 
@@ -333,7 +333,6 @@ localTitle <- function(..., col, bg, pch, cex, lty, lwd) title(...)
 The call to `localTitle()` passes the `col` parameter as part of the `...` argument to `title()`. `?title` tells us that the `title()` function specifies four parts of the plot: Main (title of the plot), sub (sub-title of the plot) and both axis labels. Therefore, it would introduce ambiguity inside `title()` to use `col` directly. Instead, one has the option to supply `col` via the `...` argument, via `col.lab` or as part of `xlab` in the form `xlab = list(c("index"), col = "red")` (similar for `ylab`).
 
 ## Exiting a function
-<!-- 6.7 -->
 
 __[Q1]{.Q}__: What does `load()` return? Why don’t you normally see these values?
 
@@ -351,7 +350,7 @@ __[A]{.solved}__: The `with_dir()` approach was given in *Advanced R* as:
 with_dir <- function(dir, code) {
   old <- setwd(dir)
   on.exit(setwd(old))
-  
+
   force(code)
 }
 ```
@@ -378,10 +377,10 @@ __[Q5]{.Q}__: We can use `on.exit()` to implement a simple version of `capture.o
 capture.output2 <- function(code) {
   temp <- tempfile()
   on.exit(file.remove(temp), add = TRUE, after = TRUE)
-  
+
   sink(temp)
   on.exit(sink(), add = TRUE, after = TRUE)
-  
+
   force(code)
   readLines(temp)
 }
@@ -397,12 +396,15 @@ In `capture_output2()` the code is simply forced, and the output is caught via `
 The main difference is that `capture.output()` calls print, i.e. compare the output of these two calls:
 
 ```{r, warning = FALSE}
-capture.output({1})
-capture.output2({1})
+capture.output({
+  1
+})
+capture.output2({
+  1
+})
 ```
 
 ## Function forms
-<!-- 6.8 -->
 
 __[Q1]{.Q}__: Rewrite the following code snippets into prefix form:
 
@@ -463,7 +465,7 @@ R internally transforms the code, and the transformed code reproduces the error 
 
 ```{r, eval = FALSE}
 get("x") <- `modify<-`(get("x"), 1, 10)
-#> Error in get("x") <- `modify<-`(get("x"), 1, 10) : 
+#> Error in get("x") <- `modify<-`(get("x"), 1, 10) :
 #>   target of assignment expands to non-language object
 ```
 
@@ -509,7 +511,7 @@ __[A]{.solved}__: To achieve this behaviour, we need to override the `+` operato
 }
 
 # Test
-+ 1
++1
 1 + 2
 "a" + "b"
 
@@ -537,7 +539,7 @@ To find out which of these functions are primitives, we first search for these f
 
 ```{r}
 repls_base_prim <- mget(repls_base, envir = baseenv()) %>%
-  Filter(is.primitive, .) %>% 
+  Filter(is.primitive, .) %>%
   names()
 
 repls_base_prim

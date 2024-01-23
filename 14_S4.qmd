@@ -1,12 +1,14 @@
+---
+bibliography: references.bib
+---
+
 ```{r, include = FALSE}
 source("common.R")
 ```
 
 # S4
-<!-- 15 -->
 
 ## Prerequisites {-}
-<!-- 15.0 -->
 
 We load the `{methods}` package [@RLanguage] as it contains the S4 object-oriented programming system.
 
@@ -14,9 +16,7 @@ We load the `{methods}` package [@RLanguage] as it contains the S4 object-orient
 library(methods)
 ```
 
-\stepcounter{section}
 ## Basics
-<!-- 15.2 -->
 
 __[Q1]{.Q}__: `lubridate::period()` returns an S4 class. What slots does it have? What class is each slot? What accessors does it provide?
 
@@ -26,7 +26,7 @@ As a short example, we create a period of 1 second, 2 minutes, 3 hours, 4 days a
 
 ```{r}
 example_12345 <- lubridate::period(
-  c(1, 2, 3, 4, 5), 
+  c(1, 2, 3, 4, 5),
   c("second", "minute", "hour", "day", "week")
 )
 ```
@@ -52,7 +52,6 @@ __[A]{.solved}__: Besides adding `?` in front of a function call (i.e. `?method(
 - documentation for a specific method via `ClassName?methodName`.
 
 ## Classes
-<!-- 15.3 -->
 
 __[Q1]{.Q}__: Extend the Person class with fields to match `utils::person()`. Think about what slots you will need, what class each slot should have, and what you’ll need to check in your validity method.
 
@@ -102,28 +101,32 @@ Person <- function(given, family,
 # Validator to ensure that each slot is of length one
 setValidity("Person", function(object) {
   invalids <- c()
-  if (length(object@age)     != 1 ||
-      length(object@given)   != 1 ||
-      length(object@family)  != 1 ||
-      length(object@email)   != 1 ||
-      length(object@comment) != 1) {
-    invalids <- paste0("@name, @age, @given, @family, @email, ",
-                       "@comment must be of length 1")
-  } 
-  
+  if (length(object@age) != 1 ||
+    length(object@given) != 1 ||
+    length(object@family) != 1 ||
+    length(object@email) != 1 ||
+    length(object@comment) != 1) {
+    invalids <- paste0(
+      "@name, @age, @given, @family, @email, ",
+      "@comment must be of length 1"
+    )
+  }
+
   known_roles <- c(
     NA_character_, "aut", "com", "cph", "cre", "ctb",
     "ctr", "dtc", "fnd", "rev", "ths", "trl"
   )
-  
+
   if (!all(object@role %in% known_roles)) {
     paste(
-      "@role(s) must be one of", 
+      "@role(s) must be one of",
       paste(known_roles, collapse = ", ")
     )
   }
-  
-  if (length(invalids)) return(invalids)  
+
+  if (length(invalids)) {
+    return(invalids)
+  }
   TRUE
 })
 ```
@@ -200,7 +203,6 @@ new("DataFrame", data = list(a = 1, b = 2))
 ```
 
 ## Generics and methods
-<!-- 15.4 -->
 
 __[Q1]{.Q}__: Add `age()` accessors for the `Person` class.
 
@@ -283,7 +285,6 @@ setMethod("show", "Person", function(object, y) {
 ```
 
 ## Method dispatch 
-<!-- 15.5 -->
 
 ```{r, include=FALSE}
 source("emoji.R")
@@ -311,7 +312,6 @@ __[Q3]{.Q}__: Take the last example which shows multiple dispatch over two class
 __[A]{.solved}__: We will introduce ambiguity, since one class has distance 2 to all terminal nodes and the other four have distance 1 to two terminal nodes each. To resolve this ambiguity we have to define five more methods, one per class combination.
 
 ## S4 and S3
-<!-- 15.6 -->
 
 __[Q1]{.Q}__: What would a full `setOldClass()` definition look like for an ordered factor (i.e. add `slots` and `prototype` to the definition above)?
 
@@ -320,19 +320,19 @@ __[A]{.solved}__: The purpose of `setOldClass()` lies in registering an S3 class
 Let's build an S4 `OrderedFactor` on top of the S3 factor in such a way.
 
 ```{r}
-setOldClass("factor")    # use build-in definition for brevity
+setOldClass("factor") # use build-in definition for brevity
 
 OrderedFactor <- setClass(
   "OrderedFactor",
-  contains = "factor",   # inherit from registered S3 class
+  contains = "factor", # inherit from registered S3 class
   slots = c(
     levels = "character",
-    ordered = "logical"  # add logical order slot
+    ordered = "logical" # add logical order slot
   ),
   prototype = structure(
     integer(),
     levels = character(),
-    ordered = logical()  # add default value
+    ordered = logical() # add default value
   )
 )
 ```
@@ -355,6 +355,8 @@ __[Q2]{.Q}__: Define a `length` method for the `Person` class.
 __[A]{.solved}__: We keep things simple and will just return `"180cm"` when the `length()` method is called on a `Person` object. The method can be defined either as an S3 or S4 method.
 
 ```{r}
-length.Person <- function(x) "180cm"  # S3
-setMethod("length", "Person", function(x) "180cm")  # S4
+length.Person <- function(x) "180cm" # S3
+setMethod("length", "Person", function(x) "180cm") # S4
 ```
+
+## References
