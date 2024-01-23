@@ -145,7 +145,7 @@ __[A]{.solved}__: In this exercise `pick(i)` acts as a function factory, which r
 ```{r}
 pick <- function(i) {
   force(i)
-  
+
   function(x) x[[i]]
 }
 
@@ -173,15 +173,15 @@ __[A]{.solved}__: The first moment is closely related to the mean and describes 
 ```{r}
 moment <- function(i) {
   force(i)
-  
-  function(x) sum((x - mean(x)) ^ i) / length(x)
+
+  function(x) sum((x - mean(x))^i) / length(x)
 }
 
 m1 <- moment(1)
 m2 <- moment(2)
 
 x <- runif(100)
-all.equal(m1(x), 0)  # removed stopifnot() for clarity
+all.equal(m1(x), 0) # removed stopifnot() for clarity
 all.equal(m2(x), var(x) * 99 / 100)
 ```
 
@@ -253,11 +253,11 @@ boot_model <- function(df, formula) {
   fitted <- unname(fitted(mod))
   resid <- unname(resid(mod))
   rm(mod)
-  
+
   function() {
     fitted + sample(resid)
   }
-} 
+}
 ```
 
 __[Q2]{.Q}__: Why might you formulate the Box-Cox transformation like this?
@@ -268,9 +268,9 @@ boxcox3 <- function(x) {
     if (lambda == 0) {
       log(x)
     } else {
-      (x ^ lambda - 1) / lambda
+      (x^lambda - 1) / lambda
     }
-  }  
+  }
 }
 ```
 
@@ -293,7 +293,7 @@ __[A]{.solved}__: `boot_permute()` is defined in *Advanced R* as:
 boot_permute <- function(df, var) {
   n <- nrow(df)
   force(var)
-  
+
   function() {
     col <- df[[var]]
     col[sample(n, replace = TRUE)]
@@ -318,7 +318,7 @@ __[A]{.solved}__: Let us recall the definitions of `ll_poisson1()`, `ll_poisson2
 ```{r}
 ll_poisson1 <- function(x) {
   n <- length(x)
-  
+
   function(lambda) {
     log(lambda) * sum(x) - n * lambda - sum(lfactorial(x))
   }
@@ -328,7 +328,7 @@ ll_poisson2 <- function(x) {
   n <- length(x)
   sum_x <- sum(x)
   c <- sum(lfactorial(x))
-  
+
   function(lambda) {
     log(lambda) * sum_x - n * lambda - c
   }
@@ -351,7 +351,7 @@ As the redundant calculations within `ll_poisson1()` become more expensive with 
 ```{r, message = FALSE, warning = FALSE}
 bench_poisson <- function(x_length) {
   x <- rpois(x_length, 100L)
-  
+
   bench::mark(
     llp1 = optimise(ll_poisson1(x), c(0, 100), maximum = TRUE),
     llp2 = optimise(ll_poisson2(x), c(0, 100), maximum = TRUE),
@@ -363,7 +363,7 @@ performances <- map_dfr(10^(1:5), bench_poisson)
 
 df_perf <- tibble(
   x_length = rep(10^(1:5), each = 2),
-  method   = rep(attr(performances$expression, "description"), 5),
+  method   = attr(performances$expression, "description"),
   median   = performances$median
 )
 
@@ -416,7 +416,7 @@ mean <- function(x) stop("Hi!")
 detach(funs)
 
 env_bind(globalenv(), !!!funs)
-mean <- function(x) stop("Hi!") 
+mean <- function(x) stop("Hi!")
 env_unbind(globalenv(), names(funs))
 ```
 
