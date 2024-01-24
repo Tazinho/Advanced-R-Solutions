@@ -2,7 +2,7 @@
 bibliography: references.bib
 ---
 
-```{r, include = FALSE}
+```{r ch24_01, include = FALSE}
 source("common.R")
 ```
 
@@ -16,7 +16,7 @@ __[A]{.solved}__: The [CRAN task view for high-performance computing](https://cr
 
 For small datasets, we observe only minor performance gains (or even a small cost):
 
-```{r}
+```{r ch24_02}
 penguins <- palmerpenguins::penguins
 
 bench::mark(
@@ -37,7 +37,7 @@ bench::mark(
 
 For larger datasets the selection of the appropriate method is of greater relevance:
 
-```{r, collapse = TRUE, warning = FALSE}
+```{r ch24_03, collapse = TRUE, warning = FALSE}
 eps <- rnorm(100000)
 x1 <- rnorm(100000, 5, 3)
 x2 <- rep(c("a", "b"), 50000)
@@ -61,7 +61,7 @@ __[Q2]{.Q}__: What package implements a version of `match()` that's faster for r
 
 __[A]{.solved}__: A web search points us to the `{fastmatch}` package [@fastmatch]. We compare it to `base::match()` and observe an impressive performance gain.
 
-```{r}
+```{r ch24_04}
 table <- 1:100000
 x <- sample(table, 10000, replace = TRUE)
 
@@ -75,28 +75,28 @@ __[Q3]{.Q}__: List four functions (not just those in base R) that convert a stri
 
 __[A]{.solved}__: The usual base R way is to use the `as.POSIXct()` generic and create a date time object of class `POSIXct` and type integer.
 
-```{r}
+```{r ch24_05}
 date_ct <- as.POSIXct("2020-01-01 12:30:25")
 date_ct
 ```
 
 Under the hood `as.POSIXct()` employs `as.POSIXlt()` for the character conversion. This creates a date time object of class `POSIXlt` and type `list`.
 
-```{r}
+```{r ch24_06}
 date_lt <- as.POSIXlt("2020-01-01 12:30:25")
 date_lt
 ```
 
 The `POSIXlt` class has the advantage that it carries the individual time components as attributes. This allows to extract the time components via typical list operators.
 
-```{r}
+```{r ch24_07}
 attributes(date_lt)
 date_lt$sec
 ```
 
 However, while lists may be practical, basic calculations are often faster and require less memory for objects with underlying integer type.
 
-```{r}
+```{r ch24_08}
 date_lt2 <- rep(date_lt, 10000)
 date_ct2 <- rep(date_ct, 10000)
 
@@ -109,7 +109,7 @@ bench::mark(
 
 `as.POSIXlt()` in turn uses `strptime()` under the hood, which creates a similar date time object.
 
-```{r}
+```{r ch24_09}
 date_str <- strptime("2020-01-01 12:30:25",
   format = "%Y-%m-%d %H:%M:%S"
 )
@@ -118,7 +118,7 @@ identical(date_lt, date_str)
 
 `as.POSIXct()` and `as.POSIXlt()` accept different character inputs by default (e.g. `"2001-01-01 12:30"` or `"2001/1/1 12:30"`). `strptime()` requires the format argument to be set explicitly, and provides a performance improvement in return.
 
-```{r}
+```{r ch24_10}
 bench::mark(
   as.POSIXct = as.POSIXct("2020-01-01 12:30:25"),
   as.POSIXct_format = as.POSIXct("2020-01-01 12:30:25",
@@ -132,7 +132,7 @@ bench::mark(
 
 A fourth way is to use the converter functions from the `{lubridate}` package [@lubridate], which contains wrapper functions (for the POSIXct approach) with an intuitive syntax. (There is a slight decrease in performance though.)
 
-```{r, message = FALSE}
+```{r ch24_11, message = FALSE}
 library(lubridate)
 ymd_hms("2013-07-24 23:55:26")
 
@@ -150,7 +150,9 @@ __[A]{.solved}__: A rolling mean is a useful statistic to smooth time-series, sp
 
 The general functionality can be found in multiple packages, which vary in speed and flexibility of the computations. Here is a benchmark for several functions that all serve our purpose.
 
-```{r}
+```{r ch24_12, eval = FALSE}
+# TODO: This works in the HTML but not in the PDF
+
 x <- 1:10
 slider::slide_dbl(x, mean, .before = 1, .complete = TRUE)
 
@@ -174,7 +176,7 @@ __[A]{.solved}__: According to its description (see `?optim`) `optim()` implemen
 
 `optim()` allows to optimise a function (`fn`) on an interval with a specific method (`method = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", "Brent")`). Many detailed examples are given in the documentation. In the simplest case, we give `optim()` the starting value `par = 0` to calculate the minimum of a quadratic polynomial:
 
-```{r}
+```{r ch24_13}
 optim(0, function(x) x^2 - 100 * x + 50,
   method = "Brent",
   lower = -1e20, upper = 1e20
@@ -183,7 +185,7 @@ optim(0, function(x) x^2 - 100 * x + 50,
 
 Since this solves a one-dimensional optimisation task, we could have also used `stats::optimize()`.
 
-```{r}
+```{r ch24_14}
 optimize(function(x) x^2 - 100 * x + 50, c(-1e20, 1e20))
 ```
 
@@ -198,19 +200,19 @@ __[Q1]{.Q}__: What's the difference between `rowSums()` and `.rowSums()`?
 
 __[A]{.solved}__: When we inspect the source code of the user-facing `rowSums()`, we see that it is designed as a wrapper around `.rowSums()` with some input validation, conversions and handling of complex numbers.
 
-```{r}
+```{r ch24_15}
 rowSums
 ```
 
 `.rowSums()` calls an internal function, which is built into the R interpreter. These compiled functions can be very fast.
 
-```{r}
+```{r ch24_16}
 .rowSums
 ```
 
 However, as our benchmark reveals almost identical computing times, we prefer the safer variant over the internal function for this case.
 
-```{r}
+```{r ch24_17}
 m <- matrix(rnorm(1e6), nrow = 1000)
 
 bench::mark(
@@ -223,7 +225,7 @@ __[Q2]{.Q}__: Make a faster version of `chisq.test()` that only computes the chi
 
 __[A]{.solved}__: We aim to speed up our reimplementation of `chisq.test()` by *doing less*.
 
-```{r}
+```{r ch24_18}
 chisq.test2 <- function(x, y) {
   m <- rbind(x, y)
   margin1 <- rowSums(m)
@@ -241,7 +243,9 @@ chisq.test2 <- function(x, y) {
 
 We check if our new implementation returns the same results and benchmark it afterwards.
 
-```{r}
+```{r ch24_19, eval = FALSE}
+# TODO: This works in the HTML but not in the PDF
+
 a <- 21:25
 b <- seq(21, 29, 2)
 m <- cbind(a, b)
@@ -262,7 +266,7 @@ __[A]{.solved}__: When analysing the source code of `table()` we aim to omit eve
 
 First, we calculate the dimensions and names of the output table. Then we use `fastmatch::fmatch()` to map the elements of each vector to their position within the vector itself (i.e. the smallest value is mapped to `1L`, the second smallest value to `2L`, etc.). Following the logic within `table()` we combine and shift these values to create a mapping of the integer pairs in our data to the index of the output table. After applying these lookups `tabulate()` counts the values and returns an integer vector with counts for each position in the table. As a last step, we reuse the code from `table()` to assign the correct dimension and class.
 
-```{r}
+```{r ch24_20}
 table2 <- function(a, b) {
   a_s <- sort(unique(a))
   b_s <- sort(unique(b))
@@ -301,7 +305,7 @@ __[Q1]{.Q}__: The density functions, e.g. `dnorm()`, have a common interface. Wh
 
 __[A]{.solved}__: We can get an overview of the interface of these functions via `?dnorm`:
 
-```{r, eval = FALSE}
+```{r ch24_21, eval = FALSE}
 dnorm(x, mean = 0, sd = 1, log = FALSE)
 pnorm(q, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
 qnorm(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
@@ -316,7 +320,9 @@ __[Q2]{.Q}__: Compare the speed of `apply(x, 1, sum)` with `rowSums(x)` for vary
 
 __[A]{.solved}__: We compare the two functions for square matrices of increasing size:
 
-```{r, warning = FALSE}
+```{r ch24_22, warning = FALSE, eval = FALSE}
+# TODO: This works in the HTML but not in the PDF
+
 rowsums <- bench::press(
   p = seq(500, 5000, length.out = 10),
   {
@@ -351,7 +357,9 @@ __[Q3]{.Q}__: How can you use `crossprod()` to compute a weighted sum? How much 
 
 __[A]{.solved}__: We can hand the vectors to `crossprod()`, which converts them to row- and column-vectors and then multiplies these. The result is the dot product, which corresponds to a weighted sum.
 
-```{r}
+```{r ch24_23, eval = FALSE}
+# TODO: This works in the HTML but not in the PDF
+
 x <- rnorm(10)
 w <- rnorm(10)
 all.equal(sum(x * w), crossprod(x, w)[[1]])
@@ -359,7 +367,9 @@ all.equal(sum(x * w), crossprod(x, w)[[1]])
 
 A benchmark of both approaches for different vector lengths indicates that the `crossprod()` variant is almost twice as fast as `sum(x * w)`.
 
-```{r}
+```{r ch24_24, eval = FALSE}
+# TODO: This works in the HTML but not in the PDF
+
 weightedsum <- bench::press(
   n = 1:10,
   {
