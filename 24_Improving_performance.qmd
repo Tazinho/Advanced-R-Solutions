@@ -3,11 +3,8 @@ source("common.R")
 ```
 
 # Improving performance
-<!-- 24 -->
 
-\addtocounter{section}{2}
 ## Checking for existing solutions
-<!-- 24.3 -->
 
 __[Q1]{.Q}__: What are faster alternatives to `lm`? Which are specifically designed to work with larger datasets?
 
@@ -20,16 +17,20 @@ penguins <- palmerpenguins::penguins
 
 bench::mark(
   "lm" = lm(
-    body_mass_g ~ bill_length_mm + species, data = penguins
+    body_mass_g ~ bill_length_mm + species,
+    data = penguins
   ) %>% coef(),
   "biglm" = biglm::biglm(
-    body_mass_g ~ bill_length_mm + species, data = penguins
+    body_mass_g ~ bill_length_mm + species,
+    data = penguins
   ) %>% coef(),
   "speedglm" = speedglm::speedlm(
-    body_mass_g ~ bill_length_mm + species, data = penguins
+    body_mass_g ~ bill_length_mm + species,
+    data = penguins
   ) %>% coef(),
   "fastLm" = RcppEigen::fastLm(
-    body_mass_g ~ bill_length_mm + species, data = penguins
+    body_mass_g ~ bill_length_mm + species,
+    data = penguins
   ) %>% coef()
 )
 ```
@@ -68,7 +69,7 @@ x <- sample(table, 10000, replace = TRUE)
 bench::mark(
   match = match(x, table),
   fastmatch = fastmatch::fmatch(x, table)
-) 
+)
 ```
 
 __[Q3]{.Q}__: List four functions (not just those in base R) that convert a string into a date time object. What are their strengths and weaknesses?
@@ -101,7 +102,7 @@ date_lt2 <- rep(date_lt, 10000)
 date_ct2 <- rep(date_ct, 10000)
 
 bench::mark(
-  date_lt2 - date_lt2, 
+  date_lt2 - date_lt2,
   date_ct2 - date_ct2,
   date_ct2 - date_lt2
 )
@@ -111,7 +112,8 @@ bench::mark(
 
 ```{r}
 date_str <- strptime("2020-01-01 12:30:25",
-                     format = "%Y-%m-%d %H:%M:%S")
+  format = "%Y-%m-%d %H:%M:%S"
+)
 identical(date_lt, date_str)
 ```
 
@@ -156,8 +158,10 @@ slider::slide_dbl(x, mean, .before = 1, .complete = TRUE)
 bench::mark(
   caTools = caTools::runmean(x, k = 2, endrule = "NA"),
   data.table = data.table::frollmean(x, 2),
-  RcppRoll = RcppRoll::roll_mean(x, n = 2, fill = NA, 
-                                 align = "right"),
+  RcppRoll = RcppRoll::roll_mean(x,
+    n = 2, fill = NA,
+    align = "right"
+  ),
   slider = slider::slide_dbl(x, mean, .before = 1, .complete = TRUE),
   TTR = TTR::SMA(x, 2),
   zoo_apply = zoo::rollapply(x, 2, mean, fill = NA, align = "right"),
@@ -195,7 +199,6 @@ For more general alternatives, the appropriate choice highly depends on the type
 - `{DEoptim}` [@Deoptim] provides a global optimiser based on the Differential Evolution algorithm.
 
 ## Doing as little as possible
-<!-- 24.4 -->
 
 __[Q1]{.Q}__: What's the difference between `rowSums()` and `.rowSums()`?
 
@@ -249,7 +252,7 @@ a <- 21:25
 b <- seq(21, 29, 2)
 m <- cbind(a, b)
 
-chisq.test(m) %>% print(digits=5)
+chisq.test(m) %>% print(digits = 5)
 chisq.test2(a, b)
 
 bench::mark(
@@ -266,25 +269,24 @@ __[A]{.solved}__: When analysing the source code of `table()` we aim to omit eve
 First, we calculate the dimensions and names of the output table. Then we use `fastmatch::fmatch()` to map the elements of each vector to their position within the vector itself (i.e. the smallest value is mapped to `1L`, the second smallest value to `2L`, etc.). Following the logic within `table()` we combine and shift these values to create a mapping of the integer pairs in our data to the index of the output table. After applying these lookups `tabulate()` counts the values and returns an integer vector with counts for each position in the table. As a last step, we reuse the code from `table()` to assign the correct dimension and class.
 
 ```{r}
-table2 <- function(a, b){
-  
+table2 <- function(a, b) {
   a_s <- sort(unique(a))
   b_s <- sort(unique(b))
-  
+
   a_l <- length(a_s)
   b_l <- length(b_s)
-  
+
   dims <- c(a_l, b_l)
   pr <- a_l * b_l
   dn <- list(a = a_s, b = b_s)
-  
+
   bin <- fastmatch::fmatch(a, a_s) +
     a_l * fastmatch::fmatch(b, b_s) - a_l
   y <- tabulate(bin, pr)
-  
+
   y <- array(y, dim = dims, dimnames = dn)
   class(y) <- "table"
-  
+
   y
 }
 
@@ -300,7 +302,6 @@ bench::mark(
 Since we didn't use `table()` in our `chisq.test2()`-implementation, we cannot benefit from the slight performance gain from `table2()`.
 
 ## Vectorise
-<!-- 24.5 -->
 
 __[Q1]{.Q}__: The density functions, e.g. `dnorm()`, have a common interface. Which arguments are vectorised over? What does `rnorm(10, mean = 10:1)` do?
 
@@ -339,11 +340,14 @@ rowsums %>%
   summary() %>%
   dplyr::mutate(Approach = as.character(expression)) %>%
   ggplot(
-    aes(p, median, color = Approach, group = Approach)) +
+    aes(p, median, color = Approach, group = Approach)
+  ) +
   geom_point() +
   geom_line() +
-  labs(x = "Number of Rows and Columns",
-       y = "Median (s)") +
+  labs(
+    x = "Number of Rows and Columns",
+    y = "Median (s)"
+  ) +
   theme(legend.position = "top")
 ```
 
@@ -379,7 +383,9 @@ weightedsum %>%
   ggplot(aes(n, median, color = Approach, group = Approach)) +
   geom_point() +
   geom_line() +
-  labs(x = "Vector length (millions)",
-       y = "Median (s)") +
+  labs(
+    x = "Vector length (millions)",
+    y = "Median (s)"
+  ) +
   theme(legend.position = "top")
 ```

@@ -2,15 +2,9 @@
 source("common.R")
 ```
 
-# (PART) Metaprogramming {-} 
-\stepcounter{chapter}
-\stepcounter{chapter}
-
 # Expressions
-<!-- 18 -->
 
 ## Prerequisites {-}
-<!-- 18.0 -->
 
 To capture and compute on expressions, and to visualise them, we will load the `{rlang}` [@rlang] and the `{lobstr}` [@lobstr] packages.
 
@@ -19,9 +13,7 @@ library(rlang)
 library(lobstr)
 ```
 
-\stepcounter{section}
 ## Abstract syntax trees
-<!-- 18.2 -->
 
 __[Q1]{.Q}__: Reconstruct the code represented by the trees below:
 
@@ -65,14 +57,14 @@ __[Q3]{.Q}__: What's happening with the ASTs below? (Hint: carefully read `?"^"`
 
 ```{r}
 ast(`x` + `y`)
-ast(x ** y)
+ast(x**y)
 ast(1 -> x)
 ```
 
 __[A]{.solved}__: ASTs start function calls with the name of the function. This is why the call in the first expression is translated into its prefix form. In the second case, `**` is translated by R's parser into `^`. In the last AST, the expression is flipped when R parses it:
 
 ```{r}
-str(expr(x ** y))
+str(expr(x**y))
 str(expr(a -> b))
 ```
 
@@ -104,14 +96,15 @@ We can see the structure more clearly if we avoid the curly braces:
 
 ```{r}
 ast(
-  if (FALSE) 1 
-  else if (FALSE) 2 
-  else if (TRUE) 3
+  if (FALSE) {
+    1
+  } else if (FALSE) {
+    2
+  } else if (TRUE) 3
 )
 ```
 
 ## Expressions
-<!-- 18.3 -->
 
 __[Q1]{.Q}__: Which two of the six types of atomic vector can't appear in an expression?  Why? Similarly, why can't you create an expression that contains an atomic vector of length greater than one?
 
@@ -224,7 +217,6 @@ ast(`if`(x > 1, "a", "b"))
 ```
 
 ## Parsing and grammar
-<!-- 18.4 -->
 
 __[Q1]{.Q}__: R uses parentheses in two slightly different ways as illustrated by these two calls:
 
@@ -260,7 +252,7 @@ __[Q2]{.Q}__: `=` can also be used in two ways. Construct a simple example that 
 __[A]{.solved}__: `=` is used both for assignment, and for naming arguments in function calls:
 
 ```{r}
-b = c(c = 1)
+b <- c(c = 1)
 ```
 
 So, when we play with `ast()`, we can directly see that the following is not possible:
@@ -274,7 +266,9 @@ We get an error because `b = ` makes R looking for an argument called `b`. Since
 The easiest way around this problem is to wrap this line in `{}`.
 
 ```{r}
-ast({b = c(c = 1)})
+ast({
+  b <- c(c = 1)
+})
 ```
 
 When we ignore the braces and compare the trees, we can see that the first `=` is used for assignment and the second `=` is part of the syntax of function calls.
@@ -336,7 +330,7 @@ ast(x + y %+% z)
 Here `y %+% z` will be calculated first and the result will be added to `x`.
 
 ```{r}
-ast(x ^ y %+% z)
+ast(x^y %+% z)
 ```
 
 Here `x ^ y` will be calculated first, and the result will be used as first argument to `%+%()`.
@@ -368,8 +362,8 @@ parse(text = "f())")
 __[Q9]{.Q}__: `deparse()` produces vectors when the input is long. For example, the following call produces a vector of length two:
 
 ```{r, eval = FALSE}
-expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + m + 
-                 n + o + p + q + r + s + t + u + v + w + x + y + z))
+expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + m +
+  n + o + p + q + r + s + t + u + v + w + x + y + z))
 
 deparse(expr)
 ```
@@ -379,13 +373,13 @@ What does `expr_text()` do instead?
 __[A]{.solved}__: `expr_text()` will paste the results from `deparse(expr)` together and use a linebreak (`\n`) as separator.
 
 ```{r, eval = FALSE}
-expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + m + 
-                 n + o + p + q + r + s + t + u + v + w + x + y + z))
+expr <- expr(g(a + b + c + d + e + f + g + h + i + j + k + l + m +
+  n + o + p + q + r + s + t + u + v + w + x + y + z))
 deparse(expr)
 #> [1] "g(a + b + c + d + e + f + g + h + i + j + k + l + m + n + "
 #> [2] "o + p + q + r + s + t + u + v + w + x + y + z)"
 expr_text(expr)
-#> [1] "g(a + b + c + d + e + f + g + h + i + j + k + l + m + n 
+#> [1] "g(a + b + c + d + e + f + g + h + i + j + k + l + m + n
 #> + \n    o + p + q + r + s + t + u + v + w + x + y + z)"
 ```
 
@@ -396,16 +390,16 @@ __[A]{.solved}__: The function `pairwise.t.test()` captures its data arguments (
 ```{r, eval = FALSE}
 # Output in R version 3.6.2
 d <- 1
-pairwise.t.test(2, d + d + d + d + d + d + d + d + 
-                  d + d + d + d + d + d + d + d + d)
-#> 	Pairwise comparisons using t tests with pooled SD 
-#> 
+pairwise.t.test(2, d + d + d + d + d + d + d + d +
+  d + d + d + d + d + d + d + d + d)
+#> 	Pairwise comparisons using t tests with pooled SD
+#>
 #> data:  2 and d + d + d + d + d + d + d + d + d + d + d + d + d + d
-#> + d + d +  2 and     d 
-#> 
+#> + d + d +  2 and     d
+#>
 #> <0 x 0 matrix>
-#> 
-#> P value adjustment method: holm 
+#>
+#> P value adjustment method: holm
 ```
 
 In [R 4.0.0](https://cran.r-project.org/doc/manuals/r-release/NEWS.html) `pairwise.t.test()` was updated to use the newly introduced `deparse1()`, which serves as a wrapper around `deparse()`.
@@ -415,20 +409,19 @@ In [R 4.0.0](https://cran.r-project.org/doc/manuals/r-release/NEWS.html) `pairwi
 ```{r, eval = FALSE}
 # Output since R 4.0.0
 d <- 1
-pairwise.t.test(2, d + d + d + d + d + d + d + d + 
-                  d + d + d + d + d + d + d + d + d)
-#> 	Pairwise comparisons using t tests with pooled SD 
-#> 
+pairwise.t.test(2, d + d + d + d + d + d + d + d +
+  d + d + d + d + d + d + d + d + d)
+#> 	Pairwise comparisons using t tests with pooled SD
+#>
 #> data:  2 and d + d + d + d + d + d + d + d + d + d + d + d + d + d
 #> + d + d + d
-#> 
+#>
 #> <0 x 0 matrix>
-#> 
-#> P value adjustment method: holm 
+#>
+#> P value adjustment method: holm
 ```
 
 ## Walking AST with recursive functions {#ast-funs}
-<!-- 18.5 -->
 
 __[Q1]{.Q}__: `logical_abbr()` returns `TRUE` for `T(1, 2, 3)`. How could you modify `logical_abbr_rec()` so that it ignores function calls that use `T` or `F`?
 
@@ -451,9 +444,12 @@ expr_type <- function(x) {
 
 switch_expr <- function(x, ...) {
   switch(expr_type(x),
-         ...,
-         stop("Don't know how to handle type ", 
-              typeof(x), call. = FALSE))
+    ...,
+    stop("Don't know how to handle type ",
+      typeof(x),
+      call. = FALSE
+    )
+  )
 }
 ```
 
@@ -473,7 +469,7 @@ logical_abbr_rec <- function(x) {
     # Base cases
     constant = FALSE,
     symbol = as_string(x) %in% c("F", "T"),
-    
+
     # Recursive cases
     pairlist = purrr::some(x, logical_abbr_rec),
     call = find_T_call(x)
@@ -551,8 +547,9 @@ find_assign_call <- function(x) {
     } else {
       lhs <- character()
       children <- as.list(x)
-    }}
-  
+    }
+  }
+
   c(lhs, flat_map_chr(children, find_assign_rec))
 }
 
@@ -560,7 +557,7 @@ find_assign_rec <- function(x) {
   switch_expr(
     x,
     # Base cases
-    constant = ,symbol = character(),
+    constant = , symbol = character(),
     # Recursive cases
     pairlist = flat_map_chr(x, find_assign_rec),
     call = find_assign_call(x)
@@ -588,7 +585,7 @@ find_assign_call <- function(x) {
     lhs <- character()
     children <- as.list(x)
   }
-  
+
   c(lhs, flat_map_chr(children, find_assign_rec))
 }
 

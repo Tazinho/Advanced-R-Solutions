@@ -3,10 +3,8 @@ source("common.R")
 ```
 
 # Evaluation
-<!-- 20 -->
 
 ## Prerequisites {-}
-<!-- 20.0 -->
 
 On our journey through R's metaprogramming, we continue to use the functions from the `{rlang}` package.
 
@@ -14,9 +12,7 @@ On our journey through R's metaprogramming, we continue to use the functions fro
 library(rlang)
 ```
 
-\stepcounter{section}
 ## Evaluation basics
-<!-- 20.2 -->
 
 __[Q1]{.Q}__: Carefully read the documentation for `source()`. What environment does it use by default? What if you supply `local = TRUE`? How do you provide a custom environment?
 
@@ -37,7 +33,7 @@ locate_evaluation <- function(file, local) {
 }
 
 # Where will source() evaluate the code?
-locate_evaluation(tmp_file, local = FALSE)  # default
+locate_evaluation(tmp_file, local = FALSE) # default
 locate_evaluation(tmp_file, local = env2)
 locate_evaluation(tmp_file, local = TRUE)
 ```
@@ -45,9 +41,9 @@ locate_evaluation(tmp_file, local = TRUE)
 __[Q2]{.Q}__: Predict the results of the following lines of code:
 
 ```{r, eval = FALSE}
-eval(expr(eval(expr(eval(expr(2 + 2))))))        # (1)
-eval(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (2)
-expr(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (3)
+eval(expr(eval(expr(eval(expr(2 + 2)))))) # (1)
+eval(eval(expr(eval(expr(eval(expr(2 + 2))))))) # (2)
+expr(eval(expr(eval(expr(eval(expr(2 + 2))))))) # (3)
 ```
 
 __[A]{.solved}__: Let's look at a quote from the [first edition of *Advanced R*](http://adv-r.had.co.nz/Computing-on-the-language.html#subset):
@@ -57,9 +53,9 @@ __[A]{.solved}__: Let's look at a quote from the [first edition of *Advanced R*]
 In general, `eval(expr(x))` evaluates to  `x`. Therefore, (1) evaluates to $2 + 2 = 4$. Adding another `eval()` doesn't have impact here. So, also (2) evaluates to `4`. However, when wrapping (1) into `expr()` the whole expression will be quoted. 
 
 ```{r}
-eval(expr(eval(expr(eval(expr(2 + 2))))))        # (1)
-eval(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (2)
-expr(eval(expr(eval(expr(eval(expr(2 + 2)))))))  # (3)
+eval(expr(eval(expr(eval(expr(2 + 2)))))) # (1)
+eval(eval(expr(eval(expr(eval(expr(2 + 2))))))) # (2)
+expr(eval(expr(eval(expr(eval(expr(2 + 2))))))) # (3)
 ```
 
 __[Q3]{.Q}__: Fill in the function bodies below to re-implement `get()` using `sym()` and `eval()`, and `assign()` using `sym()`, `expr()`, and `eval()`. Don't worry about the multiple ways of choosing an environment that `get()` and `assign()` support; assume that the user supplies it explicitly.
@@ -119,14 +115,14 @@ In order to highlight the modifications in our new `source2()` function, we've p
 source2 <- function(path, env = caller_env()) {
   file <- paste(readLines(path, warn = FALSE), collapse = "\n")
   exprs <- parse_exprs(file)
-  
+
   # res <- NULL
   # for (i in seq_along(exprs)) {
   #   res[[i]] <- eval(exprs[[i]], env)
   # }
-  
+
   res <- purrr::map(exprs, eval, env)
-  
+
   invisible(res)
 }
 ```
@@ -188,7 +184,6 @@ exists("x")
 ```
 
 ## Quosures
-<!-- 20.3 -->
 
 __[Q1]{.Q}__: Predict what evaluating each of the following quosures will return if evaluated.
 
@@ -231,7 +226,6 @@ capture_env(x)
 ```
 
 ## Data masks
-<!-- 20.4 -->
 
 __[Q1]{.Q}__: Why did I use a for loop in `transform2()` instead of `map()`? Consider `transform2(df, x = x * 2, x = x * 2)`.
 
@@ -275,7 +269,7 @@ subset2 <- function(data, rows) {
   rows <- enquo(rows)
   rows_val <- eval_tidy(rows, data)
   stopifnot(is.logical(rows_val))
-  
+
   data[rows_val, , drop = FALSE]
 }
 ```
@@ -308,12 +302,12 @@ __[Q3]{.Q}__: The following function implements the basics of `dplyr::arrange()`
 ```{r}
 arrange2 <- function(.df, ..., .na.last = TRUE) {
   args <- enquos(...)
-  
+
   order_call <- expr(order(!!!args, na.last = !!.na.last))
-  
+
   ord <- eval_tidy(order_call, .df)
   stopifnot(length(ord) == nrow(.df))
-  
+
   .df[ord, , drop = FALSE]
 }
 ```
@@ -323,20 +317,20 @@ __[A]{.solved}__: `arrange2()` basically reorders a data frame by one or more of
 ```{r}
 arrange2 <- function(.df, ..., .na.last = TRUE) {
   # Capture and quote arguments, which determine the order
-  args <- enquos(...)  
-  
+  args <- enquos(...)
+
   # `!!!`: unquote-splice arguments into order()
   # `!!.na.last`: pass option for treatment of NAs to order()
   # return expression-object
   order_call <- expr(order(!!!args, na.last = !!.na.last))
-  
+
   # Evaluate order_call within .df
-  ord <- eval_tidy(order_call, .df)    
+  ord <- eval_tidy(order_call, .df)
   # Ensure that no rows are dropped
-  stopifnot(length(ord) == nrow(.df))  
-  
+  stopifnot(length(ord) == nrow(.df))
+
   # Reorder rows via integer subsetting
-  .df[ord, , drop = FALSE]  
+  .df[ord, , drop = FALSE]
 }
 ```
 
@@ -352,14 +346,13 @@ expr(order(..., na.last = .na.last))
 ```
 
 ## Using tidy evaluation
-<!-- 20.5 -->
 
 __[Q1]{.Q}__:  I've included an alternative implementation of `threshold_var()` below. What makes it different to the approach I used above? What makes it harder?
 
 ```{r}
 threshold_var2 <- function(df, var, val) {
   var <- ensym(var)
-  
+
   subset2(df, `$`(.data, !!var) >= !!val)
 }
 ```
@@ -384,14 +377,13 @@ threshold_var2(df, x, 8)
 ```
 
 ## Base evaluation
-<!-- 20.6 -->
 
 __[Q1]{.Q}__: Why does this function fail?
 
 ```{r, error = TRUE}
 lm3a <- function(formula, data) {
   formula <- enexpr(formula)
-  
+
   lm_call <- expr(lm(!!formula, data = data))
   eval(lm_call, caller_env())
 }
@@ -404,13 +396,13 @@ __[A]{.solved}__: In this function, `lm_call` is evaluated in the caller environ
 # Change evaluation environment
 lm3b <- function(formula, data) {
   formula <- enexpr(formula)
-  
+
   lm_call <- expr(lm(!!formula, data = data))
   eval(lm_call, current_env())
 }
 
 lm3b(mpg ~ disp, mtcars)$call
-lm3b(mpg ~ disp, data)$call  #reproduces original error
+lm3b(mpg ~ disp, data)$call # reproduces original error
 ```
 
 When we want to unquote an argument within a function, we first need to capture the user-input (by `enexpr()`).
@@ -420,7 +412,7 @@ When we want to unquote an argument within a function, we first need to capture 
 lm3c <- function(formula, data) {
   formula <- enexpr(formula)
   data_quo <- enexpr(data)
-  
+
   lm_call <- expr(lm(!!formula, data = !!data_quo))
   eval(lm_call, caller_env())
 }
@@ -438,12 +430,12 @@ lm(mpg ~ disp * cyl, data = mtcars)
 __[A]{.solved}__: In our wrapper `lm_wrap()`, we provide `mpg` and `mtcars` as default response and data. This seems to give us a good mix of usability and flexibility.
 
 ```{r}
-lm_wrap <- function(pred, resp = mpg, data = mtcars, 
+lm_wrap <- function(pred, resp = mpg, data = mtcars,
                     env = caller_env()) {
   pred <- enexpr(pred)
   resp <- enexpr(resp)
   data <- enexpr(data)
-  
+
   formula <- expr(!!resp ~ !!pred)
   lm_call <- expr(lm(!!formula, data = !!data))
   eval(lm_call, envir = env)
@@ -469,13 +461,13 @@ This approach takes advantage of R's lazy evaluation of function arguments, by m
 
 ```{r}
 resample_lm <- function(
-  formula, data,
-  resample_data = data[sample(nrow(data), replace = TRUE), ,
-                       drop = FALSE],
-  env = current_env()) {
-  
+    formula, data,
+    resample_data = data[sample(nrow(data), replace = TRUE), ,
+      drop = FALSE
+    ],
+    env = current_env()) {
   formula <- enexpr(formula)
-  
+
   lm_call <- expr(lm(!!formula, data = resample_data))
   expr_print(lm_call)
   eval(lm_call, env)

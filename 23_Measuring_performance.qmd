@@ -3,14 +3,10 @@ source("common.R")
 ```
 
 # (PART) Techniques {-} 
-\stepcounter{chapter}
 
 # Measuring performance
-<!-- 23 -->
 
-\stepcounter{section}
 ## Profiling
-<!-- 23.2 -->
 
 __[Q1]{.Q}__: Profile the following function with `torture = TRUE`. What is surprising? Read the source code of `rm()` to figure out what's going on.
 
@@ -38,21 +34,24 @@ Surprisingly, profiling `f()` like this takes a very long time. What could be th
 We follow the hint in the question and inspect the source code of `rm()`:
 
 ```{r,eval = FALSE}
-function (..., list = character(), pos = -1,
-          envir = as.environment(pos), 
-          inherits = FALSE) 
-{
+function(..., list = character(), pos = -1,
+         envir = as.environment(pos),
+         inherits = FALSE) {
   dots <- match.call(expand.dots = FALSE)$...
   if (
     length(dots) && !all(
-      vapply(dots, function(x) is.symbol(x) || 
-             is.character(x), NA, USE.NAMES = FALSE)
+      vapply(dots, function(x) {
+        is.symbol(x) ||
+          is.character(x)
+      }, NA, USE.NAMES = FALSE)
     )
-  ) 
+  ) {
     stop("... must contain names or character strings")
+  }
   names <- vapply(dots, as.character, "")
-  if (length(names) == 0L) 
+  if (length(names) == 0L) {
     names <- character()
+  }
   list <- .Primitive("c")(list, names)
   .Internal(remove(list, envir, inherits))
 }
@@ -77,14 +76,13 @@ Anecdotally, one of the authors once finished the profiling under an older R ver
 In conclusion, this question appears to be unanswerable for us, even for Hadley.
 
 ## Microbenchmarking
-<!-- 23.3 -->
 
 __[Q1]{.Q}__: Instead of using `bench::mark()`, you could use the built-in function `system.time()`. But `system.time()` is much less precise, so you'll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.
 
 ```{r, eval = FALSE}
 n <- 1e6
 system.time(for (i in 1:n) sqrt(x)) / n
-system.time(for (i in 1:n) x ^ 0.5) / n
+system.time(for (i in 1:n) x^0.5) / n
 ```
 
 How do the estimates from `system.time()` compare to those from `bench::mark()`? Why are they different?
@@ -96,8 +94,8 @@ n <- 1e6
 x <- runif(100)
 
 bench_df <- bench::mark(
-  sqrt(x), 
-  x ^ 0.5,
+  sqrt(x),
+  x^0.5,
   iterations = n
 )
 
@@ -111,7 +109,7 @@ t1_bench <- mean(unlist(bench_df[1, "time"]))
 t2_bench <- mean(unlist(bench_df[2, "time"]))
 
 t1_systime <- system.time(for (i in 1:n) sqrt(x)) / n
-t2_systime <- system.time(for (i in 1:n) x ^ 0.5) / n
+t2_systime <- system.time(for (i in 1:n) x^0.5) / n
 ```
 
 We see, that both approaches get the order of magnitude right. We assume, that the `bench::mark()`-results may be a little more accurate, because of its high precision timer. There may also be overhead introduced by the for loop in the `system.time()`-approach.
@@ -130,7 +128,7 @@ Side Note: take a look at `?proc.time` if you want to learn about the difference
 __[Q2]{.Q}__: Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.
 
 ```{r, eval = FALSE}
-x ^ (1 / 2)
+x^(1 / 2)
 exp(log(x) / 2)
 ```
 
