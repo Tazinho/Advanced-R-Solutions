@@ -1,0 +1,886 @@
+```{r, include = FALSE}
+source("common.R")
+```
+
+# Rewriting R code in C++
+
+## Getting started with C++
+
+__[Q1]{.Q}__: With the basics of C++ in hand, it's now a great time to practice
+by reading and writing some simple C++ functions. For each of the following
+functions, read the code and figure out what the corresponding base R function
+is. You might not understand every part of the code yet, but you should be able
+to figure out the basics of what the function does.
+
+Pay attention to the parts where we use `writable::doubles` instead of
+`doubles`, in C++ objects can be read-only, which is different from R
+(or Python).
+
+Unlike R, C++ indexes start at 0, not 1. This is a common source of bugs when
+porting code from R to C++.
+
+```{cpp, eval = FALSE}
+double f1_(doubles x) {
+  int n = x.size();
+  double y = 0;
+  
+  for(int i = 0; i < n; ++i) {
+    y += x[i] / n;
+  }
+  return y;
+}
+
+doubles f2_(doubles x) {
+  int n = x.size();
+  writable::doubles out(n);
+  
+  out[0] = x[0];
+  for(int i = 1; i < n; ++i) {
+    out[i] = out[i - 1] + x[i];
+  }
+  return out;
+}
+
+bool f3_(logicals x) {
+  int n = x.size();
+  
+  for(int i = 0; i < n; ++i) {
+    if (x[i]) return true;
+  }
+  return false;
+}
+
+int f4_(function pred, list x) {
+  int n = x.size();
+  
+  for(int i = 0; i < n; ++i) {
+    logicals res = pred(x[i]);
+    if (res[0]) return i + 1;
+  }
+  return 0;
+}
+
+doubles f5_(doubles x, doubles y) {
+  int n = std::max(x.size(), y.size());
+  vector<double> x1(n);
+  vector<double> y1(n);
+
+  for (int i = 0; i < n; ++i) {
+    x1[i] = x[i % x.size()];
+    y1[i] = y[i % y.size()];
+  }
+
+  writable::doubles out(n);
+
+  for (int i = 0; i < n; ++i) {
+    out[i] = std::min(x1[i], y1[i]);
+  }
+
+  return out;
+}
+```
+
+__[A]{.solved}__:  The code above corresponds to the following base R functions:
+
+- f1_: `mean()`
+- f2_: `cumsum()`
+- f3_: `any()`
+- f4_: `Position()`
+- f5_: `pmin()`
+
+__[Q2]{.Q}__:  To practice your function writing skills, convert the following
+functions into C++. For now, assume the inputs have no missing values.
+
+1. `all()`.
+
+2. `cumprod()`, `cummin()`, `cummax()`.
+
+3. `diff()`. Start by assuming lag 1, and then generalise for lag `n`.
+
+4. `range()`.
+
+5. `var()`. Read about the approaches you can take on
+[Wikipedia](http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance).
+Whenever implementing a numerical algorithm, it's always good to check what is
+already known about the problem.
+
+__[A]{.solved}__: Let's port these functions to C++.
+
+1. `all()`
+
+    ```{cpp, eval = FALSE}
+    bool all_cpp_(logicals x) {
+      int n = x.size();
+      for(int i = 0; i < n; ++i) {
+        if (x[i] == false) {
+          return false;
+        }
+      }
+      return true;
+    }
+    ```
+
+2. `cumprod()`, `cummin()`, `cummax()`.
+
+    ```{cpp, eval = FALSE}
+    doubles cumprod_cpp_(doubles x) {
+      int n = x.size();
+      writable::doubles out(n);
+      out[0] = x[0];
+      for(int i = 1; i < n; ++i) {
+        out[i] = out[i - 1] * x[i];
+      }
+      return out;
+    }
+    
+    doubles cummin_cpp_(doubles x) {
+      int n = x.size();
+      writable::doubles out(n);
+
+      out[0] = x[0];
+      for (int i = 1; i < n; ++i) {
+        double x1 = out[i - 1];
+        double x2 = x[i];
+        out[i] = std::min(x1, x2);
+      }
+
+      return out;
+    }
+
+    doubles cummax_cpp_(doubles x) {
+      int n = x.size();
+      writable::doubles out(n);
+
+      out[0] = x[0];
+      for (int i = 1; i < n; ++i) {
+        double x1 = out[i - 1];
+        double x2 = x[i];
+        out[i] = std::max(x1, x2);
+      }
+      return out;
+    }
+    ```
+
+3. `diff()` (Start by assuming lag 1, and then generalise for lag `n`.)
+
+    ```{cpp, eval = FALSE}
+    doubles diff_cpp_(doubles x) {
+      int n = x.size();
+      writable::doubles out(n - 1);
+      
+      for (int i = 1; i < n; i++) {
+        out[i - 1] = x[i] - x[i - 1];
+      }
+      return out ;
+    }
+    
+    doubles diff_lag_cpp_(doubles x, int lag) {
+      int n = x.size();
+    
+      if (lag >= n) stop("`lag` must be less than `length(x)`.");
+      
+      writable::doubles out(n - lag);
+      
+      for (int i = lag; i < n; i++) {
+        out[i - lag] = x[i] - x[i - lag];
+      }
+      return out;
+    }
+    ```
+
+4. `range()`
+
+    ```{cpp, eval = FALSE}
+    doubles range_cpp_(doubles x) {
+      double omin = x[0], omax = x[0];
+      int n = x.size();
+
+      if (n == 0) stop("`length(x)` must be greater than 0.");
+
+      for (int i = 1; i < n; i++) {
+        omin = std::min(x[i], omin);
+        omax = std::max(x[i], omax);
+      }
+
+      writable::doubles out(2);
+      out[0] = omin;
+      out[1] = omax;
+      return out;
+    }
+    ```
+
+5. `var()`
+
+    ```{cpp, eval = FALSE}
+    double var_cpp_(doubles x) {
+      int n = x.size();
+      
+      if (n < 2) {
+        return NA_REAL;
+      }
+      
+      double mx = 0;
+      for (int i = 0; i < n; ++i) {
+        mx += x[i] / n;
+      }
+      
+      double out = 0;
+      for (int i = 0; i < n; ++i) {
+        out += pow(x[i] - mx, 2);
+      }
+      
+      return out / (n - 1);
+    }
+    ```
+
+## Missing values
+
+__[Q1]{.Q}__:  Rewrite any of the functions from the first exercise to deal with
+missing values. If `na.rm` is true, ignore the missing values. If `na.rm` is
+false, return a missing value if the input contains any missing values. Some
+good functions to practice with are `min()`, `max()`, `range()`, `mean()`, and `var()`.
+
+__[A]{.solved}__: For this exercise we start with `min_cpp_()` and extend it so
+it can deal with missing values. We introduce an `na_rm` argument to make
+`min_cpp_()` aware of `NA`s. In case `x` contains exclusively `NA` values
+`min_cpp_()` should return `Inf` for `na_rm = TRUE`. For the return values
+vector data types are used to avoid irregular type conversions.
+
+We use expressions provided by `#include <cpp11.hpp>` to simplify the code:
+
+* `R_PosInf`, which is pure C++ this would be
+  `std::numeric_limits<double>::infinity();` and requires `#include <limits>`.
+* `is_na(x[i])`, which is the same as `x[i] == NA_REAL`.
+
+```{cpp}
+#include <cpp.hpp>
+
+using namespace cpp11;
+
+[[cpp11::register]] doubles min_cpp_(cpp11::doubles x, bool na_rm) {
+  int n = x.size();
+  writable::doubles out = {R_PosInf};
+
+  if (na_rm) {
+    for (int i = 0; i < n; ++i) {
+      if (x[i] == NA_REAL) {
+        continue;
+      }
+      if (x[i] < out[0]) {
+        out[0] = x[i];
+      }
+    }
+  } else {
+    for (int i = 0; i < n; ++i) {
+      if (is_na(x[i])) {
+        out[0] = NA_REAL;
+        return out;
+      }
+      if (x[i] < out[0]) {
+        out[0] = x[i];
+      }
+    }
+  }
+
+  return out;
+}
+```
+
+```{r}
+min_cpp_(as.double(c(2:4, NA)), FALSE)
+min_cpp_(as.double(c(2:4, NA)), TRUE)
+min_cpp_(as.double(c(NA, NA)), TRUE)
+```
+
+Note that we added explicit values and types for each parameter. This is
+necessary because `cpp11` does not automatically cast integers (i.e., `2:4`)
+to doubles and does not allow default parameters in the function. This is
+because R (and Python) automatically cast `1L` to `1.0` depending on the
+context, which is not the case for C++. Run `min_cpp_(c(2:4, NA), FALSE)` and
+read the error message carefully.
+
+To simplify things for the end user, you can provide a wrapper function that
+calls `min_cpp_()` with the correct types and default values.
+
+```{r}
+min_cpp <- function(x, na_rm = FALSE) {
+  if (!is.double(x)) {
+    x <- as.double(x)
+  }
+  min_cpp_(x, na_rm)
+}
+
+min_cpp(c(2:4, NA))
+```
+
+We also extend `any_cpp_()` so it can deal with missing values. Please note that
+this (again) introduces some code duplication. This could be avoided by moving
+the check for missing values to the inner loop at the expense of a slight
+decrease of performance. Here we use `logicals` as return type. If we would use
+`bool` instead, the C++ `NA_LOGICAL` would be converted into R's logical `TRUE`.
+
+```{cpp}
+#include <cpp.hpp>
+
+using namespace cpp11;
+
+[[cpp11::register]] logicals any_cpp_(logicals x, bool na_rm) {
+  int n = x.size();
+  writable::logicals out = {false};
+
+  if (na_rm == false) {
+    for (int i = 0; i < n; ++i) {
+      if (is_na(x[i])) {
+        out[0] = NA_LOGICAL;
+        return out;
+      } else {
+        if (x[i]) {
+          out[0] = true;
+        }
+      }
+    }
+  }
+
+  if (na_rm) {
+    for (int i = 0; i < n; ++i) {
+      if (is_na(x[i])) {
+        continue;
+      }
+      if (x[i]) {
+        out[0] = true;
+        return out;
+      }
+    }
+  }
+
+  return out;
+}
+```
+
+```{r}
+any_cpp_(c(NA, TRUE), F) # any(c(NA, TRUE)) would return TRUE in this case
+any_cpp_(c(NA, TRUE), T)
+```
+
+__[Q2]{.Q}__: Rewrite `cumsum()` and `diff()` so they can handle missing values.
+Note that these functions have slightly more complicated behaviour.
+
+__[A]{.solved}__: Our `NA`-aware `cumsum_cpp_()` function will return a vector
+of the same length as `x`. By default (`na_rm = FALSE`) all values following the
+first `NA` input value will be set to `NA`, because they depend on the unknown
+missing value. In case of `na_rm = FALSE` the `NA` values are treated like
+zeros.
+
+```{cpp}
+#include <cpp.hpp>
+
+using namespace cpp11;
+
+[[cpp11::register]] doubles cumsum_cpp_(doubles x, bool na_rm = false) {
+  int n = x.size();
+
+  writable::doubles out(n);
+  out[0] = x[0];
+
+  if (na_rm == true) {
+    for (int i = 1; i < n; ++i) {
+      double y1 = out[i - 1], y2 = x[i];
+      if (ISNAN(y2)) {
+        out[i] = y1;
+      } else {
+        if (ISNAN(y1)) {
+          out[i] = y2;
+        } else {
+          out[i] = y1 + y2;
+        }
+      }
+    }
+  } else {
+    for (int i = 1; i < n; ++i) {
+      double y1 = out[i - 1], y2 = x[i];
+      if (ISNAN(y2)) {
+        out[i] = NA_REAL;
+      } else {
+        if (ISNAN(y1)) {
+          out[i] = NA_REAL;
+        } else {
+          out[i] = y1 + y2;
+        }
+      }
+    }
+  }
+
+  return out;
+}
+```
+
+```{r}
+cumsum_cpp_(c(1, NA, 2, 4), FALSE)
+cumsum_cpp_(c(1, NA, 2, 4), TRUE)
+```
+
+This example works immediately, because the input vector is a vector of doubles.
+If we create a sequence of integers, we need to cast it as doubles.
+
+```{r}
+cumsum_cpp_(as.double(1:4), FALSE)
+
+# or use a wrapper function
+cumsum_cpp <- function(x, na_rm = FALSE) {
+  if (!is.double(x)) {
+    x <- as.double(x)
+  }
+  cumsum_cpp_(x, na_rm)
+}
+
+cumsum_cpp(1:4, FALSE)
+```
+
+The `diff_cpp_()` implementation will return an `NA` vector of length
+`length(x) - lag`, if the input vector contains a missing value. In case of
+`na_rm = TRUE`, the function will return an `NA` for every difference with at
+least one `NA` as input.
+
+```{cpp}
+#include <cpp.hpp>
+
+using namespace cpp11;
+
+[[cpp11::register]] doubles diff_cpp_(doubles x, int lag, bool na_rm) {
+  int n = x.size();
+
+  if (lag >= n) stop("`lag` must be less than `length(x)`.");
+
+  writable::doubles out(n - lag);
+
+  for (int i = lag; i < n; i++) {
+    if (is_na(x[i]) || is_na(x[i - lag])) {
+      if (!na_rm) {
+        writable::doubles out_na(n - lag);
+        for (int j = 0; j < n - lag; ++j) {
+          out_na[j] = NA_REAL;
+        }
+        return out_na;
+      }
+      out[i - lag] = NA_REAL;
+      continue;
+    }
+    out[i - lag] = x[i] - x[i - lag];
+  }
+
+  return out;
+}
+```
+
+```{r}
+diff_cpp_(c(1, 3, NA, 10), 1L, FALSE)
+diff_cpp_(c(1, 3, NA, 10), 1L, TRUE)
+```
+
+## Standard Template Library
+
+To practice using the STL algorithms and data structures, implement the
+following using R functions in C++, using the hints provided:
+
+__[Q1]{.Q}__: `median.default()` using `partial_sort`.
+
+__[A]{.solved}__: The median is computed differently for even or odd vectors,
+which we allow for in the function below.
+
+To be able to use `partial_sort()` we need to include the `algorithm` header.
+Unlike the previous examples, the input will be `const doubles& x`, meaning that
+the function takes a constant reference to an object of type `doubles` (i.e., 
+the function will not modify the object `x`), and the `&` symbol means that the
+function takes a reference to the object instead of a copy of the object.
+
+This can improve performance when the object is large, because it avoids copying
+the object, but in this case we did it to use the `partial_sort()` function,
+which is not compatible with `doubles` but it is with `vector<double>` types.
+
+`doubles` is a data type we can send from R to C++ and vice-versa, but it is not
+compatible with all of C++ functions. `vector<double>` is a C++ data type that
+we cannot send to R. There are more details about this in the alternative
+solutions section at the end of the chapter.
+
+```{cpp}
+#include <algorithm>
+#include <cpp11.hpp>
+#include <vector>
+
+using namespace cpp11;
+using namespace std;
+
+[[cpp11::register]] double median_cpp_(const doubles& x) {
+  int n = x.size();
+
+  vector<double> y(n);
+  for (int i = 0; i < n; ++i) {
+    y[i] = x[i];
+  }
+
+  if (n % 2 == 0) {
+    partial_sort(y.begin(), y.begin() + n / 2 + 1, y.end());
+    return (y[n / 2 - 1] + y[n / 2]) / 2;
+  } else {
+    partial_sort(y.begin(), y.begin() + (n + 1) / 2, y.end());
+    return y[(n + 1) / 2 - 1];
+  }
+}
+```
+
+__[Q2]{.Q}__: `%in%` using `unordered_set` and the `find()` or `count()`
+methods.
+
+__[A]{.solved}__: We use the `find()` method and loop through the
+`unordered_set` until we find a match or have scanned the entire set.
+
+```{cpp}
+#include <cpp11.hpp>
+#include <unordered_set>
+
+using namespace cpp11;
+using namespace std;
+
+[[cpp11::register]] logicals in_cpp_(const strings& x, const strings& table) {
+  unordered_set<string> seen;
+  seen.insert(table.begin(), table.end());
+
+  int n = x.size();
+  writable::logicals out(n);
+  for (int i = 0; i < n; ++i) {
+    out[i] = seen.find(x[i]) != seen.end();
+  }
+
+  return out;
+}
+```
+
+```{r}
+x <- letters[1:3]
+y <- letters[1:2]
+in_cpp_(x, y)
+x %in% y
+```
+
+__[Q3]{.Q}__: `unique()` using an `unordered_set` (challenge: do it in one
+line!).
+
+__[A]{.solved}__: The `insert()`-method will return if an equivalent element
+already exists. If a new element is inserted, we will add it to the (unique)
+return vector of our function.
+
+First we will implement the function in multiple lines, and then reduce.
+
+```{cpp}
+#include <cpp11.hpp>
+#include <unordered_set>
+
+using namespace cpp11;
+using namespace std;
+
+[[cpp11::register]] doubles unique_cpp_(const doubles& x) {
+  unordered_set<double> seen;
+  int n = x.size();
+
+  writable::doubles out;
+  for (int i = 0; i < n; ++i) {
+    if (seen.insert(x[i]).second) out.push_back(x[i]);
+  }
+
+  return out;
+}
+```
+
+In one line we would need to write a wrapper function in C++ to be able to
+export the result to R.
+
+```{cpp}
+#include <cpp11.hpp>
+#include <unordered_set>
+
+using namespace cpp11;
+using namespace std;
+
+unordered_set<double> unique_short1_cpp_(const doubles& x) {
+  return unordered_set<double>(x.begin(), x.end());
+}
+
+[[cpp11::register]] doubles unique_short2_cpp_(const doubles& x) {
+  unordered_set<double> y = unique_short1_cpp_(x);
+
+  int n = y.size();
+  writable::doubles out(n);
+  copy(y.begin(), y.end(), out.begin());
+
+  return out;
+}
+```
+
+```{r}
+x <- c(1, 2, 2)
+unique_cpp_(x)
+unique_short2_cpp_(x)
+```
+
+__[Q4]{.Q}__: `min()` using `std::min()`, or `max()` using `std::max()`.
+
+__[A]{.solved}__: We will implement `min()` by iterating over the vector and
+recursively comparing each element to the current minimum value.
+
+In this example, and unlike the previous `min_cpp_()`, we can assign `x[i]` from
+a `doubles` object to the left hand side that is a `double` variable without the
+need to convert data types.
+
+```{cpp}
+#include <cpp11.hpp>
+
+using namespace cpp11;
+using namespace std;
+
+[[cpp11::register]] double min_cpp_(const doubles& x) {
+  int n = x.size();
+  double out = x[0];
+
+  for (int i = 0; i < n; i++) {
+    out = min(out, x[i]);
+  }
+
+  return out;
+}
+```
+
+```{r}
+x <- c(-1, 0, 1)
+min_cpp_(x)
+```
+
+__[Q5]{.Q}__: `which.min()` using `min_element`, or `which.max()` using
+`max_element`.
+
+__[A]{.solved}__: To implement `which.min()`, we will first locate the
+`min_element` and then compute the `distance()` to it (starting from the
+beginning of the vector).
+
+Check the `+1` in the return statement, which was included because of zero
+indexes as it was mentioned in the beginning of the chapter.
+
+```{cpp}
+#include <algorithm>
+#include <cpp11.hpp>
+#include <iterator>
+
+using namespace cpp11;
+using namespace std;
+
+[[cpp11::register]] double which_min_cpp_(const doubles& x) {
+  int out = distance(x.begin(), min_element(x.begin(), x.end())
+  );
+
+  return out + 1;
+}
+```
+
+```{r}
+which_min_cpp_(c(1, -1))
+```
+
+__[Q6]{.Q}__: `setdiff()`, `union()`, and `intersect()` for integers using
+sorted ranges and `set_union`, `set_intersection` and `set_difference`.
+
+__[A]{.solved}__: The structure of the three functions will be very similar.
+
+We first sort both input vectors. Then we apply the respective `set_union`,
+`set_intersection` or `set_difference` function. After that, the result will be
+between the iterators `tmp.begin()` and `out_end`. To retrieve the result, we
+loop once through the range between `tmp.begin()` and `out_end` in the last part
+of each function.
+
+The set operations in base R will discard duplicated values in the arguments.
+We achieve a similar behaviour by introducing a deduplication step, which omits
+values that match their predecessor. For the C++ implementation we rely on the
+properties of the set operations and the fact that the input vectors are sorted.
+
+We also use variables of type `vector<int>::iterator`, which are used to point
+to elements in a `vector<int>`.
+
+```{cpp}
+#include <algorithm>
+#include <cpp11.hpp>
+#include <unordered_set>
+
+using namespace cpp11;
+using namespace std;
+
+[[cpp11::register]] integers union_cpp_(const integers& x, const integers& y) {
+  vector<int> vx(x.begin(), x.end());
+  vector<int> vy(y.begin(), y.end());
+
+  sort(vx.begin(), vx.end());
+  sort(vy.begin(), vy.end());
+
+  vector<int> tmp(vx.size() + vy.size());
+
+  vector<int>::iterator out_end =
+      set_union(vx.begin(), vx.end(), vy.begin(), vy.end(), tmp.begin());
+
+  int prev_value = 0;
+  writable::integers out;
+
+  for (vector<int>::iterator it = tmp.begin(); it != out_end; ++it) {
+    if ((it != tmp.begin()) && (prev_value == *it)) continue;
+
+    out.push_back(*it);
+
+    prev_value = *it;
+  }
+
+  return out;
+}
+
+[[cpp11::register]] integers intersect_cpp_(const integers& x,
+                                            const integers& y) {
+  vector<int> vx(x.begin(), x.end());
+  vector<int> vy(y.begin(), y.end());
+
+  sort(vx.begin(), vx.end());
+  sort(vy.begin(), vy.end());
+
+  vector<int> tmp(min(vx.size(), vy.size()));
+
+  vector<int>::iterator out_end =
+      set_intersection(vx.begin(), vx.end(), vy.begin(), vy.end(), tmp.begin());
+
+  writable::integers out;
+
+  for (vector<int>::iterator it = tmp.begin(); it != out_end; ++it) {
+    out.push_back(*it);
+  }
+
+  return out;
+}
+
+[[cpp11::register]] integers setdiff_cpp_(const integers& x,
+                                          const integers& y) {
+  vector<int> vx(x.begin(), x.end());
+  vector<int> vy(y.begin(), y.end());
+
+  sort(vx.begin(), vx.end());
+  sort(vy.begin(), vy.end());
+
+  vector<int> tmp(vx.size());
+
+  vector<int>::iterator out_end =
+      set_difference(vx.begin(), vx.end(), vy.begin(), vy.end(), tmp.begin());
+
+  writable::integers out;
+
+  for (vector<int>::iterator it = tmp.begin(); it != out_end; ++it) {
+    out.push_back(*it);
+  }
+
+  return out;
+}
+```
+
+Let's verify, that these functions work as intended.
+
+```{r}
+# input vectors include duplicates
+x <- 1:3
+y <- 0:5
+
+union(x, y)
+union_cpp_(x, y)
+
+intersect(x, y)
+intersect_cpp_(x, y)
+
+x <- 1:3
+y <- 0:1
+
+setdiff(x, y)
+setdiff_cpp_(x, y)
+```
+
+## Alternative solutions
+
+### All
+
+The `all_cpp_()` function can be implemented at least in three more ways.
+
+I can save lines by not defining n.
+
+```cpp
+bool all_cpp_(logicals x) {
+  for (int i = 0; i < x.size(); ++i) {
+    if (x[i] == false) {
+      return false;
+    }
+  }
+  return true;
+}
+```
+
+It is also possible to directly define a logical variable `i` inside the loop.
+
+```cpp
+bool all_cpp_(logicals x) {
+  for (bool i : x) {
+    if (i == false) {
+      return false;
+    }
+  }
+  return true;
+}
+```
+
+Using `std::all_of()` you can do the same thing in one line.
+
+```cpp
+bool all_cpp_(logicals x) {
+  return std::all_of(x.begin(), x.end(), [](bool x) { return x; });
+}
+```
+
+### Pairwise minimum
+
+Unlike `cumprod_cpp_()`, `cummin_cpp_()` requires to declare additional `double`
+values, otherwise `std::min()` will not work.
+
+It is possible to save some lines by using `std::vector`.
+
+```cpp
+#include <cpp11.hpp>
+#include <vector>
+
+using namespace cpp11;
+using namespace std;
+
+[[cpp11::register]] doubles pmin_cpp_(doubles x, doubles y) {
+  int n = max(x.size(), y.size());
+
+  vector<double> x1(n);
+  vector<double> y1(n);
+  for (int i = 0; i < n; ++i) {
+    x1[i] = x[i % x.size()];
+    y1[i] = y[i % y.size()];
+  }
+
+  writable::doubles out(n);
+
+  for (int i = 0; i < n; ++i) {
+    out[i] = min(x1[i], y1[i]);
+  }
+
+  return out;
+}
+```
+
+We can subset `x1` and `y1` when these are of class `vector<double>` instead of
+`doubles` because `x1[i]` and `y1[i]` are of class `double`. When `x1` and `y1`
+are of class `doubles`, `x1[i]` and `y1[i]` are proxy objects that represent
+elements of `x1` and `y1` 
+
+Passing proxies to `std::min()`, which returns a reference to its smallest
+argument, creates an output that is a new proxy object that cannot be assigned
+to `out[i]`.
