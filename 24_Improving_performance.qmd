@@ -1,14 +1,18 @@
+---
+bibliography: references.bib
+---
+
 ```{r, include = FALSE}
 source("common.R")
 ```
 
-# Improving performance
+# 24 - Improving performance {-}
 
 ## Checking for existing solutions
 
 __[Q1]{.Q}__: What are faster alternatives to `lm`? Which are specifically designed to work with larger datasets?
 
-__[A]{.solved}__: The [CRAN task view for high-performance computing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) provides many recommendations. For this question, we are most interested in the section on "Large memory and out-of-memory data". We could for example give `biglm::biglm()` [@biglm], `speedglm::speedlm()` [@speedglm] or `RcppEigen::fastLm()` [@RcppEigen] a try.
+__[A]{.solved}__: The [CRAN task view for high-performance computing](https://cran.rstudio.com/web/views/HighPerformanceComputing.html) provides many recommendations. For this question, we are most interested in the section on "Large memory and out-of-memory data". We could for example give `biglm::biglm()` [@biglm], `fixest::feols()` [@fixest] a try.
 
 For small datasets, we observe only minor performance gains (or even a small cost):
 
@@ -24,11 +28,7 @@ bench::mark(
     body_mass_g ~ bill_length_mm + species,
     data = penguins
   ) %>% coef(),
-  "speedglm" = speedglm::speedlm(
-    body_mass_g ~ bill_length_mm + species,
-    data = penguins
-  ) %>% coef(),
-  "fastLm" = RcppEigen::fastLm(
+  "fixest" = fixest::feols(
     body_mass_g ~ bill_length_mm + species,
     data = penguins
   ) %>% coef()
@@ -47,14 +47,13 @@ td <- data.frame(y = y, x1 = x1, x2 = x2, eps = eps)
 bench::mark(
   "lm" = lm(y ~ x1 + x2, data = td) %>% coef(),
   "biglm" = biglm::biglm(y ~ x1 + x2, data = td) %>% coef(),
-  "speedglm" = speedglm::speedlm(y ~ x1 + x2, data = td) %>% coef(),
-  "fastLm" = RcppEigen::fastLm(y ~ x1 + x2, data = td) %>% coef()
+  "fixest" = fixest::feols(y ~ x1 + x2, data = td) %>% coef()
 )
 ```
 
-For further speed improvements, you could install a linear algebra library optimised for your system (see `?speedglm::speedlm`).
+For further speed improvements, you could install a linear algebra library optimised for your system.
 
-> The functions of class 'speedlm' may speed up the fitting of LMs to large datasets. High performances can be obtained especially if R is linked against an optimized BLAS, such as ATLAS.
+> The functions of class 'feols' may speed up the fitting of LMs to large datasets. High performances can be obtained especially if R is linked against an optimized BLAS, such as ATLAS, Intel MKL, OpenBLAS, and others.
 
 Tip: In case your dataset is stored in a database, you might want to check out the [`{modeldb}` package](https://github.com/tidymodels/modeldb) [@modeldb] which executes the linear model code in the corresponding database backend.
 
@@ -158,10 +157,6 @@ slider::slide_dbl(x, mean, .before = 1, .complete = TRUE)
 bench::mark(
   caTools = caTools::runmean(x, k = 2, endrule = "NA"),
   data.table = data.table::frollmean(x, 2),
-  RcppRoll = RcppRoll::roll_mean(x,
-    n = 2, fill = NA,
-    align = "right"
-  ),
   slider = slider::slide_dbl(x, mean, .before = 1, .complete = TRUE),
   TTR = TTR::SMA(x, 2),
   zoo_apply = zoo::rollapply(x, 2, mean, fill = NA, align = "right"),
@@ -195,7 +190,6 @@ optimize(function(x) x^2 - 100 * x + 50, c(-1e20, 1e20))
 For more general alternatives, the appropriate choice highly depends on the type of optimisation you intend to do. The [CRAN task view on optimisation and mathematical modelling](https://cran.r-project.org/web/views/Optimization.html) can serve as a useful reference. Here are a couple of examples:
   
 - `{optimx}` [@optimx1; @optimx2] extends the `optim()` function with the same syntax but more `method` choices.
-- `{RcppNumerical}` [@RcppNumerical] wraps several open source libraries for numerical computing (written in C++) and integrates them with R via `{Rcpp}`.
 - `{DEoptim}` [@Deoptim] provides a global optimiser based on the Differential Evolution algorithm.
 
 ## Doing as little as possible
@@ -389,3 +383,5 @@ weightedsum %>%
   ) +
   theme(legend.position = "top")
 ```
+
+## References
