@@ -1,16 +1,18 @@
-```{r, include = FALSE}
+---
+bibliography: references.bib
+---
+
+```{r ch23_01, include = FALSE}
 source("common.R")
 ```
 
-# (PART) Techniques {-} 
-
-# Measuring performance
+# 23 - Measuring performance {-}
 
 ## Profiling
 
 __[Q1]{.Q}__: Profile the following function with `torture = TRUE`. What is surprising? Read the source code of `rm()` to figure out what's going on.
 
-```{r}
+```{r ch23_02}
 f <- function(n = 1e5) {
   x <- rep(1, n)
   rm(x)
@@ -19,13 +21,13 @@ f <- function(n = 1e5) {
 
 __[A]{.solved}__: We expect `f()` to create a vector (`x`) of length `n`, which is then removed so that `f()` just returns `NULL`. When we profile this function, it executes too fast for meaningful results.
 
-```{r, error = TRUE}
+```{r ch23_03, error = TRUE}
 profvis::profvis(f())
 ```
 
 Setting `torture = TRUE` triggers garbage collection after every memory allocation call, which may be useful for more exact memory profiling.
 
-```{r, eval = FALSE}
+```{r ch23_04, eval = FALSE}
 profvis::profvis(f(), torture = TRUE)
 ```
 
@@ -33,7 +35,7 @@ Surprisingly, profiling `f()` like this takes a very long time. What could be th
 
 We follow the hint in the question and inspect the source code of `rm()`:
 
-```{r,eval = FALSE}
+```{r ch23_05, eval = FALSE}
 function(..., list = character(), pos = -1,
          envir = as.environment(pos),
          inherits = FALSE) {
@@ -61,7 +63,7 @@ function(..., list = character(), pos = -1,
 
 We can make the job of `rm()` considerably simpler by using the `list` argument:
 
-```{r,eval = FALSE}
+```{r ch23_06, eval = FALSE}
 f2 <- function(n = 1e5) {
   x <- rep(1, n)
   rm(list = "x")
@@ -79,7 +81,7 @@ In conclusion, this question appears to be unanswerable for us, even for Hadley.
 
 __[Q1]{.Q}__: Instead of using `bench::mark()`, you could use the built-in function `system.time()`. But `system.time()` is much less precise, so you'll need to repeat each operation many times with a loop, and then divide to find the average time of each operation, as in the code below.
 
-```{r, eval = FALSE}
+```{r ch23_07, eval = FALSE}
 n <- 1e6
 system.time(for (i in 1:n) sqrt(x)) / n
 system.time(for (i in 1:n) x^0.5) / n
@@ -89,7 +91,7 @@ How do the estimates from `system.time()` compare to those from `bench::mark()`?
 
 __[A]{.solved}__: We first microbenchmark these two expressions using `bench::mark()` [@bench] and observe that the mean is not reported (as it is generally more affected by outliers).
 
-```{r}
+```{r ch23_08}
 n <- 1e6
 x <- runif(100)
 
@@ -104,7 +106,9 @@ bench_df
 
 We need to access the raw data, so we can compare the results of both benchmarking approaches.
 
-```{r}
+```{r ch23_09, eval = FALSE}
+# TODO: This works in the HTML but not in the PDF
+
 t1_bench <- mean(unlist(bench_df[1, "time"]))
 t2_bench <- mean(unlist(bench_df[2, "time"]))
 
@@ -114,7 +118,7 @@ t2_systime <- system.time(for (i in 1:n) x^0.5) / n
 
 We see, that both approaches get the order of magnitude right. We assume, that the `bench::mark()`-results may be a little more accurate, because of its high precision timer. There may also be overhead introduced by the for loop in the `system.time()`-approach.
 
-```{r}
+```{r ch23_10}
 # Compare the results
 t1_systime["elapsed"]
 t1_bench
@@ -127,14 +131,14 @@ Side Note: take a look at `?proc.time` if you want to learn about the difference
 
 __[Q2]{.Q}__: Here are two other ways to compute the square root of a vector. Which do you think will be fastest? Which will be slowest? Use microbenchmarking to test your answers.
 
-```{r, eval = FALSE}
+```{r ch23_11, eval = FALSE}
 x^(1 / 2)
 exp(log(x) / 2)
 ```
 
 __[A]{.solved}__: To compare these approaches, we'll `bench::mark()` them and sort the result by the median execution time.
 
-```{r}
+```{r ch23_12}
 x <- runif(100)
 
 bm <- bench::mark(
@@ -147,4 +151,6 @@ bm <- bench::mark(
 bm[order(bm$median), ]
 ```
 
-As one might expect the idiomatic primitive function `sqrt()` is the fastest. The approach `exp(log(x) / 2)` which builds on two other primitive functions is second, even though already considerably slower. The other calculations are even slower: `x ^ 0.5` is faster than `x ^ (1 / 2)`, because `0.5` requires less computation than `(1 / 2)`.
+As one might expect the idiomatic primitive function `sqrt()` is the fastest. The approach `exp(log(x) / 2)` which builds on two other primitive functions is second, even though already considerably slower. The other calculations are even slower: `x^0.5` is faster than `x^ (1/2)`, because `0.5` requires less computation than `1/2`.
+
+## References
