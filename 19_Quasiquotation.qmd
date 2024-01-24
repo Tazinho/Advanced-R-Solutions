@@ -1,0 +1,422 @@
+```{r, include = FALSE}
+source("common.R")
+```
+
+# 19 - Quasiquotation {-}
+
+## Prerequisites {-}
+
+To continue computing on the language, we keep using the `{rlang}` package in this chapter.
+
+```{r}
+library(rlang)
+```
+
+## Motivation
+
+__[Q1]{.Q}__: For each function in the following base R code, identify which arguments are quoted and which are evaluated.
+
+```{r, eval = FALSE}
+library(MASS)
+
+mtcars2 <- subset(mtcars, cyl == 4)
+
+with(mtcars2, sum(vs))
+sum(mtcars2$am)
+
+rm(mtcars2)
+```
+
+__[A]{.solved}__: For each argument we first follow the advice from *Advanced R* and execute the argument outside of the respective function. Since `MASS`, `cyl`, `vs` and `am` are not objects contained in the global environment, their execution raises an "Object not found" error. This way we confirm that the respective function arguments are quoted. For the other arguments, we may inspect the source code (and the documentation) to check if any quoting mechanisms are applied or the arguments are evaluated.
+
+```{r, eval = FALSE}
+library(MASS) # MASS -> quoted
+```
+
+`library()` also accepts character vectors and doesn't quote when `character.only` is set to `TRUE`, so `library(MASS, character.only = TRUE)` would raise an error.
+
+```{r, eval = FALSE}
+mtcars2 <- subset(mtcars, cyl == 4) # mtcars -> evaluated
+# cyl -> quoted
+
+with(mtcars2, sum(vs)) # mtcars2 -> evaluated
+# sum(vs) -> quoted
+
+sum(mtcars2$am) # matcars$am -> evaluated
+# am -> quoted by $()
+```
+
+When we inspect the source code of `rm()`, we notice that `rm()` catches its `...` argument as an unevaluated call (in this case a pairlist) via `match.call()`. This call is then converted into a string for further evaluation.
+
+```{r, eval = FALSE}
+rm(mtcars2) # mtcars2 -> quoted
+```
+
+__[Q2]{.Q}__: For each function in the following tidyverse code, identify which arguments are quoted and which are evaluated.
+
+```{r, eval = FALSE}
+library(dplyr)
+library(ggplot2)
+
+by_cyl <- mtcars %>%
+  group_by(cyl) %>%
+  summarise(mean = mean(mpg))
+
+ggplot(by_cyl, aes(cyl, mean)) +
+  geom_point()
+```
+
+__[A]{.solved}__: From the previous exercise we've already learned that `library()` quotes its first argument.
+
+```{r, eval = FALSE}
+library(dplyr) # dplyr   -> quoted
+library(ggplot2) # ggplot2 -> quoted
+```
+
+In similar fashion, it becomes clear that `cyl` is quoted by `group_by()`.
+
+```{r, eval = FALSE}
+by_cyl <- mtcars %>% # mtcars -> evaluated
+  group_by(cyl) %>% # cyl -> quoted
+  summarise(mean = mean(mpg)) # mean = mean(mpg) -> quoted
+```
+
+To find out what happens in `summarise()`, we inspect the source code. Tracing down the S3-dispatch of `summarise()`, we see that the `...` argument is quoted in `dplyr:::summarise_cols()` which is called in the underlying `summarise.data.frame()` method.
+
+```{r}
+dplyr::summarise
+```
+
+```{r}
+dplyr:::summarise.data.frame
+```
+
+```{r, eval = FALSE}
+dplyr:::summarise_cols
+#> function (.data, ...)
+#> {
+#>     mask <- DataMask$new(.data, caller_env())
+#>     dots <- enquos(...)
+#>     dots_names <- names(dots)
+#>     auto_named_dots <- names(enquos(..., .named = TRUE))
+#>     cols <- list()
+#>     sizes <- 1L
+#>     chunks <- vector("list", length(dots))
+#>     types <- vector("list", length(dots))
+#>
+#>     ## function definition abbreviated for clarity ##
+#> }
+#> <bytecode: 0x55b540c07ca0>
+#> <environment: namespace:dplyr>
+```
+
+In the following `{ggplot2}` expression the `cyl`- and `mean`-objects are quoted.
+
+```{r, eval = FALSE}
+ggplot(
+  by_cyl, # by_cyl -> evaluated
+  aes(cyl, mean)
+) + # aes() -> evaluated
+  # cyl, mean -> quoted (via aes)
+  geom_point()
+```
+
+We can confirm this also by inspecting `aes()`'s source code.
+
+```{r}
+ggplot2::aes
+```
+
+## Quoting
+
+__[Q1]{.Q}__: How is `expr()` implemented? Look at its source code.
+
+__[A]{.solved}__: `expr()` acts as a simple wrapper, which passes its argument to `enexpr()`.
+
+```{r}
+expr
+```
+
+__[Q2]{.Q}__: Compare and contrast the following two functions. Can you predict the output before running them?
+
+```{r, results = FALSE}
+f1 <- function(x, y) {
+  exprs(x = x, y = y)
+}
+f2 <- function(x, y) {
+  enexprs(x = x, y = y)
+}
+f1(a + b, c + d)
+f2(a + b, c + d)
+```
+
+__[A]{.solved}__: Both functions are able to capture multiple arguments and will return a named list of expressions. `f1()` will return the arguments defined within the body of `f1()`. This happens because `exprs()` captures the expressions as specified by the developer during the definition of `f1()`.
+
+```{r}
+f1(a + b, c + d)
+```
+
+`f2()` will return the arguments supplied to `f2()` as specified by the user when the function is called. 
+
+```{r}
+f2(a + b, c + d)
+```
+
+__[Q3]{.Q}__: What happens if you try to use `enexpr()` with an expression (i.e. `enexpr(x + y)`)? What happens if `enexpr()` is passed a missing argument?
+
+__[A]{.solved}__: In the first case an error is thrown:
+
+```{r, error = TRUE}
+on_expr <- function(x) {
+  enexpr(expr(x))
+}
+on_expr(x + y)
+```
+
+In the second case a missing argument is returned:
+
+```{r}
+on_missing <- function(x) {
+  enexpr(x)
+}
+on_missing()
+is_missing(on_missing())
+```
+
+__[Q4]{.Q}__: How are `exprs(a)` and `exprs(a = )` different? Think about both the input and the output.
+
+__[A]{.solved}__: In `exprs(a)` the input `a` is interpreted as a symbol for an unnamed argument. Consequently, the output shows an unnamed list with the first element containing the symbol `a`.
+
+```{r}
+out1 <- exprs(a)
+str(out1)
+```
+
+In `exprs(a = )` the first argument is named `a`, but then no value is provided. This leads to the output of a named list with the first element named `a`, which contains the missing argument.
+
+```{r}
+out2 <- exprs(a = )
+str(out2)
+is_missing(out2$a)
+```
+
+__[Q5]{.Q}__: What are other differences between `exprs()` and `alist()`? Read the documentation for the named arguments of `exprs()` to find out.
+
+__[A]{.solved}__: `exprs()` provides the additional arguments `.named` (`= FALSE`), `.ignore_empty` (`c("trailing", "none", "all")`) and `.unquote_names` (`TRUE`). `.named` allows to ensure that all dots are named. `ignore_empty` allows to specify how empty arguments should be handled for dots (`"trailing"`) or all arguments (`"none"` and `"all"`). Further via `.unquote_names` one can specify if `:=` should be treated like `=`. `:=` can be useful as it supports unquoting (`!!`) on the left-hand side.
+
+__[Q6]{.Q}__: The documentation for `substitute()` says:
+
+> Substitution takes place by examining each component of the parse tree 
+> as follows: 
+> 
+> * If it is not a bound symbol in `env`, it is unchanged. 
+> * If it is a promise object (i.e. a formal argument to a function) the expression slot of the promise replaces the symbol. 
+> * If it is an ordinary variable, its value is substituted, unless `env` is .GlobalEnv in which case the symbol is left unchanged.
+
+Create examples that illustrate each of the above cases.
+
+__[A]{.solved}__: Let's create a new environment `my_env`, which contains no objects. In this case `substitute()` will just return its first argument (`expr`):
+
+```{r}
+my_env <- env()
+substitute(x, my_env)
+```
+
+When we create a function containing an argument, which is directly returned after substitution, this function just returns the provided expression:
+
+```{r}
+foo <- function(x) substitute(x)
+
+foo(x + y * sin(0))
+```
+
+In case `substitute()` can find (parts of) the expression in `env`, it will literally substitute. However, unless `env` is `.GlobalEnv`.
+
+```{r}
+my_env$x <- 7
+substitute(x, my_env)
+
+x <- 7
+substitute(x, .GlobalEnv)
+```
+
+## Unquoting
+
+__[Q1]{.Q}__: Given the following components:
+
+```{r}
+xy <- expr(x + y)
+xz <- expr(x + z)
+yz <- expr(y + z)
+abc <- exprs(a, b, c)
+```
+
+Use quasiquotation to construct the following calls:
+
+```{r, eval = FALSE}
+(x + y) / (y + z) # (1)
+-(x + z)^(y + z) # (2)
+(x + y) + (y + z) - (x + y) # (3)
+atan2(x + y, y + z) # (4)
+sum(x + y, x + y, y + z) # (5)
+sum(a, b, c) # (6)
+mean(c(a, b, c), na.rm = TRUE) # (7)
+foo(a = x + y, b = y + z) # (8)
+```
+
+__[A]{.solved}__: We combine and unquote the given quoted expressions to construct the desired calls like this:
+
+```{r}
+expr(!!xy / !!yz) # (1)
+
+expr(-(!!xz)^(!!yz)) # (2)
+
+expr(((!!xy)) + !!yz - !!xy) # (3)
+
+expr(atan2(!!xy, !!yz)) # (4)
+
+expr(sum(!!xy, !!xy, !!yz)) # (5)
+
+expr(sum(!!!abc)) # (6)
+
+expr(mean(c(!!!abc), na.rm = TRUE)) # (7)
+
+expr(foo(a = !!xy, b = !!yz)) # (8)
+```
+
+__[Q2]{.Q}__: The following two calls print the same, but are actually different:
+
+```{r}
+(a <- expr(mean(1:10)))
+(b <- expr(mean(!!(1:10))))
+identical(a, b)
+```
+
+What's the difference? Which one is more natural?
+
+__[A]{.solved}__: It's easiest to see the difference with `lobstr::ast()`:
+
+```{r}
+lobstr::ast(mean(1:10))
+lobstr::ast(mean(!!(1:10)))
+```
+
+In the expression `mean(!!(1:10))` the call `1:10` is evaluated to an integer vector, while still being a call object in `mean(1:10)`.
+
+The first version (`mean(1:10)`) seems more natural. It captures lazy evaluation, with a promise that is evaluated when the function is called. The second version (`mean(!!(1:10))`) inlines a vector directly into a call.
+
+## `...` (dot-dot-dot)
+
+__[Q1]{.Q}__: One way to implement `exec()` is shown below. Describe how it works. What are the key ideas?
+
+```{r, eval = FALSE}
+exec <- function(f, ..., .env = caller_env()) {
+  args <- list2(...)
+  do.call(f, args, envir = .env)
+}
+```
+
+__[A]{.solved}__: `exec()` takes a function (`f`), its arguments (`...`) and an environment (`.env`) as input. This allows to construct a call from `f` and `...` and evaluate this call in the supplied environment. As the `...` argument is handled via `list2()`, `exec()` supports tidy dots (quasiquotation), which means that arguments and names (on the left-hand side of `:=`) can be unquoted via `!!` and `!!!`.
+
+__[Q2]{.Q}__: Carefully read the source code for `interaction()`, `expand.grid()`, and `par()`. Compare and contrast the techniques they use for switching between dots and list behaviour.
+
+__[A]{.solved}__:  All three functions capture the dots via `args <- list(...)`.
+
+`interaction()` computes factor interactions between the captured input factors by iterating over the `args`. When a list is provided this is detected via `length(args) == 1 && is.list(args[[1]])` and one level of the list is stripped through `args <- args[[1]]`. The rest of the function's code doesn't differentiate further between list and dots behaviour.
+
+```{r}
+# Both calls create the same output
+interaction(a = c("a", "b", "c", "d"), b = c("e", "f")) # dots
+interaction(list(a = c("a", "b", "c", "d"), b = c("e", "f"))) # list
+```
+
+`expand.grid()` uses the same strategy and also assigns `args <- args[[1]]` in case of `length(args) == 1 && is.list(args[[1]])`.
+
+`par()` does the most pre-processing to ensure a valid structure of the `args` argument. When no dots are provided (`!length(args)`) it creates a list of arguments from an internal character vector (partly depending on its `no.readonly` argument). Further, given that all elements of `args` are character vectors (`all(unlist(lapply(args, is.character)))`), `args` is turned into a list via `as.list(unlist(args))` (this flattens nested lists). Similar to the other functions, one level of `args` gets stripped via `args <- args[[1L]]`, when `args` is of length one and its first element is a list.
+
+__[Q3]{.Q}__: Explain the problem with this definition of `set_attr()`
+
+```{r, error = TRUE}
+set_attr <- function(x, ...) {
+  attr <- rlang::list2(...)
+  attributes(x) <- attr
+  x
+}
+set_attr(1:10, x = 10)
+```
+
+__[A]{.solved}__: `set_attr()` expects an object named `x` and its attributes, supplied via the dots. Unfortunately, this prohibits us to provide attributes named `x` as these would collide with the argument name of our object. Even omitting the object's argument name doesn't help in this case — as can be seen in the example where the object is consequently treated as an unnamed attribute.
+
+However, we may name the first argument `.x`, which seems clearer and less likely to invoke errors. In this case `1:10` will get the (named) attribute `x = 10` assigned:
+
+```{r}
+set_attr <- function(.x, ...) {
+  attr <- rlang::list2(...)
+
+  attributes(.x) <- attr
+  .x
+}
+
+set_attr(1:10, x = 10)
+```
+
+## Case studies {#expr-case-studies}
+
+__[Q1]{.Q}__: In the linear-model example, we could replace the `expr()` in `reduce(summands, ~ expr(!!.x + !!.y))` with `call2()`: `reduce(summands, call2, "+")`. Compare and contrast the two approaches. Which do you think is easier to read?
+
+__[A]{.solved}__: We would consider the first version to be more readable. There seems to be a little more boilerplate code at first, but the unquoting syntax is very readable. Overall, the whole expression seems more explicit and less complex.
+
+__[Q2]{.Q}__: Re-implement the Box-Cox transform defined below using unquoting and `new_function()`:
+
+```{r}
+bc <- function(lambda) {
+  if (lambda == 0) {
+    function(x) log(x)
+  } else {
+    function(x) (x^lambda - 1) / lambda
+  }
+}
+```
+
+__[A]{.solved}__: Here `new_function()` allows us to create a function factory using tidy evaluation.
+
+```{r}
+bc2 <- function(lambda) {
+  lambda <- enexpr(lambda)
+
+  if (!!lambda == 0) {
+    new_function(exprs(x = ), expr(log(x)))
+  } else {
+    new_function(exprs(x = ), expr((x^(!!lambda) - 1) / !!lambda))
+  }
+}
+
+bc2(0)
+bc2(2)
+bc2(2)(2)
+```
+
+__[Q3]{.Q}__: Re-implement the simple `compose()` defined below using quasiquotation and `new_function()`:
+
+```{r}
+compose <- function(f, g) {
+  function(...) f(g(...))
+}
+```
+
+__[A]{.solved}__: The implementation is fairly straightforward, even though a lot of parentheses are required:
+
+```{r}
+compose2 <- function(f, g) {
+  f <- enexpr(f)
+  g <- enexpr(g)
+
+  new_function(exprs(... = ), expr((!!f)((!!g)(...))))
+}
+
+compose(sin, cos)
+compose(sin, cos)(pi)
+
+compose2(sin, cos)
+compose2(sin, cos)(pi)
+```

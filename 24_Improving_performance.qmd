@@ -150,9 +150,7 @@ __[A]{.solved}__: A rolling mean is a useful statistic to smooth time-series, sp
 
 The general functionality can be found in multiple packages, which vary in speed and flexibility of the computations. Here is a benchmark for several functions that all serve our purpose.
 
-```{r ch24_12, eval = FALSE}
-# TODO: This works in the HTML but not in the PDF
-
+```{r ch24_12}
 x <- 1:10
 slider::slide_dbl(x, mean, .before = 1, .complete = TRUE)
 
@@ -243,9 +241,7 @@ chisq.test2 <- function(x, y) {
 
 We check if our new implementation returns the same results and benchmark it afterwards.
 
-```{r ch24_19, eval = FALSE}
-# TODO: This works in the HTML but not in the PDF
-
+```{r ch24_19}
 a <- 21:25
 b <- seq(21, 29, 2)
 m <- cbind(a, b)
@@ -320,9 +316,7 @@ __[Q2]{.Q}__: Compare the speed of `apply(x, 1, sum)` with `rowSums(x)` for vary
 
 __[A]{.solved}__: We compare the two functions for square matrices of increasing size:
 
-```{r ch24_22, warning = FALSE, eval = FALSE}
-# TODO: This works in the HTML but not in the PDF
-
+```{r ch24_22, warning = FALSE}
 rowsums <- bench::press(
   p = seq(500, 5000, length.out = 10),
   {
@@ -357,9 +351,7 @@ __[Q3]{.Q}__: How can you use `crossprod()` to compute a weighted sum? How much 
 
 __[A]{.solved}__: We can hand the vectors to `crossprod()`, which converts them to row- and column-vectors and then multiplies these. The result is the dot product, which corresponds to a weighted sum.
 
-```{r ch24_23, eval = FALSE}
-# TODO: This works in the HTML but not in the PDF
-
+```{r ch24_23}
 x <- rnorm(10)
 w <- rnorm(10)
 all.equal(sum(x * w), crossprod(x, w)[[1]])
@@ -367,9 +359,7 @@ all.equal(sum(x * w), crossprod(x, w)[[1]])
 
 A benchmark of both approaches for different vector lengths indicates that the `crossprod()` variant is almost twice as fast as `sum(x * w)`.
 
-```{r ch24_24, eval = FALSE}
-# TODO: This works in the HTML but not in the PDF
-
+```{r ch24_24}
 weightedsum <- bench::press(
   n = 1:10,
   {
