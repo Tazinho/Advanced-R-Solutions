@@ -1,61 +1,53 @@
 on:
   push:
-    branches:
-      - main
+    branches: main
 
-name: bookdown
+name: Render and Publish
 
 jobs:
-  build:
-    runs-on: macOS-latest
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+  build-deploy:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-
+      - name: Check out repository
+        uses: actions/checkout@v3
+      
       - name: Setup R
-        uses: r-lib/actions/setup-r@v1
+        uses: r-lib/actions/setup-r@v2
 
-      - name: Install pandoc and pandoc citeproc
-        run: |
-          brew install pandoc
+      - name: Setup pandoc
+        uses: r-lib/actions/setup-pandoc@v2
 
-      - name: Cache Renv packages
-        uses: actions/cache@v2
+      - name: Get R version
+        id: get-r-version
+        run: echo "version=$(Rscript -e 'cat(as.character(getRversion()))')" >> $GITHUB_OUTPUT
+        shell: bash  
+
+      - name: Cache R packages
+        uses: actions/cache@v3
         with:
-          path: $HOME/.local/share/renv
-          key: r-${{ hashFiles('renv.lock') }}
-          restore-keys: r-
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-${{ steps.get-r-version.outputs.version }}-3-
 
-      - name: Cache bookdown results
-        uses: actions/cache@v2
-        with:
-          path: _bookdown_files
-          key: bookdown-${{ hashFiles('**/*Rmd') }}
-          restore-keys: bookdown-
-
-      - name: Install packages
+      - name: Install dependencies
         run: |
-          R -e 'install.packages("renv")'
-          R -e 'renv::restore()'
-          R -e 'install.packages("remotes")'
-          R -e 'remotes::install_github("hadley/emo")'
-          R -e 'remotes::install_github("rstudio/bslib")'
-          R -e 'remotes::install_deps(dependencies = TRUE)'
+          install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
+          pak::local_install_dev_deps()
+        shell: Rscript {0}
 
-      - name: Build site
-        run: Rscript -e 'bookdown::render_book("index.Rmd", quiet = TRUE)'
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          tinytex: false
+      
+      # - name: Publish to GitHub Pages (and render)
+      #   uses: quarto-dev/quarto-actions/publish@v2
+      #   with:
+      #     target: gh-pages
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # this secret is always available for github actions
 
-      - name: Install npm
-        uses: actions/setup-node@v1
-
-      - name: Deploy to Netlify
-        if: github.ref == 'refs/heads/main'
-        # NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID added in the repo's secrets
-        env:
+      - name: Publish to Netlify (and render)
+        uses: quarto-dev/quarto-actions/publish@v2
+        with:
+          target: netlify
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: |
-          npm install netlify-cli -g
-          netlify deploy --prod --dir=_book

@@ -1,0 +1,169 @@
+---
+bibliography: references.bib
+---
+
+```{r, include = FALSE}
+source("common.R")
+```
+
+# 4 - Subsetting {-}
+
+## Selecting multiple elements
+
+__[Q1]{.Q}__: Fix each of the following common data frame subsetting errors:
+
+```{r, eval = FALSE}
+mtcars[mtcars$cyl = 4, ]
+# use `==`              (instead of `=`)
+
+mtcars[-1:4, ]
+# use `-(1:4)`          (instead of `-1:4`)
+
+mtcars[mtcars$cyl <= 5]
+# `,` is missing
+
+mtcars[mtcars$cyl == 4 | 6, ]
+# use `mtcars$cyl == 6` (instead of `6`)
+#  or `%in% c(4, 6)`    (instead of `== 4 | 6`)
+```
+
+__[Q2]{.Q}__: Why does the following code yield five missing values? (Hint: why is it different from `x[NA_real_]`?)
+
+```{r}
+x <- 1:5
+x[NA]
+```
+
+__[A]{.solved}__: In contrast to `NA_real`, `NA` has logical type and logical vectors are recycled to the same length as the vector being subset, i.e. `x[NA]` is recycled to `x[c(NA, NA, NA, NA, NA)]`.
+
+__[Q3]{.Q}__: What does `upper.tri()` return? How does subsetting a matrix with it work? Do we need any additional subsetting rules to describe its behaviour?
+
+```{r echo = TRUE, results = 'hide'}
+x <- outer(1:5, 1:5, FUN = "*")
+x[upper.tri(x)]
+```
+
+__[A]{.solved}__: `upper.tri(x)` returns a logical matrix, which contains `TRUE` values above the diagonal and `FALSE` values everywhere else. In `upper.tri()` the positions for `TRUE` and `FALSE` values are determined by comparing `x`'s row and column indices via `.row(dim(x)) < .col(dim(x))`.
+
+```{r}
+x
+upper.tri(x)
+```
+
+When subsetting with logical matrices, all elements that correspond to `TRUE` will be selected. Matrices extend vectors with a dimension attribute, so the vector forms of subsetting can be used (including logical subsetting). We should take care, that the dimensions of the subsetting matrix match the object of interest — otherwise unintended selections due to vector recycling may occur. Please also note, that this form of subsetting returns a vector instead of a matrix, as the subsetting alters the dimensions of the object.
+
+```{r}
+x[upper.tri(x)]
+```
+
+__[Q4]{.Q}__: Why does `mtcars[1:20]` return an error? How does it differ from the similar `mtcars[1:20, ]`?
+
+__[A]{.solved}__: When subsetting a data frame with a single vector, it behaves the same way as subsetting a list of columns. So, `mtcars[1:20]` would return a data frame containing the first 20 columns of the dataset. However, as `mtcars` has only 11 columns, the index will be out of bounds and an error is thrown. `mtcars[1:20, ]` is subsetted with two vectors, so 2d subsetting kicks in, and the first index refers to rows.
+
+__[Q5]{.Q}__: Implement your own function that extracts the diagonal entries from a matrix (it should behave like `diag(x)` where `x` is a matrix).
+
+__[A]{.solved}__: The elements in the diagonal of a matrix have the same row- and column indices. This characteristic can be used to create a suitable numeric matrix used for subsetting.
+
+```{r}
+diag2 <- function(x) {
+  n <- min(nrow(x), ncol(x))
+  idx <- cbind(seq_len(n), seq_len(n))
+
+  x[idx]
+}
+
+# Let's check if it works
+(x <- matrix(1:30, 5))
+
+diag(x)
+diag2(x)
+```
+
+__[Q6]{.Q}__: What does `df[is.na(df)] <- 0` do? How does it work?
+
+__[A]{.solved}__: This expression replaces the `NA`s in `df` with `0`. Here `is.na(df)` returns a logical matrix that encodes the position of the missing values in `df`. Subsetting and assignment are then combined to replace only the missing values.
+
+## Selecting a single element
+
+__[Q1]{.Q}__: Brainstorm as many ways as possible to extract the third value from the `cyl` variable in the `mtcars` dataset.
+
+__[A]{.solved}__: Base R already provides an abundance of possibilities:
+
+```{r}
+# Select column first
+mtcars$cyl[[3]]
+mtcars[ , "cyl"][[3]]
+mtcars[["cyl"]][[3]]
+with(mtcars, cyl[[3]])
+
+# Select row first
+mtcars[3, ]$cyl
+mtcars[3, "cyl"]
+mtcars[3, ][ , "cyl"]
+mtcars[3, ][["cyl"]]
+
+# Select simultaneously
+mtcars[3, 2]
+mtcars[[c(2, 3)]]
+```
+
+__[Q2]{.Q}__: Given a linear model, e.g. `mod <- lm(mpg ~ wt, data = mtcars)`, extract the residual degrees of freedom. Extract the R squared from the model summary (`summary(mod)`).
+
+__[A]{.solved}__: `mod` is of type list, which opens up several possibilities. We use `$` or `[[` to extract a single element:
+
+```{r}
+mod <- lm(mpg ~ wt, data = mtcars)
+
+mod$df.residual
+mod[["df.residual"]]
+```
+
+The same also applies to `summary(mod)`, so we could use, e.g.:
+
+```{r}
+summary(mod)$r.squared
+```
+
+(Tip: The [`{broom}` package](https://github.com/tidymodels/broom) [@broom] provides a very useful approach to work with models in a tidy way.)
+
+## Applications
+
+__[Q1]{.Q}__: How would you randomly permute the columns of a data frame? (This is an important technique in random forests.) Can you simultaneously permute the rows and columns in one step?
+
+__[A]{.solved}__: This can be achieved by combining `[` and `sample()`:
+
+```{r,eval = FALSE}
+# Permute columns
+mtcars[sample(ncol(mtcars))]
+
+# Permute columns and rows in one step
+mtcars[sample(nrow(mtcars)), sample(ncol(mtcars))]
+```
+
+__[Q2]{.Q}__: How would you select a random sample of `m` rows from a data frame? What if the sample had to be contiguous (i.e. with an initial row, a final row, and every row in between)?
+
+__[A]{.solved}__: Selecting `m` random rows from a data frame can be achieved through subsetting.
+
+```{r, eval = FALSE}
+m <- 10
+mtcars[sample(nrow(mtcars), m), ]
+```
+
+Holding successive lines together as a blocked sample requires only a certain amount of caution in order to obtain the correct start and end index.
+
+```{r, eval = FALSE}
+start <- sample(nrow(mtcars) - m + 1, 1)
+end <- start + m - 1
+mtcars[start:end, , drop = FALSE]
+```
+
+__[Q3]{.Q}__: How could you put the columns in a data frame in alphabetical order?
+
+__[A]{.solved}__: We combine `[` with `order()` or `sort()`:
+
+```{r, eval = FALSE}
+mtcars[order(names(mtcars))]
+mtcars[sort(names(mtcars))]
+```
+
+## References

@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Solutions to the Exercises in Hadley Wickham’s book ‘Advanced R’.">
+
+<title>Advanced R Solutions - 6 - Functions</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./07_Environments.html" rel="next">
+<link href="./05_Control_flow.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./02_Names_and_values.html">Foundations</a></li><li class="breadcrumb-item"><a href="./06_Functions.html">6 - Functions</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Advanced R Solutions</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./00_02_Preface.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./00_03_Abstracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter abstracts</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_Names_and_values.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2 - Names and values</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_Vectors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3 - Vectors</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_Subsetting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">4 - Subsetting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_Control_flow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">5 - Control flow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_Functions.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">6 - Functions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_Environments.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 Environments</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08_Conditions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">8 - Conditions</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">Functional programming</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09_Functionals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">9 - Functionals</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10_Function_factories.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 - Function factories</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11_Function_operators.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 - Function operators</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text">Object-oriented programming</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./13_S3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">13 - S3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./14_R6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">14 - R6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./15_S4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">15 - S4</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text">Metaprogramming</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./18_Expressions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">18 - Expressions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./19_Quasiquotation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">19 - Quasiquotation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./20_Evaluation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">20 - Evaluation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./21_Translating_R_code.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">21 - Translating R code</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
+ <span class="menu-text">Techniques</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./23_Measuring_performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">23 - Measuring performance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./24_Improving_performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">24 - Improving performance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./25_Rewriting_R_code_in_Cpp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">25 - Rewriting R code in C++</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#function-fundamentals" id="toc-function-fundamentals" class="nav-link active" data-scroll-target="#function-fundamentals">Function fundamentals</a></li>
+  <li><a href="#lexical-scoping" id="toc-lexical-scoping" class="nav-link" data-scroll-target="#lexical-scoping">Lexical scoping</a></li>
+  <li><a href="#lazy-evaluation" id="toc-lazy-evaluation" class="nav-link" data-scroll-target="#lazy-evaluation">Lazy evaluation</a></li>
+  <li><a href="#dot-dot-dot" id="toc-dot-dot-dot" class="nav-link" data-scroll-target="#dot-dot-dot"><code>...</code> (dot-dot-dot)</a></li>
+  <li><a href="#exiting-a-function" id="toc-exiting-a-function" class="nav-link" data-scroll-target="#exiting-a-function">Exiting a function</a></li>
+  <li><a href="#function-forms" id="toc-function-forms" class="nav-link" data-scroll-target="#function-forms">Function forms</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">6 - Functions</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="function-fundamentals" class="level2">
+<h2 class="anchored" data-anchor-id="function-fundamentals">Function fundamentals</h2>
+<p><strong><span class="Q">Q1</span></strong>: Given a name, like <code>"mean"</code>, <code>match.fun()</code> lets you find a function. Given a function, can you find its name? Why doesn’t that make sense in R?</p>
+<p><strong><span class="solved">A</span></strong>: In R there is no one-to-one mapping between functions and names. A name always points to a single object, but an object may have zero, one or many names.</p>
+<p>Let’s look at an example:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-2_df3d2e5cb594a256235f48f90623cacc">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">function</span>(x) <span class="fu">sd</span>(x) <span class="sc">/</span> <span class="fu">mean</span>(x)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function(x) sd(x) / mean(x)</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>f1 <span class="ot">&lt;-</span> <span class="cf">function</span>(x) (x <span class="sc">-</span> <span class="fu">min</span>(x)) <span class="sc">/</span> (<span class="fu">max</span>(x) <span class="sc">-</span> <span class="fu">min</span>(x))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>f2 <span class="ot">&lt;-</span> f1</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>f3 <span class="ot">&lt;-</span> f1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>While the function in the first line is not bound to a name multiple names (<code>f1</code>, <code>f2</code> and <code>f3</code>) point to the second function. So, the main point is that the relation between name and object is only clearly defined in one direction.</p>
+<p>Besides that, there are obviously ways to search for function names. However, to be sure to find the right one(s), you should not only compare the code (body) but also the arguments (formals) and the creation environment. As <code>formals()</code>, <code>body()</code> and <code>environment()</code> all return <code>NULL</code> for primitive functions, the easiest way to check if two functions are exactly equal is just to use <code>identical()</code>.</p>
+<p><strong><span class="Q">Q2</span></strong>: It’s possible (although typically not useful) to call an anonymous function. Which of the two approaches below is correct? Why?</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-3_7ebce47f272181c6334f7544765cc521">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">function</span>(x) <span class="dv">3</span>()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function(x) 3()</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>(<span class="cf">function</span>(x) <span class="dv">3</span>)()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="solved">A</span></strong>: The second approach is correct.</p>
+<p>The anonymous function <code>function(x) 3</code> is surrounded by a pair of parentheses before it is called by <code>()</code>. These extra parentheses separate the function call from the anonymous function’s body. Without them a function with the invalid body <code>3()</code> is returned, which throws an error when we call it. This is easier to see if we name the function:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-4_9565716846794e9326e06492dd0c6aa4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="dv">3</span>()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>f</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function(x) 3()</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>()</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in f(): attempt to apply non-function</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="Q">Q3</span></strong>: A good rule of thumb is that an anonymous function should fit on one line and shouldn’t need to use <code>{}</code>. Review your code. Where could you have used an anonymous function instead of a named function? Where should you have used a named function instead of an anonymous function?</p>
+<p><strong><span class="solved">A</span></strong>: The use of anonymous functions allows concise and elegant code in certain situations. However, they miss a descriptive name and when re-reading the code, it can take a while to figure out what they do. That’s why it’s helpful to give long and complex functions a descriptive name. It may be worthwhile to take a look at your own projects or other people’s code to reflect on this part of your coding style.</p>
+<p><strong><span class="Q">Q4</span></strong>: What function allows you to tell if an object is a function? What function allows you to tell if a function is a primitive function?</p>
+<p><strong><span class="solved">A</span></strong>: Use <code>is.function()</code> to test if an object is a function. Consider using <code>is.primitive()</code> to test specifically for primitive functions.</p>
+<p><strong><span class="Q">Q5</span></strong>: This code makes a list of all functions in the <code>{base}</code> package.</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-5_855bac917906d56b5383bd8bf965c1f3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>objs <span class="ot">&lt;-</span> <span class="fu">mget</span>(<span class="fu">ls</span>(<span class="st">"package:base"</span>, <span class="at">all =</span> <span class="cn">TRUE</span>), <span class="at">inherits =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>funs <span class="ot">&lt;-</span> <span class="fu">Filter</span>(is.function, objs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Use it to answer the following questions:</p>
+<ol type="a">
+<li><p>Which base function has the most arguments?</p></li>
+<li><p>How many base functions have no arguments? What’s special about those functions?</p></li>
+<li><p>How could you adapt the code to find all primitive functions?</p></li>
+</ol>
+<p><strong><span class="solved">A</span></strong>: Let’s look at each sub-question separately:</p>
+<ol type="a">
+<li><p>To find the function with the most arguments, we first compute the length of <code>formals()</code>.</p>
+<p>::: {.cell layout-align=“center” hash=‘06_Functions_cache/html/unnamed-chunk-6_6267cff5cf01cfe02ecd151e21d5a5fa’}</p>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>n_args <span class="ot">&lt;-</span> funs <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(formals) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_int</span>(length)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>:::</p>
+<p>Then we sort <code>n_args</code> in decreasing order and look at its first entries.</p>
+<p>::: {.cell layout-align=“center” hash=‘06_Functions_cache/html/unnamed-chunk-7_e2ebb773e25ecb466480bc13c7da9a54’}</p>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>n_args <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="at">decreasing =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>()</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; scan format.default source</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22 16 16</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; formatC library merge.data.frame</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15 13 13</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>:::</p></li>
+<li><p>We can further use <code>n_args</code> to find the number of functions with no arguments:</p>
+<p>::: {.cell layout-align=“center” hash=‘06_Functions_cache/html/unnamed-chunk-8_c75252d5453caf2a84875fac9332cabc’}</p>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(n_args <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 253</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>:::</p>
+<p>However, this over counts because <code>formals()</code> returns <code>NULL</code> for primitive functions, and <code>length(NULL)</code> is 0. To fix this, we can first remove the primitive functions:</p>
+<p>::: {.cell layout-align=“center” hash=‘06_Functions_cache/html/unnamed-chunk-9_26e9cc7827d73a0a237f756700c9bf1e’}</p>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>n_args2 <span class="ot">&lt;-</span> funs <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">discard</span>(is.primitive) <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(formals) <span class="sc">%&gt;%</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_int</span>(length)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(n_args2 <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 48</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>:::</p>
+<p>Indeed, most of the functions with no arguments are actually primitive functions.</p></li>
+<li><p>To find all primitive functions, we can change the predicate in <code>Filter()</code> from <code>is.function()</code> to <code>is.primitive()</code>:</p>
+<p>::: {.cell layout-align=“center” hash=‘06_Functions_cache/html/unnamed-chunk-10_ff0eddde09f29f9d6acb9dcb81dfbef0’}</p>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>funs <span class="ot">&lt;-</span> <span class="fu">Filter</span>(is.primitive, objs)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(funs)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 205</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>:::</p></li>
+</ol>
+<p><strong><span class="Q">Q6</span></strong>: What are the three important components of a function?</p>
+<p><strong><span class="solved">A</span></strong>: These components are the function’s <code>body()</code>, <code>formals()</code> and <code>environment()</code>. However, as mentioned in <em>Advanced R</em>:</p>
+<blockquote class="blockquote">
+<p>There is one exception to the rule that functions have three components. Primitive functions, like <code>sum()</code>, call C code directly with <code>.Primitive()</code> and contain no R code. Therefore, their <code>formals()</code>, <code>body()</code>, and <code>environment()</code> are all <code>NULL</code>.</p>
+</blockquote>
+<p><strong><span class="Q">Q7</span></strong>: When does printing a function not show what environment it was created in?</p>
+<p><strong><span class="solved">A</span></strong>: Primitive functions and functions created in the global environment do not print their environment.</p>
+</section>
+<section id="lexical-scoping" class="level2">
+<h2 class="anchored" data-anchor-id="lexical-scoping">Lexical scoping</h2>
+<p><strong><span class="Q">Q1</span></strong>: What does the following code return? Why? Describe how each of the three <code>c</code>’s is interpreted.</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-11_7731ed5d60d6be8fd1a655e274c2a164">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>c <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">c =</span> c)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="solved">A</span></strong>: This code returns a named numeric vector of length one — with one element of the value <code>10</code> and the name <code>"c"</code>. The first <code>c</code> represents the <code>c()</code> function, the second <code>c</code> is interpreted as a (quoted) name and the third <code>c</code> as a value.</p>
+<p><strong><span class="Q">Q2</span></strong>: What are the four principles that govern how R looks for values?</p>
+<p><strong><span class="solved">A</span></strong>: R’s <a href="https://adv-r.hadley.nz/functions.html#lexical-scoping">lexical scoping</a> rules are based on these four principles:</p>
+<ul>
+<li><a href="https://adv-r.hadley.nz/functions.html#name-masking">Name masking</a></li>
+<li><a href="https://adv-r.hadley.nz/functions.html#functions-versus-variables">Functions vs.&nbsp;variables</a></li>
+<li><a href="https://adv-r.hadley.nz/functions.html#fresh-start">A fresh start</a></li>
+<li><a href="https://adv-r.hadley.nz/functions.html#dynamic-lookup">Dynamic lookup</a></li>
+</ul>
+<p><strong><span class="Q">Q3</span></strong>: What does the following function return? Make a prediction before running the code yourself.</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-12_4d2037cf4f0ae0d75831e0dbc3f86aac">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  f <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    f <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>      x<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">f</span>() <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">f</span>(x) <span class="sc">*</span> <span class="dv">2</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="solved">A</span></strong>: Within this nested function two more functions also named <code>f</code> are defined and called. Because the functions are each executed in their own environment R will look up and use the functions defined last in these environments. The innermost <code>f()</code> is called last, though it is the first function to return a value. Therefore, the order of the calculation passes “from the inside to the outside” and the function returns <code>((10 ^ 2) + 1) * 2</code>, i.e.&nbsp;202.</p>
+</section>
+<section id="lazy-evaluation" class="level2">
+<h2 class="anchored" data-anchor-id="lazy-evaluation">Lazy evaluation</h2>
+<p><strong><span class="Q">Q1</span></strong>: What important property of <code>&amp;&amp;</code> makes <code>x_ok()</code> work?</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-13_2ba8be19de12cd0e4c58af2cff5150ca">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>x_ok <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">!</span><span class="fu">is.null</span>(x) <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(x) <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;&amp;</span> x <span class="sc">&gt;</span> <span class="dv">0</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">x_ok</span>(<span class="cn">NULL</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">x_ok</span>(<span class="dv">1</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="fu">x_ok</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>What is different with this code? Why is this behaviour undesirable here?</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-14_69d1f9de50ebbde5c2796186d26a461c">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>x_ok <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">!</span><span class="fu">is.null</span>(x) <span class="sc">&amp;</span> <span class="fu">length</span>(x) <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> x <span class="sc">&gt;</span> <span class="dv">0</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">x_ok</span>(<span class="cn">NULL</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; logical(0)</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="fu">x_ok</span>(<span class="dv">1</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="fu">x_ok</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE FALSE FALSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="solved">A</span></strong>: In summary: <code>&amp;&amp;</code> short-circuits which means that if the left-hand side is <code>FALSE</code> it doesn’t evaluate the right-hand side (because it doesn’t matter). Similarly, if the left-hand side of <code>||</code> is <code>TRUE</code> it doesn’t evaluate the right-hand side.</p>
+<p>We expect <code>x_ok()</code> to validate its input via certain criteria: it must not be <code>NULL</code>, have length <code>1</code> and be greater than <code>0</code>. Meaningful outcomes for this assertion will be <code>TRUE</code>, <code>FALSE</code> or <code>NA</code>. The desired behaviour is reached by combining the assertions through <code>&amp;&amp;</code> instead of <code>&amp;</code>.</p>
+<p><code>&amp;&amp;</code> does not perform elementwise comparisons; instead it uses the first element of each value only. It also uses lazy evaluation, in the sense that evaluation “proceeds only until the result is determined” (from <code>?Logic</code>). This means that the RHS of <code>&amp;&amp;</code> won’t be evaluated if the LHS already determines the outcome of the comparison (e.g.&nbsp;evaluate to <code>FALSE</code>). This behaviour is also known as “short-circuiting”. For some situations (<code>x = 1</code>) both operators will lead to the same result. But this is not always the case. For <code>x = NULL</code>, the <code>&amp;&amp;</code>-operator will stop after the <code>!is.null</code> statement and return the result. The following conditions won’t even be evaluated! (If the other conditions are also evaluated (by the use of <code>&amp;</code>), the outcome would change. <code>NULL &gt; 0</code> returns <code>logical(0)</code>, which is not helpful in this case.)</p>
+<p>We can also see the difference in behaviour, when we set <code>x = 1:3</code>. The <code>&amp;&amp;</code>-operator returns the result from <code>length(x) == 1</code>, which is <code>FALSE</code>. Using <code>&amp;</code> as the logical operator leads to the (vectorised) <code>x &gt; 0</code> condition being evaluated and also returned.</p>
+<p><strong><span class="Q">Q2</span></strong>: What does this function return? Why? Which principle does it illustrate?</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-15_e210db9cba4931f840cd2c2726fad5ec">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>f2 <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">x =</span> z) {</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  x</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">f2</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="solved">A</span></strong>: The function returns 100. The default argument (<code>x = z</code>) gets lazily evaluated within the function environment when <code>x</code> gets accessed. At this time <code>z</code> has already been bound to the value <code>100</code>. The illustrated principle here is <em>lazy evaluation</em>.</p>
+<p><strong><span class="Q">Q3</span></strong>: What does this function return? Why? Which principle does it illustrate?</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-16_5c95c6f414ac11ffa28c99da3e576025">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>f1 <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">x =</span> {</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                 y <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                 <span class="dv">2</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>               }, <span class="at">y =</span> <span class="dv">0</span>) {</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(x, y)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="fu">f1</span>()</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="solved">A</span></strong>: The function returns <code>c(2, 1)</code> which is due to <em>name masking</em>. When <code>x</code> is accessed within <code>c()</code>, the promise <code>x = {y &lt;- 1; 2}</code> is evaluated inside <code>f1()</code>’s environment. <code>y</code> gets bound to the value <code>1</code> and the return value of <code>{()</code> (<code>2</code>) gets assigned to <code>x</code>. When <code>y</code> gets accessed next within <code>c()</code>, it has already the value <code>1</code> and R doesn’t need to look it up any further. Therefore, the promise <code>y = 0</code> won’t be evaluated. Also, as <code>y</code> is assigned within <code>f1()</code>’s environment, the value of the global variable <code>y</code> is left untouched.</p>
+<p><strong><span class="Q">Q4</span></strong>: In <code>hist()</code>, the default value of <code>xlim</code> is <code>range(breaks)</code>, the default value for <code>breaks</code> is <code>"Sturges"</code>, and</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-17_ba66cc9bf40ff540723d0a96c750dcd8">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(<span class="st">"Sturges"</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "Sturges" "Sturges"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Explain how <code>hist()</code> works to get a correct <code>xlim</code> value.</p>
+<p><strong><span class="solved">A</span></strong>: The <code>xlim</code> argument of <code>hist()</code> defines the range of the histogram’s x-axis. In order to provide a valid axis <code>xlim</code> must contain a numeric vector of exactly two unique values. Consequently, for the default <code>xlim = range(breaks)</code>), <code>breaks</code> must evaluate to a vector with at least two unique values.</p>
+<p>During execution <code>hist()</code> overwrites the <code>breaks</code> argument. The <code>breaks</code> argument is quite flexible and allows the users to provide the breakpoints directly or compute them in several ways. Therefore, the specific behaviour depends highly on the input. But <code>hist</code> ensures that <code>breaks</code> evaluates to a numeric vector containing at least two unique elements before <code>xlim</code> is computed.</p>
+<p><strong><span class="Q">Q5</span></strong>: Explain why this function works. Why is it confusing?</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-18_e3379f1e6d8897db53a3a2e6cdf033fe">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>show_time <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">x =</span> <span class="fu">stop</span>(<span class="st">"Error!"</span>)) {</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  stop <span class="ot">&lt;-</span> <span class="cf">function</span>(...) <span class="fu">Sys.time</span>()</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(x)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">show_time</span>()</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "2024-01-24 11:45:19 EST"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="solved">A</span></strong>: Before <code>show_time()</code> accesses <code>x</code> (default <code>stop("Error")</code>), the <code>stop()</code> function is masked by <code>function(...) Sys.time()</code>. As default arguments are evaluated in the function environment, <code>print(x)</code> will be evaluated as <code>print(Sys.time())</code>.</p>
+<p>This function is confusing because its behaviour changes when <code>x</code>’s value is supplied directly. Now the value from the calling environment will be used and the overwriting of <code>stop()</code> won’t affect <code>x</code> anymore.</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-19_5c4f4c7b8f1728b2110873413ddcef26">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show_time</span>(<span class="at">x =</span> <span class="fu">stop</span>(<span class="st">"Error!"</span>))</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in print(x): Error!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="Q">Q6</span></strong>: How many arguments are required when calling <code>library()</code>?</p>
+<p><strong><span class="solved">A</span></strong>: <code>library()</code> doesn’t require any arguments. When called without arguments <code>library()</code> invisibly returns a list of class <code>libraryIQR</code>, which contains a results matrix with one row and three columns per installed package. These columns contain entries for the name of the package (“Package”), the path to the package (“LibPath”) and the title of the package (“Title”). <code>library()</code> also has its own print method (<code>print.libraryIQR()</code>), which displays this information conveniently in its own window.</p>
+<p>This behaviour is also documented under the details section of <code>library()</code>’s help page (<code>?library</code>):</p>
+<blockquote class="blockquote">
+<p>If library is called with no package or help argument, it lists all available packages in the libraries specified by lib.loc, and returns the corresponding information in an object of class “libraryIQR”. (The structure of this class may change in future versions.) Use .packages(all = TRUE) to obtain just the names of all available packages, and installed.packages() for even more information.</p>
+</blockquote>
+<p>Because the <code>package</code> and <code>help</code> argument from <code>library()</code> do not show a default value, it’s easy to overlook the possibility to call <code>library()</code> without these arguments. (Instead of providing <code>NULL</code>s as default values <code>library()</code> uses <code>missing()</code> to check if these arguments were provided.)</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-20_c677879920ab45f5287aaa61beddb0ff">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(<span class="fu">formals</span>(library))</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Dotted pair list of 13</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ package        : symbol </span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ help           : symbol </span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ pos            : num 2</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ lib.loc        : NULL</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ character.only : logi FALSE</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ logical.return : logi FALSE</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ warn.conflicts : symbol </span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ quietly        : logi FALSE</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ verbose        : language getOption("verbose")</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ mask.ok        : symbol </span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ exclude        : symbol </span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ include.only   : symbol </span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ attach.required: language missing(include.only)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="dot-dot-dot" class="level2">
+<h2 class="anchored" data-anchor-id="dot-dot-dot"><code>...</code> (dot-dot-dot)</h2>
+<p><strong><span class="Q">Q1</span></strong>: Explain the following results:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-21_99eed28a4780af3bc116046f5c7f9649">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 6</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="at">na.omit =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 7</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="at">na.omit =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="solved">A</span></strong>: Let’s inspect the arguments and their order for both functions. For <code>sum()</code> these are <code>...</code> and <code>na.rm</code>:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-22_b4cf9c904551f8cf31e59778635603f9">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(sum)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function (..., na.rm = FALSE)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>For the <code>...</code> argument <code>sum()</code> expects numeric, complex, or logical vector input (see <code>?sum</code>). Unfortunately, when <code>...</code> is used, misspelled arguments (!) like <code>na.omit</code> won’t raise an error (in case of no further input checks). So instead, <code>na.omit</code> is treated as a logical and becomes part of the <code>...</code> argument. It will be coerced to <code>1</code> and be part of the sum. All other arguments are left unchanged. Therefore <code>sum(1, 2, 3)</code> returns <code>6</code> and <code>sum(1, 2, 3, na.omit = TRUE)</code> returns <code>7</code>.</p>
+<p>In contrast, the generic function <code>mean()</code> expects <code>x</code>, <code>trim</code>, <code>na.rm</code> and <code>...</code> for its default method.</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-23_10cb1191aed7abbeddb5122ea082f023">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(mean.default)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function (x, trim = 0, na.rm = FALSE, ...)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As <code>na.omit</code> is not one of <code>mean()</code>’s named arguments (<code>x</code>; and no candidate for partial matching), <code>na.omit</code> again becomes part of the <code>...</code> argument. However, in contrast to <code>sum()</code> the elements of <code>...</code> are not “part” of the mean. The other supplied arguments are matched by their order, i.e.&nbsp;<code>x = 1</code>, <code>trim = 2</code> and <code>na.rm = 3</code>. As <code>x</code> is of length 1 and not <code>NA</code>, the settings of <code>trim</code> and <code>na.rm</code> do not affect the calculation of the mean. Both calls (<code>mean(1, 2, 3)</code> and <code>mean(1, 2, 3, na.omit = TRUE)</code>) return <code>1</code>.</p>
+<p><strong><span class="Q">Q2</span></strong>: Explain how to find the documentation for the named arguments in the following function call:</p>
+<div class="cell" data-layout-align="center" data-small_mar="true" data-hash="06_Functions_cache/html/unnamed-chunk-24_c8f27d87b0a6e9760180622236ed7a7c">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">pch =</span> <span class="dv">20</span>, <span class="at">xlab =</span> <span class="st">"x"</span>, <span class="at">col.lab =</span> <span class="st">"blue"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="06_Functions_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" style="width:70.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong><span class="solved">A</span></strong>: First we type <code>?plot</code> in the console and check the “Usage” section which contains:</p>
+<pre><code>plot(x, y, ...)</code></pre>
+<p>The arguments we want to learn more about (<code>col</code>, <code>pch</code>, <code>xlab</code>, <code>col.lab</code>) are part of the <code>...</code> argument. There we can find information for the <code>xlab</code> argument and a recommendation to visit <code>?par</code> for the other arguments. Under <code>?par</code> we type “col” into the search bar, which leads us to the section “Color Specification”. We also search for the <code>pch</code> argument, which leads to the recommendation to check <code>?points</code>. Finally, <code>col.lab</code> is also directly documented within <code>?par</code>.</p>
+<p><strong><span class="Q">Q3</span></strong>: Why does <code>plot(1:10, col = "red")</code> only colour the points, not the axes or labels? Read the source code of <code>plot.default()</code> to find out.</p>
+<p><strong><span class="solved">A</span></strong>: To learn about the internals of <code>plot.default()</code> we add <code>browser()</code> to the first line of the code and interactively run <code>plot(1:10, col = "red")</code>. This way we can see how the plot is built and learn where the axes are added.</p>
+<p>This leads us to the function call</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-25_481de0d490fa3b034ec52a037bf89839">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">localTitle</span>(<span class="at">main =</span> main, <span class="at">sub =</span> sub, <span class="at">xlab =</span> xlab, <span class="at">ylab =</span> ylab, ...)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>localTitle()</code> function was defined in the first lines of <code>plot.default()</code> as:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-26_70fa7c31c974c06287d51f96c9c94a72">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>localTitle <span class="ot">&lt;-</span> <span class="cf">function</span>(..., col, bg, pch, cex, lty, lwd) <span class="fu">title</span>(...)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The call to <code>localTitle()</code> passes the <code>col</code> parameter as part of the <code>...</code> argument to <code>title()</code>. <code>?title</code> tells us that the <code>title()</code> function specifies four parts of the plot: Main (title of the plot), sub (sub-title of the plot) and both axis labels. Therefore, it would introduce ambiguity inside <code>title()</code> to use <code>col</code> directly. Instead, one has the option to supply <code>col</code> via the <code>...</code> argument, via <code>col.lab</code> or as part of <code>xlab</code> in the form <code>xlab = list(c("index"), col = "red")</code> (similar for <code>ylab</code>).</p>
+</section>
+<section id="exiting-a-function" class="level2">
+<h2 class="anchored" data-anchor-id="exiting-a-function">Exiting a function</h2>
+<p><strong><span class="Q">Q1</span></strong>: What does <code>load()</code> return? Why don’t you normally see these values?</p>
+<p><strong><span class="solved">A</span></strong>: <code>load()</code> loads objects saved to disk in <code>.Rdata</code> files by <code>save()</code>. When run successfully, <code>load()</code> invisibly returns a character vector containing the names of the newly loaded objects. To print these names to the console, one can set the argument <code>verbose</code> to <code>TRUE</code> or surround the call in parentheses to trigger R’s auto-printing mechanism.</p>
+<p><strong><span class="Q">Q2</span></strong>: What does <code>write.table()</code> return? What would be more useful?</p>
+<p><strong><span class="solved">A</span></strong>: <code>write.table()</code> writes an object, usually a data frame or a matrix, to disk. The function invisibly returns <code>NULL</code>. It would be more useful if <code>write.table()</code> would (invisibly) return the input data, <code>x</code>. This would allow to save intermediate results and directly take on further processing steps without breaking the flow of the code (i.e.&nbsp;breaking it into different lines). One package which uses this pattern is the <code>{readr}</code> package <span class="citation" data-cites="readr">(<a href="#ref-readr" role="doc-biblioref">Wickham and Hester 2020</a>)</span>, which is part of the <a href="https://www.tidyverse.org/">tidyverse-ecosystem</a>.</p>
+<p><strong><span class="Q">Q3</span></strong>: How does the <code>chdir</code> parameter of <code>source()</code> compare to <code>with_dir()</code>? Why might you prefer one to the other?</p>
+<p><strong><span class="solved">A</span></strong>: The <code>with_dir()</code> approach was given in <em>Advanced R</em> as:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-27_e7fe12c036fa0acec350d33930d868c5">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>with_dir <span class="ot">&lt;-</span> <span class="cf">function</span>(dir, code) {</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  old <span class="ot">&lt;-</span> <span class="fu">setwd</span>(dir)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">on.exit</span>(<span class="fu">setwd</span>(old))</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">force</span>(code)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>with_dir()</code> takes a path for a working directory (<code>dir</code>) as its first argument. This is the directory where the provided code (<code>code</code>) should be executed. Therefore, the current working directory is changed in <code>with_dir()</code> via <code>setwd()</code>. Then, <code>on.exit()</code> ensures that the modification of the working directory is reset to the initial value when the function exits. By passing the path explicitly, the user has full control over the directory to execute the code in.</p>
+<p>In <code>source()</code> the code is passed via the <code>file</code> argument (a path to a file). The <code>chdir</code> argument specifies if the working directory should be changed to the directory containing the file. The default for <code>chdir</code> is <code>FALSE</code>, so you don’t have to provide a value. However, as you can only provide <code>TRUE</code> or <code>FALSE</code>, you are also less flexible in choosing the working directory for the code execution.</p>
+<p><strong><span class="Q">Q4</span></strong>: Write a function that opens a graphics device, runs the supplied code, and closes the graphics device (always, regardless of whether or not the plotting code works).</p>
+<p><strong><span class="solved">A</span></strong>: To control the graphics device we use <code>pdf()</code> and <code>dev.off()</code>. To ensure a clean termination <code>on.exit()</code> is used.</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-28_9293617ca0783c26fcf747682e1a1ece">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>plot_pdf <span class="ot">&lt;-</span> <span class="cf">function</span>(code) {</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pdf</span>(<span class="st">"test.pdf"</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">on.exit</span>(<span class="fu">dev.off</span>(), <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  code</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="Q">Q5</span></strong>: We can use <code>on.exit()</code> to implement a simple version of <code>capture.output()</code>.</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-29_93bf32ec1c4714137072b28f40bae924">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>capture.output2 <span class="ot">&lt;-</span> <span class="cf">function</span>(code) {</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  temp <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">on.exit</span>(<span class="fu">file.remove</span>(temp), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">after =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sink</span>(temp)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">on.exit</span>(<span class="fu">sink</span>(), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">after =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">force</span>(code)</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">readLines</span>(temp)</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="fu">capture.output2</span>(<span class="fu">cat</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>, <span class="at">sep =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>))</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "a" "b" "c"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Compare <code>capture.output()</code> to <code>capture.output2()</code>. How do the functions differ? What features have I removed to make the key ideas easier to see? How have I rewritten the key ideas to be easier to understand?</p>
+<p><strong><span class="solved">A</span></strong>: Using <code>body(capture.output)</code> we inspect the source code of the original <code>capture.output()</code> function: The implementation for <code>capture.output()</code> is quite a bit longer (39 lines vs.&nbsp;7 lines).</p>
+<p>In <code>capture_output2()</code> the code is simply forced, and the output is caught via <code>sink()</code> in a temporary file. An additional feature of <code>capture_output()</code> is that one can also capture messages by setting <code>type = "message"</code>. As this is internally forwarded to <code>sink()</code>, this behaviour (and also <code>sink()</code>’s <code>split</code> argument) could be easily introduced within <code>capture_output2()</code> as well.</p>
+<p>The main difference is that <code>capture.output()</code> calls print, i.e.&nbsp;compare the output of these two calls:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-30_a13bd0cc3220a9815bc5baff3dcf7780">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">capture.output</span>({</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "[1] 1"</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="fu">capture.output2</span>({</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; character(0)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="function-forms" class="level2">
+<h2 class="anchored" data-anchor-id="function-forms">Function forms</h2>
+<p><strong><span class="Q">Q1</span></strong>: Rewrite the following code snippets into prefix form:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-31_05855dcca93c9ad9e5be300cb792c768">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">2</span> <span class="sc">+</span> <span class="dv">3</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> (<span class="dv">2</span> <span class="sc">+</span> <span class="dv">3</span>)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(x) <span class="sc">&lt;=</span> <span class="dv">5</span>) x[[<span class="dv">5</span>]] <span class="cf">else</span> x[[n]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="solved">A</span></strong>: Let’s rewrite the expressions to match the exact syntax from the code above. Because prefix functions already define the execution order, we may omit the parentheses in the second expression.</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-32_163c824377f9ae1eca1959de5821d3a7">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">+</span><span class="st">`</span>(<span class="st">`</span><span class="at">+</span><span class="st">`</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dv">3</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">+</span><span class="st">`</span>(<span class="dv">1</span>, <span class="st">`</span><span class="at">(</span><span class="st">`</span>(<span class="st">`</span><span class="at">+</span><span class="st">`</span>(<span class="dv">2</span>, <span class="dv">3</span>)))</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">+</span><span class="st">`</span>(<span class="dv">1</span>, <span class="st">`</span><span class="at">+</span><span class="st">`</span>(<span class="dv">2</span>, <span class="dv">3</span>))</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">if</span><span class="st">`</span>(<span class="st">`</span><span class="at">&lt;=</span><span class="st">`</span>(<span class="fu">length</span>(x), <span class="dv">5</span>), <span class="st">`</span><span class="at">[[</span><span class="st">`</span>(x, <span class="dv">5</span>), <span class="st">`</span><span class="at">[[</span><span class="st">`</span>(x, n))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="Q">Q2</span></strong>: Clarify the following list of odd function calls:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-33_55bd6ab2765385353720f974413cc98a">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="at">replace =</span> <span class="cn">TRUE</span>, <span class="dv">20</span>, <span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="cn">NA</span>))</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="at">min =</span> <span class="dv">0</span>, <span class="at">max =</span> <span class="dv">1</span>, <span class="dv">20</span>)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(<span class="at">m =</span> <span class="st">"k"</span>, <span class="at">y =</span> y, <span class="at">u =</span> <span class="st">"p"</span>, <span class="at">x =</span> x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="solved">A</span></strong>: None of these functions provides a <code>...</code> argument. Therefore, the function arguments are first matched exactly, then via partial matching and finally by position. This leads us to the following explicit function calls:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-34_038cdebe73fd0f91c992a4306723f032">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="cn">NA</span>), <span class="at">size =</span> <span class="dv">20</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">20</span>, <span class="at">min =</span> <span class="dv">0</span>, <span class="at">max =</span> <span class="dv">1</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(x, y, <span class="at">use =</span> <span class="st">"pairwise.complete.obs"</span>, <span class="at">method =</span> <span class="st">"kendall"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="Q">Q3</span></strong>: Explain why the following code fails:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-35_31b17dcf27c29296a6466b10b4168a38">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">modify</span>(<span class="fu">get</span>(<span class="st">"x"</span>), <span class="dv">1</span>) <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error: target of assignment expands to non-language object</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="solved">A</span></strong>: First, let’s define <code>x</code> and recall the definition of <code>modify()</code> from <em>Advanced R</em>:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-36_779eee3443ab03b45a50fc05d33fc94d">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">modify&lt;-</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="cf">function</span>(x, position, value) {</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  x[position] <span class="ot">&lt;-</span> value</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  x</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>R internally transforms the code, and the transformed code reproduces the error above:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-37_164333aa5a279f7629b069c51fe956b8">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get</span>(<span class="st">"x"</span>) <span class="ot">&lt;-</span> <span class="st">`</span><span class="at">modify&lt;-</span><span class="st">`</span>(<span class="fu">get</span>(<span class="st">"x"</span>), <span class="dv">1</span>, <span class="dv">10</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in get("x") &lt;- `modify&lt;-`(get("x"), 1, 10) :</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   target of assignment expands to non-language object</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The error occurs during the assignment because no corresponding replacement function, i.e.&nbsp;<code>get&lt;-</code>, exists for <code>get()</code>. To confirm this, we reproduce the error via the following simplified example.</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-38_065a84c860e0648fe7e7555307d6004e">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get</span>(<span class="st">"x"</span>) <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in get("x") &lt;- 2 :</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   target of assignment expands to non-language object</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="Q">Q4</span></strong>: Create a replacement function that modifies a random location in a vector.</p>
+<p><strong><span class="solved">A</span></strong>: Let’s define <code>random&lt;-</code> like this:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-39_6f64ef91f55e1893a15dccba598ed2be">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">random&lt;-</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="cf">function</span>(x, value) {</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">length</span>(x), <span class="dv">1</span>)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  x[idx] <span class="ot">&lt;-</span> value</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  x</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="Q">Q5</span></strong>: Write your own version of <code>+</code> that pastes its inputs together if they are character vectors but behaves as usual otherwise. In other words, make this code work:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-40_ab7383e5b5aa4bf79ac2de89d277ab3b">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">2</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 3</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="st">"a"</span> <span class="sc">+</span> <span class="st">"b"</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "ab"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="solved">A</span></strong>: To achieve this behaviour, we need to override the <code>+</code> operator. We need to take care to not use the <code>+</code> operator itself inside of the function definition, as this would lead to an undesired infinite recursion. We also add <code>b = 0L</code> as a default value to keep the behaviour of <code>+</code> as a unary operator, i.e.&nbsp;to keep <code>+ 1</code> working and not throwing an error.</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-41_fab61f7901ff8724c81a7b036c5d7233">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">+</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="cf">function</span>(a, <span class="at">b =</span> 0L) {</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.character</span>(a) <span class="sc">&amp;&amp;</span> <span class="fu">is.character</span>(b)) {</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(a, b)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>    base<span class="sc">::</span><span class="st">`</span><span class="at">+</span><span class="st">`</span>(a, b)</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Test</span></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a><span class="sc">+</span><span class="dv">1</span></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">2</span></span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 3</span></span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a><span class="st">"a"</span> <span class="sc">+</span> <span class="st">"b"</span></span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "ab"</span></span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Return back to the original `+` operator</span></span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="st">`</span><span class="at">+</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="Q">Q6</span></strong>: Create a list of all the replacement functions found in the <code>{base}</code> package. Which ones are primitive functions? (Hint use <code>apropos()</code>)</p>
+<p><strong><span class="solved">A</span></strong>: The hint suggests to look for functions with a specific naming pattern: Replacement functions conventionally end on “&lt;-”. We can search for these objects by supplying the regular expression <code>"&lt;-$"</code> to <code>apropos()</code>. <code>apropos()</code> also allows to return the position on the search path (<code>search()</code>) for each of its matches via setting <code>where = TRUE</code>. Finally, we can set <code>mode = function</code> to narrow down our search to relevant objects only. This gives us the following statement to begin with:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-42_fae8308a5551a0c74acaddaa1174b511">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>repls <span class="ot">&lt;-</span> <span class="fu">apropos</span>(<span class="st">"&lt;-"</span>, <span class="at">where =</span> <span class="cn">TRUE</span>, <span class="at">mode =</span> <span class="st">"function"</span>)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(repls, <span class="dv">30</span>)</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     12                     12                     12 </span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        ".rowNamesDF&lt;-"                 "[[&lt;-"      "[[&lt;-.data.frame" </span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     12                     12                     12 </span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          "[[&lt;-.factor" "[[&lt;-.numeric_version"         "[[&lt;-.POSIXlt" </span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     12                     12                     12 </span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                  "[&lt;-"       "[&lt;-.data.frame"             "[&lt;-.Date" </span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     12                     12                     12 </span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         "[&lt;-.difftime"           "[&lt;-.factor"  "[&lt;-.numeric_version" </span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     12                     12                     12 </span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          "[&lt;-.POSIXct"          "[&lt;-.POSIXlt"                  "@&lt;-" </span></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     12                     12                     12 </span></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                   "&lt;-"                  "&lt;&lt;-"                  "$&lt;-" </span></span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     12                     12                     10 </span></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       "$&lt;-.data.frame"          "$&lt;-.POSIXlt"                 "as&lt;-" </span></span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     12                     12                     10 </span></span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;               "attr&lt;-"         "attributes&lt;-"               "body&lt;-" </span></span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     12                     12                     10 </span></span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;               "body&lt;-"              "class&lt;-"             "coerce&lt;-" </span></span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     12                     12                      3 </span></span>
+<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           "colnames&lt;-"            "comment&lt;-"          "contrasts&lt;-"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To restrict <code>repl</code> to names of replacement functions from the <code>{base}</code> package, we select only matches containing the relevant position on the search path.</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-43_170add292aff9367e229e7c261c29cd5">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>repls_base <span class="ot">&lt;-</span> repls[<span class="fu">names</span>(repls) <span class="sc">==</span> <span class="fu">length</span>(<span class="fu">search</span>())]</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>repls_base</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           ".rowNamesDF&lt;-"                    "[[&lt;-"         "[[&lt;-.data.frame" </span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             "[[&lt;-.factor"    "[[&lt;-.numeric_version"            "[[&lt;-.POSIXlt" </span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     "[&lt;-"          "[&lt;-.data.frame"                "[&lt;-.Date" </span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            "[&lt;-.difftime"              "[&lt;-.factor"     "[&lt;-.numeric_version" </span></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             "[&lt;-.POSIXct"             "[&lt;-.POSIXlt"                     "@&lt;-" </span></span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                      "&lt;-"                     "&lt;&lt;-"                     "$&lt;-" </span></span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          "$&lt;-.data.frame"             "$&lt;-.POSIXlt"                  "attr&lt;-" </span></span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            "attributes&lt;-"                  "body&lt;-"                 "class&lt;-" </span></span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;              "colnames&lt;-"               "comment&lt;-"                  "diag&lt;-" </span></span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                   "dim&lt;-"              "dimnames&lt;-"   "dimnames&lt;-.data.frame" </span></span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;              "Encoding&lt;-"           "environment&lt;-"               "formals&lt;-" </span></span>
+<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                 "is.na&lt;-"         "is.na&lt;-.default"          "is.na&lt;-.factor" </span></span>
+<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; "is.na&lt;-.numeric_version"                "length&lt;-"           "length&lt;-.Date" </span></span>
+<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-30"><a href="#cb43-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       "length&lt;-.difftime"         "length&lt;-.factor"        "length&lt;-.POSIXct" </span></span>
+<span id="cb43-31"><a href="#cb43-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-32"><a href="#cb43-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        "length&lt;-.POSIXlt"                "levels&lt;-"         "levels&lt;-.factor" </span></span>
+<span id="cb43-33"><a href="#cb43-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-34"><a href="#cb43-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                  "mode&lt;-"        "mostattributes&lt;-"                 "names&lt;-" </span></span>
+<span id="cb43-35"><a href="#cb43-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-36"><a href="#cb43-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         "names&lt;-.POSIXlt"              "oldClass&lt;-"            "parent.env&lt;-" </span></span>
+<span id="cb43-37"><a href="#cb43-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-38"><a href="#cb43-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            "regmatches&lt;-"             "row.names&lt;-"  "row.names&lt;-.data.frame" </span></span>
+<span id="cb43-39"><a href="#cb43-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-40"><a href="#cb43-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     "row.names&lt;-.default"              "rownames&lt;-"                 "split&lt;-" </span></span>
+<span id="cb43-41"><a href="#cb43-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-42"><a href="#cb43-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      "split&lt;-.data.frame"         "split&lt;-.default"          "storage.mode&lt;-" </span></span>
+<span id="cb43-43"><a href="#cb43-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12                        12                        12 </span></span>
+<span id="cb43-44"><a href="#cb43-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                "substr&lt;-"             "substring&lt;-"                 "units&lt;-" </span></span>
+<span id="cb43-45"><a href="#cb43-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        12 </span></span>
+<span id="cb43-46"><a href="#cb43-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        "units&lt;-.difftime"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To find out which of these functions are primitives, we first search for these functions via <code>mget()</code> and then subset the result using <code>Filter()</code> and <code>is.primitive()</code>.</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-44_8d6c46fe06f0b38b56dc32972d423ba1">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>repls_base_prim <span class="ot">&lt;-</span> <span class="fu">mget</span>(repls_base, <span class="at">envir =</span> <span class="fu">baseenv</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Filter</span>(is.primitive, .) <span class="sc">%&gt;%</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>()</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>repls_base_prim</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [1] "[[&lt;-"           "[&lt;-"            "@&lt;-"            "&lt;-"            </span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [5] "&lt;&lt;-"            "$&lt;-"            "attr&lt;-"         "attributes&lt;-"  </span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [9] "class&lt;-"        "dim&lt;-"          "dimnames&lt;-"     "environment&lt;-" </span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [13] "length&lt;-"       "levels&lt;-"       "names&lt;-"        "oldClass&lt;-"    </span></span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [17] "storage.mode&lt;-"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Overall the <code>{base}</code> package contains 64 replacement functions of which 17 are primitive functions.</p>
+<p><strong><span class="Q">Q7</span></strong>: What are valid names for user-created infix functions?</p>
+<p><strong><span class="solved">A</span></strong>: Let’s cite from the section on <a href="https://adv-r.hadley.nz/functions.html#function-forms">function forms</a> from <em>Advanced R</em>:</p>
+<blockquote class="blockquote">
+<p>… names of infix functions are more flexible than regular R functions: they can contain any sequence of characters except “%”.</p>
+</blockquote>
+<p><strong><span class="Q">Q8</span></strong>: Create an infix <code>xor()</code> operator.</p>
+<p><strong><span class="solved">A</span></strong>: We could create an infix <code>%xor%</code> like this:</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-45_4e11930afabae1a41a61cb0d38d23015">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">%xor%</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="cf">function</span>(a, b) {</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xor</span>(a, b)</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="cn">TRUE</span> <span class="sc">%xor%</span> <span class="cn">TRUE</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a><span class="cn">FALSE</span> <span class="sc">%xor%</span> <span class="cn">TRUE</span></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong><span class="Q">Q9</span></strong>: Create infix versions of the set functions <code>intersect()</code>, <code>union()</code>, and <code>setdiff()</code>. You might call them <code>%n%</code>, <code>%u%</code>, and <code>%/%</code> to match conventions from mathematics.</p>
+<p><strong><span class="solved">A</span></strong>: These infix operators could be defined in the following way. (<code>%/%</code> is chosen instead of <code>%\%</code>, because <code>\</code> serves as an escape character.)</p>
+<div class="cell" data-layout-align="center" data-hash="06_Functions_cache/html/unnamed-chunk-46_fe087e383249fd09cdcfa2d07aaf484e">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">%n%</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="cf">function</span>(a, b) {</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">intersect</span>(a, b)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">%u%</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="cf">function</span>(a, b) {</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">union</span>(a, b)</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">%/%</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="cf">function</span>(a, b) {</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setdiff</span>(a, b)</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"d"</span>)</span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"c"</span>, <span class="st">"d"</span>)</span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>x <span class="sc">%u%</span> y</span>
+<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "a" "b" "d" "c"</span></span>
+<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a>x <span class="sc">%n%</span> y</span>
+<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "a" "d"</span></span>
+<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a>x <span class="sc">%/%</span> y</span>
+<span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "b"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-readr" class="csl-entry" role="listitem">
+Wickham, Hadley, and Jim Hester. 2020. <em>Readr: Read Rectangular Text Data</em>. <a href="https://github.com/tidyverse/readr">https://github.com/tidyverse/readr</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./05_Control_flow.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">5 - Control flow</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./07_Environments.html" class="pagination-link">
+        <span class="nav-page-text">7 Environments</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

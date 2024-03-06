@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Solutions to the Exercises in Hadley Wickham’s book ‘Advanced R’.">
+
+<title>Advanced R Solutions - Chapter abstracts</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./02_Names_and_values.html" rel="next">
+<link href="./00_02_Preface.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./00_03_Abstracts.html">Chapter abstracts</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Advanced R Solutions</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./00_02_Preface.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./00_03_Abstracts.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Chapter abstracts</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Foundations</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_Names_and_values.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2 - Names and values</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_Vectors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3 - Vectors</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_Subsetting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">4 - Subsetting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_Control_flow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">5 - Control flow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_Functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">6 - Functions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_Environments.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 Environments</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08_Conditions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">8 - Conditions</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">Functional programming</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09_Functionals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">9 - Functionals</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10_Function_factories.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 - Function factories</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11_Function_operators.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 - Function operators</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text">Object-oriented programming</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./13_S3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">13 - S3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./14_R6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">14 - R6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./15_S4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">15 - S4</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text">Metaprogramming</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./18_Expressions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">18 - Expressions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./19_Quasiquotation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">19 - Quasiquotation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./20_Evaluation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">20 - Evaluation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./21_Translating_R_code.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">21 - Translating R code</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
+ <span class="menu-text">Techniques</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./23_Measuring_performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">23 - Measuring performance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./24_Improving_performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">24 - Improving performance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./25_Rewriting_R_code_in_Cpp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">25 - Rewriting R code in C++</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#names-and-values" id="toc-names-and-values" class="nav-link active" data-scroll-target="#names-and-values">2. Names and values</a></li>
+  <li><a href="#vectors" id="toc-vectors" class="nav-link" data-scroll-target="#vectors">3. Vectors</a></li>
+  <li><a href="#subsetting" id="toc-subsetting" class="nav-link" data-scroll-target="#subsetting">4. Subsetting</a></li>
+  <li><a href="#control-flow" id="toc-control-flow" class="nav-link" data-scroll-target="#control-flow">5. Control Flow</a></li>
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">6. Functions</a></li>
+  <li><a href="#environments" id="toc-environments" class="nav-link" data-scroll-target="#environments">7. Environments</a></li>
+  <li><a href="#conditions" id="toc-conditions" class="nav-link" data-scroll-target="#conditions">8. Conditions</a></li>
+  <li><a href="#functionals" id="toc-functionals" class="nav-link" data-scroll-target="#functionals">9. Functionals</a></li>
+  <li><a href="#function-factories" id="toc-function-factories" class="nav-link" data-scroll-target="#function-factories">10. Function factories</a></li>
+  <li><a href="#function-operators" id="toc-function-operators" class="nav-link" data-scroll-target="#function-operators">11. Function operators</a></li>
+  <li><a href="#s3" id="toc-s3" class="nav-link" data-scroll-target="#s3">13. S3</a></li>
+  <li><a href="#r6" id="toc-r6" class="nav-link" data-scroll-target="#r6">14. R6</a></li>
+  <li><a href="#s4" id="toc-s4" class="nav-link" data-scroll-target="#s4">15. S4</a></li>
+  <li><a href="#expressions" id="toc-expressions" class="nav-link" data-scroll-target="#expressions">18. Expressions</a></li>
+  <li><a href="#quasiquotation" id="toc-quasiquotation" class="nav-link" data-scroll-target="#quasiquotation">19. Quasiquotation</a></li>
+  <li><a href="#evaluation" id="toc-evaluation" class="nav-link" data-scroll-target="#evaluation">20. Evaluation</a></li>
+  <li><a href="#translating-r-code" id="toc-translating-r-code" class="nav-link" data-scroll-target="#translating-r-code">21. Translating R code</a></li>
+  <li><a href="#measuring-performance" id="toc-measuring-performance" class="nav-link" data-scroll-target="#measuring-performance">23. Measuring performance</a></li>
+  <li><a href="#improving-performance" id="toc-improving-performance" class="nav-link" data-scroll-target="#improving-performance">24. Improving performance</a></li>
+  <li><a href="#rewriting-r-code-in-c" id="toc-rewriting-r-code-in-c" class="nav-link" data-scroll-target="#rewriting-r-code-in-c">25. Rewriting R code in C++</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Chapter abstracts</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="names-and-values" class="level2">
+<h2 class="anchored" data-anchor-id="names-and-values">2. Names and values</h2>
+<p>The second chapter explains the distinction between an object and its name. This distinction is important, as it helps:</p>
+<ul>
+<li>More accurately predicting the performance and memory usage of R code.</li>
+<li>Writeing faster code by avoiding accidental copies, a major source of slow code.</li>
+<li>Better understanding R’s functional programming tools.</li>
+</ul>
+<p>In section “Binding basics”, we introduce the distinction between names and values, and how bindings, or references, between a name and a value are created. Then, in “Copy-on-modify”, we learn when R makes a copy and how to use tracemem to figure out when a copy actually occurs. We also learn about the implications for different R objects. In “Object size” we explore how much memory an object occupies. “Modify-in-place” describes two exceptions to copy-on-modify: environments and values with a single name are actually modified in place. Lastly, we conclude this chapter with a discussion of the garbage collector, in “Unbinding and the garbage collector”.</p>
+</section>
+<section id="vectors" class="level2">
+<h2 class="anchored" data-anchor-id="vectors">3. Vectors</h2>
+<p>The third chapter discusses the most important family of data types in base R: vectors. It won’t cover individual vector types in too much detail, but it will show how all the types fit together as a whole.</p>
+<p>Vectors come in two flavours: atomic vectors and lists. We start with “Atomic vectors”, which are R’s simplest data structures. For atomic vectors, all elements must have the same type. Then, we take a small detour to discuss “Attributes”, R’s flexible metadata specification. “S3 atomic vectors” discusses the important vector types that are built by combining atomic vectors with special attributes. These include factors, dates, date-times, and durations. Next, we dive into “Lists”. Lists are very similar to atomic vectors. However, an element of a list can be any data type, including another list. This makes them suitable for representing hierarchical data. “Data frames and tibbles” teaches you about data frames and tibbles, which are used to represent rectangular data. They combine the behaviour of lists and matrices to make a structure ideally suited for the needs of statistical data. To finish up this chapter, we briefly talk about one final important data structure that’s closely related to vectors: “NULL”.</p>
+</section>
+<section id="subsetting" class="level2">
+<h2 class="anchored" data-anchor-id="subsetting">4. Subsetting</h2>
+<p>In chapter 4 we discuss R’s fast and powerful subsetting operators. Mastering them allows you to succinctly perform complex operations in a way that few other languages can match. Subsetting in R is easy to learn but hard to master because you need to internalise a number of interrelated concepts.</p>
+<p>“Selecting multiple elements” starts by teaching you about [. You’ll learn the six ways to subset atomic vectors. You’ll then learn how those six ways act when used to subset lists, matrices, and data frames. “Selecting a single element” expands your knowledge of subsetting operators to include [[ and $ and focuses on the important principles of simplifying versus preserving. “Applications” leads you through eight important, but not obvious, applications of subsetting to solve problems that you often encounter in data analysis.</p>
+</section>
+<section id="control-flow" class="level2">
+<h2 class="anchored" data-anchor-id="control-flow">5. Control Flow</h2>
+<p>In chapter 5 you’ll learn about the two primary tools of control flow: choices and loops. Choices, like if statements and switch() calls, allow you to run different code depending on the input. Loops, like for and while, allow you to repeatedly run code, typically with changing options.</p>
+<p>We’d expect that you’re already familiar with the basics of these functions so we’ll briefly cover some technical details and then introduce some useful, but lesser known, features. The condition system (messages, warnings, and errors), which you’ll learn about in Chapter 8, also provides non-local control flow.</p>
+<p>In “Choices” we dive into the details of the if statement, and then discuss the close relatives ifelse() and switch(). “Loops” starts off by reminding you of the basic structure of the for loop in R, discusses some common pitfalls, and then talks about the related while and repeat statements.</p>
+</section>
+<section id="functions" class="level2">
+<h2 class="anchored" data-anchor-id="functions">6. Functions</h2>
+<p>In chapter 6, you’ll learn how to turn your informal, working knowledge about functions into more rigorous, theoretical understanding. The tricks and techniques you will learn along the way will be important for understanding the more advanced topics discussed later in the book.</p>
+<p>“Function fundamentals” describes the basics of creating a function, the three main components of a function, and the exception to many function rules: primitive functions (which are implemented in C, not R). “Lexical scoping” shows you how R finds the value associated with a given name, i.e.&nbsp;the rules of lexical scoping. “Lazy evaluation” is devoted to an important property of function arguments: they are only evaluated when used for the first time. “… (dot-dot-dot)” discusses the special … argument, which allows you to pass on extra arguments to another function. “Exiting a function” discusses the two primary ways that a function can exit, and how to define an exit handler, code that is run on exit, regardless of what triggers it. “Function forms” shows you the various ways in which R disguises ordinary function calls, and how you can use the standard prefix form to better understand what’s going on.</p>
+</section>
+<section id="environments" class="level2">
+<h2 class="anchored" data-anchor-id="environments">7. Environments</h2>
+<p>In chapter 7 you will learn about environments, the data structure that powers scoping. This chapter dives deep into environments, describing their structure in depth, and using them to improve your understanding of the four scoping rules described in the “Lexical scoping” section of the functions chapter. Understanding environments is not necessary for day-to-day use of R. But they are important to understand because they power many important R features like lexical scoping, namespaces, and R6 classes, and interact with evaluation to give you powerful tools for making domain specific languages, like dplyr and ggplot2.</p>
+<p>“Environment basics” introduces you to the basic properties of an environment and shows you how to create your own. “Recursing over environments” provides a function template for computing with environments, illustrating the idea with a useful function. “Special environments” describes environments used for special purposes: for packages, within functions, for namespaces, and for function execution. “Call stacks” explains the last important environment: the caller environment. This requires you to learn about the call stack, that describes how a function was called. You’ll have seen the call stack if you’ve ever called traceback() to aid debugging. “As data structures” briefly discusses three places where environments are useful data structures for solving other problems.</p>
+</section>
+<section id="conditions" class="level2">
+<h2 class="anchored" data-anchor-id="conditions">8. Conditions</h2>
+<p>In chapter 8 we will discuss R’s condition system, which provides a paired set of tools that allow the author of a function to indicate that something unusual is happening, and the user of that function to deal with it. The function author signals conditions with functions like stop(), warning(), and message(), then the function user can handle them with functions like tryCatch() and withCallingHandlers(). Understanding the condition system is important because you’ll often need to play both roles: signalling conditions from the functions you create, and handle conditions signalled by the functions you call.</p>
+<p>R’s condition system is based on ideas from Common Lisp. Like R’s approach to object-oriented programming, it is rather different to currently popular programming languages so it is easy to misunderstand, and there has been relatively little written about how to use it effectively. Historically, this has meant that few people have taken full advantage of its power. The goal of this chapter is to remedy that situation. Here you will learn about the big ideas of R’s condition system, as well as learning a bunch of practical tools that will make your code stronger.</p>
+<p>“Signalling conditions” introduces the basic tools for signalling conditions, and discusses when it is appropriate to use each type. “Handling conditions” introduces the condition object, and the two fundamental tools of condition handling: tryCatch() for error conditions, and withCallingHandlers() for everything else. “Custom conditions” shows you how to extend the built-in condition objects to store useful data that condition handlers can use to make more informed decisions. “Applications” closes out the chapter with a grab bag of practical applications based on the low-level tools found in earlier sections.</p>
+</section>
+<section id="functionals" class="level2">
+<h2 class="anchored" data-anchor-id="functionals">9. Functionals</h2>
+<p>In chapter 9 we’ll learn about functionals. A functional is a function that takes a function as an input and returns a vector as output. A common use of functionals is as an alternative to for loops. As Loops do not convey what should be done with the results, it’s better to use a functional. Each functional is tailored for a specific task, so when you recognise the functional you immediately know why it’s being used.</p>
+<p>“My first functional: map()” introduces your first functional: purrr::map(). “Map variants” teaches you about 18 (!!) important variants of purrr::map(). Fortunately, their orthogonal design makes them easy to learn, remember, and master. “Predicate functionals” teaches you about predicates: functions that return a single TRUE or FALSE, and the family of functionals that use them to solve common problems. “Base functionals” reviews some functionals in base R that are not members of the map, reduce, or predicate families.</p>
+</section>
+<section id="function-factories" class="level2">
+<h2 class="anchored" data-anchor-id="function-factories">10. Function factories</h2>
+<p>In chapter 10 we’ll discuss function factories. A function factory is a function that makes functions.</p>
+<p>Of the three main functional programming tools (functionals, function factories, and function operators), function factories are the least used. Generally, they don’t tend to reduce overall code complexity but instead partition complexity into more easily digested chunks. Function factories are also an important building block for the very useful function operators, which you’ll learn about in Chapter 11 (“Function operators”).</p>
+<p>“Factory fundamentals” begins the chapter with an explanation of how function factories work, pulling together ideas from scoping and environments. You’ll also see how function factories can be used to implement a memory for functions, allowing data to persist across calls. “Graphical factories” illustrates the use of function factories with examples from ggplot2. You’ll see two examples of how ggplot2 works with user supplied function factories, and one example of where ggplot2 uses a function factory internally. “Statistical factories” uses function factories to tackle three challenges from statistics: understanding the Box-Cox transform, solving maximum likelihood problems, and drawing bootstrap resamples. “Function factories + functionals” shows how you can combine function factories and functionals to rapidly generate a family of functions from data.</p>
+</section>
+<section id="function-operators" class="level2">
+<h2 class="anchored" data-anchor-id="function-operators">11. Function operators</h2>
+<p>In chapter 11, you’ll learn about function operators. A function operator is a function that takes one (or more) functions as input and returns a function as output.</p>
+<p>Function operators are closely related to function factories; indeed they’re just a function factory that takes a function as input. Like factories, there’s nothing you can’t do without them, but they often allow you to factor out complexity in order to make your code more readable and reusable. Function operators are typically paired with functionals. If you’re using a for-loop, there’s rarely a reason to use a function operator, as it will make your code more complex for little gain. If you’re familiar with Python, decorators is just another name for function operators.</p>
+<p>“Existing function operators” introduces you to two extremely useful existing function operators, and shows you how to use them to solve real problems. “Case study: Creating your own function operators” works through a problem amenable to solution with function operators: downloading many web pages.</p>
+</section>
+<section id="s3" class="level2">
+<h2 class="anchored" data-anchor-id="s3">13. S3</h2>
+<p>In chapter 13 we’ll learn about R’s first and simplest OO system: S3. S3 is informal and ad hoc, but there is a certain elegance in its minimalism: you can’t take away any part of it and still have a useful OO system. For these reasons, you should use it, unless you have a compelling reason to do otherwise. S3 is the only OO system used in the base and stats packages, and it’s the most commonly used system in CRAN packages.</p>
+<p>“Basics” gives a rapid overview of all the main components of S3: classes, generics, and methods. You’ll also learn about sloop::s3_dispatch(), which we’ll use throughout the chapter to explore how S3 works. Then, “Classes” goes into the details of creating a new S3 class, including the three functions that should accompany most classes: a constructor, a helper, and a validator. Further, “Generics and methods” describes how S3 generics and methods work, including the basics of method dispatch. “Object styles” discusses the four main styles of S3 objects: vector, record, data frame, and scalar. “Inheritance” demonstrates how inheritance works in S3, and shows you what you need to make a class “subclassable”. “Dispatch details” concludes the chapter with a discussion of the finer details of method dispatch including base types, internal generics, group generics, and double dispatch.</p>
+</section>
+<section id="r6" class="level2">
+<h2 class="anchored" data-anchor-id="r6">14. R6</h2>
+<p>Chapter 14 describes the R6 OOP system which is more like OOP in other languages. It uses the encapsulated OOP paradigm, which means that methods belong to objects, not generics, and you call them like object$method(). Also, R6 objects are mutable, which means that they are modified in place, and hence have reference semantics.</p>
+<p>If you’ve learned OOP in another programming language, it’s likely that R6 will feel very natural, and you’ll be inclined to prefer it over S3. Resist the temptation to follow the path of least resistance: in most cases R6 will lead you to non-idiomatic R code.</p>
+<p>“Classes and methods” introduces R6::R6Class(), the one function that you need to know to create R6 classes. You’ll learn about the constructor method, $new(), which allows you to create R6 objects, as well as other important methods like $initialize() and $print(). “Controlling access” discusses the access mechanisms of R6: private and active fields. Together, these allow you to hide data from the user, or expose private data for reading but not writing. “Reference semantics” explores the consequences of R6’s reference semantics. You’ll learn about the use of finalizers to automatically clean up any operations performed in the initializer, and a common gotcha if you use an R6 object as a field in another R6 object. “Why R6?” describes why we cover R6, rather than the base RC system.</p>
+</section>
+<section id="s4" class="level2">
+<h2 class="anchored" data-anchor-id="s4">15. S4</h2>
+<p>In chapter 15 we’ll learn about the S4 OO system, which provides a formal approach to functional OOP. The underlying ideas are similar to S3, but the implementation is much stricter and makes use of specialised functions for creating classes (setClass()), generics (setGeneric()), and methods (setMethod()). Additionally, S4 provides both multiple inheritance (i.e.&nbsp;a class can have multiple parents) and multiple dispatch (i.e.&nbsp;method dispatch can use the class of multiple arguments).</p>
+<p>An important new component of S4 is the slot, a named component of the object that is accessed using the specialised subsetting operator @ (pronounced at). The set of slots, and their classes, forms an important part of the definition of an S4 class.</p>
+<p>“Basics” gives a quick overview of the main components of S4: classes, generics, and methods. “Classes” dives into the details of S4 classes, including prototypes, constructors, helpers, and validators. “Generics and methods” shows you how to create new S4 generics, and how to supply those generics with methods. You’ll also learn about accessor functions which are designed to allow users to safely inspect and modify object slots. “Method dispatch” dives into the full details of method dispatch in S4. The basic idea is simple, then it rapidly gets more complex once multiple inheritance and multiple dispatch are combined. “S4 and S3” discusses the interaction between S4 and S3, showing you how to use them together.</p>
+</section>
+<section id="expressions" class="level2">
+<h2 class="anchored" data-anchor-id="expressions">18. Expressions</h2>
+<p>The focus of chapter 18 chapter are the data structures that underlie expressions. Mastering this knowledge will allow you to inspect and modify captured code, and to generate code with code. We’ll come back to expr() in Chapter 19 (“Quasiquotation”), and to eval() in Chapter 20 (“Evaluation”).</p>
+<p>“Abstract syntax trees” introduces the idea of the abstract syntax tree (AST), and reveals the tree like structure that underlies all R code. “Expressions” dives into the details of the data structures that underpin the AST: constants, symbols, and calls, which are collectively known as expressions. “Parsing and grammar” covers parsing, the act of converting the linear sequence of character in code into the AST, and uses that idea to explore some details of R’s grammar. “Walking AST with recursive functions” shows you how you can use recursive functions to compute on the language, writing functions that compute with expressions. “Specialised data structures” circles back to three more specialised data structures: pairlists, missing arguments, and expression vectors.</p>
+</section>
+<section id="quasiquotation" class="level2">
+<h2 class="anchored" data-anchor-id="quasiquotation">19. Quasiquotation</h2>
+<p>In chapter 19 you will learn about quasiquotation. Quasiquotation is one of the three pillars of tidy evaluation. You’ll learn about the other two (quosures and the data mask) in Chapter 20 (“Evaluation”). When used alone, quasiquotation is most useful for programming, particularly for generating code. But when it’s combined with the other techniques, tidy evaluation becomes a powerful tool for data analysis.</p>
+<p>“Motivation” motivates the development of quasiquotation with a function, cement(), that works like paste() but automatically quotes its arguments so that you don’t have to. “Quoting” gives you the tools to quote expressions, whether they come from you or the user, or whether you use rlang or base R tools. “Unquoting” introduces the biggest difference between rlang quoting functions and base quoting function: unquoting with !! and !!!. “… (dot-dot-dot)” explores another place that you can use !!!, functions that take …. It also introduces the special := operator, which allows you to dynamically change argument names. “Case studies” shows a few practical uses of quoting to solve problems that naturally require some code generation.</p>
+</section>
+<section id="evaluation" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation">20. Evaluation</h2>
+<p>Chapter 20 discusses the topic evaluation. The user-facing inverse of quotation is unquotation: it gives the user the ability to selectively evaluate parts of an otherwise quoted argument. The developer-facing complement of quotation is evaluation: this gives the developer the ability to evaluate quoted expressions in custom environments to achieve specific goals.</p>
+<p>“Evaluation basics” discusses the basics of evaluation using eval(), and shows how you can use it to implement key functions like local() and source(). “Quosures” introduces a new data structure, the quosure, which combines an expression with an environment. You’ll learn how to capture quosures from promises, and evaluate them using rlang::eval_tidy(). “Data masks” extends evaluation with the data mask, which makes it trivial to intermingle symbols bound in an environment with variables found in a data frame. “Using tidy evaluation” shows how to use tidy evaluation in practice, focussing on the common pattern of quoting and unquoting, and how to handle ambiguity with pronouns. “Base evaluation” circles back to evaluation in base R, discusses some of the downsides, and shows how to use quasiquotation and evaluation to wrap functions that use NSE.</p>
+</section>
+<section id="translating-r-code" class="level2">
+<h2 class="anchored" data-anchor-id="translating-r-code">21. Translating R code</h2>
+<p>Chapter 20 discusses the creation of domain specific languages. The combination of first-class environments, lexical scoping, and metaprogramming gives us a powerful toolkit for translating R code into other languages. One fully-fledged example of this idea is dbplyr, which powers the database backends for dplyr, allowing you to express data manipulation in R and automatically translate it into SQL. You can see the key idea in translate_sql() which takes R code and returns the equivalent SQL.</p>
+<p>Translating R to SQL is complex because of the many idiosyncrasies of SQL dialects, so here I’ll develop two simple, but useful, domain specific languages (DSL): one to generate HTML, and the other to generate mathematical equations in LaTeX.</p>
+<p>In “HTML” we create a DSL for generating HTML, using quasiquotation and purrr to generate a function for each HTML tag, then tidy evaluation to easily access them. In “LaTeX” we transform mathematically R code into its LaTeX equivalent using a combination of tidy evaluation and expression walking.</p>
+</section>
+<section id="measuring-performance" class="level2">
+<h2 class="anchored" data-anchor-id="measuring-performance">23. Measuring performance</h2>
+<p>In chapter 23 we learn about measuring performance.</p>
+<p>Before you can make your code faster, you first need to figure out what’s making it slow. This sounds easy, but it’s not. Even experienced programmers have a hard time identifying bottlenecks in their code. So instead of relying on your intuition, you should profile your code: measure the run-time of each line of code using realistic inputs.</p>
+<p>Once you’ve identified bottlenecks you’ll need to carefully experiment with alternatives to find faster code that is still equivalent. In Chapter 24 (“Improving performance”) you’ll learn a bunch of ways to speed up code, but first you need to learn how to microbenchmark so that you can precisely measure the difference in performance.</p>
+<p>“Profiling” shows you how to use profiling tools to dig into exactly what is making code slow. Section “Microbenchmarking” shows how to use microbenchmarking to explore alternative implementations and figure out exactly which one is fastest.</p>
+</section>
+<section id="improving-performance" class="level2">
+<h2 class="anchored" data-anchor-id="improving-performance">24. Improving performance</h2>
+<p>Chapter 24 teaches how to improve performance. Once you’ve used profiling to identify a bottleneck, you need to make it faster. It’s difficult to provide general advice on improving performance, but in this chapter we’ll see four techniques that can be applied in many situations and also a general strategy for performance optimisation that helps ensure that your faster code is still correct. Also it is easy to get caught up in trying to remove all bottlenecks. Don’t! Be pragmatic: don’t spend hours of your time to save seconds of computer time.</p>
+<p>“Checking for existing solutions” reminds you to look for existing solutions. “Doing as little as possible” emphasises the importance of being lazy: often the easiest way to make a function faster is to let it to do less work. “Vectorise” concisely defines vectorisation, and shows you how to make the most of built-in functions. “Avoiding copies” discusses the performance perils of copying data. “Case study: t-test” pulls all the pieces together into a case study showing how to speed up repeated t-tests by about a thousand times. “Other techniques” finishes the chapter with pointers to more resources that will help you write fast code.</p>
+</section>
+<section id="rewriting-r-code-in-c" class="level2">
+<h2 class="anchored" data-anchor-id="rewriting-r-code-in-c">25. Rewriting R code in C++</h2>
+<p>Chapter 25 shows how to improve the performance by rewriting R code in C++ via the cpp11 package.</p>
+<p>cpp11 simplifies connecting R and C++. While it is possible to write C or Fortran code for use in R, it will be more challenging by comparison. cpp11 provides a clean, approachable API that lets you write high-performance code, that makes interfacing with R’s C API and C++ code safer.</p>
+<p>Typical bottlenecks that C++ can address include:</p>
+<ul>
+<li>Loops that cannot be easily vectorised because subsequent iterations depend on previous ones.</li>
+<li>Recursive functions, or problems which involve calling functions millions of times. The overhead of calling a function in C++ is much lower than in R.</li>
+<li>Problems that require advanced data structures and algorithms that R does not provide. Through the standard template library (STL), C++ has efficient implementations of many important data structures, from ordered maps to double-ended queues.</li>
+</ul>
+<p>“Getting started with C++” teaches you how to write C++ by converting simple R functions to their C++ equivalents. You’ll learn how C++ differs from R, and how strings and numbers are translated between languages. “Missing values” teaches you how to work with R’s missing values in C++. “Standard Template Library” shows you how to use some of the most important data structures and algorithms from the standard template library, or STL, built-in to C++.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./00_02_Preface.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Preface</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./02_Names_and_values.html" class="pagination-link">
+        <span class="nav-page-text">2 - Names and values</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -1,0 +1,235 @@
+```{r ch11_01, include = FALSE}
+source("common.R")
+```
+
+# 11 - Function operators {-}
+
+## Prerequisites {-}
+
+Also in the third chapter on functional programming, we make relatively frequent use of the {purrr} package.
+
+```{r ch11_02, message = FALSE}
+library(purrr)
+```
+
+## Existing function operators
+
+__[Q1]{.Q}__: Base R provides a function operator in the form of `Vectorize()`. What does it do? When might you use it?
+
+__[A]{.solved}__: In R a lot of functions are "vectorised". Vectorised has two meanings. First, it means (broadly) that a function inputs a vector or vectors and does something to each element. Secondly, it usually implies that these operations are implemented in a compiled language such as C or Fortran, so that the implementation is very fast.
+
+However, despite what the function's name implies, `Vectorize()` is not able to speed up the provided function. It rather changes the input format of the supplied arguments (`vectorize.args`), so that they can be iterated over.
+
+Let's take a look at an example from the documentation:
+
+```{r ch11_03, eval=FALSE}
+vrep <- Vectorize(rep.int)
+vrep
+#> function (x, times)
+#> {
+#>   args <- lapply(as.list(match.call())[-1L], eval, parent.frame())
+#>   names <- if (is.null(names(args)))
+#>     character(length(args))
+#>   else names(args)
+#>   dovec <- names %in% vectorize.args
+#>   do.call("mapply", c(FUN = FUN, args[dovec],
+#>                       MoreArgs = list(args[!dovec]),
+#>                       SIMPLIFY = SIMPLIFY, USE.NAMES = USE.NAMES))
+#> }
+#> <environment: 0x558902db65d0>
+```
+
+<!-- output above hardcoded to avoid margin-overflow in pdf -->
+
+```{r ch11_04, include=FALSE}
+vrep <- Vectorize(rep.int)
+vrep
+```
+
+```{r ch11_05}
+# Application
+vrep(1:2, 3:4)
+```
+
+`Vectorize()` provides a convenient and concise notation to iterate over multiple arguments but has some major drawbacks that mean you generally shouldn't use it. See <https://www.jimhester.com/post/2018-04-12-vectorize/> for more details.
+
+__[Q2]{.Q}__: Read the source code for `possibly()`. How does it work?
+
+__[A]{.solved}__: `possibly()` modifies functions to return a specified default value (`otherwise`) in case of an error and to suppress any error messages (`quiet = TRUE`).
+
+While reading the source code, we notice that `possibly()` internally uses `purrr::as_mapper()`. This enables users to supply not only functions, but also formulas or atomics via the same syntax as known from other functions in the `{purrr}` package. Besides this, the new default value (`otherwise`) gets evaluated once to make it (almost) immutable.
+
+```{r ch11_06}
+possibly
+```
+
+The main functionality of `possibly()` is provided by `base::tryCatch()`. In this part the supplied function (`.f`) gets wrapped and the error and interrupt handling are specified.
+
+__[Q3]{.Q}__: Read the source code for `safely()`. How does it work?
+
+__[A]{.solved}__: `safely()` modifies functions to return a list, containing the elements `result` and `error`. It works in a similar fashion as `possibly()` and besides using `as_mapper()`, `safely()` also provides the `otherwise` and `quiet` arguments. However, in order to provide the result and the error in a consistent way, the `tryCatch()` part of the implementation returns a list with similar structure for both cases. In the case of successful evaluation `error` equals `NULL` and in case of an error `result` equals `otherwise`, which is `NULL` by default.
+
+As the `tryCatch()` part is hidden in the internal `purrr:::capture_output()` function, we provide it here in addition to `safely()`:
+
+```{r ch11_07}
+safely
+
+purrr:::capture_error
+```
+
+Take a look at *Advanced R* or the documentation of `safely()` to see how you can take advantage of this behaviour, e.g. when fitting many models.
+
+## Case study: Creating your own function operators
+
+__[Q1]{.Q}__: Weigh the pros and cons of `download.file %>% dot_every(10) %>% delay_by(0.1)` versus `download.file %>% delay_by(0.1) %>% dot_every(10)`.
+
+__[A]{.solved}__: Both commands will print a dot every 10 downloads and will take the same amount of time to run, so the differences may seem quite subtle.
+
+In the first case, first the dot functionality is added to `download.file()`. Then the delay is added to this already tweaked function. This implies, that the printing of the dot will also be delayed, and the first dot will be printed as soon as the download for the 10th URL starts.
+
+In the latter case the delay is added first and the dot-functionality is wrapped around it. This order will print the first dot immediately after the 9th download is finished, then the short delay occurs before the 10th download actually starts.
+
+__[Q2]{.Q}__: Should you memoise `file.download()`? Why or why not?
+
+__[A]{.solved}__: Memoising `file.download()` will only work if the files are immutable, i.e. if the file at a given URL is always the same. There's no point memoising unless this is true. Even if this is true, however, memoise has to store the results in memory, and large files will potentially take up a lot of memory.
+
+This implies that it's probably not beneficial to memoise `file.download()` in most cases. The only exception is if you are downloading small files many times, and the file at a given URL is guaranteed not to change.
+
+__[Q3]{.Q}__: Create a function operator that reports whenever a file is created or deleted in the working directory, using `dir()` and `setdiff()`. What other global function effects might you want to track?
+
+__[A]{.solved}__: We start with a function that reports the difference between two vectors containing file names:
+
+```{r ch11_08}
+dir_compare <- function(old, new) {
+  if (setequal(old, new)) {
+    return()
+  }
+
+  added <- setdiff(new, old)
+  removed <- setdiff(old, new)
+
+  changes <- c(
+    if (length(added) > 0) paste0(" * '", added, "' was added"),
+    if (length(removed) > 0) {
+      paste0(
+        " * '", removed,
+        "' was removed"
+      )
+    }
+  )
+  message(paste(changes, collapse = "\n"))
+}
+
+dir_compare(c("x", "y"), c("x", "y"))
+dir_compare(c("x", "y"), c("x", "a"))
+```
+
+Then we wrap it up in a function operator
+
+```{r ch11_09}
+track_dir <- function(f) {
+  force(f)
+  function(...) {
+    dir_old <- dir()
+    on.exit(dir_compare(dir_old, dir()), add = TRUE)
+
+    f(...)
+  }
+}
+```
+
+And try it out by creating wrappers around `file.create()` and `file.remove()`:
+
+```{r ch11_10}
+file_create <- track_dir(file.create)
+file_remove <- track_dir(file.remove)
+
+file_create("delete_me")
+file_remove("delete_me")
+```
+
+To create a more serious version of `track_dir()` one might provide optionality to set the `full.names` and `recursive` arguments of `dir()` to `TRUE`. This would enable to also track the creation/deletion of hidden files and files in folders contained in the working directory.
+
+Other global effects that might be worth tracking include changes regarding:
+
+- the search path and possibly introduced `conflicts()`
+- `options()` and `par()` which modify global settings
+- the path of the working directory
+- environment variables
+
+__[Q4]{.Q}__: Write a function operator that logs a timestamp and message to a file every time a function is run.
+
+__[A]{.solved}__: Our `logger()` function operator takes a function and a file path as input. One timestamp is written to the file under `log_path` when we call `logger()` and another timestamp is written to the same file each time the new function gets called.
+
+```{r ch11_11}
+append_line <- function(path, ...) {
+  cat(..., "\n", sep = "", file = path, append = TRUE)
+}
+
+logger <- function(f, log_path) {
+  force(f)
+  force(log_path)
+
+  append_line(log_path, "created at: ", as.character(Sys.time()))
+  function(...) {
+    append_line(log_path, "called at: ", as.character(Sys.time()))
+    f(...)
+  }
+}
+```
+
+Now, let's check if our `logger()` works as intended and apply it to the `mean()` function:
+
+```{r ch11_12}
+log_path <- tempfile()
+mean2 <- logger(mean, log_path)
+Sys.sleep(5)
+mean2(1:4)
+Sys.sleep(1)
+mean2(1:4)
+
+readLines(log_path)
+```
+
+__[Q5]{.Q}__: Modify `delay_by()` so that instead of delaying by a fixed amount of time, it ensures that a certain amount of time has elapsed since the function was last called. That is, if you called `g <- delay_by(1, f); g(); Sys.sleep(2); g()` there shouldn't be an extra delay.
+
+__[A]{.solved}__: `delay_by()` was defined in *Advanced R* as:
+
+```{r ch11_13}
+delay_by <- function(f, amount) {
+  force(f)
+  force(amount)
+
+  function(...) {
+    Sys.sleep(amount)
+    f(...)
+  }
+}
+```
+
+To ensure that the function created by `delay_by()` waits that a certain amount of time has passed since its last execution, we incorporate three little changes into our new `delay_atleast()` as indicated in the corresponding comments below.
+
+```{r ch11_14, eval = FALSE}
+delay_atleast <- function(amount, f) {
+  force(f)
+  force(amount)
+
+  # Store the last time the function was run
+  last_time <- NULL
+
+  # Return modified "delay-aware" function
+  function(...) {
+    if (!is.null(last_time)) {
+      wait <- (last_time - Sys.time()) + amount
+      if (wait > 0) {
+        Sys.sleep(wait)
+      }
+    }
+
+    # Update the time after the function has finished
+    on.exit(last_time <<- Sys.time())
+
+    f(...)
+  }
+}
+```
